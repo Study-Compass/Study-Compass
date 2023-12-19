@@ -9,6 +9,23 @@ import asyncio
 import json
 import httpx
 from datetime import datetime
+from datetime import datetime
+
+
+def format_time(time):
+    print(time)
+    starttime, endtime = [t.strip() for t in time.split('-')]
+
+    def convert_to_military_time(time_str):
+        # Parse the time string using the specified format
+        time_obj = datetime.strptime(time_str, "%I:%M %p")
+        
+        # Convert the time to military format
+        military_time = time_obj.strftime("%H:%M")
+
+        return military_time
+    
+    return convert_to_military_time(starttime), convert_to_military_time(endtime)
 
 # function that returns a list of course ids for a given term, searches the sis catalog search, which has each course id as an option value in the selct
 async def get_course_ids(term):
@@ -26,31 +43,79 @@ async def get_all_courses(term, id):
     async with httpx.AsyncClient() as client:
         response = await client.get(url)
         soup = BeautifulSoup(response.content, 'html.parser')
-        course_links = [link.find('a') for link in soup.findAll('td', class_='nttitle')]
+        course_links = [link.find('a') for link in soup.find_all('td', class_='nttitle')]
         for link in course_links:
             if link is not None and link.has_attr('href'):
                 yield f"https://sis.rpi.edu{link['href']}"
 
-async def get_course_info(url):
+async def parse_course_info(url, classroom_info):
     async with httpx.AsyncClient() as client:
         response = await client.get(url)
         soup = BeautifulSoup(response.content, 'html.parser')
-        course_info = soup.find('table', class_='datadisplaytable')
-        course_title = course_info.find('caption').text
-        course_info_rows = course_info.findAll('tr')
-        course_info_dict = {}
-        for row in course_info_rows:
-            row_title = row.find('th').text
-            row_data = row.find('td').text
-            course_info_dict[row_title] = row_data
-        course_info_dict['title'] = course_title
-        return course_info_dict
+        course_name = soup.find('th', class_='ddtitle').text.split('-')[2].strip()
+        sections = soup.find_all('table', summary='This table lists the scheduled meeting times and assigned instructors for this class..')
+        for section in sections:
+            rows = section.find_all('tr')
+            for row in rows[1:]:
+                print(f'row: {row}')
+            for row in rows[1:]:
+                cells = row.find_all('td')
+                classroom = cells[3].text.strip()
+                time = format_time(cells[1].text.strip())
+                days = list(cells[2].text.strip())
+                if classroom not in classroom_info:
+                    classroom_info[classroom] = {
+                        "name": classroom,
+                        "weekly_schedule": {
+                            "M": [],
+                            "T": [],
+                            "W": [],
+                            "R": [],
+                            "F": [],
+                        }
+                    }
+                for day in days:
+                    classroom_info[classroom]["weekly_schedule"][day].append({"class_name": course_name, "start_time": time[0], "end_time": time[1]})
+
+
+'''
+classroom_data = {
+    "classroom_id": "101",
+    "location": "Building A",
+    "weekly_schedule": {
+        "Monday": [
+            {"class_name": "Math 101", "start_time": "08:00", "end_time": "09:30"},
+            {"class_name": "Physics 201", "start_time": "10:00", "end_time": "11:30"}
+            # ... more classes
+        ],
+        # ... other days
+    }
+}
+'''
+
+async def get_course_info(url):
+    classroom_info = {}
+
+    async with httpx.AsyncClient() as client:
+        response = await client.get(url)
+        soup = BeautifulSoup(response.content, 'html.parser')
+        courses = [link.find('a') for link in soup.find_all('td', class_="ntedefault")]
+        for course in courses:
+            if course is not None and course.has_attr('href'):
+                await parse_course_info(f"https://sis.rpi.edu{course['href']}", classroom_info)
+    print(classroom_info)
+
+
 
 async def main():
-    term = "202101"
-    soup = await get_course_ids(term)
-    async for link in get_all_courses(term, soup[0]):
-        print(link)
+    # term = "202209"
+    # soup = await get_course_ids(term)
+    # async for link in get_all_courses(term, soup[7]):
+    #     print(link)
+    #     await get_course_info(link)
+    dic = {}
+    await parse_course_info("https://sis.rpi.edu/rss/bwckctlg.p_disp_listcrse?term_in=202209&subj_in=BIOL&crse_in=4740&schd_in=L", dic)
+    print(dic)
 
 if __name__ == "__main__":
     asyncio.run(main())
