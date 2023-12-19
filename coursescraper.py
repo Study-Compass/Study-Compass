@@ -60,6 +60,8 @@ async def parse_course_info(url, classroom_info):
                 print(f'row: {row}')
             for row in rows[1:]:
                 cells = row.find_all('td')
+                if "TBA" in cells[1].text or "TBA" in cells[2].text or "TBA" in cells[3].text:
+                    continue
                 classroom = cells[3].text.strip()
                 time = format_time(cells[1].text.strip())
                 days = list(cells[2].text.strip())
@@ -75,46 +77,36 @@ async def parse_course_info(url, classroom_info):
                         }
                     }
                 for day in days:
+                    print("added")
                     classroom_info[classroom]["weekly_schedule"][day].append({"class_name": course_name, "start_time": time[0], "end_time": time[1]})
 
 
-'''
-classroom_data = {
-    "classroom_id": "101",
-    "location": "Building A",
-    "weekly_schedule": {
-        "Monday": [
-            {"class_name": "Math 101", "start_time": "08:00", "end_time": "09:30"},
-            {"class_name": "Physics 201", "start_time": "10:00", "end_time": "11:30"}
-            # ... more classes
-        ],
-        # ... other days
-    }
-}
-'''
-
-async def get_course_info(url):
-    classroom_info = {}
+async def get_course_info(url, classroom_info):
 
     async with httpx.AsyncClient() as client:
         response = await client.get(url)
         soup = BeautifulSoup(response.content, 'html.parser')
-        courses = [link.find('a') for link in soup.find_all('td', class_="ntedefault")]
+        all_courses = soup.find_all('td', class_="ntedefault")
+
+        courses = [link.find('a') for link in soup.find_all('td', class_="ntdefault")]
         for course in courses:
-            if course is not None and course.has_attr('href'):
-                await parse_course_info(f"https://sis.rpi.edu{course['href']}", classroom_info)
-    print(classroom_info)
+            print(course)
+            if course is not None and course.has_attr('href') and "crse_in" in course['href']:
+                course_url = f"https://sis.rpi.edu{course['href']}"
+                print(course_url)
+                await parse_course_info(course_url, classroom_info)
 
 
 
 async def main():
-    # term = "202209"
-    # soup = await get_course_ids(term)
-    # async for link in get_all_courses(term, soup[7]):
-    #     print(link)
-    #     await get_course_info(link)
-    dic = {}
-    await parse_course_info("https://sis.rpi.edu/rss/bwckctlg.p_disp_listcrse?term_in=202209&subj_in=BIOL&crse_in=4740&schd_in=L", dic)
+    term = "202209"
+    soup = await get_course_ids(term)
+    dic= {}
+    async for link in get_all_courses(term, soup[6]):
+        print(link)
+        await get_course_info(link, dic)
+    # dic = {}
+    # await parse_course_info("https://sis.rpi.edu/rss/bwckctlg.p_disp_listcrse?term_in=202209&subj_in=BIOL&crse_in=4740&schd_in=L", dic)
     print(dic)
 
 if __name__ == "__main__":
