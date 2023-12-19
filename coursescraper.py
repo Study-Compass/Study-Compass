@@ -80,7 +80,6 @@ async def parse_course_info(url, classroom_info):
                     print("added")
                     classroom_info[classroom]["weekly_schedule"][day].append({"class_name": course_name, "start_time": time[0], "end_time": time[1]})
 
-
 async def get_course_info(url, classroom_info):
 
     async with httpx.AsyncClient() as client:
@@ -95,8 +94,6 @@ async def get_course_info(url, classroom_info):
                 course_url = f"https://sis.rpi.edu{course['href']}"
                 print(course_url)
                 await parse_course_info(course_url, classroom_info)
-
-
 
 async def main():
     term = "202209"
