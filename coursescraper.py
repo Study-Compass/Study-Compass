@@ -4,16 +4,16 @@
 
 # =========================================================================================
 from bs4 import BeautifulSoup
-import requests
 import asyncio
 import json
 import httpx
 from datetime import datetime
 from datetime import datetime
 
+TIMEOUT = httpx.Timeout(30.0)
 
 def format_time(time):
-    print(time)
+    # print(time)
     starttime, endtime = [t.strip() for t in time.split('-')]
 
     def convert_to_military_time(time_str):
@@ -30,7 +30,8 @@ def format_time(time):
 # function that returns a list of course ids for a given term, searches the sis catalog search, which has each course id as an option value in the selct
 async def get_course_ids(term):
     url = f"https://sis.rpi.edu/rss/bwckctlg.p_display_courses?term_in={term}&sel_crse_strt=&sel_crse_end=&sel_subj=&sel_levl=&sel_schd=&sel_coll=&sel_divs=&sel_dept=&sel_attr="
-    async with httpx.AsyncClient() as client:
+    async with httpx.AsyncClient(timeout=TIMEOUT) as client:
+        # print(f'scanning url: {url}\n')
         response = await client.get(url)
         soup = BeautifulSoup(response.content, 'html.parser')
         select_element = soup.find('select') # find the course select
@@ -40,24 +41,26 @@ async def get_course_ids(term):
 
 async def get_all_courses(term, id):
     url = f"https://sis.rpi.edu/rss/bwckctlg.p_display_courses?term_in={term}&call_proc_in=&sel_subj=dummy&sel_levl=dummy&sel_schd=dummy&sel_coll=dummy&sel_divs=dummy&sel_dept=dummy&sel_attr=dummy&sel_subj={id}&sel_crse_strt=&sel_crse_end=&sel_title=&sel_levl=%25&sel_schd=%25&sel_coll=%25&sel_divs=%25&sel_dept=%25&sel_from_cred=&sel_to_cred=&sel_attr=%25"
-    async with httpx.AsyncClient() as client:
+    async with httpx.AsyncClient(timeout=TIMEOUT) as client:
+        # print(f'scanning url: {url}\n')
         response = await client.get(url)
         soup = BeautifulSoup(response.content, 'html.parser')
-        course_links = [link.find('a') for link in soup.find_all('td', class_='nttitle')]
+        course_links = [link.find('a') for link in soup.find_all('td', class_='ntdefault')]
         for link in course_links:
-            if link is not None and link.has_attr('href'):
+            if link is not None and link.has_attr('href') and "crse_in" in link['href']:
                 yield f"https://sis.rpi.edu{link['href']}"
 
 async def parse_course_info(url, classroom_info):
-    async with httpx.AsyncClient() as client:
+    async with httpx.AsyncClient(timeout=TIMEOUT) as client:
+        print(f'scanning url: {url}\n')
         response = await client.get(url)
         soup = BeautifulSoup(response.content, 'html.parser')
         course_name = soup.find('th', class_='ddtitle').text.split('-')[2].strip()
         sections = soup.find_all('table', summary='This table lists the scheduled meeting times and assigned instructors for this class..')
         for section in sections:
             rows = section.find_all('tr')
-            for row in rows[1:]:
-                print(f'row: {row}')
+            # for row in rows[1:]:
+            #     print(f'row: {row}')
             for row in rows[1:]:
                 cells = row.find_all('td')
                 if "TBA" in cells[1].text or "TBA" in cells[2].text or "TBA" in cells[3].text:
@@ -77,37 +80,36 @@ async def parse_course_info(url, classroom_info):
                         }
                     }
                 for day in days:
-                    print("added")
+                    # print("added")
                     classroom_info[classroom]["weekly_schedule"][day].append({"class_name": course_name, "start_time": time[0], "end_time": time[1]})
 
-
 async def get_course_info(url, classroom_info):
-
-    async with httpx.AsyncClient() as client:
+    print(f'scanning url: {url}\n')
+    async with httpx.AsyncClient(timeout=TIMEOUT) as client:
         response = await client.get(url)
         soup = BeautifulSoup(response.content, 'html.parser')
         all_courses = soup.find_all('td', class_="ntedefault")
 
         courses = [link.find('a') for link in soup.find_all('td', class_="ntdefault")]
         for course in courses:
-            print(course)
+            # print(course)
             if course is not None and course.has_attr('href') and "crse_in" in course['href']:
                 course_url = f"https://sis.rpi.edu{course['href']}"
-                print(course_url)
+                # print(course_url)
                 await parse_course_info(course_url, classroom_info)
 
-
-
 async def main():
-    term = "202209"
-    soup = await get_course_ids(term)
+    term = "202109"
+    # soup = await get_course_ids(term)
     dic= {}
-    async for link in get_all_courses(term, soup[6]):
-        print(link)
-        await get_course_info(link, dic)
+    # print(soup)
+    for course in await get_course_ids(term):
+        async for link in get_all_courses(term, course):
+            await parse_course_info(link, dic)
     # dic = {}
     # await parse_course_info("https://sis.rpi.edu/rss/bwckctlg.p_disp_listcrse?term_in=202209&subj_in=BIOL&crse_in=4740&schd_in=L", dic)
-    print(dic)
+    with open('classes.json', 'w') as json_file:
+        json.dump(dic, json_file, indent=4)
 
 if __name__ == "__main__":
     asyncio.run(main())
