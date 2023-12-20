@@ -52,7 +52,7 @@ async def get_all_courses(term, id):
 
 async def parse_course_info(url, classroom_info):
     async with httpx.AsyncClient(timeout=TIMEOUT) as client:
-        print(f'scanning url: {url}\n')
+        print(f'scanning url: {url}')
         response = await client.get(url)
         soup = BeautifulSoup(response.content, 'html.parser')
         course_name = soup.find('th', class_='ddtitle').text.split('-')[2].strip()
@@ -82,21 +82,6 @@ async def parse_course_info(url, classroom_info):
                 for day in days:
                     # print("added")
                     classroom_info[classroom]["weekly_schedule"][day].append({"class_name": course_name, "start_time": time[0], "end_time": time[1]})
-
-async def get_course_info(url, classroom_info):
-    print(f'scanning url: {url}\n')
-    async with httpx.AsyncClient(timeout=TIMEOUT) as client:
-        response = await client.get(url)
-        soup = BeautifulSoup(response.content, 'html.parser')
-        all_courses = soup.find_all('td', class_="ntedefault")
-
-        courses = [link.find('a') for link in soup.find_all('td', class_="ntdefault")]
-        for course in courses:
-            # print(course)
-            if course is not None and course.has_attr('href') and "crse_in" in course['href']:
-                course_url = f"https://sis.rpi.edu{course['href']}"
-                # print(course_url)
-                await parse_course_info(course_url, classroom_info)
 
 async def main():
     term = "202109"
