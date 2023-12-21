@@ -120,7 +120,6 @@ def print_url(url, full=False):
     elif term[4:] == '09':
         term = 'Fall'
     print(f'scraping {term} {year} {id} {course}')
-    
 
 async def main():
     term = "202109"
