@@ -122,50 +122,7 @@ def print_url(url, full=False):
         term = 'Fall'
     print(f'scraping {term} {year} {id} {course}')
 
-def test_mongo_insert_and_read():
-    load_dotenv()
-    # Replace 'your_database' and 'your_collection' with your actual database and collection names
-    database_name = 'studycompass'
-    collection_name = 'classrooms'
-
-    # MongoDB URI - make sure this is set correctly in your environment variables
-    uri = os.environ.get('MONGO_URL')
-    print(uri)
-    # Create a MongoClient
-    client = MongoClient(uri)
-    
-    # Access the database and collection
-    db = client[database_name]
-    collection = db[collection_name]
-
-    # Document to insert
-    test_document = {"name": "test", "message": "Hello, MngoDB!"}
-
-    # Insert the document
-    try:
-        insert_result = collection.insert_one(test_document)
-        print(f"Document inserted successfully. ID: {insert_result.inserted_id}")
-    except Exception as e:
-        print(f"Error during insertion: {e}")
-        return
-
-    # Read back the inserted document
-    try:
-        retrieved_document = collection.find_one({"_id": insert_result.inserted_id})
-        print("Retrieved Document:", retrieved_document)
-    except Exception as e:
-        print(f"Error during retrieval: {e}")
-
-async def main():
-    term = "202109"
-    dic= {}
-    for course in await get_course_ids(term):
-        async for link in get_all_courses(term, course):
-            await parse_course_info(link, dic)
-
-    with open('classes.json', 'w') as json_file:
-        json.dump(dic, json_file, indent=4)
-    
+def upload_to_mongo(dic):
     load_dotenv()
     uri = os.environ.get('MONGO_URL')
     client = MongoClient(uri, server_api=ServerApi('1'))
@@ -182,6 +139,18 @@ async def main():
     for classroom in dic:
         collection.insert_one(dic[classroom])
 
+def dump_to_json(dic):
+    with open('classes.json', 'w') as json_file:
+        json.dump(dic, json_file, indent=4)
+
+async def main():
+    term = "202109"
+    dic= {}
+    for course in await get_course_ids(term):
+        async for link in get_all_courses(term, course):
+            await parse_course_info(link, dic)
+    
+    upload_to_mongo(dic)
 
     return dic
 
@@ -193,4 +162,3 @@ if __name__ == "__main__":
     minutes = int(elapsed_time_seconds // 60)
     seconds = int(elapsed_time_seconds % 60)
     print(f"The function took {minutes} minutes and {seconds} seconds to complete.")
-    # test_mongo_insert_and_read()
