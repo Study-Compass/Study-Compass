@@ -1,6 +1,6 @@
 # =========================================================================================
 
-# code adapted from https://github.com/quacs/quacs/blob/master/scrapers/sis_scraper/main.py
+# code inspired by https://github.com/quacs/quacs/blob/master/scrapers/sis_scraper/main.py
 
 '''
 Term guide:
