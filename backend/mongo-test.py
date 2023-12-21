@@ -5,7 +5,6 @@ from dotenv import load_dotenv
 
 def test_mongo_insert_and_read():
     load_dotenv()
-    # Replace 'your_database' and 'your_collection' with your actual database and collection names
     database_name = 'studycompass'
     collection_name = 'classrooms'
 
@@ -20,7 +19,7 @@ def test_mongo_insert_and_read():
     collection = db[collection_name]
 
     # Document to insert
-    test_document = {"name": "test", "message": "Hello, MngoDB!"}
+    test_document = {"name": "test", "message": "Hello, MongoDB!"}
 
     # Insert the document
     try:
