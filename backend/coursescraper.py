@@ -41,6 +41,7 @@ from dotenv import load_dotenv
 
 TIMEOUT = httpx.Timeout(30.0)
 
+# used to convert time from string format (from x:xx pm to military time)
 def format_time(time):
     starttime, endtime = [t.strip() for t in time.split('-')]
 
@@ -56,23 +57,30 @@ async def get_course_ids(term):
     url = f"https://sis.rpi.edu/rss/bwckctlg.p_display_courses?term_in={term}&sel_crse_strt=&sel_crse_end=&sel_subj=&sel_levl=&sel_schd=&sel_coll=&sel_divs=&sel_dept=&sel_attr="
     
     async with httpx.AsyncClient(timeout=TIMEOUT) as client:
-        response = await client.get(url)
-        soup = BeautifulSoup(response.content, 'html.parser')
+        # scraping using bs4
+        response = await client.get(url) 
+        soup = BeautifulSoup(response.content, 'html.parser') 
         
         select_element = soup.find('select') # find the course select
         # extract course id (example ADMN) values from each <option>
         option_values = [option['value'] for option in select_element.find_all('option') if option.has_attr('value')]
         return option_values
 
+# function that, given a term and a course ID (exmaple: ADMN), searches for all the courses in the term with in that subject
 async def get_all_courses(term, id):
     url = f"https://sis.rpi.edu/rss/bwckctlg.p_display_courses?term_in={term}&call_proc_in=&sel_subj=dummy&sel_levl=dummy&sel_schd=dummy&sel_coll=dummy&sel_divs=dummy&sel_dept=dummy&sel_attr=dummy&sel_subj={id}&sel_crse_strt=&sel_crse_end=&sel_title=&sel_levl=%25&sel_schd=%25&sel_coll=%25&sel_divs=%25&sel_dept=%25&sel_from_cred=&sel_to_cred=&sel_attr=%25"
+    
     async with httpx.AsyncClient(timeout=TIMEOUT) as client:
+        # scraping using bs4
         response = await client.get(url)
         soup = BeautifulSoup(response.content, 'html.parser')
+
+        # finding links inside of course descriptions (only active courses have links inside course description)
         course_links = [link.find('a') for link in soup.find_all('td', class_='ntdefault')]
         for link in course_links:
-            if link is not None and link.has_attr('href') and "crse_in" in link['href']:
-                yield f"https://sis.rpi.edu{link['href']}"
+            # makes sure that the link is a link to a course, sometimes back links get included
+            if link is not None and link.has_attr('href') and "crse_in" in link['href']: 
+                yield f"https://sis.rpi.edu{link['href']}" # yields an object for async efficiency
 
 async def parse_course_info(url, classroom_info):
     async with httpx.AsyncClient(timeout=TIMEOUT) as client:
