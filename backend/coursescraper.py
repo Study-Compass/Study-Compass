@@ -91,8 +91,11 @@ async def parse_course_info(url, classroom_info):
         # finds all meeting times tables, one for each section
         sections = soup.find_all('table', summary='This table lists the scheduled meeting times and assigned instructors for this class..')
         for section in sections: 
+
             rows = section.find_all('tr') # separates into rows
+
             for row in rows[1:]: # starts iterating from second row, skipping header row
+
                 cells = row.find_all('td') # separates rows into cells
                 if "TBA" in cells[1].text or "TBA" in cells[2].text or "TBA" in cells[3].text:
                     continue # if meeting time/location isn't decided, go to next
@@ -100,11 +103,13 @@ async def parse_course_info(url, classroom_info):
                 time = format_time(cells[1].text.strip()) # getting meeting time
                 days = list(cells[2].text.strip()) # getting meeting days
                 if classroom not in classroom_info: # if classroom not initialized
+
                     classroom_info[classroom] = { # classroom data schema
                         "name": classroom, # includes name
                         "weekly_schedule": {"M": [], "T": [], "W": [], "R": [], "F": []} # includes weekly schedule for classrooms
                     }
                 for day in days: 
+
                     # if class is not duplicated (different sections with same meet times+locations)
                     if {"class_name": course_name, "start_time": time[0], "end_time": time[1]} not in classroom_info[classroom]["weekly_schedule"][day]:
                         # insert into dictionary
@@ -112,43 +117,57 @@ async def parse_course_info(url, classroom_info):
 
 
 
+# function to connect and update connected mongo database, in progress until real-
+# cluster organization and database management determined
 def upload_to_mongo(dic):
-    load_dotenv()
-    uri = os.environ.get('MONGO_URL')
-    client = MongoClient(uri, server_api=ServerApi('1'))
-    try: # Send a ping to confirm a successful connection
+    load_dotenv() # loading .env file
+    uri = os.environ.get('MONGO_URL') # fetching URI string
+    client = MongoClient(uri, server_api=ServerApi('1')) 
+    try: # send a ping to confirm a successful connection
         client.admin.command('ping')
         print("Pinged your deployment. You successfully connected to MongoDB!")
     except Exception as e:
         print(e)
 
+    # getting relevant collection, clearing data before scanning new
     db = client['studycompass']
     collection = db['classrooms']
     db['classrooms'].drop()
     
+    # inserting data into db
     for classroom in dic:
         collection.insert_one(dic[classroom])
 
+# function for dumping data into json file
 def dump_to_json(dic):
     with open('classes.json', 'w') as json_file:
         json.dump(dic, json_file, indent=4)
 
+# main function, term determinance feature on the way
 async def main():
     term = "202109"
     dic= {}
+
+    # asynchronous organization of for loops
     for course in await get_course_ids(term):
         async for link in get_all_courses(term, course):
             await parse_course_info(link, dic)
     
+    # upload data
     upload_to_mongo(dic)
 
     return dic
 
 if __name__ == "__main__":
-    start_time = time.perf_counter()
-    asyncio.run(main())
-    end_time = time.perf_counter()
-    elapsed_time_seconds = end_time - start_time
+
+    start_time = time.perf_counter() # establishing start time for benchmarking
+
+    asyncio.run(main())# <-- where the magic happens
+
+    end_time = time.perf_counter() # end time
+
+    # calculating and formatting elapsed time
+    elapsed_time_seconds = end_time - start_time 
     minutes = int(elapsed_time_seconds // 60)
     seconds = int(elapsed_time_seconds % 60)
     print(f"The function took {minutes} minutes and {seconds} seconds to complete.")
