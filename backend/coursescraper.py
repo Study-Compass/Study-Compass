@@ -38,21 +38,11 @@ from pymongo.server_api import ServerApi
 import os
 from dotenv import load_dotenv
 
+from helpers import test_mongo_insert_and_read, print_url, format_time
 
 TIMEOUT = httpx.Timeout(30.0)
 
 
-
-# used to convert time from string format (from x:xx pm to military time)
-def format_time(time):
-    starttime, endtime = [t.strip() for t in time.split('-')]
-
-    def convert_to_military_time(time_str):
-        time_obj = datetime.strptime(time_str, "%I:%M %p") # parse the time string using the specified format
-        military_time = time_obj.strftime("%H:%M") # convert the time to military format
-        return military_time
-    
-    return convert_to_military_time(starttime), convert_to_military_time(endtime)
 
 # function that returns a list of course ids for a given term, searches the sis catalog search, which has each course id as an option value in the selct
 async def get_course_ids(term):
@@ -67,6 +57,8 @@ async def get_course_ids(term):
         # extract course id (example ADMN) values from each <option>
         option_values = [option['value'] for option in select_element.find_all('option') if option.has_attr('value')]
         return option_values
+
+
 
 # function that, given a term and a course ID (exmaple: ADMN), searches for all the courses in the term with in that subject
 async def get_all_courses(term, id):
@@ -83,6 +75,8 @@ async def get_all_courses(term, id):
             # makes sure that the link is a link to a course, sometimes back links get included
             if link is not None and link.has_attr('href') and "crse_in" in link['href']: 
                 yield f"https://sis.rpi.edu{link['href']}" # yields an object for async efficiency
+
+
 
 # function that, given a course link, extracts relevant info from meeting times table
 async def parse_course_info(url, classroom_info):
@@ -116,24 +110,7 @@ async def parse_course_info(url, classroom_info):
                         # insert into dictionary
                         classroom_info[classroom]["weekly_schedule"][day].append({"class_name": course_name, "start_time": time[0], "end_time": time[1]})
 
-def print_url(url, full=False):
-    if full:
-        print(url)
-        return
-    url = url.split('term_in=')[1]
-    term = url[:6]
-    year = term[:4]
-    url = url.split('&subj_in=')[1]
-    id = url[:4]
-    url = url.split('&crse_in=')[1]
-    course = url[:4]
-    if term[4:] == '01':
-        term = 'Spring'
-    elif term[4:] == '05':
-        term = 'Summer'
-    elif term[4:] == '09':
-        term = 'Fall'
-    print(f'scraping {term} {year} {id} {course}')
+
 
 def upload_to_mongo(dic):
     load_dotenv()
