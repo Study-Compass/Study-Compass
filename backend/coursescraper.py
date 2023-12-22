@@ -159,7 +159,6 @@ async def main():
     return dic
 
 if __name__ == "__main__":
-
     start_time = time.perf_counter() # establishing start time for benchmarking
 
     asyncio.run(main())# <-- where the magic happens

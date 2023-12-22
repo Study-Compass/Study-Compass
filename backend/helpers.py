@@ -1,6 +1,7 @@
 from pymongo.mongo_client import MongoClient
 import os
 from dotenv import load_dotenv
+from datetime import datetime
 
 
 def test_mongo_insert_and_read():
