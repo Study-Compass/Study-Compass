@@ -41,6 +41,8 @@ from dotenv import load_dotenv
 
 TIMEOUT = httpx.Timeout(30.0)
 
+
+
 # used to convert time from string format (from x:xx pm to military time)
 def format_time(time):
     starttime, endtime = [t.strip() for t in time.split('-')]
@@ -82,36 +84,36 @@ async def get_all_courses(term, id):
             if link is not None and link.has_attr('href') and "crse_in" in link['href']: 
                 yield f"https://sis.rpi.edu{link['href']}" # yields an object for async efficiency
 
-
+# function that, given a course link, extracts relevant info from meeting times table
 async def parse_course_info(url, classroom_info):
     async with httpx.AsyncClient(timeout=TIMEOUT) as client:
-        print_url(url)
+        print_url(url) # outputs the course links that are being processed, for debugging purposes
+        # scraping content using bs4
         response = await client.get(url)
         soup = BeautifulSoup(response.content, 'html.parser')
+
+        # finding course name from title link
         course_name = soup.find('th', class_='ddtitle').text.split('-')[2].strip()
+        # finds all meeting times tables, one for each section
         sections = soup.find_all('table', summary='This table lists the scheduled meeting times and assigned instructors for this class..')
-        for section in sections:
-            rows = section.find_all('tr')
-            for row in rows[1:]:
-                cells = row.find_all('td')
+        for section in sections: 
+            rows = section.find_all('tr') # separates into rows
+            for row in rows[1:]: # starts iterating from second row, skipping header row
+                cells = row.find_all('td') # separates rows into cells
                 if "TBA" in cells[1].text or "TBA" in cells[2].text or "TBA" in cells[3].text:
-                    continue
-                classroom = cells[3].text.strip()
-                time = format_time(cells[1].text.strip())
-                days = list(cells[2].text.strip())
-                if classroom not in classroom_info:
-                    classroom_info[classroom] = {
-                        "name": classroom,
-                        "weekly_schedule": {
-                            "M": [],
-                            "T": [],
-                            "W": [],
-                            "R": [],
-                            "F": [],
-                        }
+                    continue # if meeting time/location isn't decided, go to next
+                classroom = cells[3].text.strip() # getting classroom name
+                time = format_time(cells[1].text.strip()) # getting meeting time
+                days = list(cells[2].text.strip()) # getting meeting days
+                if classroom not in classroom_info: # if classroom not initialized
+                    classroom_info[classroom] = { # classroom data schema
+                        "name": classroom, # includes name
+                        "weekly_schedule": {"M": [], "T": [], "W": [], "R": [], "F": []} # includes weekly schedule for classrooms
                     }
-                for day in days:
+                for day in days: 
+                    # if class is not duplicated (different sections with same meet times+locations)
                     if {"class_name": course_name, "start_time": time[0], "end_time": time[1]} not in classroom_info[classroom]["weekly_schedule"][day]:
+                        # insert into dictionary
                         classroom_info[classroom]["weekly_schedule"][day].append({"class_name": course_name, "start_time": time[0], "end_time": time[1]})
 
 def print_url(url, full=False):
