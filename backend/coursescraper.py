@@ -82,6 +82,7 @@ async def get_all_courses(term, id):
             if link is not None and link.has_attr('href') and "crse_in" in link['href']: 
                 yield f"https://sis.rpi.edu{link['href']}" # yields an object for async efficiency
 
+
 async def parse_course_info(url, classroom_info):
     async with httpx.AsyncClient(timeout=TIMEOUT) as client:
         print_url(url)
