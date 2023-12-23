@@ -159,14 +159,14 @@ async def main():
 
 if __name__ == "__main__":
     test_mongo_insert_and_read(True)
-    # start_time = time.perf_counter() # establishing start time for benchmarking
+    start_time = time.perf_counter() # establishing start time for benchmarking
 
-    # asyncio.run(main())# <-- where the magic happens
+    asyncio.run(main())# <-- where the magic happens
 
-    # end_time = time.perf_counter() # end time
+    end_time = time.perf_counter() # end time
 
-    # # calculating and formatting elapsed time
-    # elapsed_time_seconds = end_time - start_time 
-    # minutes = int(elapsed_time_seconds // 60)
-    # seconds = int(elapsed_time_seconds % 60)
-    # print(f"The function took {minutes} minutes and {seconds} seconds to complete.")
+    # calculating and formatting elapsed time
+    elapsed_time_seconds = end_time - start_time 
+    minutes = int(elapsed_time_seconds // 60)
+    seconds = int(elapsed_time_seconds % 60)
+    print(f"The function took {minutes} minutes and {seconds} seconds to complete.")
