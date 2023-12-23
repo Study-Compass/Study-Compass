@@ -42,8 +42,6 @@ from helpers import test_mongo_insert_and_read, print_url, format_time
 
 TIMEOUT = httpx.Timeout(30.0)
 
-
-
 # function that returns a list of course ids for a given term, searches the sis catalog search, which has each course id as an option value in the selct
 async def get_course_ids(term):
     url = f"https://sis.rpi.edu/rss/bwckctlg.p_display_courses?term_in={term}&sel_crse_strt=&sel_crse_end=&sel_subj=&sel_levl=&sel_schd=&sel_coll=&sel_divs=&sel_dept=&sel_attr="
