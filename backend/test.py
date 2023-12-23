@@ -19,5 +19,5 @@ def process_json(file_path):
     return processed_names
 
 # Replace 'classes.json' with the path to your JSON file
-result = process_json('classes.json')
-print(result)
+# result = process_json('classes.json')
+print("hi")

@@ -152,11 +152,13 @@ async def main():
             await parse_course_info(link, dic)
     
     # upload data
+    dump_to_json(dic)
     upload_to_mongo(dic)
 
     return dic
 
 if __name__ == "__main__":
+    test_mongo_insert_and_read()
     start_time = time.perf_counter() # establishing start time for benchmarking
 
     asyncio.run(main())# <-- where the magic happens
