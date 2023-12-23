@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 from datetime import datetime
 
 
-def test_mongo_insert_and_read():
+def test_mongo_insert_and_read(delete=False):
     load_dotenv()
     database_name = 'studycompass'
     collection_name = 'classrooms'
@@ -36,6 +36,17 @@ def test_mongo_insert_and_read():
         print("Retrieved Document:", retrieved_document)
     except Exception as e:
         print(f"Error during retrieval: {e}")
+
+    # delete the inserted document if delete is True
+    if delete:
+        try:
+            delete_result = collection.delete_one({"_id": insert_result.inserted_id})
+            if delete_result.deleted_count > 0:
+                print("Document deleted successfully.")
+            else:
+                print("Document not found.")
+        except Exception as e:
+            print(f"Error during deletion: {e}")
 
 def print_url(url, full=False):
     if full:
