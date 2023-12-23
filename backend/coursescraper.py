@@ -38,129 +38,135 @@ from pymongo.server_api import ServerApi
 import os
 from dotenv import load_dotenv
 
+from helpers import test_mongo_insert_and_read, print_url, format_time
 
 TIMEOUT = httpx.Timeout(30.0)
 
-def format_time(time):
-    starttime, endtime = [t.strip() for t in time.split('-')]
 
-    def convert_to_military_time(time_str):
-        time_obj = datetime.strptime(time_str, "%I:%M %p") # parse the time string using the specified format
-        military_time = time_obj.strftime("%H:%M") # convert the time to military format
-        return military_time
-    
-    return convert_to_military_time(starttime), convert_to_military_time(endtime)
 
 # function that returns a list of course ids for a given term, searches the sis catalog search, which has each course id as an option value in the selct
 async def get_course_ids(term):
     url = f"https://sis.rpi.edu/rss/bwckctlg.p_display_courses?term_in={term}&sel_crse_strt=&sel_crse_end=&sel_subj=&sel_levl=&sel_schd=&sel_coll=&sel_divs=&sel_dept=&sel_attr="
     
     async with httpx.AsyncClient(timeout=TIMEOUT) as client:
-        response = await client.get(url)
-        soup = BeautifulSoup(response.content, 'html.parser')
+        # scraping using bs4
+        response = await client.get(url) 
+        soup = BeautifulSoup(response.content, 'html.parser') 
         
         select_element = soup.find('select') # find the course select
         # extract course id (example ADMN) values from each <option>
         option_values = [option['value'] for option in select_element.find_all('option') if option.has_attr('value')]
         return option_values
 
+
+
+# function that, given a term and a course ID (exmaple: ADMN), searches for all the courses in the term with in that subject
 async def get_all_courses(term, id):
     url = f"https://sis.rpi.edu/rss/bwckctlg.p_display_courses?term_in={term}&call_proc_in=&sel_subj=dummy&sel_levl=dummy&sel_schd=dummy&sel_coll=dummy&sel_divs=dummy&sel_dept=dummy&sel_attr=dummy&sel_subj={id}&sel_crse_strt=&sel_crse_end=&sel_title=&sel_levl=%25&sel_schd=%25&sel_coll=%25&sel_divs=%25&sel_dept=%25&sel_from_cred=&sel_to_cred=&sel_attr=%25"
+    
     async with httpx.AsyncClient(timeout=TIMEOUT) as client:
+        # scraping using bs4
         response = await client.get(url)
         soup = BeautifulSoup(response.content, 'html.parser')
+
+        # finding links inside of course descriptions (only active courses have links inside course description)
         course_links = [link.find('a') for link in soup.find_all('td', class_='ntdefault')]
         for link in course_links:
-            if link is not None and link.has_attr('href') and "crse_in" in link['href']:
-                yield f"https://sis.rpi.edu{link['href']}"
+            # makes sure that the link is a link to a course, sometimes back links get included
+            if link is not None and link.has_attr('href') and "crse_in" in link['href']: 
+                yield f"https://sis.rpi.edu{link['href']}" # yields an object for async efficiency
 
+
+
+# function that, given a course link, extracts relevant info from meeting times table
 async def parse_course_info(url, classroom_info):
     async with httpx.AsyncClient(timeout=TIMEOUT) as client:
-        print_url(url)
+        print_url(url) # outputs the course links that are being processed, for debugging purposes
+        # scraping content using bs4
         response = await client.get(url)
         soup = BeautifulSoup(response.content, 'html.parser')
+
+        # finding course name from title link
         course_name = soup.find('th', class_='ddtitle').text.split('-')[2].strip()
+        # finds all meeting times tables, one for each section
         sections = soup.find_all('table', summary='This table lists the scheduled meeting times and assigned instructors for this class..')
-        for section in sections:
-            rows = section.find_all('tr')
-            for row in rows[1:]:
-                cells = row.find_all('td')
+        for section in sections: 
+
+            rows = section.find_all('tr') # separates into rows
+
+            for row in rows[1:]: # starts iterating from second row, skipping header row
+
+                cells = row.find_all('td') # separates rows into cells
                 if "TBA" in cells[1].text or "TBA" in cells[2].text or "TBA" in cells[3].text:
-                    continue
-                classroom = cells[3].text.strip()
-                time = format_time(cells[1].text.strip())
-                days = list(cells[2].text.strip())
-                if classroom not in classroom_info:
-                    classroom_info[classroom] = {
-                        "name": classroom,
-                        "weekly_schedule": {
-                            "M": [],
-                            "T": [],
-                            "W": [],
-                            "R": [],
-                            "F": [],
-                        }
+                    continue # if meeting time/location isn't decided, go to next
+                classroom = cells[3].text.strip() # getting classroom name
+                time = format_time(cells[1].text.strip()) # getting meeting time
+                days = list(cells[2].text.strip()) # getting meeting days
+                if classroom not in classroom_info: # if classroom not initialized
+
+                    classroom_info[classroom] = { # classroom data schema
+                        "name": classroom, # includes name
+                        "weekly_schedule": {"M": [], "T": [], "W": [], "R": [], "F": []} # includes weekly schedule for classrooms
                     }
-                for day in days:
+                for day in days: 
+
+                    # if class is not duplicated (different sections with same meet times+locations)
                     if {"class_name": course_name, "start_time": time[0], "end_time": time[1]} not in classroom_info[classroom]["weekly_schedule"][day]:
+                        # insert into dictionary
                         classroom_info[classroom]["weekly_schedule"][day].append({"class_name": course_name, "start_time": time[0], "end_time": time[1]})
 
-def print_url(url, full=False):
-    if full:
-        print(url)
-        return
-    url = url.split('term_in=')[1]
-    term = url[:6]
-    year = term[:4]
-    url = url.split('&subj_in=')[1]
-    id = url[:4]
-    url = url.split('&crse_in=')[1]
-    course = url[:4]
-    if term[4:] == '01':
-        term = 'Spring'
-    elif term[4:] == '05':
-        term = 'Summer'
-    elif term[4:] == '09':
-        term = 'Fall'
-    print(f'scraping {term} {year} {id} {course}')
 
+
+# function to connect and update connected mongo database, in progress until real-
+# cluster organization and database management determined
 def upload_to_mongo(dic):
-    load_dotenv()
-    uri = os.environ.get('MONGO_URL')
-    client = MongoClient(uri, server_api=ServerApi('1'))
-    try: # Send a ping to confirm a successful connection
+    load_dotenv() # loading .env file
+    uri = os.environ.get('MONGO_URL') # fetching URI string
+    client = MongoClient(uri, server_api=ServerApi('1')) 
+    try: # send a ping to confirm a successful connection
         client.admin.command('ping')
         print("Pinged your deployment. You successfully connected to MongoDB!")
     except Exception as e:
         print(e)
 
+    # getting relevant collection, clearing data before scanning new
     db = client['studycompass']
     collection = db['classrooms']
     db['classrooms'].drop()
     
+    # inserting data into db
     for classroom in dic:
         collection.insert_one(dic[classroom])
 
+# function for dumping data into json file
 def dump_to_json(dic):
     with open('classes.json', 'w') as json_file:
         json.dump(dic, json_file, indent=4)
 
+# main function, term determinance feature on the way
 async def main():
     term = "202109"
     dic= {}
+
+    # asynchronous organization of for loops
     for course in await get_course_ids(term):
         async for link in get_all_courses(term, course):
             await parse_course_info(link, dic)
     
+    # upload data
     upload_to_mongo(dic)
 
     return dic
 
 if __name__ == "__main__":
-    start_time = time.perf_counter()
-    asyncio.run(main())
-    end_time = time.perf_counter()
-    elapsed_time_seconds = end_time - start_time
+    start_time = time.perf_counter() # establishing start time for benchmarking
+
+    asyncio.run(main())# <-- where the magic happens
+
+    end_time = time.perf_counter() # end time
+
+    # calculating and formatting elapsed time
+    elapsed_time_seconds = end_time - start_time 
     minutes = int(elapsed_time_seconds // 60)
     seconds = int(elapsed_time_seconds % 60)
     print(f"The function took {minutes} minutes and {seconds} seconds to complete.")
