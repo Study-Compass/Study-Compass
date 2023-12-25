@@ -140,6 +140,7 @@ def upload_to_mongo(dic):
 def dump_to_json(dic):
     with open('classes.json', 'w') as json_file:
         json.dump(dic, json_file, indent=4)
+    print("dumped to json")
 
 # main function, term determinance feature on the way
 async def main():

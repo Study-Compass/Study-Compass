@@ -71,10 +71,30 @@ def print_url(url, full=False):
 def format_time(time):
     starttime, endtime = [t.strip() for t in time.split('-')]
 
+    # function that converts time from string format (from x:xx pm to military time), also rounds for ease of use
     def convert_to_military_time(time_str):
-        time_obj = datetime.strptime(time_str, "%I:%M %p") # parse the time string using the specified format
-        military_time = time_obj.strftime("%H:%M") # convert the time to military format
-        return military_time
+        time_obj = datetime.strptime(time_str, "%I:%M %p")  # parse the time string
+
+        # extract hours and minutes
+        hours, minutes = time_obj.hour, time_obj.minute
+
+        # round minutes to the nearest 30
+        rounded_minutes = round(minutes / 30) * 30
+
+        # adjust hours if necessary
+        if rounded_minutes >= 60:
+            rounded_minutes -= 60
+            hours += 1
+            # adjust for 24-hour wrap-around
+            if hours >= 24:
+                hours -= 24
+
+        # create new time object with adjusted time
+        rounded_time_obj = time_obj.replace(hour=hours, minute=rounded_minutes)
+
+        # convert to military format
+        military_time = rounded_time_obj.strftime("%H:%M")
+        return military_time    
     
     return convert_to_military_time(starttime), convert_to_military_time(endtime)
 
