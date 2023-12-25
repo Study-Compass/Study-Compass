@@ -8,8 +8,8 @@ require('dotenv').config();
 const uri = process.env.MONGO_URL;
 const client = new MongoClient(uri);
 
-app.get('/run-script', (req, res) => {
-    const pythonProcess = spawn('python', ['test.py']);
+app.get('/update-database', (req, res) => {
+    const pythonProcess = spawn('python', ['courseScraper.py']);
 
     pythonProcess.stdout.on('data', (data) => {
         res.send(data.toString());
@@ -28,8 +28,8 @@ app.get('/run-script', (req, res) => {
 app.get('/room/:name', async (req, res) => {
     try {
       await client.connect();
-      const database = client.db("studycompass"); // Replace with your database name
-      const rooms = database.collection("classrooms"); // Replace with your collection name
+      const database = client.db("studycompass"); 
+      const rooms = database.collection("classrooms"); 
   
       const roomName = req.params.name;
       const query = { name: roomName };
