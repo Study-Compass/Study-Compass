@@ -1,0 +1,11 @@
+.DayColumn{
+    display:grid;
+    grid-template-rows: repeat(24, 1fr);
+}
+
+.event{
+    position: relative;
+    border-radius: 5px;
+    padding: 5px;
+    background-color:powderblue;
+}
