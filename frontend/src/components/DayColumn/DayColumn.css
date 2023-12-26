@@ -12,11 +12,15 @@
     border-radius: 5px;
     padding: 5px;
     margin:6px;
-    background-color:powderblue;
+    background-color:#B1E6B0;
     /* border: 3px solid darkcyan; */
     box-sizing: border-box;
     /* transform:translateY(1px) */
     opacity:0.8;
+    font-family:'Satoshi';
+    font-weight: bold;
+    color: #414141;
+    text-align: left;
 }
 
 .grid{
@@ -26,7 +30,6 @@
     height:100%;   
     width:100%;
     position: absolute;
-
 }
 
 .grid-item{

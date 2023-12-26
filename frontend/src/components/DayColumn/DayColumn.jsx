@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import './DayColumn.css';
+import '../../assets/fonts.css'
 
 function DayColumn({day, dayEvents}){
     
