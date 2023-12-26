@@ -1,0 +1,11 @@
+@font-face {
+    font-family: 'Satoshi';
+    font-weight: bold;
+    src: url(Satoshi-Black.otf);
+}
+
+@font-face {
+    font-family: 'Satoshi';
+    font-weight: normal;
+    src: url(Satoshi-Bold.otf);
+}
