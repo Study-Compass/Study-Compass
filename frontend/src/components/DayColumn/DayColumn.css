@@ -1,11 +1,38 @@
 .DayColumn{
     display:grid;
     grid-template-rows: repeat(24, 1fr);
+    position: relative;
+    height:500px;   
+    width:10%;
 }
+
 
 .event{
     position: relative;
     border-radius: 5px;
     padding: 5px;
+    margin:6px;
     background-color:powderblue;
+    /* border: 3px solid darkcyan; */
+    box-sizing: border-box;
+    /* transform:translateY(1px) */
+    opacity:0.8;
 }
+
+.grid{
+    display:grid;
+    grid-template-rows: repeat(24, 1fr);
+    position: relative;
+    height:100%;   
+    width:100%;
+    position: absolute;
+
+}
+
+.grid-item{
+    position: relative;
+    box-sizing: border-box;
+    border-top: 2px solid #DDDCDC;
+    margin: 0 2px;
+}
+
