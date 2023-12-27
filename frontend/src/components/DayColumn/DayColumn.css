@@ -3,9 +3,8 @@
     grid-template-rows: repeat(24, 1fr);
     position: relative;
     height:500px;   
-    width:10%;
+    width:145px;
 }
-
 
 .event{
     position: relative;
@@ -13,14 +12,21 @@
     padding: 5px;
     margin:6px;
     background-color:#B1E6B0;
-    /* border: 3px solid darkcyan; */
+    /* border: 3px solid darkgreen; */
     box-sizing: border-box;
     /* transform:translateY(1px) */
     opacity:0.8;
     font-family:'Satoshi';
     font-weight: bold;
     color: #414141;
+    transition: all 0.3s ease;
     text-align: left;
+    font-size:12px;
+}
+
+.event:hover{
+    background-color:#D1F1D1;
+    cursor: pointer;
 }
 
 .grid{
@@ -37,5 +43,6 @@
     box-sizing: border-box;
     border-top: 2px solid #DDDCDC;
     margin: 0 2px;
+    border-bottom: 2px solid white;
 }
 

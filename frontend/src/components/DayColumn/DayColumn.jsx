@@ -1,6 +1,6 @@
-import { useState, useEffect, useRef } from 'react';
 import './DayColumn.css';
 import '../../assets/fonts.css'
+import TimeLabelColumn from '../TimeLabelColumn/TimeLabelColumn.jsx';
 
 function DayColumn({day, dayEvents}){
     
@@ -8,7 +8,7 @@ function DayColumn({day, dayEvents}){
         const [hour, minute] = time.split(':');
         return (hour - 8) * 2 + (minute === '30' ? 1 : 0) + 1;
     }
-
+    
     function Grid(){
         return (            
             <div className="grid">
@@ -30,6 +30,13 @@ function DayColumn({day, dayEvents}){
         );
     }
 
+    if(day == "S"){
+        return (
+            <div className="DayColumn" style={{width:'55px'}}>
+                <TimeLabelColumn />
+            </div>
+        );
+    }
     return (
         <div className="DayColumn">
             <Grid />
