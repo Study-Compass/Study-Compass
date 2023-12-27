@@ -18,6 +18,30 @@ def process_json(file_path):
 
     return processed_names
 
+def process_unique_classes(file_path):
+    # Initialize an empty set
+    amounts = {}
+
+    # Open and load the JSON file
+    with open(file_path, 'r') as file:
+        data= json.load(file)
+        for item in data:
+            data1 = data[item]
+            classes = []
+            for day in data1['weekly_schedule']:
+                for clasS in data1['weekly_schedule'][day]:
+                    if clasS["class_name"] not in classes:
+                        classes.append(clasS["class_name"])
+            if len(classes) > 15:
+                print(data1)
+            if str(len(classes)) not in amounts:
+                amounts[str(len(classes))] = 1
+            else:
+                amounts[str(len(classes))] += 1 
+
+    return amounts
+
 # Replace 'classes.json' with the path to your JSON file
 # result = process_json('classes.json')
-print("hi")
+result  = process_unique_classes('classes.json')
+print(result)

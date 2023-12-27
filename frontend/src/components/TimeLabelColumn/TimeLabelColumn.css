@@ -1,0 +1,33 @@
+.TimeLabelColumn{
+    display:grid;
+    grid-template-rows: repeat(24, 1fr);
+    position: relative;
+    height:100%;   
+    width:100%;
+    position: absolute;
+}
+
+.time-label{
+    position: relative;
+    box-sizing: border-box;
+    border-top: 2px solid white;
+    border-bottom: 2px solid white;
+    margin:0 2px;
+    transform:translateY(-10px);
+
+}
+
+.time-label p{
+    position:absolute;
+    top:0;
+    right:0;
+    margin:0;
+    padding-right:10px;
+    color: #B0AFAF;
+    font-family: 'Satoshi';
+    font-size: 12px;
+
+}
+
+
+

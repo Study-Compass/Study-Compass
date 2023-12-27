@@ -1,8 +1,9 @@
 import './App.css';
 import DayColumn from './components/DayColumn/DayColumn';
+import TimeLabelColumn from './components/TimeLabelColumn/TimeLabelColumn';
 
 function App() {
-    const days = ["M","T","W","R","F"];
+    const days = ["S","M","T","W","R","F"];
     const data = {
         "name": "Academy Hall AUD",
         "weekly_schedule": {
@@ -103,10 +104,7 @@ function App() {
           ]
         }
       }
-    const dayEvents = [
-        { title: 'Meeting with Team', start_time: '08:00', end_time: '10:00' },
-        { title: 'Lunch Break', start_time: '12:30', end_time: '13:30' },
-    ];
+
 
     return (
         <div className="App">
