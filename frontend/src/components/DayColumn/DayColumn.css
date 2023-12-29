@@ -25,7 +25,7 @@
 }
 
 .event:hover{
-    background-color:#D1F1D1;
+    scale: 1.05;
     cursor: pointer;
 }
 

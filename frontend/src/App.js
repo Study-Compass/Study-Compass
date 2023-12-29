@@ -111,9 +111,18 @@ function App() {
     return (
         <div className="App">
             <div className="App-body">
-                {days.map((day) => (
-                    <DayColumn day={day} dayEvents={data["weekly_schedule"][day]} eventColors={eventColors} />
-                ))}
+                <div className="App-header">
+                    <p>monday</p>
+                    <p>tuesday</p>
+                    <p>wednesday</p>
+                    <p>thursday</p>
+                    <p>friday</p>
+                </div>
+                <div className="Time-grid">
+                    {days.map((day) => (
+                        <DayColumn day={day} dayEvents={data["weekly_schedule"][day]} eventColors={eventColors} />
+                    ))}
+                </div>
             </div>
         </div>
     );

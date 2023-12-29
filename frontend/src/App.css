@@ -14,14 +14,17 @@
 }
 
 .App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+    display:flex;
+    flex-direction: row;
+    width:725px;
+}
+
+.App-header p{
+    width: 20%;
+    color: #B0AFAF;
+    font-family: 'Satoshi';
+    font-size: 14px;
+    font-weight: normal;
 }
 
 .App-link {
@@ -39,9 +42,15 @@
 
 .App-body{
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
     height: 100vh;
 }
 
+.Time-grid{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
