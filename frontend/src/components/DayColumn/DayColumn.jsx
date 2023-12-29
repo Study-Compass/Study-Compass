@@ -1,12 +1,28 @@
+import React, { useRef } from 'react';
 import './DayColumn.css';
 import '../../assets/fonts.css'
 import TimeLabelColumn from '../TimeLabelColumn/TimeLabelColumn.jsx';
 
-function DayColumn({day, dayEvents}){
+function DayColumn({day, dayEvents, eventColors}){
     
     function calculateTime(time){
         const [hour, minute] = time.split(':');
         return (hour - 8) * 2 + (minute === '30' ? 1 : 0) + 1;
+    }
+
+    const colors = ['#B1E6B0', '#D6BCDD', '#BDB2FF', '#FFD6A5', '#FDFFB6', '#A0C4FF', '#FFC6FF'];
+
+    // ref to store the event-to-color mapping
+
+    // function to get the color for an event
+    function getColorForEvent(eventName) {
+        if (eventColors.has(eventName)) {
+            return eventColors.get(eventName);
+        } else {
+            const color = colors[eventColors.size % colors.length];
+            eventColors.set(eventName, color);
+            return color;
+        }
     }
     
     function Grid(){
@@ -30,9 +46,9 @@ function DayColumn({day, dayEvents}){
         );
     }
 
-    if(day == "S"){
+    if(day === "S"){
         return (
-            <div className="DayColumn" style={{width:'55px'}}>
+            <div className="DayColumn" style={{width:'auto'}}>
                 <TimeLabelColumn />
             </div>
         );
@@ -43,13 +59,14 @@ function DayColumn({day, dayEvents}){
             {dayEvents.map(event => {
                 const rowStart = calculateTime(event.start_time);
                 const rowEnd = calculateTime(event.end_time);
-
+                const color = getColorForEvent(event.class_name);
                 return (
                     <div 
                         className="event"
                         style={{
                             gridRowStart: rowStart,
                             gridRowEnd: rowEnd,
+                            backgroundColor: color,
                         }}
                     >
                         {event.class_name}
