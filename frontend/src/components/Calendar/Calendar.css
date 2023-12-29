@@ -1,0 +1,21 @@
+.Calendar{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.Calendar-header{
+    display:flex;
+    flex-direction: row;
+    width:725px;
+}
+
+.Calendar-header p{
+    width: 20%;
+    color: #B0AFAF;
+    font-family: 'Satoshi';
+    font-size: 14px;
+    font-weight: normal;
+}

@@ -1,7 +1,7 @@
 import React, { useRef } from 'react';
 import './App.css';
 import DayColumn from './components/DayColumn/DayColumn';
-
+import Calendar from './components/Calendar/Calendar';
 
 function App() {
     const days = ["S", "M", "T", "W", "R", "F"];
@@ -110,11 +110,7 @@ function App() {
 
     return (
         <div className="App">
-            <div className="App-body">
-                {days.map((day) => (
-                    <DayColumn day={day} dayEvents={data["weekly_schedule"][day]} eventColors={eventColors} />
-                ))}
-            </div>
+            <Calendar data={data}/>
         </div>
     );
 }
