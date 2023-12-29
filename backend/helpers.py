@@ -3,7 +3,6 @@ import os
 from dotenv import load_dotenv
 from datetime import datetime
 
-
 def test_mongo_insert_and_read(delete=False):
     load_dotenv()
     database_name = 'studycompass'
