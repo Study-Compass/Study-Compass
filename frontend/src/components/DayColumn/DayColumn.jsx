@@ -3,7 +3,7 @@ import './DayColumn.css';
 import '../../assets/fonts.css'
 import TimeLabelColumn from '../TimeLabelColumn/TimeLabelColumn.jsx';
 
-function DayColumn({day, dayEvents}){
+function DayColumn({day, dayEvents, eventColors}){
     
     function calculateTime(time){
         const [hour, minute] = time.split(':');
@@ -13,7 +13,6 @@ function DayColumn({day, dayEvents}){
     const colors = ['#B1E6B0', '#D6BCDD', '#BDB2FF', '#FFD6A5', '#FDFFB6', '#A0C4FF', '#FFC6FF'];
 
     // ref to store the event-to-color mapping
-    const eventColors = useRef(new Map()).current;
 
     // function to get the color for an event
     function getColorForEvent(eventName) {
@@ -47,7 +46,7 @@ function DayColumn({day, dayEvents}){
         );
     }
 
-    if(day == "S"){
+    if(day === "S"){
         return (
             <div className="DayColumn" style={{width:'auto'}}>
                 <TimeLabelColumn />
