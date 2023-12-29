@@ -1,6 +1,5 @@
 import React, { useRef } from 'react';
 import './App.css';
-import DayColumn from './components/DayColumn/DayColumn';
 import Calendar from './components/Calendar/Calendar';
 
 function App() {
