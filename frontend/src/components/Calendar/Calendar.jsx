@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
 import './Calendar.css';
-import DayColumn from './DayColumn/DayColumn';
+import DayColumn from '../DayColumn/DayColumn';
 
 function Calendar({data}){
     const days = ["S", "M", "T", "W", "R", "F"];
