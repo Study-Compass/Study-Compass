@@ -25,7 +25,7 @@ app.get('/update-database', (req, res) => {
 });
 
 
-app.get('/room/:name', async (req, res) => {
+app.get('/getroom/:name', async (req, res) => {
     try {
       await client.connect();
       const database = client.db("studycompass"); 
