@@ -10,7 +10,7 @@ function DayColumn({day, dayEvents, eventColors}){
         return (hour - 8) * 2 + (minute === '30' ? 1 : 0) + 1;
     }
 
-    const colors = ['#B1E6B0', '#D6BCDD', '#BDB2FF', '#FFD6A5', '#FDFFB6', '#A0C4FF', '#FFC6FF'];
+    const colors = ['#B1E6B0', '#D6BCDD', '#BDB2FF', '#F1F3A8' , '#FFD6A5', '#A0C4FF', '#FFC6FF','#B4C4AE','#A2ABAB'];
 
     // ref to store the event-to-color mapping
 
@@ -25,6 +25,9 @@ function DayColumn({day, dayEvents, eventColors}){
         }
     }
     
+    const start_times = [];
+    const end_times = [];
+
     function Grid(){
         return (            
             <div className="grid">
@@ -41,7 +44,6 @@ function DayColumn({day, dayEvents, eventColors}){
                 <div className="grid-item" style={{gridRowStart:21, gridRowEnd:23}}></div>
                 <div className="grid-item" style={{gridRowStart:23, gridRowEnd:25}}></div>
                 <div className="grid-item" style={{gridRowStart:25, gridRowEnd:27}}></div>
-
             </div>
         );
     }
@@ -60,6 +62,19 @@ function DayColumn({day, dayEvents, eventColors}){
                 const rowStart = calculateTime(event.start_time);
                 const rowEnd = calculateTime(event.end_time);
                 const color = getColorForEvent(event.class_name);
+
+                if(!start_times.includes(rowStart)){
+                    start_times.push(rowStart);
+                } else {
+                    return "";
+                }
+
+                if(!end_times.includes(rowEnd)){
+                    end_times.push(rowEnd);
+                } else {
+                    return "";
+                }
+
                 return (
                     <div 
                         className="event"
