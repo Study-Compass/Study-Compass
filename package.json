@@ -1,5 +1,13 @@
 {
   "dependencies": {
     "react-router-dom": "^6.21.1"
-  }
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "scripts": {
+    "start": "concurrently \"npm run server\" \"npm run client\"",
+    "server": "cd backend && node app.js",
+    "client": "cd frontend && npm start"
+    }
 }
