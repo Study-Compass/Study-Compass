@@ -107,7 +107,7 @@ function Room(){
 
     return(
         <div>
-            <Calendar data={data}/>
+            <Calendar className={roomid}/>
         </div>
     );
 }
