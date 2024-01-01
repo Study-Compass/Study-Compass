@@ -29,5 +29,24 @@
 
 }
 
+.TimeColumn{
+    width:auto;
+}
+
+@media screen and (max-width: 875px){
+    .TimeColumn{
+        width: 50px;
+    }
+}
+
+@media(max-width: 600px){
+    .time-label p{
+        font-size: 10px;
+    }
+}
+
+@media(max-width: 500px){
+
+}
 
 

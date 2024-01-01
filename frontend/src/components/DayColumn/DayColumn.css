@@ -58,3 +58,33 @@
     font-size:13px;
     margin:0
 }
+
+@media(max-width: 600px){
+    .DayColumn{
+        width: 100px;
+    }
+    .event{
+        font-size: 10px;
+    }
+    .time{
+        font-size: 8px;
+    }
+    .class-name{
+        font-size: 10px;
+    }
+}
+
+@media(max-width: 500px){
+    .DayColumn{
+        width: 80px;
+    }
+    .event{
+        font-size: 10px;
+    }
+    .time{
+        font-size: 8px;
+    }
+    .class-name{
+        font-size: 10px;
+    }
+}

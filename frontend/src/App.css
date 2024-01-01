@@ -1,3 +1,8 @@
+:root{
+    --light:rgba(238, 238, 238, 1);
+    --dark: rgba(226, 226, 226, 1);
+}
+
 .App {
   text-align: center;
 }
@@ -12,4 +17,21 @@
     flex-direction: row;
     justify-content: center;
     align-items: center;
+}
+
+
+@keyframes shimmering {
+	0% {
+		background-position: -1300px 0;
+	}
+	100% {
+		background-position: 1300px 0;
+	}
+}
+
+.shimmer {
+	animation: shimmering 2s linear infinite;
+	background: var(--dark);
+	background: linear-gradient(90deg, var(--dark) 9%, var(--light) 18%, var(--dark) 31%);
+	background-size: 1300px 100%;
 }
