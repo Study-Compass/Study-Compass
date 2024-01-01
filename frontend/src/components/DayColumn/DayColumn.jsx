@@ -51,7 +51,7 @@ function DayColumn({day, dayEvents, eventColors}){
 
     if(day === "S"){
         return (
-            <div className="DayColumn" style={{width:'auto'}}>
+            <div className="DayColumn TimeColumn" >
                 <TimeLabelColumn />
             </div>
         );
@@ -63,6 +63,8 @@ function DayColumn({day, dayEvents, eventColors}){
                 const rowStart = calculateTime(event.start_time);
                 const rowEnd = calculateTime(event.end_time);
                 const color = getColorForEvent(event.class_name);
+
+                let timelabel = false;
 
                 if(!start_times.includes(rowStart)){
                     start_times.push(rowStart);
@@ -77,20 +79,23 @@ function DayColumn({day, dayEvents, eventColors}){
                 }
                 
                 if(rowEnd - rowStart >= 4){
+
+                    timelabel = true;
+                }
+
+                if(event.class_name === "loading"){
                     return (
                         <div 
-                            className="event"
-                            style={{
-                                gridRowStart: rowStart,
-                                gridRowEnd: rowEnd,
-                                backgroundColor: color,
-                            }}
+                        className="event shimmer"
+                        style={{
+                            gridRowStart: rowStart,
+                            gridRowEnd: rowEnd,
+                            backgroundColor: color,
+                        }}
                         >
-                            <p className="time">{event.start_time} - {event.end_time}</p>
-                            <p className="class-name">{event.class_name}</p>
                         </div>
+
                     );
-    
                 }
 
                 return (
@@ -102,7 +107,12 @@ function DayColumn({day, dayEvents, eventColors}){
                             backgroundColor: color,
                         }}
                     >
+
+                        {timelabel && <p className="time">{event.start_time} - {event.end_time}</p>}
+                        <p className="class-name">{event.class_name}</p>
+
                             <p className="class-name">{event.class_name}</p>
+
                     </div>
                 );
             })}

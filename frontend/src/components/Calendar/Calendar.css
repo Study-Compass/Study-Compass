@@ -20,3 +20,33 @@
     font-weight: normal;
     text-align: center;
 }
+
+.loading{
+    width:825px;
+    height:550px;
+    border-radius: 20px;
+}
+
+@media screen and (max-width: 875px){
+    .Calendar-header{
+        transform:translateX(25px);
+    }
+}
+
+@media(max-width: 600px){
+    .Calendar-header{
+        width:500px;
+    }
+    .Calendar-header p{
+        font-size: 10px;
+    }
+}
+
+@media(max-width: 500px){
+    .Calendar-header{
+        width:400px;
+    }
+    .Calendar-header p{
+        font-size: 10px;
+    }
+}
