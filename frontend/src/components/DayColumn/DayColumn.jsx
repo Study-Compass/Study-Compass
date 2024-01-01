@@ -75,6 +75,23 @@ function DayColumn({day, dayEvents, eventColors}){
                 } else {
                     return "";
                 }
+                
+                if(rowEnd - rowStart >= 4){
+                    return (
+                        <div 
+                            className="event"
+                            style={{
+                                gridRowStart: rowStart,
+                                gridRowEnd: rowEnd,
+                                backgroundColor: color,
+                            }}
+                        >
+                            <p className="time">{event.start_time} - {event.end_time}</p>
+                            <p className="class-name">{event.class_name}</p>
+                        </div>
+                    );
+    
+                }
 
                 return (
                     <div 
@@ -85,7 +102,7 @@ function DayColumn({day, dayEvents, eventColors}){
                             backgroundColor: color,
                         }}
                     >
-                        {event.class_name}
+                            <p className="class-name">{event.class_name}</p>
                     </div>
                 );
             })}

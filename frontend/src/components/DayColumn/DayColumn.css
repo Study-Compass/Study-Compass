@@ -46,3 +46,15 @@
     border-bottom: 2px solid white;
 }
 
+.time{
+    opacity: 0.8;
+    font-size:10px;
+    font-family: 'Satoshi';
+    font-weight: normal;
+    margin: 0 0 1px 0 ;
+}
+
+.class-name{
+    font-size:13px;
+    margin:0
+}
