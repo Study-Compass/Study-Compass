@@ -79,6 +79,7 @@ function DayColumn({day, dayEvents, eventColors}){
                 }
                 
                 if(rowEnd - rowStart >= 4){
+
                     timelabel = true;
                 }
 
@@ -106,8 +107,12 @@ function DayColumn({day, dayEvents, eventColors}){
                             backgroundColor: color,
                         }}
                     >
+
                         {timelabel && <p className="time">{event.start_time} - {event.end_time}</p>}
                         <p className="class-name">{event.class_name}</p>
+
+                            <p className="class-name">{event.class_name}</p>
+
                     </div>
                 );
             })}

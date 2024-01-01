@@ -57,6 +57,7 @@
 .class-name{
     font-size:13px;
     margin:0
+
 }
 
 @media(max-width: 600px){
@@ -87,4 +88,5 @@
     .class-name{
         font-size: 10px;
     }
+
 }
