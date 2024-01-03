@@ -7,6 +7,8 @@ function Calendar({className}){
     const loadColors = useRef(new Map()).current;
     const eventColors = useRef(new Map()).current;
     const [data, setData] = useState(null);
+    const [isLoading, setLoading] = useState(false);
+
 
     const load = [                
         {
@@ -18,38 +20,22 @@ function Calendar({className}){
 
     useEffect(() => {
         const fetchData = async () => {
+            setLoading(true);
             try {
                 const response = await fetch(`/getroom/${className}`);
                 const data = await response.json();
                 setData(data);
+                console.log(data);
             } catch (error) {
                 console.error("Error fetching data: ", error);
+            } finally{
+                setLoading(false);
             }
         };
 
         fetchData();
     }, [className]);
 
-    // Render loading state while data is being fetched
-    if (!data) {
-        return (
-            <div className="Calendar">
-                <h1>{className.toLowerCase()}</h1>
-                <div className="Calendar-header">
-                    <p>monday</p>
-                    <p>tuesday</p>
-                    <p>wednesday</p>
-                    <p>thursday</p>
-                    <p>friday</p>
-                </div>
-                <div className="Time-grid">
-                    {days.map((day) => (
-                        <DayColumn day={day} dayEvents={load} eventColors={loadColors} />
-                    ))}
-                </div>
-            </div>
-        );
-    }
 
     return (
             <div className="Calendar">
@@ -63,7 +49,12 @@ function Calendar({className}){
                 </div>
                 <div className="Time-grid">
                     {days.map((day) => (
-                        <DayColumn day={day} dayEvents={data["weekly_schedule"][day]} eventColors={eventColors} />
+                        <DayColumn 
+                            key={day}
+                            day={day} 
+                            dayEvents={isLoading ? load : data ? data["weekly_schedule"][day]: load} 
+                            eventColors={isLoading ? loadColors : data ? eventColors : loadColors } 
+                        />
                     ))}
                 </div>
             </div>
