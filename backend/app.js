@@ -8,6 +8,15 @@ require('dotenv').config();
 const uri = process.env.MONGO_URL;
 const client = new MongoClient(uri);
 
+let database;
+
+client.connect()
+  .then(() => {
+      console.log('Connected to MongoDB');
+      database = client.db("studycompass");
+  })
+  .catch(err => console.error('Failed to connect to MongoDB', err));
+
 app.get('/update-database', (req, res) => {
     const pythonProcess = spawn('python', ['courseScraper.py']);
 
@@ -27,8 +36,6 @@ app.get('/update-database', (req, res) => {
 
 app.get('/getroom/:name', async (req, res) => {
     try {
-      await client.connect();
-      const database = client.db("studycompass"); 
       const rooms = database.collection("classrooms"); 
   
       const roomName = req.params.name;
@@ -41,26 +48,20 @@ app.get('/getroom/:name', async (req, res) => {
         res.status(404).send('Room not found');
       }
     } catch (error) {
-      res.status(500).send(error.message);
-    } finally {
-      await client.close();
-    }
+        next(error);
+    } 
 });
 
 app.get('/getrooms', async (req, res) => {
     try{
-        await client.connect();
-        const database = client.db("studycompass"); 
         const rooms = database.collection("classrooms"); 
 
-        const allRooms = await rooms.find({}, {'name': 1, "_id": 0}).toArray();
-        res.json(allRooms);
-    
+        const allRooms = await rooms.find({}, { projection: { 'name': 1, '_id': 0 } }).toArray();
+        const roomNames = allRooms.map(room => room.name);
+        res.json(roomNames.sort());
     } catch (error) {
-        res.status(500).send(error.message);
-    } finally { 
-        await client.close();
-    }
+        next(error)
+    } 
 });
 
 app.get('/api/greet', async (req, res) => {

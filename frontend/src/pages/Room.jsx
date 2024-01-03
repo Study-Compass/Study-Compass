@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Calendar from '../components/Calendar/Calendar';
 import './Room.css';
@@ -9,37 +9,33 @@ function Room(){
     let navigate =  useNavigate();
     const [rooms, setRooms] = useState(null);
 
-    // useEffect(() => {
-    //     const fetchRooms = async () => {
-    //         try {
-    //             const response = await fetch(`/getrooms`);
-    //             const rooms = await response.json();
-    //             setRooms(rooms);
-    //         } catch (error) {
-    //             console.error("Error fetching data: ", error);
-    //         }
-    //     };
+    useEffect(() => {
+        const fetchRooms = async () => {
+            try {
+                const response = await fetch(`/getrooms`);
+                const rooms = await response.json();
+                setRooms(rooms);
+                console.log(rooms);
+            } catch (error) {
+                console.error("Error fetching data: ", error);
+            }
+        };
 
-    //     fetchRooms();
-    // }, [roomid]);
+        fetchRooms();
+    }, [roomid]);
 
-    function changeURL(){
-        if(roomid === "Lally Hall 02")
-            navigate("/room/Low%20Center%20for%20Industrial%20Inn.%203045",{ replace: true });
-        else {
-            console.log(roomid);
-            navigate("/room/Lally%20Hall%2002",{ replace: true });
-        }
+    function changeURL(event){
+        navigate(`/room/${event.target.value}`,{ replace: true });
     }
     return(
         <div className="room">
-            <Header />
+            <Header />  
+            <select onChange={changeURL}>
+                {rooms && rooms.map((room) => <option value={room} selected={room===roomid}>{room.toLowerCase()}</option>)}
+            </select>
             <div className="calendar-container">
                 <Calendar className={roomid}/>
             </div>
-            <button onClick={changeURL}>change</button>
-            <dropdown>
-            </dropdown>
         </div>
     );
 }

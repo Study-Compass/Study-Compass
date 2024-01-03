@@ -111,6 +111,7 @@ function App() {
             <Routes>
                 <Route path="/room/:roomid" element={<Room />}/>
             </Routes>
+            <a href="/room/Academy%20Hall%20AUD">hello</a>
         </Router>
     );
 }
