@@ -7,6 +7,13 @@
   text-align: center;
 }
 
+h1{
+    font-family: 'Satoshi';
+    font-size: 25px;
+    font-weight: bold;
+    color: #414141;
+    margin: 0 0 10px 0;
+}
 
 .App-link {
   color: #61dafb;
@@ -34,4 +41,8 @@
 	background: var(--dark);
 	background: linear-gradient(90deg, var(--dark) 9%, var(--light) 18%, var(--dark) 31%);
 	background-size: 1300px 100%;
+}
+
+.shimmer:hover{
+    scale:1 !important;
 }

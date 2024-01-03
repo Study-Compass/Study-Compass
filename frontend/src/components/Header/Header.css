@@ -1,0 +1,12 @@
+.Header{
+    width:1300px;
+    display:flex;
+    justify-content: flex-start;
+    align-items: center;
+    padding:15px;
+    box-sizing: border-box;
+}
+
+.logo{
+    width:200px;
+}
