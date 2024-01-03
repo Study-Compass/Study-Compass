@@ -47,6 +47,22 @@ app.get('/getroom/:name', async (req, res) => {
     }
 });
 
+app.get('/getrooms', async (req, res) => {
+    try{
+        await client.connect();
+        const database = client.db("studycompass"); 
+        const rooms = database.collection("classrooms"); 
+
+        const allRooms = await rooms.find({}, {'name': 1, "_id": 0}).toArray();
+        res.json(allRooms);
+    
+    } catch (error) {
+        res.status(500).send(error.message);
+    } finally { 
+        await client.close();
+    }
+});
+
 app.get('/api/greet', async (req, res) => {
   res.json({ message: 'Hello from the backend!' });
 });
