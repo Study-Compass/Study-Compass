@@ -46,7 +46,17 @@
 }
 
 @media(max-width: 500px){
+    .time-label{
+        transform:translateY(-6px);
+        margin:0;
 
+    }
+    .time-label p{
+        font-size: 8px;
+    }
+    .TimeColumn{
+        width: 30px;
+    }
 }
 
 
