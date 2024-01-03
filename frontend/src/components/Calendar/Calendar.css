@@ -3,7 +3,6 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    height: 100vh;
 }
 
 .Calendar-header{
@@ -45,6 +44,16 @@
 @media(max-width: 500px){
     .Calendar-header{
         width:400px;
+    }
+    .Calendar-header p{
+        font-size: 10px;
+    }
+}
+
+@media(max-width: 400px){
+    .Calendar-header{
+        width:300px;
+        transform:translateX(18px);
     }
     .Calendar-header p{
         font-size: 10px;

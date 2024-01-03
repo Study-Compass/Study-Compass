@@ -14,31 +14,6 @@ function Calendar({className}){
             "start_time": "7:00",
             "end_time": "20:00"
         },
-        // {
-        //     "class_name": "loading",
-        //     "start_time": "10:00",
-        //     "end_time": "12:00"
-        // },
-        // {
-        //     "class_name": "loading",
-        //     "start_time": "12:00",
-        //     "end_time": "14:00"
-        // },
-        // {
-        //     "class_name": "loading",
-        //     "start_time": "14:00",
-        //     "end_time": "16:00"
-        // },
-        // {
-        //     "class_name": "loading",
-        //     "start_time": "16:00",
-        //     "end_time": "18:00"
-        // },
-        // {
-        //     "class_name": "loading",
-        //     "start_time": "18:00",
-        //     "end_time": "20:00"
-        // },
     ];
 
     useEffect(() => {
@@ -59,6 +34,7 @@ function Calendar({className}){
     if (!data) {
         return (
             <div className="Calendar">
+                <h1>{className.toLowerCase()}</h1>
                 <div className="Calendar-header">
                     <p>monday</p>
                     <p>tuesday</p>
@@ -77,6 +53,7 @@ function Calendar({className}){
 
     return (
             <div className="Calendar">
+                <h1>{className.toLowerCase()}</h1>
                 <div className="Calendar-header">
                     <p>monday</p>
                     <p>tuesday</p>
