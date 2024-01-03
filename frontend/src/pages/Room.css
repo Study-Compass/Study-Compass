@@ -14,7 +14,23 @@
     padding:40px 20px 60px 20px;
 }
 
+select{
+    border-radius: 10px;
+
+    border: 1px solid #B0AFAF;
+    font-family: 'Satoshi';
+    font-size: 25px;
+    font-weight: bold;
+    color: #414141;
+    padding: 5px 10px;
+    box-sizing: border-box;
+    margin:50px 0 0 0;
+    outline: none;
+    text-align: center;
+}
+
 @media(max-width:400px){
+
     .calendar-container{
         padding: 20px 10px 40px 10px;
         width: auto;

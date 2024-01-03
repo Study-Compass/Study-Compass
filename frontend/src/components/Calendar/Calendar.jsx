@@ -39,7 +39,7 @@ function Calendar({className}){
 
     return (
             <div className="Calendar">
-                <h1>{className.toLowerCase()}</h1>
+                {/* <h1>{className.toLowerCase()}</h1> */}
                 <div className="Calendar-header">
                     <p>monday</p>
                     <p>tuesday</p>
