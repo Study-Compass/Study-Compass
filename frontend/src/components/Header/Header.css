@@ -10,3 +10,9 @@
 .logo{
     width:200px;
 }
+
+@media(max-width: 400px){
+    .Header{
+        width:100%;
+    }
+}
