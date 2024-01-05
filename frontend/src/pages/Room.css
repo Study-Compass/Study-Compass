@@ -16,7 +16,6 @@
 
 select{
     border-radius: 10px;
-
     border: 1px solid #B0AFAF;
     font-family: 'Satoshi';
     font-size: 25px;
@@ -24,13 +23,17 @@ select{
     color: #414141;
     padding: 5px 10px;
     box-sizing: border-box;
-    margin:50px 0 0 0;
+    margin:30px 0 0 0;
     outline: none;
     text-align: center;
 }
 
 @media(max-width:400px){
-
+    select{
+        font-size:18px;
+        width:300px;
+        margin:10px 0 0 0;
+    }
     .calendar-container{
         padding: 20px 10px 40px 10px;
         width: auto;
