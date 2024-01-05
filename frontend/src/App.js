@@ -145,7 +145,6 @@ function App() {
             <Routes>
                 <Route path="/room/:roomid" element={<Room />}/>
             </Routes>
-            <SearchBar data={locations}/>
         </Router>
     );
 }

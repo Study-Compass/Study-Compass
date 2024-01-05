@@ -2,10 +2,30 @@ ul {
     list-style-type: none;
     margin: 0;
     padding: 0;
+    width:600px;
+    position: absolute;
+    border: 1px solid #B0AFAF;
+    z-index: 9;
+    transform:translateY(-15px);
+    box-sizing: border-box;
+    border-radius: 10px;
+    background-color: #FBFBFB;
+
 }
 
+.chosen{
+    background-color: #F7F7F7;
+    border-radius: 5px;
+    border-left:4px solid #FA756D;
+    border-right: 4px solid #F7F7F7;
+
+}
+
+
+
 li {
-    border: 1px solid #B0AFAF;
+    background-color: #FBFBFB;
+    /* border-bottom: 1px solid #B0AFAF; */
     font-family: 'Satoshi';
     font-size: 25px;
     font-weight: bold;
@@ -14,19 +34,22 @@ li {
     box-sizing: border-box;
     outline: none;
     text-align: center;
+    border-radius: 10px;
 }
 
 li:hover {
     background-color: #f0f0f0;
+    cursor: pointer;
+    
 }
 
 .search-container{
     width:600px;
-    min-height:500px;
 }
 
 .search-bar{
     width:100%;
+    background-color: white;
     border-radius: 10px;
     border: 1px solid #B0AFAF;
     font-family: 'Satoshi';
@@ -38,13 +61,19 @@ li:hover {
     margin: 30px 0 0 0;
     outline: none;
     text-align: center;
+    z-index: 10;
+    position:relative;
 }
 
 .non-match{
-    color: #989898;
+    color: #929292;
 }
 
 .no-results:hover{
     background-color: white !important;
+}
+
+.spacer{
+    height:15px;
 }
 

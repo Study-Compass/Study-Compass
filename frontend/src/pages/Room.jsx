@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import Calendar from '../components/Calendar/Calendar';
 import './Room.css';
 import Header from '../components/Header/Header';
+import SearchBar from '../components/SearchBar/SearchBar';
 
 function Room(){
     let { roomid } = useParams();
@@ -27,9 +28,15 @@ function Room(){
     function changeURL(event){
         navigate(`/room/${event.target.value}`,{ replace: true });
     }
+
+    function changeURL2(option){
+        navigate(`/room/${option}`,{ replace: true });
+    }
+
     return(
         <div className="room">
             <Header />  
+            <SearchBar data={rooms} onEnter={changeURL2}/>
             <select onChange={changeURL}>
                 {rooms && rooms.map((room) => <option value={room} selected={room===roomid}>{room.toLowerCase()}</option>)}
             </select>
