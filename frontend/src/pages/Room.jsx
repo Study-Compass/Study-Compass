@@ -25,9 +25,9 @@ function Room(){
         fetchRooms();
     }, [roomid]);
 
-    function changeURL(event){
-        navigate(`/room/${event.target.value}`,{ replace: true });
-    }
+    // function changeURL(event){
+    //     navigate(`/room/${event.target.value}`,{ replace: true });
+    // }
 
     function changeURL2(option){
         navigate(`/room/${option}`,{ replace: true });

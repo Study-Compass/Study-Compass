@@ -1,5 +1,6 @@
 import React, { useState,useEffect } from 'react';
 import './SearchBar.css';
+import x from '../../assets/x.svg';
 
 //need to add support for abbreviated versions
 function SearchBar({ data, onEnter}) {
@@ -31,16 +32,23 @@ function SearchBar({ data, onEnter}) {
             }
             const firstSeven = filteredResults.slice(0, 7);
             setResults(firstSeven);
-
+            console.log(firstSeven);
         }
     };
+
+    function next(name){
+        setSearchInput(name.toLowerCase());
+        setResults([]);
+        onEnter(name);
+    }
 
     const handleKeyDown = (event) => {
         if (event.key === 'Enter') {
             if (results.length > 0) {
-                setSearchInput(results[selected].toLowerCase());
-                setResults([]);
-                onEnter(results[selected]);
+                // setSearchInput(results[selected].toLowerCase());
+                // setResults([]);
+                // onEnter(results[selected]);
+                next(results[selected]);
             }
         }
         if (event.key === 'ArrowDown') {
@@ -59,6 +67,16 @@ function SearchBar({ data, onEnter}) {
         }   
     };
 
+    function test(event){
+        next(results[event.target.value])
+        console.log(`testing url:${event.target.value}`)
+    }
+
+    function handleX(){
+        setSearchInput('');
+        setResults([]);
+    }
+
     return (
         <div className="search-container">
             <input
@@ -70,8 +88,9 @@ function SearchBar({ data, onEnter}) {
                 onFocus={() => setIsFocused(true)}
                 onBlur={() => setIsFocused(false)}
                 onKeyDown={handleKeyDown}
-                spellCheck="false"
+                spellCheck="false"  
             />
+            <img src={x} className="x" alt="x" onClick={handleX} />
             {results.length > 0 && (
                 <ul>
                     <div className="spacer"></div>
@@ -88,10 +107,10 @@ function SearchBar({ data, onEnter}) {
                             );
                         }
                         return (
-                            <li key={index} className={index === selected ? "chosen" : ""} onClick={onEnter(results[index])}>
-                                <span className="non-match">{beforeMatch}</span>
-                                <span className="match">{matchText}</span>
-                                <span className="non-match">{afterMatch}</span>
+                            <li key={index} value={index} className={index === selected ? "chosen" : ""} onClick={test}>
+                                <span className="result non-match">{beforeMatch}</span>
+                                <span className="result match">{matchText}</span>
+                                <span className="result non-match">{afterMatch}</span>
                             </li>
                         );
                     })}                 
