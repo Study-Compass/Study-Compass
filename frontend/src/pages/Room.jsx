@@ -37,9 +37,9 @@ function Room(){
         <div className="room">
             <Header />  
             <SearchBar data={rooms} onEnter={changeURL2}/>
-            <select onChange={changeURL}>
+            {/* <select onChange={changeURL}>
                 {rooms && rooms.map((room) => <option value={room} selected={room===roomid}>{room.toLowerCase()}</option>)}
-            </select>
+            </select> */}
             <div className="calendar-container">
                 <Calendar className={roomid}/>
             </div>

@@ -16,12 +16,21 @@ ul {
 .chosen{
     background-color: #F7F7F7;
     border-radius: 5px;
-    border-left:4px solid #FA756D;
-    border-right: 4px solid #F7F7F7;
+    /* border-left:4px solid #FA756D;
+    border-right: 4px solid #F7F7F7; */
 
 }
 
-
+.chosen::before{
+    content: "";
+    background-color: #FA756D;
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    height:100%;
+    width:6px;
+    border-radius: 0 5px 5px 0;
+}
 
 li {
     background-color: #FBFBFB;
@@ -35,6 +44,7 @@ li {
     outline: none;
     text-align: center;
     border-radius: 10px;
+    position:relative;
 }
 
 li:hover {
