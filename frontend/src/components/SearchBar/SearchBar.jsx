@@ -24,7 +24,9 @@ function SearchBar({ data, onEnter}) {
                 item.toLowerCase().startsWith(value)
             );
             const newfilteredResults = data.filter(item =>
-                item.toLowerCase().includes(value)
+                {if(!results.includes(item)){
+                    item.toLowerCase().includes(value) 
+                }}
             );        
             filteredResults.push(...newfilteredResults);    
             if(filteredResults.length === 0){
@@ -67,9 +69,9 @@ function SearchBar({ data, onEnter}) {
         }   
     };
 
-    function test(event){
+    function click(event){
         next(results[event.target.value])
-        console.log(`testing url:${event.target.value}`)
+        console.log(`routing url:${event.target.value}`)
     }
 
     function handleX(){
@@ -80,7 +82,7 @@ function SearchBar({ data, onEnter}) {
     return (
         <div className="search-container">
             <input
-                className="search-bar"
+                className={`search-bar ${!isFocused ? "center":""}`}
                 type="text"
                 value={searchInput}
                 onChange={handleInputChange}
@@ -107,7 +109,7 @@ function SearchBar({ data, onEnter}) {
                             );
                         }
                         return (
-                            <li key={index} value={index} className={index === selected ? "chosen" : ""} onClick={test}>
+                            <li key={index} value={index} className={index === selected ? "chosen" : ""} onClick={click}>
                                 <span className="result non-match">{beforeMatch}</span>
                                 <span className="result match">{matchText}</span>
                                 <span className="result non-match">{afterMatch}</span>
