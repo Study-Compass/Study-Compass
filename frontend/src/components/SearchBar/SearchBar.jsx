@@ -70,6 +70,7 @@ function SearchBar({ data, onEnter}) {
                 onFocus={() => setIsFocused(true)}
                 onBlur={() => setIsFocused(false)}
                 onKeyDown={handleKeyDown}
+                spellCheck="false"
             />
             {results.length > 0 && (
                 <ul>
@@ -87,7 +88,7 @@ function SearchBar({ data, onEnter}) {
                             );
                         }
                         return (
-                            <li key={index} className={index === selected ? "chosen" : ""}>
+                            <li key={index} className={index === selected ? "chosen" : ""} onClick={onEnter(results[index])}>
                                 <span className="non-match">{beforeMatch}</span>
                                 <span className="match">{matchText}</span>
                                 <span className="non-match">{afterMatch}</span>
