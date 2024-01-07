@@ -1,16 +1,30 @@
-import React, { useState,useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './SearchBar.css';
+import x from '../../assets/x.svg';
 
 //need to add support for abbreviated versions
 function SearchBar({ data, onEnter}) {
     const [searchInput, setSearchInput] = useState('');
     const [results, setResults] = useState([]);
+    const [lower, setLower] = useState("")
 
     const [isFocused, setIsFocused] = useState(false);
     const [selected, setSelected] = useState(0);
 
+    const inputRef = useRef(null);
+
     useEffect(() => {
-    }, [isFocused]);
+        if(searchInput === "" || results[0]==="no results found"){
+            setLower("");
+        }else if(results.length>0){
+
+            if(results[0]!="no results found"){
+                setLower(results[0].toLowerCase())
+            }
+        }
+    }, [results, searchInput]);
+
+
     const handleInputChange = (event) => {
         const value = event.target.value.toLowerCase();
         setSearchInput(value);
@@ -23,7 +37,9 @@ function SearchBar({ data, onEnter}) {
                 item.toLowerCase().startsWith(value)
             );
             const newfilteredResults = data.filter(item =>
-                item.toLowerCase().includes(value)
+                {if(!results.includes(item)){
+                    item.toLowerCase().includes(value) 
+                }}
             );        
             filteredResults.push(...newfilteredResults);    
             if(filteredResults.length === 0){
@@ -31,38 +47,59 @@ function SearchBar({ data, onEnter}) {
             }
             const firstSeven = filteredResults.slice(0, 7);
             setResults(firstSeven);
-
+            console.log(firstSeven);
         }
     };
+
+    function next(name){
+        setSearchInput(name.toLowerCase());
+        setResults([]);
+        onEnter(name);
+    }
 
     const handleKeyDown = (event) => {
         if (event.key === 'Enter') {
             if (results.length > 0) {
-                setSearchInput(results[selected].toLowerCase());
-                setResults([]);
-                onEnter(results[selected]);
+                next(results[selected]);
+                inputRef.current.blur();
             }
         }
-        if (event.key === 'ArrowDown') {
+        if (event.key === 'ArrowDown' || event.key === 'ArrowRight') {
             if(selected === results.length-1){
                 setSelected(0);
             } else {
                 setSelected(selected+1);
             }
         }   
-        if (event.key === 'ArrowUp') {
+        if (event.key === 'ArrowUp' || event.key === 'ArrowLeft') {
             if(selected === 0){
                 setSelected(results.length-1);
             } else {
                 setSelected(selected-1);
             }
         }   
+        if (event.key === "Tab"){
+            if (results.length > 0 && results[0] != "no results found"){
+                event.preventDefault();
+                setSearchInput(results[0].toLowerCase())
+            }
+        }
     };
+
+    function click(event){
+        next(results[event.target.value])
+        console.log(`routing url:${event.target.value}`)
+    }
+
+    function handleX(){
+        setSearchInput('');
+        setResults([]);
+    }
 
     return (
         <div className="search-container">
             <input
-                className="search-bar"
+                className={`search-bar ${!isFocused ? "center":""}`}
                 type="text"
                 value={searchInput}
                 onChange={handleInputChange}
@@ -70,8 +107,14 @@ function SearchBar({ data, onEnter}) {
                 onFocus={() => setIsFocused(true)}
                 onBlur={() => setIsFocused(false)}
                 onKeyDown={handleKeyDown}
-                spellCheck="false"
+                spellCheck="false"  
+                ref={inputRef}
             />
+            <input className={`shadow search-bar ${!isFocused ? "center":""}`}
+                placeholder={lower}
+                readOnly={true}
+            />
+            <img src={x} className="x" alt="x" onClick={handleX} />
             {results.length > 0 && (
                 <ul>
                     <div className="spacer"></div>
@@ -88,10 +131,10 @@ function SearchBar({ data, onEnter}) {
                             );
                         }
                         return (
-                            <li key={index} className={index === selected ? "chosen" : ""} onClick={onEnter(results[index])}>
-                                <span className="non-match">{beforeMatch}</span>
-                                <span className="match">{matchText}</span>
-                                <span className="non-match">{afterMatch}</span>
+                            <li key={index} value={index} className={index === selected ? "chosen" : ""} onClick={click}>
+                                <span className="result non-match">{beforeMatch}</span>
+                                <span className="result match">{matchText}</span>
+                                <span className="result non-match">{afterMatch}</span>
                             </li>
                         );
                     })}                 
