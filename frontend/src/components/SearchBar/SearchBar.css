@@ -5,7 +5,7 @@ ul {
     width:600px;
     position: absolute;
     border: 1px solid #B0AFAF;
-    z-index: 9;
+    z-index: 8;
     transform:translateY(-15px);
     box-sizing: border-box;
     border-radius: 10px;
@@ -32,6 +32,7 @@ ul {
     border-radius: 0 5px 5px 0;
 }
 
+
 li {
     background-color: #FBFBFB;
     /* border-bottom: 1px solid #B0AFAF; */
@@ -45,6 +46,7 @@ li {
     text-align: left;
     border-radius: 10px;
     position:relative;
+    transition: all 0.5s;
 }
 
 li:hover {
@@ -60,7 +62,7 @@ li:hover {
 
 .search-bar{
     width:100%;
-    background-color: white;
+    background-color: transparent;
     border-radius: 10px;
     border: 1px solid #B0AFAF;
     font-family: 'Satoshi';
@@ -74,7 +76,9 @@ li:hover {
     text-align: left;
     z-index: 10;
     position:relative;
+    transition:all 0.3s;
 }
+
 
 .non-match{
     color: #929292;
@@ -106,4 +110,18 @@ li:hover {
 
 .center{
     text-align: center;
+}
+
+.noPointer{
+    pointer-events: none;
+}
+
+.shadow{
+    position:absolute;
+    top: 0;
+    left: 0;
+    z-index: 9;
+    pointer-events: none;
+    background-color: white;
+    color: #929292;
 }
