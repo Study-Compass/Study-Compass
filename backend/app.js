@@ -34,7 +34,7 @@ app.get('/update-database', (req, res) => {
 });
 
 app.get('/getroom/:name', async (req, res) => {
-    console.log('GET: /getroom/:name')
+    console.log(`GET: /getroom/${req.params.name}`)
     try {
       const rooms = database.collection("classrooms"); 
   

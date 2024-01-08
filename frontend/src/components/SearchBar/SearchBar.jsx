@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import './SearchBar.css';
 import x from '../../assets/x.svg';
 
@@ -14,37 +14,39 @@ function SearchBar({ data, onEnter}) {
     const inputRef = useRef(null);
 
     const handleInputChange = (event) => {
-        const value = event.target.value.toLowerCase();
-        setSearchInput(value);
-        setSelected(0);
+        setSearchInput(event.target.value);
+    };
 
-        if (value === '') {
+    useEffect(() => {
+        if (searchInput === '') {
             setResults([]);
             setLower("");
         } else {
+            setSelected(0);
             const filteredResults = data.filter(item =>
-                item.toLowerCase().startsWith(value)
+                item.slice(0,-1).toLowerCase().startsWith(searchInput)
             );
             const newfilteredResults = data.filter(item => {
-                // Convert item to lowercase and check if it includes the value.
-                const includesValue = item.toLowerCase().includes(value.toLowerCase());
+                // Convert item to lowercase and check if it includes the searchInput.
+                const includesSearchInput = item.slice(0,-1).toLowerCase().includes(searchInput.toLowerCase());
                 // Check if the item is not already in the results.
                 const notInResults = !results.includes(item);
                 // Return true if both conditions are met.
-                return includesValue && notInResults;
+                return includesSearchInput && notInResults;
             });
-            filteredResults.push(...newfilteredResults);    
-            if(filteredResults.length === 0){
+            filteredResults.push(...newfilteredResults);
+            if (filteredResults.length === 0) {
                 filteredResults.push("no results found");
                 setLower("");
             } else {
-                setLower(filteredResults[0].toLowerCase())
+                setLower(filteredResults[0].toLowerCase());
             }
             const firstSeven = filteredResults.slice(0, 7);
             setResults(firstSeven);
             console.log(firstSeven);
         }
-    };
+    }, [searchInput]);
+
 
     function next(name){
         setSearchInput(name.toLowerCase());
@@ -55,29 +57,37 @@ function SearchBar({ data, onEnter}) {
 
     const handleKeyDown = (event) => {
         if (event.key === 'Enter') {
+            event.preventDefault();
             if (results.length > 0) {
                 next(results[selected]);
                 inputRef.current.blur();
             }
         }
         if (event.key === 'ArrowDown' || event.key === 'ArrowRight') {
+            event.preventDefault();
             if(selected === results.length-1){
                 setSelected(0);
+                setLower(results[0].toLowerCase());
             } else {
                 setSelected(selected+1);
+                setLower(results[selected+1].toLowerCase());
             }
         }   
         if (event.key === 'ArrowUp' || event.key === 'ArrowLeft') {
+            event.preventDefault();
             if(selected === 0){
                 setSelected(results.length-1);
+                setLower(results[results.length-1].toLowerCase());
             } else {
                 setSelected(selected-1);
+                setLower(results[selected-1].toLowerCase());
             }
         }   
         if (event.key === "Tab"){
             if (results.length > 0 && results[0] !== "no results found"){
                 event.preventDefault();
-                setSearchInput(results[0].toLowerCase())
+                setSearchInput(results[selected].toLowerCase())
+                setLower("");
             }
         }
     };
@@ -90,6 +100,7 @@ function SearchBar({ data, onEnter}) {
     function handleX(){
         setSearchInput('');
         setResults([]);
+        setLower("");
     }
 
     return (
