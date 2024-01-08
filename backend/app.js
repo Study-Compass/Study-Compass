@@ -34,6 +34,7 @@ app.get('/update-database', (req, res) => {
 });
 
 app.get('/getroom/:name', async (req, res) => {
+    console.log('GET: /getroom/:name')
     try {
       const rooms = database.collection("classrooms"); 
   
@@ -153,6 +154,7 @@ app.get('/getroom/:name', async (req, res) => {
 });
 
 app.get('/getrooms', async (req, res) => {
+    console.log('GET: /getrooms')
     try{
         const rooms = database.collection("classrooms"); 
 
@@ -299,6 +301,7 @@ app.get('/getrooms', async (req, res) => {
 });
 
 app.get('/api/greet', async (req, res) => {
+  console.log('GET: /api/greet')
   res.json({ message: 'Hello from the backend!' });
 });
 

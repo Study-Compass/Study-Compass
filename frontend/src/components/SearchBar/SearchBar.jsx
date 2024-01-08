@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import './SearchBar.css';
 import x from '../../assets/x.svg';
 
@@ -13,18 +13,6 @@ function SearchBar({ data, onEnter}) {
 
     const inputRef = useRef(null);
 
-    useEffect(() => {
-        if(searchInput === "" || results[0]==="no results found"){
-            setLower("");
-        }else if(results.length>0){
-
-            if(results[0]!="no results found"){
-                setLower(results[0].toLowerCase())
-            }
-        }
-    }, [results, searchInput]);
-
-
     const handleInputChange = (event) => {
         const value = event.target.value.toLowerCase();
         setSearchInput(value);
@@ -32,18 +20,25 @@ function SearchBar({ data, onEnter}) {
 
         if (value === '') {
             setResults([]);
+            setLower("");
         } else {
             const filteredResults = data.filter(item =>
                 item.toLowerCase().startsWith(value)
             );
-            const newfilteredResults = data.filter(item =>
-                {if(!results.includes(item)){
-                    item.toLowerCase().includes(value) 
-                }}
-            );        
+            const newfilteredResults = data.filter(item => {
+                // Convert item to lowercase and check if it includes the value.
+                const includesValue = item.toLowerCase().includes(value.toLowerCase());
+                // Check if the item is not already in the results.
+                const notInResults = !results.includes(item);
+                // Return true if both conditions are met.
+                return includesValue && notInResults;
+            });
             filteredResults.push(...newfilteredResults);    
             if(filteredResults.length === 0){
                 filteredResults.push("no results found");
+                setLower("");
+            } else {
+                setLower(filteredResults[0].toLowerCase())
             }
             const firstSeven = filteredResults.slice(0, 7);
             setResults(firstSeven);
@@ -53,6 +48,7 @@ function SearchBar({ data, onEnter}) {
 
     function next(name){
         setSearchInput(name.toLowerCase());
+        setLower("");
         setResults([]);
         onEnter(name);
     }
@@ -79,7 +75,7 @@ function SearchBar({ data, onEnter}) {
             }
         }   
         if (event.key === "Tab"){
-            if (results.length > 0 && results[0] != "no results found"){
+            if (results.length > 0 && results[0] !== "no results found"){
                 event.preventDefault();
                 setSearchInput(results[0].toLowerCase())
             }
