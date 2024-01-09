@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import './SearchBar.css';
 import x from '../../assets/x.svg';
+import tab from '../../assets/tab.svg';
 
 //need to add support for abbreviated versions
 function SearchBar({ data, onEnter}) {
@@ -12,23 +13,24 @@ function SearchBar({ data, onEnter}) {
     const [selected, setSelected] = useState(0);
 
     const inputRef = useRef(null);
+    const shadowRef = useRef(null);
 
     const handleInputChange = (event) => {
         setSearchInput(event.target.value);
     };
 
     useEffect(() => {
-        if (searchInput === '') {
+        if (searchInput === '' || !isFocused) {
             setResults([]);
             setLower("");
         } else {
             setSelected(0);
             const filteredResults = data.filter(item =>
-                item.slice(0,-1).toLowerCase().startsWith(searchInput)
+                item.toLowerCase().startsWith(searchInput)
             );
             const newfilteredResults = data.filter(item => {
                 // Convert item to lowercase and check if it includes the searchInput.
-                const includesSearchInput = item.slice(0,-1).toLowerCase().includes(searchInput.toLowerCase());
+                const includesSearchInput = item.toLowerCase().includes(searchInput.toLowerCase());
                 // Check if the item is not already in the results.
                 const notInResults = !results.includes(item);
                 // Return true if both conditions are met.
@@ -39,7 +41,9 @@ function SearchBar({ data, onEnter}) {
                 filteredResults.push("no results found");
                 setLower("");
             } else {
-                setLower(filteredResults[0].toLowerCase());
+                if(filteredResults.length > 1){
+                    setLower(filteredResults[0].toLowerCase());
+                }
             }
             const firstSeven = filteredResults.slice(0, 7);
             setResults(firstSeven);
@@ -47,6 +51,12 @@ function SearchBar({ data, onEnter}) {
         }
     }, [searchInput]);
 
+    // useEffect(() => {
+    //     if(!isFocused){
+    //         setResults([]);
+    //         setLower("");
+    //     }
+    // }, [isFocused]);
 
     function next(name){
         setSearchInput(name.toLowerCase());
@@ -99,8 +109,20 @@ function SearchBar({ data, onEnter}) {
 
     function handleX(){
         setSearchInput('');
-        setResults([]);
         setLower("");
+        setResults([]);
+    }
+
+    function tabShadow(word){
+        if(word===""){
+            return 0;
+        } else {
+            const input = shadowRef.current;
+            if(input){
+                console.log(input.scrollWidth);
+                return input.scrollWidth;
+            }
+        }
     }
 
     return (
@@ -117,10 +139,13 @@ function SearchBar({ data, onEnter}) {
                 spellCheck="false"  
                 ref={inputRef}
             />
-            <input className={`shadow search-bar ${!isFocused ? "center":""}`}
+            <div className={`shadow ${!isFocused ? "center":""} ${lower==="" ? "white":""}`}
                 placeholder={lower}
                 readOnly={true}
-            />
+                ref={shadowRef} 
+            >{lower==="" ? "." :lower}
+                <img src={tab} className={`tab ${lower==="" ? "disappear":""}`} style={{right:`${tabShadow(lower)}px`}}/>
+            </div>
             <img src={x} className="x" alt="x" onClick={handleX} />
             {results.length > 0 && (
                 <ul>
@@ -130,6 +155,7 @@ function SearchBar({ data, onEnter}) {
                         const beforeMatch = item.toLowerCase().slice(0, matchIndex);
                         const matchText = item.toLowerCase().slice(matchIndex, matchIndex + searchInput.length);
                         const afterMatch = item.toLowerCase().slice(matchIndex + searchInput.length);
+                        
                         if(item === "no results found"){
                             return (
                                 <li key={index} className="no-results">
