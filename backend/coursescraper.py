@@ -42,6 +42,7 @@ from helpers import test_mongo_insert_and_read, print_url, format_time
 
 TIMEOUT = httpx.Timeout(30.0)
 
+date = None # global variable for next date
 # function that returns a list of course ids for a given term, searches the sis catalog search, which has each course id as an option value in the selct
 async def get_course_ids(term):
     url = f"https://sis.rpi.edu/rss/bwckctlg.p_display_courses?term_in={term}&sel_crse_strt=&sel_crse_end=&sel_subj=&sel_levl=&sel_schd=&sel_coll=&sel_divs=&sel_dept=&sel_attr="
@@ -100,6 +101,11 @@ async def parse_course_info(url, classroom_info):
                 classroom = cells[3].text.strip() # getting classroom name
                 time = format_time(cells[1].text.strip()) # getting meeting time
                 days = list(cells[2].text.strip()) # getting meeting days
+
+                if not date: # if date hasn't been found yet
+                    # finding next date
+                    date = cells[5].split('-')[1].strip()
+
                 if classroom not in classroom_info: # if classroom not initialized
 
                     classroom_info[classroom] = { # classroom data schema
@@ -117,7 +123,7 @@ async def parse_course_info(url, classroom_info):
 
 # function to connect and update connected mongo database, in progress until real-
 # cluster organization and database management determined
-def upload_to_mongo(dic):
+def upload_to_mongo(dic, term):
     load_dotenv() # loading .env file
     uri = os.environ.get('MONGO_URL') # fetching URI string
     client = MongoClient(uri, server_api=ServerApi('1')) 
@@ -132,6 +138,14 @@ def upload_to_mongo(dic):
     collection = db['classrooms']
     db['classrooms'].drop()
     
+    if date: # if date has been found
+        dateCollection = db['date']
+        result = dateCollection.find_one({"semester": date})
+        if not result:
+            dateCollection.insert_one({"semester": date})
+    else:
+        print("date not found")
+
     # inserting data into db
     for classroom in dic:
         collection.insert_one(dic[classroom])
@@ -154,7 +168,7 @@ async def main():
     
     # upload data
     dump_to_json(dic)
-    upload_to_mongo(dic)
+    upload_to_mongo(dic, term)
 
     return dic
 
