@@ -42,7 +42,11 @@ function SearchBar({ data, onEnter}) {
                 setLower("");
             } else {
                 if(filteredResults.length > 1){
-                    setLower(filteredResults[0].toLowerCase());
+                    if(filteredResults[0].toLowerCase().startsWith(searchInput.toLowerCase())){
+                        setLower(filteredResults[0].toLowerCase());
+                    } else {
+                        setLower("");
+                    }
                 }
             }
             const firstSeven = filteredResults.slice(0, 7);
@@ -77,20 +81,36 @@ function SearchBar({ data, onEnter}) {
             event.preventDefault();
             if(selected === results.length-1){
                 setSelected(0);
-                setLower(results[0].toLowerCase());
-            } else {
+                if(results[0].toLowerCase().startsWith(searchInput.toLowerCase())){
+                    setLower(results[0].toLowerCase());
+                } else {
+                    setLower("");
+                }
+        } else {
                 setSelected(selected+1);
-                setLower(results[selected+1].toLowerCase());
+                if(results[0].toLowerCase().startsWith(searchInput.toLowerCase())){
+                    setLower(results[selected+1].toLowerCase());
+                } else {
+                    setLower("");
+                }
             }
         }   
         if (event.key === 'ArrowUp' || event.key === 'ArrowLeft') {
             event.preventDefault();
             if(selected === 0){
                 setSelected(results.length-1);
-                setLower(results[results.length-1].toLowerCase());
+                if(results[results.length-1].toLowerCase().startsWith(searchInput.toLowerCase())){
+                    setLower(results[results.length-1].toLowerCase());
+                } else {
+                    setLower("");
+                }
             } else {
                 setSelected(selected-1);
-                setLower(results[selected-1].toLowerCase());
+                if(results[selected-1].toLowerCase().startsWith(searchInput.toLowerCase())){
+                    setLower(results[selected-1].toLowerCase());
+                } else {
+                    setLower("");
+                }
             }
         }   
         if (event.key === "Tab"){
