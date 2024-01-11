@@ -1,8 +1,8 @@
 .DayColumn{
     display:grid;
-    grid-template-rows: repeat(26, 1fr);
+    grid-template-rows: repeat(28, 1fr);
     position: relative;
-    height:500px;   
+    height:530px;   
     width:145px;
 }
 
@@ -11,6 +11,7 @@
     border-radius: 5px;
     padding: 5px;
     margin:6px;
+    transform: translateY(1px);
     background-color:#B1E6B0;
     /* border: 3px solid darkgreen; */
     box-sizing: border-box;
@@ -31,7 +32,7 @@
 
 .grid{
     display:grid;
-    grid-template-rows: repeat(26, 1fr);
+    grid-template-rows: repeat(28, 1fr);
     position: relative;
     height:100%;   
     width:100%;

@@ -1,6 +1,6 @@
 .TimeLabelColumn{
     display:grid;
-    grid-template-rows: repeat(26, 1fr);
+    grid-template-rows: repeat(28, 1fr);
     position: relative;
     height:100%;   
     width:100%;
