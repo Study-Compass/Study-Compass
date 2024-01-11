@@ -4,8 +4,8 @@ import x from '../../assets/x.svg';
 import tab from '../../assets/tab.svg';
 
 //need to add support for abbreviated versions
-function SearchBar({ data, onEnter}) {
-    const [searchInput, setSearchInput] = useState('');
+function SearchBar({ data, onEnter, room}) {
+    const [searchInput, setSearchInput] = useState(room.toLowerCase());
     const [results, setResults] = useState([]);
     const [lower, setLower] = useState("")
 
@@ -53,14 +53,8 @@ function SearchBar({ data, onEnter}) {
             setResults(firstSeven);
             console.log(firstSeven);
         }
-    }, [searchInput]);
-
-    // useEffect(() => {
-    //     if(!isFocused){
-    //         setResults([]);
-    //         setLower("");
-    //     }
-    // }, [isFocused]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [searchInput, data]);
 
     function next(name){
         setSearchInput(name.toLowerCase());
@@ -164,7 +158,7 @@ function SearchBar({ data, onEnter}) {
                 readOnly={true}
                 ref={shadowRef} 
             >{lower==="" ? "." :lower}
-                <img src={tab} className={`tab ${lower==="" ? "disappear":""}`} style={{right:`${tabShadow(lower)}px`}}/>
+                <img src={tab} alt="tab" className={`tab ${lower==="" ? "disappear":""}`} style={{right:`${tabShadow(lower)}px`}}/>
             </div>
             <img src={x} className="x" alt="x" onClick={handleX} />
             {results.length > 0 && (

@@ -52,7 +52,7 @@ function Room(){
     return(
         <div className="room">
             <Header />  
-            <SearchBar data={rooms} onEnter={changeURL2}/>
+            <SearchBar data={rooms} onEnter={changeURL2} room={roomid}/>
             {/* <select onChange={changeURL}>
                 {rooms && rooms.map((room) => <option value={room} selected={room===roomid}>{room.toLowerCase()}</option>)}
             </select> */}
