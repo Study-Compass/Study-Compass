@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "mongoose": "^8.0.4",
     "react-router-dom": "^6.21.1"
   },
   "devDependencies": {
@@ -9,5 +10,5 @@
     "start": "concurrently \"npm run server\" \"npm run client\"",
     "server": "cd backend && node app.js",
     "client": "cd frontend && npm start"
-    }
+  }
 }
