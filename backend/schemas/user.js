@@ -1,18 +1,28 @@
 const mongoose = require('mongoose');
 
-const classroomSchema = new mongoose.Schema({
-    name: String,
-    weekly_schedule: {
-        M: Array,
-        T: Array,
-        W: Array,
-        R: Array,
-        F: Array,
-        // Add other days if needed
+const userSchema = new mongoose.Schema({
+    username: {
+        type: String,
+        required: true,
+        unique: true,
+        trim: true, // Trims whitespace
+        minlength: 3 // Minimum length of the username
+    },
+    email: {
+        type: String,
+        required: true,
+        unique: true,
+        trim: true,
+        // Add validation for email
+    },
+    password: {
+        type: String,
+        required: true,
+        minlength: 6 // Minimum length of the password
     },
     // Add other fields as necessary
 });
 
-const Classroom = mongoose.model('Classroom', classroomSchema);
+const User = mongoose.model('Classroom', userSchema , 'users');
 
-module.exports = Classroom;
+module.exports = User;
