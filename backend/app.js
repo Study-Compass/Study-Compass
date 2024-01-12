@@ -1,21 +1,23 @@
 const express = require('express');
 const { MongoClient } = require('mongodb');
+const mongoose = require('mongoose');
 const app = express();
 const port = 5001;
 const { spawn } = require('child_process');
+
 require('dotenv').config();
 
-const uri = process.env.MONGO_URL;
-const client = new MongoClient(uri);
+mongoose.connect(process.env.MONGO_URL)
 
-let database;
+mongoose.connection.on('connected', () => {
+    console.log('Mongoose connected to DB.');
+});
 
-client.connect()
-  .then(() => {
-      console.log('Connected to MongoDB');
-      database = client.db("studycompass");
-  })
-  .catch(err => console.error('Failed to connect to MongoDB', err));
+mongoose.connection.on('error', (err) => {
+    console.error('Mongoose connection error:', err);
+});
+
+const Classroom = require('./schemas/classroom.js');
 
 app.get('/update-database', (req, res) => {
     const pythonProcess = spawn('python', ['courseScraper.py']);
@@ -34,21 +36,26 @@ app.get('/update-database', (req, res) => {
 });
 
 app.get('/getroom/:name', async (req, res) => {
-    console.log(`GET: /getroom/${req.params.name}`)
     try {
-      const rooms = database.collection("classrooms"); 
-  
-      const roomName = req.params.name;
-      const query = { name: roomName };
-      const room = await rooms.findOne(query);
-  
-      if (room) {
-        res.json(room);
-      } else {
-        res.status(404).send('Room not found');
-      }
+
+        const roomName = req.params.name;
+        const query = { name: "Test Classroom" };
+        const room = await Classroom.findOne({ name: roomName });
+        const numbers = await Classroom.countDocuments({});
+        console.log("Number of documents:", numbers);
+
+        if (room) {
+            res.json(room);
+            console.log(`GET: /getroom/${req.params.name}`)
+
+        } else {
+            res.status(404).send('Room not found');
+            console.log(`GET: /getroom/${req.params.name} | NOT FOUND`)
+
+        }
     } catch (error) {
-        // res.send(error)
+        res.send(error)
+        console.log(error)
         const data = {
             "name": "Academy Hall AUD",
             "weekly_schedule": {
@@ -150,18 +157,20 @@ app.get('/getroom/:name', async (req, res) => {
             }
         }
         res.json(data);
-    } 
+    }
 });
 
 app.get('/getrooms', async (req, res) => {
-    console.log('GET: /getrooms')
-    try{
-        const rooms = database.collection("classrooms"); 
-
-        const allRooms = await rooms.find({}, { projection: { 'name': 1, '_id': 0 } }).toArray();
+    try {
+        const numbers = await Classroom.countDocuments({});
+        console.log("Number of documents:", numbers);
+        const allRooms = await Classroom.find({}).select('name -_id');
         const roomNames = allRooms.map(room => room.name);
         res.json(roomNames.sort());
+        console.log('GET: /getrooms')
+
     } catch (error) {
+        console.log(error)
         const locations = [
             "Academy Hall AUD",
             "Alumni Sports and Rec Center 209",
@@ -295,16 +304,16 @@ app.get('/getrooms', async (req, res) => {
             "West Hall 411",
             "West Hall AUD",
             "Winslow Building 1140"
-        ];   
+        ];
         res.send(locations)
-    } 
+    }
 });
 
 app.get('/api/greet', async (req, res) => {
-  console.log('GET: /api/greet')
-  res.json({ message: 'Hello from the backend!' });
+    console.log('GET: /api/greet')
+    res.json({ message: 'Hello from the backend!' });
 });
 
 app.listen(port, () => {
-  console.log(`Backend server is running on http://localhost:${port}`);
+    console.log(`Backend server is running on http://localhost:${port}`);
 });
