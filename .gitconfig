@@ -1,0 +1,114 @@
+[user]
+	name = AZ0228
+	email = jbliu88@gmail.com
+[alias]
+        ad = add
+	ada = add .
+	adc = !git add . && git commit
+	adcm = "!f() { git add . && git commit -m \"$@\"; }; f"
+	adi = add -i
+
+	br = branch
+	brd = branch -d
+	brr = branch -r
+	brv = branch -v
+
+	cf = cat-file
+	cfp = cat-file -p
+	cft = cat-file -t
+
+	cl = clone
+
+	cn = clean
+	cnf = clean -f
+	cni = clean -i
+	cnn = clean -n
+
+	co = commit
+	com = commit -m
+
+	de = describe
+
+	di = diff
+	dih = diff HEAD~1
+	din = !git --no-pager diff --no-color
+	dis = diff --staged
+
+	ed = config --global -e
+
+	fe = fetch
+	feo = fetch origin
+
+	gr = grep -n -I
+
+	lo = "! f() { git log --no-color --no-decorate | bat -n -l 'Git log' ; }; f"
+	loa = log --all --decorate --oneline --graph
+	lod = log --decorate --oneline --graph
+	lop = log -p
+	lor = git log --graph --decorate --oneline $(git rev-list -g --all)
+	lot = log --simplify-by-decoration
+
+	me = merge
+	med = merge develop
+	mem = merge main
+	met = mergetool
+
+	pu = push
+	puo = push origin
+	puod = push --delete origin
+	puot = !git push origin $(git describe --tags --abbrev=0)
+	puuo = push --set-upstream origin
+
+	rb = rebase
+
+	rf = reflog
+
+	rs = restore
+	rss = restore --staged
+
+	sa = stash
+	sap = stash pop
+
+	sh = show
+
+	sm = submodule
+	sma = submodule add
+	smad = submodule add --depth 1
+
+	st = status
+	sts = status -s
+
+	sw = switch
+	sw- = switch -
+	swc = switch -c
+	swcd = switch -c develop
+	swd = switch develop
+	swm = switch main
+
+	tg = tag
+	tga = tag -a
+	tgd = tag -d
+	tgn = tag -n99
+	tgnr = tag -n99 -l --sort=-v:refname
+
+[color]
+	ui = true
+[color "diff-highlight"]
+	oldNormal = red bold
+	oldHighlight = red bold 52
+	newNormal = green bold
+	newHighlight = green bold 22
+[commit]
+	verbose = true
+[core]
+	editor = nvim
+[init]
+	defaultBranch = main
+[mergetool "nvim"]
+  cmd = nvim -f -c \"Gvdiffsplit!\" \"$MERGED\"
+[merge]
+  tool = nvim
+[mergetool]
+  prompt = false
+[interactive]
+	diffFilter = diff-so-fancy --patch

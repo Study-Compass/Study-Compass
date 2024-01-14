@@ -20,7 +20,9 @@ const userSchema = new mongoose.Schema({
         required: true,
         minlength: 6 // Minimum length of the password
     },
-    // Add other fields as necessary
+    // You can add more fields here if needed, like 'createdAt', 'updatedAt', etc.
+}, {
+    timestamps: true // Automatically adds 'createdAt' and 'updatedAt' fields
 });
 
 const User = mongoose.model('Classroom', userSchema , 'users');
