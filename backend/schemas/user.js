@@ -1,11 +1,12 @@
 const mongoose = require('mongoose');
+const bcrypt = require('bcrypt');
 
 const userSchema = new mongoose.Schema({
     username: {
         type: String,
         required: true,
         unique: true,
-        trim: true, // Trims whitespace
+        trim: true, // trims whitespace
         minlength: 3 // Minimum length of the username
     },
     email: {
@@ -13,17 +14,24 @@ const userSchema = new mongoose.Schema({
         required: true,
         unique: true,
         trim: true,
-        // Add validation for email
+        // add validation for email
     },
     password: {
         type: String,
         required: true,
-        minlength: 6 // Minimum length of the password
+        minlength: 6 // minimum length of the password
     },
-    // You can add more fields here if needed, like 'createdAt', 'updatedAt', etc.
+    // you can add more fields here if needed, like 'createdAt', 'updatedAt', etc.
 }, {
-    timestamps: true // Automatically adds 'createdAt' and 'updatedAt' fields
+    timestamps: true // automatically adds 'createdAt' and 'updatedAt' fields
 });
+
+// pre-save hook to hash the password
+userSchema.pre('save', async function (next) {
+    if (!this.isModified('password')) return next();
+    this.password = await bcrypt.hash(this.password, 12);
+    next();
+  });
 
 const User = mongoose.model('Classroom', userSchema , 'users');
 
