@@ -1,23 +1,39 @@
 const express = require('express');
-const { MongoClient } = require('mongodb');
 const mongoose = require('mongoose');
+const { spawn } = require('child_process');
+const jwt = require('jsonwebtoken');
 const app = express();
 const port = 5001;
-const { spawn } = require('child_process');
-
 require('dotenv').config();
+const Classroom = require('./schemas/classroom.js');
+
+const authRoutes = require('./authRoutes.js');
+app.use(express.json());
+app.use(authRoutes);
+
 
 mongoose.connect(process.env.MONGO_URL)
-
 mongoose.connection.on('connected', () => {
     console.log('Mongoose connected to DB.');
 });
-
 mongoose.connection.on('error', (err) => {
     console.error('Mongoose connection error:', err);
 });
 
-const Classroom = require('./schemas/classroom.js');
+
+
+const authenticateToken = (req, res, next) => {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
+  
+    if (token == null) return res.sendStatus(401); // if there's no token
+  
+    jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+      if (err) return res.sendStatus(403); // if the token is not valid
+      req.user = user;
+      next();
+    });
+  };
 
 app.get('/update-database', (req, res) => {
     const pythonProcess = spawn('python', ['courseScraper.py']);
@@ -37,9 +53,7 @@ app.get('/update-database', (req, res) => {
 
 app.get('/getroom/:name', async (req, res) => {
     try {
-
         const roomName = req.params.name;
-        const query = { name: "Test Classroom" };
         const room = await Classroom.findOne({ name: roomName });
         const numbers = await Classroom.countDocuments({});
         console.log("Number of documents:", numbers);
