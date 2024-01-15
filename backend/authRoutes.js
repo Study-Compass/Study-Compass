@@ -7,10 +7,35 @@ const router = express.Router();
 
 // Registration endpoint
 router.post('/register', async (req, res) => {
+  // Extract user details from request body
   const { username, email, password } = req.body;
-  const user = new User({ username, email, password });
-  await user.save();
-  res.status(201).send('User created successfully');
+
+  try {
+    const existingUsername = await User.findOne({ username });
+    const existingEmail = await User.findOne({email});
+    
+    if (existingUsername && existingEmail) {
+      return res.status(400).send('Email and username are taken');
+    } else if (existingEmail) {
+      return res.status(401).send('Email is taken');
+    
+    } if (existingUsername) {
+      return res.status(402).send('Username is taken');
+    }
+
+    // Create and save the new user
+    const user = new User({ username, email, password });
+    await user.save();
+
+    // Generate a token for the new user
+    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+
+    // Send the token to the client
+    res.status(201).json({ token });
+  } catch (error) {
+    console.log(error)
+    res.status(500).send('Error registering new user');
+  }
 });
 
 // Login endpoint
