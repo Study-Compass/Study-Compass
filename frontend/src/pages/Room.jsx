@@ -46,7 +46,7 @@ function Room(){
     // }
 
     function changeURL2(option){
-        navigate(`/room/${option}`,{ replace: true });
+        navigate(`/room/${option}`,{ replace: false });
     }
 
     return(

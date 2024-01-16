@@ -1,0 +1,27 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800&display=swap');
+
+
+form{
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    gap:20px;
+    width:300px;
+    align-items: center;
+    font-family: Inter, sans-serif;
+}
+
+form input{
+    width: 100%;
+    height: 40px;
+    border-radius: 5px;
+    padding: 0 10px;
+    font-size: 14px;
+    font-family: Inter, sans-serif;
+    background-color: #F5F5F5;
+    color: #B1B1B1;
+    box-sizing: border-box;
+    outline: none;
+    border:none;
+}
+
