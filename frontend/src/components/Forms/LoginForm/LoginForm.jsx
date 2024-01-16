@@ -1,7 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+import '../Forms.css';
 
 function LoginForm() {
+    let navigate =  useNavigate();
     const [formData, setFormData] = useState({
       email: '',
       password: ''
@@ -16,6 +19,7 @@ function LoginForm() {
       try {
         const response = await axios.post('/login', formData);
         console.log(response.data);
+        navigate('room/a')
         // Handle success (e.g., store the token and redirect to a protected page)
       } catch (error) {
         console.error('Login failed:', error);
@@ -25,8 +29,9 @@ function LoginForm() {
   
     return (
       <form onSubmit={handleSubmit}>
-        <input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="Email" required />
-        <input type="password" name="password" value={formData.password} onChange={handleChange} placeholder="Password" required />
+        <h1>Welcome Back!</h1>
+        <input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="Valid Email/Username..." required />
+        <input type="password" name="password" value={formData.password} onChange={handleChange} placeholder="Enter Your Password..." required />
         <button type="submit">Login</button>
       </form>
     );

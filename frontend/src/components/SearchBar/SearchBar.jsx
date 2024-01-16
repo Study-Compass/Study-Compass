@@ -20,6 +20,14 @@ function SearchBar({ data, onEnter, room}) {
     };
 
     useEffect(() => {
+        if(room === undefined){
+            setSearchInput("");
+        } else {
+            setSearchInput(room.toLowerCase());
+        }
+    },[room]);
+
+    useEffect(() => {
         if (searchInput === '' || !isFocused) {
             setResults([]);
             setLower("");
