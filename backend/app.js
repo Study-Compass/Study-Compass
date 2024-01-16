@@ -326,6 +326,29 @@ app.get('/api/greet', async (req, res) => {
     res.json({ message: 'Hello from the backend!' });
 });
 
+app.get('/custom', async (req, res) => {
+    const rooms = await Classroom.find({
+        $or: [
+            // Case 1: No classes on Tuesday
+            { 'weekly_schedule.T': { $size: 0 } },
+    
+            // Case 2: No overlapping classes on Tuesday
+            { 'weekly_schedule.T': { 
+                $not: { 
+                    $elemMatch: {
+                        // Class starts before 4 PM and ends after 2 PM
+                        start_time: { $lt: "16:00" },
+                        end_time: { $gt: "14:00" }
+                    }
+                } 
+            }}
+        ]
+    });
+    const roomNames = rooms.map(room => room.name);
+
+    res.json(roomNames);
+});
+
 app.listen(port, () => {
     console.log(`Backend server is running on http://localhost:${port}`);
 });
