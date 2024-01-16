@@ -79,6 +79,7 @@ async def get_all_courses(term, id):
 
 # function that, given a course link, extracts relevant info from meeting times table
 async def parse_course_info(url, classroom_info):
+    global date
     async with httpx.AsyncClient(timeout=TIMEOUT) as client:
         print_url(url) # outputs the course links that are being processed, for debugging purposes
         # scraping content using bs4
@@ -104,7 +105,7 @@ async def parse_course_info(url, classroom_info):
 
                 if not date: # if date hasn't been found yet
                     # finding next date
-                    date = cells[5].split('-')[1].strip()
+                    date = cells[4].text.split('-')[1].strip()
 
                 if classroom not in classroom_info: # if classroom not initialized
 
@@ -125,7 +126,7 @@ async def parse_course_info(url, classroom_info):
 # cluster organization and database management determined
 def upload_to_mongo(dic, term):
     load_dotenv() # loading .env file
-    uri = os.environ.get('MONGO_URL') # fetching URI string
+    uri = os.environ.get('MONGO_URL1') # fetching URI string
     client = MongoClient(uri, server_api=ServerApi('1')) 
     try: # send a ping to confirm a successful connection
         client.admin.command('ping')
@@ -158,7 +159,7 @@ def dump_to_json(dic):
 
 # main function, term determinance feature on the way
 async def main():
-    term = "202109"
+    term = "202401"
     dic= {}
 
     # asynchronous organization of for loops
