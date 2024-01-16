@@ -1,14 +1,25 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import '../Forms.css';
+import google from '../../../assets/googleG.svg';
 
 function LoginForm() {
     let navigate =  useNavigate();
+    const [valid, setValid] = useState(false);
     const [formData, setFormData] = useState({
       email: '',
       password: ''
     });
+
+    useEffect(() => {
+        if (formData.email !== '' && formData.password !== ''){
+            setValid(true);
+        } else {
+            setValid(false);
+        }
+    },[formData.email, formData.password]);
+    
   
     const handleChange = (e) => {
       setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -19,6 +30,9 @@ function LoginForm() {
       try {
         const response = await axios.post('/login', formData);
         console.log(response.data);
+        if (response.ok){
+            localStorage.setItem('token', response.data.token); 
+        }
         navigate('room/a')
         // Handle success (e.g., store the token and redirect to a protected page)
       } catch (error) {
@@ -26,13 +40,25 @@ function LoginForm() {
         // Handle errors (e.g., display error message)
       }
     }
+
+    function register(){
+        navigate('/register');
+    }
   
     return (
       <form onSubmit={handleSubmit}>
         <h1>Welcome Back!</h1>
-        <input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="Valid Email/Username..." required />
-        <input type="password" name="password" value={formData.password} onChange={handleChange} placeholder="Enter Your Password..." required />
-        <button type="submit">Login</button>
+        <div className="email">
+            <p>Username/Email</p>
+            <input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="Valid username/email..." required />
+        </div>
+        <div className="password">
+            <p>Password</p>
+            <input type="password" name="password" value={formData.password} onChange={handleChange} placeholder="Enter your password..." required />
+        </div>
+        <button type="submit" className={`button ${valid ? "active":""}`}>Log In</button>
+        <p className="already">Don’t have an account? <a href="/" className="register" onClick={register}>Register</a></p>
+        <button type="button" className="button google">Continue with Google<img src={google} alt="google"/></button>
       </form>
     );
   }
