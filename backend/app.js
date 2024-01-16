@@ -34,7 +34,7 @@ const authenticateToken = (req, res, next) => {
   };
 
 app.get('/update-database', (req, res) => {
-    const pythonProcess = spawn('python', ['courseScraper.py']);
+    const pythonProcess = spawn('python3', ['courseScraper.py']);
 
     pythonProcess.stdout.on('data', (data) => {
         res.send(data.toString());
