@@ -14,9 +14,8 @@ function LoginForm() {
 
     useEffect(() => {
         const token = localStorage.getItem('token'); // or sessionStorage
-        // Optionally, you could add logic here to verify if the token is expired
-        console.log(token);
         if (!!token){
+            console.log("logged in already");
             navigate('room/a')
         
         } // returns true if token exists and is not expired
@@ -25,6 +24,7 @@ function LoginForm() {
         } else {
             setValid(false);
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     },[formData.email, formData.password]);
     
   
@@ -37,11 +37,10 @@ function LoginForm() {
       try {
         const response = await axios.post('/login', formData);
         console.log(response.data);
-        if (response.ok){
+        if (response.status === 200){
             localStorage.setItem('token', response.data.token); 
-            console.log(localStorage.getItem('token'));
         }
-        // navigate('room/a')
+        navigate('room/a')
         // Handle success (e.g., store the token and redirect to a protected page)
       } catch (error) {
         console.error('Login failed:', error);
