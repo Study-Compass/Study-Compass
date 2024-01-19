@@ -55,7 +55,7 @@ a:hover{
 }
 
 .shimmer:hover{
-    scale:1 !important;
+    transform:scale(1) !important;
 }
 .main{
   display:flex;

@@ -56,14 +56,14 @@ app.get('/getroom/:name', async (req, res) => {
         const numbers = await Classroom.countDocuments({});
         console.log("Number of documents:", numbers);
 
+        if(roomName === "none")
+
         if (room) {
             res.json(room);
             console.log(`GET: /getroom/${req.params.name}`)
-
         } else {
             res.status(404).send('Room not found');
             console.log(`GET: /getroom/${req.params.name} | NOT FOUND`)
-
         }
     } catch (error) {
         res.send(error)
@@ -333,7 +333,7 @@ app.get('/custom', async (req, res) => {
             { 'weekly_schedule.T': { $size: 0 } },
     
             // Case 2: No overlapping classes on Tuesday
-            { 'weekly_schedule.T': { 
+            { 'weekly_schedule.R': { 
                 $not: { 
                     $elemMatch: {
                         // Class starts before 4 PM and ends after 2 PM
