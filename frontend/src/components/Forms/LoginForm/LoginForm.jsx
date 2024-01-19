@@ -13,6 +13,13 @@ function LoginForm() {
     });
 
     useEffect(() => {
+        const token = localStorage.getItem('token'); // or sessionStorage
+        // Optionally, you could add logic here to verify if the token is expired
+        console.log(token);
+        if (!!token){
+            navigate('room/a')
+        
+        } // returns true if token exists and is not expired
         if (formData.email !== '' && formData.password !== ''){
             setValid(true);
         } else {
@@ -32,8 +39,9 @@ function LoginForm() {
         console.log(response.data);
         if (response.ok){
             localStorage.setItem('token', response.data.token); 
+            console.log(localStorage.getItem('token'));
         }
-        navigate('room/a')
+        // navigate('room/a')
         // Handle success (e.g., store the token and redirect to a protected page)
       } catch (error) {
         console.error('Login failed:', error);
