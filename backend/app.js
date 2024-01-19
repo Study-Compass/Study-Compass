@@ -53,8 +53,6 @@ app.get('/getroom/:name', async (req, res) => {
     try {
         const roomName = req.params.name;
         const room = await Classroom.findOne({ name: roomName });
-        const numbers = await Classroom.countDocuments({});
-        console.log("Number of documents:", numbers);
 
         if(roomName === "none")
 
