@@ -4,12 +4,17 @@ import Calendar from '../components/Calendar/Calendar';
 import './Room.css';
 import Header from '../components/Header/Header';
 import SearchBar from '../components/SearchBar/SearchBar';
+import useAuth from '../hooks/useAuth';
 
 function Room(){
     let { roomid } = useParams();
     let navigate =  useNavigate();
     const [rooms, setRooms] = useState(null);
+    const { isAuthenticated, logout} = useAuth();
 
+    useEffect(() => {
+        console.log("isAuthenticated: ", isAuthenticated);
+    }, [isAuthenticated]);
     useEffect(() => {
         const fetchRooms = async () => {
             try {
@@ -41,9 +46,6 @@ function Room(){
     
         fetchRooms();
     }, [roomid]);
-    // function changeURL(event){
-    //     navigate(`/room/${event.target.value}`,{ replace: true });
-    // }
 
     function changeURL2(option){
         navigate(`/room/${option}`,{ replace: false });
@@ -53,12 +55,10 @@ function Room(){
         <div className="room">
             <Header />  
             <SearchBar data={rooms} onEnter={changeURL2} room={roomid}/>
-            {/* <select onChange={changeURL}>
-                {rooms && rooms.map((room) => <option value={room} selected={room===roomid}>{room.toLowerCase()}</option>)}
-            </select> */}
             <div className="calendar-container">
                 <Calendar className={roomid}/>
             </div>
+            <button onClick={logout}>logout</button>
         </div>
     );
 }

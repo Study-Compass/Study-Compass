@@ -28,6 +28,9 @@ function SearchBar({ data, onEnter, room}) {
     },[room]);
 
     useEffect(() => {
+        if(searchInput === "none"){
+            setSearchInput("");
+        }
         if (searchInput === '' || !isFocused) {
             setResults([]);
             setLower("");

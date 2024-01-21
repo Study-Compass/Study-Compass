@@ -20,18 +20,7 @@ mongoose.connection.on('error', (err) => {
     console.error('Mongoose connection error:', err);
 });
 
-const authenticateToken = (req, res, next) => {
-    const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
-  
-    if (token == null) return res.sendStatus(401); // if there's no token
-  
-    jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
-      if (err) return res.sendStatus(403); // if the token is not valid
-      req.user = user;
-      next();
-    });
-  };
+
 
 app.get('/update-database', (req, res) => {
     const pythonProcess = spawn('python3', ['courseScraper.py']);
@@ -54,9 +43,11 @@ app.get('/getroom/:name', async (req, res) => {
         const roomName = req.params.name;
         const room = await Classroom.findOne({ name: roomName });
 
-        if(roomName === "none")
-
-        if (room) {
+        if(roomName === "none"){
+            const empty = new Classroom;
+            res.json(empty);
+            console.log(`GET: /getroom/${req.params.name}`)
+        } else if (room) {
             res.json(room);
             console.log(`GET: /getroom/${req.params.name}`)
         } else {
@@ -172,8 +163,6 @@ app.get('/getroom/:name', async (req, res) => {
 
 app.get('/getrooms', async (req, res) => {
     try {
-        const numbers = await Classroom.countDocuments({});
-        console.log("Number of documents:", numbers);
         const allRooms = await Classroom.find({}).select('name -_id');
         const roomNames = allRooms.map(room => room.name);
         res.json(roomNames.sort());

@@ -3,8 +3,10 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import '../Forms.css';
 import google from '../../../assets/googleG.svg';
+import useAuth from '../../../hooks/useAuth';
 
 function LoginForm() {
+    const { isAuthenticated, login } = useAuth();
     let navigate =  useNavigate();
     const [valid, setValid] = useState(false);
     const [formData, setFormData] = useState({
@@ -13,10 +15,10 @@ function LoginForm() {
     });
 
     useEffect(() => {
-        const token = localStorage.getItem('token'); // or sessionStorage
-        if (!!token){
+        // const token = localStorage.getItem('token'); // or sessionStorage
+        if (isAuthenticated){
             console.log("logged in already");
-            navigate('room/a')
+            navigate('room/none')
         
         } // returns true if token exists and is not expired
         if (formData.email !== '' && formData.password !== ''){
@@ -35,12 +37,8 @@ function LoginForm() {
     const handleSubmit = async (e) => {
       e.preventDefault();
       try {
-        const response = await axios.post('/login', formData);
-        console.log(response.data);
-        if (response.status === 200){
-            localStorage.setItem('token', response.data.token); 
-        }
-        navigate('room/a')
+        await login(formData);
+        navigate('room/none')
         // Handle success (e.g., store the token and redirect to a protected page)
       } catch (error) {
         console.error('Login failed:', error);
