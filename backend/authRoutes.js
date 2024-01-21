@@ -48,6 +48,7 @@ router.post('/login', async (req, res) => {
     return res.status(401).send('Invalid credentials');
   }
   const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '12h' });
+  console.log(`POST: /login user ${user.username} logged in`)
   res.status(200).json({ token }); //token is sent to the frontend to manage the 'session'
 });
 
