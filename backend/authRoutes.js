@@ -51,7 +51,7 @@ router.post('/login', async (req, res) => {
   res.status(200).json({ token }); //token is sent to the frontend to manage the 'session'
 });
 
-app.get('/validate-token', verifyToken, (req, res) => {
+router.get('/validate-token', verifyToken, (req, res) => {
   // If this point is reached, the token is valid
   res.json({ message: 'Token is valid' });
 });

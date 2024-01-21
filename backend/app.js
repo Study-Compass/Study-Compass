@@ -20,18 +20,7 @@ mongoose.connection.on('error', (err) => {
     console.error('Mongoose connection error:', err);
 });
 
-const authenticateToken = (req, res, next) => {
-    const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
-  
-    if (token == null) return res.sendStatus(401); // if there's no token
-  
-    jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
-      if (err) return res.sendStatus(403); // if the token is not valid
-      req.user = user;
-      next();
-    });
-  };
+
 
 app.get('/update-database', (req, res) => {
     const pythonProcess = spawn('python3', ['courseScraper.py']);

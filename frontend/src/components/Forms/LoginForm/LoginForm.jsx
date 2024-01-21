@@ -15,8 +15,8 @@ function LoginForm() {
     });
 
     useEffect(() => {
-        const token = localStorage.getItem('token'); // or sessionStorage
-        if (!!token){
+        // const token = localStorage.getItem('token'); // or sessionStorage
+        if (isAuthenticated){
             console.log("logged in already");
             navigate('room/none')
         

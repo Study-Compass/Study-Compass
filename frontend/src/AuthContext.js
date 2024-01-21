@@ -1,13 +1,11 @@
-import { useState, useEffect } from 'react';
+import React, { createContext, useState, useEffect } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
 
+export const AuthContext = createContext();
 
-const useAuth = () => {
+export const AuthProvider = ({ children }) => {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [user, setUser] = useState(null);
-
-    const navigate = useNavigate();
 
     useEffect(() => {
         const token = localStorage.getItem('token');
@@ -17,19 +15,12 @@ const useAuth = () => {
         }
     }, []);
 
-    // useEffect(() => {
-    //     if (isAuthenticated) {
-    //         navigate('room/none');
-    //     }
-    // }, [isAuthenticated, navigate]);
-
     const login = async (credentials) => {
         try {
             const response = await axios.post('/login', credentials);
             if (response.status === 200) {
                 localStorage.setItem('token', response.data.token);
                 setIsAuthenticated(true);
-                // Optionally set user details
                 setUser(response.data.user);
             }
         } catch (error) {
@@ -42,10 +33,11 @@ const useAuth = () => {
         localStorage.removeItem('token');
         setIsAuthenticated(false);
         setUser(null);
-        navigate('/')
     };
 
-    return { isAuthenticated, user, login, logout };
+    return (
+        <AuthContext.Provider value={{ isAuthenticated, user, login, logout }}>
+            {children}
+        </AuthContext.Provider>
+    );
 };
-
-export default useAuth;
