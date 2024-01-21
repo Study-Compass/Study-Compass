@@ -15,12 +15,14 @@ function LoginForm() {
     });
 
     useEffect(() => {
+      if (isAuthenticated){
+        console.log("logged in already");
+        navigate('room/none')
+      }
+    },[isAuthenticated, navigate]);
+
+    useEffect(() => {
         // const token = localStorage.getItem('token'); // or sessionStorage
-        if (isAuthenticated){
-            console.log("logged in already");
-            navigate('room/none')
-        
-        } // returns true if token exists and is not expired
         if (formData.email !== '' && formData.password !== ''){
             setValid(true);
         } else {
