@@ -54,9 +54,11 @@ app.get('/getroom/:name', async (req, res) => {
         const roomName = req.params.name;
         const room = await Classroom.findOne({ name: roomName });
 
-        if(roomName === "none")
-
-        if (room) {
+        if(roomName === "none"){
+            const empty = new Classroom;
+            res.json(empty);
+            console.log(`GET: /getroom/${req.params.name}`)
+        } else if (room) {
             res.json(room);
             console.log(`GET: /getroom/${req.params.name}`)
         } else {
@@ -172,8 +174,6 @@ app.get('/getroom/:name', async (req, res) => {
 
 app.get('/getrooms', async (req, res) => {
     try {
-        const numbers = await Classroom.countDocuments({});
-        console.log("Number of documents:", numbers);
         const allRooms = await Classroom.find({}).select('name -_id');
         const roomNames = allRooms.map(room => room.name);
         res.json(roomNames.sort());

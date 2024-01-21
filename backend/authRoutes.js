@@ -4,6 +4,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
 const router = express.Router();
+const verifyToken = require('./middlewares/verifyToken');
 
 // Registration endpoint
 router.post('/register', async (req, res) => {
@@ -48,6 +49,11 @@ router.post('/login', async (req, res) => {
   }
   const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '12h' });
   res.status(200).json({ token }); //token is sent to the frontend to manage the 'session'
+});
+
+app.get('/validate-token', verifyToken, (req, res) => {
+  // If this point is reached, the token is valid
+  res.json({ message: 'Token is valid' });
 });
 
 module.exports = router;
