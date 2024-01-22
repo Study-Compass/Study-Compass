@@ -29,6 +29,11 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
+    const googleLogin = (token) => {
+        localStorage.setItem('token', token);
+        setIsAuthenticated(true);
+    };
+
     const logout = () => {
         localStorage.removeItem('token');
         setIsAuthenticated(false);

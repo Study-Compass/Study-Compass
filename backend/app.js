@@ -2,15 +2,22 @@ const express = require('express');
 const mongoose = require('mongoose');
 const { spawn } = require('child_process');
 const jwt = require('jsonwebtoken');
+const { OAuth2Client } = require('google-auth-library');
+const cors = require('cors');
+const cookieParser = require('cookie-parser');
+require('dotenv').config();
+
 const app = express();
 const port = 5001;
-require('dotenv').config();
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 const Classroom = require('./schemas/classroom.js');
 
 const authRoutes = require('./authRoutes.js');
+
 app.use(express.json());
 app.use(authRoutes);
-
+app.use(cors());
+app.use(cookieParser());
 
 mongoose.connect(process.env.MONGO_URL)
 mongoose.connection.on('connected', () => {
@@ -20,7 +27,42 @@ mongoose.connection.on('error', (err) => {
     console.error('Mongoose connection error:', err);
 });
 
+app.post('/google-login', async (req, res) => {
+    const { token }  = req.body;
+    if (!token) {
+        return res.status(400).send('No token provided');
+    }
+    try {
+        const ticket = await client.verifyIdToken({
+            idToken: token,
+            audience: process.env.GOOGLE_CLIENT_ID
+        });
+        const payload = ticket.getPayload();    
+    
+        let user = await User.findOne({ email: payload.email });
+    
+        if (!user) {
+            user = new User({
+                googleId: payload.sub,
+                email: payload.email,
+                username: payload.name,
+                picture: payload.picture
+            });
+         
+            await user.save();
+        }
 
+        const jwtToken = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '12h' });
+        console.log(`POST: /google-login user ${user.name} logged in`);
+        res.status(200).json({ token: jwtToken });
+
+    } catch (error) {
+        
+        console.error('Google login failed:', error);
+        res.status(401).send('Google login failed');
+    
+    }
+});
 
 app.get('/update-database', (req, res) => {
     const pythonProcess = spawn('python3', ['courseScraper.py']);

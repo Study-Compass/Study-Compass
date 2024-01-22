@@ -2,6 +2,13 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 
 const userSchema = new mongoose.Schema({
+    googleid: {
+        type: String,
+        required: false,
+        unique: true,
+        trim: true, // trims whitespace
+        minlength: 3 // Minimum length of the username
+    },
     username: {
         type: String,
         required: true,
@@ -18,8 +25,13 @@ const userSchema = new mongoose.Schema({
     },
     password: {
         type: String,
-        required: true,
+        required: false,
         minlength: 6 // minimum length of the password
+    },
+    picture: {
+        type: String,
+        required: false,
+        trim: true
     },
     // you can add more fields here if needed, like 'createdAt', 'updatedAt', etc.
 }, {
