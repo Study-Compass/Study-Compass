@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import '../Forms.css';
 import google from '../../../assets/googleG.svg';
@@ -65,6 +64,11 @@ function LoginForm() {
         </div>
         <button type="submit" className={`button ${valid ? "active":""}`}>Log In</button>
         <p className="already">Don’t have an account? <a href="/" className="register" onClick={register}>Register</a></p>
+        <div className="divider">
+            <hr/>
+            <p>or</p>
+            <hr/>
+        </div>
         <button type="button" className="button google">Continue with Google<img src={google} alt="google"/></button>
       </form>
     );

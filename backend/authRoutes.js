@@ -24,7 +24,9 @@ router.post('/register', async (req, res) => {
     }
 
     // Create and save the new user
-    const user = new User({ username, email, password });
+    const user = new User({ 
+      username:username, email:email, password:password
+    });
     await user.save();
 
     // Generate a token for the new user

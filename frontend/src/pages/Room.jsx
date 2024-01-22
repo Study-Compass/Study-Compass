@@ -13,6 +13,10 @@ function Room(){
     const { isAuthenticated, logout} = useAuth();
 
     useEffect(() => {
+        if(!isAuthenticated){
+            console.log("not authenticated");
+            navigate('/');
+        }
         console.log("isAuthenticated: ", isAuthenticated);
     }, [isAuthenticated]);
     useEffect(() => {
