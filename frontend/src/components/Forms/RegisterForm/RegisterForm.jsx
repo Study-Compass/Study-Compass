@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import '../Forms.css';
-import google from '../../../assets/googleG.svg';
+import googleLogo from '../../../assets/googleG.svg';
 import { useNavigate } from 'react-router-dom';
 import useAuth from '../../../hooks/useAuth';
-import { GoogleLogin } from 'react-google-login';
+import { GoogleLogin, useGoogleLogin } from '@react-oauth/google';
 
 
 function RegisterForm() {
@@ -69,6 +69,10 @@ function RegisterForm() {
     }
   }
 
+  const google = useGoogleLogin({
+      onSuccess: tokenResponse => console.log(tokenResponse),
+      onFailure: () => {console.log("failed")},
+  })
   function login(){
     navigate('/');
   }
@@ -95,7 +99,8 @@ function RegisterForm() {
             <p>or</p>
             <hr/>
         </div>
-      <GoogleLogin
+      <button className="button google" onClick={() => google()}>Continue with Google<img src={googleLogo} alt="google"/></button>
+      {/* <GoogleLogin
         clientId="639818062398-k4qnm9l320phu967ctc2l1jt1sp9ib7p.apps.googleusercontent.com"
         render={renderProps => (
           <button 
@@ -108,7 +113,19 @@ function RegisterForm() {
         onSuccess={responseGoogle}
         onFailure={responseGoogle}
         cookiePolicy={'single_host_origin'}
-      />
+      /> */}
+      {/* <GoogleLogin
+        // clientId="639818062398-k4qnm9l320phu967ctc2l1jt1sp9ib7p.apps.googleusercontent.com"
+        onSuccess={credentialResponse => {
+          console.log(credentialResponse);
+        }}
+        onError={() => {
+          console.log('Login Failed');
+        }}
+        useOneTap
+        className="google-button"
+      /> */}
+
     </form>
   );
 }

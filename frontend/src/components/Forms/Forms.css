@@ -124,3 +124,7 @@ form input::placeholder{
     color: #414141;
     margin: 0 10px;
 }
+
+.google-button{
+    width:100% !important;
+}
