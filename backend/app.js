@@ -9,7 +9,7 @@ require('dotenv').config();
 
 const app = express();
 const port = 5001;
-const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID, process.env.GOOGLE_CLIENT_SECRET);
 const Classroom = require('./schemas/classroom.js');
 
 const authRoutes = require('./authRoutes.js');
@@ -57,7 +57,6 @@ app.post('/google-login', async (req, res) => {
         res.status(200).json({ token: jwtToken });
 
     } catch (error) {
-        
         console.error('Google login failed:', error);
         res.status(401).send('Google login failed');
     

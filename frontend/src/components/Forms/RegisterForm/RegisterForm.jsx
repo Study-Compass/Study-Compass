@@ -20,7 +20,7 @@ function RegisterForm() {
 
   const responseGoogle = async (response) => {
     try {
-      const tokenId = response.tokenId;
+      const tokenId = response.access_token;
       const res = await fetch('/google-login', {
         method: 'POST',
         headers: {
@@ -31,6 +31,19 @@ function RegisterForm() {
       const token = await res.json();
       googleLogin(token.data.token);
 
+    } catch (error) {
+      console.error('Error sending token to backend:', error);
+    }
+  };
+
+  const responseGoogle1 = async (response) => {
+    const idToken = response.code;
+    try {
+      console.log(response);
+      console.log("id token: " + idToken)
+      const res = await axios.post('/google-login', {token: idToken});
+      console.log(res.data);
+      googleLogin(res.data.data.token);
     } catch (error) {
       console.error('Error sending token to backend:', error);
     }
@@ -70,9 +83,11 @@ function RegisterForm() {
   }
 
   const google = useGoogleLogin({
-      onSuccess: tokenResponse => console.log(tokenResponse),
+      onSuccess: codeResponse => responseGoogle1(codeResponse),
+      flow: 'auth-code',
       onFailure: () => {console.log("failed")},
   })
+
   function login(){
     navigate('/');
   }
