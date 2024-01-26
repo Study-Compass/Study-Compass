@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import '../Forms.css';
 import google from '../../../assets/googleG.svg';
 import useAuth from '../../../hooks/useAuth';
+import circleWarning from '../../../assets/circle-warning.svg';
 
 function LoginForm() {
     const { isAuthenticated, login } = useAuth();
@@ -12,6 +13,7 @@ function LoginForm() {
       email: '',
       password: ''
     });
+    const [errorText, setErrorText] = useState("");
 
     useEffect(() => {
       if (isAuthenticated){
@@ -43,6 +45,7 @@ function LoginForm() {
         // Handle success (e.g., store the token and redirect to a protected page)
       } catch (error) {
         console.error('Login failed:', error);
+        setErrorText("Invalid Username/Email or Password. Please try again");
         // Handle errors (e.g., display error message)
       }
     }
@@ -54,6 +57,12 @@ function LoginForm() {
     return (
       <form onSubmit={handleSubmit}>
         <h1>Welcome Back!</h1>
+        {errorText !== "" && 
+            <div className="error"
+                ><img src={circleWarning} alt="error"></img>
+                {errorText}
+            </div>
+        }
         <div className="email">
             <p>Username/Email</p>
             <input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="Valid username/email..." required />

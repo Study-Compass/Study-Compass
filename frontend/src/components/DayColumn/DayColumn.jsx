@@ -60,7 +60,7 @@ function DayColumn({day, dayEvents, eventColors}){
     return (
         <div className="DayColumn">
             <Grid />
-            {dayEvents.map(event => {
+            {dayEvents.map((event,index) => {
                 const rowStart = calculateTime(event.start_time);
                 const rowEnd = calculateTime(event.end_time);
                 const color = getColorForEvent(event.class_name);
@@ -86,13 +86,14 @@ function DayColumn({day, dayEvents, eventColors}){
                 if(event.class_name === "loading"){
                     return (
                         <div 
-                        className="event shimmer"
-                        style={{
-                            gridRowStart: rowStart,
-                            gridRowEnd: rowEnd,
-                            backgroundColor: color,
-                        }}
-                        >
+                            key={event.id || `event-${index}`}
+                            className="event shimmer"
+                            style={{
+                                gridRowStart: rowStart,
+                                gridRowEnd: rowEnd,
+                                backgroundColor: color,
+                            }}
+                            >
                         </div>
 
                     );
