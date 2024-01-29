@@ -4,7 +4,7 @@ import axios from 'axios';
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [isAuthenticated, setIsAuthenticated] = useState(null);
     const [user, setUser] = useState(null);
 
     useEffect(() => {
@@ -12,6 +12,8 @@ export const AuthProvider = ({ children }) => {
         if (token) {
             // Optionally: Verify token validity with the backend
             setIsAuthenticated(true);
+        } else {
+            setIsAuthenticated(false);
         }
     }, []);
 
