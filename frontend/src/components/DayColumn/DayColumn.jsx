@@ -1,10 +1,30 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './DayColumn.css';
 import '../../assets/fonts.css'
 import TimeLabelColumn from '../TimeLabelColumn/TimeLabelColumn';
 
 function DayColumn({day, dayEvents, eventColors}){
-    
+    const [selectionStart, setSelectionStart] = useState(null);
+    const [selectionEnd, setSelectionEnd] = useState(null);
+    const [isSelecting, setIsSelecting] = useState(false);
+
+    const handleMouseDown = (gridPosition) => {
+        setSelectionStart(gridPosition);
+        console.log(gridPosition);
+        setSelectionEnd(gridPosition+2);
+        setIsSelecting(true);
+    };
+
+    const handleMouseMove = (gridPosition) => {
+        if (isSelecting) {
+            setSelectionEnd(gridPosition);
+        }
+    };
+
+    const handleMouseUp = () => {
+        setIsSelecting(false);
+        // Here you can handle the creation of a new event or finalize the selection
+    };
     function calculateTime(time){
         const [hour, minute] = time.split(':');
         return (hour - 7) * 2 + (minute === '30' ? 1 : 0) + 1;
@@ -29,22 +49,35 @@ function DayColumn({day, dayEvents, eventColors}){
     const end_times = [];
 
     function Grid(){
-        return (            
-            <div className="grid">
-                <div className="grid-item" style={{gridRowStart:1, gridRowEnd:3}}></div>
-                <div className="grid-item" style={{gridRowStart:3, gridRowEnd:5}}></div>
-                <div className="grid-item" style={{gridRowStart:5, gridRowEnd:7}}></div>
-                <div className="grid-item" style={{gridRowStart:7, gridRowEnd:9}}></div>
-                <div className="grid-item" style={{gridRowStart:9, gridRowEnd:11}}></div>
-                <div className="grid-item" style={{gridRowStart:11, gridRowEnd:13}}></div>
-                <div className="grid-item" style={{gridRowStart:13, gridRowEnd:15}}></div>
-                <div className="grid-item" style={{gridRowStart:15, gridRowEnd:17}}></div>
-                <div className="grid-item" style={{gridRowStart:17, gridRowEnd:19}}></div>
-                <div className="grid-item" style={{gridRowStart:19, gridRowEnd:21}}></div>
-                <div className="grid-item" style={{gridRowStart:21, gridRowEnd:23}}></div>
-                <div className="grid-item" style={{gridRowStart:23, gridRowEnd:25}}></div>
-                <div className="grid-item" style={{gridRowStart:25, gridRowEnd:27}}></div>
-                <div className="grid-item" style={{gridRowStart:27, gridRowEnd:29}}></div>
+        const gridItems = [];
+        for (let i = 1; i <= 56; i += 2) { // Assuming 14 time slots
+            gridItems.push(
+                <div 
+                    className={`grid-item ${(i-1) % 4  === 0 ? '' : 'noborder'}`} 
+                    style={{gridRowStart: i, gridRowEnd: i + 2}}
+                    onMouseDown={() => handleMouseDown(i)}
+                    onMouseMove={() => handleMouseMove(i)}
+                    key={i}
+                ></div>
+            );
+        }
+        let selectionOverlay = null;
+        if (isSelecting && selectionStart && selectionEnd) {
+            selectionOverlay = (
+                <div 
+                    className="selection-overlay"
+                    style={{
+                        gridRowStart: selectionStart,
+                        gridRowEnd: selectionEnd
+                    }}
+                ></div>
+            );
+        }
+
+        return (
+            <div className="grid" onMouseUp={handleMouseUp}>
+                {gridItems}
+                {selectionOverlay}
             </div>
         );
     }
@@ -60,7 +93,7 @@ function DayColumn({day, dayEvents, eventColors}){
     return (
         <div className="DayColumn">
             <Grid />
-            {dayEvents.map(event => {
+            {dayEvents.map((event,index) => {
                 const rowStart = calculateTime(event.start_time);
                 const rowEnd = calculateTime(event.end_time);
                 const color = getColorForEvent(event.class_name);
@@ -86,13 +119,14 @@ function DayColumn({day, dayEvents, eventColors}){
                 if(event.class_name === "loading"){
                     return (
                         <div 
-                        className="event shimmer"
-                        style={{
-                            gridRowStart: rowStart,
-                            gridRowEnd: rowEnd,
-                            backgroundColor: color,
-                        }}
-                        >
+                            key={event.id || `event-${index}`}
+                            className="event shimmer"
+                            style={{
+                                gridRowStart: rowStart,
+                                gridRowEnd: rowEnd,
+                                backgroundColor: color,
+                            }}
+                            >
                         </div>
 
                     );

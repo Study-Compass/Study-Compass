@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import '../Forms.css';
-import google from '../../../assets/googleG.svg';
+import googleLogo from '../../../assets/googleG.svg';
 import { useNavigate } from 'react-router-dom';
 import useAuth from '../../../hooks/useAuth';
-import { GoogleLogin } from 'react-google-login';
+import { GoogleLogin, useGoogleLogin } from '@react-oauth/google';
 
 
 function RegisterForm() {
@@ -20,7 +20,7 @@ function RegisterForm() {
 
   const responseGoogle = async (response) => {
     try {
-      const tokenId = response.tokenId;
+      const tokenId = response.access_token;
       const res = await fetch('/google-login', {
         method: 'POST',
         headers: {
@@ -31,6 +31,19 @@ function RegisterForm() {
       const token = await res.json();
       googleLogin(token.data.token);
 
+    } catch (error) {
+      console.error('Error sending token to backend:', error);
+    }
+  };
+
+  const responseGoogle1 = async (response) => {
+    const idToken = response.code;
+    try {
+      console.log(response);
+      console.log("id token: " + idToken)
+      const res = await axios.post('/google-login', {token: idToken});
+      console.log(res.data);
+      googleLogin(res.data.data.token);
     } catch (error) {
       console.error('Error sending token to backend:', error);
     }
@@ -69,6 +82,12 @@ function RegisterForm() {
     }
   }
 
+  const google = useGoogleLogin({
+      onSuccess: codeResponse => responseGoogle1(codeResponse),
+      flow: 'auth-code',
+      onFailure: () => {console.log("failed")},
+  })
+
   function login(){
     navigate('/');
   }
@@ -95,7 +114,8 @@ function RegisterForm() {
             <p>or</p>
             <hr/>
         </div>
-      <GoogleLogin
+      <button className="button google" onClick={() => google()}>Continue with Google<img src={googleLogo} alt="google"/></button>
+      {/* <GoogleLogin
         clientId="639818062398-k4qnm9l320phu967ctc2l1jt1sp9ib7p.apps.googleusercontent.com"
         render={renderProps => (
           <button 
@@ -108,7 +128,19 @@ function RegisterForm() {
         onSuccess={responseGoogle}
         onFailure={responseGoogle}
         cookiePolicy={'single_host_origin'}
-      />
+      /> */}
+      {/* <GoogleLogin
+        // clientId="639818062398-k4qnm9l320phu967ctc2l1jt1sp9ib7p.apps.googleusercontent.com"
+        onSuccess={credentialResponse => {
+          console.log(credentialResponse);
+        }}
+        onError={() => {
+          console.log('Login Failed');
+        }}
+        useOneTap
+        className="google-button"
+      /> */}
+
     </form>
   );
 }

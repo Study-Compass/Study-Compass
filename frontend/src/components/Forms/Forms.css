@@ -124,3 +124,35 @@ form input::placeholder{
     color: #414141;
     margin: 0 10px;
 }
+
+.google-button{
+    width:100% !important;
+}
+
+.error{
+    font-family: Inter, sans-serif;
+    position: relative;
+    font-size:14px;
+    padding: 10px 15px;
+    font-weight:500;
+    color: #FD5858;
+    background-color: rgba(250, 117, 109, 0.16);
+    border-radius: 10px;
+    box-sizing: border-box;
+    width:100%;
+    display:flex;
+    gap:10px;
+    overflow: hidden;
+}
+
+.error::before{
+    content:'';
+    position:absolute;
+    top:0;
+    left:0; 
+    height:100%;
+    background-color: #FD5858;
+    width:7px;
+    opacity:0.8;
+    border-radius: 15px 0 0 15px;
+}

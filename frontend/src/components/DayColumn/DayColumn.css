@@ -32,11 +32,22 @@
 
 .grid{
     display:grid;
+    grid-template-rows: repeat(56, 1fr);
+    position: relative;
+    height:100%;   
+    width:100%;
+    position: absolute;
+}
+
+.selection-overlay{
+    display:grid;
     grid-template-rows: repeat(28, 1fr);
     position: relative;
     height:100%;   
     width:100%;
     position: absolute;
+    background-color: #B1B1B1;
+    border-radius: 5px;
 }
 
 .grid-item{
@@ -45,6 +56,16 @@
     border-top: 2px solid #DDDCDC;
     margin: 0 2px;
     border-bottom: 2px solid white;
+}
+
+.noborder{
+    border:none;
+}
+
+.grid-item:hover{
+    background-color: #F5F5F5;
+    cursor: pointer;
+    border-radius: 5px;
 }
 
 .time{

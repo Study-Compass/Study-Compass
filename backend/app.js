@@ -6,10 +6,15 @@ const { OAuth2Client } = require('google-auth-library');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
 require('dotenv').config();
+// const { google } = require('googleapis');
 
 const app = express();
 const port = 5001;
-const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+const client = new OAuth2Client(
+    process.env.GOOGLE_CLIENT_ID, 
+    process.env.GOOGLE_CLIENT_SECRET,
+    "http://localhost:3000/register" //redirect uri
+);
 const Classroom = require('./schemas/classroom.js');
 
 const authRoutes = require('./authRoutes.js');
@@ -20,6 +25,7 @@ app.use(cors());
 app.use(cookieParser());
 
 mongoose.connect(process.env.MONGO_URL)
+
 mongoose.connection.on('connected', () => {
     console.log('Mongoose connected to DB.');
 });
@@ -28,7 +34,11 @@ mongoose.connection.on('error', (err) => {
 });
 
 app.post('/google-login', async (req, res) => {
-    const { token }  = req.body;
+    const { code }  = req.body;
+    //retrieving token from google
+    const { token } = await client.getToken(code);
+    client.setCredentials(token);
+
     if (!token) {
         return res.status(400).send('No token provided');
     }
@@ -57,7 +67,6 @@ app.post('/google-login', async (req, res) => {
         res.status(200).json({ token: jwtToken });
 
     } catch (error) {
-        
         console.error('Google login failed:', error);
         res.status(401).send('Google login failed');
     
