@@ -1,10 +1,13 @@
 import React, { useState, useRef, useEffect } from 'react';
 import './SearchBar.css';
 import x from '../../assets/x.svg';
+import { useNavigate } from 'react-router-dom';
 import tab from '../../assets/tab.svg';
 
 //need to add support for abbreviated versions
 function SearchBar({ data, onEnter, room}) {
+    let navigate =  useNavigate();
+
     const [searchInput, setSearchInput] = useState(room.toLowerCase());
     const [results, setResults] = useState([]);
     const [lower, setLower] = useState("")
@@ -136,6 +139,7 @@ function SearchBar({ data, onEnter, room}) {
         setSearchInput('');
         setLower("");
         setResults([]);
+        navigate('/room/none');
     }
 
     function tabShadow(word){

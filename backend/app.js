@@ -92,13 +92,15 @@ app.get('/update-database', (req, res) => {
 app.get('/getroom/:name', async (req, res) => {
     try {
         const roomName = req.params.name;
-        const room = await Classroom.findOne({ name: roomName });
-
         if(roomName === "none"){
             const empty = new Classroom;
             res.json(empty);
             console.log(`GET: /getroom/${req.params.name}`)
-        } else if (room) {
+            return;
+        }
+        const room = await Classroom.findOne({ name: roomName });
+
+        if (room) {
             res.json(room);
             console.log(`GET: /getroom/${req.params.name}`)
         } else {
@@ -364,26 +366,40 @@ app.get('/api/greet', async (req, res) => {
     res.json({ message: 'Hello from the backend!' });
 });
 
-app.get('/custom', async (req, res) => {
-    const rooms = await Classroom.find({
-        $or: [
-            // Case 1: No classes on Tuesday
-            { 'weekly_schedule.T': { $size: 0 } },
-    
-            // Case 2: No overlapping classes on Tuesday
-            { 'weekly_schedule.R': { 
-                $not: { 
-                    $elemMatch: {
-                        // Class starts before 4 PM and ends after 2 PM
-                        start_time: { $lt: "16:00" },
-                        end_time: { $gt: "14:00" }
-                    }
-                } 
-            }}
-        ]
-    });
+app.get('/free', async (req, res) => {
+    // Parse the input object from the request
+    const freePeriods = req.body; // Assuming the input object is in the request body
+
+    // Helper function to create query conditions for a given day
+    const createTimePeriodQuery = (day, periods) => {
+        // If no periods are specified for the day, the classroom should not be scheduled
+        if (!periods || periods.length === 0) {
+            return { [`weekly_schedule.${day}`]: { $size: 0 } };
+        }
+
+        // Create conditions for each time period
+        const timeConditions = periods.map(period => ({
+            $not: {
+                $elemMatch: {
+                    start_time: { $lt: period[1] }, // period end time
+                    end_time: { $gt: period[0] } // period start time
+                }
+            }
+        }));
+
+        return { [`weekly_schedule.${day}`]: { $and: timeConditions } };
+    };
+
+    // Build dynamic query conditions for each day
+    const queryConditions = Object.keys(freePeriods).map(day => 
+        createTimePeriodQuery(day, freePeriods[day])
+    );
+
+    // Query the database
+    const rooms = await Classroom.find({ $and: queryConditions });
     const roomNames = rooms.map(room => room.name);
 
+    // Return the results
     res.json(roomNames);
 });
 

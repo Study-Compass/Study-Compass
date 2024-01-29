@@ -3,27 +3,41 @@ import './DayColumn.css';
 import '../../assets/fonts.css'
 import TimeLabelColumn from '../TimeLabelColumn/TimeLabelColumn';
 
-function DayColumn({day, dayEvents, eventColors}){
+function DayColumn({day, dayEvents, eventColors, empty, change}){
     const [selectionStart, setSelectionStart] = useState(null);
     const [selectionEnd, setSelectionEnd] = useState(null);
     const [isSelecting, setIsSelecting] = useState(false);
 
     const handleMouseDown = (gridPosition) => {
+        if(!empty){
+            return
+        }
         setSelectionStart(gridPosition);
-        console.log(gridPosition);
         setSelectionEnd(gridPosition+2);
         setIsSelecting(true);
     };
 
     const handleMouseMove = (gridPosition) => {
+        if(!empty){
+            return
+        }
         if (isSelecting) {
-            setSelectionEnd(gridPosition);
+            setSelectionEnd(gridPosition+2);
         }
     };
 
     const handleMouseUp = () => {
+        if(!empty){
+            return
+        }
         setIsSelecting(false);
         // Here you can handle the creation of a new event or finalize the selection
+        const timeslot = {
+            class_name: "search",
+            start_time:(selectionStart+7)/2,
+            end_time: (selectionEnd + 7)/2,
+        }
+        change("add", timeslot);
     };
     function calculateTime(time){
         const [hour, minute] = time.split(':');
@@ -53,7 +67,7 @@ function DayColumn({day, dayEvents, eventColors}){
         for (let i = 1; i <= 56; i += 2) { // Assuming 14 time slots
             gridItems.push(
                 <div 
-                    className={`grid-item ${(i-1) % 4  === 0 ? '' : 'noborder'}`} 
+                    className={`grid-item ${!isSelecting ? "":"no-interaction"} ${(i-1) % 4  === 0 ? '' : 'noborder'}`} 
                     style={{gridRowStart: i, gridRowEnd: i + 2}}
                     onMouseDown={() => handleMouseDown(i)}
                     onMouseMove={() => handleMouseMove(i)}

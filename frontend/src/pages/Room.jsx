@@ -12,14 +12,25 @@ function Room(){
     const [rooms, setRooms] = useState(null);
     const { isAuthenticated, logout} = useAuth();
 
+    console.log("roomid: ", roomid);
     useEffect(() => {
+        if(isAuthenticated === null){
+            console.log("isAuthenticated null");
+            return;
+        }
         if(!isAuthenticated){
             console.log("not authenticated");
             navigate('/');
         }
         console.log("isAuthenticated: ", isAuthenticated);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isAuthenticated]);
+
     useEffect(() => {
+        if(isAuthenticated === null|| !isAuthenticated){
+            console.log("isAuthenticated null");
+            return;
+        }
         const fetchRooms = async () => {
             try {
                 const response = await fetch(`/getrooms`);
@@ -49,10 +60,10 @@ function Room(){
         };
     
         fetchRooms();
-    }, [roomid]);
+    }, [roomid, isAuthenticated]);
 
     function changeURL2(option){
-        navigate(`/room/${option}`,{ replace: false });
+        navigate(`/room/${option}`,{ replace: true });
     }
 
     return(

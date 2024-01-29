@@ -43,11 +43,15 @@
     display:grid;
     grid-template-rows: repeat(28, 1fr);
     position: relative;
-    height:100%;   
-    width:100%;
+    height:calc(100% - 10px);   
+    width:calc(100% - 10px);
     position: absolute;
-    background-color: #B1B1B1;
+    background-color: #E5E5E5;
     border-radius: 5px;
+    pointer-events: none;
+    opacity:0.8;
+    margin:6px;
+    box-sizing: border-box;
 }
 
 .grid-item{
@@ -62,10 +66,10 @@
     border:none;
 }
 
-.grid-item:hover{
+.grid-item:hover:not(.no-interaction){
     background-color: #F5F5F5;
     cursor: pointer;
-    border-radius: 5px;
+    /* border-radius: 5px; */
 }
 
 .time{
