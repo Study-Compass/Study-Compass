@@ -6,7 +6,7 @@ const { OAuth2Client } = require('google-auth-library');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
 require('dotenv').config();
-// const { google } = require('googleapis');
+const { google } = require('googleapis');
 
 const app = express();
 const port = 5001;
@@ -37,26 +37,27 @@ app.post('/google-login', async (req, res) => {
     const { code }  = req.body;
     //retrieving token from google
     const { token } = await client.getToken(code);
-    client.setCredentials(token);
-
+    
     if (!token) {
         return res.status(400).send('No token provided');
     }
+
+    client.setCredentials(token);
     try {
-        const ticket = await client.verifyIdToken({
-            idToken: token,
-            audience: process.env.GOOGLE_CLIENT_ID
+        const oath2 = google.oath2({
+            auth: client,
+            version: 'v2'
         });
-        const payload = ticket.getPayload();    
+        const userInfo = await oauth2.userinfo.get();
     
-        let user = await User.findOne({ email: payload.email });
+        let user = await User.findOne({ googleID: userInfo.data.id });
     
         if (!user) {
             user = new User({
-                googleId: payload.sub,
-                email: payload.email,
-                username: payload.name,
-                picture: payload.picture
+                googleId: userInfo.data.id,
+                email: userInfo.data.email,
+                username: userInfo.data.name,
+                picture: userInfo.data.picture
             });
          
             await user.save();
