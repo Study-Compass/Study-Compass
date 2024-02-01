@@ -10,12 +10,14 @@ const { google } = require('googleapis');
 
 const app = express();
 const port = 5001;
-const client = new OAuth2Client(
+const client = new google.auth.OAuth2(
     process.env.GOOGLE_CLIENT_ID, 
     process.env.GOOGLE_CLIENT_SECRET,
-    "http://localhost:3000/register" //redirect uri
+    process.env.GOOGLE_REDIRECT_URI //redirect uri
 );
 const Classroom = require('./schemas/classroom.js');
+const User = require('./schemas/user.js');
+
 
 const authRoutes = require('./authRoutes.js');
 
@@ -36,21 +38,25 @@ mongoose.connection.on('error', (err) => {
 app.post('/google-login', async (req, res) => {
     const { code }  = req.body;
     //retrieving token from google
-    const { token } = await client.getToken(code);
-    
-    if (!token) {
-        return res.status(400).send('No token provided');
+    if (!code) {
+        return res.status(400).send('No authorization code provided');
     }
 
-    client.setCredentials(token);
     try {
-        const oath2 = google.oath2({
+        const { tokens } = await client.getToken(code);
+        
+        if (!tokens) {
+            return res.status(400).send('No token provided');
+        }
+    
+        client.setCredentials(tokens);
+        const oauth2 = google.oath2({
             auth: client,
             version: 'v2'
         });
         const userInfo = await oauth2.userinfo.get();
     
-        let user = await User.findOne({ googleID: userInfo.data.id });
+        let user = await User.findOne({ googleId: userInfo.data.id });
     
         if (!user) {
             user = new User({

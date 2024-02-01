@@ -2,10 +2,9 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 
 const userSchema = new mongoose.Schema({
-    googleid: {
+    googleId: {
         type: String,
         required: false,
-        unique: true,
         trim: true, // trims whitespace
         minlength: 3 // Minimum length of the username
     },

@@ -41,7 +41,7 @@ function RegisterForm() {
     try {
       console.log(response);
       console.log("id token: " + idToken)
-      const res = await axios.post('/google-login', {token: idToken});
+      const res = await axios.post('/google-login', {code: idToken});
       console.log(res.data);
       googleLogin(res.data.data.token);
     } catch (error) {
