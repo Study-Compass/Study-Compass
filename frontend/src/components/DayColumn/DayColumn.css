@@ -3,7 +3,7 @@
     grid-template-rows: repeat(28, 1fr);
     position: relative;
     height:530px;   
-    width:145px;
+    width:120px;
 }
 
 .event{

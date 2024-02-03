@@ -1,8 +1,15 @@
+:root{
+    --search-width: 500px;
+    --search-height: 50px;
+    --search-font-size: 23px;
+
+}
+
 ul {
     list-style-type: none;
     margin: 0;
     padding: 0;
-    width:600px;
+    width:500px;
     position: absolute;
     border: 1px solid #B0AFAF;
     z-index: 8;
@@ -37,7 +44,7 @@ li {
     background-color: #FBFBFB;
     /* border-bottom: 1px solid #B0AFAF; */
     font-family: 'Satoshi';
-    font-size: 25px;
+    font-size: 22px;
     font-weight: bold;
     color: #414141;
     padding: 5px 20px;
@@ -56,7 +63,7 @@ li:hover {
 }
 
 .search-container{
-    width:600px;
+    width:500px;
     position:relative;
 }
 
@@ -66,7 +73,7 @@ li:hover {
     border-radius: 10px;
     border: 1px solid #B0AFAF;
     font-family: 'Satoshi';
-    font-size: 25px;
+    font-size: 23px;
     font-weight: bold;
     color: #414141;
     padding: 5px 20px;
@@ -128,7 +135,7 @@ li:hover {
     border-radius: 10px;
     border: 1px solid #B0AFAF;
     font-family: 'Satoshi';
-    font-size: 25px;
+    font-size: 23px;
     font-weight: bold;
     padding: 5px 20px;
     box-sizing: border-box;
