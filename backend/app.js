@@ -38,26 +38,30 @@ mongoose.connection.on('error', (err) => {
 app.post('/google-login', async (req, res) => {
     const { code }  = req.body;
     //retrieving token from google
+    console.log('POST: /google-login');
     if (!code) {
         return res.status(400).send('No authorization code provided');
     }
 
     try {
         const { tokens } = await client.getToken(code);
-        
-        if (!tokens) {
-            return res.status(400).send('No token provided');
+        if (!tokens || !tokens.access_token) {
+            console.error('Failed to retrieve access token');
+            return res.status(400).send('Failed to retrieve access token');
         }
     
         client.setCredentials(tokens);
-        const oauth2 = google.oath2({
+        const oauth2 = google.oauth2({
             auth: client,
             version: 'v2'
         });
         const userInfo = await oauth2.userinfo.get();
+        if (!userInfo || !userInfo.data || !userInfo.data.id || !userInfo.data.email || !userInfo.data.name) {
+            console.error('Invalid user info:', userInfo);
+            return res.status(400).send('Invalid user information received from Google');
+        }        // console.log(userInfo)
     
         let user = await User.findOne({ googleId: userInfo.data.id });
-    
         if (!user) {
             user = new User({
                 googleId: userInfo.data.id,
@@ -70,7 +74,7 @@ app.post('/google-login', async (req, res) => {
         }
 
         const jwtToken = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '12h' });
-        console.log(`POST: /google-login user ${user.name} logged in`);
+        console.log(`POST: /google-login user ${user.username} logged in`);
         res.status(200).json({ token: jwtToken });
 
     } catch (error) {

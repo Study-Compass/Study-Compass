@@ -2,13 +2,13 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import '../Forms.css';
 import googleLogo from '../../../assets/googleG.svg';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import useAuth from '../../../hooks/useAuth';
-import { GoogleLogin, useGoogleLogin } from '@react-oauth/google';
+import { useGoogleLogin } from '@react-oauth/google';
 
 
 function RegisterForm() {
-  const { isAuthenticated, googleLogin } = useAuth();
+  const { isAuthenticated, googleLogin, login } = useAuth();
   const [valid, setValid] = useState(false);
   const [formData, setFormData] = useState({
     username: '',
@@ -18,41 +18,47 @@ function RegisterForm() {
   
   let navigate = useNavigate();
 
-  const responseGoogle = async (response) => {
-    try {
-      const tokenId = response.access_token;
-      const res = await fetch('/google-login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ token: tokenId }),
-      });
-      const token = await res.json();
-      googleLogin(token.data.token);
+  const location = useLocation();
 
+  useEffect(() => {
+    // Extract the code from the URL
+    const queryParams = new URLSearchParams(location.search);
+    const code = queryParams.get('code');
+    if (code) {
+      sendCodeToBackend(code);
+    }
+  }, [location]);
+
+  // Function to send code to the backend
+  const sendCodeToBackend = async (code) => {
+    try {
+      const response = await axios.post('/google-login', { code });
+      // Handle response from the backend (e.g., storing the token, redirecting the user)
+      console.log('Backend response:', response.data);
+        googleLogin(response.data.token);
+        navigate('/room/none',{ replace: true });
+      // For example, redirect the user or store the received token in local storage
     } catch (error) {
-      console.error('Error sending token to backend:', error);
+      console.error('Error sending code to backend:', error);
     }
   };
-
-  const responseGoogle1 = async (response) => {
-    const idToken = response.code;
-    try {
-      console.log(response);
-      console.log("id token: " + idToken)
-      const res = await axios.post('/google-login', {code: idToken});
-      console.log(res.data);
-      googleLogin(res.data.data.token);
-    } catch (error) {
-      console.error('Error sending token to backend:', error);
-    }
-  };
+//   const responseGoogle1 = async (response) => {
+//     const idToken = response.code;
+//     try {
+//       console.log(response);
+//       console.log("id token: " + idToken)
+//       const res = await axios.post('/google-login', {code: idToken});
+//       console.log(res.data);
+//       googleLogin(res.data.data.token);
+//     } catch (error) {
+//       console.error('Error sending token to backend:', error);
+//     }
+//   };
 
   useEffect(() => {
     if (isAuthenticated){
       console.log("logged in already");
-      navigate('room/none')
+      navigate('/room/none',{ replace: true })
     }
   },[isAuthenticated, navigate]);
 
@@ -81,15 +87,16 @@ function RegisterForm() {
       // Handle errors (e.g., display error message)
     }
   }
-
+// codeResponse => responseGoogle1(codeResponse)
   const google = useGoogleLogin({
-      onSuccess: codeResponse => responseGoogle1(codeResponse),
+      onSuccess: () => {console.log("succeeded")},
       flow: 'auth-code',
+      ux_mode:'redirect',
       onFailure: () => {console.log("failed")},
   })
 
-  function login(){
-    navigate('/');
+  function goToLogin(){
+    navigate('/',{ replace: true });
   }
 
   return (
@@ -108,7 +115,7 @@ function RegisterForm() {
         <input type="password" name="password" value={formData.password} onChange={handleChange} placeholder="Password" required />
       </div>
       <button type="submit" className={`button ${valid ? "active":""}`}>Register</button>
-      <p className="already">Already have an account? <a href="/" className="register" onClick={login}>Login</a></p>
+      <p className="already">Already have an account? <a href="/" className="register" onClick={goToLogin}>Login</a></p>
       <div className="divider">
             <hr/>
             <p>or</p>
@@ -146,3 +153,5 @@ function RegisterForm() {
 }
 
 export default RegisterForm;
+
+
