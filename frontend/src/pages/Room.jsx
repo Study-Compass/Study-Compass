@@ -20,7 +20,7 @@ function Room(){
         }
         if(!isAuthenticated){
             console.log("not authenticated");
-            navigate('/');
+            // navigate('/');
         }
         console.log("isAuthenticated: ", isAuthenticated);
         // eslint-disable-next-line react-hooks/exhaustive-deps
