@@ -85,6 +85,7 @@ li:hover {
     position:relative;
     transition:all 0.3s;
     white-space: nowrap;
+    overflow:hidden;
 }
 
 
@@ -148,7 +149,6 @@ li:hover {
     justify-content: left;
     white-space: nowrap;
     overflow:hidden;
-
 }
 
 .shadow text::after{

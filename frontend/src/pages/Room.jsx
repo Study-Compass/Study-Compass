@@ -5,6 +5,7 @@ import './Room.css';
 import Header from '../components/Header/Header';
 import SearchBar from '../components/SearchBar/SearchBar';
 import useAuth from '../hooks/useAuth';
+import Classroom from '../components/Classroom/Classroom';
 
 function Room(){
     let { roomid } = useParams();
@@ -73,6 +74,7 @@ function Room(){
                 <div className="calendar-container">
                     <div className="left">
                         <SearchBar data={rooms} onEnter={changeURL2} room={roomid}/>
+                        <Classroom name={roomid} roomid={roomid}/>
                     </div>
                     <div className="right">
                         <Calendar className={roomid}/>
