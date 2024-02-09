@@ -10,7 +10,7 @@ function Room(){
     let { roomid } = useParams();
     let navigate =  useNavigate();
     const [rooms, setRooms] = useState(null);
-    const { isAuthenticated, logout} = useAuth();
+    const { isAuthenticated} = useAuth();
 
     console.log("roomid: ", roomid);
     useEffect(() => {
@@ -69,11 +69,17 @@ function Room(){
     return(
         <div className="room">
             <Header />  
-            <SearchBar data={rooms} onEnter={changeURL2} room={roomid}/>
-            <div className="calendar-container">
-                <Calendar className={roomid}/>
+            <div className="content-container">
+                <div className="calendar-container">
+                    <div className="left">
+                        <SearchBar data={rooms} onEnter={changeURL2} room={roomid}/>
+                    </div>
+                    <div className="right">
+                        <Calendar className={roomid}/>
+                    </div>
+                </div>
             </div>
-            <button onClick={logout}>logout</button>
+            {/* <button onClick={logout}>logout</button> */}
         </div>
     );
 }
