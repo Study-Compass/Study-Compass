@@ -85,7 +85,7 @@ function SearchBar({ data, onEnter, room}) {
                 inputRef.current.blur();
             }
         }
-        if (event.key === 'ArrowDown' || event.key === 'ArrowRight') {
+        if (event.key === 'ArrowDown') {
             event.preventDefault();
             if(selected === results.length-1){
                 setSelected(0);
@@ -103,7 +103,7 @@ function SearchBar({ data, onEnter, room}) {
                 }
             }
         }   
-        if (event.key === 'ArrowUp' || event.key === 'ArrowLeft') {
+        if (event.key === 'ArrowUp') {
             event.preventDefault();
             if(selected === 0){
                 setSelected(results.length-1);
@@ -153,6 +153,23 @@ function SearchBar({ data, onEnter, room}) {
             }
         }
     }
+    
+    useEffect(() => {
+        const inputElement = inputRef.current;
+        const shadowElement = shadowRef.current;
+
+        const syncScroll = () => {
+            if (shadowElement && inputElement) {
+                shadowElement.scrollLeft = inputElement.scrollLeft;
+            }
+        };
+
+        inputElement.addEventListener('scroll', syncScroll);
+
+        return () => {
+            inputElement.removeEventListener('scroll', syncScroll);
+        };
+    }, []);
 
     return (
         <div className="search-container">

@@ -5,12 +5,13 @@ import './Room.css';
 import Header from '../components/Header/Header';
 import SearchBar from '../components/SearchBar/SearchBar';
 import useAuth from '../hooks/useAuth';
+import Classroom from '../components/Classroom/Classroom';
 
 function Room(){
     let { roomid } = useParams();
     let navigate =  useNavigate();
     const [rooms, setRooms] = useState(null);
-    const { isAuthenticated, logout} = useAuth();
+    const { isAuthenticated} = useAuth();
 
     console.log("roomid: ", roomid);
     useEffect(() => {
@@ -69,11 +70,18 @@ function Room(){
     return(
         <div className="room">
             <Header />  
-            <SearchBar data={rooms} onEnter={changeURL2} room={roomid}/>
-            <div className="calendar-container">
-                <Calendar className={roomid}/>
+            <div className="content-container">
+                <div className="calendar-container">
+                    <div className="left">
+                        <SearchBar data={rooms} onEnter={changeURL2} room={roomid}/>
+                        <Classroom name={roomid} roomid={roomid}/>
+                    </div>
+                    <div className="right">
+                        <Calendar className={roomid}/>
+                    </div>
+                </div>
             </div>
-            <button onClick={logout}>logout</button>
+            {/* <button onClick={logout}>logout</button> */}
         </div>
     );
 }
