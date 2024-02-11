@@ -12,6 +12,8 @@ function Room(){
     let navigate =  useNavigate();
     const [rooms, setRooms] = useState(null);
     const { isAuthenticated} = useAuth();
+    const [data, setData] = useState(null);
+    const [loading, setLoading] = useState(true);
 
     console.log("roomid: ", roomid);
     useEffect(() => {
@@ -63,6 +65,29 @@ function Room(){
         fetchRooms();
     }, [roomid, isAuthenticated]);
 
+    useEffect(() => {
+        if(isAuthenticated === null || !isAuthenticated){
+            return;
+        }
+        const fetchData = async () => {
+            setLoading(true);
+            setData(null);
+            try {
+                const response = await fetch(`/getroom/${roomid}`);
+                const data = await response.json();
+                setData(data);
+                console.log(data);
+            } catch (error) {
+                console.error("Error fetching data: ", error);
+            } finally{
+                setLoading(false);
+            }
+        };
+
+        fetchData();
+    }, [roomid, isAuthenticated]);
+
+
     function changeURL2(option){
         navigate(`/room/${option}`,{ replace: true });
     }
@@ -77,7 +102,7 @@ function Room(){
                         <Classroom name={roomid} roomid={roomid}/>
                     </div>
                     <div className="right">
-                        <Calendar className={roomid}/>
+                        <Calendar className={roomid} data={data} isloading={loading}/>
                     </div>
                 </div>
             </div>

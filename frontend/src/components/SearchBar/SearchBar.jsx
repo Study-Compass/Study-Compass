@@ -3,10 +3,12 @@ import './SearchBar.css';
 import x from '../../assets/x.svg';
 import { useNavigate } from 'react-router-dom';
 import tab from '../../assets/tab.svg';
+import { set } from 'mongoose';
 
 //need to add support for abbreviated versions
 function SearchBar({ data, onEnter, room}) {
     let navigate =  useNavigate();
+    const itemRefs = useRef([]);
 
     const [searchInput, setSearchInput] = useState(room.toLowerCase());
     const [results, setResults] = useState([]);
@@ -14,13 +16,28 @@ function SearchBar({ data, onEnter, room}) {
 
     const [isFocused, setIsFocused] = useState(false);
     const [selected, setSelected] = useState(0);
+    
 
     const inputRef = useRef(null);
     const shadowRef = useRef(null);
 
+    const [goingUp, setGoingUp] = useState(false);
+
+
     const handleInputChange = (event) => {
         setSearchInput(event.target.value);
     };
+
+    useEffect(() => {
+        // Scroll the selected item into view
+        const selectedItemRef = itemRefs.current[selected];
+        if (selectedItemRef) {
+          selectedItemRef.scrollIntoView({
+            behavior: 'smooth',
+            block: 'nearest',
+          });
+        }
+      }, [selected]);
 
     useEffect(() => {
         if(room === undefined){
@@ -63,9 +80,9 @@ function SearchBar({ data, onEnter, room}) {
                     }
                 }
             }
-            const firstSeven = filteredResults.slice(0, 7);
-            setResults(firstSeven);
-            console.log(firstSeven);
+            const firstFifteen = filteredResults.slice(0, 15);
+            setResults(firstFifteen);
+            console.log(firstFifteen);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [searchInput, data]);
@@ -87,6 +104,7 @@ function SearchBar({ data, onEnter, room}) {
         }
         if (event.key === 'ArrowDown') {
             event.preventDefault();
+            setGoingUp(false);
             if(selected === results.length-1){
                 setSelected(0);
                 if(results[0].toLowerCase().startsWith(searchInput.toLowerCase())){
@@ -105,6 +123,7 @@ function SearchBar({ data, onEnter, room}) {
         }   
         if (event.key === 'ArrowUp') {
             event.preventDefault();
+            setGoingUp(true);
             if(selected === 0){
                 setSelected(results.length-1);
                 if(results[results.length-1].toLowerCase().startsWith(searchInput.toLowerCase())){
@@ -131,6 +150,7 @@ function SearchBar({ data, onEnter, room}) {
     };
 
     function click(event){
+        event.preventDefault();
         next(results[event.target.value])
         console.log(`routing url:${event.target.value}`)
     }
@@ -180,7 +200,7 @@ function SearchBar({ data, onEnter, room}) {
                 onChange={handleInputChange}
                 placeholder={!isFocused ? "search..." : ""}
                 onFocus={() => setIsFocused(true)}
-                onBlur={() => setIsFocused(false)}
+                onBlur={() => {setIsFocused(false)}}
                 onKeyDown={handleKeyDown}
                 spellCheck="false"  
                 ref={inputRef}
@@ -210,7 +230,13 @@ function SearchBar({ data, onEnter, room}) {
                             );
                         }
                         return (
-                            <li key={index} value={index} className={index === selected ? "chosen" : ""} onClick={click}>
+                            <li 
+                                ref={(el) => (itemRefs.current[index] = el)}
+                                key={index} 
+                                value={index} 
+                                className={index === selected ? "chosen" : ""} 
+                                onClick={click}
+                            >
                                 <span className="result non-match">{beforeMatch}</span>
                                 <span className="result match">{matchText}</span>
                                 <span className="result non-match">{afterMatch}</span>

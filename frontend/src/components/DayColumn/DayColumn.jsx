@@ -37,7 +37,8 @@ function DayColumn({day, dayEvents, eventColors, empty, change}){
             start_time:(selectionStart+7)/2,
             end_time: (selectionEnd + 7)/2,
         }
-        change("add", timeslot);
+        console.log(timeslot);
+        // change("add", timeslot);
     };
     function calculateTime(time){
         const [hour, minute] = time.split(':');
@@ -64,7 +65,7 @@ function DayColumn({day, dayEvents, eventColors, empty, change}){
 
     function Grid(){
         const gridItems = [];
-        for (let i = 1; i <= 56; i += 2) { // Assuming 14 time slots
+        for (let i = 1; i <= 60; i += 2) { // Assuming 14 time slots
             gridItems.push(
                 <div 
                     className={`grid-item ${!isSelecting ? "":"no-interaction"} ${(i-1) % 4  === 0 ? '' : 'noborder'}`} 

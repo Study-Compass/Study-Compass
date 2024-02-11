@@ -1,6 +1,6 @@
 .DayColumn{
     display:grid;
-    grid-template-rows: repeat(28, 1fr);
+    grid-template-rows: repeat(30, 1fr);
     position: relative;
     height:530px;   
     width:120px;
@@ -32,7 +32,7 @@
 
 .grid{
     display:grid;
-    grid-template-rows: repeat(56, 1fr);
+    grid-template-rows: repeat(60, 1fr);
     position: relative;
     height:100%;   
     width:100%;
@@ -41,7 +41,7 @@
 
 .selection-overlay{
     display:grid;
-    grid-template-rows: repeat(28, 1fr);
+    grid-template-rows: repeat(30, 1fr);
     position: relative;
     height:calc(100% - 10px);   
     width:calc(100% - 10px);
