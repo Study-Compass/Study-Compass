@@ -12,7 +12,7 @@
     display:flex;
     max-width:1300px;
     background-color: white;
-    border-radius: 20px 20px 20px 20px;
+    border-radius: 21px;
     /* padding:20px 20px 60px 20px; */
     flex-direction: row;
     border: 1px solid #B0AFAF;

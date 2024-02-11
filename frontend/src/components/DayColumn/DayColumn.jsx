@@ -3,7 +3,7 @@ import './DayColumn.css';
 import '../../assets/fonts.css'
 import TimeLabelColumn from '../TimeLabelColumn/TimeLabelColumn';
 
-function DayColumn({day, dayEvents, eventColors, empty, change}){
+function DayColumn({day, dayEvents, eventColors, empty, add, remove, queries}){
     const [selectionStart, setSelectionStart] = useState(null);
     const [selectionEnd, setSelectionEnd] = useState(null);
     const [isSelecting, setIsSelecting] = useState(false);
@@ -34,12 +34,19 @@ function DayColumn({day, dayEvents, eventColors, empty, change}){
         // Here you can handle the creation of a new event or finalize the selection
         const timeslot = {
             class_name: "search",
-            start_time:(selectionStart+7)/2,
-            end_time: (selectionEnd + 7)/2,
+            start_time: stringifyTime((selectionStart-1)/4 + 7),
+            end_time: stringifyTime((selectionEnd-1)/4 + 7),
         }
         console.log(timeslot);
-        // change("add", timeslot);
+        add(day, timeslot);
     };
+
+    function stringifyTime(time){
+        const hour = Math.floor(time);
+        const minute = time % 1 === 0.5 ? '30' : '00';
+        return `${hour}:${minute}`;
+    }
+
     function calculateTime(time){
         const [hour, minute] = time.split(':');
         return (hour - 7) * 2 + (minute === '30' ? 1 : 0) + 1;
@@ -108,6 +115,25 @@ function DayColumn({day, dayEvents, eventColors, empty, change}){
     return (
         <div className="DayColumn">
             <Grid />
+            {queries[day] ? 
+                queries[day].map((query) => {
+                    const rowStart = calculateTime(query.start_time);
+                    const rowEnd = calculateTime(query.end_time);
+                    return (
+                        <div 
+                            key={`${day}-${query.start_time}`}
+                            className="event"
+                            style={{
+                                gridRowStart: rowStart,
+                                gridRowEnd: rowEnd,
+                                backgroundColor: '#FFD6A5',
+                            }}
+                        >
+                        </div>
+                    );
+                })
+                : ""
+            }
             {dayEvents.map((event,index) => {
                 const rowStart = calculateTime(event.start_time);
                 const rowEnd = calculateTime(event.end_time);
