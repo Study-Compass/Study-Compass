@@ -10,6 +10,7 @@ ul {
     margin: 0;
     padding: 0;
     width:var(--search-width);
+    max-height: 200px;
     position: absolute;
     border: 1px solid #B0AFAF;
     z-index: 8;
@@ -17,7 +18,8 @@ ul {
     box-sizing: border-box;
     border-radius: 10px;
     background-color: #FBFBFB;
-    overflow: hidden;
+    overflow: scroll;
+    
 }
 
 .chosen{

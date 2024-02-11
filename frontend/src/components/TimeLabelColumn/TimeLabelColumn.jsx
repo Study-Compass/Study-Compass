@@ -18,6 +18,7 @@ function TimeLabelColumn(){
                 <div className="time-label" style={{gridRowStart:23, gridRowEnd:25}}><p>6:00</p></div>
                 <div className="time-label" style={{gridRowStart:25, gridRowEnd:27}}><p>7:00</p></div>
                 <div className="time-label" style={{gridRowStart:27, gridRowEnd:29}}><p>8:00</p></div>
+                <div className="time-label" style={{gridRowStart:29, gridRowEnd:31}}><p>9:00</p></div>
 
         </div>
     );
