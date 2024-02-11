@@ -122,13 +122,13 @@ function DayColumn({day, dayEvents, eventColors, empty, add, remove, queries}){
                     return (
                         <div 
                             key={`${day}-${query.start_time}`}
-                            className="event"
+                            className="event search"
                             style={{
                                 gridRowStart: rowStart,
                                 gridRowEnd: rowEnd,
-                                backgroundColor: '#FFD6A5',
                             }}
                         >
+                            <p className="time">{query.start_time} - {query.end_time}</p>
                         </div>
                     );
                 })
@@ -155,6 +155,23 @@ function DayColumn({day, dayEvents, eventColors, empty, add, remove, queries}){
                 
                 if(rowEnd - rowStart >= 4){
                     timelabel = true;
+                }
+
+                if(event.class_name === "search"){
+                    return (
+                        <div 
+                            key={event.id || `event-${index}`}
+                            className="event"
+                            style={{
+                                gridRowStart: rowStart,
+                                gridRowEnd: rowEnd,
+                                backgroundColor: color,
+                            }}
+                        >
+                            <p className="time">{event.start_time} - {event.end_time}</p>
+                            <p className="class-name">{event.class_name}</p>
+                        </div>
+                    );
                 }
 
                 if(event.class_name === "loading"){

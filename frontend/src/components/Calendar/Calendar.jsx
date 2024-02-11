@@ -15,8 +15,10 @@ function Calendar({className, data, isLoading}){
         'R': [],
         'F': [],
     });
+    const [noquery, setNoQuery] = useState(true);
 
     const addQuery = (key, newValue) => {
+        setNoQuery(false);
         setQuery(prev => {
     
             const convertTime = (time) => {
@@ -92,6 +94,7 @@ function Calendar({className, data, isLoading}){
                 }
             }
         });
+        Object.keys(query).every(key => query[key].length === 0) ? setNoQuery(true) : setNoQuery(false);
     }
 
     useEffect(() => {
@@ -135,6 +138,7 @@ function Calendar({className, data, isLoading}){
                         />
                     ))}
                 </div>
+                <button className={`button ${noquery ? "" : "active"}`} style={{"width":"200px"}}>search</button>
             </div>
     );
 

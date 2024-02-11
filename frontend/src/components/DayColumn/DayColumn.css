@@ -6,6 +6,8 @@
     width:120px;
 }
 
+
+
 .event{
     position: relative;
     border-radius: 5px;
@@ -23,6 +25,12 @@
     transition: all 0.3s ease;
     text-align: left;
     font-size:12px;
+}
+
+.search{
+    border:2px solid #A2ABAB;
+    box-sizing: border-box;
+    background-color: #DDDCDC;
 }
 
 .event:hover{
@@ -77,6 +85,11 @@
     font-family: 'Satoshi';
     font-weight: normal;
     margin: 0 0 1px 0 ;
+}
+
+.search .time{
+    font-size: 11px;
+    margin: 0 0 1px 0;
 }
 
 .class-name{
