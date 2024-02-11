@@ -16,16 +16,62 @@ function Calendar({className, data, isLoading}){
         'F': [],
     });
 
-    const addQuery = (key, value) => {
+    const addQuery = (key, newValue) => {
         setQuery(prev => {
-            const existing = prev[key];
-            if (existing === undefined) {
-                return { ...prev, [key]: [value] };
-            } else {
-                return { ...prev, [key]: [...existing, value] };
-            }
+    
+            const convertTime = (time) => {
+                const [hour, minute] = time.split(':');
+                return parseInt(hour) + (minute === '30' ? 0.5 : 0);
+            };
+    
+            const stringifyTime = (time) => {
+                const hours = Math.floor(time);
+                const minutes = (time % 1) * 60;
+                return `${hours}:${minutes.toString().padStart(2, '0')}`;
+            };
+    
+            // Create a list that includes all existing timeslots plus the new one.
+            const allSlots = [...prev[key], newValue];
+    
+            // Convert timeslots to a comparable format (minutes since midnight).
+            const slotsWithMinutes = allSlots.map(slot => ({
+                ...slot,
+                start: convertTime(slot.start_time),
+                end: convertTime(slot.end_time)
+            }));
+    
+            // Sort timeslots by start time.
+            slotsWithMinutes.sort((a, b) => a.start - b.start);
+    
+            // Merge overlapping or consecutive timeslots.
+            const mergedSlots = slotsWithMinutes.reduce((acc, slot) => {
+                if (acc.length === 0) {
+                    acc.push(slot);
+                } else {
+                    let lastSlot = acc[acc.length - 1];
+                    if (lastSlot.end >= slot.start) {
+                        // If the current slot overlaps or is consecutive with the last slot in acc, merge them.
+                        lastSlot.end = Math.max(lastSlot.end, slot.end);
+                        lastSlot.end_time = stringifyTime(lastSlot.end);
+                    } else {
+                        // If not overlapping or consecutive, just add the slot to acc.
+                        acc.push(slot);
+                    }
+                }
+                return acc;
+            }, []);
+    
+            // Map back to the original format.
+            const finalSlots = mergedSlots.map(slot => ({
+                class_name: slot.class_name, // This might need adjustment based on your requirements.
+                start_time: stringifyTime(slot.start),
+                end_time: stringifyTime(slot.end)
+            }));
+    
+            // Return updated state.
+            return { ...prev, [key]: finalSlots };
         });
-    };
+    };    
 
     useEffect(() => {
         console.log("query: ", query);
