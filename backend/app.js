@@ -14,7 +14,15 @@ const client = new google.auth.OAuth2(
     process.env.GOOGLE_CLIENT_ID, 
     process.env.GOOGLE_CLIENT_SECRET,
     process.env.GOOGLE_REDIRECT_URI //redirect uri
-);
+); 
+
+const corsOptions = {
+    origin: 'http://localhost:3000', // replace with production domain
+    optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
+  };
+app.use(cors(corsOptions));
+
+
 const Classroom = require('./schemas/classroom.js');
 const User = require('./schemas/user.js');
 
@@ -377,7 +385,7 @@ app.get('/api/greet', async (req, res) => {
     res.json({ message: 'Hello from the backend!' });
 });
 
-app.get('/free', async (req, res) => {
+app.post('/free', async (req, res) => {
     // Parse the input object from the request
     const freePeriods = req.body; // Assuming the input object is in the request body
 
@@ -392,8 +400,8 @@ app.get('/free', async (req, res) => {
         const timeConditions = periods.map(period => ({
             $not: {
                 $elemMatch: {
-                    start_time: { $lt: period[1] }, // period end time
-                    end_time: { $gt: period[0] } // period start time
+                    start_time: { $lt: period["end_time"] }, // period end time
+                    end_time: { $gt: period["start_time"] } // period start time
                 }
             }
         }));

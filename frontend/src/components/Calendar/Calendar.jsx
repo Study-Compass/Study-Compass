@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import './Calendar.css';
 import DayColumn from '../DayColumn/DayColumn';
-
+import axios from 'axios';
 function Calendar({className, data, isLoading}){
     const days = ["S", "M", "T", "W", "R", "F"];
     const loadColors = useRef(new Map()).current;
@@ -114,6 +114,18 @@ function Calendar({className, data, isLoading}){
         },
     ];
 
+    const fetchFreeRooms = async () => {
+        try {
+          const response = await axios.post('http://yourserver.com/free', {query});
+          const roomNames = response.data;
+          console.log(roomNames); // Process the response as needed
+        } catch (error) {
+          console.error('Error fetching free rooms:', error);
+          // Handle error
+        }
+      };
+    
+
     return (
             <div className="Calendar">
                 {/* <h1>{className.toLowerCase()}</h1> */}
@@ -142,6 +154,7 @@ function Calendar({className, data, isLoading}){
                 <button 
                     className={`button ${noquery ? "" : "active"}`} 
                     style={{"width":"200px", "margin":"0px"}}
+                    onClick={fetchFreeRooms}
                 >search</button>
             </div>
     );
