@@ -11,7 +11,7 @@ function Room(){
     let { roomid } = useParams();
     let navigate =  useNavigate();
     const [rooms, setRooms] = useState(null);
-    const { isAuthenticated} = useAuth();
+    const { isAuthenticated, logout } = useAuth();
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
 
@@ -30,10 +30,10 @@ function Room(){
     }, [isAuthenticated]);
 
     useEffect(() => {
-        if(isAuthenticated === null|| !isAuthenticated){
-            console.log("isAuthenticated null");
-            return;
-        }
+        // if(isAuthenticated === null|| !isAuthenticated){
+        //     console.log("isAuthenticated null");
+        //     return;
+        // }
         const fetchRooms = async () => {
             try {
                 const response = await fetch(`/getrooms`);
@@ -66,9 +66,9 @@ function Room(){
     }, [roomid, isAuthenticated]);
 
     useEffect(() => {
-        if(isAuthenticated === null || !isAuthenticated){
-            return;
-        }
+        // if(isAuthenticated === null || !isAuthenticated){
+        //     return;
+        // }
         const fetchData = async () => {
             setLoading(true);
             setData(null);
@@ -106,7 +106,7 @@ function Room(){
                     </div>
                 </div>
             </div>
-            {/* <button onClick={logout}>logout</button> */}
+            <button onClick={logout}>logout</button>
         </div>
     );
 }

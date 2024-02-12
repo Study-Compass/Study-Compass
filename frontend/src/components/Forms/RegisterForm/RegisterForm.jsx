@@ -26,6 +26,7 @@ function RegisterForm() {
     const code = queryParams.get('code');
     if (code) {
       sendCodeToBackend(code);
+      console.log("code: " + code);
     }
   }, [location]);
 

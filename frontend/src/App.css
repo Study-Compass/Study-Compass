@@ -3,6 +3,8 @@
 :root{
     --light:rgba(238, 238, 238, 1);
     --dark: rgba(226, 226, 226, 1);
+    --lightred: rgba(250, 117, 109, 0.3);
+    --red: rgba(250, 117, 109, 1);
 }
 
 .App {
@@ -65,3 +67,21 @@ a:hover{
   align-items:center;
   min-height:100vh;
 }
+
+/* button{
+    font-family: 'Satoshi';
+    font-size: 15px;
+    outline:none;
+    border: 1px solid #B0AFAF;
+    border-radius: 5px;
+    background-color: white;
+    padding:5px 20px;
+    color: #B0AFAF;
+}
+
+button.active{
+    background-color: var(--lightred);
+    color: white;
+    border: 1px solid var(--lightred);
+    color: #414141;
+} */

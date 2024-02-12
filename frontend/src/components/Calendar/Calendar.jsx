@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import './Calendar.css';
 import DayColumn from '../DayColumn/DayColumn';
-
+import axios from 'axios';
 function Calendar({className, data, isLoading}){
     const days = ["S", "M", "T", "W", "R", "F"];
     const loadColors = useRef(new Map()).current;
@@ -15,37 +15,87 @@ function Calendar({className, data, isLoading}){
         'R': [],
         'F': [],
     });
+    const [noquery, setNoQuery] = useState(true);
 
-    const addQuery = (key, value) => {
+    const addQuery = (key, newValue) => {
+        setNoQuery(false);
         setQuery(prev => {
-            const existing = prev[key];
-            if (existing === undefined) {
-                return { ...prev, [key]: [value] };
-            } else {
-                return { ...prev, [key]: [...existing, value] };
-            }
+    
+            const convertTime = (time) => {
+                const [hour, minute] = time.split(':');
+                return parseInt(hour) + (minute === '30' ? 0.5 : 0);
+            };
+    
+            const stringifyTime = (time) => {
+                const hours = Math.floor(time);
+                const minutes = (time % 1) * 60;
+                return `${hours}:${minutes.toString().padStart(2, '0')}`;
+            };
+    
+            // Create a list that includes all existing timeslots plus the new one.
+            const allSlots = [...prev[key], newValue];
+    
+            // Convert timeslots to a comparable format (minutes since midnight).
+            const slotsWithMinutes = allSlots.map(slot => ({
+                ...slot,
+                start: convertTime(slot.start_time),
+                end: convertTime(slot.end_time)
+            }));
+    
+            // Sort timeslots by start time.
+            slotsWithMinutes.sort((a, b) => a.start - b.start);
+    
+            // Merge overlapping or consecutive timeslots.
+            const mergedSlots = slotsWithMinutes.reduce((acc, slot) => {
+                if (acc.length === 0) {
+                    acc.push(slot);
+                } else {
+                    let lastSlot = acc[acc.length - 1];
+                    if (lastSlot.end >= slot.start) {
+                        // If the current slot overlaps or is consecutive with the last slot in acc, merge them.
+                        lastSlot.end = Math.max(lastSlot.end, slot.end);
+                        lastSlot.end_time = stringifyTime(lastSlot.end);
+                    } else {
+                        // If not overlapping or consecutive, just add the slot to acc.
+                        acc.push(slot);
+                    }
+                }
+                return acc;
+            }, []);
+    
+            // Map back to the original format.
+            const finalSlots = mergedSlots.map(slot => ({
+                class_name: slot.class_name, // This might need adjustment based on your requirements.
+                start_time: stringifyTime(slot.start),
+                end_time: stringifyTime(slot.end)
+            }));
+    
+            // Return updated state.
+            return { ...prev, [key]: finalSlots };
         });
-    };
+    };    
 
     useEffect(() => {
         console.log("query: ", query);
+        const allEmpty = Object.keys(query).every(key => query[key].length === 0);
+        setNoQuery(allEmpty);
     }, [query]);
 
     const removeQuery = (key, value) => {
         setQuery(prev => {
             const existing = prev[key];
             if (existing === undefined) {
+                // If the key does not exist, return the previous state unchanged.
                 return prev;
             } else {
+                // Filter the array to remove the specified value.
                 const filtered = existing.filter(v => v !== value);
-                if (filtered.length === 0) {
-                    const { [key]: omit, ...rest } = prev;
-                    return rest;
-                } else {
-                    return { ...prev, [key]: filtered };
-                }
+                // Always return the object with the key, even if the array is empty.
+                return { ...prev, [key]: filtered };
             }
         });
+        // Check if all keys in the query object have empty arrays and update `noQuery` accordingly.
+        // Object.keys(query).every(key => query[key].length === 0) ? setNoQuery(true) : setNoQuery(false);
     }
 
     useEffect(() => {
@@ -63,6 +113,18 @@ function Calendar({className, data, isLoading}){
             "end_time": "21:00"
         },
     ];
+
+    const fetchFreeRooms = async () => {
+        try {
+          const response = await axios.post('http://yourserver.com/free', {query});
+          const roomNames = response.data;
+          console.log(roomNames); // Process the response as needed
+        } catch (error) {
+          console.error('Error fetching free rooms:', error);
+          // Handle error
+        }
+      };
+    
 
     return (
             <div className="Calendar">
@@ -89,6 +151,11 @@ function Calendar({className, data, isLoading}){
                         />
                     ))}
                 </div>
+                <button 
+                    className={`button ${noquery ? "" : "active"}`} 
+                    style={{"width":"200px", "margin":"0px"}}
+                    onClick={fetchFreeRooms}
+                >search</button>
             </div>
     );
 
