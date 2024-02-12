@@ -119,6 +119,11 @@ function DayColumn({day, dayEvents, eventColors, empty, add, remove, queries}){
                 queries[day].map((query) => {
                     const rowStart = calculateTime(query.start_time);
                     const rowEnd = calculateTime(query.end_time);
+                    let timelabel;
+
+                    if(rowEnd - rowStart >= 2){
+                        timelabel = true;
+                    }
                     return (
                         <div 
                             key={`${day}-${query.start_time}`}
@@ -128,7 +133,11 @@ function DayColumn({day, dayEvents, eventColors, empty, add, remove, queries}){
                                 gridRowEnd: rowEnd,
                             }}
                         >
-                            <p className="time">{query.start_time} - {query.end_time}</p>
+                            {timelabel ? <p className="time">{query.start_time} - {query.end_time}</p>: ""}
+                            <button 
+                                className="remove-event"
+                                onClick={() => remove(day, query)}
+                            >remove</button>
                         </div>
                     );
                 })
@@ -155,23 +164,6 @@ function DayColumn({day, dayEvents, eventColors, empty, add, remove, queries}){
                 
                 if(rowEnd - rowStart >= 4){
                     timelabel = true;
-                }
-
-                if(event.class_name === "search"){
-                    return (
-                        <div 
-                            key={event.id || `event-${index}`}
-                            className="event"
-                            style={{
-                                gridRowStart: rowStart,
-                                gridRowEnd: rowEnd,
-                                backgroundColor: color,
-                            }}
-                        >
-                            <p className="time">{event.start_time} - {event.end_time}</p>
-                            <p className="class-name">{event.class_name}</p>
-                        </div>
-                    );
                 }
 
                 if(event.class_name === "loading"){

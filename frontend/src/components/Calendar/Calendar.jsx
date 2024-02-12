@@ -77,24 +77,25 @@ function Calendar({className, data, isLoading}){
 
     useEffect(() => {
         console.log("query: ", query);
+        const allEmpty = Object.keys(query).every(key => query[key].length === 0);
+        setNoQuery(allEmpty);
     }, [query]);
 
     const removeQuery = (key, value) => {
         setQuery(prev => {
             const existing = prev[key];
             if (existing === undefined) {
+                // If the key does not exist, return the previous state unchanged.
                 return prev;
             } else {
+                // Filter the array to remove the specified value.
                 const filtered = existing.filter(v => v !== value);
-                if (filtered.length === 0) {
-                    const { [key]: omit, ...rest } = prev;
-                    return rest;
-                } else {
-                    return { ...prev, [key]: filtered };
-                }
+                // Always return the object with the key, even if the array is empty.
+                return { ...prev, [key]: filtered };
             }
         });
-        Object.keys(query).every(key => query[key].length === 0) ? setNoQuery(true) : setNoQuery(false);
+        // Check if all keys in the query object have empty arrays and update `noQuery` accordingly.
+        // Object.keys(query).every(key => query[key].length === 0) ? setNoQuery(true) : setNoQuery(false);
     }
 
     useEffect(() => {
@@ -138,7 +139,10 @@ function Calendar({className, data, isLoading}){
                         />
                     ))}
                 </div>
-                <button className={`button ${noquery ? "" : "active"}`} style={{"width":"200px"}}>search</button>
+                <button 
+                    className={`button ${noquery ? "" : "active"}`} 
+                    style={{"width":"200px", "margin":"0px"}}
+                >search</button>
             </div>
     );
 
