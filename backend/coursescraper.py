@@ -126,7 +126,7 @@ async def parse_course_info(url, classroom_info):
 # cluster organization and database management determined
 def upload_to_mongo(dic, term):
     load_dotenv() # loading .env file
-    uri = os.environ.get('MONGO_URL1') # fetching URI string
+    uri = os.environ.get('MONGO_URL') # fetching URI string
     client = MongoClient(uri, server_api=ServerApi('1')) 
     try: # send a ping to confirm a successful connection
         client.admin.command('ping')
@@ -174,7 +174,7 @@ async def main():
     return dic
 
 if __name__ == "__main__":
-    test_mongo_insert_and_read(True)
+    test_mongo_insert_and_read()
     start_time = time.perf_counter() # establishing start time for benchmarking
 
     asyncio.run(main())# <-- where the magic happens

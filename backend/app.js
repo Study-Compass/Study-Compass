@@ -387,13 +387,15 @@ app.get('/api/greet', async (req, res) => {
 
 app.post('/free', async (req, res) => {
     // Parse the input object from the request
-    const freePeriods = req.body; // Assuming the input object is in the request body
-
-    // Helper function to create query conditions for a given day
+    const freePeriods = req.body.query; // Assuming the input object is in the request body
+    console.log("freePeriods:", JSON.stringify(freePeriods, null, 2));
+    console.log("freePeriods[M]:", JSON.stringify(freePeriods['M'], null, 2));
+        // Helper function to create query conditions for a given day
     const createTimePeriodQuery = (day, periods) => {
+        console.log(`periods: ${periods}`)
         // If no periods are specified for the day, the classroom should not be scheduled
         if (!periods || periods.length === 0) {
-            return { [`weekly_schedule.${day}`]: { $size: 0 } };
+            return null;
         }
 
         // Create conditions for each time period
@@ -409,12 +411,14 @@ app.post('/free', async (req, res) => {
         return { [`weekly_schedule.${day}`]: { $and: timeConditions } };
     };
 
-    // Build dynamic query conditions for each day
+    //Build dynamic query conditions for each day
     const queryConditions = Object.keys(freePeriods).map(day => 
         createTimePeriodQuery(day, freePeriods[day])
-    );
+    ).filter(condition => condition !== null);
 
-    // Query the database
+    console.log(JSON.stringify({$and: queryConditions}));
+
+    //Query the database
     const rooms = await Classroom.find({ $and: queryConditions });
     const roomNames = rooms.map(room => room.name);
 

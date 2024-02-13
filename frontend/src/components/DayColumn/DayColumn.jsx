@@ -44,12 +44,25 @@ function DayColumn({day, dayEvents, eventColors, empty, add, remove, queries}){
     function stringifyTime(time){
         const hour = Math.floor(time);
         const minute = time % 1 === 0.5 ? '30' : '00';
-        return `${hour}:${minute}`;
+        return hour*60 + parseInt(minute);
+    }
+
+    function minutesToTime(minutes){
+        let hours = Math.floor(minutes / 60);
+        const mins = minutes % 60;
+        if(hours > 12){
+            hours -= 12;
+        }
+        return `${hours}:${mins.toString().padStart(2, '0')}`;
     }
 
     function calculateTime(time){
-        const [hour, minute] = time.split(':');
-        return (hour - 7) * 2 + (minute === '30' ? 1 : 0) + 1;
+        // const [hour, minute] = time.split(':');
+        const hours = Math.floor(time / 60);
+        const minutes = time % 60;
+        console.log(time, hours, minutes);
+        console.log(`calculated: ${ (hours - 7) * 2 + (minutes === '30' ? 1 : 0) + 1}}`)
+        return (hours - 7) * 2 + (minutes === 30 ? 1 : 0) + 1;
     }
 
     const colors = ['#B1E6B0', '#D6BCDD', '#BDB2FF', '#F1F3A8' , '#FFD6A5', '#A0C4FF', '#FFC6FF','#B4C4AE','#A2ABAB'];
@@ -133,7 +146,7 @@ function DayColumn({day, dayEvents, eventColors, empty, add, remove, queries}){
                                 gridRowEnd: rowEnd,
                             }}
                         >
-                            {timelabel ? <p className="time">{query.start_time} - {query.end_time}</p>: ""}
+                            {timelabel ? <p className="time">{minutesToTime(query.start_time)} - {minutesToTime(query.end_time)}</p>: ""}
                             <button 
                                 className="remove-event"
                                 onClick={() => remove(day, query)}
@@ -191,7 +204,7 @@ function DayColumn({day, dayEvents, eventColors, empty, add, remove, queries}){
                             backgroundColor: color,
                         }}
                     >
-                        {timelabel && <p className="time">{event.start_time} - {event.end_time}</p>}
+                        {timelabel ? <p className="time">{minutesToTime(event.start_time)} - {minutesToTime(event.end_time)}</p>: ""}
                         <p className="class-name">{event.class_name}</p>
                     </div>
                 );

@@ -20,41 +20,21 @@ function Calendar({className, data, isLoading}){
     const addQuery = (key, newValue) => {
         setNoQuery(false);
         setQuery(prev => {
-    
-            const convertTime = (time) => {
-                const [hour, minute] = time.split(':');
-                return parseInt(hour) + (minute === '30' ? 0.5 : 0);
-            };
-    
-            const stringifyTime = (time) => {
-                const hours = Math.floor(time);
-                const minutes = (time % 1) * 60;
-                return `${hours}:${minutes.toString().padStart(2, '0')}`;
-            };
-    
-            // Create a list that includes all existing timeslots plus the new one.
+                // Create a list that includes all existing timeslots plus the new one.
             const allSlots = [...prev[key], newValue];
     
-            // Convert timeslots to a comparable format (minutes since midnight).
-            const slotsWithMinutes = allSlots.map(slot => ({
-                ...slot,
-                start: convertTime(slot.start_time),
-                end: convertTime(slot.end_time)
-            }));
-    
             // Sort timeslots by start time.
-            slotsWithMinutes.sort((a, b) => a.start - b.start);
+            allSlots.sort((a, b) => a.start_time - b.start_time);
     
             // Merge overlapping or consecutive timeslots.
-            const mergedSlots = slotsWithMinutes.reduce((acc, slot) => {
+            const mergedSlots = allSlots.reduce((acc, slot) => {
                 if (acc.length === 0) {
                     acc.push(slot);
                 } else {
                     let lastSlot = acc[acc.length - 1];
-                    if (lastSlot.end >= slot.start) {
+                    if (lastSlot.end_time >= slot.start_time) {
                         // If the current slot overlaps or is consecutive with the last slot in acc, merge them.
-                        lastSlot.end = Math.max(lastSlot.end, slot.end);
-                        lastSlot.end_time = stringifyTime(lastSlot.end);
+                        lastSlot.end_time = Math.max(lastSlot.end_time, slot.end_time);
                     } else {
                         // If not overlapping or consecutive, just add the slot to acc.
                         acc.push(slot);
@@ -63,15 +43,8 @@ function Calendar({className, data, isLoading}){
                 return acc;
             }, []);
     
-            // Map back to the original format.
-            const finalSlots = mergedSlots.map(slot => ({
-                class_name: slot.class_name, // This might need adjustment based on your requirements.
-                start_time: stringifyTime(slot.start),
-                end_time: stringifyTime(slot.end)
-            }));
-    
             // Return updated state.
-            return { ...prev, [key]: finalSlots };
+            return { ...prev, [key]: mergedSlots };
         });
     };    
 
@@ -109,14 +82,14 @@ function Calendar({className, data, isLoading}){
     const load = [                
         {
             "class_name": "loading",
-            "start_time": "7:00",
-            "end_time": "21:00"
+            "start_time": 420,
+            "end_time": 1260
         },
     ];
 
     const fetchFreeRooms = async () => {
         try {
-          const response = await axios.post('http://yourserver.com/free', {query});
+          const response = await axios.post('/free', {query});
           const roomNames = response.data;
           console.log(roomNames); // Process the response as needed
         } catch (error) {
