@@ -391,7 +391,8 @@ app.post('/free', async (req, res) => {
     console.log("freePeriods:", JSON.stringify(freePeriods, null, 2));
     console.log("freePeriods[M]:", JSON.stringify(freePeriods['M'], null, 2));
         // Helper function to create query conditions for a given day
-    const createTimePeriodQuery = (day, periods) => {
+    const createTimePeriodQuery1 = (day, periods) => {
+        conditions = [];
         console.log(`periods: ${periods}`)
         // If no periods are specified for the day, the classroom should not be scheduled
         if (!periods || periods.length === 0) {
@@ -411,15 +412,42 @@ app.post('/free', async (req, res) => {
         return { [`weekly_schedule.${day}`]: { $and: timeConditions } };
     };
 
-    //Build dynamic query conditions for each day
-    const queryConditions = Object.keys(freePeriods).map(day => 
-        createTimePeriodQuery(day, freePeriods[day])
-    ).filter(condition => condition !== null);
 
-    console.log(JSON.stringify({$and: queryConditions}));
+
+    const createTimePeriodQuery = (queryObject) => {
+        conditions = [];
+        Object.entries(queryObject).forEach(([day,periods]) => {
+            if(periods.length > 0){
+                periods.forEach(period => {
+                    const condition = {
+                        [`weekly_schedule.${day}`]: {
+                            "$not": {
+                                "$elemMatch": {
+                                    "start_time": { "$lt": period.end_time },
+                                    "end_time": { "$gt": period.start_time }
+                                }
+                            }
+                        }
+                    }
+                    conditions.push(condition);
+                });
+            }
+        });
+        return conditions;
+    };
+
+    //Build dynamic query conditions for each day
+    // const queryConditions = Object.keys(freePeriods).map(day => 
+    //     createTimePeriodQuery(day, freePeriods[day])
+    // ).filter(condition => condition !== null);
+
+    const queryConditions = createTimePeriodQuery(freePeriods);
+    const mongoQuery = { "$and": queryConditions };
+
+    console.log(JSON.stringify(mongoQuery));
 
     //Query the database
-    const rooms = await Classroom.find({ $and: queryConditions });
+    const rooms = await Classroom.find(mongoQuery, { name: 1, _id: 0 });
     const roomNames = rooms.map(room => room.name);
 
     // Return the results
