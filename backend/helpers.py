@@ -67,7 +67,36 @@ def print_url(url, full=False):
     print(f'scraping {term} {year} {id} {course}')
 
 # used to convert time from string format (from x:xx pm to military time)
-def format_time(time):
+    
+def format_time(time): # mintes from midnight version, allowing mongo comparison
+    starttime, endtime = [t.strip() for t in time.split('-')]
+
+    # function that converts time from string format (from x:xx pm to total minutes from midnight), also rounds for ease of use
+    def convert_to_minutes_from_midnight(time_str):
+        time_obj = datetime.strptime(time_str, "%I:%M %p")  # parse the time string
+
+        # extract hours and minutes
+        hours, minutes = time_obj.hour, time_obj.minute
+
+        # round minutes to the nearest 30
+        rounded_minutes = round(minutes / 30) * 30
+
+        # adjust hours if necessary
+        if rounded_minutes >= 60:
+            rounded_minutes -= 60
+            hours += 1
+            # adjust for 24-hour wrap-around
+            if hours >= 24:
+                hours -= 24
+
+        # calculate total minutes from midnight
+        total_minutes = hours * 60 + rounded_minutes
+        return total_minutes
+
+    return convert_to_minutes_from_midnight(starttime), convert_to_minutes_from_midnight(endtime)
+
+
+def format_time1(time):
     starttime, endtime = [t.strip() for t in time.split('-')]
 
     # function that converts time from string format (from x:xx pm to military time), also rounds for ease of use

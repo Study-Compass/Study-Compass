@@ -116,7 +116,7 @@ function Calendar({className, data, isLoading}){
 
     const fetchFreeRooms = async () => {
         try {
-          const response = await axios.post('http://yourserver.com/free', {query});
+          const response = await axios.post('/free', {query});
           const roomNames = response.data;
           console.log(roomNames); // Process the response as needed
         } catch (error) {
