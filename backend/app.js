@@ -447,7 +447,7 @@ app.post('/free', async (req, res) => {
     console.log(JSON.stringify(mongoQuery));
 
     //Query the database
-    const rooms = await Classroom.find(mongoQuery, { name: 1, _id: 0 });
+    const rooms = await Classroom.find(mongoQuery);
     const roomNames = rooms.map(room => room.name);
 
     // Return the results

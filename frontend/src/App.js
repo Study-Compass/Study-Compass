@@ -3,6 +3,7 @@ import './App.css';
 import Room from './pages/Room';
 import Login from './pages/Login';
 import Reigster from './pages/Register/Register';
+import Redirect from './pages/Redirect/Redirect';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './AuthContext';
 import { GoogleOAuthProvider } from '@react-oauth/google';
@@ -13,7 +14,7 @@ function App() {
             <AuthProvider>
                 <Router>
                     <Routes>
-                        <Route path="/" element={<Login />}/>
+                        <Route path="/" element={<Redirect />}/>
                         <Route path="/room/:roomid" element={<Room />}/>
                         <Route path="/register" element={<Reigster />}/>
                     </Routes>

@@ -126,7 +126,7 @@ function Calendar({className, data, isLoading}){
                 </div>
                 <button 
                     className={`button ${noquery ? "" : "active"}`} 
-                    style={{"width":"200px", "margin":"0px"}}
+                    style={{"width":"200px","height":"40px", "margin":"0 0 10px 0"}}
                     onClick={fetchFreeRooms}
                 >search</button>
             </div>
