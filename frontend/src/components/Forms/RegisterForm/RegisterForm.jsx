@@ -43,18 +43,6 @@ function RegisterForm() {
       console.error('Error sending code to backend:', error);
     }
   };
-//   const responseGoogle1 = async (response) => {
-//     const idToken = response.code;
-//     try {
-//       console.log(response);
-//       console.log("id token: " + idToken)
-//       const res = await axios.post('/google-login', {code: idToken});
-//       console.log(res.data);
-//       googleLogin(res.data.data.token);
-//     } catch (error) {
-//       console.error('Error sending token to backend:', error);
-//     }
-//   };
 
   useEffect(() => {
     if (isAuthenticated){

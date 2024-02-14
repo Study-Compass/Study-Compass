@@ -106,7 +106,7 @@ function Room(){
                     </div>
                 </div>
             </div>
-            <button onClick={logout}>logout</button>
+            {/* <button onClick={logout}>logout</button> */}
         </div>
     );
 }
