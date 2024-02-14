@@ -15,6 +15,9 @@ function RegisterForm() {
     email: '',
     password: ''
   });
+  const [sent, setSent] = useState(false);
+  const [loadContent, setLoadContent] = useState(false);
+
   
   let navigate = useNavigate();
 
@@ -25,8 +28,14 @@ function RegisterForm() {
     const queryParams = new URLSearchParams(location.search);
     const code = queryParams.get('code');
     if (code) {
-      sendCodeToBackend(code);
+      setLoadContent(false);
+      if(!sent){ //failsafe for double querying, still double querying, but it's fine
+          sendCodeToBackend(code);
+      }
+      setSent(true);
       console.log("code: " + code);
+    } else {
+        setLoadContent(true);
     }
   }, [location]);
 
@@ -86,6 +95,10 @@ function RegisterForm() {
 
   function goToLogin(){
     navigate('/',{ replace: true });
+  }
+
+  if(!loadContent){
+    return ("");
   }
 
   return (
