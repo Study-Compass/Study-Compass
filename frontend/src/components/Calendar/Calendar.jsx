@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import './Calendar.css';
 import DayColumn from '../DayColumn/DayColumn';
 import axios from 'axios';
-function Calendar({className, data, isLoading}){
+function Calendar({className, data, isLoading, setFreeQuery}){
     const days = ["S", "M", "T", "W", "R", "F"];
     const loadColors = useRef(new Map()).current;
     const eventColors = useRef(new Map()).current;
@@ -98,6 +98,9 @@ function Calendar({className, data, isLoading}){
         }
       };
     
+    const fetchFreeRooms1 = () => {
+        setFreeQuery(query);
+    };
 
     return (
             <div className="Calendar">

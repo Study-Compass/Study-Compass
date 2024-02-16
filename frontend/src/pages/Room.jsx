@@ -7,6 +7,9 @@ import SearchBar from '../components/SearchBar/SearchBar';
 import useAuth from '../hooks/useAuth';
 import Classroom from '../components/Classroom/Classroom';
 
+import axios from 'axios';
+
+
 function Room(){
     let { roomid } = useParams();
     let navigate =  useNavigate();
@@ -14,6 +17,14 @@ function Room(){
     const { isAuthenticated, logout } = useAuth();
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
+
+    const [freeQuery, setFreeQuery] = useState({
+        'M': [],
+        'T': [],
+        'W': [],
+        'R': [],
+        'F': [],
+    });
 
     console.log("roomid: ", roomid);
     useEffect(() => {
@@ -30,10 +41,6 @@ function Room(){
     }, [isAuthenticated]);
 
     useEffect(() => {
-        // if(isAuthenticated === null|| !isAuthenticated){
-        //     console.log("isAuthenticated null");
-        //     return;
-        // }
         const fetchRooms = async () => {
             try {
                 const response = await fetch(`/getrooms`);
@@ -66,9 +73,6 @@ function Room(){
     }, [roomid, isAuthenticated]);
 
     useEffect(() => {
-        // if(isAuthenticated === null || !isAuthenticated){
-        //     return;
-        // }
         const fetchData = async () => {
             setLoading(true);
             setData(null);
@@ -87,6 +91,21 @@ function Room(){
         fetchData();
     }, [roomid, isAuthenticated]);
 
+    const fetchFreeRooms = async () => {
+        try {
+          const response = await axios.post('/free', {freeQuery});
+          const roomNames = response.data;
+          console.log(roomNames); // Process the response as needed
+        } catch (error) {
+          console.error('Error fetching free rooms:', error);
+          // Handle error
+        }
+      };
+
+    // useState(() => {
+    //     fetchFreeRooms();
+    // }, [freeQuery]);
+
 
     function changeURL2(option){
         navigate(`/room/${option}`,{ replace: true });
@@ -102,7 +121,7 @@ function Room(){
                         <Classroom name={roomid} roomid={roomid}/>
                     </div>
                     <div className="right">
-                        <Calendar className={roomid} data={data} isloading={loading}/>
+                        <Calendar className={roomid} data={data} isloading={loading} setFreeQuery={setFreeQuery}/>
                     </div>
                 </div>
             </div>
