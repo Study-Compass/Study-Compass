@@ -88,8 +88,20 @@ function Room() {
     }, []);
 
     const fetchData = async (id) => {
+        if(offline){
+            // -- DANGER ZONE - CODE SHOULD NOT TOUCH DEPLOYMENT BRANCH
+            if(id === "none"){
+                setData(dummyData['none']);
+                return;
+            }
+            console.log("Continuing with OFFLINE development");
+            setData(dummyData['room'])
+            return;
+            // --------------------------------------------------------
+        }
         setLoading(true);
         setData(null);
+        
         try {
             const response = await fetch(`/getroom/${id}`);
             const data = await response.json();
@@ -97,10 +109,7 @@ function Room() {
             console.log(data);
         } catch (error) {
             console.error("Error fetching data: ", error);
-            // -- DANGER ZONE - CODE SHOULD NOT TOUCH DEPLOYMENT BRANCH
-            console.log("Continuing with OFFLINE development");
-            setData(dummyData['room'])
-            // --------------------------------------------------------
+
         } finally {
             setLoading(false);
         }
@@ -112,6 +121,13 @@ function Room() {
 
     const fetchFreeRooms = async () => {
         setContentState("calendarSearch")
+        if(offline){
+            // -- DANGER ZONE - CODE SHOULD NOT TOUCH DEPLOYMENT BRANCH
+            console.log("Continuing with OFFLINE development");
+            setResults(dummyData['freerooms']);
+            return;
+            // -------------------------------------------------------
+        }
         try {
             setLoading(true)
             const response = await axios.post('/free', { query });
@@ -121,10 +137,7 @@ function Room() {
             console.log(roomNames); // Process the response as needed
         } catch (error) {
             console.error('Error fetching free rooms:', error);
-            // -- DANGER ZONE - CODE SHOULD NOT TOUCH DEPLOYMENT BRANCH
-            console.log("Continuing with OFFLINE development");
-            setResults(dummyData['freerooms']);
-            // -------------------------------------------------------
+
             // Handle error
         } finally {
             setLoading(false);

@@ -99,6 +99,16 @@ const dummyData = {
             ]
         }
     },
+    'none' : {
+        'name': "none",
+        "weekly_schedule" : {
+            'M' : [],
+            'T' : [],
+            'W' : [],
+            'R' : [],
+            'F' : []
+        }
+    },
     "rooms":[
         "Academy Hall AUD",
         "Alumni Sports and Rec Center 209",
