@@ -90,8 +90,10 @@ function Room() {
     const fetchData = async (id) => {
         if(offline){
             // -- DANGER ZONE - CODE SHOULD NOT TOUCH DEPLOYMENT BRANCH
+            setLoading(false);
             if(id === "none"){
                 setData(dummyData['none']);
+
                 return;
             }
             console.log("Continuing with OFFLINE development");
@@ -146,6 +148,7 @@ function Room() {
 
     const addQuery = (key, newValue) => {
         setNoQuery(false);
+        setContentState("calendarSearch");
         setQuery(prev => {
             // Create a list that includes all existing timeslots plus the new one.
             const allSlots = [...prev[key], newValue];
@@ -196,6 +199,8 @@ function Room() {
         Object.keys(query).every(key => query[key].length === 0) ? setNoQuery(true) : setNoQuery(false);
         if (noquery === true) {
             setContentState("empty");
+        } else {
+            setContentState("calendarSearch");
         }
         console.log(`noquery: ${noquery}`);
         setResults([]);
@@ -205,6 +210,10 @@ function Room() {
         }
     }, [query])
 
+    useEffect(()=>{
+        console.log(contentState);
+        console.log(loading);
+    },[contentState]);
 
     function changeURL2(option) {
         navigate(`/room/${option}`, { replace: true });
