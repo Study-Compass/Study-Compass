@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import './DayColumn.css';
 import '../../assets/fonts.css'
 import TimeLabelColumn from '../TimeLabelColumn/TimeLabelColumn';
@@ -7,6 +7,11 @@ function DayColumn({day, dayEvents, eventColors, empty, add, remove, queries}){
     const [selectionStart, setSelectionStart] = useState(null);
     const [selectionEnd, setSelectionEnd] = useState(null);
     const [isSelecting, setIsSelecting] = useState(false);
+    const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        setLoading(false);
+    }, [dayEvents]);
 
     const handleMouseDown = (gridPosition) => {
         if(!empty){
@@ -60,8 +65,6 @@ function DayColumn({day, dayEvents, eventColors, empty, add, remove, queries}){
         // const [hour, minute] = time.split(':');
         const hours = Math.floor(time / 60);
         const minutes = time % 60;
-        console.log(time, hours, minutes);
-        console.log(`calculated: ${ (hours - 7) * 2 + (minutes === '30' ? 1 : 0) + 1}}`)
         return (hours - 7) * 2 + (minutes === 30 ? 1 : 0) + 1;
     }
 
@@ -128,7 +131,68 @@ function DayColumn({day, dayEvents, eventColors, empty, add, remove, queries}){
     return (
         <div className="DayColumn">
             <Grid />
-            {queries[day] ? 
+ 
+            {dayEvents.map((event,index) => {
+                const rowStart = calculateTime(event.start_time);
+                const rowEnd = calculateTime(event.end_time);
+                const color = getColorForEvent(event.class_name);
+
+                let timelabel = false;
+
+                if(!start_times.includes(rowStart)){
+                    start_times.push(rowStart);
+                } else {
+                    return "";
+                }
+
+                if(!end_times.includes(rowEnd)){
+                    end_times.push(rowEnd);
+                } else {
+                    return "";
+                }
+                
+                if(rowEnd - rowStart >= 4){
+                    timelabel = true;
+                }
+
+                if(event.class_name === "loading"){
+                    if(!loading){
+                        setLoading(true);
+                        console.log("loading")
+                    }
+                    return (
+                        <div 
+                            key={event.id || `event-${index}`}
+                            className="event shimmer"
+                            style={{
+                                gridRowStart: rowStart,
+                                gridRowEnd: rowEnd,
+                                backgroundColor: color,
+                            }}
+                            >
+                        </div>
+
+                    );
+                }
+                if(loading){
+                    setLoading(false);
+                }
+                return (
+                    
+                    <div 
+                        className="event"
+                        style={{
+                            gridRowStart: rowStart,
+                            gridRowEnd: rowEnd,
+                            backgroundColor: color,
+                        }}
+                    >
+                        {timelabel ? <p className="time">{minutesToTime(event.start_time)} - {minutesToTime(event.end_time)}</p>: ""}
+                        <p className="class-name">{event.class_name}</p>
+                    </div>
+                );
+            })}
+            {queries[day] && !loading ? 
                 queries[day].map((query) => {
                     const rowStart = calculateTime(query.start_time);
                     const rowEnd = calculateTime(query.end_time);
@@ -156,59 +220,6 @@ function DayColumn({day, dayEvents, eventColors, empty, add, remove, queries}){
                 })
                 : ""
             }
-            {dayEvents.map((event,index) => {
-                const rowStart = calculateTime(event.start_time);
-                const rowEnd = calculateTime(event.end_time);
-                const color = getColorForEvent(event.class_name);
-
-                let timelabel = false;
-
-                if(!start_times.includes(rowStart)){
-                    start_times.push(rowStart);
-                } else {
-                    return "";
-                }
-
-                if(!end_times.includes(rowEnd)){
-                    end_times.push(rowEnd);
-                } else {
-                    return "";
-                }
-                
-                if(rowEnd - rowStart >= 4){
-                    timelabel = true;
-                }
-
-                if(event.class_name === "loading"){
-                    return (
-                        <div 
-                            key={event.id || `event-${index}`}
-                            className="event shimmer"
-                            style={{
-                                gridRowStart: rowStart,
-                                gridRowEnd: rowEnd,
-                                backgroundColor: color,
-                            }}
-                            >
-                        </div>
-
-                    );
-                }
-
-                return (
-                    <div 
-                        className="event"
-                        style={{
-                            gridRowStart: rowStart,
-                            gridRowEnd: rowEnd,
-                            backgroundColor: color,
-                        }}
-                    >
-                        {timelabel ? <p className="time">{minutesToTime(event.start_time)} - {minutesToTime(event.end_time)}</p>: ""}
-                        <p className="class-name">{event.class_name}</p>
-                    </div>
-                );
-            })}
         </div>
 
     );

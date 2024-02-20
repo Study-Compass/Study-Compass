@@ -1,0 +1,15 @@
+.profile-picture{
+    height:35px;
+}
+
+.profile-picture img{
+    height:100%;
+}
+
+.profile-picture:hover{
+    cursor:pointer;
+}
+
+.popup{
+    z-index: 1; 
+}

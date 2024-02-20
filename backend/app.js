@@ -29,19 +29,23 @@ const User = require('./schemas/user.js');
 
 const authRoutes = require('./authRoutes.js');
 
+let mongoConnection = false;
+
 app.use(express.json());
 app.use(authRoutes);
 app.use(cors());
 app.use(cookieParser());
 
-mongoose.connect(process.env.MONGO_URL)
+// mongoose.connect(process.env.MONGO_URL)
 
-mongoose.connection.on('connected', () => {
-    console.log('Mongoose connected to DB.');
-});
-mongoose.connection.on('error', (err) => {
-    console.error('Mongoose connection error:', err);
-});
+// mongoose.connection.on('connected', () => {
+//     console.log('Mongoose connected to DB.');
+//     mongoConnection = true;
+// });
+// mongoose.connection.on('error', (err) => {
+//     console.log('Mongoose connection error:', err);
+//     mongoConnection = false;
+// });
 
 app.post('/google-login', async (req, res) => {
     const { code }  = req.body;
@@ -109,26 +113,7 @@ app.get('/update-database', (req, res) => {
 });
 
 app.get('/getroom/:name', async (req, res) => {
-    try {
-        const roomName = req.params.name;
-        if(roomName === "none"){
-            const empty = new Classroom;
-            res.json(empty);
-            console.log(`GET: /getroom/${req.params.name}`)
-            return;
-        }
-        const room = await Classroom.findOne({ name: roomName });
-
-        if (room) {
-            res.json(room);
-            console.log(`GET: /getroom/${req.params.name}`)
-        } else {
-            res.status(404).send('Room not found');
-            console.log(`GET: /getroom/${req.params.name} | NOT FOUND`)
-        }
-    } catch (error) {
-        res.send(error)
-        console.log(error)
+    if(mongoConnection === false){
         const data = {
             "name": "Academy Hall AUD",
             "weekly_schedule": {
@@ -230,18 +215,33 @@ app.get('/getroom/:name', async (req, res) => {
             }
         }
         res.json(data);
+
+    }
+    try {
+        const roomName = req.params.name;
+        if(roomName === "none"){
+            const empty = new Classroom;
+            res.json(empty);
+            console.log(`GET: /getroom/${req.params.name}`)
+            return;
+        }
+        const room = await Classroom.findOne({ name: roomName });
+
+        if (room) {
+            res.json(room);
+            console.log(`GET: /getroom/${req.params.name}`)
+        } else {
+            res.status(404).send('Room not found');
+            console.log(`GET: /getroom/${req.params.name} | NOT FOUND`)
+        }
+    } catch (error) {
+        res.send(error)
+        console.log(error)
     }
 });
 
 app.get('/getrooms', async (req, res) => {
-    try {
-        const allRooms = await Classroom.find({}).select('name -_id');
-        const roomNames = allRooms.map(room => room.name);
-        res.json(roomNames.sort());
-        console.log('GET: /getrooms')
-
-    } catch (error) {
-        console.log(error)
+    if(mongoConnection === false){
         const locations = [
             "Academy Hall AUD",
             "Alumni Sports and Rec Center 209",
@@ -378,6 +378,15 @@ app.get('/getrooms', async (req, res) => {
         ];
         res.send(locations)
     }
+    try {
+        const allRooms = await Classroom.find({}).select('name -_id');
+        const roomNames = allRooms.map(room => room.name);
+        res.json(roomNames.sort());
+        console.log('GET: /getrooms')
+
+    } catch (error) {
+        console.log(error)
+    }
 });
 
 app.get('/api/greet', async (req, res) => {
@@ -386,6 +395,35 @@ app.get('/api/greet', async (req, res) => {
 });
 
 app.post('/free', async (req, res) => {
+    if(mongoConnection === false){
+        const locations = [
+            "Academy Hall AUD",
+            "Alumni Sports and Rec Center 209",
+            "Alumni Sports and Rec Center 407",
+            "Amos Eaton Hall 214",
+            "Amos Eaton Hall 215",
+            "Amos Eaton Hall 216",
+            "Amos Eaton Hall 217",
+            "Biotechnology and Interdis Bld AUDITORIUM",
+            "Carnegie Building 101",
+            "Carnegie Building 102",
+            "Carnegie Building 106",
+            "Carnegie Building 113",
+            "Carnegie Building 201",
+            "Carnegie Building 205",
+            "Carnegie Building 206",
+            "Carnegie Building 208",
+            "Carnegie Building 210",
+            "Cogswell Laboratory 113",
+            "Darrin Communications Center 174",
+            "Darrin Communications Center 232",
+            "Darrin Communications Center 235",
+            "Darrin Communications Center 236",
+            "Darrin Communications Center 239",
+            "Darrin Communications Center 308",
+        ]; 
+        res.json(locations);
+    }
     // Parse the input object from the request
     const freePeriods = req.body.query; // Assuming the input object is in the request body
     console.log("freePeriods:", JSON.stringify(freePeriods, null, 2));

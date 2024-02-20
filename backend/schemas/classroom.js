@@ -9,28 +9,28 @@ const classroomSchema = new Schema({
     weekly_schedule: {
         M: [{
             class_name: String,
-            start_time: String,
-            end_time: String
+            start_time: Number,
+            end_time: Number
         }],
         T: [{
             class_name: String,
-            start_time: String,
-            end_time: String
+            start_time: Number,
+            end_time: Number
         }],
         W: [{
             class_name: String,
-            start_time: String,
-            end_time: String
+            start_time: Number,
+            end_time: Number
         }],
         R: [{
             class_name: String,
-            start_time: String,
-            end_time: String
+            start_time: Number,
+            end_time: Number
         }],
         F: [{
             class_name: String,
-            start_time: String,
-            end_time: String
+            start_time: Number,
+            end_time: Number
         }],
     }
 });

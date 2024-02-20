@@ -3,6 +3,12 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    opacity:1;
+    transition:0.2s all;
+}
+
+.Calendar.loading{
+    opacity:0.5;
 }
 
 .Calendar-header{
@@ -20,11 +26,11 @@
     text-align: center;
 }
 
-.loading{
+/* .loading{
     width:825px;
     height:550px;
     border-radius: 20px;
-}
+} */
 
 @media screen and (max-width: 875px){
     .Calendar-header{

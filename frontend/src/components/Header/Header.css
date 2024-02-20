@@ -1,7 +1,7 @@
 .Header{
     width:1300px;
     display:flex;
-    justify-content: flex-start;
+    justify-content: space-between;
     align-items: center;
     padding:15px;
     box-sizing: border-box;
@@ -11,6 +11,7 @@
 .logo{
     width:200px;
 }
+
 
 @media(max-width: 400px){
     .Header{

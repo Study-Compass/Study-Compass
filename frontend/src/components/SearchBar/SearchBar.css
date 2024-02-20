@@ -1,11 +1,13 @@
 :root{
     --search-width: calc(100% - 60px);
     --search-height: 50px;
-    --search-font-size: 23px;
+    --search-font:'Inter';
+    --search-font-size: 17px;
+    --search-font-weight:450;
 
 }
 
-ul {
+.search-container ul{
     list-style-type: none;
     margin: 0;
     padding: 0;
@@ -45,9 +47,9 @@ ul {
 li {
     background-color: #FBFBFB;
     /* border-bottom: 1px solid #B0AFAF; */
-    font-family: 'Satoshi';
-    font-size: 22px;
-    font-weight: bold;
+    font-family: var(--search-font);
+    font-size: var(--search-font-size);
+    font-weight: var(--search-font-weight);
     color: #414141;
     padding: 5px 20px;
     box-sizing: border-box;
@@ -56,6 +58,7 @@ li {
     border-radius: 10px;
     position:relative;
     transition: all 0.5s;
+    width:100%;
 }
 
 li:hover {
@@ -76,11 +79,11 @@ li:hover {
     background-color: transparent;
     border-radius: 10px;
     border: 1px solid #B0AFAF;
-    font-family: 'Satoshi';
-    font-size: 23px;
-    font-weight: bold;
+    font-family: var(--search-font);
+    font-size: var(--search-font-size);
+    font-weight: var(--search-font-weight);
     color: #414141;
-    padding: 5px 40px 5px 20px;
+    padding: 7px 40px 7px 20px;
     box-sizing: border-box;
     outline: none;
     text-align: left;
@@ -105,13 +108,13 @@ li:hover {
 }
 
 .x{
-    height:15px;
-    width:15px;
+    height:12px;
+    width:12px;
     position: absolute;
     right: 15px;
     z-index: 11;
     transform: scale(1.1);
-    padding: 4.5% 0 0 0;
+    padding: 4.2% 0 0 0;
 }
 .x:hover{
     cursor: pointer;
@@ -141,10 +144,10 @@ li:hover {
     width:100%;
     border-radius: 10px;
     border: 1px solid #B0AFAF;
-    font-family: 'Satoshi';
-    font-size: 23px;
-    font-weight: bold;
-    padding: 5px 40px 5px 20px;
+    font-family: var(--search-font);
+    font-size: var(--search-font-size);
+    font-weight: var(--search-font-weight);
+    padding: 7px 40px 7px 20px;
     box-sizing: border-box;
     outline: none;
     text-align: left;
