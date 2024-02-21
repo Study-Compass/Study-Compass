@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import './Calendar.css';
 import DayColumn from '../DayColumn/DayColumn';
-import axios from 'axios';
+
 function Calendar({className, data, isLoading, addQuery, removeQuery, query}){
     const days = ["S", "M", "T", "W", "R", "F"];
     const loadColors = useRef(new Map()).current;
@@ -24,16 +24,19 @@ function Calendar({className, data, isLoading, addQuery, removeQuery, query}){
         // },
     ];
 
+    const today = new Date();
+    const currentDay = today.getDay();
+
     return (
             <div className={`Calendar ${data ? "":"loading"}`}>
                 {/* <h1>{className.toLowerCase()}</h1> */}
                 {isLoading ? <div>loading</div>: ""}
                 <div className="Calendar-header">
-                    <p>monday</p>
-                    <p>tuesday</p>
-                    <p>wednesday</p>
-                    <p>thursday</p>
-                    <p>friday</p>
+                    <p className={`${currentDay === 1 ? "currentDay" : ""}`}>monday</p>
+                    <p className={`${currentDay === 2 ? "currentDay" : ""}`}>tuesday</p>
+                    <p className={`${currentDay === 3 ? "currentDay" : ""}`}>wednesday</p>
+                    <p className={`${currentDay === 4 ? "currentDay" : ""}`}>thursday</p>
+                    <p className={`${currentDay === 6 ? "currentDay" : ""}`}>friday</p>
                 </div>
                 <div className="Time-grid">
                     {days.map((day) => (

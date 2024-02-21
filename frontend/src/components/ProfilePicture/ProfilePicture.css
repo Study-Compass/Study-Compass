@@ -1,9 +1,12 @@
 .profile-picture{
     height:35px;
+    position: relative;
 }
 
 .profile-picture img{
     height:100%;
+    z-index: 3;
+    position: relative;
 }
 
 .profile-picture:hover{
@@ -12,4 +15,39 @@
 
 .popup{
     z-index: 1; 
+    position: absolute;
+    height:50px;
+    width:200px;
+    right:-10px;
+    top:-10px;
+    border-radius: 15px;
+    background-color: white;
+    transition:opacity 0.3s,
+                height 0.5s;
+    opacity:0;
+}
+
+.popup-active{
+    border: 1px solid var(--border);
+    height:100px;
+    opacity: 1;
+}
+
+.profile-picture button{
+    font-family: 'Satoshi';
+    font-size: 15px;
+    outline:none;
+    border-radius: 7px;
+    background-color: var(--red);
+    border:none;
+    padding:5px 20px;
+    margin:10px;
+    color: white;
+    width:calc(100% - 20px);
+    position: absolute;
+    bottom:0;
+}
+
+.profile-picture button:hover{
+    cursor:pointer;
 }

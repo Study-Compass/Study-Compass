@@ -9,6 +9,10 @@ function DayColumn({day, dayEvents, eventColors, empty, add, remove, queries}){
     const [isSelecting, setIsSelecting] = useState(false);
     const [loading, setLoading] = useState(false);
 
+    const dates = ["M", "T", "W", "R", "F"];
+
+    const isToday = dates.indexOf(day) === new Date().getDay() -1;
+
     useEffect(() => {
         setLoading(false);
     }, [dayEvents]);
@@ -95,10 +99,13 @@ function DayColumn({day, dayEvents, eventColors, empty, add, remove, queries}){
 
     function Grid(){
         const gridItems = [];
+        const date = new Date();
+        const currentHour = date.getHours();
+        const currentGrid = (currentHour - 7) * 4 + 1;
         for (let i = 1; i <= 60; i += 2) { // Assuming 14 time slots
             gridItems.push(
                 <div 
-                    className={`grid-item ${!isSelecting ? "":"no-interaction"} ${(i-1) % 4  === 0 ? '' : 'noborder'}`} 
+                    className={`grid-item ${!isSelecting ? "":"no-interaction"} ${(i-1) % 4  === 0 ? '' : 'noborder'} ${i === currentGrid && isToday? 'redborder' : ''}`} 
                     style={{gridRowStart: i, gridRowEnd: i + 2}}
                     onMouseDown={() => handleMouseDown(i)}
                     onMouseMove={() => handleMouseMove(i)}
