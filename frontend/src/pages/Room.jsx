@@ -9,9 +9,10 @@ import Classroom from '../components/Classroom/Classroom';
 
 import dummyData from '../dummyData.js'
 
-import axios from 'axios';
 
-const offline = true;
+import {getRooms, getRoom, getFreeRooms, debounce} from '../Query.js';
+
+const offline = false;
 
 function Room() {
     let { roomid } = useParams();
@@ -20,6 +21,7 @@ function Room() {
     const { isAuthenticated, logout } = useAuth();
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [calendarLoading, setCalendarLoading] = useState(true);
 
     const [contentState, setContentState] = useState("empty")
 
@@ -56,32 +58,8 @@ function Room() {
                 return;
             }
             // --------------------------------------------------
-            try {
-                const response = await fetch(`/getrooms`);
-                const responseBody = await response.text(); // First, always read the response as text
-
-                if (!response.ok) {
-                    // Log the error if the response status is not OK
-                    console.error("Error fetching data:", responseBody);
-                    return;
-                }
-
-                let rooms;
-                try {
-                    rooms = JSON.parse(responseBody); // Then, parse the text as JSON
-                } catch (jsonError) {
-                    // Log the JSON parsing error along with the raw response
-                    console.error("JSON parsing error:", jsonError);
-                    console.log("Raw response:", responseBody);
-                    return;
-                }
-
-                setRooms(rooms);
-                console.log(rooms);
-            } catch (error) {
-                console.error("Error:", error);
-
-            }
+            const rooms = await getRooms();
+            setRooms(rooms);
         };
 
         fetchRooms();
@@ -103,26 +81,19 @@ function Room() {
         }
         setLoading(true);
         setData(null);
-        
-        try {
-            const response = await fetch(`/getroom/${id}`);
-            const data = await response.json();
-            setData(data);
-            console.log(data);
-        } catch (error) {
-            console.error("Error fetching data: ", error);
-
-        } finally {
-            setLoading(false);
-        }
+        const data = await getRoom(id);
+        setLoading(false);
+        setData(data);
     };
 
     useEffect(() => {
         fetchData(roomid);
+        setContentState("nameSearch");
     }, [roomid, isAuthenticated]);
 
     const fetchFreeRooms = async () => {
         setContentState("calendarSearch")
+        setCalendarLoading(true)
         if(offline){
             // -- DANGER ZONE - CODE SHOULD NOT TOUCH DEPLOYMENT BRANCH
             console.log("Continuing with OFFLINE development");
@@ -130,20 +101,9 @@ function Room() {
             return;
             // -------------------------------------------------------
         }
-        try {
-            setLoading(true)
-            const response = await axios.post('/free', { query });
-            const roomNames = response.data;
-            setResults(roomNames);
-            console.log(`names:${roomNames}`); // Process the response as needed
-            console.log(roomNames); // Process the response as needed
-        } catch (error) {
-            console.error('Error fetching free rooms:', error);
-
-            // Handle error
-        } finally {
-            setLoading(false);
-        }
+        const roomNames = await getFreeRooms(query);
+        setResults(roomNames);
+        setCalendarLoading(false);
     };
 
     const addQuery = (key, newValue) => {
@@ -195,7 +155,7 @@ function Room() {
         // Check if all keys in the query object have empty arrays and update `noQuery` accordingly.
     }
 
-    useEffect(() => {
+    useEffect(() => { 
         Object.keys(query).every(key => query[key].length === 0) ? setNoQuery(true) : setNoQuery(false);
         if (noquery === true) {
             setContentState("empty");
@@ -215,8 +175,24 @@ function Room() {
         console.log(loading);
     },[contentState]);
 
+    const debouncedFetchData = debounce(fetchData, 500); // Adjust delay as needed
+
+
     function changeURL2(option) {
         navigate(`/room/${option}`, { replace: true });
+    }
+
+    function onX(){
+        setContentState('empty');
+        setResults([]);
+        setQuery({
+            'M': [],
+            'T': [],
+            'W': [],
+            'R': [],
+            'F': [],
+        })
+        // setData(dummyData["none"]);
     }
 
     return (
@@ -225,16 +201,23 @@ function Room() {
             <div className="content-container">
                 <div className="calendar-container">
                     <div className="left">
-                        <SearchBar data={rooms} onEnter={changeURL2} room={roomid} />
+                        <SearchBar data={rooms} onEnter={changeURL2} room={roomid} onX={onX} />
                         <Classroom name={roomid} roomid={roomid} />
-                        {contentState === "calendarSearch" ? loading ? "" : <h1>{results.length} results</h1> : ""}
-                        <ul className="time-results">
-                            {
-                                results.map((result, index) => {
-                                    return <li key={index} value={result} onMouseOver={() => { }}>{result.toLowerCase()}</li>
-                                })
-                            }
-                        </ul>
+                        {contentState === "calendarSearch" ? calendarLoading ? "" : <h1>{results.length} results</h1> : ""}
+                        {contentState === "calendarSearch" ? 
+                            <ul className="time-results">
+                                {
+                                    results.map((result, index) => {
+                                        return <li 
+                                            key={index} 
+                                            value={result} 
+                                            onMouseOver={() => {debouncedFetchData(result)}} 
+                                            onMouseLeave={()=>{setData(dummyData["none"])}}
+                                        >{result.toLowerCase()}</li>
+                                    })
+                                }
+                            </ul> : ""
+                        }
                     </div>
                     <div className="right">
                         <Calendar className={roomid} data={data} isloading={loading} addQuery={addQuery} removeQuery={removeQuery} query={query} />

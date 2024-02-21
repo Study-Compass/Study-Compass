@@ -6,7 +6,7 @@ import tab from '../../assets/tab.svg';
 import { set } from 'mongoose';
 
 //need to add support for abbreviated versions
-function SearchBar({ data, onEnter, room}) {
+function SearchBar({ data, onEnter, room, onX}) {
     let navigate =  useNavigate();
     const itemRefs = useRef([]);
 
@@ -156,6 +156,7 @@ function SearchBar({ data, onEnter, room}) {
     }
 
     function handleX(){
+        onX();
         setSearchInput('');
         setLower("");
         setResults([]);
