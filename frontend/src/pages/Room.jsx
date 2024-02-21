@@ -9,7 +9,8 @@ import Classroom from '../components/Classroom/Classroom';
 
 import dummyData from '../dummyData.js'
 
-import axios from 'axios';
+
+import {getRooms, getRoom, getFreeRooms, debounce} from '../Query.js';
 
 const offline = false;
 
@@ -57,32 +58,8 @@ function Room() {
                 return;
             }
             // --------------------------------------------------
-            try {
-                const response = await fetch(`/getrooms`);
-                const responseBody = await response.text(); // First, always read the response as text
-
-                if (!response.ok) {
-                    // Log the error if the response status is not OK
-                    console.error("Error fetching data:", responseBody);
-                    return;
-                }
-
-                let rooms;
-                try {
-                    rooms = JSON.parse(responseBody); // Then, parse the text as JSON
-                } catch (jsonError) {
-                    // Log the JSON parsing error along with the raw response
-                    console.error("JSON parsing error:", jsonError);
-                    console.log("Raw response:", responseBody);
-                    return;
-                }
-
-                setRooms(rooms);
-                console.log(rooms);
-            } catch (error) {
-                console.error("Error:", error);
-
-            }
+            const rooms = await getRooms();
+            setRooms(rooms);
         };
 
         fetchRooms();
@@ -104,21 +81,9 @@ function Room() {
         }
         setLoading(true);
         setData(null);
-        
-        try {
-            const response = await fetch(`/getroom/${id}`);
-            const data = await response.json();
-            if(id==='none'){
-                console.log(data);
-            }
-            setData(data);
-            console.log(data);
-        } catch (error) {
-            console.error("Error fetching data: ", error);
-
-        } finally {
-            setLoading(false);
-        }
+        const data = await getRoom(id);
+        setLoading(false);
+        setData(data);
     };
 
     useEffect(() => {
@@ -128,6 +93,7 @@ function Room() {
 
     const fetchFreeRooms = async () => {
         setContentState("calendarSearch")
+        setCalendarLoading(true)
         if(offline){
             // -- DANGER ZONE - CODE SHOULD NOT TOUCH DEPLOYMENT BRANCH
             console.log("Continuing with OFFLINE development");
@@ -135,20 +101,9 @@ function Room() {
             return;
             // -------------------------------------------------------
         }
-        try {
-            setCalendarLoading(true)
-            const response = await axios.post('/free', { query });
-            const roomNames = response.data;
-            setResults(roomNames);
-            console.log(`names:${roomNames}`); // Process the response as needed
-            console.log(roomNames); // Process the response as needed
-        } catch (error) {
-            console.error('Error fetching free rooms:', error);
-
-            // Handle error
-        } finally {
-            setCalendarLoading(false);
-        }
+        const roomNames = await getFreeRooms(query);
+        setResults(roomNames);
+        setCalendarLoading(false);
     };
 
     const addQuery = (key, newValue) => {
@@ -220,18 +175,6 @@ function Room() {
         console.log(loading);
     },[contentState]);
 
-    function debounce(func, wait) { //move logic to other file
-        let timeout;
-        return function executedFunction(...args) {
-          const later = () => {
-            clearTimeout(timeout);
-            func(...args);
-          };
-          clearTimeout(timeout);
-          timeout = setTimeout(later, wait);
-        };
-      }
-
     const debouncedFetchData = debounce(fetchData, 500); // Adjust delay as needed
 
 
@@ -249,6 +192,7 @@ function Room() {
             'R': [],
             'F': [],
         })
+        // setData(dummyData["none"]);
     }
 
     return (
@@ -264,7 +208,12 @@ function Room() {
                             <ul className="time-results">
                                 {
                                     results.map((result, index) => {
-                                        return <li key={index} value={result} onMouseOver={() => {debouncedFetchData(result)}} onMouseLeave={()=>{setData(dummyData["none"])}}>{result.toLowerCase()}</li>
+                                        return <li 
+                                            key={index} 
+                                            value={result} 
+                                            onMouseOver={() => {debouncedFetchData(result)}} 
+                                            onMouseLeave={()=>{setData(dummyData["none"])}}
+                                        >{result.toLowerCase()}</li>
                                     })
                                 }
                             </ul> : ""

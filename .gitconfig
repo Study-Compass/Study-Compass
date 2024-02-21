@@ -7,7 +7,8 @@
 	adc = !git add . && git commit
 	adcm = "!f() { git add . && git commit -m \"$@\"; }; f"
 	adi = add -i
-
+	adcmp = "!f() { git add . && git commit -m \"$@\" && git push origin HEAD; }; f"
+	
 	br = branch
 	brd = branch -d
 	brr = branch -r
@@ -98,6 +99,14 @@
 	oldHighlight = red bold 52
 	newNormal = green bold
 	newHighlight = green bold 22
+[color "diff"]
+	meta = 11
+	frag = magenta bold
+	func = 146 bold
+	commit = yellow bold
+	old = red bold
+	new = green bold
+	whitespace = red reverse
 [commit]
 	verbose = true
 [core]
@@ -112,3 +121,10 @@
   prompt = false
 [interactive]
 	diffFilter = diff-so-fancy --patch
+[credential "https://submitty.cs.rpi.edu"]
+	provider = generic
+[credential]
+	helper = 
+	helper = /usr/local/share/gcm-core/git-credential-manager
+[credential "https://dev.azure.com"]
+	useHttpPath = true
