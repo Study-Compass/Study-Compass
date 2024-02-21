@@ -37,6 +37,13 @@ function DayColumn({day, dayEvents, eventColors, empty, add, remove, queries}){
         }
         setIsSelecting(false);
         // Here you can handle the creation of a new event or finalize the selection
+
+        if(selectionStart > selectionEnd){
+            let temp = selectionStart;
+            setSelectionStart(selectionEnd);
+            setSelectionEnd(temp);
+        }
+
         const timeslot = {
             class_name: "search",
             start_time: stringifyTime((selectionStart-1)/4 + 7),
@@ -192,7 +199,7 @@ function DayColumn({day, dayEvents, eventColors, empty, add, remove, queries}){
                     </div>
                 );
             })}
-            {queries[day] && !loading ? 
+            {queries[day] ? 
                 queries[day].map((query) => {
                     const rowStart = calculateTime(query.start_time);
                     const rowEnd = calculateTime(query.end_time);

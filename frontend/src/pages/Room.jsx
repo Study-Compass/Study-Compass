@@ -11,7 +11,7 @@ import dummyData from '../dummyData.js'
 
 import axios from 'axios';
 
-const offline = true;
+const offline = false;
 
 function Room() {
     let { roomid } = useParams();
@@ -20,6 +20,7 @@ function Room() {
     const { isAuthenticated, logout } = useAuth();
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [calendarLoading, setCalendarLoading] = useState(true);
 
     const [contentState, setContentState] = useState("empty")
 
@@ -107,6 +108,9 @@ function Room() {
         try {
             const response = await fetch(`/getroom/${id}`);
             const data = await response.json();
+            if(id==='none'){
+                console.log(data);
+            }
             setData(data);
             console.log(data);
         } catch (error) {
@@ -119,6 +123,7 @@ function Room() {
 
     useEffect(() => {
         fetchData(roomid);
+        setContentState("nameSearch");
     }, [roomid, isAuthenticated]);
 
     const fetchFreeRooms = async () => {
@@ -131,7 +136,7 @@ function Room() {
             // -------------------------------------------------------
         }
         try {
-            setLoading(true)
+            setCalendarLoading(true)
             const response = await axios.post('/free', { query });
             const roomNames = response.data;
             setResults(roomNames);
@@ -142,7 +147,7 @@ function Room() {
 
             // Handle error
         } finally {
-            setLoading(false);
+            setCalendarLoading(false);
         }
     };
 
@@ -195,7 +200,7 @@ function Room() {
         // Check if all keys in the query object have empty arrays and update `noQuery` accordingly.
     }
 
-    useEffect(() => {
+    useEffect(() => { 
         Object.keys(query).every(key => query[key].length === 0) ? setNoQuery(true) : setNoQuery(false);
         if (noquery === true) {
             setContentState("empty");
@@ -215,8 +220,35 @@ function Room() {
         console.log(loading);
     },[contentState]);
 
+    function debounce(func, wait) { //move logic to other file
+        let timeout;
+        return function executedFunction(...args) {
+          const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+          };
+          clearTimeout(timeout);
+          timeout = setTimeout(later, wait);
+        };
+      }
+
+    const debouncedFetchData = debounce(fetchData, 500); // Adjust delay as needed
+
+
     function changeURL2(option) {
         navigate(`/room/${option}`, { replace: true });
+    }
+
+    function onX(){
+        setContentState('empty');
+        setResults([]);
+        setQuery({
+            'M': [],
+            'T': [],
+            'W': [],
+            'R': [],
+            'F': [],
+        })
     }
 
     return (
@@ -225,16 +257,18 @@ function Room() {
             <div className="content-container">
                 <div className="calendar-container">
                     <div className="left">
-                        <SearchBar data={rooms} onEnter={changeURL2} room={roomid} />
+                        <SearchBar data={rooms} onEnter={changeURL2} room={roomid} onX={onX} />
                         <Classroom name={roomid} roomid={roomid} />
-                        {contentState === "calendarSearch" ? loading ? "" : <h1>{results.length} results</h1> : ""}
-                        <ul className="time-results">
-                            {
-                                results.map((result, index) => {
-                                    return <li key={index} value={result} onMouseOver={() => { }}>{result.toLowerCase()}</li>
-                                })
-                            }
-                        </ul>
+                        {contentState === "calendarSearch" ? calendarLoading ? "" : <h1>{results.length} results</h1> : ""}
+                        {contentState === "calendarSearch" ? 
+                            <ul className="time-results">
+                                {
+                                    results.map((result, index) => {
+                                        return <li key={index} value={result} onMouseOver={() => {debouncedFetchData(result)}} onMouseLeave={()=>{setData(dummyData["none"])}}>{result.toLowerCase()}</li>
+                                    })
+                                }
+                            </ul> : ""
+                        }
                     </div>
                     <div className="right">
                         <Calendar className={roomid} data={data} isloading={loading} addQuery={addQuery} removeQuery={removeQuery} query={query} />
