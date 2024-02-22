@@ -10,7 +10,7 @@ function Header(){
     const navigate = useNavigate();
 
     const goToLogin = ()=>{
-        navigate('/login',{replace : true});
+        navigate('/register',{replace : true});
 
     }
     user ? console.log(user) : console.log("no user");

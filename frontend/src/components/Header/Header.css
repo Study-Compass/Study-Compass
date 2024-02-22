@@ -6,12 +6,16 @@
     padding:15px;
     box-sizing: border-box;
     height:80px;
+    width: calc(100% - 100px);
 }
 
 .logo{
     width:200px;
 }
 
+.header-right{
+    height:50px;
+}
 
 @media(max-width: 400px){
     .Header{

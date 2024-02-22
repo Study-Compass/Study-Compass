@@ -41,7 +41,7 @@ function LoginForm() {
       e.preventDefault();
       try {
         await login(formData);
-        navigate('room/none')
+        navigate('/room/none',{ replace: true })
         // Handle success (e.g., store the token and redirect to a protected page)
       } catch (error) {
         console.error('Login failed:', error);

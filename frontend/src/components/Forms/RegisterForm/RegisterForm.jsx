@@ -8,123 +8,114 @@ import { useGoogleLogin } from '@react-oauth/google';
 
 
 function RegisterForm() {
-  const { isAuthenticated, googleLogin, login } = useAuth();
-  const [valid, setValid] = useState(false);
-  const [formData, setFormData] = useState({
-    username: '',
-    email: '',
-    password: ''
-  });
-  const [sent, setSent] = useState(false);
-  const [loadContent, setLoadContent] = useState(false);
+    const { isAuthenticated, googleLogin, login } = useAuth();
+    const [valid, setValid] = useState(false);
+    const [formData, setFormData] = useState({
+        username: '',
+        email: '',
+        password: ''
+    });
+    const [sent, setSent] = useState(false);
+    const [loadContent, setLoadContent] = useState(false);
 
-  
-  let navigate = useNavigate();
 
-  const location = useLocation();
+    let navigate = useNavigate();
 
-  useEffect(() => {
-    // Extract the code from the URL
-    const queryParams = new URLSearchParams(location.search);
-    const code = queryParams.get('code');
-    if (code) {
-      setLoadContent(false);
-      if(!sent){ //failsafe for double querying, still double querying, but it's fine
-          sendCodeToBackend(code);
-      }
-      setSent(true);
-      console.log("code: " + code);
-    } else {
-        setLoadContent(true);
+    const location = useLocation();
+
+    useEffect(() => {
+        async function google(code) {
+            const codeResponse = await googleLogin(code);
+            console.log("codeResponse: " + codeResponse);
+        }
+        // Extract the code from the URL
+        const queryParams = new URLSearchParams(location.search);
+        const code = queryParams.get('code');
+        if (code) {
+            setLoadContent(false);
+            if (!sent) {
+                google(code); //failsafe for double querying, still double querying, but it's fine
+            }
+            setSent(true);
+            console.log("code: " + code);
+        } else {
+            setLoadContent(true);
+        }
+    }, [location]);
+
+
+    useEffect(() => {
+        if (isAuthenticated) {
+            console.log("logged in already");
+            navigate('/room/none', { replace: true })
+        }
+    }, [isAuthenticated, navigate]);
+
+    useEffect(() => {
+        if (formData.email !== '' && formData.password !== '' && formData.username !== '') {
+            setValid(true);
+        } else {
+            setValid(false);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [formData.email, formData.password, formData.username]);
+
+
+    const handleChange = (e) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
     }
-  }, [location]);
 
-  // Function to send code to the backend
-  const sendCodeToBackend = async (code) => {
-    try {
-      const response = await axios.post('/google-login', { code });
-      // Handle response from the backend (e.g., storing the token, redirecting the user)
-      console.log('Backend response:', response.data);
-        googleLogin(response.data.token);
-        navigate('/room/none',{ replace: true });
-      // For example, redirect the user or store the received token in local storage
-    } catch (error) {
-      console.error('Error sending code to backend:', error);
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            const response = await axios.post('/register', formData);
+            console.log(response.data);
+            // Handle success (e.g., redirect to login page or auto-login)
+        } catch (error) {
+            console.error('Registration failed:', error);
+            // Handle errors (e.g., display error message)
+        }
     }
-  };
+    // codeResponse => responseGoogle1(codeResponse)
+    const google = useGoogleLogin({
+        onSuccess: () => { console.log("succeeded") },
+        flow: 'auth-code',
+        ux_mode: 'redirect',
+        onFailure: () => { console.log("failed") },
+    })
 
-  useEffect(() => {
-    if (isAuthenticated){
-      console.log("logged in already");
-      navigate('/room/none',{ replace: true })
+    function goToLogin() {
+        navigate('/login', { replace: true });
     }
-  },[isAuthenticated, navigate]);
 
-  useEffect(() => {
-    if (formData.email !== '' && formData.password !== '' && formData.username !== ''){
-        setValid(true);
-    } else {
-        setValid(false);
+    if (!loadContent) {
+        return ("");
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  },[formData.email, formData.password, formData.username]);
 
-
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  }
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const response = await axios.post('/register', formData);
-      console.log(response.data);
-      // Handle success (e.g., redirect to login page or auto-login)
-    } catch (error) {
-      console.error('Registration failed:', error);
-      // Handle errors (e.g., display error message)
-    }
-  }
-// codeResponse => responseGoogle1(codeResponse)
-  const google = useGoogleLogin({
-      onSuccess: () => {console.log("succeeded")},
-      flow: 'auth-code',
-      ux_mode:'redirect',
-      onFailure: () => {console.log("failed")},
-  })
-
-  function goToLogin(){
-    navigate('/',{ replace: true });
-  }
-
-  if(!loadContent){
-    return ("");
-  }
-
-  return (
-    <form onSubmit={handleSubmit}>
-      <h1>Register</h1>
-      <div className="username">
-        <p>Username</p>
-        <input type="text" name="username" value={formData.username} onChange={handleChange} placeholder="Username" required />
-      </div>
-      <div className="email">
-        <p>Email</p>
-        <input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="Email" required />
-      </div>
-      <div className="password">
-        <p>Password</p>
-        <input type="password" name="password" value={formData.password} onChange={handleChange} placeholder="Password" required />
-      </div>
-      <button type="submit" className={`button ${valid ? "active":""}`}>Register</button>
-      <p className="already">Already have an account? <a href="/" className="register" onClick={goToLogin}>Login</a></p>
-      <div className="divider">
-            <hr/>
-            <p>or</p>
-            <hr/>
-        </div>
-      <button className="button google" onClick={() => google()}>Continue with Google<img src={googleLogo} alt="google"/></button>
-      {/* <GoogleLogin
+    return (
+        <form onSubmit={handleSubmit}>
+            <h1>Register</h1>
+            <div className="username">
+                <p>Username</p>
+                <input type="text" name="username" value={formData.username} onChange={handleChange} placeholder="Username" required />
+            </div>
+            <div className="email">
+                <p>Email</p>
+                <input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="Email" required />
+            </div>
+            <div className="password">
+                <p>Password</p>
+                <input type="password" name="password" value={formData.password} onChange={handleChange} placeholder="Password" required />
+            </div>
+            <button type="submit" className={`button ${valid ? "active" : ""}`}>Register</button>
+            <p className="already">Already have an account? <a href="/" className="register" onClick={goToLogin}>Login</a></p>
+            <div className="divider">
+                <hr />
+                <p>or</p>
+                <hr />
+            </div>
+            <button className="button google" onClick={() => google()}>Continue with Google<img src={googleLogo} alt="google" /></button>
+            {/* <GoogleLogin
         clientId="639818062398-k4qnm9l320phu967ctc2l1jt1sp9ib7p.apps.googleusercontent.com"
         render={renderProps => (
           <button 
@@ -138,7 +129,7 @@ function RegisterForm() {
         onFailure={responseGoogle}
         cookiePolicy={'single_host_origin'}
       /> */}
-      {/* <GoogleLogin
+            {/* <GoogleLogin
         // clientId="639818062398-k4qnm9l320phu967ctc2l1jt1sp9ib7p.apps.googleusercontent.com"
         onSuccess={credentialResponse => {
           console.log(credentialResponse);
@@ -150,8 +141,8 @@ function RegisterForm() {
         className="google-button"
       /> */}
 
-    </form>
-  );
+        </form>
+    );
 }
 
 export default RegisterForm;

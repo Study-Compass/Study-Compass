@@ -71,7 +71,6 @@ function Room() {
             setLoading(false);
             if(id === "none"){
                 setData(dummyData['none']);
-
                 return;
             }
             console.log("Continuing with OFFLINE development");

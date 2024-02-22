@@ -9,10 +9,12 @@ function ProfilePicture(){
     const { logout, user } = useAuth();
     return(
         <div className="profile-picture">
-            <img className="profile" src = {pfp} onClick={()=>{setShowPopup(!showPopup)}}></img>
             <div className={`popup ${showPopup ? "popup-active":""}`}>
-                <button onClick={logout}>logout</button>
-
+                <div className="popup-content">
+                    <p>{user ? user.username : "no user"}</p>
+                    <img className="profile" src = {pfp} onClick={()=>{setShowPopup(!showPopup)}}></img>
+                </div>
+                { showPopup ? <button onClick={logout}>logout</button>: "" }
             </div>
         </div>
     )
