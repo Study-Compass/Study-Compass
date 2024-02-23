@@ -109,6 +109,11 @@
     border:none;
 }
 
+.redborder{
+    border-top: 3px solid var(--red);
+    border-bottom: 1px solid white;
+}
+
 .grid-item:hover:not(.no-interaction){
     background-color: #F5F5F5;
     cursor: pointer;

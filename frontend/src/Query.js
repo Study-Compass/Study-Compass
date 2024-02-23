@@ -4,26 +4,22 @@ import axios from 'axios';
 const getRooms = async () => {
     try {
         const response = await fetch(`/getrooms`);
-        const responseBody = await response.text(); // First, always read the response as text
+        const responseBody = await response.json();
 
         if (!response.ok) {
             // Log the error if the response status is not OK
-            console.error("Error fetching data:", responseBody);
+            console.error("Error fetching data:", responseBody.message);
             return;
         }
 
-        let rooms;
-        try {
-            rooms = JSON.parse(responseBody); // Then, parse the text as JSON
-        } catch (jsonError) {
-            // Log the JSON parsing error along with the raw response
-            console.error("JSON parsing error:", jsonError);
-            console.log("Raw response:", responseBody);
+        if (!responseBody.success) {
+            // Log the error if success is false
+            console.error("Error fetching room names:", responseBody.message);
             return;
         }
 
-        console.log(rooms);
-        return rooms;
+        //console.log(responseBody.data);
+        return responseBody.data;
     } catch (error) {
         console.error("Error:", error);
 
@@ -35,22 +31,29 @@ const getRoom = async (id) => {
     try {
         const response = await fetch(`/getroom/${id}`);
         const data = await response.json();
-        // console.log(data);
-        return data;
+        //console.log(data.data);
+        return data.data;
     } catch (error) {
         console.error("Error fetching data: ", error);
     }
 };
-
 const getFreeRooms = async (query) => {
     try {
         const response = await axios.post('/free', { query });
-        const roomNames = response.data;
-        // console.log(`names:${roomNames}`); // Process the response as needed
-        // console.log(roomNames); // Process the response as needed
+        const responseBody = response.data;
+
+        if (!responseBody.success) {
+            // Log the error message if the operation was not successful
+            console.error("Error fetching free rooms:", responseBody.message);
+            return;
+        }
+
+        const roomNames = responseBody.data; // Extract the room names from the response data
+        //console.log(roomNames); // Log the room names or process them as needed
         return roomNames;
     } catch (error) {
         console.error('Error fetching free rooms:', error);
+        return []; // Return an empty array or handle the error as needed
     }
 };
 

@@ -2,7 +2,7 @@ import React from 'react';
 import './App.css';
 import Room from './pages/Room';
 import Login from './pages/Login';
-import Reigster from './pages/Register/Register';
+import Register from './pages/Register/Register';
 import Redirect from './pages/Redirect/Redirect';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './AuthContext';
@@ -16,7 +16,9 @@ function App() {
                     <Routes>
                         <Route path="/" element={<Redirect />}/>
                         <Route path="/room/:roomid" element={<Room />}/>
-                        <Route path="/register" element={<Reigster />}/>
+                        <Route path="/register" element={<Register />}/>
+                        <Route path="/login" element={<Login />}/>
+
                     </Routes>
                 </Router>
             </AuthProvider>

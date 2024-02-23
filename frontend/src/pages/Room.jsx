@@ -71,7 +71,6 @@ function Room() {
             setLoading(false);
             if(id === "none"){
                 setData(dummyData['none']);
-
                 return;
             }
             console.log("Continuing with OFFLINE development");
@@ -185,13 +184,13 @@ function Room() {
     function onX(){
         setContentState('empty');
         setResults([]);
-        setQuery({
-            'M': [],
-            'T': [],
-            'W': [],
-            'R': [],
-            'F': [],
-        })
+        // setQuery({
+        //     'M': [],
+        //     'T': [],
+        //     'W': [],
+        //     'R': [],
+        //     'F': [],
+        // })
         // setData(dummyData["none"]);
     }
 
