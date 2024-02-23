@@ -14,7 +14,7 @@ function App() {
             <AuthProvider>
                 <Router>
                     <Routes>
-                        <Route path="/" element={<Redirect />}/>
+                        <Route path="/" element={<Redirect/> }/>
                         <Route path="/room/:roomid" element={<Room />}/>
                         <Route path="/register" element={<Register />}/>
                         <Route path="/login" element={<Login />}/>

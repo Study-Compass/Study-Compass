@@ -35,6 +35,7 @@ function Room() {
     });
     const [noquery, setNoQuery] = useState(true);
 
+
     console.log("roomid: ", roomid);
     useEffect(() => {
         if (isAuthenticated === null) {

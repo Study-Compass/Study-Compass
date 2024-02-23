@@ -12,7 +12,7 @@ function ProfilePicture(){
             <div className={`popup ${showPopup ? "popup-active":""}`}>
                 <div className="popup-content">
                     <p>{user ? user.username : "no user"}</p>
-                    <img className="profile" src = {pfp} onClick={()=>{setShowPopup(!showPopup)}}></img>
+                    <img className="profile" src ={user.picture ? user.picture : pfp} onClick={()=>{setShowPopup(!showPopup)}}></img>
                 </div>
                 { showPopup ? <button onClick={logout}>logout</button>: "" }
             </div>

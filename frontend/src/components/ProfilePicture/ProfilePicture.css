@@ -9,6 +9,7 @@
     z-index: 3;
     position: relative;
     margin:5px;
+    border-radius: 50%;
 }
 
 .profile-picture:hover{
