@@ -55,7 +55,7 @@ router.post('/login', async (req, res) => {
 
     try {
         const { user, token } = await loginUser({ email, password });
-
+        console.log(`POST: /login user ${user.username} logged in`)
         res.status(200).json({
             success: true,
             message: 'Logged in successfully',
@@ -69,6 +69,7 @@ router.post('/login', async (req, res) => {
             }
         });
     } catch (error) {
+        console.log(`POST: /login login user failed`)
         res.status(500).json({
             success: false,
             message: error.message
@@ -80,8 +81,10 @@ router.get('/validate-token', verifyToken, async (req, res) => {
     try {
         const user = await User.findById(req.user.userId); // Assuming Mongoose for DB operations
         if (!user) {
+            console.log(`GET: /validate-token token is invalid`)
             return res.status(404).json({ success: false, message: 'User not found' });
         }
+        console.log(`GET: /validate-token token is valid for user ${user.username}`)
         res.json({
             success: true,
             message: 'Token is valid',
@@ -94,6 +97,7 @@ router.get('/validate-token', verifyToken, async (req, res) => {
             }
         });
     } catch (error) {
+        console.log(`GET: /validate-token token is invalid`)
         res.status(500).json({
             success: false,
             message: 'Error fetching user details',
