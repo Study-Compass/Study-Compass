@@ -46,17 +46,10 @@ function Room() {
         setNoQuery(true);
     }
 
-    console.log("roomid: ", roomid);
     useEffect(() => {
         if (isAuthenticated === null) {
-            console.log("isAuthenticated null");
             return;
         }
-        if (!isAuthenticated) {
-            console.log("not authenticated");
-            // navigate('/');
-        }
-        console.log("isAuthenticated: ", isAuthenticated);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isAuthenticated]);
 
@@ -96,8 +89,17 @@ function Room() {
         setData(data);
     };
 
+    const debouncedFetchData = debounce(fetchData, 500); // Adjust delay as needed
+
     useEffect(() => {
-        fetchData(roomid);
+        if(contentState === "calendarSearch"){
+            console.log("fetching data debounced");
+            setTimeout(() => {             
+                debouncedFetchData(roomid);
+            }, 100);
+        } else {
+            fetchData(roomid);
+        }
         setContentState("nameSearch");
         clearQuery();
     }, [roomid, isAuthenticated]);
@@ -177,9 +179,9 @@ function Room() {
         } else {
             setContentState("calendarSearch");
         }
-        console.log(`noquery: ${noquery}`);
+        // console.log(`noquery: ${noquery}`);
         setResults([]);
-        console.log("query: ", query);
+        // console.log("query: ", query);
         if (!noquery) {
             fetchFreeRooms();
         }
@@ -188,10 +190,9 @@ function Room() {
 
     useEffect(()=>{
         console.log("contentstate",contentState);
-        console.log(loading);
+        // console.log(loading);
     },[contentState]);
 
-    const debouncedFetchData = debounce(fetchData, 500); // Adjust delay as needed
 
 
     function changeURL2(option) {

@@ -26,7 +26,6 @@ function Calendar({className, data, isLoading, addQuery, removeQuery, query}){
 
     const today = new Date();
     const currentDay = today.getDay();
-    console.log(currentDay);
 
     return (
             <div className={`Calendar ${data ? "":"loading"}`}>
