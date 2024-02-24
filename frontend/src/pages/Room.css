@@ -102,7 +102,7 @@ select{
     border-radius: 15px;
 }
 
-.left h1{
+.left .resultCount{
     font-size:20px;
     text-align: left;
     margin-left:30px;
@@ -113,6 +113,28 @@ select{
     margin: 20px 0 0 30px;
 }
 
+.instructions-container{
+    position: absolute;
+    height:100%;
+    width:100%;
+    display:grid;
+}
+
+.instructions{
+    position: absolute;
+    align-self: center;
+    justify-self: center;
+    width:50%;
+    text-align: center;
+    transform:translateY(-20px);
+}
+
+.instructions p{
+    font-size: 18px;
+    font-weight: 400;
+    color: var(--border);
+
+}
 
 @media(max-width:400px){
     select{

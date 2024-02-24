@@ -18,7 +18,7 @@ function Room() {
     let { roomid } = useParams();
     let navigate = useNavigate();
     const [rooms, setRooms] = useState(null);
-    const { isAuthenticated, logout } = useAuth();
+    const { isAuthenticated } = useAuth();
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [calendarLoading, setCalendarLoading] = useState(true);
@@ -35,6 +35,16 @@ function Room() {
     });
     const [noquery, setNoQuery] = useState(true);
 
+    function clearQuery(){
+        setQuery({
+            'M': [],
+            'T': [],
+            'W': [],
+            'R': [],
+            'F': [],
+        });
+        setNoQuery(true);
+    }
 
     console.log("roomid: ", roomid);
     useEffect(() => {
@@ -89,6 +99,7 @@ function Room() {
     useEffect(() => {
         fetchData(roomid);
         setContentState("nameSearch");
+        clearQuery();
     }, [roomid, isAuthenticated]);
 
     const fetchFreeRooms = async () => {
@@ -139,7 +150,7 @@ function Room() {
     };
 
     const removeQuery = (key, value) => {
-        setNoQuery(true); //failsafe, useEffect checks before query anyways
+        // setNoQuery(true); //failsafe, useEffect checks before query anyways
         setQuery(prev => {
             const existing = prev[key];
             if (existing === undefined) {
@@ -149,14 +160,18 @@ function Room() {
                 // Filter the array to remove the specified value.
                 const filtered = existing.filter(v => v !== value);
                 // Always return the object with the key, even if the array is empty.
-                return { ...prev, [key]: filtered };
+                const newQuery = { ...prev, [key]: filtered };
+                const isQueryEmpty = Object.values(newQuery).every(arr => arr.length === 0);
+                setNoQuery(isQueryEmpty);
+                return  newQuery;
             }
         });
+        
         // Check if all keys in the query object have empty arrays and update `noQuery` accordingly.
     }
 
     useEffect(() => { 
-        Object.keys(query).every(key => query[key].length === 0) ? setNoQuery(true) : setNoQuery(false);
+        
         if (noquery === true) {
             setContentState("empty");
         } else {
@@ -168,10 +183,11 @@ function Room() {
         if (!noquery) {
             fetchFreeRooms();
         }
+     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [query])
 
     useEffect(()=>{
-        console.log(contentState);
+        console.log("contentstate",contentState);
         console.log(loading);
     },[contentState]);
 
@@ -182,16 +198,10 @@ function Room() {
         navigate(`/room/${option}`, { replace: true });
     }
 
-    function onX(){
+    function onX(){ //make a reset function soon
         setContentState('empty');
         setResults([]);
-        // setQuery({
-        //     'M': [],
-        //     'T': [],
-        //     'W': [],
-        //     'R': [],
-        //     'F': [],
-        // })
+        clearQuery();
         // setData(dummyData["none"]);
     }
 
@@ -203,7 +213,7 @@ function Room() {
                     <div className="left">
                         <SearchBar data={rooms} onEnter={changeURL2} room={roomid} onX={onX} />
                         <Classroom name={roomid} roomid={roomid} />
-                        {contentState === "calendarSearch" ? calendarLoading ? "" : <h1>{results.length} results</h1> : ""}
+                        {contentState === "calendarSearch" ? calendarLoading ? "" : <h1 className="resultCount">{results.length} results</h1> : ""}
                         {contentState === "calendarSearch" ? 
                             <ul className="time-results">
                                 {
@@ -212,12 +222,18 @@ function Room() {
                                             key={index} 
                                             value={result} 
                                             onMouseOver={() => {debouncedFetchData(result)}} 
-                                            onMouseLeave={()=>{setData(dummyData["none"])}}
+                                            onMouseLeave={()=>{debouncedFetchData("none")}}
+                                            onClick={() => {changeURL2(result)}}
                                         >{result.toLowerCase()}</li>
                                     })
                                 }
                             </ul> : ""
                         }
+                        {contentState === "empty" ? <div className="instructions-container">
+                            <div className="instructions">
+                                <p>search by name or by selecting a timeslot</p>
+                            </div>
+                        </div> :""}
                     </div>
                     <div className="right">
                         <Calendar className={roomid} data={data} isloading={loading} addQuery={addQuery} removeQuery={removeQuery} query={query} />

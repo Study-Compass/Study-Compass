@@ -71,6 +71,8 @@ function RegisterForm() {
             const response = await axios.post('/register', formData);
             console.log(response.data);
             // Handle success (e.g., redirect to login page or auto-login)
+            await login(formData);
+            navigate('/room/none', { replace: true });
         } catch (error) {
             console.error('Registration failed:', error);
             // Handle errors (e.g., display error message)

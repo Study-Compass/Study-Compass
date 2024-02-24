@@ -6,7 +6,9 @@
     left:0;
     display:flex;
     flex-direction: column;
-
+    background-color: white;
+    z-index: 1;
+    border-radius: 19px
 }
 
 .image{
