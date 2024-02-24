@@ -17,6 +17,23 @@
     height:50px;
 }
 
+.Header button{
+    font-family: 'Satoshi';
+    font-size: 15px;
+    outline:none;
+    border-radius: 12px;
+    background-color: var(--red);
+    border:none;
+    padding:5px 20px;
+    margin:10px;
+    color: white;
+    width:calc(100% - 20px);
+}
+
+.Header button:hover{
+    cursor:pointer;
+}
+
 @media(max-width: 400px){
     .Header{
         width:100%;

@@ -26,6 +26,7 @@ function Calendar({className, data, isLoading, addQuery, removeQuery, query}){
 
     const today = new Date();
     const currentDay = today.getDay();
+    console.log(currentDay);
 
     return (
             <div className={`Calendar ${data ? "":"loading"}`}>
@@ -36,7 +37,7 @@ function Calendar({className, data, isLoading, addQuery, removeQuery, query}){
                     <p className={`${currentDay === 2 ? "currentDay" : ""}`}>tuesday</p>
                     <p className={`${currentDay === 3 ? "currentDay" : ""}`}>wednesday</p>
                     <p className={`${currentDay === 4 ? "currentDay" : ""}`}>thursday</p>
-                    <p className={`${currentDay === 6 ? "currentDay" : ""}`}>friday</p>
+                    <p className={`${currentDay === 5 ? "currentDay" : ""}`}>friday</p>
                 </div>
                 <div className="Time-grid">
                     {days.map((day) => (

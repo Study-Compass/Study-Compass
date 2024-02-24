@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import '../Forms.css';
 import googleLogo from '../../../assets/googleG.svg';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import useAuth from '../../../hooks/useAuth';
 import { useGoogleLogin } from '@react-oauth/google';
 
@@ -45,7 +45,7 @@ function RegisterForm() {
 
 
     useEffect(() => {
-        if (isAuthenticated) {
+        if (isAuthenticated && isAuthenticated !== null) {
             console.log("logged in already");
             navigate('/room/none', { replace: true })
         }
@@ -71,6 +71,8 @@ function RegisterForm() {
             const response = await axios.post('/register', formData);
             console.log(response.data);
             // Handle success (e.g., redirect to login page or auto-login)
+            await login(formData);
+            navigate('/room/none', { replace: true });
         } catch (error) {
             console.error('Registration failed:', error);
             // Handle errors (e.g., display error message)
@@ -85,7 +87,7 @@ function RegisterForm() {
     })
 
     function goToLogin() {
-        navigate('/login', { replace: true });
+        navigate('/login');
     }
 
     if (!loadContent) {
@@ -108,39 +110,13 @@ function RegisterForm() {
                 <input type="password" name="password" value={formData.password} onChange={handleChange} placeholder="Password" required />
             </div>
             <button type="submit" className={`button ${valid ? "active" : ""}`}>Register</button>
-            <p className="already">Already have an account? <a href="/" className="register" onClick={goToLogin}>Login</a></p>
+            <p className="already">Already have an account? <Link to="/login">Login</Link></p>
             <div className="divider">
                 <hr />
                 <p>or</p>
                 <hr />
             </div>
             <button className="button google" onClick={() => google()}>Continue with Google<img src={googleLogo} alt="google" /></button>
-            {/* <GoogleLogin
-        clientId="639818062398-k4qnm9l320phu967ctc2l1jt1sp9ib7p.apps.googleusercontent.com"
-        render={renderProps => (
-          <button 
-            type="button" 
-            className="button google"
-            onClick={renderProps.onClick} // This line is crucial
-            disabled={renderProps.disabled}
-          >Continue with Google<img src={google} alt="google"/></button>
-        )}
-        onSuccess={responseGoogle}
-        onFailure={responseGoogle}
-        cookiePolicy={'single_host_origin'}
-      /> */}
-            {/* <GoogleLogin
-        // clientId="639818062398-k4qnm9l320phu967ctc2l1jt1sp9ib7p.apps.googleusercontent.com"
-        onSuccess={credentialResponse => {
-          console.log(credentialResponse);
-        }}
-        onError={() => {
-          console.log('Login Failed');
-        }}
-        useOneTap
-        className="google-button"
-      /> */}
-
         </form>
     );
 }
