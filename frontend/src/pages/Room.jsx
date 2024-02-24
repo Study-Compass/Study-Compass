@@ -91,17 +91,18 @@ function Room() {
 
     const debouncedFetchData = debounce(fetchData, 500); // Adjust delay as needed
 
-    useEffect(() => {
+    useEffect(() => { // FETCH ROOM DATA , triggers on url change
         if(contentState === "calendarSearch"){
             console.log("fetching data debounced");
             setTimeout(() => {             
                 debouncedFetchData(roomid);
+                console.log("results", results);
             }, 100);
         } else {
             fetchData(roomid);
+            setContentState("nameSearch");
+            clearQuery();
         }
-        setContentState("nameSearch");
-        clearQuery();
     }, [roomid, isAuthenticated]);
 
     const fetchFreeRooms = async () => {
@@ -193,10 +194,14 @@ function Room() {
         // console.log(loading);
     },[contentState]);
 
-
+    
+    function changeURL(option) {
+        navigate(`/room/${option}`, { replace: true });
+    }
 
     function changeURL2(option) {
         navigate(`/room/${option}`, { replace: true });
+        setContentState("nameSearch");
     }
 
     function onX(){ //make a reset function soon
@@ -224,7 +229,7 @@ function Room() {
                                             value={result} 
                                             onMouseOver={() => {debouncedFetchData(result)}} 
                                             onMouseLeave={()=>{debouncedFetchData("none")}}
-                                            onClick={() => {changeURL2(result)}}
+                                            onClick={() => {changeURL(result)}}
                                         >{result.toLowerCase()}</li>
                                     })
                                 }
