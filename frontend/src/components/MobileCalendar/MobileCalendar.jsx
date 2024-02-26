@@ -13,7 +13,7 @@ import 'swiper/css/pagination'; // Updated path for pagination module CSS
 // Install Swiper modules
 
 
-function MobileCalendar({ className, data, isLoading, addQuery, removeQuery, query }) {
+function MobileCalendar({ className, data, isLoading, addQuery, removeQuery, query, show, setShow}) {
     const days = ["M", "T", "W", "R", "F"];
     const dayNames = {
         "M": "monday",
@@ -44,8 +44,9 @@ function MobileCalendar({ className, data, isLoading, addQuery, removeQuery, que
         // },
     ];
     return (
-        <div className="mobile-calendar">
+        <div className={`mobile-calendar ${show ? "active" : ""}`}>
             <div className="swiper-container">
+                <button className="hide-mobile-calendar" onClick={()=>{setShow(false)}}>hide</button>
                 <div className="mobile-time">
                     <DayColumn day={'S'}/>
                 </div>
@@ -59,7 +60,7 @@ function MobileCalendar({ className, data, isLoading, addQuery, removeQuery, que
                     {days.map((day) => (
                         <SwiperSlide>
                             <div className="swiper-slide-content">
-                                <p className={`day-name ${currentDay === days.indexOf(day) ? "current-day-mobile" : ""}`}>{dayNames[day]}</p>
+                                <p className={`day-name ${currentDay === days.indexOf(day)+1 ? "current-day-mobile" : ""}`}>{dayNames[day]}</p>
                                 <DayColumn
                                     key={day}
                                     day={day}

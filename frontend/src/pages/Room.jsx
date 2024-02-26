@@ -221,6 +221,8 @@ function Room() {
         clearQuery();
         // setData(dummyData["none"]);
     }
+    
+    const [showMobileCalendar, setShowMobileCalendar] = useState(false);
 
     if (width < 800) {
         return(
@@ -228,8 +230,8 @@ function Room() {
             <Header />
             <div className="content-container">
                 <div className="calendar-container">
-                        {/* <SearchBar data={rooms} onEnter={changeURL2} room={roomid} onX={onX} />
-                        <Classroom name={roomid} roomid={roomid}/> */}
+                        <SearchBar data={rooms} onEnter={changeURL2} room={roomid} onX={onX} />
+                        <Classroom name={roomid} roomid={roomid}/>
                         {contentState === "calendarSearch" ? calendarLoading ? "" : <h1 className="resultCount">{results.length} results</h1> : ""}
                         {contentState === "calendarSearch" ? 
                             <ul className="time-results">
@@ -251,10 +253,12 @@ function Room() {
                                 <p>search by name or by selecting a timeslot</p>
                             </div>
                         </div> :""} */}
-                        <MobileCalendar className={roomid} data={data} isloading={loading} addQuery={addQuery} removeQuery={removeQuery} query={query} />
+                        <div className="calendar-content-container">
+                            <MobileCalendar className={roomid} data={data} isloading={loading} addQuery={addQuery} removeQuery={removeQuery} query={query} show={showMobileCalendar} setShow={setShowMobileCalendar} />
+                        </div>
+                    <button className="show-calendar" onClick={()=>{setShowMobileCalendar(true)}}>show</button>
                 </div>
             </div>
-            {/* <button onClick={logout}>logout</button> */}
         </div>
         );
     }
