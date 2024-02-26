@@ -140,8 +140,10 @@
 
 @media(max-width: 600px){
     .DayColumn{
-        width: 100px;
+        width: 100%;
+        height:500px;
     }
+
     .event{
         font-size: 10px;
     }
@@ -149,9 +151,6 @@
 }
 
 @media(max-width: 500px){
-    .DayColumn{
-        width: 80px;
-    }
     .event{
         font-size: 10px;
         margin:4px;
@@ -161,10 +160,6 @@
 }
 
 @media(max-width: 400px){
-    .DayColumn{
-        width: 100%;
-        height:500px;
-    }
 
     .event {
         margin:3px 3px 4px 3px;

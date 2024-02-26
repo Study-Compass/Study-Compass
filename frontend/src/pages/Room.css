@@ -19,8 +19,10 @@
     width:calc(100% - 100px);
     height:calc(100% - 60px);
     max-height: min(calc(100% - 60px), 800px);
-    overflow:none;
+    overflow:hidden;
+    position: relative;
 }
+
 .content-container{
     display:flex;
     flex-direction: column;
@@ -153,6 +155,28 @@ select{
 
 }
 
+.calendar-content-container{
+    width:100%;
+    height:100%;
+    display:flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+    overflow:hidden;
+    position: absolute;
+}
+
+.show-calendar{
+    position: absolute;
+    bottom:10px;
+    left:0;
+    z-index: 10;
+    transition: all 0.5s;
+    height:20px;
+    width:100px;
+    left:calc(50% - 50px);
+}
+
 @media(max-width:500px){
     select{
         font-size:18px;
@@ -160,7 +184,7 @@ select{
         margin:10px 0 0 0;
     }
     .calendar-container{
-        padding: 20px 20px 40px 20px;
+        /* padding: 20px 20px 40px 20px; */
         width:100%;
         box-sizing: border-box;
         height:100%;
