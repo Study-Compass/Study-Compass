@@ -6,6 +6,7 @@ import Header from '../components/Header/Header';
 import SearchBar from '../components/SearchBar/SearchBar';
 import useAuth from '../hooks/useAuth';
 import Classroom from '../components/Classroom/Classroom';
+import MobileCalendar from '../components/MobileCalendar/MobileCalendar.jsx';
 
 import dummyData from '../dummyData.js'
 
@@ -46,12 +47,22 @@ function Room() {
         setNoQuery(true);
     }
 
+    const [width, setWidth] = useState(window.innerWidth);
+
     useEffect(() => {
-        if (isAuthenticated === null) {
-            return;
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [isAuthenticated]);
+      // Handler to call on window resize
+      function handleResize() {
+        // Set window width to state
+        setWidth(window.innerWidth);
+      }
+  
+      // Add event listener
+      window.addEventListener('resize', handleResize);
+  
+      // Remove event listener on cleanup
+      return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
 
     useEffect(() => {
         const fetchRooms = async () => {
@@ -211,6 +222,43 @@ function Room() {
         // setData(dummyData["none"]);
     }
 
+    if (width < 800) {
+        return(
+            <div className="room">
+            <Header />
+            <div className="content-container">
+                <div className="calendar-container">
+                        {/* <SearchBar data={rooms} onEnter={changeURL2} room={roomid} onX={onX} />
+                        <Classroom name={roomid} roomid={roomid}/> */}
+                        {contentState === "calendarSearch" ? calendarLoading ? "" : <h1 className="resultCount">{results.length} results</h1> : ""}
+                        {contentState === "calendarSearch" ? 
+                            <ul className="time-results">
+                                {
+                                    results.map((result, index) => {
+                                        return <li 
+                                            key={index} 
+                                            value={result} 
+                                            onMouseOver={() => {debouncedFetchData(result)}} 
+                                            onMouseLeave={()=>{debouncedFetchData("none")}}
+                                            onClick={() => {changeURL(result)}}
+                                        >{result.toLowerCase()}</li>
+                                    })
+                                }
+                            </ul> : ""
+                        }
+                        {/* {contentState === "empty" ? <div className="instructions-container">
+                            <div className="instructions">
+                                <p>search by name or by selecting a timeslot</p>
+                            </div>
+                        </div> :""} */}
+                        <MobileCalendar className={roomid} data={data} isloading={loading} addQuery={addQuery} removeQuery={removeQuery} query={query} />
+                </div>
+            </div>
+            {/* <button onClick={logout}>logout</button> */}
+        </div>
+        );
+    }
+
     return (
         <div className="room">
             <Header />
@@ -218,7 +266,7 @@ function Room() {
                 <div className="calendar-container">
                     <div className="left">
                         <SearchBar data={rooms} onEnter={changeURL2} room={roomid} onX={onX} />
-                        <Classroom name={roomid} roomid={roomid} />
+                        <Classroom name={roomid} roomid={roomid}/>
                         {contentState === "calendarSearch" ? calendarLoading ? "" : <h1 className="resultCount">{results.length} results</h1> : ""}
                         {contentState === "calendarSearch" ? 
                             <ul className="time-results">
