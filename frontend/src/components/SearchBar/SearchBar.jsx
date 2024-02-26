@@ -48,6 +48,7 @@ function SearchBar({ data, onEnter, room, onX}) {
     },[room]);
 
     useEffect(() => {
+        setSearchInput(searchInput.toLowerCase());
         if(searchInput === "none"){
             setSearchInput("");
         }
@@ -213,7 +214,9 @@ function SearchBar({ data, onEnter, room, onX}) {
             >{lower==="" ? "." :lower}
                 <img src={tab} alt="tab" className={`tab ${lower==="" ? "disappear":""}`} style={{right:`${tabShadow(lower)}px`}}/>
             </div>
-            <img src={x} className="x" alt="x" onClick={handleX} />
+            <div className="x-container">
+                <img src={x} className="x" alt="x" onClick={handleX} />
+            </div>
             {results.length > 0 && (
                 <ul>
                     <div className="spacer"></div>

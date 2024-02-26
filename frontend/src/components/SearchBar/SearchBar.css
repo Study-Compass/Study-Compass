@@ -71,7 +71,7 @@ li:hover {
     width:var(--search-width);
     position:relative;
     margin: 30px 30px 0 30px;
-
+    height:fit-content;
 }
 
 .search-bar{
@@ -107,11 +107,19 @@ li:hover {
     height:15px;
 }
 
+.x-container{
+    height:100%;
+    position:absolute;
+    display:flex;
+    align-items: center;
+    justify-content: center;
+    right:15px;
+    top:0;
+}
+
 .x{
     height:12px;
     width:12px;
-    position: absolute;
-    right: 15px;
     z-index: 11;
     transform: scale(1.1);
     padding: 4.2% 0 0 0;

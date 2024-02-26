@@ -27,6 +27,12 @@ function MobileCalendar({ className, data, isLoading, addQuery, removeQuery, que
     const loadColors = useRef(new Map()).current;
     const eventColors = useRef(new Map()).current;
     const [empty, setEmpty] = useState(true);
+    
+    const today = new Date();
+    const currentDay = today.getDay();
+
+    const [swiper, setSwiper] = useState(null);
+    const initialSlide = 0 < currentDay < 6 ? currentDay-1:1;
 
     useEffect(() => {
         if (className === "none") {
@@ -34,10 +40,11 @@ function MobileCalendar({ className, data, isLoading, addQuery, removeQuery, que
         } else {
             setEmpty(false);
         }
+        if(swiper){
+            swiper.slideTo(initialSlide);
+        }
     }, [empty, className]);
 
-    const today = new Date();
-    const currentDay = today.getDay();
     const load = [
         // {
         //     "class_name": "loading",
@@ -93,6 +100,7 @@ function MobileCalendar({ className, data, isLoading, addQuery, removeQuery, que
                 touchAction: 'none',
             }}
         >
+            <div className="grab"></div>
             <div className="swiper-container">
                 {/* <button className="hide-mobile-calendar" onClick={()=>{setShow(false)}}>hide</button> */}
                 <div className="mobile-time">
@@ -100,10 +108,11 @@ function MobileCalendar({ className, data, isLoading, addQuery, removeQuery, que
                 </div>
                 <Swiper
                     modules={[Pagination]}
+                    initialSlide={0 < currentDay < 6 ? currentDay-1:1}
                     slidesPerView={1}
                     pagination={{ clickable: true }} // Enables clickable pagination dots
                     onSlideChange={() => console.log('slide change')}
-                    onSwiper={(swiper) => console.log(swiper)}
+                    onSwiper={setSwiper}
                 >   
                     {days.map((day) => (
                         <SwiperSlide>

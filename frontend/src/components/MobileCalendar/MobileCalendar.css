@@ -83,3 +83,12 @@
     width:100px;
     left:calc(50% - 50px);
 }
+
+.grab{
+    position: absolute;
+    top:7px;
+    width:50px;
+    height:5px;
+    background-color: var(--lightborder);
+    border-radius: 5px;
+}

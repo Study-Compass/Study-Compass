@@ -141,7 +141,7 @@
 @media(max-width: 600px){
     .DayColumn{
         width: 100%;
-        height:500px;
+        height:450px;
     }
 
     .event{
