@@ -258,6 +258,7 @@ function Room() {
                         <div className="calendar-content-container">
                             <MobileCalendar className={roomid} data={data} isloading={loading} addQuery={addQuery} removeQuery={removeQuery} query={query} show={showMobileCalendar} setShow={setShowMobileCalendar} />
                         </div>
+                        {/* <SwipeablePopup /> */}
                     <button className="show-calendar" onClick={()=>{setShowMobileCalendar(true)}}>show</button>
                 </div>
             </div>

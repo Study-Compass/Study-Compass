@@ -8,9 +8,13 @@
     border: 1px solid var(--border);
     background-color: white;
     position: absolute;
-    transition: all 1.2s;
+    /* transition: all 0.5s; */
     z-index: 20;
-    transform: translateY(1000px);
+    /* transform: translateY(1000px); */    
+}
+
+.mobile-calendar.hidden{
+    transform: translateY(1000px) !important;
 }
 
 .mobile-calendar.active{
