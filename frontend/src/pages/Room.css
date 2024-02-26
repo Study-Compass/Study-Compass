@@ -76,8 +76,8 @@ select{
     display:flex;
     flex-direction: column;
     justify-content: flex-start;
-    align-items: left;
-    width:100%;
+    align-items: center;
+    width:98%;
     position:relative;
     border:none;
     list-style-type: none;
@@ -91,16 +91,33 @@ select{
 }
 
 .time-results li{
-    border-bottom:1px solid var(--lightborder);
+    /* border-bottom:1px solid var(--lightborder); */
     border-radius: 0;
     padding:10px 30px;
     background-color: white;
+    width:90%;
+    border: 1px solid var(--lightborder);
+    margin:5px 0;
+    border-radius: 10px;
 }
 
-.time-results::-webkit-scrollbar-thumb {
-    background-color: var(--lightborder); /* Color of the scrollbar thumb */
-    border-radius: 15px;
+::-webkit-scrollbar {
+    width: 10px; /* or height for horizontal scrollbars */
+  }
+  
+  /* This styles the scrollbar thumb (the moving part) */
+::-webkit-scrollbar-thumb {
+    background: var(--lightborder); /* Thumb color */
+    border-radius: 10px; /* Roundness of the thumb */
 }
+  
+  /* This styles the scrollbar thumb on hover */
+::-webkit-scrollbar-thumb:hover {
+    background: #949494; /* Darker color on hover */
+    cursor:pointer;
+  }
+
+
 
 .left .resultCount{
     font-size:20px;
@@ -136,14 +153,21 @@ select{
 
 }
 
-@media(max-width:400px){
+@media(max-width:500px){
     select{
         font-size:18px;
         width:300px;
         margin:10px 0 0 0;
     }
     .calendar-container{
-        padding: 20px 10px 40px 10px;
-        width: auto;
+        padding: 20px 20px 40px 20px;
+        width:100%;
+        box-sizing: border-box;
+        height:100%;
+        max-height:100%;
+    }
+    .content-container{
+        padding:0px 20px 20px 20px;
+        width:95%;
     }
 }

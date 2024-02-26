@@ -1,0 +1,59 @@
+.mobile-calendar{
+    max-width: 100%;
+    display:flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content:center;
+}
+.swiper-slide-content{
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 20px 0 0 0;
+    box-sizing: border-box;
+    border-radius: 20px;
+    position: relative;
+    margin-bottom:20px;
+}
+
+.day-name{
+    /* width: 20%; */
+    color: #B0AFAF;
+    font-family: 'Satoshi';
+    font-size: 16px;
+    font-weight: normal;
+    text-align: center;
+    margin:0;
+    margin-top:10px;
+    margin-bottom: 15px;
+}
+
+.current-day-mobile{
+    background-color: var(--red);
+    color: white !important;
+    border-radius: 10px;
+    padding: 5px 15px;
+    box-sizing:border-box;
+    margin-top:5px;
+    margin-bottom:10px
+}
+
+.swiper-container{
+    width:60%;
+
+}
+
+.mobile-time{
+    position: absolute;
+    margin-top:65px;
+    transform:translateX(-30px)
+}
+
+.swiper-pagination-bullet-active {
+    background-color: var(--red) !important; /* Light gray color */
+    opacity: 1;
+  }
+  
