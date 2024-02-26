@@ -7,6 +7,8 @@ import SearchBar from '../components/SearchBar/SearchBar';
 import useAuth from '../hooks/useAuth';
 import Classroom from '../components/Classroom/Classroom';
 import MobileCalendar from '../components/MobileCalendar/MobileCalendar.jsx';
+import SwipeablePopup from '../components/Swipe/Swipe.jsx';
+
 
 import dummyData from '../dummyData.js'
 
