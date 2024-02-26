@@ -226,9 +226,15 @@ function Room() {
     
     const [showMobileCalendar, setShowMobileCalendar] = useState(false);
 
+    const [viewport, setViewport] = useState("100vh");
+    useEffect(() => {
+        setViewport((window.innerHeight) + 'px');
+        console.log('adjusting')
+    },[]);
+
     if (width < 800) {
         return(
-            <div className="room">
+            <div className="room" style={{height:viewport}}>
             <Header />
             <div className="content-container">
                 <div className="calendar-container">
