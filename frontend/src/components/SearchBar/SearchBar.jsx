@@ -96,6 +96,9 @@ function SearchBar({ data, onEnter, room, onX}) {
     }
 
     const handleKeyDown = (event) => {
+        if(results.length === 0){
+            return;
+        }
         if (event.key === 'Enter') {
             event.preventDefault();
             if (results.length > 0) {
@@ -123,6 +126,9 @@ function SearchBar({ data, onEnter, room, onX}) {
             }
         }   
         if (event.key === 'ArrowUp') {
+            if(results.length === 0){
+                return;
+            }
             event.preventDefault();
             setGoingUp(true);
             if(selected === 0){
