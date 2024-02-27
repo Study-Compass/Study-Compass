@@ -20,6 +20,7 @@ const offline = false;
 function Room() {
     let { roomid } = useParams();
     let navigate = useNavigate();
+    const [room, setRoom] = useState(null);
     const [rooms, setRooms] = useState(null);
     const [roomIds, setRoomIds] = useState({});
     const { isAuthenticated } = useAuth();
@@ -101,7 +102,8 @@ function Room() {
         setData(null);
         const data = await getRoom(id);
         setLoading(false);
-        setData(data);
+        setRoom(data.room);
+        setData(data.data);
     };
 
     const debouncedFetchData = debounce(fetchData, 500); // Adjust delay as needed
@@ -249,7 +251,7 @@ function Room() {
             <div className="content-container">
                 <div className="calendar-container">
                         <SearchBar data={rooms} onEnter={changeURL2} room={roomid} onX={onX} />
-                        <Classroom name={roomid} roomid={roomid}/>
+                        <Classroom name={roomid} roomid={roomid} image={room.image}/>
                         {contentState === "calendarSearch" ? calendarLoading ? "" : <h1 className="resultCount">{results.length} results</h1> : ""}
                         {contentState === "calendarSearch" ? 
                             <ul className="time-results">
@@ -266,11 +268,11 @@ function Room() {
                                 }
                             </ul> : ""
                         }
-                        {/* {contentState === "empty" ? <div className="instructions-container">
+                        {contentState === "empty" ? <div className="instructions-container">
                             <div className="instructions">
                                 <p>search by name or by selecting a timeslot</p>
                             </div>
-                        </div> :""} */}
+                        </div> :""}
                         <div className="calendar-content-container">
                             <MobileCalendar className={roomid} data={data} isloading={loading} addQuery={addQuery} removeQuery={removeQuery} query={query} show={showMobileCalendar} setShow={setShowMobileCalendar} />
                         </div>
@@ -289,7 +291,7 @@ function Room() {
                 <div className="calendar-container">
                     <div className="left">
                         <SearchBar data={rooms} onEnter={changeURL2} room={roomid} onX={onX} />
-                        <Classroom name={roomid} roomid={roomid}/>
+                        <Classroom name={roomid} room={room}/>
                         {contentState === "calendarSearch" ? calendarLoading ? "" : <h1 className="resultCount">{results.length} results</h1> : ""}
                         {contentState === "calendarSearch" ? 
                             <ul className="time-results">

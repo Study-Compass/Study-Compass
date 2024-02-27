@@ -18,13 +18,13 @@ router.get('/getroom/:id', async (req, res) => {
         }
 
         // Find the classroom by name
-        // const room = await Classroom.findOne({ _id: roomName });
+        const room = await Classroom.findOne({ _id: roomId });
         const schedule = await Schedule.findOne({ classroom_id: roomId });
         console.log(`GET: /getroom/${roomId}`);
         console.log(schedule);
         if (schedule) {
             // If the room exists, return it
-            res.json({ success: true, message: "Room found", data: schedule });
+            res.json({ success: true, message: "Room found", room: room, data: schedule });
         } else {
             // If not found, return a 404 with a message
             res.status(404).json({ success: false, message: 'Room not found' });

@@ -33,6 +33,27 @@ def updateClassroom():
         }
         schedules.insert_one(schedule)
 
-updateClassroom()
+def addNewField():
+    load_dotenv() # loading .env file
+    uri = os.environ.get('MONGO_URL') # fetching URI string
+    client = MongoClient(uri, server_api=ServerApi('1')) 
+    try: # send a ping to confirm a successful connection
+        client.admin.command('ping')
+        print("Pinged your deployment. You successfully connected to MongoDB!")
+    except Exception as e:
+        print(e)
 
+    db = client['studycompass']
+    collection = db['classrooms1']
+    result = collection.update_many(
+        {},
+        {
+            '$set': {
+                'image': "/"
+            }
+        }
+    )
 
+    print(f'Number of documents updated: {result.modified_count}')
+
+addNewField() # call the function to add new field to the collection

@@ -33,7 +33,7 @@ const getRoom = async (id) => {
         const response = await fetch(`/getroom/${id}`);
         const data = await response.json();
         //console.log(data.data);
-        return data.data;
+        return data;
     } catch (error) {
         console.error("Error fetching data: ", error);
     }
