@@ -19,6 +19,7 @@ const getRooms = async () => {
         }
 
         //console.log(responseBody.data);
+        console.log(responseBody.data);
         return responseBody.data;
     } catch (error) {
         console.error("Error:", error);

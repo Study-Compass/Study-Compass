@@ -27,6 +27,8 @@ function Calendar({className, data, isLoading, addQuery, removeQuery, query}){
     const today = new Date();
     const currentDay = today.getDay();
 
+    useEffect(() => {console.log(data)},[data]);
+
     return (
             <div className={`Calendar ${data ? "":"loading"}`}>
                 {/* <h1>{className.toLowerCase()}</h1> */}

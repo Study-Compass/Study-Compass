@@ -172,10 +172,19 @@ select{
     left:0;
     z-index: 10;
     transition: all 0.5s;
-    height:20px;
-    width:100px;
-    left:calc(50% - 50px);
+    left:calc(50% - 20px);
+    height:40px;
+    width:40px;
+    outline:none;
+    background-color: white;
+    border: none;
 }
+
+.show-calendar:active{
+    transform: translateY(-10px);
+}
+
+
 
 @media(max-width:500px){
     select{
