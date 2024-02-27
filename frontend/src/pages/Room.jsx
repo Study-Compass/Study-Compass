@@ -7,8 +7,8 @@ import SearchBar from '../components/SearchBar/SearchBar';
 import useAuth from '../hooks/useAuth';
 import Classroom from '../components/Classroom/Classroom';
 import MobileCalendar from '../components/MobileCalendar/MobileCalendar.jsx';
-import SwipeablePopup from '../components/Swipe/Swipe.jsx';
 
+import chevronUp from '../assets/chevronup.svg';
 
 import dummyData from '../dummyData.js'
 
@@ -107,6 +107,14 @@ function Room() {
     const debouncedFetchData = debounce(fetchData, 500); // Adjust delay as needed
 
     useEffect(() => { // FETCH ROOM DATA , triggers on url change
+        if(roomIds[roomid] === undefined && roomid !== "none"){
+            return;
+        }
+        if(roomid === "none"){
+            setContentState("empty");
+            fetchData("none");
+            return;
+        }
         if(contentState === "calendarSearch"){
             console.log("fetching data debounced");
             setTimeout(() => {             
@@ -118,7 +126,7 @@ function Room() {
             setContentState("nameSearch");
             clearQuery();
         }
-    }, [roomid, isAuthenticated]);
+    }, [roomid, isAuthenticated, roomIds]);
 
     const fetchFreeRooms = async () => {
         setContentState("calendarSearch")
@@ -267,7 +275,7 @@ function Room() {
                             <MobileCalendar className={roomid} data={data} isloading={loading} addQuery={addQuery} removeQuery={removeQuery} query={query} show={showMobileCalendar} setShow={setShowMobileCalendar} />
                         </div>
                         {/* <SwipeablePopup /> */}
-                    <button className="show-calendar" onClick={()=>{setShowMobileCalendar(true)}}>show</button>
+                    <button className="show-calendar" onClick={()=>{setShowMobileCalendar(true)}}> <img src={chevronUp} alt="show schedule" /> </button>
                 </div>
             </div>
         </div>

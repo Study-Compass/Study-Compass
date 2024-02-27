@@ -1,31 +1,30 @@
 const express = require('express');
 const Classroom = require('./schemas/classroom.js');
 const Schedule = require('./schemas/schedule.js');
-const { default: Room } = require('../frontend/src/pages/Room.jsx');
 
 const router = express.Router();
 
 // Route to get a specific classroom by name
-router.get('/getroom/:name', async (req, res) => {
+router.get('/getroom/:id', async (req, res) => {
     try {
-        const roomName = req.params.name;
+        const roomId = req.params.id;
         
         // Handle special case where "none" is passed as a room name
-        if(roomName === "none"){
+        if(roomId === "none"){
             // Return an empty Classroom object
-            res.json({ success: true, message: "Empty room object returned", data: new Classroom() });
-                console.log(`GET: /getroom/${roomName}`);
+            res.json({ success: true, message: "Empty room object returned", data: new Schedule() });
+                console.log(`GET: /getroom/none`);
             return;
         }
 
         // Find the classroom by name
-        const room = await Classroom.findOne({ name: roomName });
-        const schedule = await Schedule.findOne({ classroom_id: room._id });
-        console.log(`GET: /getroom/${roomName}`);
-
-        if (room) {
+        // const room = await Classroom.findOne({ _id: roomName });
+        const schedule = await Schedule.findOne({ classroom_id: roomId });
+        console.log(`GET: /getroom/${roomId}`);
+        console.log(schedule);
+        if (schedule) {
             // If the room exists, return it
-            res.json({ success: true, message: "Room found", data: room });
+            res.json({ success: true, message: "Room found", data: schedule });
         } else {
             // If not found, return a 404 with a message
             res.status(404).json({ success: false, message: 'Room not found' });
@@ -90,8 +89,10 @@ router.post('/free', async (req, res) => {
         const roomIds = rooms.map(room => room.classroom_id);
 
         // Fetch the names of the rooms that are free
-        const roomNames = await Classroom.find({ _id: { "$in": roomIds } }).select('name -_id');
+        const names = await Classroom.find({ _id: { "$in": roomIds } }).select('name -_id');
+        const roomNames = names.map(room => room.name);
         console.log(`POST: /free`, freePeriods);
+        console.log(roomNames);
         // Return the names of rooms that are free during the specified periods
         res.json({ success: true, message: "Rooms available during the specified periods", data: roomNames });
     } catch (error) {
