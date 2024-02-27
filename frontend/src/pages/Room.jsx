@@ -21,6 +21,7 @@ function Room() {
     let { roomid } = useParams();
     let navigate = useNavigate();
     const [rooms, setRooms] = useState(null);
+    const [roomIds, setRoomIds] = useState({});
     const { isAuthenticated } = useAuth();
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -76,7 +77,8 @@ function Room() {
             }
             // --------------------------------------------------
             const rooms = await getRooms();
-            setRooms(rooms);
+            setRooms(Object.keys(rooms).sort());
+            setRoomIds(rooms);
         };
 
         fetchRooms();
@@ -108,11 +110,11 @@ function Room() {
         if(contentState === "calendarSearch"){
             console.log("fetching data debounced");
             setTimeout(() => {             
-                debouncedFetchData(roomid);
+                debouncedFetchData(roomIds[roomid]);
                 console.log("results", results);
             }, 100);
         } else {
-            fetchData(roomid);
+            fetchData(roomIds[roomid]);
             setContentState("nameSearch");
             clearQuery();
         }
@@ -248,7 +250,7 @@ function Room() {
                                         return <li 
                                             key={index} 
                                             value={result} 
-                                            onMouseOver={() => {debouncedFetchData(result)}} 
+                                            onMouseOver={() => {debouncedFetchData(roomIds[result])}} 
                                             onMouseLeave={()=>{debouncedFetchData("none")}}
                                             onClick={() => {changeURL(result)}}
                                         >{result.toLowerCase()}</li>
@@ -288,7 +290,7 @@ function Room() {
                                         return <li 
                                             key={index} 
                                             value={result} 
-                                            onMouseOver={() => {debouncedFetchData(result)}} 
+                                            onMouseOver={() => {debouncedFetchData(roomIds[result])}} 
                                             onMouseLeave={()=>{debouncedFetchData("none")}}
                                             onClick={() => {changeURL(result)}}
                                         >{result.toLowerCase()}</li>

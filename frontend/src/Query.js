@@ -37,6 +37,7 @@ const getRoom = async (id) => {
         console.error("Error fetching data: ", error);
     }
 };
+
 const getFreeRooms = async (query) => {
     try {
         const response = await axios.post('/free', { query });

@@ -6,36 +6,9 @@ const classroomSchema = new Schema({
         type: String,
         required: true
     },
-    weekly_schedule: {
-        M: [{
-            class_name: String,
-            start_time: Number,
-            end_time: Number
-        }],
-        T: [{
-            class_name: String,
-            start_time: Number,
-            end_time: Number
-        }],
-        W: [{
-            class_name: String,
-            start_time: Number,
-            end_time: Number
-        }],
-        R: [{
-            class_name: String,
-            start_time: Number,
-            end_time: Number
-        }],
-        F: [{
-            class_name: String,
-            start_time: Number,
-            end_time: Number
-        }],
-    }
 });
 
 
-const Classroom = mongoose.model('Classroom', classroomSchema, 'classrooms');
+const Classroom = mongoose.model('Classroom', classroomSchema, 'classrooms1');
 
 module.exports = Classroom;
