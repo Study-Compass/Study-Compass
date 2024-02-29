@@ -17,6 +17,11 @@ import {getRooms, getRoom, getFreeRooms, debounce} from '../Query.js';
 
 const offline = false;
 
+/*
+STATES
+contentState: "empty", "nameSearch", "calendarSearch" , "calendarSearchResult"
+*/ 
+
 function Room() {
     let { roomid } = useParams();
     let navigate = useNavigate();
@@ -117,7 +122,7 @@ function Room() {
             fetchData("none");
             return;
         }
-        if(contentState === "calendarSearch"){
+        if(contentState === "calendarSearchResult"){
             console.log("fetching data debounced");
             setTimeout(() => {             
                 debouncedFetchData(roomIds[roomid]);
@@ -128,6 +133,7 @@ function Room() {
             setContentState("nameSearch");
             clearQuery();
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [roomid, isAuthenticated, roomIds]);
 
     const fetchFreeRooms = async () => {
@@ -199,11 +205,11 @@ function Room() {
     }
 
     useEffect(() => { 
-        
-        if (noquery === true) {
+        // if query is changed and noquery is true, set contentstate to empty unless query cleaered using namesearch
+        if ((noquery === true && contentState === "calendarSearchResult") || roomid === "none") {
             setContentState("empty");
-        } else {
-            setContentState("calendarSearch");
+        } else if(contentState !== "nameSearch"){
+            setContentState("calendarSearch");  
         }
         // console.log(`noquery: ${noquery}`);
         setResults([]);
@@ -222,6 +228,7 @@ function Room() {
     
     function changeURL(option) {
         navigate(`/room/${option}`, { replace: true });
+        setContentState("calendarSearchResult");
     }
 
     function changeURL2(option) {
@@ -245,13 +252,13 @@ function Room() {
     },[]);
 
     if (width < 800) {
-        return(
+        return( // ----------------------------------------------MOBILE--------------------------------------------------------------------------------
             <div className="room" style={{height:viewport}}>
             <Header />
             <div className="content-container">
                 <div className="calendar-container">
                         <SearchBar data={rooms} onEnter={changeURL2} room={roomid} onX={onX} />
-                        <Classroom name={roomid} room={room}/>
+                        <Classroom name={roomid} room={room} state={contentState} setState={setContentState}/>
                         {contentState === "calendarSearch" ? calendarLoading ? "" : <h1 className="resultCount">{results.length} results</h1> : ""}
                         {contentState === "calendarSearch" ? 
                             <ul className="time-results">
@@ -270,7 +277,7 @@ function Room() {
                         }
                         {contentState === "empty" ? <div className="instructions-container">
                             <div className="instructions">
-                                <p>search by name or by selecting a timeslot</p>
+                                <p>search by name</p>
                             </div>
                         </div> :""}
                         <div className="calendar-content-container">
@@ -284,14 +291,19 @@ function Room() {
         );
     }
 
-    return (
+    return ( // ----------------------------------------------DESKTOP--------------------------------------------------------------------------------
         <div className="room">
             <Header />
             <div className="content-container">
                 <div className="calendar-container">
                     <div className="left">
                         <SearchBar data={rooms} onEnter={changeURL2} room={roomid} onX={onX} />
-                        <Classroom name={roomid} room={room}/>
+                        {contentState === "nameSearch" || contentState === "calendarSearchResult"? <Classroom 
+                            name={roomid} 
+                            room={room} 
+                            state={contentState} 
+                            setState={setContentState}
+                        /> : ""}
                         {contentState === "calendarSearch" ? calendarLoading ? "" : <h1 className="resultCount">{results.length} results</h1> : ""}
                         {contentState === "calendarSearch" ? 
                             <ul className="time-results">

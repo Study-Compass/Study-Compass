@@ -36,3 +36,21 @@
     color:var(--text);
     font-weight:400;
 }
+
+.back-to-results{
+    margin-bottom:10px;
+    display:flex;
+    align-items:center;
+    gap:5px;
+    cursor:pointer;
+    transform:translateX(-4px);
+}
+
+.back-to-results p{
+    margin:0;
+    font-family:'Inter';
+    font-weight:500;
+    color:var(--text);
+    font-size:15px;
+
+}
