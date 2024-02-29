@@ -64,26 +64,25 @@ function MobileCalendar({ className, data, isLoading, addQuery, removeQuery, que
         set({ y: show ? 0 : 1000 });
     }, [show, set]);
 
-    const bind = useDrag(({ down, movement: [, my], velocity }) => {
-        // Determine if the gesture is a swipe down based on velocity and distance
-        const isSwipeDown = velocity > 0.5 && my > window.innerHeight * 0.2;
-
-        if (down && !isSwipeDown) {
-            // Follow the finger movement unless it's a determined swipe down
-            set({ y: my, immediate: true });
-        } else if (!down) {
+    const bind = useDrag(({ down, movement: [, my], velocity, direction: [xDir, yDir] }) => {
+        // Determine if the gesture is a swipe down based on velocity and the direction
+        const isSwipeDown = velocity > 0.5 && yDir > 0; // yDir > 0 indicates a downward movement
+    
+        if (down) {
+            // Prevent scrolling above initial show state
+            const newY = my < 0 ? 0 : my; // This line ensures the element does not move above its initial position
+            set({ y: newY, immediate: true });
+        } else {
             if (isSwipeDown) {
                 // Hide the calendar smoothly
                 setShow(false);
                 set({ y: 1000, immediate: false });
             } else {
-                // Snap back to the top if not enough distance is covered
+                // Snap back to the top if not enough distance is covered or if trying to move above the initial state
                 set({ y: 0, immediate: false });
             }
         }
     }, { axis: 'y', filterTaps: true });
-
-
     return (
         <animated.div 
             {...bind()} 
@@ -96,7 +95,7 @@ function MobileCalendar({ className, data, isLoading, addQuery, removeQuery, que
                 backgroundColor: 'white',
                 width: '100%', // Adjusted for full width
                 height: '90%',
-                transform:  y.to(y => `translateY(${y}px)`),
+                transform:  y.to(y => `translate(-1px,${y}px)`),
                 touchAction: 'none',
             }}
         >

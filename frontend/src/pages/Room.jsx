@@ -251,7 +251,7 @@ function Room() {
             <div className="content-container">
                 <div className="calendar-container">
                         <SearchBar data={rooms} onEnter={changeURL2} room={roomid} onX={onX} />
-                        <Classroom name={roomid} roomid={roomid} image={room.image}/>
+                        <Classroom name={roomid} room={room}/>
                         {contentState === "calendarSearch" ? calendarLoading ? "" : <h1 className="resultCount">{results.length} results</h1> : ""}
                         {contentState === "calendarSearch" ? 
                             <ul className="time-results">
