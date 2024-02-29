@@ -171,7 +171,7 @@ select{
     bottom:10px;
     left:0;
     z-index: 10;
-    transition: all 0.5s;
+    transition: all 1s;
     left:calc(50% - 20px);
     height:40px;
     width:40px;
@@ -181,7 +181,7 @@ select{
 }
 
 .show-calendar:active{
-    transform: translateY(-10px);
+    transform: translateY(-700px);
 }
 
 
