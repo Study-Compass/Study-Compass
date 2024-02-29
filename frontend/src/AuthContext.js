@@ -9,8 +9,8 @@ export const AuthProvider = ({ children }) => {
 
 
     const validateToken = async () => {
+        const token = localStorage.getItem('token');
         try {
-            const token = localStorage.getItem('token');
             // Set up the Authorization header
             const config = {
                 headers: {
@@ -30,9 +30,9 @@ export const AuthProvider = ({ children }) => {
                 setIsAuthenticated(false);
             }
         } catch (error) {
-            console.error('Error validating token:', error);
+            localStorage.removeItem('token');
+            console.log('Token expired or invalid');
             return error;
-            // Handle error...
         }
     };
 
