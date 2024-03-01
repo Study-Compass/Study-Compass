@@ -14,6 +14,7 @@ import dummyData from '../dummyData.js'
 
 
 import {getRooms, getRoom, getFreeRooms, debounce} from '../Query.js';
+import { now } from 'mongoose';
 
 const offline = false;
 
@@ -151,6 +152,31 @@ function Room() {
         setCalendarLoading(false);
     };
 
+    const fetchFreeNow = async () => {
+        setContentState("calendarSearch")
+        setCalendarLoading(true)
+        let nowQuery = {
+            'M': [],
+            'T': [],
+            'W': [],
+            'R': [],
+            'F': [],
+        };
+        const days = ["M", "T", "W", "R", "F"];
+        const today = new Date();
+        const day = today.getDay();
+        const hour = today.getHours();
+        if(day == 0 || day == 6){
+            nowQuery['M'] = [{start_time: 0, end_time: 30}];
+        } else {
+            nowQuery[days[day-1]] = [{start_time: hour*60, end_time: (hour*60)+30}];
+        }
+        console.log(nowQuery);
+        const roomNames = await getFreeRooms(nowQuery);
+        setResults(roomNames.sort());
+        setCalendarLoading(false);
+    }
+
     const addQuery = (key, newValue) => {
         setNoQuery(false);
         setContentState("calendarSearch");
@@ -213,7 +239,7 @@ function Room() {
         }
         // console.log(`noquery: ${noquery}`);
         setResults([]);
-        // console.log("query: ", query);
+        console.log("query: ", query);
         if (!noquery) {
             fetchFreeRooms();
         }
@@ -258,8 +284,12 @@ function Room() {
             <div className="content-container">
                 <div className="calendar-container">
                         <SearchBar data={rooms} onEnter={changeURL2} room={roomid} onX={onX} />
-                        <Classroom name={roomid} room={room} state={contentState} setState={setContentState}/>
-                        {contentState === "calendarSearch" ? calendarLoading ? "" : <h1 className="resultCount">{results.length} results</h1> : ""}
+                        {contentState === "nameSearch" || contentState === "calendarSearchResult"? <Classroom 
+                            name={roomid} 
+                            room={room} 
+                            state={contentState} 
+                            setState={setContentState}
+                        /> : ""}                        {contentState === "calendarSearch" ? calendarLoading ? "" : <h1 className="resultCount">{results.length} results</h1> : ""}
                         {contentState === "calendarSearch" ? 
                             <ul className="time-results">
                                 {
@@ -277,14 +307,15 @@ function Room() {
                         }
                         {contentState === "empty" ? <div className="instructions-container">
                             <div className="instructions">
-                                <p>search by name</p>
+                                <p>search by name or see which rooms are</p>
+                                <button onClick={fetchFreeNow}>free now</button>
                             </div>
                         </div> :""}
-                        <div className="calendar-content-container">
+                        <div className={`calendar-content-container ${showMobileCalendar ? "active":""}`}>
                             <MobileCalendar className={roomid} data={data} isloading={loading} addQuery={addQuery} removeQuery={removeQuery} query={query} show={showMobileCalendar} setShow={setShowMobileCalendar} />
                         </div>
                         {/* <SwipeablePopup /> */}
-                    <button className="show-calendar" onClick={()=>{setShowMobileCalendar(true)}}> <img src={chevronUp} alt="show schedule" /> </button>
+                    {contentState === "calendarSearchResult" || contentState === "nameSearch" ? <button className="show-calendar" onClick={()=>{setShowMobileCalendar(true)}}> <img src={chevronUp} alt="show schedule" /> </button>: ""}
                 </div>
             </div>
         </div>
@@ -323,6 +354,7 @@ function Room() {
                         {contentState === "empty" ? <div className="instructions-container">
                             <div className="instructions">
                                 <p>search by name or by selecting a timeslot</p>
+                                <button onClick={fetchFreeNow}>free now</button>
                             </div>
                         </div> :""}
                     </div>

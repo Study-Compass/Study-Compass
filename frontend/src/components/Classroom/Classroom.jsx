@@ -2,9 +2,12 @@ import React, { useEffect, useState } from 'react';
 import './Classroom.css';
 // import '../../App.css';  
 import leftArrow from '../../assets/leftarrow.svg';
+import { useNavigate } from 'react-router-dom';
 
 function Classroom({ name, room, state, setState}) {
     const [image, setImage] = useState("")
+
+    const navigate = useNavigate();
 
     useEffect(()=>{
         setImage("");
@@ -29,6 +32,9 @@ function Classroom({ name, room, state, setState}) {
         return "";
     }
 
+    const backtoResults = () => {
+        setState("calendarSearch");
+    };
 
     return (
         <div className='classroom-component'>
@@ -39,7 +45,7 @@ function Classroom({ name, room, state, setState}) {
             </div>
             
             <div className="classroom-info">
-                {state === "calendarSearchResult" ? <div className="back-to-results" onClick={()=>setState("calendarSearch")}>
+                {state === "calendarSearchResult" ? <div className="back-to-results" onClick={backtoResults}>
                     <img src={leftArrow} alt="back arrow" ></img>
                     <p>back to results</p>
                 </div> : "" }
