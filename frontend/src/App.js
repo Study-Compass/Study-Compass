@@ -6,21 +6,24 @@ import Register from './pages/Register/Register';
 import Redirect from './pages/Redirect/Redirect';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './AuthContext';
+import { CacheProvider } from './CacheContext';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 
 function App() {
     return (
         <GoogleOAuthProvider clientId="639818062398-k4qnm9l320phu967ctc2l1jt1sp9ib7p.apps.googleusercontent.com">
             <AuthProvider>
-                <Router>
-                    <Routes>
-                        <Route path="/" element={<Redirect/> }/>
-                        <Route path="/room/:roomid" element={<Room />}/>
-                        <Route path="/register" element={<Register />}/>
-                        <Route path="/login" element={<Login />}/>
+                <CacheProvider>
+                    <Router>
+                        <Routes>
+                            <Route path="/" element={<Redirect/> }/>
+                            <Route path="/room/:roomid" element={<Room />}/>
+                            <Route path="/register" element={<Register />}/>
+                            <Route path="/login" element={<Login />}/>
 
-                    </Routes>
-                </Router>
+                        </Routes>
+                    </Router>
+                </CacheProvider>
             </AuthProvider>
         </GoogleOAuthProvider>
     );

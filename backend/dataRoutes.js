@@ -21,7 +21,6 @@ router.get('/getroom/:id', async (req, res) => {
         const room = await Classroom.findOne({ _id: roomId });
         const schedule = await Schedule.findOne({ classroom_id: roomId });
         console.log(`GET: /getroom/${roomId}`);
-        console.log(schedule);
         if (schedule) {
             // If the room exists, return it
             res.json({ success: true, message: "Room found", room: room, data: schedule });
@@ -92,7 +91,6 @@ router.post('/free', async (req, res) => {
         const names = await Classroom.find({ _id: { "$in": roomIds } }).select('name -_id');
         const roomNames = names.map(room => room.name);
         console.log(`POST: /free`, freePeriods);
-        console.log(roomNames);
         // Return the names of rooms that are free during the specified periods
         res.json({ success: true, message: "Rooms available during the specified periods", data: roomNames });
     } catch (error) {

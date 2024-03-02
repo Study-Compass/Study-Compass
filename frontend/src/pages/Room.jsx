@@ -5,18 +5,17 @@ import './Room.css';
 import Header from '../components/Header/Header';
 import SearchBar from '../components/SearchBar/SearchBar';
 import useAuth from '../hooks/useAuth';
+import { useCache } from '../CacheContext';
 import Classroom from '../components/Classroom/Classroom';
 import MobileCalendar from '../components/MobileCalendar/MobileCalendar.jsx';
+import Loader from '../components/Loader/Loader.jsx'
 
 import chevronUp from '../assets/chevronup.svg';
 
 import dummyData from '../dummyData.js'
 
 
-import {getRooms, getRoom, getFreeRooms, debounce} from '../Query.js';
-import { now } from 'mongoose';
-
-const offline = false;
+import { debounce} from '../Query.js';
 
 /*
 STATES
@@ -30,6 +29,7 @@ function Room() {
     const [rooms, setRooms] = useState(null);
     const [roomIds, setRoomIds] = useState({});
     const { isAuthenticated } = useAuth();
+    const { getRooms, getFreeRooms, getRoom } = useCache();
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [calendarLoading, setCalendarLoading] = useState(true);
@@ -39,6 +39,7 @@ function Room() {
     const [results, setResults] = useState([]);
     const [numLoaded, setNumLoaded] = useState(0);
     const [loadedResults, setLoadedResults] = useState([]);
+    const [resultsLoading, setResultsLoading] = useState(true);
     const [query, setQuery] = useState({
         'M': [],
         'T': [],
@@ -130,6 +131,7 @@ function Room() {
         setCalendarLoading(true)
         const roomNames = await getFreeRooms(query);
         setResults(roomNames);
+        setNumLoaded(10);
         setCalendarLoading(false);
     };
 
@@ -167,16 +169,17 @@ function Room() {
             }
             let newResults = [...loadedResults] ;
             console.log(loadedResults.length, numLoaded);
+            setResultsLoading(true);
             for(let i=loadedResults.length;i<numLoaded;i++){
                 const roomData = await fetchSchedule(roomIds[results[i]]);
                 newResults.push(roomData);
                 console.log(roomData);
             }
             setLoadedResults(newResults);
+            setResultsLoading(false);
         };
-
         updateLoadedResults();
-
+        
     },[numLoaded]);
 
     useEffect(()=>{console.log("loaded results change detected", loadedResults)},[loadedResults]);
@@ -252,7 +255,10 @@ function Room() {
 
     useEffect(()=>{
         console.log("contentstate",contentState);
-        // console.log(loading);
+        if(contentState === "empty"){
+            setNumLoaded(0);
+            setLoadedResults([]);
+        }
     },[contentState]);
 
     
@@ -270,7 +276,7 @@ function Room() {
         setContentState('empty');
         setResults([]);
         clearQuery();
-        // setData(dummyData["none"]);
+        setLoadedResults([]);
     }
     
     const [showMobileCalendar, setShowMobileCalendar] = useState(false);
@@ -293,19 +299,23 @@ function Room() {
                             room={room} 
                             state={contentState} 
                             setState={setContentState}
-                        /> : ""}                        {contentState === "calendarSearch" ? calendarLoading ? "" : <h1 className="resultCount">{results.length} results</h1> : ""}
+                        /> : ""}                        
+                        {contentState === "calendarSearch" ? calendarLoading ? "" : <h1 className="resultCount">{results.length} results</h1> : ""}
                         {contentState === "calendarSearch" ? 
                             <ul className="time-results">
                                 {
                                     loadedResults.map((result, index) => {
                                         return <li 
                                             key={index} 
-                                            value={result.name} 
-                                            onMouseOver={() => {debouncedFetchData(roomIds[result.name])}} 
+                                            value={result.room.name} 
+                                            onMouseOver={() => {debouncedFetchData(result.room._id)}} 
                                             onMouseLeave={()=>{debouncedFetchData("none")}}
-                                            onClick={() => {changeURL(result.name)}}
-                                        >{result.name.toLowerCase()}</li>
-                                    })
+                                            onClick={() => {changeURL(result)}}
+                                        >
+                                            <h2>{result.room.name.toLowerCase()}</h2>
+                                            <p className="free-until">free until 6:00</p>
+                                        </li>
+                                    })  
                                 }
                             </ul> : ""
                         }
@@ -349,15 +359,21 @@ function Room() {
                                             value={result.room.name} 
                                             onMouseOver={() => {debouncedFetchData(result.room._id)}} 
                                             onMouseLeave={()=>{debouncedFetchData("none")}}
-                                            onClick={() => {changeURL(result)}}
+                                            onClick={() => {changeURL(result.room.name)}}
                                         >
                                             <h2>{result.room.name.toLowerCase()}</h2>
                                             <p className="free-until">free until 6:00</p>
                                         </li>
                                     })  
                                 }
+                                {resultsLoading ? <div className="loader-container">
+                                    <Loader/>
+                                </div> : <li onClick={()=>{setNumLoaded(numLoaded + 10)}}>get more</li>}
+
+
                             </ul> : ""
                         }
+
                         {contentState === "empty" ? <div className="instructions-container">
                             <div className="instructions">
                                 <p>search by name or by selecting a timeslot</p>

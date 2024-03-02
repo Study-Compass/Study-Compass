@@ -217,6 +217,11 @@ select{
     cursor:pointer;
 }
 
+.loader-container{
+    height:20%;
+    width:20%;
+}
+
 @media(max-width:500px){
     select{
         font-size:18px;
