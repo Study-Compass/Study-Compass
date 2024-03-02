@@ -103,6 +103,19 @@ select{
     border-radius: 10px;
 }
 
+.time-results li h2{
+    font-family:'Inter';
+    font-weight:600;
+    font-size:17px;
+    margin: 5px 0;
+}
+
+.time-results li .free-until{
+    font-weight:500;
+    margin: 5px 0;
+    font-size:13px;
+}
+
 ::-webkit-scrollbar {
     width: 10px; /* or height for horizontal scrollbars */
   }
@@ -152,7 +165,7 @@ select{
     font-size: 17px;
     font-weight: 400;
     color: var(--border);
-
+    font-family:'Inter',sans-serif;
 }
 
 .calendar-content-container{
@@ -188,7 +201,21 @@ select{
     transform: translateY(-700px);
 }
 
+.free-now{
+    font-size: 16px;
+    font-weight: 400;
+    color: var(--border);
+    font-family:'Inter',sans-serif;
+    background-color: white;
+    otuline:none;
+    border:1px solid var(--border);
+    border-radius: 5px;
 
+}
+
+.free-now:hover{
+    cursor:pointer;
+}
 
 @media(max-width:500px){
     select{

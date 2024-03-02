@@ -37,6 +37,8 @@ function Room() {
     const [contentState, setContentState] = useState("empty")
 
     const [results, setResults] = useState([]);
+    const [numLoaded, setNumLoaded] = useState(0);
+    const [loadedResults, setLoadedResults] = useState([]);
     const [query, setQuery] = useState({
         'M': [],
         'T': [],
@@ -76,13 +78,6 @@ function Room() {
 
     useEffect(() => {
         const fetchRooms = async () => {
-            // -- DANGER ZONE - CODE SHOULD NOT TOUCH DEPLOYMENT BRANCH
-            if(offline){
-                console.log("Continuing with OFFLINE development");
-                setRooms(dummyData['rooms']);
-                return;
-            }
-            // --------------------------------------------------
             const rooms = await getRooms();
             setRooms(Object.keys(rooms).sort());
             setRoomIds(rooms);
@@ -92,18 +87,6 @@ function Room() {
     }, []);
 
     const fetchData = async (id) => {
-        if(offline){
-            // -- DANGER ZONE - CODE SHOULD NOT TOUCH DEPLOYMENT BRANCH
-            setLoading(false);
-            if(id === "none"){
-                setData(dummyData['none']);
-                return;
-            }
-            console.log("Continuing with OFFLINE development");
-            setData(dummyData['room'])
-            return;
-            // --------------------------------------------------------
-        }
         setLoading(true);
         setData(null);
         const data = await getRoom(id);
@@ -111,6 +94,11 @@ function Room() {
         setRoom(data.room);
         setData(data.data);
     };
+
+    const fetchSchedule = async (id) =>{
+        const data = await getRoom(id);
+        return data;
+    }
 
     const debouncedFetchData = debounce(fetchData, 500); // Adjust delay as needed
 
@@ -140,13 +128,6 @@ function Room() {
     const fetchFreeRooms = async () => {
         setContentState("calendarSearch")
         setCalendarLoading(true)
-        if(offline){
-            // -- DANGER ZONE - CODE SHOULD NOT TOUCH DEPLOYMENT BRANCH
-            console.log("Continuing with OFFLINE development");
-            setResults(dummyData['freerooms']);
-            return;
-            // -------------------------------------------------------
-        }
         const roomNames = await getFreeRooms(query);
         setResults(roomNames);
         setCalendarLoading(false);
@@ -166,7 +147,7 @@ function Room() {
         const today = new Date();
         const day = today.getDay();
         const hour = today.getHours();
-        if(day == 0 || day == 6){
+        if(day === 0 || day === 6){
             nowQuery['M'] = [{start_time: 0, end_time: 30}];
         } else {
             nowQuery[days[day-1]] = [{start_time: hour*60, end_time: (hour*60)+30}];
@@ -174,8 +155,31 @@ function Room() {
         console.log(nowQuery);
         const roomNames = await getFreeRooms(nowQuery);
         setResults(roomNames.sort());
+        setNumLoaded(10);
+        // setLoadedResults(roomNames.sort().slice(0,10));
         setCalendarLoading(false);
     }
+
+    useEffect(()=>{
+        const updateLoadedResults = async ()=>{
+            if(numLoaded === 0){
+                setLoadedResults([]);
+            }
+            let newResults = [...loadedResults] ;
+            console.log(loadedResults.length, numLoaded);
+            for(let i=loadedResults.length;i<numLoaded;i++){
+                const roomData = await fetchSchedule(roomIds[results[i]]);
+                newResults.push(roomData);
+                console.log(roomData);
+            }
+            setLoadedResults(newResults);
+        };
+
+        updateLoadedResults();
+
+    },[numLoaded]);
+
+    useEffect(()=>{console.log("loaded results change detected", loadedResults)},[loadedResults]);
 
     const addQuery = (key, newValue) => {
         setNoQuery(false);
@@ -293,14 +297,14 @@ function Room() {
                         {contentState === "calendarSearch" ? 
                             <ul className="time-results">
                                 {
-                                    results.map((result, index) => {
+                                    loadedResults.map((result, index) => {
                                         return <li 
                                             key={index} 
-                                            value={result} 
-                                            onMouseOver={() => {debouncedFetchData(roomIds[result])}} 
+                                            value={result.name} 
+                                            onMouseOver={() => {debouncedFetchData(roomIds[result.name])}} 
                                             onMouseLeave={()=>{debouncedFetchData("none")}}
-                                            onClick={() => {changeURL(result)}}
-                                        >{result.toLowerCase()}</li>
+                                            onClick={() => {changeURL(result.name)}}
+                                        >{result.name.toLowerCase()}</li>
                                     })
                                 }
                             </ul> : ""
@@ -308,7 +312,7 @@ function Room() {
                         {contentState === "empty" ? <div className="instructions-container">
                             <div className="instructions">
                                 <p>search by name or see which rooms are</p>
-                                <button onClick={fetchFreeNow}>free now</button>
+                                <button onClick={fetchFreeNow} className="free-now">free now</button>
                             </div>
                         </div> :""}
                         <div className={`calendar-content-container ${showMobileCalendar ? "active":""}`}>
@@ -339,22 +343,25 @@ function Room() {
                         {contentState === "calendarSearch" ? 
                             <ul className="time-results">
                                 {
-                                    results.map((result, index) => {
+                                    loadedResults.map((result, index) => {
                                         return <li 
                                             key={index} 
-                                            value={result} 
-                                            onMouseOver={() => {debouncedFetchData(roomIds[result])}} 
+                                            value={result.room.name} 
+                                            onMouseOver={() => {debouncedFetchData(result.room._id)}} 
                                             onMouseLeave={()=>{debouncedFetchData("none")}}
                                             onClick={() => {changeURL(result)}}
-                                        >{result.toLowerCase()}</li>
-                                    })
+                                        >
+                                            <h2>{result.room.name.toLowerCase()}</h2>
+                                            <p className="free-until">free until 6:00</p>
+                                        </li>
+                                    })  
                                 }
                             </ul> : ""
                         }
                         {contentState === "empty" ? <div className="instructions-container">
                             <div className="instructions">
                                 <p>search by name or by selecting a timeslot</p>
-                                <button onClick={fetchFreeNow}>free now</button>
+                                <button onClick={fetchFreeNow} className="free-now">free now</button>
                             </div>
                         </div> :""}
                     </div>
