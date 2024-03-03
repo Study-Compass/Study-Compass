@@ -56,4 +56,14 @@ def addNewField():
 
     print(f'Number of documents updated: {result.modified_count}')
 
-addNewField() # call the function to add new field to the collection
+def ping():
+    load_dotenv() # loading .env file
+    uri = os.environ.get('MONGO_URL1') # fetching URI string
+    client = MongoClient(uri, server_api=ServerApi('1')) 
+    try: # send a ping to confirm a successful connection
+        client.admin.command('ping')
+        print("Pinged your deployment. You successfully connected to MongoDB!")
+    except Exception as e:
+        print(e)
+
+ping() # call the function to add new field to the collection

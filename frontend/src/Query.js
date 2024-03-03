@@ -3,7 +3,7 @@ import axios from 'axios';
 
 const getRooms = async () => {
     try {
-        const response = await fetch(`/getrooms`);
+        let response = await fetch(`/getrooms`);
         const responseBody = await response.json();
 
         if (!response.ok) {
@@ -41,6 +41,8 @@ const getRoom = async (id) => {
 
 const getFreeRooms = async (query) => {
     try {
+        const query1 = `/free/${JSON.stringify(query)}`;
+        console.log(query1);
         const response = await axios.post('/free', { query });
         const responseBody = response.data;
 
