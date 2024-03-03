@@ -4,6 +4,7 @@ import './Classroom.css';
 import leftArrow from '../../assets/leftarrow.svg';
 import { useNavigate } from 'react-router-dom';
 
+
 function Classroom({ name, room, state, setState}) {
     const [image, setImage] = useState("")
 

@@ -9,6 +9,7 @@ import { useCache } from '../CacheContext';
 import Classroom from '../components/Classroom/Classroom';
 import MobileCalendar from '../components/MobileCalendar/MobileCalendar.jsx';
 import Loader from '../components/Loader/Loader.jsx'
+import { findNext } from "./RoomHelpers.js";
 
 import chevronUp from '../assets/chevronup.svg';
 
@@ -238,6 +239,8 @@ function Room() {
     }
 
     useEffect(() => { 
+        setLoadedResults([]);
+        setNumLoaded(0);
         // if query is changed and noquery is true, set contentstate to empty unless query cleaered using namesearch
         if ((noquery === true && contentState === "calendarSearchResult") || roomid === "none") {
             setContentState("empty");
@@ -313,7 +316,7 @@ function Room() {
                                             onClick={() => {changeURL(result)}}
                                         >
                                             <h2>{result.room.name.toLowerCase()}</h2>
-                                            <p className="free-until">free until 6:00</p>
+                                            <p className="free-until">free </p>
                                         </li>
                                     })  
                                 }
@@ -362,7 +365,7 @@ function Room() {
                                             onClick={() => {changeURL(result.room.name)}}
                                         >
                                             <h2>{result.room.name.toLowerCase()}</h2>
-                                            <p className="free-until">free until 6:00</p>
+                                            <p className="free-until">free {findNext(result.data.weekly_schedule)}</p>
                                         </li>
                                     })  
                                 }
