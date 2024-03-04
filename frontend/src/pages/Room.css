@@ -207,7 +207,7 @@ select{
     color: var(--border);
     font-family:'Inter',sans-serif;
     background-color: white;
-    otuline:none;
+    outline:none;
     border:1px solid var(--border);
     border-radius: 5px;
 
