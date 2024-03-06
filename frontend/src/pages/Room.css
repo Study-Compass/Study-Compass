@@ -21,7 +21,7 @@
     max-height: min(calc(100% - 60px), 800px);
     overflow:hidden;
     position: relative;
-}
+} 
 
 .content-container{
     display:flex;
