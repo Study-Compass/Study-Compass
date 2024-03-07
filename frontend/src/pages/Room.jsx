@@ -22,7 +22,6 @@ import { debounce} from '../Query.js';
 STATES
 contentState: "empty", "nameSearch", "calendarSearch" , "calendarSearchResult"
 */ 
-
 function Room() {
     let { roomid } = useParams();
     let navigate = useNavigate();
