@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import './Classroom.css';
-// import '../../App.css';  
 import leftArrow from '../../assets/leftarrow.svg';
 import { useNavigate } from 'react-router-dom';
 
