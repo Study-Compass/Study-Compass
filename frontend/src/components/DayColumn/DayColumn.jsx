@@ -40,7 +40,6 @@ function DayColumn({day, dayEvents, eventColors, empty, add, remove, queries}){
             return
         }
         setIsSelecting(false);
-        // Here you can handle the creation of a new event or finalize the selection
 
         if(selectionStart > selectionEnd){
             let temp = selectionStart;
