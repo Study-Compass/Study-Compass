@@ -99,4 +99,44 @@ router.post('/free', async (req, res) => {
     }
 });
 
+router.post('/getbatch', async (req, res) => {
+    const queries = req.body.queries;
+    const exhaustive = req.body.exhaustive; // Gives option to retrieve just schedule data or both schedule and room data
+    let rooms = {};
+    let schedules = {};
+    console.log(`GET: /getbatch`, JSON.stringify(req.body.queries) );
+    for(query in queries){
+        try{             
+            if(query === "none"){
+                // Return an empty Classroom object
+                schedules["none"] = new Schedule();
+                return;
+            }
+            // Find the classroom by name
+            if(exhaustive){
+                const room = await Classroom.findOne({ _id: query });
+                if(room){
+                    rooms[query] = room;
+                } else {
+                    rooms[query] = "not found";
+                }
+            }
+            const schedule = await Schedule.findOne({ classroom_id: query });
+            // console.log(`GET: /getroom/${query}`);
+            if (schedule) {
+                schedules[query] = schedule;
+                // If the room exists, return it
+            } else {
+                // If not found, return a 404 with a message
+                schedules[query] = "not found";
+            }
+        } catch (error) {
+            // Handle any errors that occur during the process
+            res.status(500).json({ success: false, message: 'Error retrieving rooms', error: error.message });
+        }        
+    }
+    res.json({ success: true, message: "Rooms found", rooms: rooms, schedules: schedules });
+
+});
+
 module.exports = router;

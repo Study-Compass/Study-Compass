@@ -41,8 +41,6 @@ const getRoom = async (id) => {
 
 const getFreeRooms = async (query) => {
     try {
-        const query1 = `/free/${JSON.stringify(query)}`;
-        console.log(query1);
         const response = await axios.post('/free', { query });
         const responseBody = response.data;
 
@@ -61,6 +59,14 @@ const getFreeRooms = async (query) => {
     }
 };
 
+const getBatch = async (queries) => {
+    try{
+        const response = await axios.post('/getbatch', {queries});
+    } catch (error){
+
+    }
+};
+
 function debounce(func, wait) { //move logic to other file
     let timeout;
     return function executedFunction(...args) {
@@ -72,6 +78,7 @@ function debounce(func, wait) { //move logic to other file
         timeout = setTimeout(later, wait);
     };
 }
+
 
 
 export { getRooms, getRoom, getFreeRooms, debounce };
