@@ -291,63 +291,14 @@ function Room() {
         console.log('adjusting')
     },[]);
 
-    if (width < 800) {
-        return( // ----------------------------------------------MOBILE--------------------------------------------------------------------------------
-            <div className="room" style={{height:viewport}}>
+    return (
+        <div className="room" style={{ height: width < 800 ? viewport : '100vh' }}>
             <Header />
             <div className="content-container">
                 <div className="calendar-container">
+                    <div className={width < 800 ? "left-mobile" : "left"}>
                         <SearchBar data={rooms} onEnter={changeURL2} room={roomid} onX={onX} />
-                        {contentState === "nameSearch" || contentState === "calendarSearchResult"? <Classroom 
-                            name={roomid} 
-                            room={room} 
-                            state={contentState} 
-                            setState={setContentState}
-                        /> : ""}                        
-                        {contentState === "calendarSearch" ? calendarLoading ? "" : <h1 className="resultCount">{results.length} results</h1> : ""}
-                        {contentState === "calendarSearch" ? 
-                            <ul className="time-results">
-                                {
-                                    loadedResults.map((result, index) => {
-                                        return <li 
-                                            key={index} 
-                                            value={result.room.name} 
-                                            onMouseOver={() => {debouncedFetchData(result.room._id)}} 
-                                            onMouseLeave={()=>{debouncedFetchData("none")}}
-                                            onClick={() => {changeURL(result)}}
-                                        >
-                                            <h2>{result.room.name.toLowerCase()}</h2>
-                                            <p className="free-until">free </p>
-                                        </li>
-                                    })  
-                                }
-                            </ul> : ""
-                        }
-                        {contentState === "empty" ? <div className="instructions-container">
-                            <div className="instructions">
-                                <p>search by name or see which rooms are</p>
-                                <button onClick={fetchFreeNow} className="free-now">free now</button>
-                            </div>
-                        </div> :""}
-                        <div className={`calendar-content-container ${showMobileCalendar ? "active":""}`}>
-                            <MobileCalendar className={roomid} data={data} isloading={loading} addQuery={addQuery} removeQuery={removeQuery} query={query} show={showMobileCalendar} setShow={setShowMobileCalendar} />
-                        </div>
-                        {/* <SwipeablePopup /> */}
-                    {contentState === "calendarSearchResult" || contentState === "nameSearch" ? <button className="show-calendar" onClick={()=>{setShowMobileCalendar(true)}}> <img src={chevronUp} alt="show schedule" /> </button>: ""}
-                </div>
-            </div>
-        </div>
-        );
-    }
-
-    return ( // ----------------------------------------------DESKTOP--------------------------------------------------------------------------------
-        <div className="room">
-            <Header />
-            <div className="content-container">
-                <div className="calendar-container">
-                    <div className="left">
-                        <SearchBar data={rooms} onEnter={changeURL2} room={roomid} onX={onX} />
-                        {contentState === "nameSearch" || contentState === "calendarSearchResult"? <Classroom 
+                        {contentState === "nameSearch" || contentState === "calendarSearchResult" ? <Classroom 
                             name={roomid} 
                             room={room} 
                             state={contentState} 
@@ -356,41 +307,41 @@ function Room() {
                         {contentState === "calendarSearch" ? calendarLoading ? "" : <h1 className="resultCount">{results.length} results</h1> : ""}
                         {contentState === "calendarSearch" ? 
                             <ul className="time-results">
-                                {
-                                    loadedResults.map((result, index) => {
-                                        return <li 
-                                            key={index} 
-                                            value={result.room.name} 
-                                            onMouseOver={() => {debouncedFetchData(result.room._id)}} 
-                                            onMouseLeave={()=>{debouncedFetchData("none")}}
-                                            onClick={() => {changeURL(result.room.name)}}
-                                        >
-                                            <h2>{result.room.name.toLowerCase()}</h2>
-                                            <p className="free-until">free {findNext(result.data.weekly_schedule)}</p>
-                                        </li>
-                                    })  
-                                }
-                                {resultsLoading ? <div className="loader-container">
-                                    <Loader/>
-                                </div> : <li onClick={()=>{setNumLoaded(numLoaded + 10)}}>get more</li>}
-
-
+                                {loadedResults.map((result, index) => (
+                                    <li 
+                                        key={index} 
+                                        value={result.room.name} 
+                                        onMouseOver={() => {debouncedFetchData(result.room._id)}} 
+                                        onMouseLeave={()=>{debouncedFetchData("none")}}
+                                        onClick={() => {changeURL(result.room.name)}}
+                                    >
+                                        <h2>{result.room.name.toLowerCase()}</h2>
+                                        <p className="free-until">free {width >= 800 ? findNext(result.data.weekly_schedule) : ''}</p>
+                                    </li>
+                                ))}
+                                {width >= 800 && resultsLoading ? <div className="loader-container"><Loader/></div> : null}
+                                {width >= 800 ? <li onClick={()=>{setNumLoaded(numLoaded + 10)}}>get more</li> : null}
                             </ul> : ""
                         }
-
-                        {contentState === "empty" ? <div className="instructions-container">
+                        {contentState === "empty" ? <div className={`instructions-container ${width < 800 ? "mobile-instructions" : ""}`}>
                             <div className="instructions">
-                                <p>search by name or by selecting a timeslot</p>
+                                <p>search by name or {width < 800 ? "see which rooms are" : "by selecting a timeslot"}</p>
                                 <button onClick={fetchFreeNow} className="free-now">free now</button>
                             </div>
-                        </div> :""}
+                        </div> : ""}
                     </div>
-                    <div className="right">
-                        <Calendar className={roomid} data={data} isloading={loading} addQuery={addQuery} removeQuery={removeQuery} query={query} />
-                    </div>
+                    {width < 800 ? (
+                        <div className={`calendar-content-container ${showMobileCalendar ? "active" : ""}`}>
+                            <MobileCalendar className={roomid} data={data} isloading={loading} addQuery={addQuery} removeQuery={removeQuery} query={query} show={showMobileCalendar} setShow={setShowMobileCalendar} />
+                        </div>
+                    ) : (
+                        <div className="right">
+                            <Calendar className={roomid} data={data} isloading={loading} addQuery={addQuery} removeQuery={removeQuery} query={query} />
+                        </div>
+                    )}
+                    {contentState === "calendarSearchResult" || contentState === "nameSearch" ? <button className="show-calendar" onClick={() => { setShowMobileCalendar(true) }}> <img src={chevronUp} alt="show schedule" /> </button> : ""}
                 </div>
             </div>
-            {/* <button onClick={logout}>logout</button> */}
         </div>
     );
 }

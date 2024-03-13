@@ -8,11 +8,6 @@ const { google } = require('googleapis');
 
 const app = express();
 const port = 5001;
-const client = new google.auth.OAuth2(
-    process.env.GOOGLE_CLIENT_ID, 
-    process.env.GOOGLE_CLIENT_SECRET,
-    process.env.GOOGLE_REDIRECT_URI //redirect uri
-); 
 
 const corsOptions = {
     origin: 'http://localhost:3000', // replace with production domain
@@ -31,7 +26,7 @@ app.use(dataRoutes);
 app.use(cors());
 app.use(cookieParser());
 
-mongoose.connect(process.env.MONGO_URL1)
+mongoose.connect(process.env.MONGO_URL)
 
 mongoose.connection.on('connected', () => {
     console.log('Mongoose connected to DB.');
