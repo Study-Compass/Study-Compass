@@ -104,39 +104,40 @@ router.post('/getbatch', async (req, res) => {
     const exhaustive = req.body.exhaustive; // Gives option to retrieve just schedule data or both schedule and room data
     let rooms = {};
     let schedules = {};
-    console.log(`GET: /getbatch`, JSON.stringify(req.body.queries) );
-    for(query in queries){
-        try{             
+    let data = [];
+
+    console.log(`POST: /getbatch`, JSON.stringify(req.body.queries) );
+    
+    try {
+        await Promise.all(queries.map(async (query) => {
+            let result = {};
             if(query === "none"){
-                // Return an empty Classroom object
-                schedules["none"] = new Schedule();
-                return;
+                result.data = new Schedule();
+                // break early in a way that doesn't proceed to send response
+                throw new Error("noneQueryFound");
             }
-            // Find the classroom by name
+
             if(exhaustive){
                 const room = await Classroom.findOne({ _id: query });
-                if(room){
-                    rooms[query] = room;
-                } else {
-                    rooms[query] = "not found";
-                }
+                result.room = room ? room : "not found";
             }
-            const schedule = await Schedule.findOne({ classroom_id: query });
-            // console.log(`GET: /getroom/${query}`);
-            if (schedule) {
-                schedules[query] = schedule;
-                // If the room exists, return it
-            } else {
-                // If not found, return a 404 with a message
-                schedules[query] = "not found";
-            }
-        } catch (error) {
-            // Handle any errors that occur during the process
-            res.status(500).json({ success: false, message: 'Error retrieving rooms', error: error.message });
-        }        
-    }
-    res.json({ success: true, message: "Rooms found", rooms: rooms, schedules: schedules });
 
+            const schedule = await Schedule.findOne({ classroom_id: query });
+            result.data = schedule ? schedule : "not found";
+            data.push(result);
+        }));
+
+        // send response after all operations are done
+        res.json({ success: true, message: "Rooms found", data: data });
+    } catch (error) {
+        // check if it's a special case to stop the process early
+        if (error.message === "noneQueryFound") {
+            return res.json({ success: true, message: "Empty query processed", rooms: {}, schedules: {} });
+        }
+        // if not, it's a real error
+        return res.status(500).json({ success: false, message: 'Error retrieving data', error: error.message });
+    }
 });
+
 
 module.exports = router;
