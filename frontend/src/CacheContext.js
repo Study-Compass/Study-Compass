@@ -78,6 +78,22 @@ export const CacheProvider = ({children}) =>{
         }
     };
     
+    // no cache support for now, very unlikely to be called multiple times
+    const getBatch = async (queries) => {
+        try{
+            const response = await axios.post('/getbatch', {queries, exhaustive: true});
+            const responseBody = response.data;
+            if(!responseBody.success){
+                console.error('Error fetching batch data:', responseBody.message);
+                return;
+            }
+            return responseBody.data;
+        } catch (error){
+            console.error('Error fetching data:', error);
+        }
+    };
+
+    
     function debounce(func, wait) { //move logic to other file
         let timeout;
         return function executedFunction(...args) {
@@ -90,7 +106,7 @@ export const CacheProvider = ({children}) =>{
         };
     }
     return (
-        <CacheContext.Provider value={{ getRooms, getRoom, getFreeRooms, debounce }}>
+        <CacheContext.Provider value={{ getRooms, getRoom, getFreeRooms, getBatch, debounce }}>
             {children}
         </CacheContext.Provider>
     );

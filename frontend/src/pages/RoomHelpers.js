@@ -24,7 +24,7 @@ const findNext = (schedule) => {
         let next = 9999;
         for(let i=0; i<schedule[days[day]].length;i++){
             const event = schedule[days[day]][i];
-            console.log('time:', minutes, "compare", event.start_time);
+            // console.log('time:', minutes, "compare", event.start_time);
             if(event.end_time < minutes){ // passed already
                 continue;
             } else if (event.start_time < minutes){ // right now

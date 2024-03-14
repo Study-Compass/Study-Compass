@@ -31,7 +31,7 @@ function Room() {
     const [rooms, setRooms] = useState(null);
     const [roomIds, setRoomIds] = useState({});
     const { isAuthenticated } = useAuth();
-    const { getRooms, getFreeRooms, getRoom } = useCache();
+    const { getRooms, getFreeRooms, getRoom, getBatch } = useCache();
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [calendarLoading, setCalendarLoading] = useState(true);
@@ -169,14 +169,15 @@ function Room() {
             if(numLoaded === 0){
                 setLoadedResults([]);
             }
-            let newResults = [...loadedResults] ;
-            console.log(loadedResults.length, numLoaded);
             setResultsLoading(true);
-            for(let i=loadedResults.length;i<numLoaded;i++){
-                const roomData = await fetchSchedule(roomIds[results[i]]);
-                newResults.push(roomData);
-                console.log(roomData);
-            }
+            let batchResults = await getBatch(results.slice(loadedResults.length, Math.min(numLoaded, results.length)).map(room => roomIds[room]));
+            // outdated query logic, too many requests, would overwhelm backend
+            // for(let i=loadedResults.length;i<Math.min(numLoaded, results.length);i++){
+            //     const roomData = await fetchSchedule(roomIds[results[i]]);
+            //     newResults.push(roomData);
+            //     console.log(roomData);
+            // } 
+            let newResults = [...loadedResults, ...batchResults];
             setLoadedResults(newResults);
             setResultsLoading(false);
         };
@@ -320,7 +321,7 @@ function Room() {
                                     </li>
                                 ))}
                                 {width >= 800 && resultsLoading ? <div className="loader-container"><Loader/></div> : null}
-                                {width >= 800 ? <li onClick={()=>{setNumLoaded(numLoaded + 10)}}>get more</li> : null}
+                                {width >= 800 && !resultsLoading ? <li onClick={()=>{setNumLoaded(numLoaded + 10)}}>get more</li> : null}
                             </ul> : ""
                         }
                         {contentState === "empty" ? <div className={`instructions-container ${width < 800 ? "mobile-instructions" : ""}`}>
