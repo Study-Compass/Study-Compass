@@ -339,7 +339,7 @@ function Room() {
                             <Calendar className={roomid} data={data} isloading={loading} addQuery={addQuery} removeQuery={removeQuery} query={query} />
                         </div>
                     )}
-                    {contentState === "calendarSearchResult" || contentState === "nameSearch" ? <button className="show-calendar" onClick={() => { setShowMobileCalendar(true) }}> <img src={chevronUp} alt="show schedule" /> </button> : ""}
+                    {width < 800 ? contentState === "calendarSearchResult" || contentState === "nameSearch" ? <button className="show-calendar" onClick={() => { setShowMobileCalendar(true) }}> <img src={chevronUp} alt="show schedule" /> </button> : "" : ""}
                 </div>
             </div>
         </div>
