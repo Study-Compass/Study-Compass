@@ -8,6 +8,11 @@ function Calendar({className, data, isLoading, addQuery, removeQuery, query}){
     const eventColors = useRef(new Map()).current;
     const [empty, setEmpty] = useState(true);
 
+
+    useEffect(() => {
+        eventColors.clear();
+    },[data]);
+
     useEffect(() => {
         if(className === "none"){
             setEmpty(true);
