@@ -107,7 +107,7 @@ router.get('/validate-token', verifyToken, async (req, res) => {
 });
 
 router.post('/google-login', async (req, res) => {
-    const { code } = req.body;
+    const { code, isRegister } = req.body;
 
     if (!code) {
         return res.status(400).json({
@@ -117,42 +117,7 @@ router.post('/google-login', async (req, res) => {
     }
 
     try {
-        // const { tokens } = await client.getToken(code);
-        // if (!tokens || !tokens.access_token) {
-        //     return res.status(400).json({
-        //         success: false,
-        //         message: 'Failed to retrieve access token'
-        //     });
-        // }
-
-        // client.setCredentials(tokens);
-        // const oauth2 = google.oauth2({
-        //     auth: client,
-        //     version: 'v2'
-        // });
-        // const userInfo = await oauth2.userinfo.get();
-
-        // if (!userInfo || !userInfo.data || !userInfo.data.id || !userInfo.data.email || !userInfo.data.name) {
-        //     return res.status(400).json({
-        //         success: false,
-        //         message: 'Invalid user information received from Google'
-        //     });
-        // }
-
-        // let user = await User.findOne({ googleId: userInfo.data.id });
-        // if (!user) {
-        //     user = new User({
-        //         googleId: userInfo.data.id,
-        //         email: userInfo.data.email,
-        //         username: userInfo.data.name,
-        //         picture: userInfo.data.picture // Assuming you have a field for storing the user's picture URL
-        //     });
-        //     await user.save();
-        // }
-
-        // const jwtToken = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '12h' });
-
-        const { user, token } = await authenticateWithGoogle(code);
+        const { user, token } = await authenticateWithGoogle(code, isRegister);
         res.status(200).json({
             success: true,
             message: 'Google login successful',

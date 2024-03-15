@@ -25,7 +25,7 @@ function RegisterForm() {
 
     useEffect(() => {
         async function google(code) {
-            const codeResponse = await googleLogin(code);
+            const codeResponse = await googleLogin(code, true);
             console.log("codeResponse: " + codeResponse);
         }
         // Extract the code from the URL

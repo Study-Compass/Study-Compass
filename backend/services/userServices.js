@@ -4,11 +4,19 @@ const jwt = require('jsonwebtoken');
 const User = require('../schemas/user.js');
 
 
-const client = new google.auth.OAuth2(
+const login = new google.auth.OAuth2(
     process.env.GOOGLE_CLIENT_ID,
     process.env.GOOGLE_CLIENT_SECRET,
     process.env.GOOGLE_REDIRECT_URI
 );
+
+
+const register = new google.auth.OAuth2(
+    process.env.GOOGLE_CLIENT_ID,
+    process.env.GOOGLE_CLIENT_SECRET,
+    process.env.GOOGLE_REDIRECT_URI_REGISTER
+);
+
 
 async function registerUser({ username, email, password }) {
     const existingUsername = await User.findOne({ username });
@@ -48,7 +56,9 @@ async function loginUser({ email, password }) {
     return { user, token };
 }
 
-async function authenticateWithGoogle(code) {
+async function authenticateWithGoogle(code, isRegister = false) {
+    const client = isRegister ? register : login;
+
     const { tokens } = await client.getToken(code);
     client.setCredentials(tokens);
 

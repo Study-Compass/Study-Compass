@@ -132,7 +132,7 @@ function Room() {
         setContentState("calendarSearch")
         setCalendarLoading(true)
         const roomNames = await getFreeRooms(query);
-        setResults(roomNames);
+        setResults(roomNames.sort());
         setNumLoaded(10);
         setCalendarLoading(false);
     };
@@ -159,6 +159,7 @@ function Room() {
         console.log(nowQuery);
         const roomNames = await getFreeRooms(nowQuery);
         setResults(roomNames.sort());
+        console.log(results);
         setNumLoaded(10);
         // setLoadedResults(roomNames.sort().slice(0,10));
         setCalendarLoading(false);
@@ -185,7 +186,7 @@ function Room() {
         
     },[numLoaded]);
 
-    useEffect(()=>{console.log("loaded results change detected", loadedResults)},[loadedResults]);
+    // useEffect(()=>{console.log("loaded results change detected", loadedResults)},[loadedResults]);
 
     const addQuery = (key, newValue) => {
         setNoQuery(false);
@@ -251,7 +252,7 @@ function Room() {
         }
         // console.log(`noquery: ${noquery}`);
         setResults([]);
-        console.log("query: ", query);
+        // console.log("query: ", query);
         if (!noquery) {
             fetchFreeRooms();
         }
@@ -259,13 +260,14 @@ function Room() {
     }, [query])
 
     useEffect(()=>{
-        console.log("contentstate",contentState);
+        // console.log("contentstate",contentState);
         if(contentState === "empty"){
             setNumLoaded(0);
             setLoadedResults([]);
         }
     },[contentState]);
 
+    useEffect(()=>{console.log(results)},[results]);
     
     function changeURL(option) {
         navigate(`/room/${option}`, { replace: true });
@@ -289,7 +291,6 @@ function Room() {
     const [viewport, setViewport] = useState("100vh");
     useEffect(() => {
         setViewport((window.innerHeight) + 'px');
-        console.log('adjusting')
     },[]);
 
     return (

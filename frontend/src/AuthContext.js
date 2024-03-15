@@ -60,10 +60,10 @@ export const AuthProvider = ({ children }) => {
             throw error;
         }
     };
-
-    const googleLogin = async (code) => {
+    
+    const googleLogin = async (code, isRegister) => {
         try {
-          const response = await axios.post('/google-login', { code });
+          const response = await axios.post('/google-login', { code, isRegister });
           // Handle response from the backend (e.g., storing the token, redirecting the user)
           console.log('Backend response:', response.data);
           localStorage.setItem('token', response.data.data.token);

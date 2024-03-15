@@ -24,7 +24,7 @@ function LoginForm() {
     useEffect(() => {
       if (isAuthenticated){
         console.log("logged in already");
-        navigate('room/none')
+        navigate('/room/none')
       }
     },[isAuthenticated, navigate]);
 
@@ -59,7 +59,7 @@ function LoginForm() {
 
     useEffect(() => {
         async function google(code) {
-            const codeResponse = await googleLogin(code);
+            const codeResponse = await googleLogin(code, false);
             console.log("codeResponse: " + codeResponse);
         }
         // Extract the code from the URL
@@ -67,14 +67,12 @@ function LoginForm() {
         const code = queryParams.get('code');
         if (code) {
             setLoadContent(false);
-            google(code); //failsafe for double querying, still double querying, but it's fine
+            google(code); 
             console.log("code: " + code);
         } else {
             setLoadContent(true);
         }
     }, [location]);
-
-
 
     const google = useGoogleLogin({
         onSuccess: () => { console.log("succeeded") },
