@@ -1,5 +1,4 @@
 import './TimeLabelColumn.css';
-import '../../assets/fonts.css';
 
 function TimeLabelColumn(){
     return (

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import './Classroom.css';
 import leftArrow from '../../assets/leftarrow.svg';
 import { useNavigate } from 'react-router-dom';
-
+import Bookmark from '../Interface/Bookmark/Bookmark';
 
 function Classroom({ name, room, state, setState}) {
     const [image, setImage] = useState("")
@@ -49,7 +49,12 @@ function Classroom({ name, room, state, setState}) {
                     <img src={leftArrow} alt="back arrow" ></img>
                     <p>back to results</p>
                 </div> : "" }
-                <h1>{name}</h1>
+                <div className="header-row">
+                    <h1>{name}</h1>
+                    <div className="bookmark-container">
+                        <Bookmark room={room} />
+                    </div>
+                </div>
             </div>
         </div>
     );
