@@ -12,7 +12,7 @@ const findNext = (schedule) => {
     const today = new Date();
     const day = 1;
     const minutes = (today.getHours()*60) + today.getMinutes()-500;
-    console.log(minutes);
+    // console.log(minutes);
 
     if(day === 0 || day === 6){
         return "for the day";
