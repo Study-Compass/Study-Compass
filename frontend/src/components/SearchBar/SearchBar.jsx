@@ -3,7 +3,6 @@ import './SearchBar.css';
 import x from '../../assets/x.svg';
 import { useNavigate } from 'react-router-dom';
 import tab from '../../assets/tab.svg';
-import { set } from 'mongoose';
 
 //need to add support for abbreviated versions
 function SearchBar({ data, onEnter, room, onX}) {

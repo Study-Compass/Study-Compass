@@ -1,6 +1,6 @@
 import React from 'react';
 import './App.css';
-import Room from './pages/Room';
+import Room from './pages/Room/Room';
 import Login from './pages/Login';
 import Register from './pages/Register/Register';
 import Redirect from './pages/Redirect/Redirect';

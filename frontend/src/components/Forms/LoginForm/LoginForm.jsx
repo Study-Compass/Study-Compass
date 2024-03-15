@@ -78,9 +78,13 @@ function LoginForm() {
         onSuccess: () => { console.log("succeeded") },
         flow: 'auth-code',
         ux_mode: 'redirect',
-        onFailure: () => { console.log("failed") },
+        onFailure: () => {failed("Google login failed. Please try again")},
     })
 
+    function failed(message){
+        navigate('/login');
+        setErrorText(message);
+    }
     function register(){
         navigate('/register');
     }

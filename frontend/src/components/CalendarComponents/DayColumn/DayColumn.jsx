@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import './DayColumn.css';
-import '../../assets/fonts.css'
+import '../../../assets/fonts.css'
 import TimeLabelColumn from '../TimeLabelColumn/TimeLabelColumn';
 
 function DayColumn({day, dayEvents, eventColors, empty, add, remove, queries}){
@@ -193,6 +193,8 @@ function DayColumn({day, dayEvents, eventColors, empty, add, remove, queries}){
                 return (
                     
                     <div 
+                     key={event.id || `event-${index}`}
+
                         className="event"
                         style={{
                             gridRowStart: rowStart,

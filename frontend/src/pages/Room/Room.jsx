@@ -1,22 +1,22 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import Calendar from '../components/Calendar/Calendar';
+import Calendar from '../../components/CalendarComponents/Calendar/Calendar.jsx';
 import './Room.css';
-import Header from '../components/Header/Header';
-import SearchBar from '../components/SearchBar/SearchBar';
-import useAuth from '../hooks/useAuth';
-import { useCache } from '../CacheContext';
-import Classroom from '../components/Classroom/Classroom';
-import MobileCalendar from '../components/MobileCalendar/MobileCalendar.jsx';
-import Loader from '../components/Loader/Loader.jsx'
-import { findNext } from "./RoomHelpers.js";
+import Header from '../../components/Header/Header.jsx';
+import SearchBar from '../../components/SearchBar/SearchBar.jsx';
+import useAuth from '../../hooks/useAuth.js';
+import { useCache } from '../../CacheContext.js';
+import Classroom from '../../components/Classroom/Classroom.jsx';
+import MobileCalendar from '../../components/CalendarComponents/MobileCalendar/MobileCalendar.jsx';
+import Loader from '../../components/Loader/Loader.jsx'
+import { findNext } from "../RoomHelpers.js";
 
-import chevronUp from '../assets/chevronup.svg';
+import chevronUp from '../../assets/chevronup.svg';
 
-import dummyData from '../dummyData.js'
+import dummyData from '../../dummyData.js'
 
 
-import { debounce} from '../Query.js';
+import { debounce} from '../../Query.js';
 
 /*
 STATES
@@ -77,6 +77,34 @@ function Room() {
       // Remove event listener on cleanup
       return () => window.removeEventListener('resize', handleResize);
     }, []);
+
+    const resultRef = useRef(null);
+
+    useEffect(() => {
+        const container = resultRef.current;
+        const handleScroll = () => {
+          // Calculate if the scroll has reached the bottom of the container
+          const scrollPosition = container.scrollTop + container.offsetHeight;
+          const containerHeight = container.scrollHeight;
+    
+          // Check if the scroll has reached the bottom
+          if (scrollPosition >= containerHeight) {
+            console.log('Reached the bottom of the container');
+          }
+        };
+    
+        // Add the scroll event listener to the container
+        if (container) {
+          container.addEventListener('scroll', handleScroll);
+        }
+    
+        // Clean up the event listener on component unmount
+        // return () => {
+        //   if (container) {
+        //     container.removeEventListener('scroll', handleScroll);
+        //   }
+        // };
+      }, []);
 
 
     useEffect(() => {
@@ -308,10 +336,10 @@ function Room() {
                         /> : ""}
                         {contentState === "calendarSearch" ? calendarLoading ? "" : <h1 className="resultCount">{results.length} results</h1> : ""}
                         {contentState === "calendarSearch" ? 
-                            <ul className="time-results">
+                            <ul className="time-results" ref={resultRef}>
                                 {loadedResults.map((result, index) => (
                                     <li 
-                                        key={index} 
+                                        key={result.room.name} 
                                         value={result.room.name} 
                                         onMouseOver={() => {debouncedFetchData(result.room._id)}} 
                                         onMouseLeave={()=>{debouncedFetchData("none")}}

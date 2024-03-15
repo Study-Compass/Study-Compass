@@ -29,13 +29,16 @@
     transition:opacity 0.3s,
                 height 0.5s,
                 border 0.5s;
-    position: relative;
+    position: absolute;
+    background-color: transparent;
 }
             
 .popup-active{
     border: 1px solid var(--border);
     height:100px;
     opacity: 1;
+    background-color: white;
+    z-index: 20;
 }
 
 .profile-picture button{
