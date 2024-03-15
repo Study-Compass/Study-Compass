@@ -55,7 +55,7 @@ export const AuthProvider = ({ children }) => {
                 console.log(response.data);
             }
         } catch (error) {
-            console.error('Login failed:', error);
+            // console.error('Login failed:', error);
             // Handle login error
             throw error;
         }

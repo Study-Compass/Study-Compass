@@ -80,6 +80,9 @@ export const CacheProvider = ({children}) =>{
     
     // no cache support for now, very unlikely to be called multiple times
     const getBatch = async (queries) => {
+        if(queries.length === 0){
+            return [];
+        }
         try{
             const response = await axios.post('/getbatch', {queries, exhaustive: true});
             const responseBody = response.data;

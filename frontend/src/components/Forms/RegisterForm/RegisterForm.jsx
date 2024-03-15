@@ -5,6 +5,8 @@ import googleLogo from '../../../assets/googleG.svg';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import useAuth from '../../../hooks/useAuth';
 import { useGoogleLogin } from '@react-oauth/google';
+import circleWarning from '../../../assets/circle-warning.svg';
+
 
 
 function RegisterForm() {
@@ -17,6 +19,7 @@ function RegisterForm() {
     });
     const [sent, setSent] = useState(false);
     const [loadContent, setLoadContent] = useState(false);
+    const [errorText, setErrorText] = useState("");
 
 
     let navigate = useNavigate();
@@ -74,7 +77,10 @@ function RegisterForm() {
             await login(formData);
             navigate('/room/none', { replace: true });
         } catch (error) {
-            console.error('Registration failed:', error);
+            if(error.response.status === 400){
+                setErrorText("Username or Email already exists");
+            }
+            // console.error('Registration failed:', error);
             // Handle errors (e.g., display error message)
         }
     }
@@ -97,6 +103,13 @@ function RegisterForm() {
     return (
         <form onSubmit={handleSubmit}>
             <h1>Register</h1>
+            {errorText !== "" && 
+                <div className="error"
+                    ><img src={circleWarning} alt="error"></img>
+                    {errorText}
+                </div>
+            }
+
             <div className="username">
                 <p>Username</p>
                 <input type="text" name="username" value={formData.username} onChange={handleChange} placeholder="Username" required />

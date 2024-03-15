@@ -193,6 +193,8 @@ function DayColumn({day, dayEvents, eventColors, empty, add, remove, queries}){
                 return (
                     
                     <div 
+                     key={event.id || `event-${index}`}
+
                         className="event"
                         style={{
                             gridRowStart: rowStart,
