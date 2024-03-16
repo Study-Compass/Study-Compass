@@ -3,7 +3,7 @@
     position: relative;
 }
 
-.profile-picture img{
+.profile-picture .profile{
     height:35px;
     width:35px;
     z-index: 3;
@@ -20,22 +20,25 @@
     display:flex;
     flex-direction: column;
     z-index: 1; 
-    height:45px;
-    width:200px;
-    right:0;
-    top:0;
-    border-radius: 23px;
+    width:230px;
+    right:10px;
+    top:50px;
+    box-sizing: border-box;
+    border-radius: 15px;
     background-color: white;
     transition:opacity 0.3s,
-                height 0.5s,
-                border 0.5s;
+                height 0.5s;
     position: absolute;
     background-color: transparent;
+    border: 1px solid var(--lighterborder);
+    opacity: 0;
+    overflow:hidden;
+    padding: 0 0 4px 0;
 }
             
 .popup-active{
-    border: 1px solid var(--border);
-    height:100px;
+    border: 1px solid var(--lighterborder);
+    height:auto;
     opacity: 1;
     background-color: white;
     z-index: 20;
@@ -61,17 +64,87 @@
 }
 
 .popup-content{
+    margin:5px;
     height:45px;
     display:flex;
     flex-direction: row;
     width:100%;
     align-items: center;
-    justify-content: space-between;
+    justify-content: start;
 }
 
-.popup-content p{
+.popup-content .profile{
+    height:40px;
+    width:40px;
+}
+
+.popup-content h3{
+    transform:translateY(-2px);
     flex-grow:1;
+    font-size:17px;
     text-align: center;
     font-family:'Satoshi';
     color:var(--text);
+    margin:0;
+}
+.profile-info{
+    display:flex;
+    flex-direction: column;
+    margin-left:5px;
+    height:35px;
+}
+
+.badges{
+    height:15px;
+}
+
+.badge{
+    border-radius: 5px;
+    width: fit-content;
+}
+
+.badge p{
+    margin:0 7px;
+    color:white;
+    font-size:12px;
+    font-family: 'Inter';
+    font-weight:600;
+}
+
+hr{
+    margin:4px 0;
+    background-color: var(--lighterborder);
+    height:1px;
+    border:none;
+    width:100%;
+}
+
+
+.menu-item{
+    display:flex;
+    flex-direction: row;
+    align-items: center;
+    gap:10px;
+    /* margin:5px 0; */
+    padding:5px;
+    padding-left:15px;
+}
+
+.menu-item .icon{
+    height:22px;
+    width:22px;
+}
+
+.menu-item p{
+    margin:0;
+    font-family: 'Inter';
+    font-weight: 600;
+    color:var(--text);
+    font-size:13.5px;
+}
+
+.menu-item:hover{
+    background-color: var(--lighterborder);
+    border-radius: 5px;
+    cursor:pointer;
 }

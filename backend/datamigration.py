@@ -44,12 +44,12 @@ def addNewField():
         print(e)
 
     db = client['studycompass']
-    collection = db['classrooms1']
+    collection = db['users']
     result = collection.update_many(
         {},
         {
             '$set': {
-                'image': "/"
+                'saved': []
             }
         }
     )
@@ -66,4 +66,4 @@ def ping():
     except Exception as e:
         print(e)
 
-ping() # call the function to add new field to the collection
+addNewField() # call the function to add new field to the collection

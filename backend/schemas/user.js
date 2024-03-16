@@ -31,6 +31,10 @@ const userSchema = new mongoose.Schema({
         required: false,
         trim: true
     },
+    saved: {
+        type: Array,
+        default: [],
+    }
     // you can add more fields here if needed, like 'createdAt', 'updatedAt', etc.
 }, {
     timestamps: true // automatically adds 'createdAt' and 'updatedAt' fields
