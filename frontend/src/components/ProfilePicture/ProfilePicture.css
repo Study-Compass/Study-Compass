@@ -82,7 +82,7 @@
     transform:translateY(-2px);
     flex-grow:1;
     font-size:17px;
-    text-align: center;
+    text-align: left;
     font-family:'Satoshi';
     color:var(--text);
     margin:0;
@@ -96,6 +96,8 @@
 
 .badges{
     height:15px;
+    display: flex;
+    gap:5px
 }
 
 .badge{

@@ -24,6 +24,9 @@ function ProfilePicture(){
                             <div className="badge" style={{backgroundColor:"#A0C4FF"}}>
                                 <p>beta</p>
                             </div>
+                            <div className="badge" style={{backgroundColor:"#EA4335"}}>
+                                <p>admin</p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -43,7 +46,7 @@ function ProfilePicture(){
                 </div>
                 <hr />
                 <div className="menu-item" onClick={logout}>
-                    <img className="icon" src={Logout}   alt="log out" />
+                    <img className="icon" src={Logout} alt="log out" />
                     <p>Logout</p>
                 </div>
                 {/* { showPopup ? <button onClick={logout}>logout</button>: "" } */}
