@@ -1,10 +1,11 @@
 import React from 'react';
 import './Bookmark.css';
 
-function Bookmark({ name, room }) {
+function Bookmark({ room, isChecked, setIsChecked }) {
+    const initialChecked = isChecked;
     return (
         <label class="ui-bookmark">
-            <input type="checkbox" />
+            <input type="checkbox" checked={initialChecked}/>
             <div class="bookmark">
                 <svg viewBox="0 0 32 32">
                     <g>
