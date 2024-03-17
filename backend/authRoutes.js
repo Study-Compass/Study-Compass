@@ -64,7 +64,8 @@ router.post('/login', async (req, res) => {
                 user: {
                     username: user.username,
                     email: user.email,
-                    // Add other fields but exclude sensitive ones
+                    picture : user.picture,
+                    admin : user.admin
                 }
             }
         });
@@ -92,7 +93,8 @@ router.get('/validate-token', verifyToken, async (req, res) => {
                 user: {
                     username: user.username,
                     email: user.email,
-                    // Add other fields but exclude sensitive ones
+                    picture : user.picture,
+                    admin : user.admin
                 }
             }
         });

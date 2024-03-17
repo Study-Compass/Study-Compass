@@ -3,9 +3,26 @@ import './Classroom.css';
 import leftArrow from '../../assets/leftarrow.svg';
 import { useNavigate } from 'react-router-dom';
 import Bookmark from '../Interface/Bookmark/Bookmark';
+import useAuth from '../../hooks/useAuth.js';
+import '../../assets/fonts.css'
+import EditAttributes from './EditAttributes/EditAttributes.jsx';
+
+import Edit from '../../assets/Icons/Edit.svg';
+import Outlets from '../../assets/Icons/Outlets.svg';
+import Windows from '../../assets/Icons/Windows.svg';
+import Printer from '../../assets/Icons/Printer.svg';
+
+
 
 function Classroom({ name, room, state, setState}) {
     const [image, setImage] = useState("")
+    const { user } = useAuth();
+
+    const attributeIcons = {
+        "outlets": Outlets,
+        "windows": Windows,
+        "printer": Printer
+    };
 
     const navigate = useNavigate();
 
@@ -36,6 +53,8 @@ function Classroom({ name, room, state, setState}) {
         setState("calendarSearch");
     };
 
+    console.log(user);
+
     return (
         <div className='classroom-component'>
             <div className={`image ${image === "" ? "shimmer": ""}`}>
@@ -55,7 +74,19 @@ function Classroom({ name, room, state, setState}) {
                         <Bookmark room={room} />
                     </div>
                 </div>
+                <div className="attributes">
+                    {room && room.attributes.map((attribute, index) => {
+                        return (
+                            <div className="attribute" key={index}>
+                                <img src={attributeIcons[attribute]} alt={attribute} />
+                                {attribute}
+                            </div>
+                        );
+                    })}
+                    {user && user.admin ? <div className="attribute"><img src={Edit} alt="" /></div> : "" }
+                </div>
             </div>
+            {room ? <EditAttributes room={room} attributes={room.attributes} />: ""}
         </div>
     );
 }

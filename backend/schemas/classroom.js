@@ -10,6 +10,10 @@ const classroomSchema = new Schema({
         type: String,
         required: true
     },
+    attributes: {
+        type: Array,
+        required: true
+    }
 });
 
 

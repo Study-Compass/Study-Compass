@@ -139,5 +139,25 @@ router.post('/getbatch', async (req, res) => {
     }
 });
 
+router.post('/changeclassroom', async (req, res) => {
+    const id = req.body.id;
+    const attributes = req.body.attributes;
+
+    try{
+        const classroom = await Classroom.findOne({_id: id});
+
+        if (!classroom) {
+            return res.status(404).json({ success: false, message: "Classroom not found" });
+        }
+
+        classroom.attributes = attributes;
+        await classroom.save();
+        console.log(`POST: /changeclassroom/${id}`);
+        res.json({ success: true, message: "Room changed" });
+    } catch (error) {
+        res.status(500).json({success: false, message: 'Error changing data', error: error.message });
+    }
+});
+
 
 module.exports = router;

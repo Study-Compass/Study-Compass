@@ -33,7 +33,9 @@ def updateClassroom():
         }
         schedules.insert_one(schedule)
 
-def addNewField():
+
+# collectionName should be a string, attribute should be an object like { 'username' : '' }
+def addNewField(collectionName, attribute):
     load_dotenv() # loading .env file
     uri = os.environ.get('MONGO_URL') # fetching URI string
     client = MongoClient(uri, server_api=ServerApi('1')) 
@@ -44,13 +46,11 @@ def addNewField():
         print(e)
 
     db = client['studycompass']
-    collection = db['users']
+    collection = db[collectionName]
     result = collection.update_many(
         {},
         {
-            '$set': {
-                'saved': []
-            }
+            '$set': attribute,
         }
     )
 
@@ -114,4 +114,7 @@ def write_items_with_root_image_to_file(file_path):
     print(f'Items with image attribute set to "/" have been written to {file_path}')
 
 
-write_items_with_root_image_to_file("not-done.txt") # call the function to add new field to the collection
+# write_items_with_root_image_to_file("not-done.txt") # call the function to add new field to the collection
+# addNewField('users',{'saved' : []})
+# addNewField('classrooms1',{'attributes': []})
+addNewField('users',{'admin': False})

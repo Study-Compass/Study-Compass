@@ -19,7 +19,7 @@ export const AuthProvider = ({ children }) => {
             };
             // Make the GET request to the validate-token endpoint
             const response = await axios.get('/validate-token', config);
-            
+
             console.log('Token validation response:', response.data);
             // Handle response...
             if (response.data.success) {
@@ -60,25 +60,22 @@ export const AuthProvider = ({ children }) => {
             throw error;
         }
     };
-    
+
     const googleLogin = async (code, isRegister) => {
         try {
-          const response = await axios.post('/google-login', { code, isRegister });
-          // Handle response from the backend (e.g., storing the token, redirecting the user)
-          console.log('Backend response:', response.data);
-          localStorage.setItem('token', response.data.data.token);
-        setIsAuthenticated(true);
-        setUser(response.data.data.user);
-          // For example, redirect the user or store the received token in local storage
+            const response = await axios.post('/google-login', { code, isRegister });
+            // Handle response from the backend (e.g., storing the token, redirecting the user)
+            console.log('Backend response:', response.data);
+            localStorage.setItem('token', response.data.data.token);
+            setIsAuthenticated(true);
+            setUser(response.data.data.user);
+            // For example, redirect the user or store the received token in local storage
         } catch (error) {
-          console.error('Error sending code to backend:', error);
+            console.error('Error sending code to backend:', error);
         }
-      };
-    
-    // const googleL2ogin = (token) => {
-    //     localStorage.setItem('token', token);
-    //     setIsAuthenticated(true);
-    // };
+    };
+
+
 
     const logout = () => {
         localStorage.removeItem('token');
