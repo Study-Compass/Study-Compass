@@ -34,6 +34,10 @@ const userSchema = new mongoose.Schema({
     saved: {
         type: Array,
         default: [],
+    },
+    admin: {
+        type: Boolean,
+        default: false,
     }
     // you can add more fields here if needed, like 'createdAt', 'updatedAt', etc.
 }, {

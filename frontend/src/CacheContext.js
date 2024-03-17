@@ -108,6 +108,7 @@ export const CacheProvider = ({children}) =>{
             timeout = setTimeout(later, wait);
         };
     }
+
     return (
         <CacheContext.Provider value={{ getRooms, getRoom, getFreeRooms, getBatch, debounce }}>
             {children}
