@@ -349,7 +349,7 @@ function Room() {
                                                 <div className="outer-dot"></div>
                                                 <div className="inner-dot"></div>
                                             </div>
-                                            free {width >= 800 ? findNext(result.data.weekly_schedule).message : ''}
+                                            free { result ? findNext(result.data.weekly_schedule).message : ''}
                                         </div> : ""}
                                     </li>
                                 ))}
