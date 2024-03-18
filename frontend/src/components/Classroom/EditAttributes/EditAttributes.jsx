@@ -12,7 +12,11 @@ import X from '../../../assets/x.svg';
 
 import { changeClasroom } from '../../../DBInteractions.js';
 
-function EditAttributes({room, attributes, setEdit}){
+import { useNotification } from '../../../NotificationContext.js';
+
+function EditAttributes({room, attributes}){
+
+    const { addNotification } = useNotification();
     const navigate = useNavigate();
     const { user } = useAuth();
 

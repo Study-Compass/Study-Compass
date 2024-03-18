@@ -92,3 +92,8 @@ button.active{
     border: 1px solid var(--lightred);
     color: #414141;
 } */
+
+.notification{
+    position: absolute;
+    
+}

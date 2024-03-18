@@ -10,6 +10,7 @@ import Classroom from '../../components/Classroom/Classroom.jsx';
 import MobileCalendar from '../../components/CalendarComponents/MobileCalendar/MobileCalendar.jsx';
 import Loader from '../../components/Loader/Loader.jsx'
 import { findNext } from "../RoomHelpers.js";
+import { useNotification } from '../../NotificationContext.js';
 
 import chevronUp from '../../assets/chevronup.svg';
 
@@ -50,6 +51,8 @@ function Room() {
         'F': [],
     });
     const [noquery, setNoQuery] = useState(true);
+
+    const { addNotification } = useNotification();
 
     function clearQuery(){
         setQuery({
@@ -321,6 +324,7 @@ function Room() {
         setViewport((window.innerHeight) + 'px');
     },[]);
 
+    // addNotification({message: "Welcome to the room page!", type: "info"});
     return (
         <div className="room" style={{ height: width < 800 ? viewport : '100vh' }}>
             <Header />
