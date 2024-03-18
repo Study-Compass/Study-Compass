@@ -4,13 +4,21 @@
     height:100%;
     top:0;
     background-color: white;
-    padding:20px;
+    padding:35px 20px 20px 20px;
     border-radius: 14px;
     align-self: center;
     justify-self: center;
     top:20%;
     border: 2px solid var(--lightborder);
     box-sizing: border-box;
+}
+
+.edit-attributes .x{
+    position:absolute;
+    top:15px;
+    right:15px;
+    margin:0;
+    padding:0;
 }
 
 .edit-attributes .attribute{

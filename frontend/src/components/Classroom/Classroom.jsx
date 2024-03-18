@@ -18,6 +18,7 @@ function Classroom({ name, room, state, setState}) {
     const [image, setImage] = useState("")
     const { user } = useAuth();
 
+    const [edit, setEdit] = useState(false);
     const attributeIcons = {
         "outlets": Outlets,
         "windows": Windows,
@@ -78,15 +79,15 @@ function Classroom({ name, room, state, setState}) {
                     {room && room.attributes.map((attribute, index) => {
                         return (
                             <div className="attribute" key={index}>
-                                <img src={attributeIcons[attribute]} alt={attribute} />
+                                {attribute in attributeIcons ? <img src={attributeIcons[attribute]} alt={attribute} /> : ""}
                                 {attribute}
                             </div>
                         );
                     })}
-                    {user && user.admin ? <div className="attribute"><img src={Edit} alt="" /></div> : "" }
+                    {user && user.admin ? <div className="attribute" onClick={()=>{setEdit(!edit)}}><img src={Edit} alt=""  /></div> : "" }
                 </div>
             </div>
-            {room ? <EditAttributes room={room} attributes={room.attributes} />: ""}
+            {user && user.admin ? room ? edit ? <EditAttributes room={room} attributes={room.attributes} setEdit={setEdit}/>: "" : "" : ""}
         </div>
     );
 }

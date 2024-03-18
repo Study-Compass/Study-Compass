@@ -22,7 +22,7 @@ function ProfilePicture(){
                         <h3>James Liu</h3>
                         <div className="badges">
                             <div className="badge" style={{backgroundColor:"#A0C4FF"}}>
-                                <p>beta</p>
+                                <p>beta tester</p>
                             </div>
                             <div className="badge" style={{backgroundColor:"#EA4335"}}>
                                 <p>admin</p>

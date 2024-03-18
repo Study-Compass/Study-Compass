@@ -10,8 +10,8 @@ function minutesToTime(minutes){
 const findNext = (schedule) => {
     const days = ["M","T","W","R","F"];
     const today = new Date();
-    const day = 1;
-    const minutes = (today.getHours()*60) + today.getMinutes()-500;
+    const day = today.getDay();
+    const minutes = (today.getHours()*60) + today.getMinutes();
     // console.log(minutes);
 
     if(day === 0 || day === 6){

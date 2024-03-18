@@ -12,10 +12,22 @@ function SearchBar({ data, onEnter, room, onX}) {
     const [searchInput, setSearchInput] = useState(room.toLowerCase());
     const [results, setResults] = useState([]);
     const [lower, setLower] = useState("")
+    const [dataAbb, setDataAbb] = useState([]);
 
     const [isFocused, setIsFocused] = useState(false);
     const [selected, setSelected] = useState(0);
     
+    const abbreviations = {
+        "DCC" : "Darrin Communications Center",
+        "JEC" : "Jonsson Engineering Center",
+        "JROWL" : "Jonsson-Rowland Science Center",
+        "LOW" : "Low Center for Industrial Inn.",
+        "PITTS" : "Pittsburgh Building",
+        "SAGE" : "Russell Sage Laboratory",
+        "VCC" : "Voorhees Computing Center",
+        "WALK" : "Walker Laboratory",
+        "WINS" : "Winslow Building",
+    }
 
     const inputRef = useRef(null);
     const shadowRef = useRef(null);
@@ -80,9 +92,8 @@ function SearchBar({ data, onEnter, room, onX}) {
                     }
                 }
             }
-            const firstFifteen = filteredResults.slice(0, 15);
-            setResults(firstFifteen);
-            console.log(firstFifteen);
+            // const firstFifteen = filteredResults.slice(0, 15);
+            setResults(filteredResults);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [searchInput, data]);
