@@ -7,6 +7,16 @@ function minutesToTime(minutes){
     return `${hours}:${mins.toString().padStart(2, '0')}`;
 }
 
+const findChain = (schedule, time) => {
+    for(let i=0;i<schedule.length;i++){
+        const event = schedule[i];
+        if(event.start_time === time){
+            return findChain(schedule, event.end_time);
+        }
+    }
+    return time;
+};
+
 const findNext = (schedule) => {
     const days = ["M","T","W","R","F"];
     const today = new Date();
@@ -15,21 +25,22 @@ const findNext = (schedule) => {
     // console.log(minutes);
 
     if(day === 0 || day === 6){
-        return "for the day";
+        return { message: "for the day", free: true };
     } else {
-        if(schedule[days[day]].length === 0 ){
-            return "for the day";
+        if(schedule[days[day-1]].length === 0 ){
+            return{ message: "for the day", free: true };
         }
         let free = true;
         let next = 9999;
-        for(let i=0; i<schedule[days[day]].length;i++){
-            const event = schedule[days[day]][i];
+        for(let i=0; i<schedule[days[day-1]].length;i++){
+            const event = schedule[days[day-1]][i];
             // console.log('time:', minutes, "compare", event.start_time);
             if(event.end_time < minutes){ // passed already
                 continue;
             } else if (event.start_time < minutes){ // right now
                 free = false;
                 next = event.end_time;
+                next = findChain(schedule[days[day-1]], next);
                 break;
             } else { // in the future
                 next = Math.min(next, event.start_time); 
@@ -37,12 +48,11 @@ const findNext = (schedule) => {
         }
         if(free === true && next === 9999){
             console.log("here");
-
-            return "for the day"
+            return { message: "for the day", free: true };
         } else if (free === false){
-            return `at ${minutesToTime(next)}`
+            return { message: `at ${minutesToTime(next)}`, free };
         } else {
-            return `until ${minutesToTime(next)}`
+            return { message: `until ${minutesToTime(next)}`, free };
         }   
     }
 };

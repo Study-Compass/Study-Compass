@@ -122,12 +122,6 @@ select{
     margin: 5px 0;
 }
 
-.time-results li .free-until{
-    font-weight:500;
-    margin: 5px 0;
-    font-size:13px;
-}
-
 ::-webkit-scrollbar {
     width: 10px; /* or height for horizontal scrollbars */
   }
@@ -222,7 +216,6 @@ select{
     outline:none;
     border:1px solid var(--border);
     border-radius: 5px;
-
 }
 
 .free-now:hover{
@@ -233,6 +226,77 @@ select{
     height:20%;
     width:20%;
 }
+
+
+.free-until{
+    font-weight:500;
+    margin: 5px 0 10px 0;
+    font-size:13px;
+    display:flex;
+    align-items:center;
+    gap:5px;
+    color:var(--green);
+    padding:0 18px;
+    position: relative;
+}
+
+
+.dot{
+    height:18px;
+    width:18px;/*
+    background-color:var(--green);
+    border-radius:50%;
+    animation: pulse 1.5s infinite; */
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    left:0;
+    margin-top:1px
+}
+
+.outer-dot{
+    height:12px;
+    width:12px;
+    background-color:var(--green);
+    border-radius:50%;
+    animation: pulse 1.5s infinite;
+    position: absolute;
+    justify-self: center;
+    align-self: center;
+
+}
+
+.inner-dot{
+    height:12px;
+    width:12px;
+    background-color:var(--green);
+    border-radius:50%;
+    /* animation: dot 1.5s infinite; */
+    position: absolute;
+    justify-self: center;
+    align-self: center;
+
+}
+
+.outer-dot, .inner-dot {
+    transform: scale(0.5);
+    transform-origin: center;
+}
+
+@keyframes pulse {
+    0% {
+      transform: scale(0.5);
+      opacity: 0;
+    }
+    70%{
+        transform: scale(0.9);
+        opacity: 0.5;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
 
 @media(max-width:500px){
     select{

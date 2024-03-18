@@ -12,9 +12,13 @@ import Outlets from '../../assets/Icons/Outlets.svg';
 import Windows from '../../assets/Icons/Windows.svg';
 import Printer from '../../assets/Icons/Printer.svg';
 
+import { findNext } from '../../pages/Room/RoomHelpers.js';
 
+import '../../pages/Room/Room.css';
 
-function Classroom({ name, room, state, setState}) {
+function Classroom({ name, room, state, setState, schedule }) {
+
+    console.log(schedule);
     const [image, setImage] = useState("")
     const { user } = useAuth();
 
@@ -27,15 +31,15 @@ function Classroom({ name, room, state, setState}) {
 
     const navigate = useNavigate();
 
-    useEffect(()=>{
-        setImage("");
-    },[room])
-    
     useEffect(() => {
-        if(room === null || room === undefined){
+        setImage("");
+    }, [room])
+
+    useEffect(() => {
+        if (room === null || room === undefined) {
             return;
         }
-        if(room.image === "/"){
+        if (room.image === "/") {
             console.log("image is /");
             setImage("https://www.jmzarchitects.com/wp-content/uploads/2020/03/17112901-2-scaled.jpg");
         } else {
@@ -43,10 +47,10 @@ function Classroom({ name, room, state, setState}) {
         }
     }, [room]);
 
-    useEffect(() => {console.log(state)},[state]);
+    useEffect(() => { console.log(state) }, [state]);
 
-    
-    if(name === "none" || !name){
+
+    if (name === "none" || !name) {
         return "";
     }
 
@@ -58,22 +62,29 @@ function Classroom({ name, room, state, setState}) {
 
     return (
         <div className='classroom-component'>
-            <div className={`image ${image === "" ? "shimmer": ""}`}>
-                {!(image === "")? 
+            <div className={`image ${image === "" ? "shimmer" : ""}`}>
+                {!(image === "") ?
                     <img src={image} alt="classroom"></img>
-                : ""}
+                    : ""}
             </div>
-            
+
             <div className="classroom-info">
                 {state === "calendarSearchResult" ? <div className="back-to-results" onClick={backtoResults}>
                     <img src={leftArrow} alt="back arrow" ></img>
                     <p>back to results</p>
-                </div> : "" }
+                </div> : ""}
                 <div className="header-row">
                     <h1>{name}</h1>
                     <div className="bookmark-container">
                         <Bookmark room={room} />
                     </div>
+                </div>
+                <div className="free-until">
+                    <div className="dot">
+                        <div className="outer-dot"></div>
+                        <div className="inner-dot"></div>
+                    </div>
+                    free {schedule ? findNext(schedule.weekly_schedule).message: ""}
                 </div>
                 <div className="attributes">
                     {room && room.attributes.map((attribute, index) => {
@@ -84,10 +95,10 @@ function Classroom({ name, room, state, setState}) {
                             </div>
                         );
                     })}
-                    {user && user.admin ? <div className="attribute" onClick={()=>{setEdit(!edit)}}><img src={Edit} alt=""  /></div> : "" }
+                    {user && user.admin ? <div className="attribute" onClick={() => { setEdit(!edit) }}><img src={Edit} alt="" /></div> : ""}
                 </div>
             </div>
-            {user && user.admin ? room ? edit ? <EditAttributes room={room} attributes={room.attributes} setEdit={setEdit}/>: "" : "" : ""}
+            {user && user.admin ? room ? edit ? <EditAttributes room={room} attributes={room.attributes} setEdit={setEdit} /> : "" : "" : ""}
         </div>
     );
 }

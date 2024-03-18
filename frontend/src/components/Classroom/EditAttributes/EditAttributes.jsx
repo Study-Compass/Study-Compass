@@ -14,7 +14,7 @@ import { changeClasroom } from '../../../DBInteractions.js';
 
 import { useNotification } from '../../../NotificationContext.js';
 
-function EditAttributes({room, attributes}){
+function EditAttributes({room, attributes, setEdit}){
 
     const { addNotification } = useNotification();
     const navigate = useNavigate();
@@ -36,6 +36,8 @@ function EditAttributes({room, attributes}){
         const newAttributes = [...attributesAdmin, attribute];
         setAttributes(newAttributes);
         setAdding("");
+        addNotification({message: "Attributes updated"});
+
     };
 
     const handleChange = (e) => {
@@ -45,6 +47,7 @@ function EditAttributes({room, attributes}){
     const handleSubmit = () => {
         console.log("hello");
         changeClasroom(room._id, attributesAdmin);
+        // addNotification({message: "Attributes updated"});
         window.location.reload();
     };
 

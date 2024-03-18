@@ -9,7 +9,7 @@ import { useCache } from '../../CacheContext.js';
 import Classroom from '../../components/Classroom/Classroom.jsx';
 import MobileCalendar from '../../components/CalendarComponents/MobileCalendar/MobileCalendar.jsx';
 import Loader from '../../components/Loader/Loader.jsx'
-import { findNext } from "../RoomHelpers.js";
+import { findNext } from "./RoomHelpers.js";
 import { useNotification } from '../../NotificationContext.js';
 
 import chevronUp from '../../assets/chevronup.svg';
@@ -100,13 +100,6 @@ function Room() {
         if (container) {
           container.addEventListener('scroll', handleScroll);
         }
-    
-        // Clean up the event listener on component unmount
-        // return () => {
-        //   if (container) {
-        //     container.removeEventListener('scroll', handleScroll);
-        //   }
-        // };
       }, []);
 
 
@@ -169,7 +162,7 @@ function Room() {
     };
 
     const fetchFreeNow = async () => {
-        setContentState("calendarSearch")
+        setContentState("freeNowSearch")
         setCalendarLoading(true)
         let nowQuery = {
             'M': [],
@@ -332,14 +325,15 @@ function Room() {
                 <div className="calendar-container">
                     <div className={width < 800 ? "left-mobile" : "left"}>
                         <SearchBar data={rooms} onEnter={changeURL2} room={roomid} onX={onX} />
-                        {contentState === "nameSearch" || contentState === "calendarSearchResult" ? <Classroom 
+                        {contentState === "nameSearch" || contentState === "calendarSearchResult" || contentState === "freeNowSearch" ? <Classroom 
                             name={roomid} 
                             room={room} 
                             state={contentState} 
                             setState={setContentState}
+                            schedule={data}
                         /> : ""}
-                        {contentState === "calendarSearch" ? calendarLoading ? "" : <h1 className="resultCount">{results.length} results</h1> : ""}
-                        {contentState === "calendarSearch" ? 
+                        {contentState === "calendarSearch" || contentState === "freeNowSearch" ? calendarLoading ? "" : <h1 className="resultCount">{results.length} results</h1> : ""}
+                        {contentState === "calendarSearch" || contentState === "freeNowSearch" ? 
                             <ul className="time-results" ref={resultRef}>
                                 {loadedResults.map((result, index) => (
                                     <li 
@@ -350,7 +344,13 @@ function Room() {
                                         onClick={() => {changeURL(result.room.name)}}
                                     >
                                         <h2>{result.room.name.toLowerCase()}</h2>
-                                        <p className="free-until">free {width >= 800 ? findNext(result.data.weekly_schedule) : ''}</p>
+                                        {contentState !== "calendarSearch" ? <div className="free-until">
+                                            <div className="dot">
+                                                <div className="outer-dot"></div>
+                                                <div className="inner-dot"></div>
+                                            </div>
+                                            free {width >= 800 ? findNext(result.data.weekly_schedule).message : ''}
+                                        </div> : ""}
                                     </li>
                                 ))}
                                 {width >= 800 && resultsLoading ? <div className="loader-container"><Loader/></div> : null}
