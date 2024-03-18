@@ -8,23 +8,26 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './AuthContext';
 import { CacheProvider } from './CacheContext';
 import { GoogleOAuthProvider } from '@react-oauth/google';
+import { NotificationProvider } from './NotificationContext';
 
 function App() {
     return (
         <GoogleOAuthProvider clientId="639818062398-k4qnm9l320phu967ctc2l1jt1sp9ib7p.apps.googleusercontent.com">
-            <AuthProvider>
-                <CacheProvider>
-                    <Router>
-                        <Routes>
-                            <Route path="/" element={<Redirect/> }/>
-                            <Route path="/room/:roomid" element={<Room />}/>
-                            <Route path="/register" element={<Register />}/>
-                            <Route path="/login" element={<Login />}/>
+            <NotificationProvider>
+                <AuthProvider>
+                    <CacheProvider>
+                        <Router>
+                            <Routes>
+                                <Route path="/" element={<Redirect/> }/>
+                                <Route path="/room/:roomid" element={<Room />}/>
+                                <Route path="/register" element={<Register />}/>
+                                <Route path="/login" element={<Login />}/>
 
-                        </Routes>
-                    </Router>
-                </CacheProvider>
-            </AuthProvider>
+                            </Routes>
+                        </Router>
+                    </CacheProvider>
+                </AuthProvider>
+            </NotificationProvider>
         </GoogleOAuthProvider>
     );
 }

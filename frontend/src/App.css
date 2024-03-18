@@ -12,6 +12,7 @@
     --border:#B0AFAF;
     --lightborder:#DDDCDC;
     --lighterborder:#E4E5E6;
+    --green: #4DAA57;
 }
 
 .App {
@@ -92,3 +93,61 @@ button.active{
     border: 1px solid var(--lightred);
     color: #414141;
 } */
+.notification-container{
+    position: absolute;
+    display:grid;
+    width:100%;
+    height:100%;
+    pointer-events: none;
+    top:0;
+    left:0;
+}
+
+
+.notification{
+    width: 50%;
+    height: 50px;
+    background-color: white;
+    border: 1px solid var(--lightborder);
+    border-radius: 10px;
+    position:absolute;
+    top: 30px;
+    justify-self: center;   
+    display: flex;
+    align-items: center;
+    justify-content: left;
+    padding: 0 20px; 
+    animation: slideIn 0.3s ease, fadeIn 0.3s ease;
+    transition: all 0.3s ease;
+}
+
+.notification p{
+    font-family: 'Inter';
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--text);
+    margin: 0;
+}
+
+.notification.remove{
+    transform: translateY(-300%);
+
+}
+
+@keyframes slideIn{
+    from{
+        transform: translateY(-100%);
+    }
+    to{
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }

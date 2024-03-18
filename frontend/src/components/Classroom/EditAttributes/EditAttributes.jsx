@@ -7,10 +7,16 @@ import Outlets from '../../../assets/Icons/Outlets.svg';
 import Windows from '../../../assets/Icons/Windows.svg';
 import Printer from '../../../assets/Icons/Printer.svg';
 import Delete from '../../../assets/Icons/Delete.svg';
+import X from '../../../assets/x.svg';
+
 
 import { changeClasroom } from '../../../DBInteractions.js';
 
-function EditAttributes({room, attributes}){
+import { useNotification } from '../../../NotificationContext.js';
+
+function EditAttributes({room, attributes, setEdit}){
+
+    const { addNotification } = useNotification();
     const navigate = useNavigate();
     const { user } = useAuth();
 
@@ -30,6 +36,8 @@ function EditAttributes({room, attributes}){
         const newAttributes = [...attributesAdmin, attribute];
         setAttributes(newAttributes);
         setAdding("");
+        addNotification({message: "Attributes updated"});
+
     };
 
     const handleChange = (e) => {
@@ -39,13 +47,15 @@ function EditAttributes({room, attributes}){
     const handleSubmit = () => {
         console.log("hello");
         changeClasroom(room._id, attributesAdmin);
-        navigate(`/room/${room.name}`);
+        // addNotification({message: "Attributes updated"});
+        window.location.reload();
     };
 
     console.log(room);
 
     return (
         <div className="edit-attributes">
+            <img src={X} alt="" className="x" onClick={()=>{setEdit(false)}}/>
             {attributesAdmin && attributesAdmin.map((attribute, index) => {
                 return (
                     <div className="attribute" key={index}>
@@ -66,6 +76,8 @@ function EditAttributes({room, attributes}){
                 <button className="add" onClick={()=>{addAttribute(adding)}}>add</button>
             </div>
             <button className="save" onClick={handleSubmit}>save</button>
+            <button className="save" onClick={()=>{setEdit(false)}}>cancel</button>
+
         </div>
     )
 }

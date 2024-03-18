@@ -19,7 +19,6 @@
 .popup{
     display:flex;
     flex-direction: column;
-    z-index: 1; 
     width:230px;
     right:10px;
     top:50px;
@@ -34,6 +33,8 @@
     opacity: 0;
     overflow:hidden;
     padding: 0 0 4px 0;
+    z-index: 20;
+    pointer-events: none;
 }
             
 .popup-active{
@@ -41,7 +42,7 @@
     height:auto;
     opacity: 1;
     background-color: white;
-    z-index: 20;
+    pointer-events: all;
 }
 
 .profile-picture button{

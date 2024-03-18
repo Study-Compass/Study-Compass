@@ -12,10 +12,34 @@ function SearchBar({ data, onEnter, room, onX}) {
     const [searchInput, setSearchInput] = useState(room.toLowerCase());
     const [results, setResults] = useState([]);
     const [lower, setLower] = useState("")
+    const [dataAbb, setDataAbb] = useState([]);
 
     const [isFocused, setIsFocused] = useState(false);
     const [selected, setSelected] = useState(0);
-    
+
+    const abbreviations = {
+        "Darrin Communications Center": "DCC",
+        "Jonsson Engineering Center": "JEC",
+        "Jonsson-Rowland Science Center": "JROWL",
+        "Low Center for Industrial Inn.": "LOW",
+        "Pittsburgh Building": "PITTS",
+        "Russell Sage Laboratory": "SAGE",
+        "Voorhees Computing Center": "VCC",
+        "Walker Laboratory": "WALK",
+        "Winslow Building": "WINS",
+    }
+
+    const fullnames = {
+        "DCC" : "Darrin Communications Center",
+        "JEC" : "Jonsson Engineering Center",
+        "JROWL" : "Jonsson-Rowland Science Center",
+        "LOW" : "Low Center for Industrial Inn.",
+        "PITTS" : "Pittsburgh Building",
+        "SAGE" : "Russell Sage Laboratory",
+        "VCC" : "Voorhees Computing Center",
+        "WALK" : "Walker Laboratory",
+        "WINS" : "Winslow Building",
+    }
 
     const inputRef = useRef(null);
     const shadowRef = useRef(null);
@@ -25,6 +49,28 @@ function SearchBar({ data, onEnter, room, onX}) {
 
     const handleInputChange = (event) => {
         setSearchInput(event.target.value);
+    };
+
+    const removeLastWord = str => str.split(' ').slice(0, -1).join(' ');
+
+    useEffect(() => {
+        if(!data){return}
+        let newData = [...data];
+        data.map(item => {
+            if(removeLastWord(item) in abbreviations){
+                newData.push(abbreviations[removeLastWord(item)]+" "+item.split(' ').pop());
+            }
+        });
+        setDataAbb(newData);
+    }, [data]);
+
+    const getFull = (abb) => {
+        console.log(abb);
+        if(removeLastWord(abb) in fullnames){
+            return fullnames[removeLastWord(abb)]+" "+abb.split(' ').pop();
+        } else {
+            return abb;
+        }
     };
 
     useEffect(() => {
@@ -56,10 +102,10 @@ function SearchBar({ data, onEnter, room, onX}) {
             setLower("");
         } else {
             setSelected(0);
-            const filteredResults = data.filter(item =>
+            const filteredResults = dataAbb.filter(item =>
                 item.toLowerCase().startsWith(searchInput)
             );
-            const newfilteredResults = data.filter(item => {
+            const newfilteredResults = dataAbb.filter(item => {
                 // Convert item to lowercase and check if it includes the searchInput.
                 const includesSearchInput = item.toLowerCase().includes(searchInput.toLowerCase());
                 // Check if the item is not already in the results.
@@ -80,12 +126,11 @@ function SearchBar({ data, onEnter, room, onX}) {
                     }
                 }
             }
-            const firstFifteen = filteredResults.slice(0, 15);
-            setResults(firstFifteen);
-            console.log(firstFifteen);
+            // const firstFifteen = filteredResults.slice(0, 15);
+            setResults(filteredResults);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [searchInput, data]);
+    }, [searchInput, dataAbb]);
 
     function next(name){
         setSearchInput(name.toLowerCase());
@@ -101,7 +146,7 @@ function SearchBar({ data, onEnter, room, onX}) {
         if (event.key === 'Enter') {
             event.preventDefault();
             if (results.length > 0) {
-                next(results[selected]);
+                next(getFull(results[selected]));
                 inputRef.current.blur();
             }
         }
@@ -157,8 +202,8 @@ function SearchBar({ data, onEnter, room, onX}) {
 
     function click(event){
         event.preventDefault();
-        next(results[event.target.value])
-        console.log(`routing url:${event.target.value}`)
+        next(getFull(results[event.target.value]))
+        // console.log(`routing url:${event.target.value}`)
     }
 
     function handleX(){

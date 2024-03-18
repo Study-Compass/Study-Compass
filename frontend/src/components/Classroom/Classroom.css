@@ -18,8 +18,10 @@
     font-size: 22px;
     font-weight: 800;
     color: #414141;
-    margin: 0 0 10px 0;
+    margin: 0;
 }
+
+
 
 .image{
     width: 100%;
@@ -71,7 +73,6 @@
     display:flex;
     justify-content: space-between;
     align-items: start;
-    margin-bottom:5px;
 }
 
 .bookmark-container{
