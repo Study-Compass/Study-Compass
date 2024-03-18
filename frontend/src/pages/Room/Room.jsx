@@ -354,7 +354,7 @@ function Room() {
                                     </li>
                                 ))}
                                 {width >= 800 && resultsLoading ? <div className="loader-container"><Loader/></div> : null}
-                                {width >= 800 && !resultsLoading ? <li onClick={()=>{setNumLoaded(numLoaded + 10)}}>get more</li> : null}
+                                {!resultsLoading ? <li onClick={()=>{setNumLoaded(numLoaded + 10)}}>get more</li> : null}
                             </ul> : ""
                         }
                         {contentState === "empty" ? <div className={`instructions-container ${width < 800 ? "mobile-instructions" : ""}`}>
