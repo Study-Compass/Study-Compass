@@ -15,6 +15,9 @@
     appearance: none;
     display: none;
   }
+  .ui-bookmark input[type="checkbox"], .ui-bookmark input[type="checkbox"] + .bookmark {
+    -webkit-tap-highlight-color: transparent;
+  }
   
   .ui-bookmark .bookmark {
     width: var(--icon-size);

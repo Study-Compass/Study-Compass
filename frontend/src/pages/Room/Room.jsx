@@ -349,12 +349,12 @@ function Room() {
                                                 <div className="outer-dot"></div>
                                                 <div className="inner-dot"></div>
                                             </div>
-                                            free {width >= 800 ? findNext(result.data.weekly_schedule).message : ''}
+                                            free { result ? findNext(result.data.weekly_schedule).message : ''}
                                         </div> : ""}
                                     </li>
                                 ))}
                                 {width >= 800 && resultsLoading ? <div className="loader-container"><Loader/></div> : null}
-                                {width >= 800 && !resultsLoading ? <li onClick={()=>{setNumLoaded(numLoaded + 10)}}>get more</li> : null}
+                                {!resultsLoading ? <li onClick={()=>{setNumLoaded(numLoaded + 10)}}>get more</li> : null}
                             </ul> : ""
                         }
                         {contentState === "empty" ? <div className={`instructions-container ${width < 800 ? "mobile-instructions" : ""}`}>
