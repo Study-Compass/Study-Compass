@@ -51,8 +51,9 @@ function Classroom({ name, room, state, setState, schedule }) {
 
         // useEffect(() => { console.log(state) }, [state]);
     useEffect(() => {
-        setSuccess(schedule ? findNext(schedule.weekly_schedule).free : false);
-        setMessage(schedule ? success ? `free ${findNext(schedule.weekly_schedule).message}` : `class in session ${findNext(schedule.weekly_schedule).message}` : "");
+        setSuccess(schedule ? findNext(schedule.weekly_schedule).free : true);
+        console.log(schedule);
+        setMessage(schedule ? findNext(schedule.weekly_schedule).message : "");
     }, [schedule]);
 
     if (name === "none" || !name) {
@@ -89,7 +90,7 @@ function Classroom({ name, room, state, setState, schedule }) {
                         <div className="outer-dot"></div>
                         <div className="inner-dot"></div>
                     </div>
-                    {message}                    
+                    {success ? "free" : "class in session"} {message}                    
                 </div>
                 <div className="attributes">
                     {room && room.attributes.map((attribute, index) => {

@@ -43,6 +43,7 @@
     opacity: 1;
     background-color: white;
     pointer-events: all;
+    box-shadow: var(--shadow);
 }
 
 .profile-picture button{
