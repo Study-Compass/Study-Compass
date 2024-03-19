@@ -161,6 +161,12 @@ button.active{
 
 }
 
+@media screen and (max-width: 768px){
+    .notification{
+        width: 80%;
+    }
+    
+}
 
 
 @keyframes slideIn{
