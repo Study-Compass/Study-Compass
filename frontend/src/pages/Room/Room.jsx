@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Calendar from '../../components/CalendarComponents/Calendar/Calendar.jsx';
 import './Room.css';
@@ -8,13 +8,12 @@ import useAuth from '../../hooks/useAuth.js';
 import { useCache } from '../../CacheContext.js';
 import Classroom from '../../components/Classroom/Classroom.jsx';
 import MobileCalendar from '../../components/CalendarComponents/MobileCalendar/MobileCalendar.jsx';
-import Loader from '../../components/Loader/Loader.jsx'
 import { findNext } from "./RoomHelpers.js";
-import { useNotification } from '../../NotificationContext.js';
+import Results from '../../components/Results/Results.jsx';
 
 import chevronUp from '../../assets/chevronup.svg';
 
-import dummyData from '../../dummyData.js'
+// import dummyData from '../../dummyData.js'
 
 
 import { debounce} from '../../Query.js';
@@ -41,8 +40,6 @@ function Room() {
     const [results, setResults] = useState([]);
     const [numLoaded, setNumLoaded] = useState(0);
     const [loadedResults, setLoadedResults] = useState([]);
-    const [resultsLoading, setResultsLoading] = useState(true);
-    let scrollLoading = false;
     const [query, setQuery] = useState({
         'M': [],
         'T': [],
@@ -51,8 +48,6 @@ function Room() {
         'F': [],
     });
     const [noquery, setNoQuery] = useState(true);
-
-    const { addNotification } = useNotification();
 
     function clearQuery(){
         setQuery({
@@ -80,9 +75,6 @@ function Room() {
       // Remove event listener on cleanup
       return () => window.removeEventListener('resize', handleResize);
     }, []);
-
-
-
 
     useEffect(() => {
         const fetchRooms = async () => {
@@ -180,10 +172,8 @@ function Room() {
             let batchResults = await getBatch(results.slice(loadedResults.length, Math.min(numLoaded, results.length)).map(room => roomIds[room]));
             let newResults = [...loadedResults, ...batchResults];
             setLoadedResults(newResults);
-            setResultsLoading(false);
         };
         updateLoadedResults();
-        scrollLoading = false;
     },[numLoaded]);
 
     // useEffect(()=>{console.log("loaded results change detected", loadedResults)},[loadedResults]);
@@ -293,33 +283,7 @@ function Room() {
         setViewport((window.innerHeight) + 'px');
     },[]);
 
-    const resultRef = useRef(null);
 
-    useEffect(() => {
-        const container = resultRef.current;
-        const handleScroll = () => {
-          // Calculate if the scroll has reached the bottom of the container
-          const scrollPosition = container.scrollTop + container.offsetHeight+100;
-          const containerHeight = container.scrollHeight;
-    
-          // Check if the scroll has reached the bottom
-          if (scrollPosition >= containerHeight) {
-              if(!scrollLoading){
-                console.log('Reached the bottom of the container');
-                setTimeout(() => {              
-                    setNumLoaded(numLoaded + 10);
-                }, 500);
-                console.log(numLoaded)
-                scrollLoading = true;
-            }
-          }
-        };
-    
-        // Add the scroll event listener to the container
-        if (container) {
-          container.addEventListener('scroll', handleScroll);
-        }
-      }, [contentState, numLoaded]);
 
     return (
         <div className="room" style={{ height: width < 800 ? viewport : '100vh' }}>
@@ -337,27 +301,16 @@ function Room() {
                         /> : ""}
                         {contentState === "calendarSearch" || contentState === "freeNowSearch" ? calendarLoading ? "" : <h1 className="resultCount">{results.length} results</h1> : ""}
                         {contentState === "calendarSearch" || contentState === "freeNowSearch" ? 
-                            <ul className="time-results" ref={resultRef}>
-                                {loadedResults.map((result, index) => (
-                                    <li 
-                                        key={result.room.name} 
-                                        value={result.room.name} 
-                                        onMouseOver={() => {debouncedFetchData(result.room._id)}} 
-                                        onMouseLeave={()=>{debouncedFetchData("none")}}
-                                        onClick={() => {changeURL(result.room.name)}}
-                                    >
-                                        <h2>{result.room.name.toLowerCase()}</h2>
-                                        {contentState !== "calendarSearch" ? <div className="free-until">
-                                            <div className="dot">
-                                                <div className="outer-dot"></div>
-                                                <div className="inner-dot"></div>
-                                            </div>
-                                            free { result ? findNext(result.data.weekly_schedule).message : ''}
-                                        </div> : ""}
-                                    </li>
-                                ))}
-                                {!(loadedResults.length === results.length) ? <div className="loader-container"><Loader/></div> : ""}
-                            </ul> : ""
+                            <Results 
+                                results={results}
+                                loadedResults={loadedResults}
+                                numLoaded={numLoaded}
+                                setNumLoaded={setNumLoaded}
+                                debouncedFetchData={debouncedFetchData}
+                                contentState={contentState}
+                                changeURL={changeURL}
+                                findNext={findNext}
+                            />: ""
                         }
                         {contentState === "empty" ? <div className={`instructions-container ${width < 800 ? "mobile-instructions" : ""}`}>
                             <div className="instructions">

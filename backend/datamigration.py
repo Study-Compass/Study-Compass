@@ -113,8 +113,23 @@ def write_items_with_root_image_to_file(file_path):
     client.close()
     print(f'Items with image attribute set to "/" have been written to {file_path}')
 
+def replaceImage():
+    load_dotenv() # loading .env file
+    uri = os.environ.get('MONGO_URL') # fetching URI string
+    client = MongoClient(uri, server_api=ServerApi('1')) 
+    try: # send a ping to confirm a successful connection
+        client.admin.command('ping')
+        print("Pinged your deployment. You successfully connected to MongoDB!")
+    except Exception as e:
+        print(e)
+
+    db = client['studycompass']
+    collection = db['classrooms1']
+
+    collection.update_many({'image': '/'},{'$set': {'image': '/classrooms/placeholder.jpg'},})
 
 # write_items_with_root_image_to_file("not-done.txt") # call the function to add new field to the collection
 # addNewField('users',{'saved' : []})
 # addNewField('classrooms1',{'attributes': []})
-addNewField('users',{'admin': False})
+# addNewField('users',{'admin': False})
+replaceImage() # call the function to add new field to the collection
