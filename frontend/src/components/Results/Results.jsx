@@ -1,7 +1,7 @@
 import React, {useRef, useEffect} from 'react';
 import './Results.css';
 
-import { Img } from 'react-optimized-image';
+// import { Img } from 'react-optimized-image';
 
 import Loader from '../Loader/Loader.jsx';
 
