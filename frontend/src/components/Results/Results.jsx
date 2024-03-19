@@ -1,7 +1,7 @@
 import React, {useRef, useEffect} from 'react';
 import './Results.css';
 
-// import { Img } from 'react-optimized-image';
+import { Img } from 'react-optimized-image';
 
 import Loader from '../Loader/Loader.jsx';
 
@@ -46,7 +46,7 @@ function Results({ results, loadedResults, numLoaded, setNumLoaded, debouncedFet
                 onClick={() => {changeURL(result.room.name)}}
             >
                 <div className="image">
-                    <img src={`${process.env.PUBLIC_URL}${result.room.image}`} alt="classroom" width={100} height={75} />
+                    {result.room.image ? <img src={`${process.env.PUBLIC_URL}${result.room.image}`} alt="classroom" width={100} height={75} />:""}
                 </div>
                 <div className="result-info">
                     <h2>{result.room.name.toLowerCase()}</h2>

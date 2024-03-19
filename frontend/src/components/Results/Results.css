@@ -43,11 +43,19 @@
     gap:10px;
 }
 
+.time-results li:hover{
+    background-color: var(--lighterborder);
+    cursor:pointer;
+
+}
+
 .time-results li h2{
     font-family:'Inter';
     font-weight:600;
     font-size:17px;
     margin: 0;
+    hyphens:auto;
+    -webkit-hyphens: auto;
 }
 
 .result-info{
