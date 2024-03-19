@@ -252,7 +252,6 @@ select{
     justify-content: center;
     align-items: center;
     left:0;
-    margin-top:1px
 }
 
 .outer-dot{
@@ -289,12 +288,13 @@ select{
       transform: scale(0.5);
       opacity: 0;
     }
-    70%{
+    40%{
         transform: scale(0.9);
         opacity: 0.5;
     }
     100% {
-      opacity: 0;
+        transform: scale(0.9);
+        opacity: 0;
     }
   }
 
