@@ -24,7 +24,6 @@ STATES
 contentState: "empty", "nameSearch", "calendarSearch" , "calendarSearchResult"
 */ 
 
-
 function Room() {
     let { roomid } = useParams();
     let navigate = useNavigate();
@@ -43,6 +42,7 @@ function Room() {
     const [numLoaded, setNumLoaded] = useState(0);
     const [loadedResults, setLoadedResults] = useState([]);
     const [resultsLoading, setResultsLoading] = useState(true);
+    let scrollLoading = false;
     const [query, setQuery] = useState({
         'M': [],
         'T': [],
@@ -81,26 +81,7 @@ function Room() {
       return () => window.removeEventListener('resize', handleResize);
     }, []);
 
-    const resultRef = useRef(null);
 
-    useEffect(() => {
-        const container = resultRef.current;
-        const handleScroll = () => {
-          // Calculate if the scroll has reached the bottom of the container
-          const scrollPosition = container.scrollTop + container.offsetHeight;
-          const containerHeight = container.scrollHeight;
-    
-          // Check if the scroll has reached the bottom
-          if (scrollPosition >= containerHeight) {
-            console.log('Reached the bottom of the container');
-          }
-        };
-    
-        // Add the scroll event listener to the container
-        if (container) {
-          container.addEventListener('scroll', handleScroll);
-        }
-      }, []);
 
 
     useEffect(() => {
@@ -190,24 +171,19 @@ function Room() {
     }
 
     useEffect(()=>{
+        console.log("numloaded changed", numLoaded, results.length, loadedResults.length)
         const updateLoadedResults = async ()=>{
             if(numLoaded === 0){
                 setLoadedResults([]);
             }
-            setResultsLoading(true);
+            // setResultsLoading(true);
             let batchResults = await getBatch(results.slice(loadedResults.length, Math.min(numLoaded, results.length)).map(room => roomIds[room]));
-            // outdated query logic, too many requests, would overwhelm backend
-            // for(let i=loadedResults.length;i<Math.min(numLoaded, results.length);i++){
-            //     const roomData = await fetchSchedule(roomIds[results[i]]);
-            //     newResults.push(roomData);
-            //     console.log(roomData);
-            // } 
             let newResults = [...loadedResults, ...batchResults];
             setLoadedResults(newResults);
             setResultsLoading(false);
         };
         updateLoadedResults();
-        
+        scrollLoading = false;
     },[numLoaded]);
 
     // useEffect(()=>{console.log("loaded results change detected", loadedResults)},[loadedResults]);
@@ -291,7 +267,7 @@ function Room() {
         }
     },[contentState]);
 
-    useEffect(()=>{console.log(results)},[results]);
+    // useEffect(()=>{console.log(results)},[results]);
     
     function changeURL(option) {
         navigate(`/room/${option}`, { replace: true });
@@ -317,7 +293,34 @@ function Room() {
         setViewport((window.innerHeight) + 'px');
     },[]);
 
-    // addNotification({message: "Welcome to the room page!", type: "info"});
+    const resultRef = useRef(null);
+
+    useEffect(() => {
+        const container = resultRef.current;
+        const handleScroll = () => {
+          // Calculate if the scroll has reached the bottom of the container
+          const scrollPosition = container.scrollTop + container.offsetHeight+100;
+          const containerHeight = container.scrollHeight;
+    
+          // Check if the scroll has reached the bottom
+          if (scrollPosition >= containerHeight) {
+              if(!scrollLoading){
+                console.log('Reached the bottom of the container');
+                setTimeout(() => {              
+                    setNumLoaded(numLoaded + 10);
+                }, 500);
+                console.log(numLoaded)
+                scrollLoading = true;
+            }
+          }
+        };
+    
+        // Add the scroll event listener to the container
+        if (container) {
+          container.addEventListener('scroll', handleScroll);
+        }
+      }, [contentState, numLoaded]);
+
     return (
         <div className="room" style={{ height: width < 800 ? viewport : '100vh' }}>
             <Header />
@@ -353,8 +356,7 @@ function Room() {
                                         </div> : ""}
                                     </li>
                                 ))}
-                                {width >= 800 && resultsLoading ? <div className="loader-container"><Loader/></div> : null}
-                                {!resultsLoading ? <li onClick={()=>{setNumLoaded(numLoaded + 10)}}>get more</li> : null}
+                                {!(loadedResults.length === results.length) ? <div className="loader-container"><Loader/></div> : ""}
                             </ul> : ""
                         }
                         {contentState === "empty" ? <div className={`instructions-container ${width < 800 ? "mobile-instructions" : ""}`}>
