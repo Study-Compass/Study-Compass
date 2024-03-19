@@ -1,10 +1,15 @@
 function minutesToTime(minutes){
     let hours = Math.floor(minutes / 60);
     const mins = minutes % 60;
+    let end = hours === 12 ? "PM": "AM";
     if(hours > 12){
         hours -= 12;
+        end = "PM";
     }
-    return `${hours}:${mins.toString().padStart(2, '0')}`;
+    if(mins == 0){
+        return `${hours}${end}`;
+    }
+    return `${hours}:${mins.toString().padStart(2, '0')} ${end}`;
 }
 
 const findChain = (schedule, time) => {
@@ -47,10 +52,9 @@ const findNext = (schedule) => {
             }
         }
         if(free === true && next === 9999){
-            console.log("here");
             return { message: "for the day", free: true };
         } else if (free === false){
-            return { message: `at ${minutesToTime(next)}`, free };
+            return { message: `until ${minutesToTime(next)}`, free };
         } else {
             return { message: `until ${minutesToTime(next)}`, free };
         }   

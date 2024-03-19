@@ -225,10 +225,16 @@ select{
 .loader-container{
     height:20%;
     width:20%;
+    position: relative;
+    margin:10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 
-.free-until{
+.free-until,
+.class-until{
     font-weight:500;
     margin: 5px 0 10px 0;
     font-size:13px;
@@ -240,6 +246,9 @@ select{
     position: relative;
 }
 
+.class-until{
+    color:var(--red);
+}
 
 .dot{
     height:18px;
@@ -254,7 +263,7 @@ select{
     left:0;
 }
 
-.outer-dot{
+.free-until .outer-dot{
     height:12px;
     width:12px;
     background-color:var(--green);
@@ -266,10 +275,22 @@ select{
 
 }
 
-.inner-dot{
+.free-until .inner-dot{
     height:12px;
     width:12px;
     background-color:var(--green);
+    border-radius:50%;
+    /* animation: dot 1.5s infinite; */
+    position: absolute;
+    justify-self: center;
+    align-self: center;
+
+}
+
+.class-until .inner-dot{
+    height:12px;
+    width:12px;
+    background-color:var(--red);
     border-radius:50%;
     /* animation: dot 1.5s infinite; */
     position: absolute;

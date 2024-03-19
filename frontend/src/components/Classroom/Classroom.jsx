@@ -18,9 +18,11 @@ import '../../pages/Room/Room.css';
 
 function Classroom({ name, room, state, setState, schedule }) {
 
-    console.log(schedule);
+    // console.log(schedule);
     const [image, setImage] = useState("")
     const { user } = useAuth();
+    const [success, setSuccess] = useState(false);
+    const [message, setMessage] = useState("");
 
     const [edit, setEdit] = useState(false);
     const attributeIcons = {
@@ -40,15 +42,18 @@ function Classroom({ name, room, state, setState, schedule }) {
             return;
         }
         if (room.image === "/") {
-            console.log("image is /");
+            // console.log("image is /");
             setImage("https://www.jmzarchitects.com/wp-content/uploads/2020/03/17112901-2-scaled.jpg");
         } else {
             setImage(`${process.env.PUBLIC_URL}${room.image}`);
         }
     }, [room]);
 
-    useEffect(() => { console.log(state) }, [state]);
-
+        // useEffect(() => { console.log(state) }, [state]);
+    useEffect(() => {
+        setSuccess(schedule ? findNext(schedule.weekly_schedule).free : false);
+        setMessage(schedule ? success ? `free ${findNext(schedule.weekly_schedule).message}` : `class in session ${findNext(schedule.weekly_schedule).message}` : "");
+    }, [schedule]);
 
     if (name === "none" || !name) {
         return "";
@@ -58,7 +63,7 @@ function Classroom({ name, room, state, setState, schedule }) {
         setState("calendarSearch");
     };
 
-    console.log(user);
+
 
     return (
         <div className='classroom-component'>
@@ -79,12 +84,12 @@ function Classroom({ name, room, state, setState, schedule }) {
                         <Bookmark room={room} />
                     </div>
                 </div>
-                <div className="free-until">
+                <div className={`${success ? 'free-until' : 'class-until'}`}>
                     <div className="dot">
                         <div className="outer-dot"></div>
                         <div className="inner-dot"></div>
                     </div>
-                    free {schedule ? findNext(schedule.weekly_schedule).message: ""}
+                    {message}                    
                 </div>
                 <div className="attributes">
                     {room && room.attributes.map((attribute, index) => {
