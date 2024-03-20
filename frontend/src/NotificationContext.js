@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import Check from './assets/Icons/Check.svg';
 
 // Create the context
 const NotificationContext = createContext();
@@ -40,7 +41,11 @@ export const NotificationProvider = ({ children }) => {
       <div className="notification-container">
         {notifications.map((notification) => (
           <div key={notification.id} className={`notification ${notification.exit ? 'remove' : ''}`}>
-            <p>{notification.message}</p>
+            <img src={Check}></img>
+            <div className="notification-content">
+                <h1>{notification.title}</h1>
+                {notification.message ? <p>{notification.message}</p>: ""}
+            </div>
           </div>
         ))}
       </div>

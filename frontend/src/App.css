@@ -13,6 +13,7 @@
     --lightborder:#DDDCDC;
     --lighterborder:#E4E5E6;
     --green: #4DAA57;
+    --shadow: 0px 7px 29px 0px rgba(100, 100, 111, 0.1);
 }
 
 .App {
@@ -105,13 +106,13 @@ button.active{
 
 
 .notification{
-    width: 50%;
-    height: 50px;
+    width: 40%;
+    /* height: 50px; */
     background-color: white;
     border: 1px solid var(--lightborder);
     border-radius: 10px;
     position:absolute;
-    top: 30px;
+    top: 50px;
     justify-self: center;   
     display: flex;
     align-items: center;
@@ -119,11 +120,37 @@ button.active{
     padding: 0 20px; 
     animation: slideIn 0.3s ease, fadeIn 0.3s ease;
     transition: all 0.3s ease;
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding:10px;
+    z-index: 100;
+    gap:10px;
+}
+
+.notification content{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    margin-left: 10px;
+    height:100%;
+
+}
+
+.notification h1{
+    font-family: 'Inter';
+    font-size: 14px;
+    font-weight: 800;
+    color: var(--text);
+    margin: 0;
+    margin-bottom: 3px;
 }
 
 .notification p{
     font-family: 'Inter';
-    font-size: 16px;
+    font-size: 12px;
     font-weight: 500;
     color: var(--text);
     margin: 0;
@@ -133,6 +160,14 @@ button.active{
     transform: translateY(-300%);
 
 }
+
+@media screen and (max-width: 768px){
+    .notification{
+        width: 80%;
+    }
+    
+}
+
 
 @keyframes slideIn{
     from{

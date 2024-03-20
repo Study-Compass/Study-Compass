@@ -36,7 +36,7 @@ function EditAttributes({room, attributes, setEdit}){
         const newAttributes = [...attributesAdmin, attribute];
         setAttributes(newAttributes);
         setAdding("");
-        addNotification({message: "Attributes updated"});
+        addNotification({title: "Attributes updated", message: "your changes will be reflected in the database"});
 
     };
 
