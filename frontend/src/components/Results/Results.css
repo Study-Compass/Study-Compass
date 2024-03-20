@@ -32,7 +32,7 @@
 .time-results li{
     /* border-bottom:1px solid var(--lightborder); */
     border-radius: 0;
-    padding:15px 15px;
+    padding:10px;
     background-color: white;
     width:90%;
     border: 1px solid var(--lightborder);
@@ -61,4 +61,22 @@
 .result-info{
     display:flex;
     flex-direction: column;
+}
+
+.result-info-container{
+    display:flex;
+    flex-direction: row;
+    gap:10px;
+    align-items: center;
+}
+
+@media(max-width:500px){
+    .time-results li h2{
+        font-family:'Inter';
+        font-weight:600;
+        font-size:16px;
+        margin: 0;
+        hyphens:auto;
+        -webkit-hyphens: auto;
+    }
 }

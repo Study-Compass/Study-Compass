@@ -302,4 +302,12 @@ select{
         padding:0px 20px 20px 20px;
         width:97%;
     }
+    .dot{
+        height:18px;
+        width:10px;
+    }
+    .free-until{
+        font-size:12px;
+        padding-left:13px;
+    }
 }
