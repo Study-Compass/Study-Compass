@@ -79,6 +79,7 @@ export const CacheProvider = ({children}) =>{
     };
     
     // no cache support for now, very unlikely to be called multiple times
+    // todo: add cache support, above still applies but can do partial cache
     const getBatch = async (queries) => {
         if(queries.length === 0){
             return [];
@@ -96,7 +97,20 @@ export const CacheProvider = ({children}) =>{
         }
     };
 
-    
+    const search = async (query, attributes) => {
+        try{
+            const response = await axios.post('/search', {query, attributes});
+            const responseBody = response.data;
+            if(!responseBody.success){
+                console.error('Error fetching search data:', responseBody.message);
+                return;
+            }
+            return responseBody.data;
+        } catch (error){
+            console.error('Error fetching search data:', error);
+        }
+    };
+
     function debounce(func, wait) { //move logic to other file
         let timeout;
         return function executedFunction(...args) {
