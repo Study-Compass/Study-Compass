@@ -159,5 +159,34 @@ router.post('/changeclassroom', async (req, res) => {
     }
 });
 
+router.get('/search', async (req, res) => {
+    const query = req.query.query;
+    const attributes = req.query.attributes ? req.query.attributes.split(",") : []; // Ensure attributes is an array
+    const sort = req.query.sort;
+
+    try {
+        // Define the base query with projection to only include the name field
+        let findQuery = Classroom.find(
+            { name: { $regex: query, $options: 'i' }, attributes: { $all: attributes } },
+            { name: 1, _id: 0 } // Project only the name field
+        );
+
+        // Conditionally add sorting if required
+        if (sort === "name") {
+            findQuery = findQuery.sort('name'); // Sort by name in ascending order
+        }
+
+        // Execute the query
+        const classrooms = await findQuery;
+
+        // Extract only the names from the result set
+        const names = classrooms.map(classroom => classroom.name);
+
+        console.log(`GET: /search?query=${query}&attributes=${attributes}&sort=${sort}`);
+        res.json({ success: true, message: "Rooms found", data: names });
+    } catch (error) {
+        res.status(500).json({ success: false, message: 'Error searching for rooms', error: error.message });
+    }
+});
 
 module.exports = router;

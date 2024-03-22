@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import tab from '../../assets/tab.svg';
 
 //need to add support for abbreviated versions
-function SearchBar({ data, onEnter, room, onX}) {
+function SearchBar({ data, onEnter, onSearch, room, onX}) {
     let navigate =  useNavigate();
     const itemRefs = useRef([]);
 

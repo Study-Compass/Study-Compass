@@ -284,7 +284,6 @@ function Room() {
     },[]);
 
 
-
     return (
         <div className="room" style={{ height: width < 800 ? viewport : '100vh' }}>
             <Header />
