@@ -30,7 +30,7 @@ function Room() {
     const [rooms, setRooms] = useState(null);
     const [roomIds, setRoomIds] = useState({});
     const { isAuthenticated } = useAuth();
-    const { getRooms, getFreeRooms, getRoom, getBatch } = useCache();
+    const { getRooms, getFreeRooms, getRoom, getBatch, search } = useCache();
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [calendarLoading, setCalendarLoading] = useState(true);
@@ -162,6 +162,15 @@ function Room() {
         setCalendarLoading(false);
     }
 
+    const fetchSearch = async (query, attributes, sort) => {
+        setContentState("nameSearch")
+        setCalendarLoading(true)
+        const roomNames = await search(query, attributes, sort);
+        setResults(roomNames.sort());
+        setNumLoaded(10);
+        setCalendarLoading(false);
+    };
+
     useEffect(()=>{
         console.log("numloaded changed", numLoaded, results.length, loadedResults.length)
         const updateLoadedResults = async ()=>{
@@ -290,7 +299,7 @@ function Room() {
             <div className="content-container">
                 <div className="calendar-container">
                     <div className={width < 800 ? "left-mobile" : "left"}>
-                        <SearchBar data={rooms} onEnter={changeURL2} room={roomid} onX={onX} />
+                        <SearchBar data={rooms} onEnter={changeURL2} room={roomid} onX={onX} onSearch={fetchSearch} />
                         {contentState === "nameSearch" || contentState === "calendarSearchResult" || contentState === "freeNowSearch" ? <Classroom 
                             name={roomid} 
                             room={room} 

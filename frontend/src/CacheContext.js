@@ -97,9 +97,15 @@ export const CacheProvider = ({children}) =>{
         }
     };
 
-    const search = async (query, attributes) => {
+    const search = async (query, attributes, sort) => {
         try{
-            const response = await axios.post('/search', {query, attributes});
+            const response = await axios.get('/search', {
+                params: {
+                  query: query,
+                  attributes: attributes,
+                  sort: 'name'
+                }
+              });            
             const responseBody = response.data;
             if(!responseBody.success){
                 console.error('Error fetching search data:', responseBody.message);
@@ -124,7 +130,7 @@ export const CacheProvider = ({children}) =>{
     }
 
     return (
-        <CacheContext.Provider value={{ getRooms, getRoom, getFreeRooms, getBatch, debounce }}>
+        <CacheContext.Provider value={{ getRooms, getRoom, getFreeRooms, getBatch, search, debounce }}>
             {children}
         </CacheContext.Provider>
     );

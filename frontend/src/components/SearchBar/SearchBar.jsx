@@ -136,7 +136,7 @@ function SearchBar({ data, onEnter, onSearch, room, onX}) {
         setSearchInput(name.toLowerCase());
         setLower("");
         setResults([]);
-        onEnter(name);
+        onSearch(name, [], "name");
     }
 
     const handleKeyDown = (event) => {
