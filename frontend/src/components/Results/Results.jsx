@@ -2,8 +2,6 @@ import React, {useRef, useEffect} from 'react';
 import './Results.css';
 import Result from './Result/Result.jsx';
 
-import { Img } from 'react-optimized-image';
-
 import Loader from '../Loader/Loader.jsx';
 
 function Results({ results, loadedResults, numLoaded, setNumLoaded, debouncedFetchData, contentState, changeURL, findNext}) {

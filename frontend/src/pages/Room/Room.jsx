@@ -20,7 +20,7 @@ import { debounce} from '../../Query.js';
 
 /*
 STATES
-contentState: "empty", "nameSearch", "calendarSearch" , "calendarSearchResult"
+contentState: "empty", "classroom", "calendarSearch" , "calendarSearchResult", "nameSearch"
 */ 
 
 function Room() {
@@ -119,7 +119,7 @@ function Room() {
             }, 100);
         } else {
             fetchData(roomIds[roomid]);
-            setContentState("nameSearch");
+            setContentState("classroom");
             clearQuery();
         }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -165,8 +165,10 @@ function Room() {
     const fetchSearch = async (query, attributes, sort) => {
         setContentState("nameSearch")
         setCalendarLoading(true)
+        setResults([]);
         const roomNames = await search(query, attributes, sort);
-        setResults(roomNames.sort());
+        setResults(roomNames);
+        console.log(roomNames);
         setNumLoaded(10);
         setCalendarLoading(false);
     };
@@ -243,10 +245,10 @@ function Room() {
     useEffect(() => { 
         setLoadedResults([]);
         setNumLoaded(0);
-        // if query is changed and noquery is true, set contentstate to empty unless query cleaered using namesearch
+        // if query is changed and noquery is true, set contentstate to empty unless query cleaered using classroom
         if ((noquery === true && contentState === "calendarSearchResult") || roomid === "none") {
             setContentState("empty");
-        } else if(contentState !== "nameSearch"){
+        } else if(contentState !== "classroom"){
             setContentState("calendarSearch");  
         }
         // console.log(`noquery: ${noquery}`);
@@ -275,7 +277,7 @@ function Room() {
 
     function changeURL2(option) {
         navigate(`/room/${option}`, { replace: true });
-        setContentState("nameSearch");
+        setContentState("classroom");
     }
 
     function onX(){ //make a reset function soon
@@ -300,15 +302,15 @@ function Room() {
                 <div className="calendar-container">
                     <div className={width < 800 ? "left-mobile" : "left"}>
                         <SearchBar data={rooms} onEnter={changeURL2} room={roomid} onX={onX} onSearch={fetchSearch} />
-                        {contentState === "nameSearch" || contentState === "calendarSearchResult" || contentState === "freeNowSearch" ? <Classroom 
+                        {contentState === "classroom" || contentState === "calendarSearchResult" || contentState === "freeNowSearch" ? <Classroom 
                             name={roomid} 
                             room={room} 
                             state={contentState} 
                             setState={setContentState}
                             schedule={data}
                         /> : ""}
-                        {contentState === "calendarSearch" || contentState === "freeNowSearch" ? calendarLoading ? "" : <h1 className="resultCount">{results.length} results</h1> : ""}
-                        {contentState === "calendarSearch" || contentState === "freeNowSearch" ? 
+                        {contentState === "calendarSearch" || contentState === "freeNowSearch" || contentState === "nameSearch" ? calendarLoading ? "" : <h1 className="resultCount">{results.length} results</h1> : ""}
+                        {contentState === "calendarSearch" || contentState === "freeNowSearch" || contentState === "nameSearch" ? 
                             <Results 
                                 results={results}
                                 loadedResults={loadedResults}
@@ -336,7 +338,7 @@ function Room() {
                             <Calendar className={roomid} data={data} isloading={loading} addQuery={addQuery} removeQuery={removeQuery} query={query} />
                         </div>
                     )}
-                    {width < 800 ? contentState === "calendarSearchResult" || contentState === "nameSearch" ? <button className="show-calendar" onClick={() => { setShowMobileCalendar(true) }}> <img src={chevronUp} alt="show schedule" /> </button> : "" : ""}
+                    {width < 800 ? contentState === "calendarSearchResult" || contentState === "classroom" ? <button className="show-calendar" onClick={() => { setShowMobileCalendar(true) }}> <img src={chevronUp} alt="show schedule" /> </button> : "" : ""}
                 </div>
             </div>
         </div>

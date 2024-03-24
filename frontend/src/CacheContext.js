@@ -78,19 +78,29 @@ export const CacheProvider = ({children}) =>{
         }
     };
     
-    // no cache support for now, very unlikely to be called multiple times
-    // todo: add cache support, above still applies but can do partial cache
+    
     const getBatch = async (queries) => {
         if(queries.length === 0){
             return [];
         }
         try{
+            // for(let i = 0; i < queries.length; i++){
+            //     if(cache[`/getroom/${queries[i]}`]){
+            //         queries.splice(i, 1);
+            //         i--;
+            //     }
+            // }
             const response = await axios.post('/getbatch', {queries, exhaustive: true});
             const responseBody = response.data;
             if(!responseBody.success){
                 console.error('Error fetching batch data:', responseBody.message);
                 return;
             }
+            for(let i = 0; i < responseBody.data.length; i++){
+                cache[`/getroom/${queries[i]}`] = responseBody.data[i];
+            }
+            console.log("responsedata", responseBody.data)
+            console.log("query", queries);
             return responseBody.data;
         } catch (error){
             console.error('Error fetching data:', error);

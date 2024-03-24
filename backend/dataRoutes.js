@@ -101,44 +101,45 @@ router.post('/free', async (req, res) => {
 
 router.post('/getbatch', async (req, res) => {
     const queries = req.body.queries;
-    const exhaustive = req.body.exhaustive; // Gives option to retrieve just schedule data or both schedule and room data
-    let rooms = {};
-    let schedules = {};
+    const exhaustive = req.body.exhaustive; // Option to retrieve just schedule data or both schedule and room data
     let data = [];
 
-    console.log(`POST: /getbatch`, JSON.stringify(req.body.queries) );
+    console.log(`POST: /getbatch`, JSON.stringify(req.body.queries));
     
     try {
-        await Promise.all(queries.map(async (query) => {
-            let result = {};
-            if(query === "none"){
-                result.data = new Schedule();
-                // break early in a way that doesn't proceed to send response
-                throw new Error("noneQueryFound");
+        const results = await Promise.all(queries.map(async (query, index) => {
+            if (query === "none") {
+                // Use null or a specific structure to indicate early break, handle it later
+                return { index, result: { data: new Schedule() }};
             }
 
-            if(exhaustive){
+            let result = { room: "not found", data: "not found" };
+            if (exhaustive) {
                 const room = await Classroom.findOne({ _id: query });
                 result.room = room ? room : "not found";
             }
 
             const schedule = await Schedule.findOne({ classroom_id: query });
             result.data = schedule ? schedule : "not found";
-            data.push(result);
+
+            // Attach the index to each result
+            return { index, result };
         }));
 
-        // send response after all operations are done
-        res.json({ success: true, message: "Rooms found", data: data });
+        // Sort results based on the original index to ensure order
+        const sortedResults = results.sort((a, b) => a.index - b.index).map(item => item.result);
+
+        // Send response after all operations are done and results are sorted
+        res.json({ success: true, message: "Rooms found", data: sortedResults });
     } catch (error) {
-        // check if it's a special case to stop the process early
+        // Check if it's a special case to stop the process early
         if (error.message === "noneQueryFound") {
             return res.json({ success: true, message: "Empty query processed", rooms: {}, schedules: {} });
         }
-        // if not, it's a real error
+        // If not, it's a real error
         return res.status(500).json({ success: false, message: 'Error retrieving data', error: error.message });
     }
 });
-
 router.post('/changeclassroom', async (req, res) => {
     const id = req.body.id;
     const attributes = req.body.attributes;
@@ -170,6 +171,16 @@ router.get('/search', async (req, res) => {
             { name: { $regex: query, $options: 'i' }, attributes: { $all: attributes } },
             { name: 1, _id: 0 } // Project only the name field
         );
+
+        if(attributes.length === 0){
+            findQuery = Classroom.find(
+                { name: { $regex: query, $options: 'i' }},
+                { name: 1, _id: 0 } // Project only the name field
+            );
+        }
+
+        console.log({ name: { $regex: query, $options: 'i' }, attributes: { $all: attributes } },{ name: 1, _id: 0 }) 
+
 
         // Conditionally add sorting if required
         if (sort === "name") {
