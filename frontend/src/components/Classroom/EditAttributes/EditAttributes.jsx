@@ -33,6 +33,7 @@ function EditAttributes({room, attributes, setEdit}){
         if(attribute === "" || attributesAdmin.includes(attribute)){
             return;
         }
+        attribute = attribute.toLowerCase().trim();
         const newAttributes = [...attributesAdmin, attribute];
         setAttributes(newAttributes);
         setAdding("");

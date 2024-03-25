@@ -1,10 +1,17 @@
 import React from 'react';
 import './Result1.css';
+import FilledStar from '../../../assets/Icons/FilledStar.svg';
 
-function Result({ result, debouncedFetchData, changeURL, findNext }) {
+function Result({ result, attributes, debouncedFetchData, changeURL, findNext }) {
+    console.log(attributes);
+    console.log(result);
+    const schedule = result.data.weekly_schedule;
+    const success = findNext(schedule).free;
+    const message = findNext(schedule).message;
+
     return (
         <li
-            className="result" 
+            className={`result ${attributes.includes('restricted access') ? "restricted": "" }`}
             value={result.room.name} 
             onMouseOver={() => {debouncedFetchData(result.room._id)}} 
             onMouseLeave={()=>{debouncedFetchData("none")}}
@@ -15,13 +22,19 @@ function Result({ result, debouncedFetchData, changeURL, findNext }) {
             </div>
             <div className="result-info">
                 <h2>{result.room.name.toLowerCase()}</h2>
-                <div className="free-until">
-                    <div className="dot">
-                        <div className="outer-dot"></div>
-                        <div className="inner-dot"></div>
+                <div className="info-row">      
+                    <div className="rating">
+                        <img src={FilledStar} alt="star" />
+                        <p>4.6</p>
                     </div>
-                    free { result ? findNext(result.data.weekly_schedule).message : ''}
-                </div> 
+                    <div className={`${success ? 'free-until' : 'class-until'}`}>
+                        <div className="dot">
+                            <div className="outer-dot"></div>
+                            <div className="inner-dot"></div>
+                        </div>
+                        {success ? "free" : "class in session"} {message}                    
+                    </div>
+                </div>
             </div>
         </li>
     );

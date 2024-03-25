@@ -8,6 +8,11 @@ function Results({ results, loadedResults, numLoaded, setNumLoaded, debouncedFet
     const resultRef = useRef(null);
     let scrollLoading = false;
 
+
+    //checking loaded results
+    console.log("Loaded Results", loadedResults)
+    loadedResults.map(result => {console.log(result.room)})
+
     useEffect(() => {
         const container = resultRef.current;
         const handleScroll = () => {
@@ -36,10 +41,11 @@ function Results({ results, loadedResults, numLoaded, setNumLoaded, debouncedFet
 
     return (
         <ul className="time-results" ref={resultRef}>
-        {loadedResults.map((result, index) => (
+        {loadedResults.map(result => (
             <Result 
-                key={index} 
+                key={result.room.name} 
                 result={result} 
+                attributes={result.room.attributes}
                 debouncedFetchData={debouncedFetchData} 
                 changeURL={changeURL}
                 findNext={findNext}

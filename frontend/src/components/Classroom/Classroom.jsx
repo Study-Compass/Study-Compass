@@ -11,6 +11,7 @@ import Edit from '../../assets/Icons/Edit.svg';
 import Outlets from '../../assets/Icons/Outlets.svg';
 import Windows from '../../assets/Icons/Windows.svg';
 import Printer from '../../assets/Icons/Printer.svg';
+import FilledStar from '../../assets/Icons/FilledStar.svg';
 
 import { findNext } from '../../pages/Room/RoomHelpers.js';
 
@@ -85,12 +86,18 @@ function Classroom({ name, room, state, setState, schedule }) {
                         <Bookmark room={room} />
                     </div>
                 </div>
-                <div className={`${success ? 'free-until' : 'class-until'}`}>
-                    <div className="dot">
-                        <div className="outer-dot"></div>
-                        <div className="inner-dot"></div>
+                <div className="info-row">
+                    <div className="rating">
+                        <img src={FilledStar} alt="star" />
+                        <p>4.6</p>
                     </div>
-                    {success ? "free" : "class in session"} {message}                    
+                    <div className={`${success ? 'free-until' : 'class-until'}`}>
+                        <div className="dot">
+                            <div className="outer-dot"></div>
+                            <div className="inner-dot"></div>
+                        </div>
+                        {success ? "free" : "class in session"} {message}                    
+                    </div>
                 </div>
                 <div className="attributes">
                     {room && room.attributes.map((attribute, index) => {
