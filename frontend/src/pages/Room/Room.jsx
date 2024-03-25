@@ -166,6 +166,7 @@ function Room() {
         setContentState("nameSearch")
         setCalendarLoading(true)
         setResults([]);
+        setLoadedResults([]);
         const roomNames = await search(query, attributes, sort);
         setResults(roomNames);
         console.log(roomNames);
