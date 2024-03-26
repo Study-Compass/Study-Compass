@@ -13,9 +13,6 @@ import Results from '../../components/Results/Results.jsx';
 
 import chevronUp from '../../assets/chevronup.svg';
 
-// import dummyData from '../../dummyData.js'
-
-
 import { debounce} from '../../Query.js';
 
 /*
@@ -78,9 +75,14 @@ function Room() {
 
     useEffect(() => {
         const fetchRooms = async () => {
-            const rooms = await getRooms();
-            setRooms(Object.keys(rooms).sort());
-            setRoomIds(rooms);
+            try{
+                const rooms = await getRooms();
+                setRooms(Object.keys(rooms).sort());
+                setRoomIds(rooms);
+            } catch (error){
+                console.log(error);
+                navigate("/error/500");
+            }
         };
 
         fetchRooms();
@@ -89,10 +91,16 @@ function Room() {
     const fetchData = async (id) => {
         setLoading(true);
         setData(null);
-        const data = await getRoom(id);
-        setLoading(false);
-        setRoom(data.room);
-        setData(data.data);
+        try{
+            const data = await getRoom(id);
+            setLoading(false);
+            setRoom(data.room);
+            setData(data.data);
+        } catch (error){
+            console.log(error);
+            navigate("/error/500");
+        }
+
     };
 
     const fetchSchedule = async (id) =>{

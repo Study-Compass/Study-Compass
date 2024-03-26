@@ -6,6 +6,7 @@ function Redirect() {
     let navigate =  useNavigate();
 
     useEffect(() => {
+        
         navigate('/room/none');
     })
     return "";
