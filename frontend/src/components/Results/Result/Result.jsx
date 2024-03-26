@@ -1,13 +1,15 @@
 import React from 'react';
 import './Result1.css';
 import FilledStar from '../../../assets/Icons/FilledStar.svg';
+import Bookmark from '../../../assets/Icons/Bookmark.svg';
+import useAuth from '../../../hooks/useAuth';
 
 function Result({ result, attributes, debouncedFetchData, changeURL, findNext }) {
-    console.log(attributes);
-    console.log(result);
     const schedule = result.data.weekly_schedule;
     const success = findNext(schedule).free;
     const message = findNext(schedule).message;
+
+    const { user } = useAuth();
 
     return (
         <li
@@ -17,6 +19,9 @@ function Result({ result, attributes, debouncedFetchData, changeURL, findNext })
             onMouseLeave={()=>{debouncedFetchData("none")}}
             onClick={() => {changeURL(result.room.name)}}
         >
+            {user ? user.saved.includes(result.room._id) ?  
+                <img src={Bookmark} alt="bookmark" className="saved"/>:"":""
+            }
             <div className="image">
                 {result.room.image ? <img src={`${process.env.PUBLIC_URL}${result.room.image}`} alt="classroom" width={100} height={75} />:""}
             </div>

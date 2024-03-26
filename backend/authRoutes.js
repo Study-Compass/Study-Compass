@@ -62,10 +62,12 @@ router.post('/login', async (req, res) => {
             data: {
                 token,
                 user: {
+                    _id: user._id,
                     username: user.username,
                     email: user.email,
                     picture : user.picture,
-                    admin : user.admin
+                    admin : user.admin,
+                    saved: user.saved
                 }
             }
         });
@@ -91,10 +93,12 @@ router.get('/validate-token', verifyToken, async (req, res) => {
             message: 'Token is valid',
             data: {
                 user: {
+                    _id: user._id,
                     username: user.username,
                     email: user.email,
                     picture : user.picture,
-                    admin : user.admin
+                    admin : user.admin,
+                    saved: user.saved
                 }
             }
         });
@@ -126,9 +130,12 @@ router.post('/google-login', async (req, res) => {
             data: {
                 token,
                 user: {
+                    _id: user._id,
                     username: user.username,
                     email: user.email,
-                    picture: user.picture
+                    picture: user.picture,
+                    admin : user.admin,
+                    saved: user.saved
                 }
             }
         });

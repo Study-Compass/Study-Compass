@@ -1,6 +1,7 @@
 const express = require('express');
 const Classroom = require('./schemas/classroom.js');
 const Schedule = require('./schemas/schedule.js');
+const User = require('./schemas/user.js');
 
 const router = express.Router();
 
@@ -200,6 +201,48 @@ router.get('/search', async (req, res) => {
         res.json({ success: true, message: "Rooms found", data: names });
     } catch (error) {
         res.status(500).json({ success: false, message: 'Error searching for rooms', error: error.message });
+    }
+});
+
+// Route to save a classroom to a user's saved list, expects a room and user ID
+router.post('/save', async (req, res) => {
+    const roomId = req.body.roomId;
+    const userId = req.body.userId;
+    const operation = req.body.operation; // true is add, false is remove
+
+    try {
+        const classroom = await Classroom.findOne({ _id: roomId });
+        if (!classroom) {
+            console.log(`POST: /save/${roomId}/${userId} failed`);
+            return res.status(404).json({ success: false, message: "Classroom not found" });
+        }
+        const user = await User.findOne({ _id: userId });
+        if (!user) {
+            console.log(`POST: /save/${roomId}/${userId} failed`);
+            return res.status(404).json({ success: false, message: "User not found" });
+        }
+        if (operation && user.saved.includes(classroom._id)) {
+            console.log(`POST: /save/${roomId}/${userId} failed`);
+            return res.status(409).json({ success: false, message: "Room already saved" });
+        }
+        if (!operation && !user.saved.includes(classroom._id)) {
+            console.log(`POST: /save/${roomId}/${userId} failed`);
+            return res.status(409).json({ success: false, message: "Room not saved" });
+        }
+        if (!operation) {
+            user.saved = user.saved.filter(id => id !== roomId);
+            await user.save();
+            console.log(`POST: /save/${roomId}/${userId}`);
+            return res.json({ success: true, message: "Room removed" });
+        } else {
+            user.saved.push(roomId);
+            await user.save();
+            console.log(`POST: /save/${roomId}/${user}`);
+            res.json({ success: true, message: "Room saved" });
+        }
+    } catch (error) {
+        console.log(`POST: /save/${roomId}/${userId} failed`);
+        res.status(500).json({ success: false, message: 'Error saving room', error: error.message });
     }
 });
 

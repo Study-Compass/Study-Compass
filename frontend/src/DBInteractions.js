@@ -30,5 +30,35 @@ const changeClasroom = async (id, attributes, imageUrl) => {
         throw error;
     }
 };  
+//expects roomid, userid, and operation, true for save, false for unsave
+const save = async (roomId, userId, operation) => {
+    try {
+        const response = await axios.post(`/save/`, { roomId, userId, operation});
+        const responseBody = response.data;
+        if (!response.ok) {
+            // Log the error if the response status is not OK
+            console.error("Error saving room:", responseBody.message);
+            return;
+        }
+        if (!responseBody.success) {
+            // Log the error if success is false
+            console.error("Error saving room:", responseBody.message);
+            return;
+        }
+        return responseBody.data;
+    } catch (error) {
+        if (error.response) {
+            // The server responded with a status code outside the 2xx range
+            console.error("Error saving room: HTTP Status", error.response.status, error.response.data);
+        } else if (error.request) {
+            // The request was made but no response was received
+            console.error("Error saving room: No response received", error.request);
+        } else {
+            // Something else caused the error, like a setup issue
+            console.error("Error:", error.message);
+        }
+        throw error;
+    }
+};
 
-export { changeClasroom };
+export { changeClasroom, save };

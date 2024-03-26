@@ -1,11 +1,39 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import './Bookmark.css';
+import useAuth from '../../../hooks/useAuth';
+import { save } from '../../../DBInteractions';
+import { useNotification } from '../../../NotificationContext';
 
-function Bookmark({ room, isChecked, setIsChecked }) {
-    const initialChecked = isChecked;
+function Bookmark({ room }) {    
+    const [isChecked, setIsChecked] = useState(false);
+    const { user, isAuthenticated, validateToken } = useAuth();
+    const { addNotification } = useNotification();
+
+    useEffect(() => {
+        if(room && isAuthenticated) {
+            setIsChecked(user.saved.includes(room._id));
+        }
+    }, [isAuthenticated, room]);
+
+    const onCheck = async (e) => {
+        if (!isAuthenticated) {
+            addNotification({ title: "Please log in", message: "You must be logged in to save a room", type: "error" });
+            return;
+        }
+        const operation = e.target.checked;
+        setIsChecked(operation);
+        try {
+            await save(room._id, user._id, operation);
+            validateToken();
+        } catch (error) {
+            addNotification({ title: "Error saving room", message: error.message, type: "error" });
+        }
+    }
+
+    
     return (
         <label className="ui-bookmark">
-            <input type="checkbox" checked={initialChecked}/>
+            <input type="checkbox" checked={isChecked} onChange={onCheck}/>
             <div className="bookmark">
                 <svg viewBox="0 0 32 32">
                     <g>

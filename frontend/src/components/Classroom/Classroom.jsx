@@ -19,7 +19,7 @@ import '../../pages/Room/Room.css';
 
 function Classroom({ name, room, state, setState, schedule }) {
 
-    // console.log(schedule);
+    console.log("room",room);
     const [image, setImage] = useState("")
     const { user } = useAuth();
     const [success, setSuccess] = useState(false);

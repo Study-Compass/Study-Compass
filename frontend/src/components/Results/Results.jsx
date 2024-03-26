@@ -10,7 +10,6 @@ function Results({ results, loadedResults, numLoaded, setNumLoaded, debouncedFet
 
 
     //checking loaded results
-    console.log("Loaded Results", loadedResults)
     loadedResults.map(result => {console.log(result.room)})
 
     useEffect(() => {
