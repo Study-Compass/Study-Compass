@@ -1,0 +1,58 @@
+.errorPage{
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    height: 100vh;
+    background-color: #f8f9fa;
+    flex-direction: column;
+}
+
+.errorPage a{
+    text-decoration: none;
+    color: var(--red);
+
+}
+
+.content{
+    position: absolute;
+    top:30%;
+}
+
+.details{
+    display: flex;
+    flex-direction: column;
+    gap:10px;
+    margin-top:10px;
+    align-items: center;
+}
+
+.details p{
+    font-size: 16px;
+    margin:0;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.message{
+    display: flex;
+    gap:6px;
+    margin-top:20px;
+}
+
+.message .whoops{
+    color: var(--red);
+}
+
+.errorPage .content{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+
+}
+
+.button-container{
+    display:flex;
+    width:60%;
+    margin-top:15%;
+}
