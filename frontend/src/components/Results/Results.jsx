@@ -10,8 +10,6 @@ function Results({ results, loadedResults, numLoaded, setNumLoaded, debouncedFet
 
 
     //checking loaded results
-    loadedResults.map(result => {console.log(result.room)})
-
     useEffect(() => {
         const container = resultRef.current;
         const handleScroll = () => {
@@ -26,7 +24,6 @@ function Results({ results, loadedResults, numLoaded, setNumLoaded, debouncedFet
                 setTimeout(() => {              
                     setNumLoaded(numLoaded + 10);
                 }, 500);
-                console.log(numLoaded)
                 scrollLoading = true;
             }
           }

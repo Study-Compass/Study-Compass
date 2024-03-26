@@ -2,6 +2,7 @@ const express = require('express');
 const Classroom = require('./schemas/classroom.js');
 const Schedule = require('./schemas/schedule.js');
 const User = require('./schemas/user.js');
+const verifyToken = require('./middlewares/verifyToken');
 
 const router = express.Router();
 
@@ -205,9 +206,9 @@ router.get('/search', async (req, res) => {
 });
 
 // Route to save a classroom to a user's saved list, expects a room and user ID
-router.post('/save', async (req, res) => {
+router.post('/save', verifyToken, async (req, res) => {
     const roomId = req.body.roomId;
-    const userId = req.body.userId;
+    const userId = req.user.userId;
     const operation = req.body.operation; // true is add, false is remove
 
     try {

@@ -1,5 +1,6 @@
 import axios from "axios";
 
+//todo: make protected route
 const changeClasroom = async (id, attributes, imageUrl) => {
     try {
         const response = await axios.post(`/changeclassroom/`, { id, attributes, imageUrl });
@@ -33,7 +34,7 @@ const changeClasroom = async (id, attributes, imageUrl) => {
 //expects roomid, userid, and operation, true for save, false for unsave
 const save = async (roomId, userId, operation) => {
     try {
-        const response = await axios.post(`/save/`, { roomId, userId, operation});
+        const response = await axios.post(`/save/`, { roomId, userId, operation }, {headers: {'Authorization': `Bearer ${localStorage.getItem('token')}`}});
         const responseBody = response.data;
         if (!response.ok) {
             // Log the error if the response status is not OK

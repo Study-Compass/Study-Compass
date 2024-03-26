@@ -29,7 +29,7 @@ function SearchBar({ data, onEnter, onSearch, room, onX}) {
         "Winslow Building": "WINS",
     }
 
-    const fullnames = {
+    const fullNames = {
         "DCC" : "Darrin Communications Center",
         "JEC" : "Jonsson Engineering Center",
         "JROWL" : "Jonsson-Rowland Science Center",
@@ -62,9 +62,16 @@ function SearchBar({ data, onEnter, onSearch, room, onX}) {
     }, [data]);
 
     const getFull = (abb) => {
-        console.log(abb);
-        if(removeLastWord(abb) in fullnames){
-            return fullnames[removeLastWord(abb)]+" "+abb.split(' ').pop();
+        if(removeLastWord(abb) in fullNames){
+            return fullNames[removeLastWord(abb)]+" "+abb.split(' ').pop();
+        } else {
+            return abb;
+        }
+    };
+
+    const getAbbFull = (abb) => {
+        if(abb.toUpperCase() in fullNames){
+            return fullNames[abb.toUpperCase()];
         } else {
             return abb;
         }
@@ -133,7 +140,12 @@ function SearchBar({ data, onEnter, onSearch, room, onX}) {
         setSearchInput(searchInput.toLowerCase());
         setLower("");
         setResults([]);
-        onSearch(searchInput, [], "name");
+        if(searchInput === results[selected].toLowerCase()){
+            onEnter(getFull(results[selected]));
+        } else {     
+            console.log(getAbbFull(searchInput));
+            onSearch(getAbbFull(searchInput), [], "name");
+        }
     }
 
     const handleKeyDown = (event) => {
