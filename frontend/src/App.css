@@ -110,7 +110,7 @@ button.active{
     /* height: 50px; */
     background-color: white;
     border: 1px solid var(--lightborder);
-    border-radius: 10px;
+    border-radius: 15px;
     position:absolute;
     top: 50px;
     justify-self: center;   

@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import Check from './assets/Icons/Check.svg';
+import CircleX from './assets/Icons/Circle-X.svg';
+import Error from './assets/circle-warning.svg';
 
 // Create the context
 const NotificationContext = createContext();
@@ -12,6 +14,11 @@ export const useNotification = () => useContext(NotificationContext);
 // Notification provider component
 export const NotificationProvider = ({ children }) => {
   const [notifications, setNotifications] = useState([]);
+
+  const images = {
+    'success': Check,
+    'error': Error,
+  }
 
   // Function to show a notification
 
@@ -57,7 +64,7 @@ export const NotificationProvider = ({ children }) => {
       <div className="notification-container">
         {notifications.map((notification) => (
           <div key={notification.id} className={`notification ${notification.exit ? 'remove' : ''}`}>
-            <img src={Check}></img>
+            <img src={images[notification.type]}></img>
             <div className="notification-content">
                 <h1>{notification.title}</h1>
                 {notification.message ? <p>{notification.message}</p>: ""}

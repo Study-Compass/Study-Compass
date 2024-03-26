@@ -24,6 +24,11 @@ function Bookmark({ room }) {
         setIsChecked(operation);
         try {
             await save(room._id, user._id, operation);
+            if(operation){
+                addNotification({ title: "Room saved", message: operation ? "Room saved successfully" : "Room removed from saved", type: "success" });
+            } else {
+                addNotification({ title: "Room removed", message: operation ? "Room saved successfully" : "Room removed from saved", type: "success" });
+            }
             validateToken();
         } catch (error) {
             addNotification({ title: "Error saving room", message: error.message, type: "error" });
