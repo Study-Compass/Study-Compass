@@ -44,7 +44,7 @@ li.result{
 }
 
 .result:hover{
-    background-color:#F1F1F1;
+    filter: brightness(90%);
     cursor:pointer;
 }
 
