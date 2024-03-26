@@ -106,3 +106,33 @@
     width:13px;
 }
 
+
+
+.rating{
+    display:flex;
+    flex-direction: row;
+    gap:5px;
+    align-items: center;
+
+}
+
+.rating p{
+    margin:0;
+    font-size:14px;
+    font-family:'Inter';
+    font-weight:700;
+}
+
+.rating img{
+    width:15px;
+    height:15px;
+
+}
+
+.info-row{
+    display:flex;
+    flex-direction: row;
+    gap:10px;
+    align-items: center;
+    margin: 7px 0;
+}

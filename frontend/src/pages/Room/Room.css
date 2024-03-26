@@ -31,7 +31,7 @@
     height: 100%;
     box-sizing: border-box;
     /* padding: 20px 0 0 0; */
-    border: 1px solid #B0AFAF;
+    /* border: 1px solid #B0AFAF; */
     border-radius: 20px;
     position: relative;
 }
@@ -201,7 +201,7 @@ select{
 .free-until,
 .class-until{
     font-weight:500;
-    margin: 5px 0 10px 0;
+    /* margin: 5px 0 10px 0; */
     font-size:13px;
     display:flex;
     align-items:center;

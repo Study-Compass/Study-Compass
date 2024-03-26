@@ -20,7 +20,7 @@ import { debounce} from '../../Query.js';
 
 /*
 STATES
-contentState: "empty", "nameSearch", "calendarSearch" , "calendarSearchResult"
+contentState: "empty", "classroom", "calendarSearch" , "calendarSearchResult", "nameSearch"
 */ 
 
 function Room() {
@@ -30,7 +30,7 @@ function Room() {
     const [rooms, setRooms] = useState(null);
     const [roomIds, setRoomIds] = useState({});
     const { isAuthenticated } = useAuth();
-    const { getRooms, getFreeRooms, getRoom, getBatch } = useCache();
+    const { getRooms, getFreeRooms, getRoom, getBatch, search } = useCache();
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [calendarLoading, setCalendarLoading] = useState(true);
@@ -119,7 +119,7 @@ function Room() {
             }, 100);
         } else {
             fetchData(roomIds[roomid]);
-            setContentState("nameSearch");
+            setContentState("classroom");
             clearQuery();
         }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -161,6 +161,18 @@ function Room() {
         // setLoadedResults(roomNames.sort().slice(0,10));
         setCalendarLoading(false);
     }
+
+    const fetchSearch = async (query, attributes, sort) => {
+        setContentState("nameSearch")
+        setCalendarLoading(true)
+        setResults([]);
+        setLoadedResults([]);
+        const roomNames = await search(query, attributes, sort);
+        setResults(roomNames);
+        console.log(roomNames);
+        setNumLoaded(10);
+        setCalendarLoading(false);
+    };
 
     useEffect(()=>{
         console.log("numloaded changed", numLoaded, results.length, loadedResults.length)
@@ -234,10 +246,10 @@ function Room() {
     useEffect(() => { 
         setLoadedResults([]);
         setNumLoaded(0);
-        // if query is changed and noquery is true, set contentstate to empty unless query cleaered using namesearch
+        // if query is changed and noquery is true, set contentstate to empty unless query cleaered using classroom
         if ((noquery === true && contentState === "calendarSearchResult") || roomid === "none") {
             setContentState("empty");
-        } else if(contentState !== "nameSearch"){
+        } else if(contentState !== "classroom"){
             setContentState("calendarSearch");  
         }
         // console.log(`noquery: ${noquery}`);
@@ -266,7 +278,7 @@ function Room() {
 
     function changeURL2(option) {
         navigate(`/room/${option}`, { replace: true });
-        setContentState("nameSearch");
+        setContentState("classroom");
     }
 
     function onX(){ //make a reset function soon
@@ -290,16 +302,16 @@ function Room() {
             <div className="content-container">
                 <div className="calendar-container">
                     <div className={width < 800 ? "left-mobile" : "left"}>
-                        <SearchBar data={rooms} onEnter={changeURL2} room={roomid} onX={onX} />
-                        {contentState === "nameSearch" || contentState === "calendarSearchResult" || contentState === "freeNowSearch" ? <Classroom 
+                        <SearchBar data={rooms} onEnter={changeURL2} room={roomid} onX={onX} onSearch={fetchSearch} />
+                        {contentState === "classroom" || contentState === "calendarSearchResult" || contentState === "freeNowSearch" ? <Classroom 
                             name={roomid} 
                             room={room} 
                             state={contentState} 
                             setState={setContentState}
                             schedule={data}
                         /> : ""}
-                        {contentState === "calendarSearch" || contentState === "freeNowSearch" ? calendarLoading ? "" : <h1 className="resultCount">{results.length} results</h1> : ""}
-                        {contentState === "calendarSearch" || contentState === "freeNowSearch" ? 
+                        {contentState === "calendarSearch" || contentState === "freeNowSearch" || contentState === "nameSearch" ? calendarLoading ? "" : <h1 className="resultCount">{results.length} results</h1> : ""}
+                        {contentState === "calendarSearch" || contentState === "freeNowSearch" || contentState === "nameSearch" ? 
                             <Results 
                                 results={results}
                                 loadedResults={loadedResults}
@@ -327,7 +339,7 @@ function Room() {
                             <Calendar className={roomid} data={data} isloading={loading} addQuery={addQuery} removeQuery={removeQuery} query={query} />
                         </div>
                     )}
-                    {width < 800 ? contentState === "calendarSearchResult" || contentState === "nameSearch" ? <button className="show-calendar" onClick={() => { setShowMobileCalendar(true) }}> <img src={chevronUp} alt="show schedule" /> </button> : "" : ""}
+                    {width < 800 ? contentState === "calendarSearchResult" || contentState === "classroom" ? <button className="show-calendar" onClick={() => { setShowMobileCalendar(true) }}> <img src={chevronUp} alt="show schedule" /> </button> : "" : ""}
                 </div>
             </div>
         </div>

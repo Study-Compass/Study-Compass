@@ -7,17 +7,33 @@ const NotificationContext = createContext();
 // Function to use the notification context
 export const useNotification = () => useContext(NotificationContext);
 
+// Notification format : {title: "title", message: "message", type: "success/error/warning/info"}
+
 // Notification provider component
 export const NotificationProvider = ({ children }) => {
   const [notifications, setNotifications] = useState([]);
 
   // Function to show a notification
+
+  const reloadNotification = (notification) => {
+    localStorage.setItem('notifications', JSON.stringify(notification));
+  };
+
+  useEffect(() => {
+    // Load notifications from localStorage when the component mounts
+    const savedNotification = localStorage.getItem('notifications');
+    if (savedNotification) {
+      addNotification(JSON.parse(savedNotification));
+      setTimeout(() => localStorage.removeItem('notifications'), 3000);
+
+    }
+  }, []);
+
   const addNotification = (notification) => {
     const id = new Date().getTime(); // Simple unique ID
     setNotifications((prevNotifications) => [...prevNotifications, { ...notification, id, exit: false }]);
 
-    // Optionally, start exit animation after a delay, then remove
-    setTimeout(() => initiateExit(id), 3000); // Adjust time as needed
+    setTimeout(() => initiateExit(id), 3000); 
   };
 
   const initiateExit = (id) => {
@@ -36,7 +52,7 @@ export const NotificationProvider = ({ children }) => {
   };
 
   return (
-    <NotificationContext.Provider value={{ addNotification }}>
+    <NotificationContext.Provider value={{ addNotification, reloadNotification }}>
       {children}
       <div className="notification-container">
         {notifications.map((notification) => (

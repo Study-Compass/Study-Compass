@@ -2,13 +2,15 @@ import React, {useRef, useEffect} from 'react';
 import './Results.css';
 import Result from './Result/Result.jsx';
 
-import { Img } from 'react-optimized-image';
-
 import Loader from '../Loader/Loader.jsx';
 
 function Results({ results, loadedResults, numLoaded, setNumLoaded, debouncedFetchData, contentState, changeURL, findNext}) {
     const resultRef = useRef(null);
     let scrollLoading = false;
+
+
+    //checking loaded results
+    loadedResults.map(result => {console.log(result.room)})
 
     useEffect(() => {
         const container = resultRef.current;
@@ -38,10 +40,11 @@ function Results({ results, loadedResults, numLoaded, setNumLoaded, debouncedFet
 
     return (
         <ul className="time-results" ref={resultRef}>
-        {loadedResults.map((result, index) => (
+        {loadedResults.map(result => (
             <Result 
-                key={index} 
+                key={result.room.name} 
                 result={result} 
+                attributes={result.room.attributes}
                 debouncedFetchData={debouncedFetchData} 
                 changeURL={changeURL}
                 findNext={findNext}

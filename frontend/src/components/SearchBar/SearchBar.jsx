@@ -44,9 +44,6 @@ function SearchBar({ data, onEnter, onSearch, room, onX}) {
     const inputRef = useRef(null);
     const shadowRef = useRef(null);
 
-    const [goingUp, setGoingUp] = useState(false);
-
-
     const handleInputChange = (event) => {
         setSearchInput(event.target.value);
     };
@@ -132,11 +129,11 @@ function SearchBar({ data, onEnter, onSearch, room, onX}) {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [searchInput, dataAbb]);
 
-    function next(name){
-        setSearchInput(name.toLowerCase());
+    function next(){
+        setSearchInput(searchInput.toLowerCase());
         setLower("");
         setResults([]);
-        onEnter(name);
+        onSearch(searchInput, [], "name");
     }
 
     const handleKeyDown = (event) => {
@@ -146,13 +143,12 @@ function SearchBar({ data, onEnter, onSearch, room, onX}) {
         if (event.key === 'Enter') {
             event.preventDefault();
             if (results.length > 0) {
-                next(getFull(results[selected]));
+                next();
                 inputRef.current.blur();
             }
         }
         if (event.key === 'ArrowDown') {
             event.preventDefault();
-            setGoingUp(false);
             if(selected === results.length-1){
                 setSelected(0);
                 if(results[0].toLowerCase().startsWith(searchInput.toLowerCase())){
@@ -174,7 +170,6 @@ function SearchBar({ data, onEnter, onSearch, room, onX}) {
                 return;
             }
             event.preventDefault();
-            setGoingUp(true);
             if(selected === 0){
                 setSelected(results.length-1);
                 if(results[results.length-1].toLowerCase().startsWith(searchInput.toLowerCase())){
@@ -202,8 +197,12 @@ function SearchBar({ data, onEnter, onSearch, room, onX}) {
 
     function click(event){
         event.preventDefault();
-        next(getFull(results[event.target.value]))
+        const name = getFull(results[event.target.value]);
         // console.log(`routing url:${event.target.value}`)
+        setSearchInput(name.toLowerCase());
+        setLower("");
+        setResults([]);
+        onEnter(name);
     }
 
     function handleX(){

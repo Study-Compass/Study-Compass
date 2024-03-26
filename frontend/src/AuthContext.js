@@ -55,7 +55,7 @@ export const AuthProvider = ({ children }) => {
                 setIsAuthenticated(true);
                 setUser(response.data.data.user);
                 console.log(response.data);
-                addNotification({ title:'Logged in successfully',success: 'success'});
+                addNotification({ title:'Logged in successfully',type: 'success'});
             }
         } catch (error) {
             // console.error('Login failed:', error);
@@ -72,7 +72,7 @@ export const AuthProvider = ({ children }) => {
             localStorage.setItem('token', response.data.data.token);
             setIsAuthenticated(true);
             setUser(response.data.data.user);
-            addNotification({title: 'Logged in successfully',success: 'success'});
+            addNotification({title: 'Logged in successfully',type: 'success'});
             // For example, redirect the user or store the received token in local storage
         } catch (error) {
             console.error('Error sending code to backend:', error);
@@ -89,7 +89,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     return (
-        <AuthContext.Provider value={{ isAuthenticated, user, login, logout, googleLogin }}>
+        <AuthContext.Provider value={{ isAuthenticated, user, login, logout, googleLogin, validateToken }}>
             {children}
         </AuthContext.Provider>
     );

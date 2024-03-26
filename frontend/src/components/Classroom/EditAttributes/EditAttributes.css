@@ -53,6 +53,11 @@
     height:35px;
 }
 
+.input::placeholder{
+    color:var(--lighterborder);
+
+}
+
 .add{
     width:30%;
     height:35px;
@@ -77,4 +82,9 @@
     color: var(--border);
     border-radius: 5px;
     margin-top:10px;
+}
+
+.image-change{
+    margin-top:10px;
+    width:100%
 }
