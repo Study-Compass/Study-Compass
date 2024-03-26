@@ -103,7 +103,23 @@ select{
     cursor:pointer;
   }
 
+.resultsCountContainer{
+    width:100%;
+    display:flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-end;
+}
 
+.resultsCountContainer img{
+    margin-right:30px;
+    transition: all 0.3s;
+}
+
+.resultsCountContainer img:hover{
+    transform: scale(1.1);
+    cursor:pointer;
+}
 
 .resultCount{
     font-size:20px;
@@ -111,7 +127,6 @@ select{
     margin-left:30px;
     top:0;
     left:0;
-    width:calc(100% - 30px);
     margin-top:20px;
     margin: 20px 0 0 30px;
 }

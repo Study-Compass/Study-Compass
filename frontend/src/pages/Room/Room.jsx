@@ -8,10 +8,11 @@ import useAuth from '../../hooks/useAuth.js';
 import { useCache } from '../../CacheContext.js';
 import Classroom from '../../components/Classroom/Classroom.jsx';
 import MobileCalendar from '../../components/CalendarComponents/MobileCalendar/MobileCalendar.jsx';
-import { findNext } from "./RoomHelpers.js";
+import { findNext, fetchDataHelper, fetchFreeRoomsHelper, fetchFreeNowHelper, fetchSearchHelper, addQueryHelper, removeQueryHelper } from "./RoomHelpers.js";
 import Results from '../../components/Results/Results.jsx';
 
 import chevronUp from '../../assets/chevronup.svg';
+import Sort from '../../assets/Icons/Sort.svg';
 
 import { debounce} from '../../Query.js';
 
@@ -37,27 +38,23 @@ function Room() {
     const [results, setResults] = useState([]);
     const [numLoaded, setNumLoaded] = useState(0);
     const [loadedResults, setLoadedResults] = useState([]);
-    const [query, setQuery] = useState({
-        'M': [],
-        'T': [],
-        'W': [],
-        'R': [],
-        'F': [],
-    });
+    const [query, setQuery] = useState({'M': [],'T': [],'W': [],'R': [],'F': [],});
     const [noquery, setNoQuery] = useState(true);
 
-    function clearQuery(){
-        setQuery({
-            'M': [],
-            'T': [],
-            'W': [],
-            'R': [],
-            'F': [],
-        });
+    function clearQuery(){ setQuery({'M': [],'T': [],'W': [],'R': [],'F': [],});
         setNoQuery(true);
     }
 
     const [width, setWidth] = useState(window.innerWidth);
+
+    const fetchData = async (id) => fetchDataHelper(id, setLoading, setData, setRoom, navigate, getRoom);
+    const fetchFreeRooms = async () => fetchFreeRoomsHelper(setContentState, setCalendarLoading, getFreeRooms, setResults, setNumLoaded, query);
+    const debouncedFetchData = debounce(fetchData, 500); // Adjust delay as needed
+    const fetchFreeNow = async () => fetchFreeNowHelper(setContentState, setCalendarLoading, setResults, setNumLoaded, getFreeRooms);
+    const fetchSearch = async (query, attributes, sort) => fetchSearchHelper(query, attributes, sort, setContentState, setCalendarLoading, setResults, setLoadedResults, search, setNumLoaded);
+    const addQuery = (key, newValue) => addQueryHelper(key, newValue, setNoQuery, setContentState, setQuery);
+    const removeQuery = (key, value) => removeQueryHelper(key, value, setQuery, setNoQuery);
+
 
     useEffect(() => {
       // Handler to call on window resize
@@ -88,28 +85,6 @@ function Room() {
         fetchRooms();
     }, []);
 
-    const fetchData = async (id) => {
-        setLoading(true);
-        setData(null);
-        try{
-            const data = await getRoom(id);
-            setLoading(false);
-            setRoom(data.room);
-            setData(data.data);
-        } catch (error){
-            console.log(error);
-            navigate("/error/500");
-        }
-
-    };
-
-    const fetchSchedule = async (id) =>{
-        const data = await getRoom(id);
-        return data;
-    }
-
-    const debouncedFetchData = debounce(fetchData, 500); // Adjust delay as needed
-
     useEffect(() => { // FETCH ROOM DATA , triggers on url change
         if(roomIds[roomid] === undefined && roomid !== "none"){
             return;
@@ -133,54 +108,6 @@ function Room() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [roomid, isAuthenticated, roomIds]);
 
-    const fetchFreeRooms = async () => {
-        setContentState("calendarSearch")
-        setCalendarLoading(true)
-        const roomNames = await getFreeRooms(query);
-        setResults(roomNames.sort());
-        setNumLoaded(10);
-        setCalendarLoading(false);
-    };
-
-    const fetchFreeNow = async () => {
-        setContentState("freeNowSearch")
-        setCalendarLoading(true)
-        let nowQuery = {
-            'M': [],
-            'T': [],
-            'W': [],
-            'R': [],
-            'F': [],
-        };
-        const days = ["M", "T", "W", "R", "F"];
-        const today = new Date();
-        const day = today.getDay();
-        const hour = today.getHours();
-        if(day === 0 || day === 6){
-            nowQuery['M'] = [{start_time: 0, end_time: 30}];
-        } else {
-            nowQuery[days[day-1]] = [{start_time: hour*60, end_time: (hour*60)+30}];
-        }
-        console.log(nowQuery);
-        const roomNames = await getFreeRooms(nowQuery);
-        setResults(roomNames.sort());
-        console.log(results);
-        setNumLoaded(10);
-        // setLoadedResults(roomNames.sort().slice(0,10));
-        setCalendarLoading(false);
-    }
-
-    const fetchSearch = async (query, attributes, sort) => {
-        setContentState("nameSearch")
-        setCalendarLoading(true)
-        setResults([]);
-        setLoadedResults([]);
-        const roomNames = await search(query, attributes, sort);
-        setResults(roomNames);
-        console.log(roomNames);
-        setNumLoaded(10);
-        setCalendarLoading(false);
-    };
 
     useEffect(()=>{
         console.log("numloaded changed", numLoaded, results.length, loadedResults.length)
@@ -196,61 +123,6 @@ function Room() {
         updateLoadedResults();
     },[numLoaded]);
 
-    // useEffect(()=>{console.log("loaded results change detected", loadedResults)},[loadedResults]);
-
-    const addQuery = (key, newValue) => {
-        setNoQuery(false);
-        setContentState("calendarSearch");
-        setQuery(prev => {
-            // Create a list that includes all existing timeslots plus the new one.
-            const allSlots = [...prev[key], newValue];
-
-            // Sort timeslots by start time.
-            allSlots.sort((a, b) => a.start_time - b.start_time);
-
-            // Merge overlapping or consecutive timeslots.
-            const mergedSlots = allSlots.reduce((acc, slot) => {
-                if (acc.length === 0) {
-                    acc.push(slot);
-                } else {
-                    let lastSlot = acc[acc.length - 1];
-                    if (lastSlot.end_time >= slot.start_time) {
-                        // If the current slot overlaps or is consecutive with the last slot in acc, merge them.
-                        lastSlot.end_time = Math.max(lastSlot.end_time, slot.end_time);
-                    } else {
-                        // If not overlapping or consecutive, just add the slot to acc.
-                        acc.push(slot);
-                    }
-                }
-                return acc;
-            }, []);
-
-            // Return updated state.
-            return { ...prev, [key]: mergedSlots };
-        });
-    };
-
-    const removeQuery = (key, value) => {
-        // setNoQuery(true); //failsafe, useEffect checks before query anyways
-        setQuery(prev => {
-            const existing = prev[key];
-            if (existing === undefined) {
-                // If the key does not exist, return the previous state unchanged.
-                return prev;
-            } else {
-                // Filter the array to remove the specified value.
-                const filtered = existing.filter(v => v !== value);
-                // Always return the object with the key, even if the array is empty.
-                const newQuery = { ...prev, [key]: filtered };
-                const isQueryEmpty = Object.values(newQuery).every(arr => arr.length === 0);
-                setNoQuery(isQueryEmpty);
-                return  newQuery;
-            }
-        });
-        
-        // Check if all keys in the query object have empty arrays and update `noQuery` accordingly.
-    }
-
     useEffect(() => { 
         setLoadedResults([]);
         setNumLoaded(0);
@@ -260,9 +132,7 @@ function Room() {
         } else if(contentState !== "classroom"){
             setContentState("calendarSearch");  
         }
-        // console.log(`noquery: ${noquery}`);
         setResults([]);
-        // console.log("query: ", query);
         if (!noquery) {
             fetchFreeRooms();
         }
@@ -270,7 +140,6 @@ function Room() {
     }, [query])
 
     useEffect(()=>{
-        // console.log("contentstate",contentState);
         if(contentState === "empty"){
             setNumLoaded(0);
             setLoadedResults([]);
@@ -318,7 +187,13 @@ function Room() {
                             setState={setContentState}
                             schedule={data}
                         /> : ""}
-                        {contentState === "calendarSearch" || contentState === "freeNowSearch" || contentState === "nameSearch" ? calendarLoading ? "" : <h1 className="resultCount">{results.length} results</h1> : ""}
+                        {contentState === "calendarSearch" || contentState === "freeNowSearch" || contentState === "nameSearch" ? calendarLoading ? "" : 
+                            <div className="resultsCountContainer">
+                                <h1 className="resultCount">{results.length} results</h1> 
+                                <img src={Sort} alt="sort" />
+                            </div>
+                            
+                        : ""}
                         {contentState === "calendarSearch" || contentState === "freeNowSearch" || contentState === "nameSearch" ? 
                             <Results 
                                 results={results}

@@ -61,6 +61,118 @@ const findNext = (schedule) => {
     }
 };
 
+const fetchDataHelper = async (id, setLoading, setData, setRoom, navigate, getRoom) => {
+    setLoading(true);
+    setData(null);
+    try{
+        const data = await getRoom(id);
+        setLoading(false);
+        setRoom(data.room);
+        setData(data.data);
+    } catch (error){
+        console.log(error);
+        navigate("/error/500");
+    }
+};
+
+const fetchFreeRoomsHelper = async (setContentState, setCalendarLoading, getFreeRooms, setResults, setNumLoaded, query) => {
+    setContentState("calendarSearch")
+    setCalendarLoading(true)
+    const roomNames = await getFreeRooms(query);
+    setResults(roomNames.sort());
+    setNumLoaded(10);
+    setCalendarLoading(false);
+};
+
+const fetchFreeNowHelper = async (setContentState, setCalendarLoading, setResults, setNumLoaded, getFreeRooms) => {
+    setContentState("freeNowSearch")
+    setCalendarLoading(true)
+    let nowQuery = {
+        'M': [],
+        'T': [],
+        'W': [],
+        'R': [],
+        'F': [],
+    };
+    const days = ["M", "T", "W", "R", "F"];
+    const today = new Date();
+    const day = today.getDay();
+    const hour = today.getHours();
+    if(day === 0 || day === 6){
+        nowQuery['M'] = [{start_time: 0, end_time: 30}];
+    } else {
+        nowQuery[days[day-1]] = [{start_time: hour*60, end_time: (hour*60)+30}];
+    }
+    const roomNames = await getFreeRooms(nowQuery);
+    setResults(roomNames.sort());
+    setNumLoaded(10);
+    // setLoadedResults(roomNames.sort().slice(0,10));
+    setCalendarLoading(false);
+}
+
+const fetchSearchHelper = async (query, attributes, sort, setContentState, setCalendarLoading, setResults, setLoadedResults, search, setNumLoaded) => {
+    setContentState("nameSearch")
+    setCalendarLoading(true)
+    setResults([]);
+    setLoadedResults([]);
+    const roomNames = await search(query, attributes, sort);
+    setResults(roomNames);
+    setNumLoaded(10);
+    setCalendarLoading(false);
+};
+
+const addQueryHelper = (key, newValue, setNoQuery, setContentState, setQuery) => {
+    setNoQuery(false);
+    setContentState("calendarSearch");
+    setQuery(prev => {
+        // Create a list that includes all existing timeslots plus the new one.
+        const allSlots = [...prev[key], newValue];
+
+        // Sort timeslots by start time.
+        allSlots.sort((a, b) => a.start_time - b.start_time);
+
+        // Merge overlapping or consecutive timeslots.
+        const mergedSlots = allSlots.reduce((acc, slot) => {
+            if (acc.length === 0) {
+                acc.push(slot);
+            } else {
+                let lastSlot = acc[acc.length - 1];
+                if (lastSlot.end_time >= slot.start_time) {
+                    // If the current slot overlaps or is consecutive with the last slot in acc, merge them.
+                    lastSlot.end_time = Math.max(lastSlot.end_time, slot.end_time);
+                } else {
+                    // If not overlapping or consecutive, just add the slot to acc.
+                    acc.push(slot);
+                }
+            }
+            return acc;
+        }, []);
+
+        // Return updated state.
+        return { ...prev, [key]: mergedSlots };
+    });
+};
+
+const removeQueryHelper = (key, value, setQuery, setNoQuery ) => {
+    // setNoQuery(true); //failsafe, useEffect checks before query anyways
+    setQuery(prev => {
+        const existing = prev[key];
+        if (existing === undefined) {
+            // If the key does not exist, return the previous state unchanged.
+            return prev;
+        } else {
+            // Filter the array to remove the specified value.
+            const filtered = existing.filter(v => v !== value);
+            // Always return the object with the key, even if the array is empty.
+            const newQuery = { ...prev, [key]: filtered };
+            const isQueryEmpty = Object.values(newQuery).every(arr => arr.length === 0);
+            setNoQuery(isQueryEmpty);
+            return  newQuery;
+        }
+    });
+    
+    // Check if all keys in the query object have empty arrays and update `noQuery` accordingly.
+}
 
 
-export { findNext };
+export { findNext, fetchDataHelper, fetchFreeRoomsHelper, fetchFreeNowHelper, fetchSearchHelper, addQueryHelper, removeQueryHelper };
