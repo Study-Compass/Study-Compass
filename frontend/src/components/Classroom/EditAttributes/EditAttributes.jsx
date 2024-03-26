@@ -16,7 +16,7 @@ import { useNotification } from '../../../NotificationContext.js';
 
 function EditAttributes({room, attributes, setEdit}){
 
-    const { addNotification } = useNotification();
+    const { reloadNotification } = useNotification();
     const navigate = useNavigate();
     const { user } = useAuth();
 
@@ -28,6 +28,7 @@ function EditAttributes({room, attributes, setEdit}){
 
     const [attributesAdmin, setAttributes] = useState([...attributes]);
     const [adding, setAdding] = useState("");
+    const [imageUrl, setImageUrl] = useState("");
 
     const addAttribute = (attribute) => {
         if(attribute === "" || attributesAdmin.includes(attribute)){
@@ -37,7 +38,7 @@ function EditAttributes({room, attributes, setEdit}){
         const newAttributes = [...attributesAdmin, attribute];
         setAttributes(newAttributes);
         setAdding("");
-        addNotification({title: "Attributes updated", message: "your changes will be reflected in the database"});
+        // addNotification({title: "Attributes updated", message: "your changes will be reflected in the database"});
 
     };
 
@@ -45,11 +46,21 @@ function EditAttributes({room, attributes, setEdit}){
         setAdding(e.target.value);
     };
 
+    const imageChange = (e) => {
+        setImageUrl(e.target.value);
+    };
+
     const handleSubmit = () => {
-        console.log("hello");
-        changeClasroom(room._id, attributesAdmin);
-        // addNotification({message: "Attributes updated"});
-        window.location.reload();
+        try{
+            changeClasroom(room._id, attributesAdmin, imageUrl.trim());
+        } catch (error){
+            console.error(error);
+            reloadNotification({title: "Error updating attributes", message: "please try again", type: "error"});
+        } finally {
+            reloadNotification({title: "Successfully updated attributes", message: "your changes will be reflected in the database", type: "success"});
+            window.location.reload();
+        }
+
     };
 
     console.log(room);
@@ -73,9 +84,10 @@ function EditAttributes({room, attributes, setEdit}){
                 );
             })}
             <div className="addNew">
-                <input type="text" value={adding} onChange={handleChange} className="input" />
+                <input type="text" value={adding} onChange={handleChange} className="input" placeholder='add new attributes'/>
                 <button className="add" onClick={()=>{addAttribute(adding)}}>add</button>
             </div>
+            <input className="input image-change" type="text" value={imageUrl} onChange={imageChange} placeholder='add new image url'/>
             <button className="save" onClick={handleSubmit}>save</button>
             <button className="save" onClick={()=>{setEdit(false)}}>cancel</button>
 

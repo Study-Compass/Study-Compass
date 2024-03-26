@@ -143,6 +143,7 @@ router.post('/getbatch', async (req, res) => {
 router.post('/changeclassroom', async (req, res) => {
     const id = req.body.id;
     const attributes = req.body.attributes;
+    const imageUrl = req.body.imageUrl;
 
     try{
         const classroom = await Classroom.findOne({_id: id});
@@ -150,7 +151,9 @@ router.post('/changeclassroom', async (req, res) => {
         if (!classroom) {
             return res.status(404).json({ success: false, message: "Classroom not found" });
         }
-
+        if(imageUrl !== ""){
+            classroom.image = `/classrooms/${imageUrl}`;
+        }
         classroom.attributes = attributes;
         await classroom.save();
         console.log(`POST: /changeclassroom/${id}`);
