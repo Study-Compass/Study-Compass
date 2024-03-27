@@ -1,5 +1,6 @@
 import React, { createContext, useContext } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom'; 
 
 export const CacheContext = createContext();
 
@@ -114,6 +115,8 @@ export const CacheProvider = ({children}) =>{
                   query: query,
                   attributes: attributes,
                   sort: 'name'
+                }, headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
                 }
               });            
             const responseBody = response.data;
@@ -124,6 +127,7 @@ export const CacheProvider = ({children}) =>{
             return responseBody.data;
         } catch (error){
             console.error('Error fetching search data:', error);
+            throw error;
         }
     };
 

@@ -3,7 +3,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
 const router = express.Router();
-const verifyToken = require('./middlewares/verifyToken');
+const { verifyToken } = require('./middlewares/verifyToken');
 
 const { authenticateWithGoogle, loginUser, registerUser } = require('./services/userServices');
 

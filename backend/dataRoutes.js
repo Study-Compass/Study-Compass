@@ -2,7 +2,7 @@ const express = require('express');
 const Classroom = require('./schemas/classroom.js');
 const Schedule = require('./schemas/schedule.js');
 const User = require('./schemas/user.js');
-const verifyToken = require('./middlewares/verifyToken');
+const { verifyToken, verifyTokenOptional } = require('./middlewares/verifyToken');
 
 const router = express.Router();
 
@@ -142,6 +142,8 @@ router.post('/getbatch', async (req, res) => {
         return res.status(500).json({ success: false, message: 'Error retrieving data', error: error.message });
     }
 });
+
+
 router.post('/changeclassroom', async (req, res) => {
     const id = req.body.id;
     const attributes = req.body.attributes;
@@ -165,26 +167,36 @@ router.post('/changeclassroom', async (req, res) => {
     }
 });
 
-router.get('/search', async (req, res) => {
+router.get('/search', verifyTokenOptional, async (req, res) => {
     const query = req.query.query;
     const attributes = req.query.attributes ? req.query.attributes.split(",") : []; // Ensure attributes is an array
     const sort = req.query.sort;
+    const userId = req.user ? req.user.userId : null;
+
+    let user;
+    if(userId){
+        try{
+            user = await User.findOne({ _id: userId });
+        } catch(error) {
+            console.log('invalid user')
+        }
+    }
 
     try {
         // Define the base query with projection to only include the name field
         let findQuery = Classroom.find(
             { name: { $regex: query, $options: 'i' }, attributes: { $all: attributes } },
-            { name: 1, _id: 0 } // Project only the name field
+            { name: 1 } // Project only the name field
         );
 
         if(attributes.length === 0){
             findQuery = Classroom.find(
                 { name: { $regex: query, $options: 'i' }},
-                { name: 1, _id: 0 } // Project only the name field
+                { name: 1 } // Project only the name field
             );
         }
 
-        console.log({ name: { $regex: query, $options: 'i' }, attributes: { $all: attributes } },{ name: 1, _id: 0 }) 
+        console.log({ name: { $regex: query, $options: 'i' }, attributes: { $all: attributes } },{ name: 1} ) 
 
 
         // Conditionally add sorting if required
@@ -195,8 +207,30 @@ router.get('/search', async (req, res) => {
         // Execute the query
         const classrooms = await findQuery;
 
+        let sortedClassrooms = [];
+
+        if (userId && user) {
+            const savedSet = new Set(user.saved); // Convert saved items to a Set for efficient lookups
+
+            // Split classrooms into saved and not saved
+            const { saved, notSaved } = classrooms.reduce((acc, classroom) => {
+                console.log(classroom._id, savedSet.has(classroom._id));
+                if (savedSet.has(classroom._id.toString())) { 
+                    acc.saved.push(classroom);
+                } else {
+                    acc.notSaved.push(classroom);
+                }
+                return acc;
+            }, { saved: [], notSaved: [] });
+
+            // Concatenate saved items in front of not saved items
+            sortedClassrooms = saved.concat(notSaved);
+        } else {
+            sortedClassrooms = classrooms; // No user or saved info, use original order
+        }
+
         // Extract only the names from the result set
-        const names = classrooms.map(classroom => classroom.name);
+        const names = sortedClassrooms.map(classroom => classroom.name);
 
         console.log(`GET: /search?query=${query}&attributes=${attributes}&sort=${sort}`);
         res.json({ success: true, message: "Rooms found", data: names });

@@ -1,3 +1,4 @@
+
 function minutesToTime(minutes){
     let hours = Math.floor(minutes / 60);
     const mins = minutes % 60;
@@ -6,7 +7,7 @@ function minutesToTime(minutes){
         hours -= 12;
         end = "PM";
     }
-    if(mins == 0){
+    if(mins === 0){
         return `${hours}${end}`;
     }
     return `${hours}:${mins.toString().padStart(2, '0')} ${end}`;
@@ -110,15 +111,19 @@ const fetchFreeNowHelper = async (setContentState, setCalendarLoading, setResult
     setCalendarLoading(false);
 }
 
-const fetchSearchHelper = async (query, attributes, sort, setContentState, setCalendarLoading, setResults, setLoadedResults, search, setNumLoaded) => {
+const fetchSearchHelper = async (query, attributes, sort, setContentState, setCalendarLoading, setResults, setLoadedResults, search, setNumLoaded, navigate, newError) => {
     setContentState("nameSearch")
     setCalendarLoading(true)
     setResults([]);
     setLoadedResults([]);
-    const roomNames = await search(query, attributes, sort);
-    setResults(roomNames);
-    setNumLoaded(10);
-    setCalendarLoading(false);
+    try{
+        const roomNames = await search(query, attributes, sort);
+        setResults(roomNames);
+        setNumLoaded(10);
+        setCalendarLoading(false);
+    } catch (error) {
+        newError(navigate);
+    }
 };
 
 const addQueryHelper = (key, newValue, setNoQuery, setContentState, setQuery) => {

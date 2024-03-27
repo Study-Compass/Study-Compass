@@ -6,6 +6,7 @@ import Header from '../../components/Header/Header.jsx';
 import SearchBar from '../../components/SearchBar/SearchBar.jsx';
 import useAuth from '../../hooks/useAuth.js';
 import { useCache } from '../../CacheContext.js';
+import { useError } from '../../ErrorContext.js'; 
 import Classroom from '../../components/Classroom/Classroom.jsx';
 import MobileCalendar from '../../components/CalendarComponents/MobileCalendar/MobileCalendar.jsx';
 import { findNext, fetchDataHelper, fetchFreeRoomsHelper, fetchFreeNowHelper, fetchSearchHelper, addQueryHelper, removeQueryHelper } from "./RoomHelpers.js";
@@ -45,13 +46,15 @@ function Room() {
         setNoQuery(true);
     }
 
+    const { setError } = useError();
+
     const [width, setWidth] = useState(window.innerWidth);
 
     const fetchData = async (id) => fetchDataHelper(id, setLoading, setData, setRoom, navigate, getRoom);
     const fetchFreeRooms = async () => fetchFreeRoomsHelper(setContentState, setCalendarLoading, getFreeRooms, setResults, setNumLoaded, query);
     const debouncedFetchData = debounce(fetchData, 500); // Adjust delay as needed
     const fetchFreeNow = async () => fetchFreeNowHelper(setContentState, setCalendarLoading, setResults, setNumLoaded, getFreeRooms);
-    const fetchSearch = async (query, attributes, sort) => fetchSearchHelper(query, attributes, sort, setContentState, setCalendarLoading, setResults, setLoadedResults, search, setNumLoaded);
+    const fetchSearch = async (query, attributes, sort) => fetchSearchHelper(query, attributes, sort, setContentState, setCalendarLoading, setResults, setLoadedResults, search, setNumLoaded, navigate, setError);
     const addQuery = (key, newValue) => addQueryHelper(key, newValue, setNoQuery, setContentState, setQuery);
     const removeQuery = (key, value) => removeQueryHelper(key, value, setQuery, setNoQuery);
 
