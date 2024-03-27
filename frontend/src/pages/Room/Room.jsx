@@ -42,6 +42,8 @@ function Room() {
     const [query, setQuery] = useState({'M': [],'T': [],'W': [],'R': [],'F': [],});
     const [noquery, setNoQuery] = useState(true);
 
+    const [searchQuery, setSearchQuery] = useState(""); // for search bar
+
     function clearQuery(){ setQuery({'M': [],'T': [],'W': [],'R': [],'F': [],});
         setNoQuery(true);
     }
@@ -54,7 +56,7 @@ function Room() {
     const fetchFreeRooms = async () => fetchFreeRoomsHelper(setContentState, setCalendarLoading, getFreeRooms, setResults, setNumLoaded, query);
     const debouncedFetchData = debounce(fetchData, 500); // Adjust delay as needed
     const fetchFreeNow = async () => fetchFreeNowHelper(setContentState, setCalendarLoading, setResults, setNumLoaded, getFreeRooms);
-    const fetchSearch = async (query, attributes, sort) => fetchSearchHelper(query, attributes, sort, setContentState, setCalendarLoading, setResults, setLoadedResults, search, setNumLoaded, navigate, setError);
+    const fetchSearch = async (query, attributes, sort) => fetchSearchHelper(query, attributes, sort, setContentState, setCalendarLoading, setResults, setLoadedResults, search, setNumLoaded, navigate, setError, setSearchQuery);
     const addQuery = (key, newValue) => addQueryHelper(key, newValue, setNoQuery, setContentState, setQuery);
     const removeQuery = (key, value) => removeQueryHelper(key, value, setQuery, setNoQuery);
 
@@ -113,7 +115,6 @@ function Room() {
 
 
     useEffect(()=>{
-        console.log("numloaded changed", numLoaded, results.length, loadedResults.length)
         const updateLoadedResults = async ()=>{
             if(numLoaded === 0){
                 setLoadedResults([]);
@@ -192,7 +193,7 @@ function Room() {
                         /> : ""}
                         {contentState === "calendarSearch" || contentState === "freeNowSearch" || contentState === "nameSearch" ? calendarLoading ? "" : 
                             <div className="resultsCountContainer">
-                                <h1 className="resultCount">{results.length} results</h1> 
+                                <h1 className="resultCount">{results.length} results {contentState === "nameSearch" ? searchQuery ? `for "${searchQuery.slice(0,9)}${searchQuery.length>9 ? "..." : ""}"` : "" : ""}</h1> 
                                 <img src={Sort} alt="sort" />
                             </div>
                             

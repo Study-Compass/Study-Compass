@@ -214,7 +214,6 @@ router.get('/search', verifyTokenOptional, async (req, res) => {
 
             // Split classrooms into saved and not saved
             const { saved, notSaved } = classrooms.reduce((acc, classroom) => {
-                console.log(classroom._id, savedSet.has(classroom._id));
                 if (savedSet.has(classroom._id.toString())) { 
                     acc.saved.push(classroom);
                 } else {

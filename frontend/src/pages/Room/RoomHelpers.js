@@ -111,7 +111,7 @@ const fetchFreeNowHelper = async (setContentState, setCalendarLoading, setResult
     setCalendarLoading(false);
 }
 
-const fetchSearchHelper = async (query, attributes, sort, setContentState, setCalendarLoading, setResults, setLoadedResults, search, setNumLoaded, navigate, newError) => {
+const fetchSearchHelper = async (query, attributes, sort, setContentState, setCalendarLoading, setResults, setLoadedResults, search, setNumLoaded, navigate, newError, setSearchQuery) => {
     setContentState("nameSearch")
     setCalendarLoading(true)
     setResults([]);
@@ -123,7 +123,8 @@ const fetchSearchHelper = async (query, attributes, sort, setContentState, setCa
         setCalendarLoading(false);
     } catch (error) {
         newError(navigate);
-    }
+    } 
+    setSearchQuery(query);
 };
 
 const addQueryHelper = (key, newValue, setNoQuery, setContentState, setQuery) => {
