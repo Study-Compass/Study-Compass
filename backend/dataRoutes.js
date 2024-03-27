@@ -14,7 +14,7 @@ router.get('/getroom/:id', async (req, res) => {
         // Handle special case where "none" is passed as a room name
         if(roomId === "none"){
             // Return an empty Classroom object
-            res.json({ success: true, message: "Empty room object returned", data: new Schedule() });
+            res.json({ success: true, message: "Empty room object returned",room: {name:null},  data: new Schedule() });
                 console.log(`GET: /getroom/none`);
             return;
         }
@@ -123,13 +123,16 @@ router.post('/getbatch', async (req, res) => {
 
             const schedule = await Schedule.findOne({ classroom_id: query });
             result.data = schedule ? schedule : "not found";
-
+            if(result.room === "not found" && result.data === "not found"){
+                return null;
+            }
             // Attach the index to each result
             return { index, result };
         }));
 
+        const filteredResults = results.filter(result => result !== null && result !== undefined);
         // Sort results based on the original index to ensure order
-        const sortedResults = results.sort((a, b) => a.index - b.index).map(item => item.result);
+        const sortedResults = filteredResults.sort((a, b) => a.index - b.index).map(item => item.result);
 
         // Send response after all operations are done and results are sorted
         res.json({ success: true, message: "Rooms found", data: sortedResults });

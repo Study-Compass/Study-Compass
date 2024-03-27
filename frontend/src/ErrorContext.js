@@ -1,8 +1,8 @@
-```
+import React, { createContext, useContext } from 'react';
+/** 
 documentation:
 https://incongruous-reply-44a.notion.site/Frontend-ErrorProvider-Component-ErrorContext-2f2ef272695d4e74b595b48f66a8949c
-```
-import React, { createContext, useContext } from 'react';
+*/
 
 export const ErrorContext = createContext();
 

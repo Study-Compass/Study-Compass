@@ -70,6 +70,7 @@ const fetchDataHelper = async (id, setLoading, setData, setRoom, navigate, getRo
         setLoading(false);
         setRoom(data.room);
         setData(data.data);
+        console.log(data.room);
     } catch (error){
         console.log(error);
         navigate("/error/500");
@@ -121,6 +122,7 @@ const fetchSearchHelper = async (query, attributes, sort, setContentState, setCa
         setResults(roomNames);
         setNumLoaded(10);
         setCalendarLoading(false);
+        console.log(roomNames);
     } catch (error) {
         newError(navigate);
     } 

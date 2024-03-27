@@ -1,20 +1,20 @@
-```
-documentation:
-https://incongruous-reply-44a.notion.site/Frontend-SearchBar-Component-35e616d525f0492dac52ac9161b1945f
-```
-
 import React, { useState, useRef, useEffect } from 'react';
 import './SearchBar.css';
 import x from '../../assets/x.svg';
 import { useNavigate } from 'react-router-dom';
 import tab from '../../assets/tab.svg';
 
+/** 
+documentation:
+https://incongruous-reply-44a.notion.site/Frontend-SearchBar-Component-35e616d525f0492dac52ac9161b1945f
+*/
+
 //need to add support for abbreviated versions
-function SearchBar({ data, onEnter, onSearch, room, onX}) {
+function SearchBar({ data, onEnter, onSearch, room, onX, query}) {
     let navigate =  useNavigate();
     const itemRefs = useRef([]);
 
-    const [searchInput, setSearchInput] = useState(room.toLowerCase());
+    const [searchInput, setSearchInput] = useState(room === null ? "" : room.name === null ? "" : room.name.toLowerCase());
     const [results, setResults] = useState([]);
     const [lower, setLower] = useState("")
     const [dataAbb, setDataAbb] = useState([]);
@@ -56,6 +56,12 @@ function SearchBar({ data, onEnter, onSearch, room, onX}) {
     const removeLastWord = str => str.split(' ').slice(0, -1).join(' ');
 
     useEffect(() => {
+        if(query !== "") {
+            setSearchInput(query);
+        }  
+    }, [query]);
+
+    useEffect(() => {
         if(!data){return}
         let newData = [...data];
         data.map(item => {
@@ -94,10 +100,13 @@ function SearchBar({ data, onEnter, onSearch, room, onX}) {
       }, [selected]);
 
     useEffect(() => {
-        if(room === undefined){
+        if(query !== "") {
+            return;
+        }  
+        if(room === null || room.name === null){
             setSearchInput("");
         } else {
-            setSearchInput(room.toLowerCase());
+            setSearchInput(room.name.toLowerCase());
         }
     },[room]);
 

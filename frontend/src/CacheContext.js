@@ -1,11 +1,10 @@
-```
-documentation:
-https://incongruous-reply-44a.notion.site/Frontend-CacheProvider-Component-CacheContext-64296ab287fc4347be59ca848cc632b0
-```
-
 import React, { createContext, useContext } from 'react';
 import axios from 'axios';
 
+/** 
+documentation:
+https://incongruous-reply-44a.notion.site/Frontend-CacheProvider-Component-CacheContext-64296ab287fc4347be59ca848cc632b0
+*/
 export const CacheContext = createContext();
 
 export const CacheProvider = ({children}) =>{

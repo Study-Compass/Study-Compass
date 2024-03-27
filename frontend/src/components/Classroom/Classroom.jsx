@@ -17,7 +17,7 @@ import { findNext } from '../../pages/Room/RoomHelpers.js';
 
 import '../../pages/Room/Room.css';
 
-function Classroom({ name, room, state, setState, schedule }) {
+function Classroom({ room, state, setState, schedule }) {
 
     console.log("room",room);
     const [image, setImage] = useState("")
@@ -57,7 +57,7 @@ function Classroom({ name, room, state, setState, schedule }) {
         setMessage(schedule ? findNext(schedule.weekly_schedule).message : "");
     }, [schedule]);
 
-    if (name === "none" || !name) {
+    if (!room || room.name === "none" || room.attributes === undefined) {
         return "";
     }
 
@@ -81,7 +81,7 @@ function Classroom({ name, room, state, setState, schedule }) {
                     <p>back to results</p>
                 </div> : ""}
                 <div className="header-row">
-                    <h1>{name}</h1>
+                    <h1>{room.name}</h1>
                     <div className="bookmark-container">
                         <Bookmark room={room} />
                     </div>

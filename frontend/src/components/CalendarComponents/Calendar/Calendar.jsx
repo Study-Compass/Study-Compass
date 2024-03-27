@@ -1,10 +1,10 @@
-```
-documentation:
-https://incongruous-reply-44a.notion.site/Frontend-Calendar-DayColumn-Components-0283818fd23a4bbfa5ab81d76a0ad876
-```
 import React, { useEffect, useState, useRef } from 'react';
 import './Calendar.css';
 import DayColumn from '../DayColumn/DayColumn';
+/** 
+ * documentation:
+ * https://incongruous-reply-44a.notion.site/Frontend-Calendar-DayColumn-Components-0283818fd23a4bbfa5ab81d76a0ad876
+ * */ 
 
 function Calendar({className, data, isLoading, addQuery, removeQuery, query}){
     const days = ["S", "M", "T", "W", "R", "F"];
