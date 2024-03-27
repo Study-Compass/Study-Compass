@@ -1,3 +1,8 @@
+```
+documentation:
+https://incongruous-reply-44a.notion.site/Frontend-SearchBar-Component-35e616d525f0492dac52ac9161b1945f
+```
+
 import React, { useState, useRef, useEffect } from 'react';
 import './SearchBar.css';
 import x from '../../assets/x.svg';

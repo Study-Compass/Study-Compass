@@ -1,6 +1,10 @@
+```
+documentation:
+https://incongruous-reply-44a.notion.site/Frontend-CacheProvider-Component-CacheContext-64296ab287fc4347be59ca848cc632b0
+```
+
 import React, { createContext, useContext } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom'; 
 
 export const CacheContext = createContext();
 
@@ -85,12 +89,6 @@ export const CacheProvider = ({children}) =>{
             return [];
         }
         try{
-            // for(let i = 0; i < queries.length; i++){
-            //     if(cache[`/getroom/${queries[i]}`]){
-            //         queries.splice(i, 1);
-            //         i--;
-            //     }
-            // }
             const response = await axios.post('/getbatch', {queries, exhaustive: true});
             const responseBody = response.data;
             if(!responseBody.success){

@@ -1,3 +1,7 @@
+```
+documentation:
+https://incongruous-reply-44a.notion.site/Frontend-Calendar-DayColumn-Components-0283818fd23a4bbfa5ab81d76a0ad876
+```
 import React, { useEffect, useState, useRef } from 'react';
 import './Calendar.css';
 import DayColumn from '../DayColumn/DayColumn';
@@ -22,21 +26,13 @@ function Calendar({className, data, isLoading, addQuery, removeQuery, query}){
     }, [empty, className]);
 
     const load = [                
-        // {
-        //     "class_name": "loading",
-        //     "start_time": 420,
-        //     "end_time": 1260
-        // },
     ];
 
     const today = new Date();
     const currentDay = today.getDay();
 
-    // useEffect(() => {console.log(data)},[data]);
-
     return (
             <div className={`Calendar ${data ? "":"loading"}`}>
-                {/* <h1>{className.toLowerCase()}</h1> */}
                 {isLoading ? <div>loading</div>: ""}
                 <div className="Calendar-header">
                     <p className={`${currentDay === 1 ? "currentDay" : ""}`}>monday</p>
@@ -60,11 +56,6 @@ function Calendar({className, data, isLoading, addQuery, removeQuery, query}){
                         />
                     ))}
                 </div>
-                {/* <button 
-                    className={`button ${noquery ? "" : "active"}`} 
-                    style={{"width":"200px","height":"40px", "margin":"0 0 10px 0"}}
-                    onClick={fetchFreeRooms1}
-                >search</button> */}
             </div>
     );
 
