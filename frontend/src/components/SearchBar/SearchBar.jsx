@@ -10,11 +10,11 @@ https://incongruous-reply-44a.notion.site/Frontend-SearchBar-Component-35e616d52
 */
 
 //need to add support for abbreviated versions
-function SearchBar({ data, onEnter, onSearch, room, onX, query}) {
+function SearchBar({ data, onEnter, onSearch, room, onX }) {
     let navigate =  useNavigate();
     const itemRefs = useRef([]);
 
-    const [searchInput, setSearchInput] = useState(room === null ? "" : room.name === null ? "" : room.name.toLowerCase());
+    const [searchInput, setSearchInput] = useState(room);
     const [results, setResults] = useState([]);
     const [lower, setLower] = useState("")
     const [dataAbb, setDataAbb] = useState([]);
@@ -55,11 +55,6 @@ function SearchBar({ data, onEnter, onSearch, room, onX, query}) {
 
     const removeLastWord = str => str.split(' ').slice(0, -1).join(' ');
 
-    useEffect(() => {
-        if(query !== "") {
-            setSearchInput(query);
-        }  
-    }, [query]);
 
     useEffect(() => {
         if(!data){return}
@@ -100,13 +95,10 @@ function SearchBar({ data, onEnter, onSearch, room, onX, query}) {
       }, [selected]);
 
     useEffect(() => {
-        if(query !== "") {
-            return;
-        }  
-        if(room === null || room.name === null){
+        if(room === null){
             setSearchInput("");
         } else {
-            setSearchInput(room.name.toLowerCase());
+            setSearchInput(room);
         }
     },[room]);
 

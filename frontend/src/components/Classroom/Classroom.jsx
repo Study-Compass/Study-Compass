@@ -72,6 +72,7 @@ function Classroom({ room, state, setState, schedule, roomName }) {
 
     const backtoResults = () => {
         setState("calendarSearch");
+        navigate(-1);
     };
 
 

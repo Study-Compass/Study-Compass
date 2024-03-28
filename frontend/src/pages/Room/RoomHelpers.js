@@ -62,7 +62,7 @@ const findNext = (schedule) => {
     }
 };
 
-const fetchDataHelper = async (id, setLoading, setData, setRoom, navigate, getRoom) => {
+const fetchDataHelper = async (id, setLoading, setData, setRoom, navigate, getRoom, setRoomName) => {
     setRoom(null);
     setLoading(true);
     setData(null);
@@ -70,6 +70,7 @@ const fetchDataHelper = async (id, setLoading, setData, setRoom, navigate, getRo
         const data = await getRoom(id);
         setLoading(false);
         setRoom(data.room);
+        setRoomName(data.room.name);
         setData(data.data);
         console.log(data.room);
     } catch (error){

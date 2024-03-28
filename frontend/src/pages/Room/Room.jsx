@@ -31,6 +31,7 @@ function Room() {
     let { roomid } = useParams();
     let navigate = useNavigate();
     const [room, setRoom] = useState(null);
+    const [roomName, setRoomName] = useState(null);
     const [rooms, setRooms] = useState(null);
     const [roomIds, setRoomIds] = useState({});
     const [ready, setReady] = useState(false);
@@ -58,7 +59,7 @@ function Room() {
 
     const [width, setWidth] = useState(window.innerWidth);
 
-    const fetchData = async (id) => fetchDataHelper(id, setLoading, setData, setRoom, navigate, getRoom);
+    const fetchData = async (id) => fetchDataHelper(id, setLoading, setData, setRoom, navigate, getRoom, setRoomName);
     const fetchFreeRooms = async () => fetchFreeRoomsHelper(setContentState, setCalendarLoading, getFreeRooms, setResults, setNumLoaded, query);
     const debouncedFetchData = debounce(fetchData, 500); // Adjust delay as needed
     const fetchFreeNow = async () => fetchFreeNowHelper(setContentState, setCalendarLoading, setResults, setNumLoaded, getFreeRooms);
@@ -118,10 +119,11 @@ function Room() {
             }
             if(contentState === "calendarSearchResult"){
                 console.log("fetching data debounced");
-                setTimeout(() => {             
-                    debouncedFetchData(roomIds[roomid]);
-                    console.log("results", results);
-                }, 100);
+                fetchData(roomIds[roomid]);
+                // setTimeout(() => {             
+                //     debouncedFetchData(roomIds[roomid]);
+                //     console.log("results", results);
+                // }, 100);
             } else {
                 fetchData(roomIds[roomid]);
                 setContentState("classroom");
@@ -129,7 +131,7 @@ function Room() {
             }
         }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [roomid, isAuthenticated, roomIds]);
+    }, [isAuthenticated, roomIds]);
 
     useEffect(()=>{
         const updateLoadedResults = async ()=>{
@@ -176,12 +178,12 @@ function Room() {
     },[contentState]);
     
     function changeURL(option) {
-        navigate(`/room/${option}`, { replace: true });
+        navigate(`/room/${option}`);
         setContentState("calendarSearchResult");
     }
 
     function changeURL2(option) {
-        navigate(`/room/${option}`, { replace: true });
+        navigate(`/room/${option}`);
         setContentState("classroom");
     }
 
@@ -195,6 +197,7 @@ function Room() {
     function onSearch(query, attributes, sort){
         const queryString = new URLSearchParams({ query, attributes: JSON.stringify(attributes), sort }).toString();
         navigate(`/room/search?${queryString}`, { replace: true });        
+        fetchSearch(query, attributes, sort);
     }
     
     const [showMobileCalendar, setShowMobileCalendar] = useState(false);
@@ -211,8 +214,8 @@ function Room() {
             <div className="content-container">
                 <div className="calendar-container">
                     <div className={width < 800 ? "left-mobile" : "left"}>
-                        <SearchBar data={rooms} onEnter={changeURL2} room={room} onX={onX} onSearch={onSearch} query={searchQuery} />
-                        {contentState === "classroom" || contentState === "calendarSearchResult" || contentState === "freeNowSearch" ? <Classroom  
+                        <SearchBar data={rooms} onEnter={changeURL2} room={contentState === "classroom" || contentState === "calendarSearchResult" ? roomName : searchQuery } onX={onX} onSearch={onSearch} query={searchQuery} />
+                        {contentState === "classroom" || contentState === "calendarSearchResult"  ? <Classroom  
                             room={room} 
                             state={contentState} 
                             setState={setContentState}

@@ -15,8 +15,8 @@ function Result({ result, attributes, debouncedFetchData, changeURL, findNext })
         <li
             className={`result ${attributes.includes('restricted access') ? "restricted": "" }`}
             value={result.room.name} 
-            // onMouseOver={() => {debouncedFetchData(result.room._id)}} 
-            // onMouseLeave={()=>{debouncedFetchData("none")}}
+            onMouseOver={() => {debouncedFetchData(result.room._id)}} 
+            onMouseLeave={()=>{debouncedFetchData("none")}}
             onClick={() => {changeURL(result.room.name)}}
         >
             {user ? user.saved.includes(result.room._id) ?  
