@@ -10,10 +10,10 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css'; // This is the updated path for Swiper's CSS
 import 'swiper/css/pagination'; // Updated path for pagination module CSS
 
-// Import required modules
-
-// Install Swiper modules
-
+/** 
+documentation:
+https://incongruous-reply-44a.notion.site/Frontend-MobileCalendar-Component-a4d78a97be4c43e99b8ed78137014746
+*/
 
 function MobileCalendar({ className, data, isLoading, addQuery, removeQuery, query, show, setShow}) {
     const days = ["M", "T", "W", "R", "F"];

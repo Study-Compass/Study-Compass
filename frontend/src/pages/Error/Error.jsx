@@ -42,6 +42,10 @@ function Error() {
                         <p>If this issue persists, <a href="">contact support</a></p>
                     </div>
                 }
+                <div className="error-message">
+                    <p>{errorCode}</p>
+                    <p>{errorMessage}</p>
+                </div>
                 <div className="button-container">
                     <button className="button active lightred" onClick={() => navigate("/")}>Go Home</button>
                 </div>

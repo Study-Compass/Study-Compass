@@ -2,6 +2,11 @@ import React, { createContext, useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNotification } from './NotificationContext';
 
+/** 
+documentation:
+https://incongruous-reply-44a.notion.site/Frontend-AuthProvider-Component-AuthContext-951d04c042614f32a9052e9d57905e8d
+*/
+
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
@@ -78,8 +83,6 @@ export const AuthProvider = ({ children }) => {
             console.error('Error sending code to backend:', error);
         }
     };
-
-
 
     const logout = () => {
         localStorage.removeItem('token');

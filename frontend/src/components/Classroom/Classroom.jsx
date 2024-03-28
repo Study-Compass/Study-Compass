@@ -6,6 +6,7 @@ import Bookmark from '../Interface/Bookmark/Bookmark';
 import useAuth from '../../hooks/useAuth.js';
 import '../../assets/fonts.css'
 import EditAttributes from './EditAttributes/EditAttributes.jsx';
+import Loader from '../Loader/Loader.jsx';
 
 import Edit from '../../assets/Icons/Edit.svg';
 import Outlets from '../../assets/Icons/Outlets.svg';
@@ -17,7 +18,7 @@ import { findNext } from '../../pages/Room/RoomHelpers.js';
 
 import '../../pages/Room/Room.css';
 
-function Classroom({ name, room, state, setState, schedule }) {
+function Classroom({ room, state, setState, schedule, roomName }) {
 
     console.log("room",room);
     const [image, setImage] = useState("")
@@ -57,12 +58,21 @@ function Classroom({ name, room, state, setState, schedule }) {
         setMessage(schedule ? findNext(schedule.weekly_schedule).message : "");
     }, [schedule]);
 
-    if (name === "none" || !name) {
+    if (!room) {
+        return <Loader/>;
+    }
+
+    if(room.name === "none"|| room.attributes === undefined){
+        return "";
+    }
+
+    if(!roomName){
         return "";
     }
 
     const backtoResults = () => {
         setState("calendarSearch");
+        navigate(-1);
     };
 
 
@@ -81,7 +91,7 @@ function Classroom({ name, room, state, setState, schedule }) {
                     <p>back to results</p>
                 </div> : ""}
                 <div className="header-row">
-                    <h1>{name}</h1>
+                    <h1>{roomName}</h1>
                     <div className="bookmark-container">
                         <Bookmark room={room} />
                     </div>

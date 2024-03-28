@@ -1,6 +1,10 @@
 import React, { createContext, useContext } from 'react';
 import axios from 'axios';
 
+/** 
+documentation:
+https://incongruous-reply-44a.notion.site/Frontend-CacheProvider-Component-CacheContext-64296ab287fc4347be59ca848cc632b0
+*/
 export const CacheContext = createContext();
 
 export const CacheProvider = ({children}) =>{
@@ -84,12 +88,6 @@ export const CacheProvider = ({children}) =>{
             return [];
         }
         try{
-            // for(let i = 0; i < queries.length; i++){
-            //     if(cache[`/getroom/${queries[i]}`]){
-            //         queries.splice(i, 1);
-            //         i--;
-            //     }
-            // }
             const response = await axios.post('/getbatch', {queries, exhaustive: true});
             const responseBody = response.data;
             if(!responseBody.success){
@@ -114,6 +112,8 @@ export const CacheProvider = ({children}) =>{
                   query: query,
                   attributes: attributes,
                   sort: 'name'
+                }, headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
                 }
               });            
             const responseBody = response.data;
@@ -124,6 +124,7 @@ export const CacheProvider = ({children}) =>{
             return responseBody.data;
         } catch (error){
             console.error('Error fetching search data:', error);
+            throw error;
         }
     };
 

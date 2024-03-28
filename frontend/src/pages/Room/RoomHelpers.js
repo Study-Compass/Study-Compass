@@ -1,3 +1,4 @@
+
 function minutesToTime(minutes){
     let hours = Math.floor(minutes / 60);
     const mins = minutes % 60;
@@ -6,7 +7,7 @@ function minutesToTime(minutes){
         hours -= 12;
         end = "PM";
     }
-    if(mins == 0){
+    if(mins === 0){
         return `${hours}${end}`;
     }
     return `${hours}:${mins.toString().padStart(2, '0')} ${end}`;
@@ -61,14 +62,17 @@ const findNext = (schedule) => {
     }
 };
 
-const fetchDataHelper = async (id, setLoading, setData, setRoom, navigate, getRoom) => {
+const fetchDataHelper = async (id, setLoading, setData, setRoom, navigate, getRoom, setRoomName) => {
+    setRoom(null);
     setLoading(true);
     setData(null);
     try{
         const data = await getRoom(id);
         setLoading(false);
         setRoom(data.room);
+        setRoomName(data.room.name);
         setData(data.data);
+        console.log(data.room);
     } catch (error){
         console.log(error);
         navigate("/error/500");
@@ -110,15 +114,21 @@ const fetchFreeNowHelper = async (setContentState, setCalendarLoading, setResult
     setCalendarLoading(false);
 }
 
-const fetchSearchHelper = async (query, attributes, sort, setContentState, setCalendarLoading, setResults, setLoadedResults, search, setNumLoaded) => {
+const fetchSearchHelper = async (query, attributes, sort, setContentState, setCalendarLoading, setResults, setLoadedResults, search, setNumLoaded, navigate, newError, setSearchQuery) => {
     setContentState("nameSearch")
     setCalendarLoading(true)
     setResults([]);
     setLoadedResults([]);
-    const roomNames = await search(query, attributes, sort);
-    setResults(roomNames);
-    setNumLoaded(10);
-    setCalendarLoading(false);
+    try{
+        const roomNames = await search(query, attributes, sort);
+        setResults(roomNames);
+        setNumLoaded(10);
+        setCalendarLoading(false);
+        console.log(roomNames);
+    } catch (error) {
+        newError(navigate);
+    } 
+    setSearchQuery(query);
 };
 
 const addQueryHelper = (key, newValue, setNoQuery, setContentState, setQuery) => {

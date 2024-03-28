@@ -4,12 +4,17 @@ import x from '../../assets/x.svg';
 import { useNavigate } from 'react-router-dom';
 import tab from '../../assets/tab.svg';
 
+/** 
+documentation:
+https://incongruous-reply-44a.notion.site/Frontend-SearchBar-Component-35e616d525f0492dac52ac9161b1945f
+*/
+
 //need to add support for abbreviated versions
-function SearchBar({ data, onEnter, onSearch, room, onX}) {
+function SearchBar({ data, onEnter, onSearch, room, onX }) {
     let navigate =  useNavigate();
     const itemRefs = useRef([]);
 
-    const [searchInput, setSearchInput] = useState(room.toLowerCase());
+    const [searchInput, setSearchInput] = useState(room);
     const [results, setResults] = useState([]);
     const [lower, setLower] = useState("")
     const [dataAbb, setDataAbb] = useState([]);
@@ -29,7 +34,7 @@ function SearchBar({ data, onEnter, onSearch, room, onX}) {
         "Winslow Building": "WINS",
     }
 
-    const fullnames = {
+    const fullNames = {
         "DCC" : "Darrin Communications Center",
         "JEC" : "Jonsson Engineering Center",
         "JROWL" : "Jonsson-Rowland Science Center",
@@ -50,6 +55,7 @@ function SearchBar({ data, onEnter, onSearch, room, onX}) {
 
     const removeLastWord = str => str.split(' ').slice(0, -1).join(' ');
 
+
     useEffect(() => {
         if(!data){return}
         let newData = [...data];
@@ -62,9 +68,16 @@ function SearchBar({ data, onEnter, onSearch, room, onX}) {
     }, [data]);
 
     const getFull = (abb) => {
-        console.log(abb);
-        if(removeLastWord(abb) in fullnames){
-            return fullnames[removeLastWord(abb)]+" "+abb.split(' ').pop();
+        if(removeLastWord(abb) in fullNames){
+            return fullNames[removeLastWord(abb)]+" "+abb.split(' ').pop();
+        } else {
+            return abb;
+        }
+    };
+
+    const getAbbFull = (abb) => {
+        if(abb.toUpperCase() in fullNames){
+            return fullNames[abb.toUpperCase()];
         } else {
             return abb;
         }
@@ -82,10 +95,10 @@ function SearchBar({ data, onEnter, onSearch, room, onX}) {
       }, [selected]);
 
     useEffect(() => {
-        if(room === undefined){
+        if(room === null){
             setSearchInput("");
         } else {
-            setSearchInput(room.toLowerCase());
+            setSearchInput(room);
         }
     },[room]);
 
@@ -133,7 +146,12 @@ function SearchBar({ data, onEnter, onSearch, room, onX}) {
         setSearchInput(searchInput.toLowerCase());
         setLower("");
         setResults([]);
-        onSearch(searchInput, [], "name");
+        if(searchInput === results[selected].toLowerCase()){
+            onEnter(getFull(results[selected]));
+        } else {     
+            console.log(getAbbFull(searchInput));
+            onSearch(getAbbFull(searchInput), [], "name");
+        }
     }
 
     const handleKeyDown = (event) => {
