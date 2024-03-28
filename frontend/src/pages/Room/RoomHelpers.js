@@ -63,6 +63,7 @@ const findNext = (schedule) => {
 };
 
 const fetchDataHelper = async (id, setLoading, setData, setRoom, navigate, getRoom) => {
+    setRoom(null);
     setLoading(true);
     setData(null);
     try{

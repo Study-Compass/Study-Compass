@@ -217,6 +217,7 @@ function Room() {
                             state={contentState} 
                             setState={setContentState}
                             schedule={data}
+                            roomName={roomid}
                         /> : ""}
                         {contentState === "calendarSearch" || contentState === "freeNowSearch" || contentState === "nameSearch" ? calendarLoading ? "" : 
                             <div className="resultsCountContainer">
