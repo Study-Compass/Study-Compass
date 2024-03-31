@@ -76,6 +76,10 @@ function Room() {
       return () => window.removeEventListener('resize', handleResize);
     }, []);
 
+    useEffect(()=>{
+
+    },[roomid]);
+
     useEffect(() => { //useEffect fetch all room names
         const fetchRooms = async () => {
             try{
@@ -118,12 +122,7 @@ function Room() {
                 return;
             }
             if(contentState === "calendarSearchResult"){
-                console.log("fetching data debounced");
                 fetchData(roomIds[roomid]);
-                // setTimeout(() => {             
-                //     debouncedFetchData(roomIds[roomid]);
-                //     console.log("results", results);
-                // }, 100);
             } else {
                 fetchData(roomIds[roomid]);
                 setContentState("classroom");
@@ -179,16 +178,20 @@ function Room() {
     
     function changeURL(option) {
         navigate(`/room/${option}`);
+        fetchData(roomIds[option]);
         setContentState("calendarSearchResult");
     }
 
     function changeURL2(option) {
         navigate(`/room/${option}`);
+        fetchData(roomIds[option]);
+
         setContentState("classroom");
     }
 
     function onX(){ //make a reset function soon
         setContentState('empty');
+        fetchData('none');
         setResults([]);
         clearQuery();
         setLoadedResults([]);
