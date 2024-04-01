@@ -1,0 +1,71 @@
+.sort-popup .switch{
+    font-size: 15px;
+    position: relative;
+    display: inline-block;
+    width: 100%;
+    height: 39px;
+    margin-top:10px;
+}
+
+.sort-popup .slider{
+    position: absolute;
+    cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+    background-color: var(--lightborder);
+    color: var(--border);
+    font-weight: 600;
+    border-radius: 7px;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    transition: .4s;
+}
+
+.sort-popup .slider span{
+    -webkit-user-select: none; /* Safari */
+    -moz-user-select: none;    /* Firefox */
+    -ms-user-select: none;     /* Internet Explorer/Edge */
+    user-select: none;         /* Non-prefixed version, currently supported by Chrome, Edge, Opera, and Firefox */
+
+}
+
+.sort-popup .slider:before {
+    position: absolute;
+    content: "include";
+    height:calc(100% - 5px);
+    width: calc(50% - 3px);
+    left: 3px;
+    border-radius: 6px;
+    background-color: white;
+    color: var(--text);
+    display: grid;
+    align-content: center;
+    justify-content: center;
+    transition: .4s;
+
+}
+
+/* .sort-popup .slider:after {
+  content: "";
+  position: absolute;
+  top: -7px;
+  left: -7px;
+  right: -7px;
+  bottom: -7px;
+  border-radius: 1.71em;
+  z-index: -1;
+} */
+
+
+.sort-popup .switch input:checked + .slider:before {
+  content: "exclude";
+  transform: translateX(100%);
+  color: var(--text);
+}
+
+.sort-popup .switch input {
+  display: none;
+}

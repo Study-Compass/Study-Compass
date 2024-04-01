@@ -10,6 +10,8 @@ import MoreSelected from '../../assets/Icons/sort/MoreSelected.svg';
 import ChevronDown from '../../assets/Icons/sort/ChevronDown.svg';
 import ChevronUp from '../../assets/Icons/sort/ChevronUp.svg';
 
+import TagsPopup from './Tags/Tags';
+
 function Sort(){
     const [selected, setSelected] = useState(null);
 
@@ -21,9 +23,9 @@ function Sort(){
         }
     };  
 
-
     return (
         <div className="sort-row">
+            {selected === "tags" ? <TagsPopup />: ""}
             <div className={`tags ${selected === 'tags' ? "selected": ""}`} onClick={()=>{handleSelect('tags')}}>
                 <img src={selected === 'tags' ? TagsSelected : Tags} alt="" />
                 <p>Tags</p>

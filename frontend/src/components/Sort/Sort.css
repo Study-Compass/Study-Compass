@@ -3,10 +3,16 @@
     justify-content: flex-start;
     align-items: center;
     gap:5px;
-    width:80%;
-
+    width:100%;
+    padding:0 30px;
     margin-top:10px;
+    box-sizing: border-box;
+    position: relative;
 }
+
+/* .sort-row div:hover{
+    cursor: pointer;
+} */
 
 .sort-row .tags,
 .sort-row .sort-by,
@@ -18,6 +24,12 @@
     align-items: center;
     gap:5px;
     padding: 3px 7px;
+    cursor:pointer;
+    -webkit-user-select: none; /* Safari */
+    -moz-user-select: none;    /* Firefox */
+    -ms-user-select: none;     /* Internet Explorer/Edge */
+    user-select: none;         /* Non-prefixed version, currently supported by Chrome, Edge, Opera, and Firefox */
+
 }
 
 .sort-row .tags img,
@@ -45,4 +57,40 @@
 
 .sort-row .selected p{
     color: white;
+}
+.sort-popup{
+    position: absolute;
+    top: 30px;
+    left: 20px;
+    background-color: white;
+    box-sizing: border-box;
+    border: 1px solid var(--border);
+    border-radius: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    padding: 15px 20px;
+    z-index: 100;
+    height: 300px;
+    opacity: 1;
+    width:calc(100% - 40px);
+}
+
+.sort-popup .heading h1{
+    font-family: 'Inter', sans-serif;
+    font-size: 18px;
+    margin:0;
+}
+
+.sort-popup .heading p{
+    margin:0;
+    color: var(--red);
+    font-size:16px;
+    font-weight:450
+}
+
+.heading{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
