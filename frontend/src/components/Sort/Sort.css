@@ -1,0 +1,48 @@
+.sort-row{
+    display:flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap:5px;
+    width:80%;
+
+    margin-top:10px;
+}
+
+.sort-row .tags,
+.sort-row .sort-by,
+.sort-row .more{
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    display:flex;
+    justify-content: center;
+    align-items: center;
+    gap:5px;
+    padding: 3px 7px;
+}
+
+.sort-row .tags img,
+.sort-row .sort-by img,
+.sort-row .more img{
+    width:12px;
+    height:12px;
+}
+
+.sort-row .tags p,
+.sort-row .sort-by p,
+.sort-row .more p{
+    color: var(--border);
+    font-size: 12px;
+    font-weight: 500;
+    font-family: 'Inter', sans-serif;
+    margin:0;
+}
+
+.sort-row .selected{
+    background-color: var(--red);
+    color: white;
+    border: 1px solid var(--red);
+}
+
+.sort-row .selected p{
+    color: white;
+}

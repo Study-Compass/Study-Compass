@@ -11,9 +11,10 @@ import Classroom from '../../components/Classroom/Classroom.jsx';
 import MobileCalendar from '../../components/CalendarComponents/MobileCalendar/MobileCalendar.jsx';
 import { findNext, fetchDataHelper, fetchFreeRoomsHelper, fetchFreeNowHelper, fetchSearchHelper, addQueryHelper, removeQueryHelper } from "./RoomHelpers.js";
 import Results from '../../components/Results/Results.jsx';
+import Sort from '../../components/Sort/Sort.jsx';
 
 import chevronUp from '../../assets/chevronup.svg';
-import Sort from '../../assets/Icons/Sort.svg';
+import SortIcon from '../../assets/Icons/Sort.svg';
 
 import { debounce} from '../../Query.js';
 
@@ -76,6 +77,10 @@ function Room() {
       return () => window.removeEventListener('resize', handleResize);
     }, []);
 
+    useEffect(()=>{
+
+    },[roomid]);
+
     useEffect(() => { //useEffect fetch all room names
         const fetchRooms = async () => {
             try{
@@ -118,12 +123,7 @@ function Room() {
                 return;
             }
             if(contentState === "calendarSearchResult"){
-                console.log("fetching data debounced");
                 fetchData(roomIds[roomid]);
-                // setTimeout(() => {             
-                //     debouncedFetchData(roomIds[roomid]);
-                //     console.log("results", results);
-                // }, 100);
             } else {
                 fetchData(roomIds[roomid]);
                 setContentState("classroom");
@@ -179,16 +179,20 @@ function Room() {
     
     function changeURL(option) {
         navigate(`/room/${option}`);
+        fetchData(roomIds[option]);
         setContentState("calendarSearchResult");
     }
 
     function changeURL2(option) {
         navigate(`/room/${option}`);
+        fetchData(roomIds[option]);
+
         setContentState("classroom");
     }
 
     function onX(){ //make a reset function soon
         setContentState('empty');
+        fetchData('none');
         setResults([]);
         clearQuery();
         setLoadedResults([]);
@@ -225,10 +229,10 @@ function Room() {
                         {contentState === "calendarSearch" || contentState === "freeNowSearch" || contentState === "nameSearch" ? calendarLoading ? "" : 
                             <div className="resultsCountContainer">
                                 <h1 className="resultCount">{results.length} results {contentState === "nameSearch" ? searchQuery ? `for "${searchQuery.slice(0,9)}${searchQuery.length>9 ? "..." : ""}"` : "" : ""}</h1> 
-                                <img src={Sort} alt="sort" />
+                                <img src={SortIcon} alt="sort" />
                             </div>
-                            
                         : ""}
+                        {contentState === "calendarSearch" || contentState === "freeNowSearch" || contentState === "nameSearch" ? <Sort /> : ""}
                         {contentState === "calendarSearch" || contentState === "freeNowSearch" || contentState === "nameSearch" ? 
                             <Results 
                                 results={results}
