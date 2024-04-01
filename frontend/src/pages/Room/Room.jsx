@@ -11,9 +11,10 @@ import Classroom from '../../components/Classroom/Classroom.jsx';
 import MobileCalendar from '../../components/CalendarComponents/MobileCalendar/MobileCalendar.jsx';
 import { findNext, fetchDataHelper, fetchFreeRoomsHelper, fetchFreeNowHelper, fetchSearchHelper, addQueryHelper, removeQueryHelper } from "./RoomHelpers.js";
 import Results from '../../components/Results/Results.jsx';
+import Sort from '../../components/Sort/Sort.jsx';
 
 import chevronUp from '../../assets/chevronup.svg';
-import Sort from '../../assets/Icons/Sort.svg';
+import SortIcon from '../../assets/Icons/Sort.svg';
 
 import { debounce} from '../../Query.js';
 
@@ -228,10 +229,10 @@ function Room() {
                         {contentState === "calendarSearch" || contentState === "freeNowSearch" || contentState === "nameSearch" ? calendarLoading ? "" : 
                             <div className="resultsCountContainer">
                                 <h1 className="resultCount">{results.length} results {contentState === "nameSearch" ? searchQuery ? `for "${searchQuery.slice(0,9)}${searchQuery.length>9 ? "..." : ""}"` : "" : ""}</h1> 
-                                <img src={Sort} alt="sort" />
+                                <img src={SortIcon} alt="sort" />
                             </div>
-                            
                         : ""}
+                        {contentState === "calendarSearch" || contentState === "freeNowSearch" || contentState === "nameSearch" ? <Sort /> : ""}
                         {contentState === "calendarSearch" || contentState === "freeNowSearch" || contentState === "nameSearch" ? 
                             <Results 
                                 results={results}

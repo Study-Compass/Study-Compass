@@ -1,0 +1,37 @@
+.sort-row{
+    display:flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap:10px;
+    width:90%;
+    margin-left:30px;
+}
+
+.sort-row .tags,
+.sort-row .sort-by,
+.sort-row .more{
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    display:flex;
+    justify-content: center;
+    align-items: center;
+    gap:5px;
+    padding: 5px 10px;
+}
+
+.sort-row .tags img,
+.sort-row .sort-by img,
+.sort-row .more img{
+    width:14px;
+    height:14px;
+}
+
+.sort-row .tags p,
+.sort-row .sort-by p,
+.sort-row .more p{
+    color: var(--border);
+    font-size: 13px;
+    font-weight: 500;
+    font-family: 'Inter', sans-serif;
+    margin:0;
+}
