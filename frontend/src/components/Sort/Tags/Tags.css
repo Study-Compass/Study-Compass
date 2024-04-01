@@ -22,6 +22,8 @@
     justify-content: space-around;
     align-items: center;
     transition: .4s;
+    -webkit-tap-highlight-color: transparent;
+
 }
 
 .sort-popup .slider span{
@@ -68,4 +70,5 @@
 
 .sort-popup .switch input {
   display: none;
+  
 }
