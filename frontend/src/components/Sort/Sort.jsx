@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import './Sort.css';
+import useOutsideClick from '../../hooks/useClickOutside';
 
 import Tags from '../../assets/Icons/sort/Tags.svg';
 import SortBy from '../../assets/Icons/sort/SortBy.svg';
@@ -23,9 +24,10 @@ function Sort(){
         }
     };  
 
+
     return (
         <div className="sort-row">
-            {selected === "tags" ? <TagsPopup />: ""}
+            {selected === "tags" ? <TagsPopup setSelected={setSelected} />: ""}
             <div className={`tags ${selected === 'tags' ? "selected": ""}`} onClick={()=>{handleSelect('tags')}}>
                 <img src={selected === 'tags' ? TagsSelected : Tags} alt="" />
                 <p>Tags</p>

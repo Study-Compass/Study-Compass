@@ -97,5 +97,16 @@
     gap:5px
 }
 
+.clear{
+    -webkit-user-select: none; /* Safari */
+    -moz-user-select: none;    /* Firefox */
+    -ms-user-select: none;     /* Internet Explorer/Edge */
+    user-select: none;         /* Non-prefixed version, currently supported by Chrome, Edge, Opera, and Firefox */
+    transition: all 0.2s;
+}
+
+.clear:active{
+    transform: scale(1.1);
+}
 
 

@@ -12,12 +12,26 @@ import Profile from './assets/Icons/Profile.svg';
 import Settings from './assets/Icons/Settings.svg';
 import Trash from './assets/Icons/Trash.svg';
 import Google from './assets/Icons/Google.svg';
+import SmallDesks from './assets/Icons/SmallDesks.svg';
+import OutletSelected from './assets/Icons/OutletSelected.svg';
+import PrinterSelected from './assets/Icons/PrinterSelected.svg';
+import WindowsSelected from './assets/Icons/WindowsSelected.svg';
+import SmallDesksSelected from './assets/Icons/SmallDesksSelected.svg';
+
 
 
 const attributeIcons = {
     "outlets": Outlets,
     "windows": Windows,
-    "printer": Printer
+    "printer": Printer,
+    "small desks": SmallDesks,
+};
+
+const selectedAttributeIcons = {
+    "outlets": OutletSelected,
+    "windows": WindowsSelected,
+    "printer": PrinterSelected,
+    "small desks": SmallDesksSelected,
 };
 
 const generalIcons = {
@@ -35,4 +49,4 @@ const generalIcons = {
     ...attributeIcons,
 };
 
-export { attributeIcons, generalIcons };
+export { attributeIcons, generalIcons, selectedAttributeIcons };
