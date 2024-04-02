@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import '../Forms.css';
-import googleLogo from '../../../assets/googleG.svg';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import useAuth from '../../../hooks/useAuth';
 import { useGoogleLogin } from '@react-oauth/google';
 import circleWarning from '../../../assets/circle-warning.svg';
+import { generalIcons } from '../../../Icons';
 
 
 
@@ -21,6 +21,7 @@ function RegisterForm() {
     const [loadContent, setLoadContent] = useState(false);
     const [errorText, setErrorText] = useState("");
 
+    const googleLogo = generalIcons.google;
 
     let navigate = useNavigate();
 

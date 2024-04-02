@@ -72,3 +72,30 @@
   display: none;
   
 }
+
+.tags-container{
+    overflow-x:hidden;
+}
+
+.tags-content{
+    display:flex;
+    width:210%;
+    transition:all 0.4s;
+    gap:5%;
+}
+
+.next{
+    transform:translateX(-52.5%);
+}
+
+.include,
+.exclude{
+    margin-top:10px;
+    width:50%;
+    display:flex;
+    flex-direction: column;
+    gap:5px
+}
+
+
+

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import '../Forms.css';
-import googleLogo from '../../../assets/googleG.svg';
+import { generalIcons } from '../../../Icons';
 import useAuth from '../../../hooks/useAuth';
 import circleWarning from '../../../assets/circle-warning.svg';
 import { useGoogleLogin } from '@react-oauth/google';
@@ -12,14 +12,15 @@ function LoginForm() {
     let navigate =  useNavigate();
     const [valid, setValid] = useState(false);
     const [formData, setFormData] = useState({
-      email: '',
-      password: ''
+        email: '',
+        password: ''
     });
     const [errorText, setErrorText] = useState("");
     const [loadContent, setLoadContent] = useState(false);
-
+    
     const location = useLocation();
-
+    
+    const googleLogo = generalIcons.google;
 
     useEffect(() => {
       if (isAuthenticated){
