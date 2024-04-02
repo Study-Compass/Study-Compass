@@ -20,7 +20,7 @@ function Tags(){
                 </div>
             </label>
             <div className="tags-container">
-                <div className={`tags-content ${tagsState ? "" : "next"}`}>
+                <div className={`tags-content ${tagsState ? "next" : ""}`}>
                     <div className="include">
                         <div className="option">
                             <img src={attributeIcons["windows"]} alt="outlets"/>
