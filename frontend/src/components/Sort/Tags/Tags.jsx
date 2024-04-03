@@ -5,7 +5,7 @@ import useOutsideClick from '../../../hooks/useClickOutside';
 
 function Tags({setSelected}){
     const [tagsState, setTagsState] = useState(true); //true for include, false for exclude
-    const tags = ["windows", "outlets", "printer", "small desks"];
+    const tags = ["windows", "outlets", "printer", "small desks", "tables"];
 
     const [include, setInclude] = useState([]);
     const [exclude, setExclude] = useState([]);
@@ -42,9 +42,7 @@ function Tags({setSelected}){
 
     useOutsideClick(ref, () => {
         setSelected(null);
-    });
-
-
+    }, ["tags"]);
 
     return (
         <div className="sort-popup" ref={ref}>

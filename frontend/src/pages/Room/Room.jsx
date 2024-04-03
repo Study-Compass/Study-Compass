@@ -25,7 +25,7 @@ https://incongruous-reply-44a.notion.site/Frontend-Room-Page-667531d41a284511bb6
 
 /*
 STATES
-contentState: "empty", "classroom", "calendarSearch" , "calendarSearchResult", "nameSearch"
+contentState: "empty", "classroom", "calendarSearch" , "calendarSearchResult", "nameSearch" , "freeNowSearch" 
 */ 
 
 function Room() {
@@ -78,6 +78,21 @@ function Room() {
     }, []);
 
     useEffect(()=>{
+        if(contentState === "calendarSearch" || contentState === "freeNowSearch"){
+            return;
+        }
+        const searchParams = new URLSearchParams(window.location.search);
+        const searchQuery = searchParams.get('query');
+        if(searchQuery){
+            setContentState("nameSearch");
+            return;
+        }
+        if(roomid === "none"){
+            setContentState("empty");
+            setSearchQuery("");
+            fetchData("none");
+            return;
+        }
 
     },[roomid]);
 
@@ -101,9 +116,9 @@ function Room() {
         const searchQuery = searchParams.get('query');
         const attributes = searchParams.get('attributes') ? JSON.parse(searchParams.get('attributes')) : null;
         const sort = searchParams.get('sort');
-        console.log("searchQuery", searchQuery);
-        console.log("attributes", attributes);
-        console.log("sort", sort);
+        // console.log("searchQuery", searchQuery);
+        // console.log("attributes", attributes);
+        // console.log("sort", sort);
         if(searchQuery){
             if(!ready){
                 return;
@@ -140,8 +155,8 @@ function Room() {
             }
             // setResultsLoading(true);
             try{
-                console.log(loadedResults.length, numLoaded, results.length)
-                console.log(results.slice(loadedResults.length, Math.min(numLoaded, results.length)).map(room => roomIds[room]));
+                // console.log(loadedResults.length, numLoaded, results.length)
+                // console.log(results.slice(loadedResults.length, Math.min(numLoaded, results.length)).map(room => roomIds[room]));
                 let batchResults = await getBatch(results.slice(loadedResults.length, Math.min(numLoaded, results.length)).map(room => roomIds[room]));
                 let newResults = [...loadedResults, ...batchResults];
                 setLoadedResults(newResults);

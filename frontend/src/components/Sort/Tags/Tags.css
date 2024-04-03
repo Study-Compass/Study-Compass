@@ -38,7 +38,7 @@
     position: absolute;
     content: "include";
     height:calc(100% - 6px);
-    width: calc(50% - 4px);
+    width: calc(50% - 3px);
     left: 3px;
     border-radius: 6px;
     background-color: white;
@@ -75,6 +75,7 @@
 
 .tags-container{
     overflow-x:hidden;
+    overflow:hidden;
 }
 
 .tags-content{
@@ -94,7 +95,21 @@
     width:50%;
     display:flex;
     flex-direction: column;
-    gap:5px
+    gap:5px;
+    max-height: 180px;
+    overflow-y:scroll;
+}
+
+.include::-webkit-scrollbar,
+.exclude::-webkit-scrollbar {
+  width: 10px;
+  margin:2px; /* or height for horizontal scrollbars */
+}
+
+.include::-webkit-scrollbar-thumb,
+.exclude::-webkit-scrollbar-thumb {
+  width:8px;
+  border:2px solid white;
 }
 
 .clear{

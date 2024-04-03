@@ -24,7 +24,6 @@ function Sort(){
         }
     };  
 
-
     return (
         <div className="sort-row">
             {selected === "tags" ? <TagsPopup setSelected={setSelected} />: ""}

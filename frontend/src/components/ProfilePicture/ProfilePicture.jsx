@@ -1,4 +1,4 @@
-import React, { useState, useEffect }from 'react'
+import React, { useState, useRef }from 'react'
 import './ProfilePicture.css'
 import pfp from '../../assets/defaultAvatar.svg'
 import useAuth from '../../hooks/useAuth';
@@ -9,13 +9,22 @@ import Settings from '../../assets/Icons/Settings.svg'
 import Guide from '../../assets/Icons/Guide.svg'
 import Logout from '../../assets/Icons/Logout.svg'
 
+import useOutsideClick from '../../hooks/useClickOutside';
+
 function ProfilePicture(){
     const [showPopup, setShowPopup] = useState(false);
     const { logout, user } = useAuth();
+
+    const ref = useRef();
+    
+    useOutsideClick(ref, () => {
+        setShowPopup(false);
+    }, ["profile"]);
+
     return(
         <div className="profile-picture">
             <img className="profile" src ={user.picture ? user.picture : pfp} onClick={()=>{setShowPopup(!showPopup)}}></img>
-            <div className={`popup ${showPopup ? "popup-active":""}`}>
+            <div className={`popup ${showPopup ? "popup-active":""}`} ref={ref}>
                 <div className="popup-content">
                     <img className="profile" src ={user.picture ? user.picture : pfp}></img>
                     <div className="profile-info">

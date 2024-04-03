@@ -37,6 +37,7 @@
 .sort-row .more img{
     width:12px;
     height:12px;
+    pointer-events: none;
 }
 
 .sort-row .tags p,
@@ -47,6 +48,8 @@
     font-weight: 500;
     font-family: 'Inter', sans-serif;
     margin:0;
+    pointer-events: none;
+
 }
 
 .sort-row .selected{
@@ -109,7 +112,8 @@
     -ms-user-select: none;     /* Internet Explorer/Edge */
     user-select: none;         /* Non-prefixed version, currently supported by Chrome, Edge, Opera, and Firefox */
     transition: all 0.2s;
-
+    cursor: pointer;
+    height:40px;
 }
 
 .option img{
