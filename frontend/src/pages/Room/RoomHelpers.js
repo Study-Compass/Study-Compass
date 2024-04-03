@@ -121,6 +121,7 @@ const fetchSearchHelper = async (query, attributes, sort, setContentState, setCa
     setResults([]);
     setLoadedResults([]);
     setNumLoaded(0);
+
     try{
         const roomNames = await search(query, attributes, sort);
         setResults(roomNames);
@@ -128,7 +129,7 @@ const fetchSearchHelper = async (query, attributes, sort, setContentState, setCa
         setCalendarLoading(false);
         console.log(roomNames);
     } catch (error) {
-        newError(navigate);
+        newError(error, navigate);
     } 
     setSearchQuery(query);
 };

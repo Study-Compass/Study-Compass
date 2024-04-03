@@ -51,12 +51,14 @@ function Room() {
     const [noquery, setNoQuery] = useState(true);
 
     const [searchQuery, setSearchQuery] = useState(""); // for search bar
+    const [searchAttributes, setSearchAttributes] = useState([]);
+    const [searchSort, setSearchSort] = useState("name"); 
 
     function clearQuery(){ setQuery({'M': [],'T': [],'W': [],'R': [],'F': [],});
         setNoQuery(true);
     }
 
-    const { setError } = useError();
+    const { newError } = useError();
 
     const [width, setWidth] = useState(window.innerWidth);
 
@@ -64,7 +66,7 @@ function Room() {
     const fetchFreeRooms = async () => fetchFreeRoomsHelper(setContentState, setCalendarLoading, getFreeRooms, setResults, setNumLoaded, query);
     const debouncedFetchData = debounce(fetchData, 500); // Adjust delay as needed
     const fetchFreeNow = async () => fetchFreeNowHelper(setContentState, setCalendarLoading, setResults, setNumLoaded, getFreeRooms);
-    const fetchSearch = async (query, attributes, sort) => fetchSearchHelper(query, attributes, sort, setContentState, setCalendarLoading, setResults, setLoadedResults, search, setNumLoaded, navigate, setError, setSearchQuery);
+    const fetchSearch = async (query, attributes, sort) => fetchSearchHelper(query, attributes, sort, setContentState, setCalendarLoading, setResults, setLoadedResults, search, setNumLoaded, navigate, newError, setSearchQuery);
     const addQuery = (key, newValue) => addQueryHelper(key, newValue, setNoQuery, setContentState, setQuery);
     const removeQuery = (key, value) => removeQueryHelper(key, value, setQuery, setNoQuery);
 
@@ -110,6 +112,7 @@ function Room() {
         };
         fetchRooms();
     }, []);
+
 
     useEffect(() => { // FETCH ROOM DATA , triggers on url change
         const searchParams = new URLSearchParams(window.location.search);
@@ -162,7 +165,7 @@ function Room() {
                 setLoadedResults(newResults);
             } catch(error){
                 console.log(error);
-                setError(error, navigate);
+                newError(error, navigate);
             }
         };
         updateLoadedResults();
@@ -216,7 +219,9 @@ function Room() {
     function onSearch(query, attributes, sort){
         const queryString = new URLSearchParams({ query, attributes: JSON.stringify(attributes), sort }).toString();
         navigate(`/room/search?${queryString}`, { replace: true });        
-        fetchSearch(query, attributes, sort);
+        fetchSearch(query, attributes, sort); //sets search query
+        setSearchAttributes(attributes);
+        setSearchSort(sort);
     }
     
     const [showMobileCalendar, setShowMobileCalendar] = useState(false);
@@ -227,7 +232,7 @@ function Room() {
     },[]);
 
 
-    return (
+    return (    
         <div className="room" style={{ height: width < 800 ? viewport : '100vh' }}>
             <Header />
             <div className="content-container">
@@ -243,11 +248,19 @@ function Room() {
                         /> : ""}
                         {contentState === "calendarSearch" || contentState === "freeNowSearch" || contentState === "nameSearch" ? calendarLoading ? "" : 
                             <div className="resultsCountContainer">
-                                <h1 className="resultCount">{results.length} results {contentState === "nameSearch" ? searchQuery ? `for "${searchQuery.slice(0,9)}${searchQuery.length>9 ? "..." : ""}"` : "" : ""}</h1> 
+                                <h1 className="resultCount">{results.length} results {contentState === "nameSearch" ? searchQuery ? `for "${searchQuery.slice(0,width < 800 ? 4:9)}${searchQuery.length>(width < 800 ? 4:9) ? "..." : ""}"` : "" : ""}</h1> 
                                 <img src={SortIcon} alt="sort" />
                             </div>
                         : ""}
-                        {contentState === "calendarSearch" || contentState === "freeNowSearch" || contentState === "nameSearch" ? <Sort /> : ""}
+                        {contentState === "calendarSearch" || contentState === "freeNowSearch" || contentState === "nameSearch" ? 
+                        <Sort
+                            query={searchQuery}
+                            searchAttributes={searchAttributes}
+                            setSearchAttributes={setSearchAttributes}
+                            searchSort={searchSort}
+                            setSearchSort={setSearchSort}
+                            onSearch={onSearch}
+                        /> : ""}
                         {contentState === "calendarSearch" || contentState === "freeNowSearch" || contentState === "nameSearch" ? 
                             <Results 
                                 results={results}

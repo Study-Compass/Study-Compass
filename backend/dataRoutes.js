@@ -172,7 +172,7 @@ router.post('/changeclassroom', async (req, res) => {
 
 router.get('/search', verifyTokenOptional, async (req, res) => {
     const query = req.query.query;
-    const attributes = req.query.attributes ? req.query.attributes.split(",") : []; // Ensure attributes is an array
+    const attributes = req.query.attributes ? req.query.attributes : []; // Ensure attributes is an array
     const sort = req.query.sort;
     const userId = req.user ? req.user.userId : null;
 

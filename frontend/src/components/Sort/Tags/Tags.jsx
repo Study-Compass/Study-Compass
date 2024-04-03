@@ -3,11 +3,11 @@ import './Tags.css';
 import { attributeIcons, selectedAttributeIcons } from '../../../Icons';
 import useOutsideClick from '../../../hooks/useClickOutside';
 
-function Tags({setSelected}){
+function Tags({ setSelected, searchAttributes, setSearchAttributes, onApply }){
     const [tagsState, setTagsState] = useState(true); //true for include, false for exclude
     const tags = ["windows", "outlets", "printer", "small desks", "tables"];
 
-    const [include, setInclude] = useState([]);
+    const [include, setInclude] = useState([...searchAttributes]);
     const [exclude, setExclude] = useState([]);
 
 
@@ -43,6 +43,7 @@ function Tags({setSelected}){
     useOutsideClick(ref, () => {
         setSelected(null);
     }, ["tags"]);
+
 
     return (
         <div className="sort-popup" ref={ref}>
@@ -81,6 +82,8 @@ function Tags({setSelected}){
                     </div>
                 </div>
             </div>
+            <button className={`button ${JSON.stringify(include) === JSON.stringify(searchAttributes) ? "" : "active"}`} style={{height:'40px'}} onClick={()=>{onApply(include)}}>apply</button>
+
         </div>
     );
 }

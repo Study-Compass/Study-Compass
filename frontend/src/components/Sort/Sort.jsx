@@ -13,9 +13,9 @@ import ChevronUp from '../../assets/Icons/sort/ChevronUp.svg';
 
 import TagsPopup from './Tags/Tags';
 
-function Sort(){
+function Sort({query, searchAttributes, setSearchAttributes, searchSort, setSearchSort, onSearch}) {
     const [selected, setSelected] = useState(null);
-
+    console.log(query);
     const handleSelect = (select) => {
         if(selected === select){
             setSelected(null);
@@ -24,9 +24,14 @@ function Sort(){
         }
     };  
 
+    const onApply = (tags) => {
+        setSelected(null);
+        onSearch(query, tags, searchSort);
+    }
+
     return (
         <div className="sort-row">
-            {selected === "tags" ? <TagsPopup setSelected={setSelected} />: ""}
+            {selected === "tags" ? <TagsPopup setSelected={setSelected} searchAttributes={searchAttributes} setSearchAttributes={setSearchAttributes} onApply={onApply}/>: ""}
             <div className={`tags ${selected === 'tags' ? "selected": ""}`} onClick={()=>{handleSelect('tags')}}>
                 <img src={selected === 'tags' ? TagsSelected : Tags} alt="" />
                 <p>Tags</p>
