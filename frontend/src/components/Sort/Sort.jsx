@@ -15,7 +15,6 @@ import TagsPopup from './Tags/Tags';
 
 function Sort({query, searchAttributes, setSearchAttributes, searchSort, setSearchSort, onSearch}) {
     const [selected, setSelected] = useState(null);
-    console.log(query);
     const handleSelect = (select) => {
         if(selected === select){
             setSelected(null);
