@@ -1,3 +1,4 @@
+import { set } from "mongoose";
 
 function minutesToTime(minutes){
     let hours = Math.floor(minutes / 60);
@@ -72,7 +73,7 @@ const fetchDataHelper = async (id, setLoading, setData, setRoom, navigate, getRo
         setRoom(data.room);
         setRoomName(data.room.name);
         setData(data.data);
-        console.log(data.room);
+        // console.log(data.room);
     } catch (error){
         console.log(error);
         navigate("/error/500");
@@ -119,6 +120,8 @@ const fetchSearchHelper = async (query, attributes, sort, setContentState, setCa
     setCalendarLoading(true)
     setResults([]);
     setLoadedResults([]);
+    setNumLoaded(0);
+
     try{
         const roomNames = await search(query, attributes, sort);
         setResults(roomNames);
@@ -126,7 +129,7 @@ const fetchSearchHelper = async (query, attributes, sort, setContentState, setCa
         setCalendarLoading(false);
         console.log(roomNames);
     } catch (error) {
-        newError(navigate);
+        newError(error, navigate);
     } 
     setSearchQuery(query);
 };

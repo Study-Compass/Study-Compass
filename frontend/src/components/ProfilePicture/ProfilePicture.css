@@ -26,7 +26,7 @@
     border-radius: 15px;
     background-color: white;
     transition:opacity 0.3s,
-                height 0.5s;
+               max-height 1s;
     position: absolute;
     background-color: transparent;
     border: 1px solid var(--lighterborder);
@@ -39,7 +39,6 @@
             
 .popup-active{
     border: 1px solid var(--lighterborder);
-    height:auto;
     opacity: 1;
     background-color: white;
     pointer-events: all;

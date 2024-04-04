@@ -43,7 +43,7 @@ export const CacheProvider = ({children}) =>{
         try {
             const queryString = `/getroom/${id}`;
             if(cache[queryString]){
-                console.log('returning cached');
+                // console.log('returning cached');
                 return cache[queryString];
             } else {
                 const response = await fetch(`/getroom/${id}`);
@@ -82,31 +82,58 @@ export const CacheProvider = ({children}) =>{
         }
     };
     
-    
     const getBatch = async (queries) => {
-        if(queries.length === 0){
+        if (queries.length === 0) {
             return [];
         }
-        try{
-            const response = await axios.post('/getbatch', {queries, exhaustive: true});
+    
+        const fetchQueries = [];
+        const results = [];
+        const cacheMisses = [];
+    
+        // check which queries are already cached
+        queries.forEach((query, index) => {
+            const cacheKey = `/getroom/${query}`;
+            if (cache[cacheKey]) {
+                results[index] = cache[cacheKey];
+            } else {
+                fetchQueries.push(query);
+                cacheMisses.push(index);
+            }
+        });
+    
+        // if all queries are cached, return the results
+        if (fetchQueries.length === 0) {
+            return results.filter(result => result);
+        }
+    
+        // fetch missing data from the backend
+        try {
+            const response = await axios.post('/getbatch', { queries: fetchQueries, exhaustive: true });
             const responseBody = response.data;
-            if(!responseBody.success){
+            if (!responseBody.success) {
                 console.error('Error fetching batch data:', responseBody.message);
                 return;
             }
-            for(let i = 0; i < responseBody.data.length; i++){
-                cache[`/getroom/${queries[i]}`] = responseBody.data[i];
-            }
-            console.log("responsedata", responseBody.data)
-            console.log("query", queries);
-            return responseBody.data;
-        } catch (error){
+    
+            // update cache and results with fetched data
+            responseBody.data.forEach((data, i) => {
+                const cacheKey = `/getroom/${fetchQueries[i]}`;
+                cache[cacheKey] = data; 
+                results[cacheMisses[i]] = data; // insert data into the correct position
+            });
+    
+            return results.filter(result => result);
+        } catch (error) {
             console.error('Error fetching data:', error);
         }
     };
-
+    
     const search = async (query, attributes, sort) => {
         try{
+            if(`${query}${attributes}${sort}` in cache){
+                return cache[`${query}${attributes}${sort}`];
+            }
             const response = await axios.get('/search', {
                 params: {
                   query: query,
@@ -121,6 +148,7 @@ export const CacheProvider = ({children}) =>{
                 console.error('Error fetching search data:', responseBody.message);
                 return;
             }
+            cache[`${query}${attributes}${sort}`] = responseBody.data;
             return responseBody.data;
         } catch (error){
             console.error('Error fetching search data:', error);

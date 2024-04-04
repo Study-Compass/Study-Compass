@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import './Sort.css';
+import useOutsideClick from '../../hooks/useClickOutside';
 
 import Tags from '../../assets/Icons/sort/Tags.svg';
 import SortBy from '../../assets/Icons/sort/SortBy.svg';
@@ -10,9 +11,10 @@ import MoreSelected from '../../assets/Icons/sort/MoreSelected.svg';
 import ChevronDown from '../../assets/Icons/sort/ChevronDown.svg';
 import ChevronUp from '../../assets/Icons/sort/ChevronUp.svg';
 
-function Sort(){
-    const [selected, setSelected] = useState(null);
+import TagsPopup from './Tags/Tags';
 
+function Sort({query, searchAttributes, setSearchAttributes, searchSort, setSearchSort, onSearch}) {
+    const [selected, setSelected] = useState(null);
     const handleSelect = (select) => {
         if(selected === select){
             setSelected(null);
@@ -21,9 +23,14 @@ function Sort(){
         }
     };  
 
+    const onApply = (tags) => {
+        setSelected(null);
+        onSearch(query, tags, searchSort);
+    }
 
     return (
         <div className="sort-row">
+            {selected === "tags" ? <TagsPopup setSelected={setSelected} searchAttributes={searchAttributes} setSearchAttributes={setSearchAttributes} onApply={onApply}/>: ""}
             <div className={`tags ${selected === 'tags' ? "selected": ""}`} onClick={()=>{handleSelect('tags')}}>
                 <img src={selected === 'tags' ? TagsSelected : Tags} alt="" />
                 <p>Tags</p>

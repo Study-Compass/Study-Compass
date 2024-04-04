@@ -8,7 +8,6 @@ function Results({ results, loadedResults, numLoaded, setNumLoaded, debouncedFet
     const resultRef = useRef(null);
     let scrollLoading = false;
 
-
     //checking loaded results
     useEffect(() => {
         const container = resultRef.current;
@@ -35,6 +34,22 @@ function Results({ results, loadedResults, numLoaded, setNumLoaded, debouncedFet
         }
       }, [contentState, numLoaded]);
 
+      useEffect(() => {
+        // On component mount, restore the scroll position
+        const savedScrollPosition = localStorage.getItem('resultsScrollPosition');
+        console.log(savedScrollPosition);
+        if (resultRef.current && savedScrollPosition) {
+            resultRef.current.scrollTop = parseInt(savedScrollPosition, 10);
+        }
+    }, []);
+
+    const changeURLHelper = (roomName) => {
+        if (resultRef.current) {
+            localStorage.setItem('resultsScrollPosition', resultRef.current.scrollTop.toString());
+        }
+        changeURL(roomName);
+    }
+
     return (
         <ul className="time-results" ref={resultRef}>
         {loadedResults.map(result => (
@@ -43,7 +58,7 @@ function Results({ results, loadedResults, numLoaded, setNumLoaded, debouncedFet
                 result={result} 
                 attributes={result.room.attributes}
                 debouncedFetchData={debouncedFetchData} 
-                changeURL={changeURL}
+                changeURL={changeURLHelper}
                 findNext={findNext}
             />
         ))}

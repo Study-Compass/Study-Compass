@@ -20,7 +20,6 @@ import '../../pages/Room/Room.css';
 
 function Classroom({ room, state, setState, schedule, roomName }) {
 
-    console.log("room",room);
     const [image, setImage] = useState("")
     const { user } = useAuth();
     const [success, setSuccess] = useState(false);
@@ -54,7 +53,6 @@ function Classroom({ room, state, setState, schedule, roomName }) {
         // useEffect(() => { console.log(state) }, [state]);
     useEffect(() => {
         setSuccess(schedule ? findNext(schedule.weekly_schedule).free : true);
-        console.log(schedule);
         setMessage(schedule ? findNext(schedule.weekly_schedule).message : "");
     }, [schedule]);
 
