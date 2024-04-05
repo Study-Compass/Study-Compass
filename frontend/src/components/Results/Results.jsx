@@ -19,7 +19,7 @@ function Results({ results, loadedResults, numLoaded, setNumLoaded, debouncedFet
           // Check if the scroll has reached the bottom
           if (scrollPosition >= containerHeight) {
               if(!scrollLoading){
-                console.log('Reached the bottom of the container');
+                // console.log('Reached the bottom of the container');
                 setTimeout(() => {              
                     setNumLoaded(numLoaded + 10);
                 }, 500);
@@ -37,7 +37,8 @@ function Results({ results, loadedResults, numLoaded, setNumLoaded, debouncedFet
       useEffect(() => {
         // On component mount, restore the scroll position
         const savedScrollPosition = localStorage.getItem('resultsScrollPosition');
-        console.log(savedScrollPosition);
+        localStorage.removeItem('resultsScrollPosition');
+        // console.log(savedScrollPosition);
         if (resultRef.current && savedScrollPosition) {
             resultRef.current.scrollTop = parseInt(savedScrollPosition, 10);
         }

@@ -5,7 +5,7 @@ import useOutsideClick from '../../../hooks/useClickOutside';
 
 function Tags({ setSelected, searchAttributes, setSearchAttributes, onApply }){
     const [tagsState, setTagsState] = useState(true); //true for include, false for exclude
-    const tags = ["windows", "outlets", "printer", "small desks", "tables"];
+    const tags = ["windows", "outlets", "printer", "small desks", "tables", "empty"];
 
     const [include, setInclude] = useState([...searchAttributes]);
     const [exclude, setExclude] = useState([]);

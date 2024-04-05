@@ -28,7 +28,8 @@ const findNext = (schedule) => {
     const days = ["M","T","W","R","F"];
     const today = new Date();
     const day = today.getDay();
-    const minutes = (today.getHours()*60) + today.getMinutes();
+    const minutes = (today.getHours()*60) + today.getMinutes() + 10;
+    console.log(minutes);
     // console.log(minutes);
 
     if(day === 0 || day === 6){
@@ -102,7 +103,14 @@ const fetchFreeNowHelper = async (setContentState, setCalendarLoading, setResult
     const days = ["M", "T", "W", "R", "F"];
     const today = new Date();
     const day = today.getDay();
-    const hour = today.getHours();
+    let hour = today.getHours();
+    const minutes = today.getMinutes() + 10;
+    if(minutes >= 60){
+        hour += 1;
+    }
+    if(minutes >=30 && minutes < 60){
+        hour += 0.5;
+    }
     if(day === 0 || day === 6){
         nowQuery['M'] = [{start_time: 0, end_time: 30}];
     } else {
@@ -127,7 +135,7 @@ const fetchSearchHelper = async (query, attributes, sort, setContentState, setCa
         setResults(roomNames);
         setNumLoaded(10);
         setCalendarLoading(false);
-        console.log(roomNames);
+        // console.log(roomNames);
     } catch (error) {
         newError(error, navigate);
     } 
