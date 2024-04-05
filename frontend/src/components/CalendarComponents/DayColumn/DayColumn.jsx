@@ -41,17 +41,21 @@ function DayColumn({day, dayEvents, eventColors, empty, add, remove, queries}){
         }
         setIsSelecting(false);
 
-        if(selectionStart > selectionEnd){
-            let temp = selectionStart;
-            setSelectionStart(selectionEnd);
-            setSelectionEnd(temp);
-        }
-
-        const timeslot = {
+        let timeslot = {
             class_name: "search",
             start_time: stringifyTime((selectionStart-1)/4 + 7),
             end_time: stringifyTime((selectionEnd-1)/4 + 7),
         }
+
+        if(selectionStart > selectionEnd){
+            let temp = selectionStart;
+            timeslot.start_time = stringifyTime((selectionEnd-1)/4 + 7);
+            timeslot.end_time = stringifyTime((temp-1)/4 + 7);
+            setSelectionStart(selectionEnd);
+            setSelectionEnd(temp);
+            
+        }
+
         console.log(timeslot);
         add(day, timeslot);
     };
@@ -99,7 +103,11 @@ function DayColumn({day, dayEvents, eventColors, empty, add, remove, queries}){
     function Grid(){
         const gridItems = [];
         const date = new Date();
-        const currentHour = date.getHours();
+        let currentHour = date.getHours();
+        const currentMinute = date.getMinutes() + 10;
+        if(currentMinute >= 60){
+            currentHour += 1;
+        }
         const currentGrid = (currentHour - 7) * 4 + 1;
         for (let i = 1; i <= 60; i += 2) { // Assuming 14 time slots
             gridItems.push(
@@ -171,7 +179,6 @@ function DayColumn({day, dayEvents, eventColors, empty, add, remove, queries}){
                 if(event.class_name === "loading"){
                     if(!loading){
                         setLoading(true);
-                        console.log("loading")
                     }
                     return (
                         <div 

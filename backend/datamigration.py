@@ -128,8 +128,34 @@ def replaceImage():
 
     collection.update_many({'image': '/'},{'$set': {'image': '/classrooms/placeholder.jpg'},})
 
+def bulkUpdate():
+    load_dotenv() # loading .env file
+    uri = os.environ.get('MONGO_URL') # fetching URI string
+    client = MongoClient(uri, server_api=ServerApi('1')) 
+    db = client['studycompass']
+    collection = db['classrooms1']
+
+    result = collection.update_many(
+    {'attribute': {'$exists': True}},  # Criteria to match documents that have an 'attribute' field
+    {'$unset': {'attribute': ""}}  # Action to remove the 'attribute' field
+    )
+    print(f"Update complete. Modified {result.modified_count} documents.")
+    # Find documents where the attribute field is an empty array
+    # and construct bulk update operations
+    for document in collection.find():
+        # Check if the attribute field exists and is an empty array
+        if document.get('attributes') == []:
+            # Add "empty" to the array
+            collection.update_one(
+                {'_id': document['_id']}, 
+                {'$push': {'attributes': 'empty'}}
+            )
+
+    print("Update complete.")
+
 # write_items_with_root_image_to_file("not-done.txt") # call the function to add new field to the collection
 # addNewField('users',{'saved' : []})
 # addNewField('classrooms1',{'attributes': []})
 # addNewField('users',{'admin': False})
-replaceImage() # call the function to add new field to the collection
+# replaceImage() # call the function to add new field to the collection
+bulkUpdate() 
