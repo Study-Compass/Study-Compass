@@ -137,7 +137,7 @@ export const CacheProvider = ({children}) =>{
             const response = await axios.get('/search', {
                 params: {
                   query: query,
-                  attributes: attributes,
+                  attributes: attributes, 
                   sort: 'name'
                 }, headers: {
                     'Authorization': `Bearer ${localStorage.getItem('token')}`
