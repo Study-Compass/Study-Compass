@@ -78,6 +78,7 @@
     opacity: 1;
     width:calc(100% - 40px);
     overflow-x:hidden;
+    justify-content: space-between;
 }
 
 .sort-popup .heading h1{

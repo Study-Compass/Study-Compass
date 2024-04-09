@@ -26,13 +26,12 @@ app.use(dataRoutes);
 app.use(cors());
 app.use(cookieParser());
 
-mongoose.connect(process.env.MONGO_URL)
-
+mongoose.connect(process.env.MONGO_URL);
 mongoose.connection.on('connected', () => {
     console.log('Mongoose connected to DB.');
     mongoConnection = true;
-});
-mongoose.connection.on('error', (err) => {
+    });
+    mongoose.connection.on('error', (err) => {
     console.log('Mongoose connection error:', err);
     mongoConnection = false;
 });

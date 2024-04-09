@@ -64,7 +64,7 @@ function Tags({ setSelected, searchAttributes, setSearchAttributes, onApply }){
                         {tags.map((tag, index) => {
                             return (
                                 <div key={index} className={`option ${include.includes(tag) ? "selected" : ""}`} onClick={()=>{handleSelect("include",tag)}}>
-                                    <img src={include.includes(tag) ? selectedAttributeIcons[tag]:attributeIcons[tag]} alt={tag}/>
+                                    {Object.keys(attributeIcons).includes(tag) && <img src={include.includes(tag) ? selectedAttributeIcons[tag]:attributeIcons[tag]} alt={tag}/>}
                                     <p>{tag}</p>
                                 </div>
                             );
@@ -74,7 +74,7 @@ function Tags({ setSelected, searchAttributes, setSearchAttributes, onApply }){
                         {tags.map((tag, index) => {
                             return (
                                 <div key={index} className={`option ${exclude.includes(tag) ? "selected" : ""}`} onClick={()=>{handleSelect("exclude",tag)}}>
-                                    <img src={exclude.includes(tag) ? selectedAttributeIcons[tag]:attributeIcons[tag]} alt={tag}/>
+                                    {Object.keys(attributeIcons).includes(tag) && <img src={exclude.includes(tag) ? selectedAttributeIcons[tag]:attributeIcons[tag]} alt={tag}/>}
                                     <p>{tag}</p>
                                 </div>
                             );
