@@ -82,7 +82,7 @@ function Tags({ setSelected, searchAttributes, setSearchAttributes, onApply }){
                     </div>
                 </div>
             </div>
-            <button className={`button ${JSON.stringify(include) === JSON.stringify(searchAttributes) ? "" : "active"}`} style={{height:'40px'}} onClick={()=>{onApply(include)}}>apply</button>
+            <button className={`button ${JSON.stringify(include) === JSON.stringify(searchAttributes) ? "" : "active"}`} style={{height:'40px'}} onClick={()=>{onApply(include, null)}}>apply</button>
 
         </div>
     );

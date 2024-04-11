@@ -25,15 +25,27 @@ function Sort({query, searchAttributes, setSearchAttributes, searchSort, setSear
         }
     };  
 
-    const onApply = (tags) => {
+    const onApply = (tags, sort) => {
         setSelected(null);
-        onSearch(query, tags, searchSort);
+        if(tags !== null){
+            if(sort !== null){
+                onSearch(query, tags, sort);
+            } else {
+                onSearch(query, tags, searchSort);
+            }
+        } else {
+            if(sort !== null){
+                onSearch(query, searchAttributes, sort);
+            } else {
+                return;
+            }
+        }
     }
 
     return (
         <div className="sort-row">
             {selected === "tags" ? <TagsPopup setSelected={setSelected} searchAttributes={searchAttributes} setSearchAttributes={setSearchAttributes} onApply={onApply}/>: ""}
-            {selected === "sort" ? <SortByPopup setSelected={setSelected} sortBy={searchSort} setSortBy={setSearchSort}/>: ""}
+            {selected === "sort" ? <SortByPopup setSelected={setSelected} sortBy={searchSort} onApply={onApply}/>: ""}
             <div className={`tags ${selected === 'tags' ? "selected": ""}`} onClick={()=>{handleSelect('tags')}}>
                 <img src={selected === 'tags' ? TagsSelected : Tags} alt="" />
                 <p>Tags</p>

@@ -138,7 +138,7 @@ export const CacheProvider = ({children}) =>{
                 params: {
                   query: query,
                   attributes: attributes, 
-                  sort: 'name'
+                  sort: sort
                 }, headers: {
                     'Authorization': `Bearer ${localStorage.getItem('token')}`
                 }

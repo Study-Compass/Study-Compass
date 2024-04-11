@@ -127,6 +127,8 @@ function Room() {
                 return;
             }
             fetchSearch(searchQuery, attributes, sort);
+            setSearchAttributes(attributes);
+            setSearchSort(sort);    
             console.log("searching");
             setContentState("nameSearch");
             fetchData("none");
@@ -219,6 +221,7 @@ function Room() {
     function onSearch(query, attributes, sort){
         const queryString = new URLSearchParams({ query, attributes: JSON.stringify(attributes), sort }).toString();
         navigate(`/room/search?${queryString}`, { replace: true });        
+        // console.log(sort);
         fetchSearch(query, attributes, sort); //sets search query
         setSearchAttributes(attributes);
         setSearchSort(sort);
