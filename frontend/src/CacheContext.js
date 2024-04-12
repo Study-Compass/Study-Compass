@@ -60,8 +60,11 @@ export const CacheProvider = ({children}) =>{
     const getFreeRooms = async (query) => {
         try {
             const queryString = `/free/${JSON.stringify(query)}`;
+            
             if(cache[queryString]){
-                return cache[queryString];
+                setTimeout(() => { // this is for asynchronous nature of useState, else useEffect won't trigger               
+                    return cache[queryString];
+                }, 100);
             }
             const response = await axios.post('/free', { query });
             const responseBody = response.data;

@@ -54,6 +54,8 @@ function Room() {
     const [searchAttributes, setSearchAttributes] = useState([]);
     const [searchSort, setSearchSort] = useState("name"); 
 
+    const [showFilter, setShowFilter] = useState(false); 
+
     function clearQuery(){ setQuery({'M': [],'T': [],'W': [],'R': [],'F': [],});
         setNoQuery(true);
     }
@@ -156,6 +158,8 @@ function Room() {
     useEffect(()=>{
         const updateLoadedResults = async ()=>{
             if(numLoaded === 0){
+                console.log("0");
+
                 setLoadedResults([]);
             }
             // setResultsLoading(true);
@@ -170,6 +174,7 @@ function Room() {
                 newError(error, navigate);
             }
         };
+        console.log("numLoaded:", numLoaded);
         updateLoadedResults();
     },[numLoaded]);
 
@@ -186,6 +191,8 @@ function Room() {
         if (!noquery) {
             fetchFreeRooms();
         }
+        console.log(numLoaded + " " + loadedResults.length + " " + results.length);
+        console.log(noquery);
      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [query])
 
@@ -252,18 +259,19 @@ function Room() {
                         {contentState === "calendarSearch" || contentState === "freeNowSearch" || contentState === "nameSearch" ? calendarLoading ? "" : 
                             <div className="resultsCountContainer">
                                 <h1 className="resultCount">{results.length} results {contentState === "nameSearch" ? searchQuery ? `for "${searchQuery.slice(0,width < 800 ? 4:9)}${searchQuery.length>(width < 800 ? 4:9) ? "..." : ""}"` : "" : ""}</h1> 
-                                <img src={SortIcon} alt="sort" />
+                                <img src={SortIcon} alt="sort" onClick={()=>{setShowFilter(!showFilter)}}/>
                             </div>
                         : ""}
-                        {contentState === "calendarSearch" || contentState === "freeNowSearch" || contentState === "nameSearch" ? 
-                        <Sort
-                            query={searchQuery}
-                            searchAttributes={searchAttributes}
-                            setSearchAttributes={setSearchAttributes}
-                            searchSort={searchSort}
-                            setSearchSort={setSearchSort}
-                            onSearch={onSearch}
-                        /> : ""}
+                        {showFilter && (contentState === "calendarSearch" || contentState === "freeNowSearch" || contentState === "nameSearch")? 
+                            <Sort
+                                query={searchQuery}
+                                searchAttributes={searchAttributes}
+                                setSearchAttributes={setSearchAttributes}
+                                searchSort={searchSort}
+                                setSearchSort={setSearchSort}
+                                onSearch={onSearch}
+                            /> 
+                        : ""}
                         {contentState === "calendarSearch" || contentState === "freeNowSearch" || contentState === "nameSearch" ? 
                             <Results 
                                 results={results}

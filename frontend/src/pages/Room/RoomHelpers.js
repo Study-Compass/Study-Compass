@@ -83,6 +83,7 @@ const fetchFreeRoomsHelper = async (setContentState, setCalendarLoading, getFree
     setContentState("calendarSearch")
     setCalendarLoading(true)
     const roomNames = await getFreeRooms(query);
+    console.log(roomNames);
     setResults(roomNames.sort());
     setNumLoaded(10);
     setCalendarLoading(false);
