@@ -201,7 +201,7 @@ router.get('/search', verifyTokenOptional, async (req, res) => {
         }
 
         if(sort === "availability"){
-            findQuery = Classroom.aggregate([
+            findQuery =  Classroom.aggregate([
                 {
                     $match: {
                         name: { $regex: query, $options: 'i' } // Filters classrooms by name using regex
@@ -212,13 +212,16 @@ router.get('/search', verifyTokenOptional, async (req, res) => {
                         from: "schedules", // Assumes "schedules" is the collection name
                         localField: "_id", // Field in the 'classroom' documents
                         foreignField: "classroom_id", // Corresponding field in 'schedule' documents
-                        as: "weekly_schedule" // Adds the entire schedule
+                        as: "schedule_info" // Temporarily holds the entire joined schedule documents
                     }
+                },
+                {
+                    $unwind: "$schedule_info" // Unwinds the schedule_info to handle multiple documents if necessary
                 },
                 {
                     $project: {
                         name: 1, // Includes classroom name in the output
-                        weekly_schedule: 1 // Includes the entire weekly_schedule
+                        weekly_schedule: "$schedule_info.weekly_schedule" // Projects only the weekly_schedule part from each schedule_info
                     }
                 }
             ]);
@@ -235,6 +238,7 @@ router.get('/search', verifyTokenOptional, async (req, res) => {
 
         if(sort === "availability"){
             classrooms = sortByAvailability(classrooms);
+            // console.log(classrooms);
         }
 
         let sortedClassrooms = [];
@@ -265,6 +269,7 @@ router.get('/search', verifyTokenOptional, async (req, res) => {
         res.json({ success: true, message: "Rooms found", data: names });
     } catch (error) {
         res.status(500).json({ success: false, message: 'Error searching for rooms', error: error.message });
+        console.error(error);
     }
 });
 
