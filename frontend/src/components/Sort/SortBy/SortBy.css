@@ -1,0 +1,10 @@
+.sort-options{
+    display:flex;
+    flex-direction: column;
+    gap:5px;
+    /* max-height: 180px;
+    min-height: 180px; */
+    overflow-y:scroll;
+    margin-top:10px;
+    flex:1
+}

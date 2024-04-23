@@ -3,6 +3,7 @@ const Classroom = require('./schemas/classroom.js');
 const Schedule = require('./schemas/schedule.js');
 const User = require('./schemas/user.js');
 const { verifyToken, verifyTokenOptional } = require('./middlewares/verifyToken');
+const { sortByAvailability } = require('./helpers.js');
 
 const router = express.Router();
 
@@ -175,7 +176,7 @@ router.get('/search', verifyTokenOptional, async (req, res) => {
     const attributes = req.query.attributes ? req.query.attributes : []; // Ensure attributes is an array
     const sort = req.query.sort;
     const userId = req.user ? req.user.userId : null;
-
+    console.log('sort', sort);
     let user;
     if(userId){
         try{
@@ -199,16 +200,46 @@ router.get('/search', verifyTokenOptional, async (req, res) => {
             );
         }
 
+        if(sort === "availability"){
+            findQuery =  Classroom.aggregate([
+                {
+                    $match: {
+                        name: { $regex: query, $options: 'i' } // Filters classrooms by name using regex
+                    }
+                },
+                {
+                    $lookup: {
+                        from: "schedules", // Assumes "schedules" is the collection name
+                        localField: "_id", // Field in the 'classroom' documents
+                        foreignField: "classroom_id", // Corresponding field in 'schedule' documents
+                        as: "schedule_info" // Temporarily holds the entire joined schedule documents
+                    }
+                },
+                {
+                    $unwind: "$schedule_info" // Unwinds the schedule_info to handle multiple documents if necessary
+                },
+                {
+                    $project: {
+                        name: 1, // Includes classroom name in the output
+                        weekly_schedule: "$schedule_info.weekly_schedule" // Projects only the weekly_schedule part from each schedule_info
+                    }
+                }
+            ]);
+        }
+
         console.log({ name: { $regex: query, $options: 'i' }, attributes: { $all: attributes } },{ name: 1} ) 
 
 
         // Conditionally add sorting if required
-        if (sort === "name") {
-            findQuery = findQuery.sort('name'); // Sort by name in ascending order
-        }
+        findQuery = findQuery.sort('name'); // Sort by name in ascending order
 
         // Execute the query
-        const classrooms = await findQuery;
+        let classrooms = await findQuery;
+
+        if(sort === "availability"){
+            classrooms = sortByAvailability(classrooms);
+            // console.log(classrooms);
+        }
 
         let sortedClassrooms = [];
 
@@ -238,6 +269,7 @@ router.get('/search', verifyTokenOptional, async (req, res) => {
         res.json({ success: true, message: "Rooms found", data: names });
     } catch (error) {
         res.status(500).json({ success: false, message: 'Error searching for rooms', error: error.message });
+        console.error(error);
     }
 });
 

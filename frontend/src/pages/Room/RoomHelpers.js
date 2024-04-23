@@ -1,4 +1,3 @@
-import { set } from "mongoose";
 
 function minutesToTime(minutes){
     let hours = Math.floor(minutes / 60);
@@ -29,7 +28,6 @@ const findNext = (schedule) => {
     const today = new Date();
     const day = today.getDay();
     const minutes = (today.getHours()*60) + today.getMinutes() + 10;
-    console.log(minutes);
     // console.log(minutes);
 
     if(day === 0 || day === 6){
@@ -85,6 +83,7 @@ const fetchFreeRoomsHelper = async (setContentState, setCalendarLoading, getFree
     setContentState("calendarSearch")
     setCalendarLoading(true)
     const roomNames = await getFreeRooms(query);
+    console.log(roomNames);
     setResults(roomNames.sort());
     setNumLoaded(10);
     setCalendarLoading(false);
@@ -129,7 +128,6 @@ const fetchSearchHelper = async (query, attributes, sort, setContentState, setCa
     setResults([]);
     setLoadedResults([]);
     setNumLoaded(0);
-
     try{
         const roomNames = await search(query, attributes, sort);
         setResults(roomNames);
