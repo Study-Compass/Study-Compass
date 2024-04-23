@@ -258,11 +258,11 @@ function Room() {
                         /> : ""}
                         {contentState === "calendarSearch" || contentState === "freeNowSearch" || contentState === "nameSearch" ? calendarLoading ? "" : 
                             <div className="resultsCountContainer">
-                                <h1 className="resultCount">{results.length} results {contentState === "nameSearch" ? searchQuery ? `for "${searchQuery.slice(0,width < 800 ? 4:9)}${searchQuery.length>(width < 800 ? 4:9) ? "..." : ""}"` : "" : ""}</h1> 
-                                <img src={SortIcon} alt="sort" onClick={()=>{setShowFilter(!showFilter)}}/>
+                                <h1 className="resultCount">{results.length} results {contentState === "nameSearch" ? searchQuery ? `for "${searchQuery.slice(0,width < 800 ? 8:15)}${searchQuery.length>(width < 800 ? 8:15) ? "..." : ""}"` : "" : ""}</h1> 
+                                {/* <img src={SortIcon} alt="sort" onClick={()=>{setShowFilter(!showFilter)}}/> */}
                             </div>
                         : ""}
-                        {showFilter && (contentState === "calendarSearch" || contentState === "freeNowSearch" || contentState === "nameSearch")? 
+                        { (contentState === "calendarSearch" || contentState === "freeNowSearch" || contentState === "nameSearch")? 
                             <Sort
                                 query={searchQuery}
                                 searchAttributes={searchAttributes}
