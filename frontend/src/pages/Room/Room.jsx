@@ -17,6 +17,7 @@ import chevronUp from '../../assets/chevronup.svg';
 import SortIcon from '../../assets/Icons/Sort.svg';
 
 import { debounce} from '../../Query.js';
+import { set } from 'mongoose';
 
 /** 
 documentation:
@@ -64,8 +65,8 @@ function Room() {
 
     const [width, setWidth] = useState(window.innerWidth);
 
-    const fetchData = async (id) => fetchDataHelper(id, setLoading, setData, setRoom, navigate, getRoom, setRoomName);
-    const fetchFreeRooms = async () => fetchFreeRoomsHelper(setContentState, setCalendarLoading, getFreeRooms, setResults, setNumLoaded, query);
+    const fetchData = async (id) => fetchDataHelper(id, setLoading, setData, setRoom, navigate, getRoom, setRoomName, newError);
+    const fetchFreeRooms = async () => fetchFreeRoomsHelper(setContentState, setCalendarLoading, getFreeRooms, setResults, setNumLoaded, query, newError);
     const debouncedFetchData = debounce(fetchData, 500); // Adjust delay as needed
     const fetchFreeNow = async () => fetchFreeNowHelper(setContentState, setCalendarLoading, setResults, setNumLoaded, getFreeRooms);
     const fetchSearch = async (query, attributes, sort) => fetchSearchHelper(query, attributes, sort, setContentState, setCalendarLoading, setResults, setLoadedResults, search, setNumLoaded, navigate, newError, setSearchQuery);
@@ -109,7 +110,11 @@ function Room() {
                 setReady(true);
             } catch (error){
                 console.log(error);
-                navigate("/error/500");
+                const fetchError = {
+                    message: "Failed to fetch rooms list, likely due to proxy error. Please try again later.",
+                    status: 500,
+                }
+                newError(fetchError, navigate);
             }
         };
         fetchRooms();

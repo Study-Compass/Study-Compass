@@ -6,11 +6,14 @@ import { useNavigate, useParams } from 'react-router-dom';
 import Header from '../../components/Header/Header';
 import Loader from '../../components/Loader/Loader';
 
+import Info from '../../assets/Icons/Info.svg';
+
 function Error() {
     const { errorCode } = useParams();
     const navigate = useNavigate();
 
     const [errorMessage, setErrorMessage] = useState("");
+    const [showMessage, setShowMessage] = useState(false);
     
     useEffect(() => {
         if(!errorCode){
@@ -20,6 +23,7 @@ function Error() {
         if (message) {
             localStorage.removeItem("error");
             setErrorMessage(message);
+            console.log(message);
         }
     }, []);
 
@@ -43,9 +47,18 @@ function Error() {
                     </div>
                 }
                 <div className="error-message">
-                    <p>{errorCode}</p>
-                    <p>{errorMessage}</p>
+                    <p>Error {errorCode}</p>
+                    <img src={Info} alt="Info" onClick={()=>{setShowMessage(!showMessage)}}/>
+                    {/* <p>{errorMessage}</p> */}
+
                 </div>
+                {showMessage && 
+                    <div className="error-popup">
+                        <p>{errorMessage}</p>
+                    </div>
+            
+
+                }
                 <div className="button-container">
                     <button className="button active lightred" onClick={() => navigate("/")}>Go Home</button>
                 </div>

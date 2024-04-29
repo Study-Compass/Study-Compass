@@ -62,7 +62,7 @@ const findNext = (schedule) => {
     }
 };
 
-const fetchDataHelper = async (id, setLoading, setData, setRoom, navigate, getRoom, setRoomName) => {
+const fetchDataHelper = async (id, setLoading, setData, setRoom, navigate, getRoom, setRoomName, newError) => {
     setRoom(null);
     setLoading(true);
     setData(null);
@@ -75,18 +75,22 @@ const fetchDataHelper = async (id, setLoading, setData, setRoom, navigate, getRo
         // console.log(data.room);
     } catch (error){
         console.log(error);
-        navigate("/error/500");
+        // navigate("/error/500");
+        newError(error, navigate);
     }
 };
 
-const fetchFreeRoomsHelper = async (setContentState, setCalendarLoading, getFreeRooms, setResults, setNumLoaded, query) => {
+const fetchFreeRoomsHelper = async (setContentState, setCalendarLoading, getFreeRooms, setResults, setNumLoaded, query, newError) => {
     setContentState("calendarSearch")
     setCalendarLoading(true)
-    const roomNames = await getFreeRooms(query);
-    console.log(roomNames);
-    setResults(roomNames.sort());
-    setNumLoaded(10);
-    setCalendarLoading(false);
+    try{
+        const roomNames = await getFreeRooms(query);
+        setResults(roomNames.sort());
+        setNumLoaded(10);
+        setCalendarLoading(false);
+    } catch (error) {
+        console.log(error);
+    }
 };
 
 const fetchFreeNowHelper = async (setContentState, setCalendarLoading, setResults, setNumLoaded, getFreeRooms) => {

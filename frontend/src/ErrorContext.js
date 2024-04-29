@@ -17,7 +17,7 @@ export const ErrorProvider = ({children}) =>{
     const getError = () => {
         return localStorage.getItem('error');
     }
-
+ 
     return (
         <ErrorContext.Provider value={{ newError, getError }}>
             {children}
