@@ -17,7 +17,6 @@ import chevronUp from '../../assets/chevronup.svg';
 import SortIcon from '../../assets/Icons/Sort.svg';
 
 import { debounce} from '../../Query.js';
-import { set } from 'mongoose';
 
 /** 
 documentation:
