@@ -10,7 +10,7 @@
 
 .calendar-container{
     display:flex;
-    max-width:1300px;
+    max-width:1500px;
     background-color: white;
     border-radius: 21px;
     /* padding:20px 20px 60px 20px; */
@@ -38,7 +38,7 @@
 .content-container{
     display:flex;
     flex-direction: column;
-    justify-content: flex-start;
+    justify-content: center;
     align-items: center;
     width:100%;
     height:calc(100% - 80px);
@@ -255,6 +255,26 @@ select{
     align-self: center;
 
 }
+
+.mini-footer{
+    display:flex;
+    justify-content: center;
+    align-items: center;
+    gap:10px;
+    padding:10px;
+}
+
+.mini-footer p{
+    color:var(--border);
+    font-size:15px;
+    margin:0;
+}
+
+.mini-footer .github{
+    width:20px;
+    height:20px;
+}
+
 
 .free-until .inner-dot{
     height:12px;

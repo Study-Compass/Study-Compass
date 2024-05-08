@@ -15,6 +15,7 @@ import Sort from '../../components/Sort/Sort.jsx';
 
 import chevronUp from '../../assets/chevronup.svg';
 import SortIcon from '../../assets/Icons/Sort.svg';
+import Github from '../../assets/Icons/Github.svg';
 
 import { debounce} from '../../Query.js';
 
@@ -306,6 +307,14 @@ function Room() {
                     )}
                     {width < 800 ? contentState === "calendarSearchResult" || contentState === "classroom" ? <button className="show-calendar" onClick={() => { setShowMobileCalendar(true) }}> <img src={chevronUp} alt="show schedule" /> </button> : "" : ""}
                 </div>
+            </div>
+            <div className="mini-footer">
+                <p>© {new Date().getFullYear()} Study Compass</p> 
+                <p>|</p>
+                <p>MIT license</p>
+                <p>|</p>
+                <a href="https://github.com/AZ0228/Study-Compass" className="github" ><img src={Github} alt="" className="github" /></a>
+                <p>Github</p>
             </div>
         </div>
     );
