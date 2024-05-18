@@ -12,18 +12,21 @@
     font-family: 'Satoshi';
     color: var(--text);
     text-align: center;
+    margin:0;
 }
 
 .onboard .yellow-red{
     position: absolute;
     top:0;
     right:0;
+    pointer-events: none;
 }
 
 .onboard .purple{
     position:absolute;
     bottom:0;
     left:0;
+    pointer-events: none;
 }
 
 .onboard .content{
@@ -31,6 +34,21 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    gap:20px;
+    overflow: hidden;
+    transition: all 0.5s ease-in-out;
+
+}
+
+.onboard .content.nextOnboard{
+    opacity:0;
+    position:absolute;
+
+}
+
+.onboard .content.beforeOnboard{
+    opacity:0;
+    
 }
 
 .onboard .content p{
@@ -41,6 +59,24 @@
     color:var(--text);
     text-align: center;
 
+}
+
+.onboard .content button{
+    font-family: 'Satoshi';
+    font-size: 15px;
+    outline:none;
+    border-radius: 8px;
+    background-color: var(--red);
+    border:none;
+    padding:5px 20px;
+    margin:10px;
+    color: white;
+
+}
+
+.onboard .content button:hover{
+    cursor:pointer;
+    filter: brightness(0.9);
 }
 
 .onboard .logo{

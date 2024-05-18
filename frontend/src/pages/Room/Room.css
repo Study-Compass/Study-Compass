@@ -5,6 +5,7 @@
     align-items: center;
     background-color: #FFFF;
     height:100vh;
+    max-height:100vh;
     position: relative;
 }
 
@@ -17,8 +18,8 @@
     flex-direction: row;
     border: 1px solid #B0AFAF;
     width:calc(100% - 100px);
-    height:calc(100% - 60px);
-    max-height: min(calc(100% - 60px), 800px);
+    height:calc(100% - 40px);
+    max-height: min(calc(100% - 40px), 800px);
     overflow:hidden;
     position: relative;
 } 
@@ -41,7 +42,8 @@
     justify-content: center;
     align-items: center;
     width:100%;
-    height:calc(100% - 80px);
+    height:calc(100% - 115px);
+    max-height:calc(100% - 115px);
     padding: 20px 20px 40px 20px;
     box-sizing: border-box;
 
@@ -261,7 +263,9 @@ select{
     justify-content: center;
     align-items: center;
     gap:10px;
-    padding:10px;
+    padding:5px;
+    height:35px;
+    box-sizing: border-box;
 }
 
 .mini-footer p{
