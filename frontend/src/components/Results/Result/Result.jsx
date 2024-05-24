@@ -4,7 +4,7 @@ import FilledStar from '../../../assets/Icons/FilledStar.svg';
 import Bookmark from '../../../assets/Icons/Bookmark.svg';
 import useAuth from '../../../hooks/useAuth';
 
-function Result({ result, attributes, debouncedFetchData, changeURL, findNext }) {
+function Result({ result, attributes, debouncedFetchData, changeURL, findNext, contentState }) {
     const schedule = result.data.weekly_schedule;
     const success = findNext(schedule).free;
     const message = findNext(schedule).message;
@@ -32,13 +32,16 @@ function Result({ result, attributes, debouncedFetchData, changeURL, findNext })
                         <img src={FilledStar} alt="star" />
                         <p>4.6</p>
                     </div>
-                    <div className={`${success ? 'free-until' : 'class-until'}`}>
-                        <div className="dot">
-                            <div className="outer-dot"></div>
-                            <div className="inner-dot"></div>
-                        </div>
-                        {success ? "free" : "class in session"} {message}                    
-                    </div>
+                    { contentState === "nameSearch" ?
+
+                        <div className={`${success ? 'free-until' : 'class-until'}`}>
+                            <div className="dot">
+                                <div className="outer-dot"></div>
+                                <div className="inner-dot"></div>
+                            </div>
+                            {success ? "free" : "class in session"} {message}                    
+                        </div> : ""
+                    }
                 </div>
             </div>
         </li>

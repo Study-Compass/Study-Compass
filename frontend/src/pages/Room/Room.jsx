@@ -291,7 +291,7 @@ function Room() {
                         }
                         {contentState === "empty" ? <div className={`instructions-container ${width < 800 ? "mobile-instructions" : ""}`}>
                             <div className="instructions">
-                                <p>search by name or {width < 800 ? "see which rooms are" : "by selecting a timeslot"}</p>
+                                <p>search by name or {width < 800 ? "see which rooms are" : "by selecting a timeslot, or see which rooms are"}</p>
                                 <button onClick={fetchFreeNow} className="free-now">free now</button>
                             </div>
                         </div> : ""}
