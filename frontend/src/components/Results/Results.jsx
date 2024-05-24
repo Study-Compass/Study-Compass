@@ -61,6 +61,7 @@ function Results({ results, loadedResults, numLoaded, setNumLoaded, debouncedFet
                 debouncedFetchData={debouncedFetchData} 
                 changeURL={changeURLHelper}
                 findNext={findNext}
+                contentState={contentState}
             />
         ))}
         {!(loadedResults.length === results.length) ? <div className="loader-container"><Loader/></div> : ""}

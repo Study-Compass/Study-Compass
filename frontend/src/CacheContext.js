@@ -74,8 +74,11 @@ export const CacheProvider = ({children}) =>{
                 console.error("Error fetching free rooms:", responseBody.message);
                 return;
             }
+
+            //exclude entries including "alumni"
+            // responseBody.data = responseBody.data.filter(room => !room.name.toLowerCase().includes('alumni'));
     
-            const roomNames = responseBody.data; // Extract the room names from the response data
+            const roomNames = responseBody.data.filter(room => !room.toLowerCase().includes('alumni')); // Extract the room names from the response data
             cache[queryString] = responseBody.data;
             //console.log(roomNames); // Log the room names or process them as needed
             return roomNames;
