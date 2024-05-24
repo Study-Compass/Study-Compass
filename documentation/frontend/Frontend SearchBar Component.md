@@ -6,7 +6,7 @@ Tags: Frontend, UI
 
 ## **Overview**
 
-The **`SearchBar`** component is a customizable search bar designed for applications requiring a search functionality with autocomplete and support for abbreviations. It provides visual feedback on matching results as the user types, supports keyboard navigation, and allows users to select a result either by clicking on it or pressing the Enter key. Additionally, it incorporates an abbreviated versions feature for specific terms.
+The **`SearchBar`** component is a customizable search bar designed for Study Compass requiring a search functionality with autocomplete and support for abbreviations. It provides visual feedback on matching results as the user types, supports keyboard navigation, and allows users to select a result either by clicking on it or pressing the Enter key. Additionally, it incorporates an abbreviated versions feature for specific terms.
 
 ## **Features**
 
@@ -30,6 +30,7 @@ The **`SearchBar`** component is a customizable search bar designed for applicat
 - **`results`**: An array of search results filtered from the **`data`** prop based on the user's input.
 - **`isFocused`**: Indicates whether the search bar is currently focused.
 - **`selected`**: An index marking the currently highlighted result in the dropdown list.
+- **`dataAbb`**: (**`array`**) An array that includes both the full names and their corresponding abbreviations derived from the **`data`** prop.
 
 ## **Key Functions**
 
@@ -53,9 +54,73 @@ Handles the selection of a search result when clicked with the mouse.
 
 Clears the current search input and executes the **`onX`** prop function.
 
+## Key useEffect Hooks
+
+### **Effect to Handle Abbreviations**
+
+```jsx
+useEffect(() => {
+    if(!data){return}
+    let newData = [...data];
+    data.map(item => {
+        if(removeLastWord(item) in abbreviations){
+            newData.push(abbreviations[removeLastWord(item)]+" "+item.split(' ').pop());
+        }
+    });
+    setDataAbb(newData);
+}, [data]);
+```
+
+- **Purpose:** Adds support for abbreviations by creating a new data array that includes both full names and their corresponding abbreviations.
+- **Dependencies:** Runs whenever the **`data`** prop changes.
+- **Explanation:** It checks each item in the **`data`** array, and if the item's base name matches an abbreviation, it adds the abbreviated version to the new data array (**`newData`**). The updated array is then set to the **`dataAbb`** state.
+
+### **Effect to Filter Results Based on Search Input**
+
+```jsx
+useEffect(() => {
+    setSearchInput(searchInput.toLowerCase());
+    if(searchInput === "none"){
+        setSearchInput("");
+    }
+    if (searchInput === '' || !isFocused) {
+        setResults([]);
+        setLower("");
+    } else {
+        setSelected(0);
+        const filteredResults = dataAbb.filter(item =>
+            item.toLowerCase().startsWith(searchInput)
+        );
+        const newfilteredResults = dataAbb.filter(item => {
+            const includesSearchInput = item.toLowerCase().includes(searchInput.toLowerCase());
+            const notInResults = !results.includes(item);
+            return includesSearchInput && notInResults;
+        });
+        filteredResults.push(...newfilteredResults);
+        if (filteredResults.length === 0) {
+            filteredResults.push("no results found");
+            setLower("");
+        } else {
+            if(filteredResults.length > 1){
+                if(filteredResults[0].toLowerCase().startsWith(searchInput.toLowerCase())){
+                    setLower(filteredResults[0].toLowerCase());
+                } else {
+                    setLower("");
+                }
+            }
+        }
+        setResults(filteredResults);
+    }
+}, [searchInput, dataAbb]);
+```
+
+- **Purpose:** Filters the search results based on the current **`searchInput`**.
+- **Dependencies:** Runs whenever the **`searchInput`** or **`dataAbb`** state changes.
+- **Explanation:** Handler for the general search logic. It normalizes the **`searchInput`** to lowercase and checks if it's empty or if the search bar is not focused. If either condition is true, it clears the results and **`lower`** state. Otherwise, it filters **`dataAbb`** based on whether items start with the **`searchInput`** and updates the results accordingly. It then filters dataAbb for items that include the **`searchInput`** but don’t start with the **`searchInput`**, appending those entries to the end (first display search results that start with query, then display search results that include query).
+
 ## **Usage**
 
-The **`SearchBar`** component can be integrated into any application that requires a search functionality with support for keyboard navigation and abbreviation matching. It requires the parent component to provide searchable data and handle the selection of items from the search results.
+The **`SearchBar`** component is used in Study Compass for the nameSearch, allowing users to search for classrooms by name. All classroom names are passed into the search bar. The **`SearchBar`** component can be integrated into any application that requires a search functionality with support for keyboard navigation and abbreviation matching. It requires the parent component to provide searchable data and handle the selection of items from the search results.
 
 Example:
 
