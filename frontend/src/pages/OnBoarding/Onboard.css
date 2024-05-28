@@ -23,6 +23,7 @@
     top:0;
     right:0;
     pointer-events: none;
+    z-index: -1;
 }
 
 .onboard .purple{
@@ -30,6 +31,7 @@
     bottom:0;
     left:0;
     pointer-events: none;
+    z-index: -1;
 }
 
 .onboard .content{
@@ -41,13 +43,19 @@
     gap:20px;
     overflow: hidden;
     transition: all 0.5s ease-in-out;
+    max-width: 400px;
+}
 
+.onboard .content .loader{
+    margin-top:10px;
 }
 
 .onboard .content.nextOnboard{
     opacity:0;
     position:absolute;
     pointer-events: none;
+    max-width: 400px;
+    width:100%;
 }
 
 .onboard .content.beforeOnboard{
@@ -63,6 +71,7 @@
     font-weight:500;
     color:var(--text);
     text-align: center;
+    margin-bottom:10px;
 
 }
 
@@ -89,13 +98,14 @@
     height:50px;
 }
 
-.slider{
+.onboard .slider{
     background: linear-gradient(to right, #FA756D, #87AFF1);
     -webkit-appearance: none;
     appearance: none;
     height:10px;
     width:400px;
     border-radius: 5px;
+    margin:0;
 }
 
 
@@ -105,7 +115,7 @@
     width: 15px;
     height: 15px;
     border-radius: 50%;
-    background: #D9D9D9;
+    background: transparent;
     cursor: pointer;
 }
 
@@ -113,14 +123,62 @@
     width: 15px;
     height: 15px;
     border-radius: 50%;
-    background: #D9D9D9;
+    background: transparent;
     cursor: pointer;
-    transition: transform 0.3s ease;
+    transition: transform 0.2s ease;
 }
 
 .sliderText{
     font-size:14px;
 }
+
+.sliderContainer{
+    display:flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    /* gap:10px; */
+    width:400px;
+}
+
+.rangeText{
+    display:flex;
+    justify-content: space-between;
+    width:100%;
+}
+
+.onboard .content .rangeText p{
+    font-family: 'Satoshi';
+    font-size: 16px;
+    font-weight: bold;
+    margin:0;
+}
+
+.rangeText .routine{
+    color: var(--red) !important;
+}
+
+.rangeText .novelty{
+    color: var(--blue) !important;
+
+}
+
+.sliderInput{
+    display:grid;
+    width:100%;
+}
+
+.thumb{
+    height:15px;
+    width:15px;
+    border-radius:50%;
+    background-color: #D9D9D9;
+    position: absolute;
+    align-self: center;
+    pointer-events: none;
+    transition: left 0.3s ease;
+}
+
 
 @media (max-width: 1000px) {
     .onboard .yellow-red,
@@ -135,8 +193,26 @@
         height:300px;
     }
 
+    .onboard{
+        gap:0px;
+    }
+
+    .onboard button{
+        margin:0;
+    }
+
     .onboard .content{
-        margin:30px;
+        margin:25px;
+        gap:10px;
+    }
+
+    .sliderContainer{
+        width:100%;
+    }
+
+    .onboard .slider{
+        width:100%;
+        border-radius: 5px;
     }
     
     .onboard .content h2{

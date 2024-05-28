@@ -71,7 +71,7 @@
     flex-direction: row;
     width:100%;
     align-items: center;
-    justify-content: start;
+    justify-content: flex-start;
 }
 
 .popup-content .profile{
