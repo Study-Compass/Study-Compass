@@ -6,12 +6,14 @@ import Register from './pages/Register/Register';
 import Redirect from './pages/Redirect/Redirect';
 import Error from './pages/Error/Error';
 import Onboard from './pages/OnBoarding/Onboard';
+import Profile from './pages/Profile/Profile';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './AuthContext';
 import { CacheProvider } from './CacheContext';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { NotificationProvider } from './NotificationContext';
 import { ErrorProvider } from './ErrorContext';
+
 
 function App() {
     return (
@@ -29,6 +31,7 @@ function App() {
                                     <Route path="*" element={<Error />}/>
                                     <Route path="/error/:errorCode" element={<Error />}/>
                                     <Route path="/onboard" element={<Onboard />}/>
+                                    <Route path="/profile" element={<Profile />}/>
                                 </Routes>
                             </Router>
                         </CacheProvider>

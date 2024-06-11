@@ -1,0 +1,45 @@
+.card{
+    border-radius:10px;
+    padding:7px 25px;
+    display:flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-evenly;
+    height: 100%;
+    width: 100%;
+}
+
+.card .header{
+    width: 100%;
+    height: 46%;
+}
+
+
+.card .tracked-data{
+    display:flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    height: 46%;
+    padding-bottom: 15px;
+}
+
+
+.card .tracked-data .saved{
+    width: 39%;
+    background-color: white;
+    border-radius: 21px;
+    /* padding:20px 20px 60px 20px; */
+    border: 1px solid #B0AFAF;
+    height: 100%;
+}
+
+.card .tracked-data .study-history{
+    width: 59%;
+    background-color: white;
+    border-radius: 21px;
+    /* padding:20px 20px 60px 20px; */
+    border: 1px solid #B0AFAF;
+    height: 100%;
+}
