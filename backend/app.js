@@ -26,7 +26,7 @@ app.use(dataRoutes);
 app.use(cors());
 app.use(cookieParser());
 
-mongoose.connect(process.env.MONGO_URL);
+mongoose.connect(process.env.MONGO_URL_LOCAL);
 mongoose.connection.on('connected', () => {
     console.log('Mongoose connected to DB.');
     mongoConnection = true;
