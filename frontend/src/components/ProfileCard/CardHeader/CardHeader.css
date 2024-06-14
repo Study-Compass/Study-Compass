@@ -1,0 +1,29 @@
+.card-header{
+    display:flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: space-evenly;
+    width: 100%;
+    height: 100%;
+}
+
+.card-header .stats{
+    display:flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-evenly;
+    width: 100%;
+}
+
+.card-header .stats p{
+    font-family: 'Satoshi';
+    display: flex;
+    justify-content: left;
+    flex-direction: row;
+    align-items: center;
+    gap: 5px;
+}
+
+.card-header .stats .num{
+    color: var(--red);
+}
