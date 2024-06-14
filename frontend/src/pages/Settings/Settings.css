@@ -8,3 +8,38 @@
     position: relative;
 }
 
+.settings-container{
+    display: flex;
+    max-width:1500px;
+    border-radius: 21px;
+    box-sizing: border-box;
+    width:100%;
+    width:calc(100% - 100px);
+    height:calc(100% - 115px);
+    max-height:calc(100% - 115px);
+    /* padding: 20px 0 0 0; */
+    border: 1px solid #B0AFAF;
+    border-radius: 20px;
+    position: relative;
+}
+
+.settings-left{
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    width:30%;
+    height:100%;
+    border-right: 1px solid #B0AFAF;
+
+}
+
+.settings-right{
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    width:70%;
+    height:100%;
+    box-sizing: border-box;
+
+}
+

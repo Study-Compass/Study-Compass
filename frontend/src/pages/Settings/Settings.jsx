@@ -8,8 +8,19 @@ function Settings(){
     return(
         <div className='settings'>
             <Header />
-            <div >
+            <div className='content-container'>
+                <div className='settings-container'>
+                    <div className='settings-left'>
+                        
+                    </div>
 
+                    <div className='settings-right'>
+
+                    </div>
+                </div>
+            </div>
+        <div>
+            
             </div>
         </div>
     );
