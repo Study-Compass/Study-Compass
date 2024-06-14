@@ -1,14 +1,24 @@
 import React from 'react';
 import './CardHeader.css';
+import Settings from "../../../assets/Icons/Settings.svg"
 
 
 
 function CardHeader(){
     return (
         <div className="card-header">
-            hello1
-            <p>test</p>
-            hello2
+            <div className="bar">
+                <img src={Settings} alt="settings-icon" />
+            </div>
+            <div className="profile-info">
+                <div className="name">
+                    James Liu
+                    <p>@username</p>
+                </div>
+                <p>beta tester</p>
+                <p>admin</p>
+            </div>
+            
             <div className="stats">
                 <p><p className="num">123</p>rooms visited</p>
                 <p><p className="num">18</p>study partners</p>
