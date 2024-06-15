@@ -22,6 +22,7 @@
     max-height: min(calc(100% - 40px), 800px);
     overflow:hidden;
     position: relative;
+    box-shadow:var(--shadow);
 } 
 
 .left-mobile{

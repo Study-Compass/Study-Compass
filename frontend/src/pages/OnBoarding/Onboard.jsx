@@ -8,9 +8,10 @@ import { set } from 'mongoose';
 
 function Onboard(){
     const [current, setCurrent] = useState(0);
+    const [show, setShow] = useState(0);
     const [currentTransition, setCurrentTransition] = useState(0);
     const [containerHeight, setContainerHeight] = useState(175);
-    const [sliderText, setSliderText] = useState("I prefer an even mix of routine and novelty");
+    const [sliderText, setSliderText] = useState("I prefer an even mix of routine and variety");
     const [sliderValue, setSliderValue] = useState(2);
     const [thumbPosition, setThumbPosition] = useState(0);
 
@@ -21,7 +22,7 @@ function Onboard(){
     const messages = [
         "I stick to a strict routine that rarely changes",
         "I follow a consistent routine with occasional changes",
-        "I prefer an even mix of routine and novelty",
+        "I prefer an even mix of routine and variety",
         "I prefer a flexible routine that changes often",
         "I prefer an ever-changing routine that is rarely the same"   
     ];
@@ -72,12 +73,22 @@ function Onboard(){
             setCurrentTransition(currentTransition+1);
         }, 500);
         if (contentRefs.current[current] && current !== 0) {
-            setContainerHeight(contentRefs.current[current].offsetHeight);
+            setTimeout(() => {
+                setContainerHeight(contentRefs.current[current].offsetHeight);
+            }, 500);
             console.log(contentRefs.current[current].offsetHeight);
             console.log(current);
         }
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [current]);
+
+    useEffect(()=>{
+        if(show === 0){return;}
+        setTimeout(() => {
+            setCurrent(current+1);
+        }, 500);
+    }, [show]);
+
 
 
     const interpolateColor = (color1, color2, factor) => {
@@ -100,7 +111,7 @@ function Onboard(){
     const getColor = (value) => {
         const color1 = [250, 117, 109]; // RGB for #FA756D
         const color2 = [135, 175, 241]; // RGB for #87AFF1
-        const factor = value / 5;
+        const factor = value / 4;
         const interpolatedColor = interpolateColor(color1, color2, factor);
         return rgbToHex(interpolatedColor[0], interpolatedColor[1], interpolatedColor[2]);
     };
@@ -116,23 +127,23 @@ function Onboard(){
             <img src={YellowRedGradient} alt="" className="yellow-red" />
             <img src={PurpleGradient} alt="" className="purple" />
 
-            <div className="content" style={{ height: containerHeight }} ref={containerRef}>
+            <div className="content" style={{ height: containerHeight}} ref={containerRef}>
                 <div >
-                    { (current === 0 || current === 1) &&
-                        <div className={`content ${current === 1 ? "nextOnboard": ""}`} ref={el => contentRefs.current[0] = el}>
+                    { current === 0 &&
+                        <div className={`content ${show === 1 ? "going": ""}`} ref={el => contentRefs.current[0] = el}>
                             {/* <img src={Compass} alt="Logo" className="logo" /> */}
                             <Loader/>
                             <h2>welcome to study compass</h2>
                             <p>Study Compass is a student-created tool designed to help students find study spaces according to their preferences</p>
                         </div>
                     }
-                    { (current === 1 || current === 2) &&
-                        <div className={`content ${current === 2 ? "nextOnboard": ""} ${current === currentTransition ? "": "beforeOnboard"}`} ref={el => contentRefs.current[1] = el}>
+                    { current === 1 &&
+                        <div className={`content ${show === 2 ? "going": ""} ${1 === currentTransition ? "": "beforeOnboard"}`} ref={el => contentRefs.current[1] = el}>
                             {/* <img src={Compass} alt="Logo" className="logo" /> */}
                             <Loader/>
 
-                            <h2>choose your preferences</h2>
-                            <p>when choosing a study environment, do you prefer routine or novelty?</p>
+                            <h2>recommendation preferences</h2>
+                            <p>Would you like Study Compass to recommend familiar classrooms for routine, or new classrooms for variety?</p>
                             <div className="sliderContainer">
                                 <p className="sliderText" style={{color:`${sliderTextColor}`}}>{sliderText}</p>
                                 <div className="sliderInput" >
@@ -141,24 +152,30 @@ function Onboard(){
                                 </div>
                                 <div className="rangeText">
                                     <p className="routine">routine</p>
-                                    <p className="novelty">novelty</p>
+                                    <p className="novelty">variety</p>
                                 </div>
                             </div>
                         </div>
                     }
-                    { (current === 2 || current === 3) &&
-                        <div className={`content ${current === 3 ? "nextOnboard": ""} ${current === currentTransition ? "": "beforeOnboard"}`} ref={el => contentRefs.current[2] = el}>
+                    { current === 2 &&
+                        <div className={`content ${current === 3 ? "going": ""} ${2 === currentTransition ? "": "beforeOnboard"}`} ref={el => contentRefs.current[2] = el}>
                             {/* <img src={Compass} alt="Logo" className="logo" /> */}
-                            <h2>chooose your preferences</h2>
-                            <h2>chooose your preferences</h2>
-
+                            <h2>rank your classroom preferences</h2>
                             <p>Study Compass is a student-created tool designed to help students find study spaces according to their preferences</p>
+                            <p>Study Compass is a student-created tool designed to help students find study spaces according to their preferences</p>
+
+                        </div>
+                    }
+                    { current === 3 &&
+                        <div className={`content ${current === 4 ? "going": ""} ${3 === currentTransition ? "": "beforeOnboard"}`} ref={el => contentRefs.current[3] = el}>
+                            {/* <img src={Compass} alt="Logo" className="logo" /> */}
+                            <h2>rank your classroom preferences</h2>
 
                         </div>
                     }
                 </div>
             </div>
-                <button onClick={()=>{setCurrent(current+1)}}>
+                <button onClick={()=>{setShow(show+1)}}>
                     next
                 </button>
         </div>
