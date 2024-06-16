@@ -1,0 +1,61 @@
+.DragList{
+    width:100%;
+}
+
+.DragList nav {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 300px;
+}
+
+.DragList ul,
+.DragList li {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    font-weight: 500;
+    font-size: 16px;
+    font-weight: 600;
+    font-family: 'Inter';
+}
+
+.DragList ul {
+    position: relative;
+    width: 100%;
+}
+
+.DragList li {
+    border-radius: 10px;
+    margin-bottom: 10px;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 15px 18px;
+    /* position: relative; */
+    background-color: white;
+    border-radius: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+    cursor: grab;
+    border: 1px solid var(--lighterborder);
+    box-shadow: var(--shadow);
+    color: var(--text);
+}
+
+.DragList li svg {
+    width: 18px;
+    height: 18px;
+    cursor: grab;
+}
+
+.DragList .background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 300px;
+    background: #fff;
+}

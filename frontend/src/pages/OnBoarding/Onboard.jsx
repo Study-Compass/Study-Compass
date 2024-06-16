@@ -3,8 +3,7 @@ import './Onboard.css';
 import PurpleGradient from '../../assets/PurpleGrad.svg';
 import YellowRedGradient from '../../assets/YellowRedGrad.svg';
 import Loader from '../../components/Loader/Loader.jsx';
-import { set } from 'mongoose';
-
+import DragList from './DragList/DragList.jsx';
 
 function Onboard(){
     const [current, setCurrent] = useState(0);
@@ -170,7 +169,7 @@ function Onboard(){
                         <div className={`content ${current === 4 ? "going": ""} ${3 === currentTransition ? "": "beforeOnboard"}`} ref={el => contentRefs.current[3] = el}>
                             {/* <img src={Compass} alt="Logo" className="logo" /> */}
                             <h2>rank your classroom preferences</h2>
-
+                            <DragList/>
                         </div>
                     }
                 </div>
