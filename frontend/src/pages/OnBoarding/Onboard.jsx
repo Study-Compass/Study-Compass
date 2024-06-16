@@ -5,6 +5,7 @@ import YellowRedGradient from '../../assets/YellowRedGrad.svg';
 import Loader from '../../components/Loader/Loader.jsx';
 import DragList from './DragList/DragList.jsx';
 import Recommendation from './Recommendation/Recommendation.jsx';
+import { useNavigate } from 'react-router-dom';
 
 function Onboard(){
     const [current, setCurrent] = useState(0);
@@ -12,12 +13,16 @@ function Onboard(){
     const [currentTransition, setCurrentTransition] = useState(0);
     const [containerHeight, setContainerHeight] = useState(175);
 
+    const navigate = useNavigate();
+
     const [buttonActive, setButtonActive] = useState(true);
+
+    
 
     const containerRef = useRef(null);
     const contentRefs = useRef([]);
 
-    const [items, setItems] = useState(["outlets", "classroom type", "printer"]);
+    const [items, setItems] = useState(["outlets", "classroom type", "printer", "table type", "windows"]);
     const details = {
         "outlets": "having outlet access from a majority of seats",
         "classroom type": "ex: lecture hall, classroom, auditorium",
@@ -53,14 +58,15 @@ function Onboard(){
             setCurrent(current+1);
         }, 500);
 
+        if(current === 2){
+            navigate('/room/none');
+        }
+
         setButtonActive(false);
         setTimeout(() => {
             setButtonActive(true);
         }, 1000);
     }, [show]);
-
-
-
 
 
     const [viewport, setViewport] = useState("100vh");
@@ -88,7 +94,12 @@ function Onboard(){
                         <div className={`content ${show === 2 ? "going": ""} ${1 === currentTransition ? "": "beforeOnboard"}`} ref={el => contentRefs.current[1] = el}>
                             {/* <img src={Compass} alt="Logo" className="logo" /> */}
                             <h2>rank your classroom preferences</h2>
-                            <DragList items={items} setItems={setItems} details={details}/>
+                            <p>What features do you find most important in your study spaces? Rank them from top to bottom.</p>
+                            <div className="preference-list">
+                                <p className="most">most important</p>
+                                <DragList items={items} setItems={setItems} details={details}/>
+                                <p className="least">least important</p>
+                            </div>
                         </div>
                     }
                     { current === 2 &&
@@ -96,14 +107,10 @@ function Onboard(){
                             <Recommendation />
                         </div>
                     }
-                    { current === 3 &&
-                        <div className={`content ${current === 4 ? "going": ""} ${3 === currentTransition ? "": "beforeOnboard"}`} ref={el => contentRefs.current[3] = el}>
-                        </div>
-                    }
                 </div>
             </div>
                 <button className={`${buttonActive ? "":"deactivated"}`} onClick={()=>{setShow(show+1)}}>
-                    next
+                    {current === 2 ? "finish" : "next"}
                 </button>
                 
         </div>

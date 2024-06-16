@@ -37,7 +37,7 @@
     border-radius: 10px;
     display: flex;
     flex-direction: column;
-    justify-content: left;
+    justify-content: center;
     align-items: left;
     flex-shrink: 0;
     cursor: grab;
@@ -47,20 +47,37 @@
 }
 
 .DragList li h3{
-    font-size: 16px;
+    font-size: 14px;
     font-weight: 700;
     font-family: 'Inter';
     margin: 0;
-    margin-bottom: 5px;
 
 }
 
-.DragList li h4{
+.preference-list{
+    width:100%;
+}
+
+.preference-list p.most{
+    color:var(--red);
+    font-family: 'Satoshi';
+    font-weight: bold;
     font-size: 14px;
+}
+
+.preference-list p.least{
+    color:var(--blue);
+    font-family: 'Satoshi';
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.DragList li h4{
+    font-size: 13px;
     font-weight: 500;
     font-family: 'Inter';
     margin: 0;
-    margin-bottom: 5px;
+    margin-top: 5px;
     text-align: left;
     color: var(--border);
 }

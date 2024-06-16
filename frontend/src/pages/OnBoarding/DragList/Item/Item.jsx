@@ -9,7 +9,9 @@ function Item({ item, details }) {
     return (
         <Reorder.Item value={item} id={item} style={{ boxShadow, y }}>
             <h3>{item}</h3>
-            <h4>{details[item]}</h4>
+            {
+                details[item] && <h4>{details[item]}</h4>
+            }
         </Reorder.Item>
     );
 };

@@ -7,7 +7,6 @@
     align-items: center;
     justify-content: center ;
     flex-direction: column;
-    gap:20px;
 
 }
 
@@ -205,7 +204,7 @@
     }
 
     .onboard .content{
-        margin:25px;
+        margin:15px;
         gap:10px;
     }
 
