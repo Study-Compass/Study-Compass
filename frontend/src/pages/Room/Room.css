@@ -18,8 +18,8 @@
     flex-direction: row;
     border: 1px solid #B0AFAF;
     width:calc(100% - 100px);
-    height:calc(100% - 40px);
-    max-height: min(calc(100% - 40px), 800px);
+    height:100%;
+    max-height: min(100%, 1000px);
     overflow:hidden;
     position: relative;
     box-shadow:var(--shadow);

@@ -36,13 +36,33 @@
     background-color: white;
     border-radius: 10px;
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    flex-direction: column;
+    justify-content: left;
+    align-items: left;
     flex-shrink: 0;
     cursor: grab;
     border: 1px solid var(--lighterborder);
     box-shadow: var(--shadow);
     color: var(--text);
+}
+
+.DragList li h3{
+    font-size: 16px;
+    font-weight: 700;
+    font-family: 'Inter';
+    margin: 0;
+    margin-bottom: 5px;
+
+}
+
+.DragList li h4{
+    font-size: 14px;
+    font-weight: 500;
+    font-family: 'Inter';
+    margin: 0;
+    margin-bottom: 5px;
+    text-align: left;
+    color: var(--border);
 }
 
 .DragList li svg {

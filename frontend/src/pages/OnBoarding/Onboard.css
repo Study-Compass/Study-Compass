@@ -82,12 +82,18 @@
     padding:5px 20px;
     margin:10px;
     color: white;
-    cursor:pointer
+    cursor:pointer;
+    transition: all 0.5s;
 }
 
 .onboard .content button:hover{
     cursor:pointer;
     filter: brightness(0.9);
+}
+
+.onboard button.deactivated{
+    background-color: var(--lightborder);
+    pointer-events: none;
 }
 
 .onboard .logo{
