@@ -16,7 +16,7 @@
     border-radius: 21px;
     /* padding:20px 20px 60px 20px; */
     flex-direction: row;
-    border: 1px solid #B0AFAF;
+    border: 1px solid var(--lightborder);
     width:calc(100% - 100px);
     height:100%;
     max-height: min(100%, 1000px);
@@ -71,7 +71,7 @@
     height:100%;
     box-sizing: border-box;
     /* padding: 20px 0 0 0; */
-    border: 1px solid #B0AFAF;
+    border: 1px solid  var(--lightborder);
     border-radius: 20px;
     position: relative;
 }

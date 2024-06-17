@@ -1,6 +1,7 @@
 import React, { createContext, useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNotification } from './NotificationContext';
+import { set } from 'mongoose';
 
 /** 
 documentation:
@@ -11,6 +12,7 @@ export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [isAuthenticating, setIsAuthenticating] = useState(true); // [1
     const [user, setUser] = useState(null);
 
     const { addNotification } = useNotification();
@@ -33,12 +35,17 @@ export const AuthProvider = ({ children }) => {
                 setUser(response.data.data.user);
                 console.log(response.data.data.user);
                 setIsAuthenticated(true);
+                setIsAuthenticating(false);
             } else {
                 setIsAuthenticated(false);
+                setIsAuthenticating(false);
+                localStorage.removeItem('token');
             }
         } catch (error) {
             localStorage.removeItem('token');
             console.log('Token expired or invalid');
+            setIsAuthenticated(false);
+            setIsAuthenticating(false);
             return error;
         }
     };
@@ -49,6 +56,7 @@ export const AuthProvider = ({ children }) => {
             validateToken();
         } else {
             setIsAuthenticated(false);
+            setIsAuthenticating(false);
         }
     }, []);
 
@@ -92,7 +100,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     return (
-        <AuthContext.Provider value={{ isAuthenticated, user, login, logout, googleLogin, validateToken }}>
+        <AuthContext.Provider value={{ isAuthenticated, user, login, logout, googleLogin, validateToken, isAuthenticating }}>
             {children}
         </AuthContext.Provider>
     );

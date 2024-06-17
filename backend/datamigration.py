@@ -91,9 +91,6 @@ def migrateClassrooms():
             schedules.insert_one(blank_schedule)
             print(f"Blank schedule created for classroom '{classroom1['name']}'.")
 
-
-
-
 # collectionName should be a string, attribute should be an object like { 'username' : '' }
 def addNewField(collectionName, attribute):
     load_dotenv() # loading .env file
