@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 
 def updateClassroom():
     load_dotenv() # loading .env file
-    uri = os.environ.get('MONGO_URL') # fetching URI string
+    uri = os.environ.get('MONGO_URL1') # fetching URI string
     client = MongoClient(uri, server_api=ServerApi('1')) 
     try: # send a ping to confirm a successful connection
         client.admin.command('ping')
@@ -33,11 +33,71 @@ def updateClassroom():
         }
         schedules.insert_one(schedule)
 
+def migrateClassrooms():
+    load_dotenv() # loading .env file
+    uri = os.environ.get('MONGO_URL1') # fetching URI string
+    client = MongoClient(uri, server_api=ServerApi('1')) 
+    try: # send a ping to confirm a successful connection
+        client.admin.command('ping')
+        print("Pinged your deployment. You successfully connected to MongoDB!")
+    except Exception as e:
+        print(e)
+
+    # getting relevant collection, clearing data before scanning new
+    db = client['studycompass']
+    collection = db['classrooms']
+    collection1 = db['classrooms1']  
+    schedules = db['schedules']
+    schedules.drop()
+
+    all_classes = collection.find({})
+    for classroom in all_classes:
+        # Check if the classroom already exists in collection1
+        existing_classroom = collection1.find_one({'name': classroom['name']})
+        if existing_classroom is None:
+            # Insert the classroom into collection1 if it doesn't exist
+            classroom1 = {
+                'name': classroom['name']
+            }
+            collection1.insert_one(classroom1)
+            print(f"Classroom '{classroom['name']}' and its schedule were migrated.")
+        else:
+            print(f"Classroom '{classroom['name']}' already exists in 'classrooms1'.")
+
+        new_classroom = collection1.find_one({'name': classroom['name']})
+
+        # Insert the schedule into the schedules collection
+        schedule = {
+            'classroom_id': new_classroom['_id'],
+            'weekly_schedule': classroom['weekly_schedule']
+        }        
+        schedules.insert_one(schedule)
+
+    all_classrooms1 = collection1.find({})
+    for classroom1 in all_classrooms1:
+        existing_schedule = schedules.find_one({'classroom_id': classroom1['_id']})
+        if existing_schedule is None:
+            # Insert a blank schedule if none exists
+            blank_schedule = {
+                'classroom_id': classroom1['_id'],
+                'weekly_schedule': {
+                    'M': [],
+                    'T': [],
+                    'W': [],
+                    'R': [],
+                    'F': []
+                }
+            }
+            schedules.insert_one(blank_schedule)
+            print(f"Blank schedule created for classroom '{classroom1['name']}'.")
+
+
+
 
 # collectionName should be a string, attribute should be an object like { 'username' : '' }
 def addNewField(collectionName, attribute):
     load_dotenv() # loading .env file
-    uri = os.environ.get('MONGO_URL') # fetching URI string
+    uri = os.environ.get('MONGO_URL1') # fetching URI string
     client = MongoClient(uri, server_api=ServerApi('1')) 
     try: # send a ping to confirm a successful connection
         client.admin.command('ping')
@@ -115,7 +175,7 @@ def write_items_with_root_image_to_file(file_path):
 
 def replaceImage():
     load_dotenv() # loading .env file
-    uri = os.environ.get('MONGO_URL') # fetching URI string
+    uri = os.environ.get('MONGO_URL1') # fetching URI string
     client = MongoClient(uri, server_api=ServerApi('1')) 
     try: # send a ping to confirm a successful connection
         client.admin.command('ping')
@@ -158,4 +218,5 @@ def bulkUpdate():
 # addNewField('classrooms1',{'attributes': []})
 # addNewField('users',{'admin': False})
 # replaceImage() # call the function to add new field to the collection
-bulkUpdate() 
+# bulkUpdate() 
+migrateClassrooms()
