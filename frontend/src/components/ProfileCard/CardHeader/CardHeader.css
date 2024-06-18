@@ -2,15 +2,35 @@
     display:flex;
     flex-direction: column;
     align-items: flex-start;
-    justify-content: space-evenly;
+    justify-content: space-between;
     width: 100%;
     height: 100%;
-    gap:20px
+    box-shadow: var(--shadow);
 }
 
 .card-header .profile-info{
-    padding-top: 5%;
+    padding-top: 60px;
     padding-left: 10%;
+    display:flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 1px;
+}
+
+.card-header .user p{
+    margin: 0px;
+}
+
+.card-header .name p{
+    margin: 0px;
+}
+
+.card-header .profile-info p{
+    margin: 0px;
+}
+
+.card-header .profile-info .tags{
     display:flex;
     flex-direction: row;
     align-items: flex-start;
@@ -18,29 +38,31 @@
     gap: 10px;
 }
 
-.card-header .profile-info .name{
-    display:flex;
-    flex-direction: column;
-    align-items: flex-start;
-    justify-content: space-evenly;
+.card-header .profile-info .tags p{
+    padding: 0px 7px;
 }
 
 .card-header .stats{
     display:flex;
-    flex-direction: row;
-    align-items: center;
+    flex-direction: column;
+    align-items: flex-start;
     justify-content: space-evenly;
     width: 100%;
+    margin: 12px 12px;
+    gap: 5px;
 }
 
 .card-header .stats p{
+
     font-family: 'Satoshi';
     font-weight: bold;
     display: flex;
     justify-content: left;
     flex-direction: row;
     align-items: center;
+    margin: 0px;
     gap: 5px;
+    font-size: small;
 }
 
 .card-header .stats .num{
@@ -60,6 +82,8 @@
     align-items: center;
     padding-right: 20px;
     box-sizing: border-box;
+    border-top-left-radius: 21px;
+    border-top-right-radius: 21px;
     gap: 5px;
     width: 100%;
     height: 50px;

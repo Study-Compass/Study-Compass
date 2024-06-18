@@ -1,46 +1,48 @@
 .card{
     border-radius:10px;
-    padding:7px 25px;
     display:flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
     justify-content: space-evenly;
     height: 100%;
     width: 100%;
-    position: relative;
+}
+
+.card .left_profile{
+    display:flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    height: 97%;
+    width: 33%;
 }
 
 .card .header{
     width: 100%;
-    height: 31%;
+    height: 44%;
+    border-radius: 21px;
+    border: 1px solid #B0AFAF;
+    position: relative;
 }
 
-
-.card .tracked-data{
-    display:flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
+.card .saved{
+    background-color: white;
+    border-radius: 21px;
+    border: 1px solid #B0AFAF;
+    height: 52%;
     width: 100%;
-    height: 61%;
-    padding-bottom: 15px;
+    box-shadow: var(--shadow);
+
 }
 
-
-.card .tracked-data .saved{
-    width: 39%;
+.card .study-history{
+    width: 60%;
     background-color: white;
     border-radius: 21px;
     border: 1px solid #B0AFAF;
-    height: 100%;
-}
+    height: 97%;
+    box-shadow: var(--shadow);
 
-.card .tracked-data .study-history{
-    width: 59%;
-    background-color: white;
-    border-radius: 21px;
-    border: 1px solid #B0AFAF;
-    height: 100%;
 }
 
 .card .box-header{

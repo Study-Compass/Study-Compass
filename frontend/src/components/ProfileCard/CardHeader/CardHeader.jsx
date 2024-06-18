@@ -11,12 +11,16 @@ function CardHeader(){
                 <img src={Settings} alt="settings-icon" />
             </div>
             <div className="profile-info">
-                <div className="name">
-                    James Liu
-                    <p>@username</p>
+                <p className="name">James Liu</p>
+                <p className="user">@username</p>
+                <div className="tags">
+                    <div className="badge" style={{backgroundColor:"#A0C4FF"}}>
+                        <p>beta tester</p>
+                    </div>
+                    <div className="badge" style={{backgroundColor:"#A0C4FF"}}>
+                        <p>jeremy</p>
+                    </div>
                 </div>
-                <p>beta tester</p>
-                <p>admin</p>
             </div>
             
             <div className="stats">
