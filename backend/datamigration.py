@@ -33,9 +33,34 @@ def updateClassroom():
         }
         schedules.insert_one(schedule)
 
-def migrateClassrooms():
+def findNoPics():
     load_dotenv() # loading .env file
     uri = os.environ.get('MONGO_URL1') # fetching URI string
+    client = MongoClient(uri, server_api=ServerApi('1')) 
+    try: # send a ping to confirm a successful connection
+        client.admin.command('ping')
+        print("Pinged your deployment. You successfully connected to MongoDB!")
+    except Exception as e:
+        print(e)
+
+    db = client['studycompass']
+    collection = db['classrooms1']
+
+    count = 0
+    for classroom in collection.find({}):
+        # print(classroom)
+        if 'image' not in classroom:
+            print(f"no image field '{classroom['name']}'")
+            continue;
+        if classroom['image'] == '/classrooms/downsizedPlaceholder.jpeg':
+            print(f"{classroom['name']}'")
+            count += 1
+
+    print(f'Number of classrooms with no image: {count}')
+
+def migrateClassrooms():
+    load_dotenv() # loading .env file
+    uri = os.environ.get('MONGO_URL') # fetching URI string
     client = MongoClient(uri, server_api=ServerApi('1')) 
     try: # send a ping to confirm a successful connection
         client.admin.command('ping')
@@ -57,7 +82,9 @@ def migrateClassrooms():
         if existing_classroom is None:
             # Insert the classroom into collection1 if it doesn't exist
             classroom1 = {
-                'name': classroom['name']
+                'name': classroom['name'],
+                'image' : '/classrooms/downsizedPlaceholder.jpeg',
+                'attributes': [],
             }
             collection1.insert_one(classroom1)
             print(f"Classroom '{classroom['name']}' and its schedule were migrated.")
@@ -94,7 +121,7 @@ def migrateClassrooms():
 # collectionName should be a string, attribute should be an object like { 'username' : '' }
 def addNewField(collectionName, attribute):
     load_dotenv() # loading .env file
-    uri = os.environ.get('MONGO_URL1') # fetching URI string
+    uri = os.environ.get('MONGO_URL') # fetching URI string
     client = MongoClient(uri, server_api=ServerApi('1')) 
     try: # send a ping to confirm a successful connection
         client.admin.command('ping')
@@ -216,4 +243,11 @@ def bulkUpdate():
 # addNewField('users',{'admin': False})
 # replaceImage() # call the function to add new field to the collection
 # bulkUpdate() 
-migrateClassrooms()
+# migrateClassrooms()
+# findNoPics()
+# addNewField('users',{'visited': 0})
+# addNewField('users',{'partners': 0})
+# addNewField('users',{'sessions': 0})
+# addNewField('users',{'hours': 0})
+# addNewField('users',{'contributions': 0})
+# migrateClassrooms()

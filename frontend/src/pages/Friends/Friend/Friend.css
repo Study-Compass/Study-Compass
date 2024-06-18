@@ -1,0 +1,42 @@
+.friend{
+    width:100%;
+    display:flex;
+    justify-content:space-between;
+    padding:12px;
+    border-bottom: 1px solid var(--lighterborder);
+    box-sizing: border-box;
+}
+
+.friend .friend-content{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    justify-content: center;
+}
+
+.friend .profile-picture{
+    width:40px;
+    height:40px;
+    border-radius:50%;
+}
+
+.friend .friend-content img{
+    width:40px;
+    height:40px;
+    border-radius:50%;
+}
+
+.friend .friend-content h1{
+    font-size: 17px;
+    font-weight: 700;
+    font-family: 'Satoshi';
+    margin: 0;
+}
+
+.friend .friend-content p{
+    margin:0;
+    font-family:'Satoshi';
+    font-weight:bold;
+    color:var(--border);
+    font-size:13px;  
+}

@@ -60,6 +60,7 @@
 .friends .add-friend{
     width:100%;
     display:flex;
+    position: relative;
 }
 
 .friends .add-friend button{
@@ -94,6 +95,7 @@
     background-color: var(--light);
     color: var(--text);
     font-weight:500;
+    padding-left:40px;
 }
 
 .friends .add-friend input::placeholder{
@@ -139,3 +141,16 @@
     font-family: 'Inter';
 }
 
+.friends .add-friend-icon{
+    position: absolute;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left:10px;
+}
+
+.friends .add-friend-icon img{
+    width: 20px;
+    height: 20px;
+}

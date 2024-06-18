@@ -126,7 +126,7 @@ async def parse_course_info(url, classroom_info):
 # cluster organization and database management determined
 def upload_to_mongo(dic, term):
     load_dotenv() # loading .env file
-    uri = os.environ.get('MONGO_URL1') # fetching URI string
+    uri = os.environ.get('MONGO_URL') # fetching URI string
     client = MongoClient(uri, server_api=ServerApi('1')) 
     try: # send a ping to confirm a successful connection
         client.admin.command('ping')

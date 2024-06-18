@@ -10,7 +10,7 @@ def test_mongo_insert_and_read(delete=False):
     collection_name = 'classrooms'
 
     # MongoDB URI - make sure this is set correctly in your environment variables
-    uri = os.environ.get('MONGO_URL1')
+    uri = os.environ.get('MONGO_URL')
     print(uri)
     # Create a MongoClient
     client = MongoClient(uri)
@@ -129,7 +129,7 @@ def format_time1(time):
 
 def drop_collection():
     load_dotenv() # loading .env file
-    uri = os.environ.get('MONGO_URL1') # fetching URI string
+    uri = os.environ.get('MONGO_URL') # fetching URI string
     client = MongoClient(uri, server_api=ServerApi('1')) 
     try: # send a ping to confirm a successful connection
         client.admin.command('ping')

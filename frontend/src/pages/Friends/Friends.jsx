@@ -4,10 +4,18 @@ import { useNavigate } from 'react-router-dom';
 import useAuth from '../../hooks/useAuth.js';
 import Header from '../../components/Header/Header.jsx';
 import pfp from '../../assets/defaultAvatar.svg'
+import Friend from './Friend/Friend.jsx';
+import AddFriend from '../../assets/Icons/Add-Friend.svg';
 
 function Friends() {
     const { isAuthenticated, isAuthenticating, user } = useAuth();
     const navigate = useNavigate();
+    const [addValue, setAddValue] = useState("");
+    
+    const friend ={
+        username: "james",
+        picture: pfp
+    }
 
     useEffect(() => {
         console.log(isAuthenticating);
@@ -18,6 +26,19 @@ function Friends() {
             navigate('/login');
         }
     }, [isAuthenticating, isAuthenticated, navigate]);
+
+    useEffect(() => {
+        if(addValue.length === 1 && addValue[0] !== '@'){
+            setAddValue('@' + addValue);
+        }
+        if(addValue === '@'){
+            setAddValue('');
+        }
+    },[addValue]);
+
+    const handleAddChange = (e) => {
+        setAddValue(e.target.value);
+    }
 
     const [viewport, setViewport] = useState("100vh");
     useEffect(() => {
@@ -40,18 +61,19 @@ function Friends() {
                                     <p>@{user.username}</p>
                                 </div>
                         </div>
-                        <div className="add-friend">
-                            <input type="text" placeholder="add a friend" />
-                            <button>add</button>
-                        </div>
+                        <form className="add-friend">
+                            <input type="text" placeholder="add a friend" value={addValue} onChange={handleAddChange}/>
+                            <div className="add-friend-icon">
+                                <img src={AddFriend} alt=""/>
+                            </div>
+                            <button type="submit">add</button>
+                        </form>
 
                         <div className="friends-list">
                             <div className="friends-list-header">
                                 <h2>friends</h2>
                             </div>
-                            <div className="no-friends">
-                                <h2>you have no friends :((</h2>
-                            </div>
+                            <Friend friend={friend}/>
                         </div>
                     </div>
                 </div>

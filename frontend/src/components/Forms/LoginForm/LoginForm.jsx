@@ -95,7 +95,7 @@ function LoginForm() {
     }
   
     return (
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} className='form'>
         <h1>Welcome Back!</h1>
         {errorText !== "" && 
             <div className="error"
