@@ -159,7 +159,7 @@ def dump_to_json(dic):
 
 # main function, term determinance feature on the way
 async def main():
-    term = "202401"
+    term = "202405"
     dic= {}
 
     # asynchronous organization of for loops

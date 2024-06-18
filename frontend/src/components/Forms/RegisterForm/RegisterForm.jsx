@@ -102,7 +102,7 @@ function RegisterForm() {
     }
 
     return (
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} className='form'>
             <h1>Register</h1>
             {errorText !== "" && 
                 <div className="error"

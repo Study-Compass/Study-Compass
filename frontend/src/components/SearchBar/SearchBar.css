@@ -44,7 +44,7 @@
 }
 
 
-li {
+.search-container li {
     background-color: #FBFBFB;
     /* border-bottom: 1px solid #B0AFAF; */
     font-family: var(--search-font);
@@ -61,7 +61,7 @@ li {
     width:100%;
 }
 
-li:hover {
+.search-container li:hover {
     background-color: #f0f0f0;
     cursor: pointer;
     

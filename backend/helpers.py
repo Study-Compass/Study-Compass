@@ -1,6 +1,7 @@
 from pymongo.mongo_client import MongoClient
 import os
 from dotenv import load_dotenv
+from pymongo.server_api import ServerApi
 from datetime import datetime
 
 def test_mongo_insert_and_read(delete=False):
@@ -126,6 +127,30 @@ def format_time1(time):
     
     return convert_to_military_time(starttime), convert_to_military_time(endtime)
 
+def drop_collection():
+    load_dotenv() # loading .env file
+    uri = os.environ.get('MONGO_URL') # fetching URI string
+    client = MongoClient(uri, server_api=ServerApi('1')) 
+    try: # send a ping to confirm a successful connection
+        client.admin.command('ping')
+        print("Pinged your deployment. You successfully connected to MongoDB!")
+    except Exception as e:
+        print(e)
+
+    # getting relevant collection, clearing data before scanning new
+    try:
+        # Getting relevant collection, clearing data before scanning new
+        db = client['studycompass']
+        collection = db['classrooms']
+        print("Collections in the database before dropping:")
+        print(db.list_collection_names())
+        print(f"Attempting to drop collection: {collection.full_name}")
+        collection.drop()
+        print("Collection dropped successfully.")
+        print("Collections in the database after dropping:")
+        print(db.list_collection_names())
+    except Exception as e:
+        print(f"Error dropping collection: {e}")
 
 if __name__ == "__main__":
-    test_mongo_insert_and_read()
+    drop_collection()

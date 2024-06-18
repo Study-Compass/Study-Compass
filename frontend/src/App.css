@@ -15,6 +15,7 @@
     --lighterborder:#E4E5E6;
     --green: #4DAA57;
     --shadow: 0px 7px 29px 0px rgba(100, 100, 111, 0.1);
+
 }
 
 .App {
@@ -95,6 +96,18 @@ button.active{
     border: 1px solid var(--lightred);
     color: #414141;
 } */
+
+.component{
+    position: relative;
+    overflow:hidden;
+    height:100vh;
+    width:100vw;
+    display:flex;
+    align-items: center;
+    justify-content: flex-start ;
+    flex-direction: column;
+}
+
 .notification-container{
     position: absolute;
     display:grid;
