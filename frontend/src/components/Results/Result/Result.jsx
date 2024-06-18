@@ -32,7 +32,7 @@ function Result({ result, attributes, debouncedFetchData, changeURL, findNext, c
                         <img src={FilledStar} alt="star" />
                         <p>4.6</p>
                     </div>
-                    { contentState === "nameSearch" ?
+                    { contentState === "nameSearch" || contentState === "freeNowSearch" ?
 
                         <div className={`${success ? 'free-until' : 'class-until'}`}>
                             <div className="dot">

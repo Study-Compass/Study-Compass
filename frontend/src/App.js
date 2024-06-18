@@ -6,6 +6,7 @@ import Register from './pages/Register/Register';
 import Redirect from './pages/Redirect/Redirect';
 import Error from './pages/Error/Error';
 import Onboard from './pages/OnBoarding/Onboard';
+import Friends from './pages/Friends/Friends';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './AuthContext';
 import { CacheProvider } from './CacheContext';
@@ -29,6 +30,7 @@ function App() {
                                     <Route path="*" element={<Error />}/>
                                     <Route path="/error/:errorCode" element={<Error />}/>
                                     <Route path="/onboard" element={<Onboard />}/>
+                                    <Route path="/friends" element={<Friends />}/>
                                 </Routes>
                             </Router>
                         </CacheProvider>
