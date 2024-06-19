@@ -6,10 +6,39 @@ const router = express.Router();
 const { verifyToken } = require('./middlewares/verifyToken');
 
 const Friendship = require('./schemas/friendship');
+const User = require('./schemas/user');
 
-router.post('/friend-request/:friendId', verifyToken, async (req, res) => {
-    const { friendId } = req.params;
-    const requester = req.user._id;
+router.post('/friend-request/:friendUsername', verifyToken, async (req, res) => {
+    const { friendUsername } = req.params;
+    const requester = req.user.userId;
+    let friendId;
+
+
+
+    try{
+        const friend = await User.findOne({ username: friendUsername });
+        if(!friend){
+            console.log(`POST: /friend-request/:friendId friend not found`)
+            return res.status(404).json({
+                success: false,
+                message: 'Friend not found.'
+            });
+        }
+        friendId = friend._id;
+        if(friendId == requester){
+            console.log(`POST: /friend-request/:friendId cannot send friend request to self`)
+            return res.status(400).json({
+                success: false,
+                message: 'Cannot send friend request to self.'
+            });
+        }
+    } catch (error) {
+        console.log(`POST: /friend-request/:friendId failed`)
+        return res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
 
     const friendship = new Friendship({
         requester: requester,
@@ -17,6 +46,28 @@ router.post('/friend-request/:friendId', verifyToken, async (req, res) => {
         status: 'pending'
     });
 
+    // check if friendship already exists
+    const existingFriendship = await Friendship.findOne({
+        requester: requester,
+        recipient: friendId
+    });
+
+    if(existingFriendship){
+        if(existingFriendship.status === 'pending'){
+            console.log(`POST: /friend-request/:friendId friend request already sent`)
+            return res.status(400).json({
+                success: false,
+                message: 'Friend request already sent.'
+            });
+        }
+        if(existingFriendship.status === 'accepted'){
+            console.log(`POST: /friend-request/:friendId friend already exists`)
+            return res.status(400).json({
+                success: false,
+                message: 'Friend already exists.'
+            });
+        }
+    }
 
     try{
         await friendship.save();
@@ -131,6 +182,28 @@ router.get('/friends', verifyToken, async (req, res) => {
             success: false,
             message: error.message
         })
+    }
+});
+
+router.get('/friend-requests', verifyToken, async (req, res) => {
+    const userId = req.user._id;
+
+    try {
+        const requests = await Friendship.find({
+            recipient: userId,
+            status: 'pending'
+        }).populate('requester', 'username');
+
+        res.json({
+            success: true,
+            message: 'Friend requests found',
+            data: requests
+        });
+    } catch (error) {
+        res.json({
+            success: false,
+            message: error.message
+        });
     }
 });
 
