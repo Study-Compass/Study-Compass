@@ -3,7 +3,7 @@ import axios from 'axios';
 
 const getFriends = async () => {
     try{
-        const response = await axios.get('/friends', {
+        const response = await axios.get('/getFriends', {
             headers: {
                 'Authorization': `Bearer ${localStorage.getItem('token')}`
             }

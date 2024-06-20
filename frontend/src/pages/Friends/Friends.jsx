@@ -133,9 +133,48 @@ function Friends() {
                                 <p className={`no-select ${contentState === 'pending' ? "active" : ""}`} onClick={handlePending}>pending</p>
                             </div>
                             <div className={`content-container  ${contentState === 'pending' ? "left-staging" : ""}`}>
-
                                 <div className={`content`} >
                                     {
+                                        friends.map(friend => {
+                                            return <Friend friend={friend} key={friend._id} isFriendRequest={false} reload={reload} setReload={setReload}/>
+                                        })
+                                    }
+                                                                        {
+                                        friends.map(friend => {
+                                            return <Friend friend={friend} key={friend._id} isFriendRequest={false} reload={reload} setReload={setReload}/>
+                                        })
+                                    }
+                                                                        {
+                                        friends.map(friend => {
+                                            return <Friend friend={friend} key={friend._id} isFriendRequest={false} reload={reload} setReload={setReload}/>
+                                        })
+                                    }
+                                                                        {
+                                        friends.map(friend => {
+                                            return <Friend friend={friend} key={friend._id} isFriendRequest={false} reload={reload} setReload={setReload}/>
+                                        })
+                                    }
+                                                                        {
+                                        friends.map(friend => {
+                                            return <Friend friend={friend} key={friend._id} isFriendRequest={false} reload={reload} setReload={setReload}/>
+                                        })
+                                    }
+                                                                        {
+                                        friends.map(friend => {
+                                            return <Friend friend={friend} key={friend._id} isFriendRequest={false} reload={reload} setReload={setReload}/>
+                                        })
+                                    }
+                                                                        {
+                                        friends.map(friend => {
+                                            return <Friend friend={friend} key={friend._id} isFriendRequest={false} reload={reload} setReload={setReload}/>
+                                        })
+                                    }
+                                                                        {
+                                        friends.map(friend => {
+                                            return <Friend friend={friend} key={friend._id} isFriendRequest={false} reload={reload} setReload={setReload}/>
+                                        })
+                                    }
+                                                                        {
                                         friends.map(friend => {
                                             return <Friend friend={friend} key={friend._id} isFriendRequest={false} reload={reload} setReload={setReload}/>
                                         })
@@ -146,6 +185,12 @@ function Friends() {
                                         friendRequests.map(friend => {
                                             return <FriendRequest friendRequest={friend} reload={reload} setReload={setReload}/>
                                         })
+                                    }
+                                    {
+                                        friendRequests.length === 0 &&
+                                        <div className="no-requests">
+                                            <p>no pending requests</p>
+                                        </div>
                                     }
                                 </div>
                             </div>

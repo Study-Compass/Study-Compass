@@ -43,7 +43,6 @@ function Friend({ friend, isFriendRequest, reload, setReload }) {
                     remove
                 </button>
             }
-
         </div>
     );
 }

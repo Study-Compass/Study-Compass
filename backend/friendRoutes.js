@@ -1,7 +1,4 @@
 const express = require('express');
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
-
 const router = express.Router();
 const { verifyToken } = require('./middlewares/verifyToken');
 
@@ -156,7 +153,7 @@ router.post('/friend-request/reject/:friendshipId', verifyToken, async (req, res
     }
 });
 
-router.get('/friends', verifyToken, async (req, res) => {
+router.get('/getFriends', verifyToken, async (req, res) => {
     const userId = req.user.userId; // Assuming you have user authentication
 
     try {
