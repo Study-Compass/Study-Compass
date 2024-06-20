@@ -15,13 +15,11 @@ function Friends() {
     const navigate = useNavigate();
     const [addValue, setAddValue] = useState("");
     const [contentState, setContentState] = useState('friends');
+    const [friends, setFriends] = useState([]);
+    const [friendRequests, setFriendRequests] = useState([]);
+    const [reload, setReload] = useState(0);
     
     const { addNotification } = useNotification();
-
-    const friend ={
-        username: "james",
-        picture: pfp
-    }
 
     useEffect(() => {
         console.log(isAuthenticating);
@@ -35,13 +33,34 @@ function Friends() {
 
     useEffect(() => {
         const fetchFriends = async () => {
-            const result = await getFriends();
-            console.log(result);
+            try{
+                const result = await getFriends();
+                setFriends(result);
+            } catch (error){
+                console.error('Error fetching friends:', error);
+                if(error.response.status === 403){
+                    navigate('/login');
+                }
+            }
         }
+        const fetchFriendRequests = async () => { 
+            try{
+                const result = await getFriendRequests();
+                console.log(result);
+                setFriendRequests(result);
+            } catch (error){
+                console.error('Error fetching friend requests:', error);
+                if(error.response.status === 403){
+                    navigate('/login');
+                }
+            }
+        }
+
         if(isAuthenticated){
             fetchFriends();
+            fetchFriendRequests();
         }
-    }, [isAuthenticated]);
+    }, [isAuthenticated, reload]);
 
     useEffect(() => {
         if(addValue.length === 1 && addValue[0] !== '@'){
@@ -60,8 +79,10 @@ function Friends() {
         e.preventDefault();
         const result = await sendFriendRequest(addValue.slice(1));
         console.log(result);
+        setReload(reload + 1);
         if(result === 'Friend request sent'){
             addNotification({title: 'Friend request sent', message: 'Friend request sent successfully', type: 'success'});
+            setAddValue('');
             return;
         }
         if(result === 'User not found'){
@@ -69,7 +90,7 @@ function Friends() {
         } else {
             addNotification({title: 'Error sending friend request', message: result, type: 'error'});
         }
-
+        setAddValue('');
     }
 
     const [viewport, setViewport] = useState("100vh");
@@ -114,13 +135,18 @@ function Friends() {
                             <div className={`content-container  ${contentState === 'pending' ? "left-staging" : ""}`}>
 
                                 <div className={`content`} >
-                                    <Friend friend={friend}/>
-                                    <Friend friend={friend}/>
-                                    <Friend friend={friend}/>
-                                    <Friend friend={friend}/>
+                                    {
+                                        friends.map(friend => {
+                                            return <Friend friend={friend} key={friend._id} isFriendRequest={false} reload={reload} setReload={setReload}/>
+                                        })
+                                    }
                                 </div>
                                 <div className={`content pending`} >
-                                    <FriendRequest friendRequest={friend}/>
+                                    {
+                                        friendRequests.map(friend => {
+                                            return <FriendRequest friendRequest={friend} reload={reload} setReload={setReload}/>
+                                        })
+                                    }
                                 </div>
                             </div>
                         </div>
