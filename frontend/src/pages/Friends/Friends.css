@@ -174,20 +174,41 @@
     color: var(--text);
 }
 
-.friends .friends-list-header p{
+.friends .friends-list-header .pending{
     font-weight:500;
     transform:translateY(1px);
     background-color: var(--light);
     padding:2px 10px;
     border-radius: 6px;
     cursor:pointer;
+    display:flex;
+    gap:5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.friends .friends-list-header p:hover{
+.friends .pending-count{
+    background-color: var(--red);
+    aspect-ratio: 1/1;
+    border-radius: 75%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height:80%; 
+}
+
+.friends .pending-count p{
+    line-height: 0.7;
+    font-size:11px;
+    color: white;
+}
+
+.friends .friends-list-header .pending:hover{
     background-color: var(--lightborder);
 }
 
-.friends .friends-list-header p.active{
+.friends .friends-list-header .pending.active{
     background-color: var(--border);
     color:white;    
 }

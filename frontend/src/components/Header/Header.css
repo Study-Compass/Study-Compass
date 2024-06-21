@@ -11,12 +11,21 @@
 }
 
 .logo{
-    width:200px;
+    height:47px;
+    z-index: 2;
 }
 
 .header-right{
     height:50px;
     /* width:50px; */
+    z-index: 2;
+}
+
+.Header a{
+    text-decoration: none;
+    color: var(--text);
+    display:flex;
+    align-items: center;
 }
 
 .Header button{
@@ -30,6 +39,7 @@
     margin:10px;
     color: white;
     width:calc(100% - 20px);
+    pointer-events: all;
 }
 
 .Header button:hover{
@@ -74,6 +84,7 @@
     display:flex;
     align-items: center;
     justify-content: center;
+    z-index:1;
 }
 
 .Header .nav-link{
