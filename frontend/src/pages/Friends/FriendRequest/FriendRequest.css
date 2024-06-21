@@ -1,0 +1,30 @@
+.friend-request{
+    position: relative;
+    display:grid;
+}
+
+.friend-request .friend-request-buttons{
+    display:flex;
+    gap:10px;
+    position: absolute;
+    right:10px;
+    align-self:center;
+}
+
+.friend-request button{
+    font-family: 'Satoshi';
+    outline:none;
+    border:none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    color:white;
+    cursor:pointer;
+}
+
+.friend-request button.accept{
+    background-color: var(--blue);
+}
+
+.friend-request button.decline{
+    background-color: var(--red);
+}

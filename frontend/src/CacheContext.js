@@ -174,6 +174,7 @@ export const CacheProvider = ({children}) =>{
         };
     }
 
+
     return (
         <CacheContext.Provider value={{ getRooms, getRoom, getFreeRooms, getBatch, search, debounce }}>
             {children}
