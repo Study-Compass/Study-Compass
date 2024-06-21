@@ -218,7 +218,6 @@ function Room() {
     function changeURL2(option) {
         navigate(`/room/${option}`);
         fetchData(roomIds[option]);
-
         setContentState("classroom");
     }
 

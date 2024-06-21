@@ -1,0 +1,9 @@
+.saved-content{
+    display:flex;
+    flex-direction: column;
+    overflow-y:scroll;
+    height:calc(100% - 35px);
+    align-items: center;
+    padding: 5px 10px;
+    box-sizing: border-box;
+}

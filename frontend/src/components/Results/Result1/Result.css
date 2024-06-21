@@ -8,14 +8,15 @@ li.result{
     border-radius: 10px;
     display:flex;
     flex-direction: row;
-    gap:10px;
+    gap:5px;
     pointer-events: all !important;
+    position: relative;
 }
 
 .result .image{
     border-radius: 5px;
-    width:100px;
-    height:75px;
+    width:75px;
+    height:70px;
     min-width: 100px;
 }
 

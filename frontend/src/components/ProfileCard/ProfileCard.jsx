@@ -14,9 +14,8 @@ function ProfileCard({userInfo}){
                 <div className="header">
                     <CardHeader userInfo={userInfo}/>
                 </div>
-                <div className="saved">
-                    <SavedClassrooms userInfo={userInfo}/>
-                </div>
+                <SavedClassrooms userInfo={userInfo}/>
+
             </div>
             <div className="study-history">
                 <StudyHistory userInfo={userInfo}/>
