@@ -4,7 +4,7 @@ import Bookmark from "../../../assets/Icons/Bookmark.svg"
 
 
 
-function SavedClassrooms(){
+function SavedClassrooms(userInfo){
     return (
         <div className="box-header">
             <div className="title">

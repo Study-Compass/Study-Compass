@@ -42,7 +42,6 @@
     border: 1px solid #B0AFAF;
     height: 97%;
     box-shadow: var(--shadow);
-
 }
 
 .card .box-header{
@@ -71,10 +70,38 @@
 
 .card .box-header p{
     font-family: 'Satoshi';
+    color: var(--text);
     font-weight: bold;
     display: flex;
     justify-content: left;
     flex-direction: row;
     align-items: center;
     gap: 5px;
+}
+
+
+@media (max-width:500px) {
+    .card{
+        border-radius:10px;
+        display:flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+        height: 100%;
+        width: 100%;
+    }
+
+    .card .left_profile{
+        height: 66%;
+        width: 97%;
+    }
+
+    .card .study-history{
+        width: 97%;
+        background-color: white;
+        border-radius: 21px;
+        border: 1px solid #B0AFAF;
+        height: 33%;
+        box-shadow: var(--shadow);
+    }
 }
