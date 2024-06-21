@@ -7,3 +7,34 @@
     padding: 5px 10px;
     box-sizing: border-box;
 }
+
+@media (max-width:500px) {
+    .collapsible-head{
+        margin-left: auto;
+        margin-right: 10px;
+        border: none;
+        outline: none;
+        background-color: var(--white);
+        transform: rotate(180deg);
+        display: block;
+    }
+}
+
+.collapsible-head{
+    display: none;
+}
+
+.collapsible-head.open {
+    transform: rotate(0deg);
+}
+
+.history-content.open {
+    max-height: 0px;
+    overflow: hidden;
+}
+
+
+.saved.open{
+    max-height: 34px;
+    overflow: hidden;
+}

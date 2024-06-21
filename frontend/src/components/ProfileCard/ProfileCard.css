@@ -32,7 +32,6 @@
     height: 52%;
     width: 100%;
     box-shadow: var(--shadow);
-
 }
 
 .card .study-history{
@@ -86,14 +85,25 @@
         display:flex;
         flex-direction: column;
         align-items: center;
+        justify-content: flex-start;
         gap: 10px;
         height: 100%;
         width: 100%;
     }
 
+    .card .header{
+        height: 267px;
+    }
+
+    .card .saved{
+        height: 317px;
+    }
+
     .card .left_profile{
-        height: 66%;
+        height: auto;
         width: 97%;
+        justify-content: flex-start;
+        gap: 10px;
     }
 
     .card .study-history{
