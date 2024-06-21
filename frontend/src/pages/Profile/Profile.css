@@ -4,7 +4,6 @@
     justify-content: flex-start;
     align-items: center;
     background-color: #FFFF;
-    gap: 30px;
     height:100vh;
     max-height:100vh;
     position: relative;
@@ -12,7 +11,7 @@
 
 .profile-card{
     display:flex;
-    max-width:1500px;
+    max-width:1200px;
     background-color: white;
     border-radius: 21px;
     /* padding:20px 20px 60px 20px; */
@@ -20,7 +19,7 @@
     width:calc(100% - 100px);
     height:calc(100% - 40px);
     max-height: min(calc(100% - 40px), 800px);
-    overflow:hidden;
+    /* overflow:hidden; */
     position: relative;
 }
 

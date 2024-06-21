@@ -6,6 +6,7 @@
     justify-content: space-evenly;
     height: 100%;
     width: 100%;
+    gap:20px;
 }
 
 .card .left_profile{
@@ -15,6 +16,7 @@
     justify-content: space-between;
     height: 97%;
     width: 33%;
+    max-width: 310px;
 }
 
 .card .header{
@@ -35,7 +37,7 @@
 }
 
 .card .study-history{
-    width: 60%;
+    flex-grow:1;
     background-color: white;
     border-radius: 21px;
     border: 1px solid #B0AFAF;

@@ -7,6 +7,7 @@ import DownArrow from "../../../assets/Icons/DownArrow.svg"
 
 
 
+
 function StudyHistory({userInfo}){
 
     const [isOpen, setIsOpen] = useState(false);

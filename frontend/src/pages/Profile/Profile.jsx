@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import './Profile.css';
 import Header from '../../components/Header/Header';
+import Footer from '../../components/Footer/Footer.jsx';
 import ProfileCard from '../../components/ProfileCard/ProfileCard';
 import useAuth from '../../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
@@ -35,6 +36,7 @@ function Profile(){
                     </div>
                 </div>
             }
+            <Footer/>
         </div>
     )
 }
