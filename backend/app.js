@@ -18,15 +18,17 @@ app.use(cors(corsOptions));
 
 const authRoutes = require('./authRoutes.js');
 const dataRoutes = require('./dataRoutes.js');
+const friendRoutes = require('./friendRoutes.js');
 
 
 app.use(express.json());
 app.use(authRoutes);
 app.use(dataRoutes);
+app.use(friendRoutes);
 app.use(cors());
 app.use(cookieParser());
 
-mongoose.connect(process.env.MONGO_URL1);
+mongoose.connect(process.env.MONGO_URL_LOCAL);
 mongoose.connection.on('connected', () => {
     console.log('Mongoose connected to DB.');
     mongoConnection = true;

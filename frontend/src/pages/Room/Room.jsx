@@ -314,7 +314,6 @@ function Room() {
                 <p>MIT license</p>
                 <p>|</p>
                 <a href="https://github.com/AZ0228/Study-Compass" className="github" ><img src={Github} alt="" className="github" /></a>
-                <p>Github</p>
             </div>
         </div>
     );
