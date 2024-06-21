@@ -14,7 +14,7 @@ function CardHeader({userInfo}){
             </div>
             <div className="personal">
                 <div className="pfp">
-                    <img src={userInfo.picture} alt="profile-icon" />
+                    <img src={userInfo.picture ? userInfo.picture : defaultAvatar} alt="profile-icon" />
                 </div>
                 <div className="profile-info">
                     <p className="name">{userInfo.username}</p>

@@ -19,7 +19,9 @@
 }
 
 .card-header .personal .pfp{
-    height:95%;
+    height :95%;
+    aspect-ratio: 1/1;
+    width:fit-content;
     margin-left: 4%;
     margin-top: 2%;
     position: relative;
@@ -78,12 +80,12 @@
     flex-direction: row;
     align-items: flex-start;
     justify-content: space-evenly;
-    gap: 10px;
+    gap: 7px;
     margin: 0px;
 }
 
 .card-header .profile-info .tags p{
-    padding: 0px 7px;
+    padding: 0px 4px;
 }
 
 .card-header .stats{
@@ -156,5 +158,12 @@
         width: 100%;
         margin: 12px 12px;
         gap: 5px;
+    }
+
+    .card-header .personal img{
+        height: 100%;
+        z-index: 3;
+        position: relative;
+        border-radius: 50%;
     }
 }
