@@ -13,7 +13,7 @@ function Result1({ result, attributes, debouncedFetchData, changeURL, findNext, 
 
     return (
         <li
-            className={`result ${attributes.includes('restricted access') ? "restricted": "" }`}
+            className={`result1 ${attributes.includes('restricted access') ? "restricted": "" }`}
             value={result.room.name} 
             onClick={() => {changeURL(result.room.name)}}
         >

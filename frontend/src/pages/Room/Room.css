@@ -37,6 +37,7 @@
     border-radius: 20px;
     position: relative;
 }
+
 .content-container{
     display:flex;
     flex-direction: column;
@@ -47,7 +48,7 @@
     max-height:calc(100% - 115px);
     padding: 20px 20px 40px 20px;
     box-sizing: border-box;
-
+    
 }
 .right{
     display:flex;
@@ -312,6 +313,12 @@ select{
     transform-origin: center;
 }
 
+@media (max-height:730px) {
+    .content-container{
+        padding: 10px 20px 20px 20px;
+    }
+}
+
 @keyframes pulse {
     0% {
       transform: scale(0.5);
@@ -344,7 +351,6 @@ select{
     .content-container{
         padding:0px 10px 10px 10px;
         width:97%;
-        
     }
     .dot{
         height:18px;

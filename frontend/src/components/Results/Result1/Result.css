@@ -1,4 +1,4 @@
-li.result{
+li.result1{
     border-radius: 0;
     padding:10px;
     background-color: white;
@@ -13,19 +13,19 @@ li.result{
     position: relative;
 }
 
-.result .image{
+.result1 .image{
     border-radius: 5px;
     width:75px;
     height:70px;
     min-width: 100px;
 }
 
-.result:hover{
+.result1:hover{
     background-color: var(--lighterborder);
     cursor:pointer;
 }
 
-.result h2{
+.result1 h2{
     font-family:'Inter';
     font-weight:600;
     font-size:17px;
@@ -34,12 +34,12 @@ li.result{
     -webkit-hyphens: auto;
 }
 
-.result-info{
+.result1-info{
     display:flex;
     flex-direction: column;
 }
 
-.result-info-container{
+.result1-info-container{
     display:flex;
     flex-direction: row;
     gap:10px;
@@ -47,7 +47,7 @@ li.result{
 }
 
 @media(max-width:500px){
-    .result h2{
+    .result1 h2{
         font-family:'Inter';
         font-weight:600;
         font-size:16px;
