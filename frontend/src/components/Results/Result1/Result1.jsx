@@ -20,7 +20,7 @@ function Result1({ result, attributes, debouncedFetchData, changeURL, findNext, 
             <div className="image">
                 {result.room.image ? <img src={`${process.env.PUBLIC_URL}${result.room.image}`} alt="classroom" width={100} height={75} />:""}
             </div>
-            <div className="result-info">
+            <div className="result1-info">
                 <h2>{result.room.name.toLowerCase()}</h2>
                 <div className="info-row">      
                     <div className="rating">

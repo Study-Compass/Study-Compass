@@ -8,7 +8,7 @@ li.result1{
     border-radius: 10px;
     display:flex;
     flex-direction: row;
-    gap:5px;
+    gap:10px;
     pointer-events: all !important;
     position: relative;
 }
@@ -28,7 +28,7 @@ li.result1{
 .result1 h2{
     font-family:'Inter';
     font-weight:600;
-    font-size:17px;
+    font-size:14px;
     margin: 0;
     hyphens:auto;
     -webkit-hyphens: auto;
@@ -45,6 +45,32 @@ li.result1{
     gap:10px;
     align-items: center;
 }
+
+.result1 .rating{
+    display:flex;
+    flex-direction: row;
+    gap:5px;
+    align-items: center;
+}
+
+.result1 .rating p{
+    margin:0;
+    font-size:13px;
+    font-family:'Inter';
+    font-weight:700;
+}
+
+.result1 .rating img{
+    width:12px;
+    height:12px;
+
+}
+
+.result1 .free-until{
+    font-size:12px;
+    padding: 0 0 0 15px
+}
+
 
 @media(max-width:500px){
     .result1 h2{
