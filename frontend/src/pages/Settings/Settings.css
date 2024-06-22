@@ -27,7 +27,7 @@
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
-    width:30%;
+    width:230px;
     height:100%;
     border-right: 1px solid #B0AFAF;
 
@@ -40,6 +40,196 @@
     width:70%;
     height:100%;
     box-sizing: border-box;
+    padding: 28px;
+    width: calc(100% - 230px);
 
 }
 
+.settings-left .header{
+    display: flex;
+    flex-direction: row;
+    height:63px;
+    width:100%;
+    box-sizing: border-box;
+    padding-top: 9px;
+}
+
+.settings-left .header .name{
+    display: flex;
+    flex-direction: column;
+    height: 37px;
+    width: 128px;
+    padding-left: 10px;
+}
+
+.settings-left .header h1{
+    display: flex;
+    flex-direction: column;
+    font-family: 'Satoshi';
+    font-size: 16px;
+    color: var(--text);
+    margin: 0px;
+}
+
+.settings-left .header p{
+    display: flex;
+    flex-direction: column;
+    font-family: 'Satoshi';
+    font-size: 14px;
+    color: var(--border);
+    margin: 0px;
+
+}
+
+.settings-left .header img{
+    display: flex;
+    flex-direction: column;
+    height:40px;
+    width:40px;
+    padding-left: 10px;
+    
+}
+
+.settings-left .preferences{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height:43px;
+    width:100%;
+    box-sizing: border-box;
+    font-family: 'Satoshi';
+    font-size: 14px;
+    color: var(--text);
+
+}
+
+.settings-right .header{
+    display: flex;
+    flex-direction: column;
+    /* align-content: ; */
+    font-family: 'Satoshi';
+    font-size: 24px;
+    font-weight: bold;
+    color: var(--text);
+    /* margin: 0px; */
+}
+
+.settings-right .profile{
+    display: flex;
+    flex-direction: column;
+    font-family: 'Satoshi';
+    font-size: 14px;
+    color: var(--text);
+}
+
+.settings-right .name-settings{
+    display: flex;
+    flex-direction: row;
+    font-family: 'Satoshi';
+    gap: 20px;
+    width: 42px;
+}
+
+.settings-right .name-settings .input-name{
+    display: flex;
+    flex-direction: column;
+    font-family: 'Satoshi';
+    /* gap: 200px; */
+    width: 237px;
+    height: 31px;
+}
+
+.settings-right .user-container{
+    display: flex;
+    flex-direction: row;
+    font-family: 'Satoshi';
+    padding-left: 37px;
+    width: 100%;
+    height: 69px;
+    margin: 0px;
+    box-sizing: border-box;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.settings-right .user-container button{
+    display: flex;
+    flex-direction: column;
+    font-family: 'Inter';
+    color: var(--text);
+    font-size: 12px;
+    padding: 5px 9px;
+    height: fit-content;
+    outline: none;
+    border: none;
+    border-radius: 6px;
+}
+
+.settings-right .user-container .user{
+    display: flex;
+    flex-direction: column;
+    font-family: 'Satoshi';
+    width: 79px;
+    height: 42px;
+}
+
+.settings-right .user-container .email{
+    display: flex;
+    flex-direction: column;
+    font-family: 'Satoshi';
+    width: 137px;
+    height: 42px;
+}
+
+.settings-right .user-container .password{
+    display: flex;
+    flex-direction: column;
+    font-family: 'Satoshi';
+    width: 67px;
+    height: 42px;
+}
+
+/* .settings-right .user-container p{
+
+} */
+
+.settings-right h2{
+    font-family: 'Inter';
+    font-size: 16px;
+    color: var(--text);
+    font-weight: 600;
+    margin: 0px;
+    margin-bottom: 7px;
+}
+
+.settings-right h3{
+    font-family: 'Inter';
+    font-size: 14px;
+    color: var(--text);
+    font-weight: 600;
+    margin: 0px;
+    margin-bottom: 7px;
+}
+
+.settings-right p{
+    display: flex;
+    flex-direction: row;
+    margin: 0px;
+    color: var(--border);
+    font-size: 15px;
+}
+
+.settings-right hr{
+    display: flex;
+    flex-direction: column;
+    font-size: 20px;
+    background-color: var(--border);
+}
+
+.settings-right img{
+    display: flex;
+    flex-direction: row;
+    height:62px;
+    width:62px;
+    padding-left: 10px;
+}
