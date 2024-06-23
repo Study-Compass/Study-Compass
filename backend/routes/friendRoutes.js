@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const { verifyToken } = require('./middlewares/verifyToken');
+const { verifyToken } = require('../middlewares/verifyToken');
 
-const Friendship = require('./schemas/friendship');
-const User = require('./schemas/user');
+const Friendship = require('../schemas/friendship');
+const User = require('../schemas/user');
 
 router.post('/friend-request/:friendUsername', verifyToken, async (req, res) => {
     const { friendUsername } = req.params;

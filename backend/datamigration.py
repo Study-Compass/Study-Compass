@@ -237,6 +237,22 @@ def bulkUpdate():
 
     print("Update complete.")
 
+
+# update all existing fields to a value, overwrite existing values
+def forceUpdate(collection, attribute):
+    load_dotenv() # loading .env file
+    uri = os.environ.get('MONGO_URL_LOCAL') # fetching URI string
+    client = MongoClient(uri, server_api=ServerApi('1')) 
+    db = client['studycompass']
+    collection = db[collection]
+
+    result = collection.update_many(
+    {},  # Criteria to match all documents
+    {'$set': attribute}  # Action to set the attribute field to a value
+    )
+    print(f"Update complete. Modified {result.modified_count} documents.")
+
+
 # write_items_with_root_image_to_file("not-done.txt") # call the function to add new field to the collection
 # addNewField('users',{'saved' : []})
 # addNewField('classrooms1',{'attributes': []})
@@ -251,3 +267,4 @@ def bulkUpdate():
 # addNewField('users',{'hours': 0})
 # addNewField('users',{'contributions': 0})
 # migrateClassrooms()
+forceUpdate('users', {'visited': [], 'partners': [], 'sessions': [], 'hours': 0, 'contributions': 0})

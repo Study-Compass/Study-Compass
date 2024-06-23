@@ -1,9 +1,9 @@
 const express = require('express');
-const Classroom = require('./schemas/classroom.js');
-const Schedule = require('./schemas/schedule.js');
-const User = require('./schemas/user.js');
-const { verifyToken, verifyTokenOptional } = require('./middlewares/verifyToken');
-const { sortByAvailability } = require('./helpers.js');
+const Classroom = require('../schemas/classroom.js');
+const Schedule = require('../schemas/schedule.js');
+const User = require('../schemas/user.js');
+const { verifyToken, verifyTokenOptional } = require('../middlewares/verifyToken');
+const { sortByAvailability } = require('../helpers.js');
 
 const router = express.Router();
 

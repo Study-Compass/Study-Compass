@@ -16,19 +16,25 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 
-const authRoutes = require('./authRoutes.js');
-const dataRoutes = require('./dataRoutes.js');
-const friendRoutes = require('./friendRoutes.js');
+const authRoutes = require('./routes/authRoutes.js');
+const dataRoutes = require('./routes/dataRoutes.js');
+const friendRoutes = require('./routes/friendRoutes.js');
+// const maintenanceRoutes = require('./routes/maintenanceRoutes.js'); //comment out for production
 
 
 app.use(express.json());
 app.use(authRoutes);
 app.use(dataRoutes);
 app.use(friendRoutes);
+// app.use(maintenanceRoutes); //comment out for production
 app.use(cors());
 app.use(cookieParser());
 
-mongoose.connect(process.env.MONGO_URL_LOCAL);
+if(process.env.NODE_ENV === 'production') {
+    mongoose.connect(process.env.MONGO_URL);
+} else {
+    mongoose.connect(process.env.MONGO_URL_LOCAL);
+}
 mongoose.connection.on('connected', () => {
     console.log('Mongoose connected to DB.');
     mongoConnection = true;
@@ -59,6 +65,17 @@ app.get('/api/greet', async (req, res) => {
     console.log('GET: /api/greet')
     res.json({ message: 'Hello from the backend!' });
 });
+
+// Serve static files from the React app in production
+if (process.env.NODE_ENV === 'production') {
+    app.use(express.static(path.join(__dirname, '../frontend/build')));
+
+    // The "catchall" handler: for any request that doesn't match one above, send back React's index.html file.
+    app.get('*', (req, res) => {
+        res.sendFile(path.join(__dirname, '../frontend/build/index.html'));
+    });
+}
+
 
 
 app.listen(port, () => {
