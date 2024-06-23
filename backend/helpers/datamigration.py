@@ -252,6 +252,22 @@ def forceUpdate(collection, attribute):
     )
     print(f"Update complete. Modified {result.modified_count} documents.")
 
+def updateImages():
+    load_dotenv() # loading .env file
+    uri = os.environ.get('MONGO_URL') # fetching URI string
+    client = MongoClient(uri, server_api=ServerApi('1')) 
+    db = client['studycompass']
+    collection = db['classrooms1']
+
+    # replace /classrooms/ with https://studycompass.s3.amazonaws.com/
+    for classroom in collection.find({}):
+        if 'image' in classroom:
+            if classroom['image'].startswith('/classrooms/'):
+                new_image = classroom['image'].replace('/classrooms/', 'https://studycompass.s3.amazonaws.com/')
+                collection.update_one({'_id': classroom['_id']}, {'$set': {'image': new_image}})
+                print(f"Updated image for classroom '{classroom['name']}'.")
+
+
 
 # write_items_with_root_image_to_file("not-done.txt") # call the function to add new field to the collection
 # addNewField('users',{'saved' : []})
@@ -267,4 +283,5 @@ def forceUpdate(collection, attribute):
 # addNewField('users',{'hours': 0})
 # addNewField('users',{'contributions': 0})
 # migrateClassrooms()
-forceUpdate('users', {'visited': [], 'partners': [], 'sessions': [], 'hours': 0, 'contributions': 0})
+# forceUpdate('users', {'visited': [], 'partners': [], 'sessions': [], 'hours': 0, 'contributions': 0})
+updateImages()
