@@ -3,11 +3,11 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
 const router = express.Router();
-const { verifyToken } = require('./middlewares/verifyToken');
+const { verifyToken } = require('../middlewares/verifyToken.js');
 
-const { authenticateWithGoogle, loginUser, registerUser } = require('./services/userServices');
+const { authenticateWithGoogle, loginUser, registerUser } = require('../services/userServices.js');
 
-const User = require('./schemas/user.js');
+const User = require('../schemas/user.js');
 // Registration endpoint
 router.post('/register', async (req, res) => {
     // Extract user details from request body
