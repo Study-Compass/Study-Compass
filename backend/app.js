@@ -8,7 +8,8 @@ require('dotenv').config();
 const { google } = require('googleapis');
 
 const app = express();
-const port = 5001;
+// const port = 5001;
+const port = process.env.PORT || 5001;
 
 const corsOptions = {
     origin: 'http://localhost:3000', // replace with production domain
