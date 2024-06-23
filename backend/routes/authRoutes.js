@@ -144,7 +144,7 @@ router.post('/google-login', async (req, res) => {
         console.log('Google login failed:', error);
         res.status(500).json({
             success: false,
-            message: 'Google login failed'
+            message: `Google login failed, error: ${error.message}`
         });
     }
 });
