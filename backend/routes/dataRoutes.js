@@ -273,6 +273,102 @@ router.get('/search', verifyTokenOptional, async (req, res) => {
     }
 });
 
+router.get('/all-purpose-search', verifyTokenOptional, async (req, res) => {
+    const query = req.query.query;
+    const attributes = req.query.attributes ? req.query.attributes : []; // Ensure attributes is an array
+    const timePeriod = req.query.timePeriod; // might be null
+    const sort = req.query.sort;
+    const userId = req.user ? req.user.userId : null;
+    let user;
+
+    const createTimePeriodQuery = (queryObject) => {
+        let conditions = [];
+        Object.entries(queryObject).forEach(([day, periods]) => {
+            if(periods.length > 0){
+                periods.forEach(period => {
+                    const condition = {
+                        [`weekly_schedule.${day}`]: {
+                            "$not": {
+                                "$elemMatch": {
+                                    "start_time": { "$lt": period.end_time },
+                                    "end_time": { "$gt": period.start_time }
+                                }
+                            }
+                        }
+                    };
+                    conditions.push(condition);
+                });
+            }
+        });
+        return conditions;
+    };
+
+    if(userId){
+        try{
+            user = await User.findOne({ _id: userId });
+        } catch(error) {
+            console.log('invalid user')
+        }
+    }
+
+    try {
+        // Define the base query with projection to only include the name field
+        let findQuery = Classroom.find(
+            { name: { $regex: query, $options: 'i' }, attributes: { $all: attributes } },
+            { name: 1 } // Project only the name field
+        );
+
+        if(attributes.length === 0){
+            findQuery = Classroom.find(
+                { name: { $regex: query, $options: 'i' }},
+                { name: 1 } // Project only the name field
+            );
+        }
+
+        if(timePeriod){
+            const queryConditions = createTimePeriodQuery(timePeriod);
+            const mongoQuery = { "$and": queryConditions };
+            const rooms = await Schedule.find(mongoQuery);
+            const roomIds = rooms.map(room => room.classroom_id); //add condition to findQuery
+            findQuery = findQuery.where('_id').in(roomIds);
+        }
+
+        if(sort === "availability"){
+            findQuery =  Classroom.aggregate([
+                {
+                    $match: {
+                        name: { $regex: query, $options: 'i' } // Filters classrooms by name using regex
+                    }
+                },
+                {
+                    $lookup: {
+                        from: "schedules", // Assumes "schedules" is the collection name
+                        localField: "_id", // Field in the 'classroom' documents
+                        foreignField: "classroom_id", // Corresponding field in 'schedule' documents
+                        as: "schedule_info" // Temporarily holds the entire joined schedule documents
+                    }
+                },
+                {
+                    $unwind: "$schedule_info" // Unwinds the schedule_info to handle multiple documents if necessary
+                },
+                {
+                    $project: {
+                        name: 1, // Includes classroom name in the output
+                        weekly_schedule: "$schedule_info.weekly_schedule" // Projects only the weekly_schedule part from each schedule_info
+                    }
+                }
+            ]);
+        }
+
+        console.log({ name: { $regex: query, $options: 'i' }, attributes: { $all: attributes } },{ name: 1} );
+
+        
+    } catch (error) {
+        res.status(500).json({ success: false, message: 'Error searching for rooms', error: error.message });
+        console.error(error);
+    }
+});
+
 // Route to save a classroom to a user's saved list, expects a room and user ID
 router.post('/save', verifyToken, async (req, res) => {
     const roomId = req.body.roomId;
