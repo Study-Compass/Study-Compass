@@ -2,30 +2,82 @@ import React, { useEffect, useState } from 'react';
 import Header from '../../components/Header/Header';
 import './Settings.css';
 import pfp from '../../assets/defaultAvatar.svg';
+import preferences from '../../assets/Icons/Preferences.svg';
+import rightarrow from '../../assets/Icons/RightArrow.svg';
 
 function Settings(){
+    const [width, setWidth] = useState(window.innerWidth);
+    const [settingsRightSide, setSettingsRightSide] = useState(false);
+
+    useEffect(() => { //useEffect for window resizing
+      function handleResize() {
+        setWidth(window.innerWidth);
+      }
+      window.addEventListener('resize', handleResize);
+  
+      return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
+    useEffect(() => {
+        if (width > 700) {
+            setSettingsRightSide(false);
+        }
+    }, [width]);
+
+    const handleArrowClick = () => {
+        setSettingsRightSide(true);
+    };
+
+    const handleBackClick = () => {
+        setSettingsRightSide(false);
+    };
+
+    
+
 
     return(
         <div className='settings'>
             <Header />
             <div className='content-container'>
                 <div className='settings-container'>
-                    <div className='settings-left'>
-                        <div className='header'>
-                            <img src={pfp} alt="" />
-                            <div className='name'>
-                                <h1>James Liu</h1>
-                                <p>email</p>
+                       
+                        <div className='settings-left'>
+                            <div className='header'>
+                                <img src={pfp} alt="" />
+                                <div className='name'>
+                                    <h1>James Liu</h1>
+                                    <p>email</p>
+                                </div>
+                                {width <= 700 &&(
+                                    <button className='right-arrow' onClick={handleArrowClick} >
+                                        <img src={rightarrow} alt="" />                                       
+                                    </button>  
+                                )}
+                                
+                            </div>
+                            <div className='preferences'>
+                                <img src={preferences} alt="" />
+                                <p>Study Preferences</p>
+                                {width <= 700 && (
+                                    <button className='right-arrow' onClick={handleArrowClick} >
+                                        <img src={rightarrow} alt="" />
+                                    </button>
+                                )}
+
                             </div>
                         </div>
-                        <div className='preferences'>
-                            <p>Study Preferences</p>
-                        </div>
-                    </div>
 
-                    <div className='settings-right'>
+
+                {/* {(width > 700 || settingsRightSide) && ( */}
+
+                    <div className={`settings-right ${settingsRightSide ? "active" : "not-active"}`}>
                         <div className='header'>
                             <h1>Account Settings</h1>
+                            {width <= 700 && settingsRightSide && (
+                                <button className='back-arrow' onClick={handleBackClick}>
+                                <img src={rightarrow} alt="Back Arrow" style={{ transform: 'rotate(180deg)' }} />
+                                </button>
+                            )}
                         </div>
                        
                         <div className='profile'>
@@ -73,7 +125,17 @@ function Settings(){
 
                             <h2>danger zone</h2>
                             <hr />
-                            <button>delete account</button>
+                            <div className='user-container'>
+                                <div className='delete'>
+                                    <button>
+                                        <h3>delete account</h3>
+                                        
+                                        </button>
+                                    <p>warning: this is a permanent action !</p>
+
+                                </div>
+                            </div>
+                            
                             
 
                         </div>
@@ -86,6 +148,11 @@ function Settings(){
                         </div>
 
                     </div>
+                    
+                {/* )} */}
+
+
+
                 </div>
             </div>
         <div>

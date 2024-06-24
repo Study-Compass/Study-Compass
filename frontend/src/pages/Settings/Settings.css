@@ -17,7 +17,6 @@
     width:calc(100% - 100px);
     height:calc(100% - 115px);
     max-height:calc(100% - 115px);
-    /* padding: 20px 0 0 0; */
     border: 1px solid #B0AFAF;
     border-radius: 20px;
     position: relative;
@@ -42,13 +41,14 @@
     box-sizing: border-box;
     padding: 28px;
     width: calc(100% - 230px);
+    overflow-y:scroll;
 
 }
 
 .settings-left .header{
     display: flex;
     flex-direction: row;
-    height:63px;
+    /* height:63px; */
     width:100%;
     box-sizing: border-box;
     padding-top: 9px;
@@ -57,7 +57,7 @@
 .settings-left .header .name{
     display: flex;
     flex-direction: column;
-    height: 37px;
+    /* height: 37px; */
     width: 128px;
     padding-left: 10px;
 }
@@ -77,8 +77,7 @@
     font-family: 'Satoshi';
     font-size: 14px;
     color: var(--border);
-    margin: 0px;
-
+    margin: 0 0 0px 0;
 }
 
 .settings-left .header img{
@@ -92,9 +91,11 @@
 
 .settings-left .preferences{
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
-    height:43px;
+    padding: 10px 18px;
+    gap: 10px;
+    /* height:43px; */
     width:100%;
     box-sizing: border-box;
     font-family: 'Satoshi';
@@ -106,12 +107,10 @@
 .settings-right .header{
     display: flex;
     flex-direction: column;
-    /* align-content: ; */
     font-family: 'Satoshi';
     font-size: 24px;
     font-weight: bold;
     color: var(--text);
-    /* margin: 0px; */
 }
 
 .settings-right .profile{
@@ -145,7 +144,7 @@
     font-family: 'Satoshi';
     padding-left: 37px;
     width: 100%;
-    height: 69px;
+    /* height: 69px; */
     margin: 0px;
     box-sizing: border-box;
     justify-content: space-between;
@@ -170,7 +169,7 @@
     flex-direction: column;
     font-family: 'Satoshi';
     width: 79px;
-    height: 42px;
+    /* height: 42px; */
 }
 
 .settings-right .user-container .email{
@@ -178,7 +177,7 @@
     flex-direction: column;
     font-family: 'Satoshi';
     width: 137px;
-    height: 42px;
+    /* height: 42px; */
 }
 
 .settings-right .user-container .password{
@@ -186,12 +185,45 @@
     flex-direction: column;
     font-family: 'Satoshi';
     width: 67px;
-    height: 42px;
+    /* height: 42px; */
 }
 
-/* .settings-right .user-container p{
+.settings-right .user-container .delete{
+    display: flex;
+    flex-direction: column;
+    font-family: 'Satoshi';
+    width: 100%;
+    /* height: 55px; */
+}
 
-} */
+
+.settings-right .user-container .delete p{
+    display: flex;
+    flex-direction: row;
+    margin: 0px;
+    color: var(--border);
+    font-size: 12px;
+}
+
+.settings-right .user-container .delete button {
+    display: flex;
+    flex-direction: column;
+    font-family: 'Satoshi';
+    padding: 0px;
+    font-size: 14px;
+    height: fit-content;
+    outline: none;
+    border: none;
+    border-radius: 6px;
+    background-color: transparent;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.settings-right .user-container .delete h3{
+    color: red;
+}
+
 
 .settings-right h2{
     font-family: 'Inter';
@@ -200,6 +232,7 @@
     font-weight: 600;
     margin: 0px;
     margin-bottom: 7px;
+    margin-top: 15px;
 }
 
 .settings-right h3{
@@ -232,4 +265,137 @@
     height:62px;
     width:62px;
     padding-left: 10px;
+}
+
+@media (max-width:700px) {
+    .settings-left{
+        display:block;
+        width:100%;
+        border-right:none;
+    }
+
+    .settings-left .header{
+        padding: 20px;
+        padding-bottom: 10px;
+        gap: 10px;
+        position: relative;
+    }
+
+    .settings-left .header img{
+        height:50px;
+        width:50px;
+        padding: 0px;
+        
+    }
+
+    .settings-left .header .right-arrow{
+        height:100%;
+        display:flex;
+        align-items: center;
+        justify-content: center;
+        position:absolute;
+        top:0;
+        right:20px;
+        background: none;
+        border: none;
+    }
+
+    .settings-left .header .right-arrow img{
+        height: 17px;
+        width: 17px;
+    }
+
+    .settings-left .header h1{
+        font-size: 20px;
+        
+    }
+
+    .settings-left .header p{
+        font-size: 17px;
+        
+    }
+
+    .settings-left .preferences{
+        font-size: 17px;
+        padding: 0px 24px;
+        position: relative;
+    }
+
+    .settings-left .preferences img{
+        width: 25px;
+    }
+
+    .settings-left .preferences .right-arrow img{
+        height: 17px;
+        width: 17px;
+    }
+    .settings-left .preferences .right-arrow{
+        height:100%;
+        display:flex;
+        align-items: center;
+        justify-content: center;
+        position:absolute;
+        top:0;
+        right:20px;
+        background: none;
+        border: none;
+    }
+
+    .settings-container{
+        width:100%;
+        box-sizing: border-box;
+        height:100%;
+        max-height:100%;
+        flex-direction: column;
+        overflow:hidden;
+    }
+    .settings-right{
+        width: 100%;
+        transition: all 0.5s ease;
+        transform:translateX(100%);
+        position:absolute;
+        background-color: white;
+        border-left: 1px solid var(--border);
+        box-sizing: border-box;
+        border-radius: 20px;
+    }
+
+    .settings-right.active{
+        transform:translateX(-1px);
+    }
+
+    /* .settings-right.not-active{
+        transform:translateX(-100%);
+    } */
+
+    .settings-right .user-container{
+        padding: 10px;
+    }
+
+    .settings-right .header{
+        position: relative;
+        padding-left: 35px;
+
+    }
+
+    .settings-right .header img{
+        height: 17px;
+        width: 17px;
+    }
+
+    .settings-right .header .back-arrow{
+        display:flex;
+        align-items: center;
+        justify-content: center;
+        position:absolute;
+        top:0px;
+        left:0px;
+        background: none;
+        border: none;
+        height: calc(100% - 10px);
+        padding: 0;
+        margin-bottom: 10px;
+        box-sizing: border-box;
+    }
+
 }
