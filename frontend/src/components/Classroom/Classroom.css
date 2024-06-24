@@ -21,8 +21,6 @@
     margin: 0;
 }
 
-
-
 .image{
     width: 100%;
     height: 30%;
@@ -97,7 +95,7 @@
     color:var(--border);
     font-size: 13px;
     cursor: pointer;
-    border: 2px solid var(--lightborder);
+    border: 1px solid var(--lighterborder);
     gap:5px
 }
 

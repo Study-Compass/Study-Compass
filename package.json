@@ -10,8 +10,10 @@
     "concurrently": "^8.2.2"
   },
   "scripts": {
-    "start": "concurrently \"npm run server\" \"npm run client\"",
+    "start": "node backend/app.js",
+    "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm install --prefix frontend && npm run build --prefix frontend && npm install --prefix backend",
     "server": "cd backend && node app.js",
-    "client": "cd frontend && npm start"
+    "client": "cd frontend && npm start",
+    "dev" : "concurrently \"npm run server\" \"npm run client\""
   }
 }

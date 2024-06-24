@@ -1,6 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800&display=swap');
 
-form{
+.form{
     display:flex;
     flex-direction:column;
     justify-content:center;
@@ -11,7 +11,7 @@ form{
     height:100%;
 }
 
-form input{
+.form input{
     width: 100%;
     height: 40px;
     border-radius: 10px;
@@ -27,7 +27,7 @@ form input{
     font-weight:500;
 }
 
-form input::placeholder{
+.form input::placeholder{
     color: #B1B1B1;
 }
 

@@ -7,7 +7,6 @@
     align-items: center;
     justify-content: center ;
     flex-direction: column;
-    gap:20px;
 
 }
 
@@ -41,7 +40,6 @@
     align-items: center;
     justify-content: center;
     gap:20px;
-    overflow: hidden;
     transition: all 0.5s ease-in-out;
     max-width: 400px;
 }
@@ -50,18 +48,16 @@
     margin-top:10px;
 }
 
-.onboard .content.nextOnboard{
+.onboard .content.going{
     opacity:0;
-    position:absolute;
-    pointer-events: none;
-    max-width: 400px;
-    width:100%;
+}
+
+.onoard .content.gone{
+    position: absolute;
 }
 
 .onboard .content.beforeOnboard{
     opacity:0;
-    position:absolute;
-
 }
 
 .onboard .content p{
@@ -85,12 +81,18 @@
     padding:5px 20px;
     margin:10px;
     color: white;
-    cursor:pointer
+    cursor:pointer;
+    transition: all 0.5s;
 }
 
 .onboard .content button:hover{
     cursor:pointer;
     filter: brightness(0.9);
+}
+
+.onboard button.deactivated{
+    background-color: var(--lightborder);
+    pointer-events: none;
 }
 
 .onboard .logo{
@@ -202,7 +204,7 @@
     }
 
     .onboard .content{
-        margin:25px;
+        margin:15px;
         gap:10px;
     }
 
