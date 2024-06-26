@@ -9,17 +9,19 @@
 }
 
 .settings-container{
-    display: flex;
+    display:flex;
     max-width:1500px;
+    background-color: white;
     border-radius: 21px;
-    box-sizing: border-box;
-    width:100%;
+    /* padding:20px 20px 60px 20px; */
+    flex-direction: row;
+    /* border: 1px solid var(--lightborder); */
     width:calc(100% - 100px);
-    height:calc(100% - 115px);
-    max-height:calc(100% - 115px);
-    border: 1px solid #B0AFAF;
-    border-radius: 20px;
+    height:100%;
+    max-height: min(100%, 1000px);
+    overflow:hidden;
     position: relative;
+    box-shadow: inset 0px 0px 0px 1px var(--lightborder),var(--shadow);
 }
 
 .settings-left{
@@ -85,8 +87,8 @@
     flex-direction: column;
     height:40px;
     width:40px;
-    padding-left: 10px;
-    
+    margin-left: 10px;
+    border-radius: 50%;
 }
 
 .settings-left .preferences{
