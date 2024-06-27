@@ -76,7 +76,7 @@ function RegisterForm() {
             console.log(response.data);
             // Handle success (e.g., redirect to login page or auto-login)
             await login(formData);
-            navigate('/room/none', { replace: true });
+            navigate('/onboard', { replace: true });
         } catch (error) {
             if(error.response.status === 400){
                 setErrorText("Username or Email already exists");
