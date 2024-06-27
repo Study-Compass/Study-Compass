@@ -98,7 +98,8 @@ router.get('/validate-token', verifyToken, async (req, res) => {
                     email: user.email,
                     picture : user.picture,
                     admin : user.admin,
-                    saved: user.saved
+                    saved: user.saved,
+                    google: user.googleId ? true : false
                 }
             }
         });
@@ -141,6 +142,12 @@ router.post('/google-login', async (req, res) => {
         });
 
     } catch (error) {
+        if (error.message === 'Email already exists') {
+            return res.status(409).json({
+                success: false,
+                message: 'Email already exists'
+            });
+        }
         console.log('Google login failed:', error);
         res.status(500).json({
             success: false,

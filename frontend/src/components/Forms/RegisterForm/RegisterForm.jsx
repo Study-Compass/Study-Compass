@@ -29,8 +29,17 @@ function RegisterForm() {
 
     useEffect(() => {
         async function google(code) {
-            const codeResponse = await googleLogin(code, true);
-            console.log("codeResponse: " + codeResponse);
+            try{
+                const codeResponse = await googleLogin(code, false);
+                console.log("codeResponse: " + codeResponse);
+            } catch (error){
+                if(error.response.status  === 409){
+                    failed("Email already exists");
+                } else {
+                    console.error("Google login failed:", error);
+                    failed("Google login failed. Please try again");
+                }
+            }
         }
         // Extract the code from the URL
         const queryParams = new URLSearchParams(location.search);
@@ -92,6 +101,11 @@ function RegisterForm() {
         ux_mode: 'redirect',
         onFailure: () => { console.log("failed") },
     })
+
+    function failed(message){
+        navigate('/login');
+        setErrorText(message);
+    }
 
     function goToLogin() {
         navigate('/login');

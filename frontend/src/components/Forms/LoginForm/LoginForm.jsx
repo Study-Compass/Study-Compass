@@ -23,6 +23,10 @@ function LoginForm() {
     const googleLogo = generalIcons.google;
 
     useEffect(() => {
+        console.log("hello");
+    },[]);
+
+    useEffect(() => {
       if (isAuthenticated){
         console.log("logged in already");
         navigate('/room/none')
@@ -58,21 +62,46 @@ function LoginForm() {
       }
     }
 
+    function debounce(func, wait) { //move logic to other file
+        let timeout;
+        return function executedFunction(...args) {
+            const later = () => {
+                clearTimeout(timeout);
+                func(...args);
+            };
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+        };
+    }
+
+
     useEffect(() => {
-        async function google(code) {
-            const codeResponse = await googleLogin(code, false);
-            console.log("codeResponse: " + codeResponse);
+        async function googleLog(code) {
+            try{
+                const codeResponse = await googleLogin(code, false);
+                console.log("codeResponse: " + codeResponse);
+            } catch (error){
+                if(error.response.status  === 409){
+                    failed("Email already exists");
+                } else {
+                    console.error("Google login failed:", error);
+                    failed("Google login failed. Please try again");
+                }
+            }
         }
         // Extract the code from the URL
+        console.log(location);
         const queryParams = new URLSearchParams(location.search);
         const code = queryParams.get('code');
+        const debouncedGoogle = debounce(googleLog, 500);
         if (code) {
             setLoadContent(false);
-            google(code); 
+            debouncedGoogle(code); 
             console.log("code: " + code);
         } else {
             setLoadContent(true);
         }
+
     }, [location]);
 
     const google = useGoogleLogin({
