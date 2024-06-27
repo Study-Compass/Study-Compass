@@ -5,6 +5,7 @@ import { generalIcons } from '../../../Icons';
 import useAuth from '../../../hooks/useAuth';
 import circleWarning from '../../../assets/circle-warning.svg';
 import { useGoogleLogin } from '@react-oauth/google';
+import axios from 'axios';
 
 
 function LoginForm() {
@@ -21,10 +22,6 @@ function LoginForm() {
     const location = useLocation();
     
     const googleLogo = generalIcons.google;
-
-    useEffect(() => {
-        console.log("hello");
-    },[]);
 
     useEffect(() => {
       if (isAuthenticated){

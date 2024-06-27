@@ -80,6 +80,17 @@ function RegisterForm() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        try{
+            const response = await axios.post('/verify-email', { email: formData.email });
+            if(response.data.data && response.data.data.result === "undeliverable"){
+                setErrorText("Invalid Email. Please try again");
+                return;
+            }
+        } catch (error){
+            console.error("Email verification failed:", error);
+            setErrorText("Invalid Username/Email or Password. Please try again");
+            return;
+        }
         try {
             const response = await axios.post('/register', formData);
             console.log(response.data);
