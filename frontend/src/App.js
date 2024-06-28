@@ -33,6 +33,7 @@ function App() {
                                     <Route path="/error/:errorCode" element={<Error />}/>
                                     <Route path="/onboard" element={<Onboard />}/>
                                     <Route path="/profile" element={<Profile/>}/>
+                                    <Route path="/friends" element={<Friends/>}/>
                                 </Routes>
                             </Router>
                         </CacheProvider>
