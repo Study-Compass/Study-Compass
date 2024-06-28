@@ -1,1 +1,0 @@
-data rounding to the nearest 30 minutes for dates

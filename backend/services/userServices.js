@@ -71,7 +71,14 @@ async function authenticateWithGoogle(code, isRegister = false) {
     console.log('Google user info:', userInfo.data)
     let user = await User.findOne({ googleId: userInfo.data.id });
 
+
     if (!user) {
+        //check if email already exists
+        user = await User.findOne({ email: userInfo.data.email });
+        if (user) {
+            throw new Error('Email already exists');
+        }
+
         user = new User({
             googleId: userInfo.data.id,
             email: userInfo.data.email,

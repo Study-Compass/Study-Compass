@@ -32,6 +32,7 @@ function SearchBar({ data, onEnter, onSearch, room, onX }) {
         "Voorhees Computing Center": "VCC",
         "Walker Laboratory": "WALK",
         "Winslow Building": "WINS",
+        "Troy Building": "TROY",
     }
 
     const fullNames = {
@@ -44,6 +45,7 @@ function SearchBar({ data, onEnter, onSearch, room, onX }) {
         "VCC" : "Voorhees Computing Center",
         "WALK" : "Walker Laboratory",
         "WINS" : "Winslow Building",
+        "TROY" : "Troy Building",
     }
 
     const inputRef = useRef(null);
