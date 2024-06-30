@@ -9,7 +9,7 @@ import { useCache } from '../../CacheContext.js';
 import { useError } from '../../ErrorContext.js'; 
 import Classroom from '../../components/Classroom/Classroom.jsx';
 import MobileCalendar from '../../components/CalendarComponents/MobileCalendar/MobileCalendar.jsx';
-import { findNext, fetchDataHelper, fetchFreeRoomsHelper, fetchFreeNowHelper, fetchSearchHelper, addQueryHelper, removeQueryHelper } from "./RoomHelpers.js";
+import { findNext, fetchDataHelper, fetchFreeRoomsHelper, fetchFreeNowHelper, fetchSearchHelper, addQueryHelper, removeQueryHelper, allPurposeFetchHelper } from "./RoomHelpers.js";
 import Results from '../../components/Results/Results.jsx';
 import Sort from '../../components/Sort/Sort.jsx';
 import Footer from '../../components/Footer/Footer.jsx';
@@ -40,7 +40,7 @@ function Room() {
     const [roomIds, setRoomIds] = useState({});
     const [ready, setReady] = useState(false);
     const { isAuthenticated, isAuthenticating, user } = useAuth();
-    const { getRooms, getFreeRooms, getRoom, getBatch, search } = useCache();
+    const { getRooms, getFreeRooms, getRoom, getBatch, search, allSearch } = useCache();
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [calendarLoading, setCalendarLoading] = useState(true);
@@ -67,11 +67,16 @@ function Room() {
 
     const [width, setWidth] = useState(window.innerWidth);
 
+
+    // data fetching helpers
     const fetchData = async (id) => fetchDataHelper(id, setLoading, setData, setRoom, navigate, getRoom, setRoomName, newError);
-    const fetchFreeRooms = async () => fetchFreeRoomsHelper(setContentState, setCalendarLoading, getFreeRooms, setResults, setNumLoaded, query, newError);
     const debouncedFetchData = debounce(fetchData, 500); // Adjust delay as needed
+    const fetchFreeRooms = async () => fetchFreeRoomsHelper(setContentState, setCalendarLoading, getFreeRooms, setResults, setNumLoaded, query, newError);
     const fetchFreeNow = async () => fetchFreeNowHelper(setContentState, setCalendarLoading, setResults, setNumLoaded, getFreeRooms);
     const fetchSearch = async (query, attributes, sort) => fetchSearchHelper(query, attributes, sort, setContentState, setCalendarLoading, setResults, setLoadedResults, search, setNumLoaded, navigate, newError, setSearchQuery);
+    const allPurposeSearch = async () => allPurposeFetchHelper(allSearch, searchQuery, query, searchAttributes, searchSort);
+    
+    // query formatting helpers
     const addQuery = (key, newValue) => addQueryHelper(key, newValue, setNoQuery, setContentState, setQuery);
     const removeQuery = (key, value) => removeQueryHelper(key, value, setQuery, setNoQuery);
 
@@ -239,11 +244,13 @@ function Room() {
         setLoadedResults([]);
     }
 
-    function onSearch(query, attributes, sort){
-        const queryString = new URLSearchParams({ query, attributes: JSON.stringify(attributes), sort }).toString();
+    function onSearch(nameQuery, attributes, sort){
+        const queryString = new URLSearchParams({ nameQuery, attributes: JSON.stringify(attributes), sort }).toString();
         navigate(`/room/search?${queryString}`, { replace: true });        
         // console.log(sort);
-        fetchSearch(query, attributes, sort); //sets search query
+        fetchSearch(nameQuery, attributes, sort); //sets search query
+        allPurposeSearch();
+        console.log(query);
         setSearchAttributes(attributes);
         setSearchSort(sort);
     }
