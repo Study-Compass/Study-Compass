@@ -1,0 +1,119 @@
+.card{
+    border-radius:10px;
+    display:flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-evenly;
+    height: 100%;
+    width: 100%;
+    gap:20px;
+}
+
+.card .left_profile{
+    display:flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    height: 97%;
+    width: 33%;
+    max-width: 310px;
+}
+
+.card .header{
+    width: 100%;
+    height: 44%;
+    border-radius: 21px;
+    border: 1px solid #B0AFAF;
+    position: relative;
+}
+
+.card .saved{
+    background-color: white;
+    border-radius: 21px;
+    border: 1px solid #B0AFAF;
+    height: 52%;
+    width: 100%;
+    box-shadow: var(--shadow);
+}
+
+.card .study-history{
+    flex-grow:1;
+    background-color: white;
+    border-radius: 21px;
+    border: 1px solid #B0AFAF;
+    height: 97%;
+    box-shadow: var(--shadow);
+}
+
+.card .box-header{
+    display:flex;
+    flex-direction: column;
+    align-items: center;
+    /* height: 100%; */
+}
+
+.card .box-header img{
+    height:60%
+}
+
+.card .box-header .title{
+    display:flex;
+    border-bottom: 1px solid #B0AFAF;
+    justify-content: left;
+    flex-direction: row;
+    align-items: center;
+    padding-left: 20px;
+    box-sizing: border-box;
+    gap: 5px;
+    width: 100%;
+    height: 35px;
+}
+
+.card .box-header p{
+    font-family: 'Satoshi';
+    color: var(--text);
+    font-weight: bold;
+    display: flex;
+    justify-content: left;
+    flex-direction: row;
+    align-items: center;
+    gap: 5px;
+}
+
+
+@media (max-width:500px) {
+    .card{
+        border-radius:10px;
+        display:flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 10px;
+        height: 100%;
+        width: 100%;
+    }
+
+    .card .header{
+        height: 267px;
+    }
+
+    .card .saved{
+        height: 317px;
+    }
+
+    .card .left_profile{
+        height: auto;
+        width: 97%;
+        justify-content: flex-start;
+        gap: 10px;
+    }
+
+    .card .study-history{
+        width: 97%;
+        background-color: white;
+        border-radius: 21px;
+        border: 1px solid #B0AFAF;
+        height: 33%;
+        box-shadow: var(--shadow);
+    }
+}

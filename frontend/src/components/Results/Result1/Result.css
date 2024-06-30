@@ -1,4 +1,4 @@
-li.result{
+li.result1{
     border-radius: 0;
     padding:10px;
     background-color: white;
@@ -10,43 +10,70 @@ li.result{
     flex-direction: row;
     gap:10px;
     pointer-events: all !important;
+    position: relative;
 }
 
-.result .image{
+.result1 .image{
     border-radius: 5px;
-    width:100px;
-    height:75px;
+    width:75px;
+    height:70px;
     min-width: 100px;
 }
 
-.result:hover{
+.result1:hover{
     background-color: var(--lighterborder);
     cursor:pointer;
 }
 
-.result h2{
+.result1 h2{
     font-family:'Inter';
     font-weight:600;
-    font-size:17px;
+    font-size:14px;
     margin: 0;
     hyphens:auto;
     -webkit-hyphens: auto;
 }
 
-.result-info{
+.result1-info{
     display:flex;
     flex-direction: column;
 }
 
-.result-info-container{
+.result1-info-container{
     display:flex;
     flex-direction: row;
     gap:10px;
     align-items: center;
 }
 
+.result1 .rating{
+    display:flex;
+    flex-direction: row;
+    gap:5px;
+    align-items: center;
+}
+
+.result1 .rating p{
+    margin:0;
+    font-size:13px;
+    font-family:'Inter';
+    font-weight:700;
+}
+
+.result1 .rating img{
+    width:12px;
+    height:12px;
+
+}
+
+.result1 .free-until{
+    font-size:12px;
+    padding: 0 0 0 15px
+}
+
+
 @media(max-width:500px){
-    .result h2{
+    .result1 h2{
         font-family:'Inter';
         font-weight:600;
         font-size:16px;
