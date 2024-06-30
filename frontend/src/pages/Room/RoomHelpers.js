@@ -144,6 +144,17 @@ const fetchSearchHelper = async (query, attributes, sort, setContentState, setCa
     setSearchQuery(query);
 };
 
+const allPurposeFetchHelper = async (allSearch, nameQuery, timeQuery, attributeQuery, sortQuery) => {
+    try{
+        const roomNames = await allSearch(nameQuery, timeQuery, attributeQuery, sortQuery);
+        console.log(roomNames);
+    } catch (error){
+        console.error(error);
+    }
+    
+}
+
+
 const addQueryHelper = (key, newValue, setNoQuery, setContentState, setQuery) => {
     setNoQuery(false);
     setContentState("calendarSearch");
@@ -190,7 +201,7 @@ const removeQueryHelper = (key, value, setQuery, setNoQuery ) => {
             const newQuery = { ...prev, [key]: filtered };
             const isQueryEmpty = Object.values(newQuery).every(arr => arr.length === 0);
             setNoQuery(isQueryEmpty);
-            return  newQuery;
+            return newQuery;
         }
     });
     
@@ -198,4 +209,4 @@ const removeQueryHelper = (key, value, setQuery, setNoQuery ) => {
 }
 
 
-export { findNext, fetchDataHelper, fetchFreeRoomsHelper, fetchFreeNowHelper, fetchSearchHelper, addQueryHelper, removeQueryHelper };
+export { findNext, fetchDataHelper, fetchFreeRoomsHelper, fetchFreeNowHelper, fetchSearchHelper, addQueryHelper, removeQueryHelper, allPurposeFetchHelper };
