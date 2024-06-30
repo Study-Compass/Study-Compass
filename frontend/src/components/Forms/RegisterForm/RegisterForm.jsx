@@ -29,8 +29,17 @@ function RegisterForm() {
 
     useEffect(() => {
         async function google(code) {
-            const codeResponse = await googleLogin(code, true);
-            console.log("codeResponse: " + codeResponse);
+            try{
+                const codeResponse = await googleLogin(code, false);
+                console.log("codeResponse: " + codeResponse);
+            } catch (error){
+                if(error.response.status  === 409){
+                    failed("Email already exists");
+                } else {
+                    console.error("Google login failed:", error);
+                    failed("Google login failed. Please try again");
+                }
+            }
         }
         // Extract the code from the URL
         const queryParams = new URLSearchParams(location.search);
@@ -71,6 +80,17 @@ function RegisterForm() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        try{
+            const response = await axios.post('/verify-email', { email: formData.email });
+            if(response.data.data && response.data.data.result === "undeliverable"){
+                setErrorText("Invalid Email. Please try again");
+                return;
+            }
+        } catch (error){
+            console.error("Email verification failed:", error);
+            setErrorText("Invalid Username/Email or Password. Please try again");
+            return;
+        }
         try {
             const response = await axios.post('/register', formData);
             console.log(response.data);
@@ -92,6 +112,11 @@ function RegisterForm() {
         ux_mode: 'redirect',
         onFailure: () => { console.log("failed") },
     })
+
+    function failed(message){
+        navigate('/login');
+        setErrorText(message);
+    }
 
     function goToLogin() {
         navigate('/login');
