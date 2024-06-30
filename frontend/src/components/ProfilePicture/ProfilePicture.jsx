@@ -11,6 +11,8 @@ import Logout from '../../assets/Icons/Logout.svg'
 
 import useOutsideClick from '../../hooks/useClickOutside';
 
+import {Link} from 'react-router-dom'
+
 function ProfilePicture(){
     const [showPopup, setShowPopup] = useState(false);
     const { logout, user } = useAuth();
@@ -40,10 +42,12 @@ function ProfilePicture(){
                     </div>
                 </div>
                 <hr />
-                <div className="menu-item">
-                    <img className="icon" src={ProfileIcon} alt="profile" />
-                    <p>Profile</p>
-                </div>
+                <Link to="/profile">
+                    <div className="menu-item">
+                        <img className="icon" src={ProfileIcon} alt="profile" />
+                        <p>Profile</p>
+                    </div>
+                </Link>
                 <div className="menu-item">
                     <img className="icon" src={Settings} alt="settings" />
                     <p>Settings</p>
