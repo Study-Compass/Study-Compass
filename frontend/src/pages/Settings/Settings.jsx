@@ -99,10 +99,7 @@ function Settings() {
                         handleBackClick={handleBackClick}
                         userInfo={userInfo}
                     />
-<<<<<<< Updated upstream
-=======
 
->>>>>>> Stashed changes
                 </div>
             </div>
             <div>
