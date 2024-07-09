@@ -8,6 +8,7 @@ import useAuth from '../../hooks/useAuth.js';
 import { useCache } from '../../CacheContext.js';
 import { useError } from '../../ErrorContext.js'; 
 import Classroom from '../../components/Classroom/Classroom.jsx';
+import ProfileCreation from '../../components/ProfileCreation/ProfileCreation.jsx';
 import MobileCalendar from '../../components/CalendarComponents/MobileCalendar/MobileCalendar.jsx';
 import { findNext, fetchDataHelper, fetchFreeRoomsHelper, fetchFreeNowHelper, fetchSearchHelper, addQueryHelper, removeQueryHelper } from "./RoomHelpers.js";
 import Results from '../../components/Results/Results.jsx';
@@ -18,6 +19,7 @@ import SortIcon from '../../assets/Icons/Sort.svg';
 import Github from '../../assets/Icons/Github.svg';
 
 import { debounce} from '../../Query.js';
+import ProfilePicture from '../../components/ProfilePicture/ProfilePicture.jsx';
 
 /** 
 documentation:
@@ -249,6 +251,7 @@ function Room() {
 
     return (    
         <div className="room" style={{ height: width < 800 ? viewport : '100vh' }}>
+            <ProfileCreation />
             <Header />
             <div className="content-container">
                 <div className="calendar-container">
