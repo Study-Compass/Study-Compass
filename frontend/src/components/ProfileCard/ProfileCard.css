@@ -17,21 +17,22 @@
     height: 97%;
     width: 33%;
     max-width: 310px;
+    gap:20px;
 }
 
 .card .header{
     width: 100%;
-    height: 44%;
+    height: 270px;
     border-radius: 21px;
-    border: 1px solid #B0AFAF;
+    border: 1px solid var(--lightborder);
     position: relative;
 }
 
 .card .saved{
     background-color: white;
     border-radius: 21px;
-    border: 1px solid #B0AFAF;
-    height: 52%;
+    border: 1px solid var(--lightborder);
+    flex-grow: 1;
     width: 100%;
     box-shadow: var(--shadow);
 }
@@ -40,7 +41,7 @@
     flex-grow:1;
     background-color: white;
     border-radius: 21px;
-    border: 1px solid #B0AFAF;
+    border: 1px solid var(--lightborder);
     height: 97%;
     box-shadow: var(--shadow);
 }
@@ -58,7 +59,7 @@
 
 .card .box-header .title{
     display:flex;
-    border-bottom: 1px solid #B0AFAF;
+    border-bottom: 1px solid var(--lightborder);
     justify-content: left;
     flex-direction: row;
     align-items: center;
