@@ -96,16 +96,9 @@ function Settings() {
                     </div>
                     <AccountSettings settingsRightSide={settingsRightSide} 
                         width={width} 
-                        handleBackClick={handleArrowClick}
+                        handleBackClick={handleBackClick}
                         userInfo={userInfo}
                     />
-
-
-                    
-
-
-
-
                 </div>
             </div>
             <div>

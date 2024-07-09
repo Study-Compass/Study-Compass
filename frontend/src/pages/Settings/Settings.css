@@ -370,13 +370,13 @@
         transform:translateX(100%);
         position:absolute;
         background-color: white;
-        border-left: 1px solid var(--border);
-        box-sizing: border-box;
+        border: 1px solid var(--lightborder);
+        /* box-sizing: border-box; */
         border-radius: 20px;
     }
 
     .settings-right.active{
-        transform:translateX(-1px);
+        transform:translateX(0px);
     }
 
     /* .settings-right.not-active{

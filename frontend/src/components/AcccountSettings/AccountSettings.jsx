@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import './AccountSettings.css';
 import rightarrow from '../../assets/Icons/RightArrow.svg';
+import pfp from '../../assets/defaultAvatar.svg';
 
 function AccountSettings({ settingsRightSide, width, handleBackClick, userInfo }) {
 
@@ -22,7 +23,7 @@ function AccountSettings({ settingsRightSide, width, handleBackClick, userInfo }
                 <hr />
 
                 <div className='name-settings'>
-                    <img src={userInfo.picture} alt="" />
+                    <img src={userInfo.picture ? userInfo.picture : pfp} alt="" />
 
 
                     <div className='input-name'>
@@ -34,41 +35,45 @@ function AccountSettings({ settingsRightSide, width, handleBackClick, userInfo }
 
                 <h2>security settings</h2>
                 <hr />
-                <div className='user-container'>
-                    <div className='user'>
-                        <h3>{userInfo.username}</h3>
-                        <p>@id</p>
-                    </div>
-                    <button>change usename</button>
+                <div className="settings-rows-container">
+                    <div className='user-container'>
+                        <div className='user'>
+                            <h3>{userInfo.username}</h3>
+                            <p>@id</p>
+                        </div>
+                        <button>change usename</button>
 
-                </div>
-                <div className='user-container'>
-                    <div className='email'>
-                        <h3>email</h3>
-                        <p>{userInfo.email}</p>
                     </div>
-                    <button>change email</button>
+                    <div className='user-container'>
+                        <div className='email'>
+                            <h3>email</h3>
+                            <p>{userInfo.email}</p>
+                        </div>
+                        <button>change email</button>
 
-                </div>
-                <div className='user-container'>
-                    <div className='password'>
-                        <h3>password</h3>
-                        <p>enabled</p>
                     </div>
-                    <button>change password</button>
+                    <div className='user-container'>
+                        <div className='password'>
+                            <h3>password</h3>
+                            <p>enabled</p>
+                        </div>
+                        <button>change password</button>
 
+                    </div>
                 </div>
 
                 <h2>danger zone</h2>
                 <hr />
-                <div className='user-container'>
-                    <div className='delete'>
-                        <button>
-                            <h3>delete account</h3>
+                <div className="settings-rows-container">
+                    <div className='user-container'>
+                        <div className='delete'>
+                            <button>
+                                <h3>delete account</h3>
 
-                        </button>
-                        <p>warning: this is a permanent action !</p>
+                            </button>
+                            <p>warning: this is a permanent action !</p>
 
+                        </div>
                     </div>
                 </div>
 
