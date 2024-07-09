@@ -5,7 +5,6 @@ import pfp from '../../assets/defaultAvatar.svg';
 
 function AccountSettings({ settingsRightSide, width, handleBackClick, userInfo }) {
 
-
     return (
         <div className={`settings-right ${settingsRightSide ? "active" : "not-active"}`}>
             <div className='header'>
@@ -76,8 +75,6 @@ function AccountSettings({ settingsRightSide, width, handleBackClick, userInfo }
                         </div>
                     </div>
                 </div>
-
-
 
             </div>
             <div className='security'>
