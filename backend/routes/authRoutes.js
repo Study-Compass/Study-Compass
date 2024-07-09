@@ -1,6 +1,8 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const axios = require('axios');
+require('dotenv').config();
 
 const router = express.Router();
 const { verifyToken } = require('../middlewares/verifyToken.js');
@@ -98,7 +100,8 @@ router.get('/validate-token', verifyToken, async (req, res) => {
                     email: user.email,
                     picture : user.picture,
                     admin : user.admin,
-                    saved: user.saved
+                    saved: user.saved,
+                    google: user.googleId ? true : false
                 }
             }
         });
@@ -111,6 +114,18 @@ router.get('/validate-token', verifyToken, async (req, res) => {
         });
     }
 });
+
+router.post('/verify-email', async (req, res) => {
+    const { email } = req.body;
+    const apiKey = process.env.HUNTER_API; // Replace with your actual API key
+  
+    try {
+      const response = await axios(`https://api.hunter.io/v2/email-verifier?email=${email}&api_key=${apiKey}`);
+      res.json(response.data);
+    } catch (error) {
+      res.status(500).json({ error: 'Error verifying email' });
+    }
+  });
 
 router.post('/google-login', async (req, res) => {
     const { code, isRegister } = req.body;
@@ -141,6 +156,12 @@ router.post('/google-login', async (req, res) => {
         });
 
     } catch (error) {
+        if (error.message === 'Email already exists') {
+            return res.status(409).json({
+                success: false,
+                message: 'Email already exists'
+            });
+        }
         console.log('Google login failed:', error);
         res.status(500).json({
             success: false,

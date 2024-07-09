@@ -8,12 +8,14 @@ import Error from './pages/Error/Error';
 import Onboard from './pages/OnBoarding/Onboard';
 import Settings from './pages/Settings/Settings';
 import Friends from './pages/Friends/Friends';
+import Profile from './pages/Profile/Profile';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './AuthContext';
 import { CacheProvider } from './CacheContext';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { NotificationProvider } from './NotificationContext';
 import { ErrorProvider } from './ErrorContext';
+
 
 function App() {
     return (
@@ -32,7 +34,8 @@ function App() {
                                     <Route path="/error/:errorCode" element={<Error />}/>
                                     <Route path="/onboard" element={<Onboard />}/>
                                     <Route path="/settings" element={<Settings/> }/>
-                                    <Route path="/friends" element={<Friends />}/>
+                                    <Route path="/profile" element={<Profile/>}/>
+                                    <Route path="/friends" element={<Friends/>}/>
                                 </Routes>
                             </Router>
                         </CacheProvider>
