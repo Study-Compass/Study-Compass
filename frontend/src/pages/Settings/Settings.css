@@ -30,7 +30,7 @@
     justify-content: flex-start;
     width:230px;
     height:100%;
-    border-right: 1px solid #B0AFAF;
+    border-right: 1px solid var(--lightborder);
 
 }
 
@@ -41,7 +41,7 @@
     width:70%;
     height:100%;
     box-sizing: border-box;
-    padding: 28px;
+    padding: 24px;
     width: calc(100% - 230px);
     overflow-y:scroll;
 
@@ -128,7 +128,7 @@
     flex-direction: row;
     font-family: 'Satoshi';
     gap: 20px;
-    width: 42px;
+    margin-top:10px;
 }
 
 .settings-right .name-settings .input-name{
@@ -144,7 +144,7 @@
     display: flex;
     flex-direction: row;
     font-family: 'Satoshi';
-    padding-left: 37px;
+    padding-left: 20px;
     width: 100%;
     /* height: 69px; */
     margin: 0px;
@@ -157,6 +157,7 @@
     display: flex;
     flex-direction: column;
     font-family: 'Inter';
+    font-weight:500;
     color: var(--text);
     font-size: 12px;
     padding: 5px 9px;
@@ -172,6 +173,15 @@
     font-family: 'Satoshi';
     width: 79px;
     /* height: 42px; */
+}
+
+.settings-right .settings-rows-container{
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    /* height: 42px; */
+    gap:10px;
+    margin: 10px 0;
 }
 
 .settings-right .user-container .email{
@@ -229,17 +239,17 @@
 
 .settings-right h2{
     font-family: 'Inter';
-    font-size: 16px;
+    font-size: 15px;
     color: var(--text);
     font-weight: 600;
     margin: 0px;
     margin-bottom: 7px;
-    margin-top: 15px;
+    margin-top: 12px;
 }
 
 .settings-right h3{
     font-family: 'Inter';
-    font-size: 14px;
+    font-size: 13px;
     color: var(--text);
     font-weight: 600;
     margin: 0px;
@@ -258,7 +268,9 @@
     display: flex;
     flex-direction: column;
     font-size: 20px;
-    background-color: var(--border);
+    background-color: var(--lightborder);
+    height:1px;
+
 }
 
 .settings-right img{
@@ -309,7 +321,7 @@
     }
 
     .settings-left .header h1{
-        font-size: 20px;
+        font-size: 18px;
         
     }
 

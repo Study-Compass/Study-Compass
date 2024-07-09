@@ -71,7 +71,7 @@ function Settings() {
 
                     <div className='settings-left'>
                         <div className='header'>
-                            <img src={userInfo.picture} alt="" />
+                            <img src={userInfo.picture ? userInfo.picture : pfp} alt="" />
                             <div className='name'>
                                 <h1>{userInfo.username}</h1>
                                 <p>{userInfo.email}</p>
