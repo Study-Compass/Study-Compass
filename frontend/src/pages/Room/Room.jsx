@@ -8,7 +8,6 @@ import useAuth from '../../hooks/useAuth.js';
 import { useCache } from '../../CacheContext.js';
 import { useError } from '../../ErrorContext.js'; 
 import Classroom from '../../components/Classroom/Classroom.jsx';
-import ProfileCreation from '../../components/ProfileCreation/ProfileCreation.jsx';
 import MobileCalendar from '../../components/CalendarComponents/MobileCalendar/MobileCalendar.jsx';
 import { findNext, fetchDataHelper, fetchFreeRoomsHelper, fetchFreeNowHelper, fetchSearchHelper, addQueryHelper, removeQueryHelper } from "./RoomHelpers.js";
 import Results from '../../components/Results/Results.jsx';
@@ -251,7 +250,6 @@ function Room() {
 
     return (    
         <div className="room" style={{ height: width < 800 ? viewport : '100vh' }}>
-            <ProfileCreation />
             <Header />
             <div className="content-container">
                 <div className="calendar-container">

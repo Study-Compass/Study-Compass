@@ -18,6 +18,7 @@
 .whole_page.out {
     background-color: rgba(0, 0, 0, 0);
     opacity: 0;
+    pointer-events: none;
 }
 
 
@@ -52,6 +53,7 @@
 
 .pop_up.out {
     opacity: 0;
+    pointer-events: none;
 }
 
 .pop_up .loader{
