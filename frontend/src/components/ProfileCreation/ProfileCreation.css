@@ -4,13 +4,28 @@
     left: 0;
     width: 100%;
     height: 100%;
-    z-index: 9999;  
-    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 9998;  
+    background-color: rgba(0, 0, 0, 0);
+    opacity: 0;
+    transition: background-color 0.5s ease, opacity 0.5s ease;
+}
+
+.whole_page.in{
+    background-color: rgba(0, 0, 0, 0.3);
+    opacity: 1;
+}
+
+.whole_page.out {
+    background-color: rgba(0, 0, 0, 0);
+    opacity: 0;
 }
 
 
 .pop_up{
-    padding: 20px;
+    box-sizing: border-box;
+    padding-top: 50px;
+    padding-left: 420px;
+    padding-right: 20px;
     border-radius:10px;
     display:flex;
     flex-direction: column;
@@ -19,20 +34,80 @@
     top: 50%; 
     left: 50%; 
     transform: translate(-50%, -50%);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     background-color: white;
-    height: 350px;
-    width: 500px;
+    height: 400px;
+    width: 630px;
     position: fixed; 
     border-radius: 8px; 
+    gap: 3%;
+    opacity: 0;
+    z-index: 9999; 
+    transition: opacity 0.5s ease;
 }
 
+.pop_up.in {
+    opacity: 1;
+}
+
+.pop_up.out {
+    opacity: 0;
+}
+
+.pop_up .loader{
+    height: 15%;
+}
+
+.left_benifits{
+    position: absolute;
+    left: 0;
+    top: 0;
+    border-radius: 8px 0 0 8px ;
+    width: 62%;
+    height: 100%;
+    background-color: var(--salmon);
+}
+
+.whole_page h1{
+    width: 100%;
+    font-size: 20px;
+    text-align: left;
+    margin-left: 0;
+    padding-left: 0;
+}
+
+.whole_page p{
+    color: var(--black);
+    font-size: 13px;
+    text-align: left;
+    margin-bottom: 47%;
+}
+
+.whole_page .button{
+    font-family: 'Satoshi';
+    font-size: 15px;
+    outline: none;
+    border-radius: 6px;
+    background-color: var(--red);
+    border: none;
+    padding: 0px 0px;
+    margin: 0px;
+    color: white;
+    height: 27px;
+    width: calc(100%);
+    pointer-events: all;
+}
 
 
 .close-button {
     position: absolute;
-    top: 10px;
-    right: 10px;
+    top: 13px;
+    right: 13px;
     background: none;
     border: none;
     cursor: pointer;
+}
+
+.close-button img{
+    height: 15px;
 }
