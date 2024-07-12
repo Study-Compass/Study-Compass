@@ -53,7 +53,15 @@
     /* height:63px; */
     width:100%;
     box-sizing: border-box;
-    padding-top: 9px;
+    padding:9px 0;
+    cursor:pointer;
+    border-radius: 0 0 10px 10px;
+    transition: all 0.3s;
+}
+
+.settings-left .header:hover,
+.settings-left .preferences:hover{
+    background-color: var(--light);
 }
 
 .settings-left .header .name{
@@ -103,7 +111,9 @@
     font-family: 'Satoshi';
     font-size: 14px;
     color: var(--text);
-
+    transition: all 0.3s;
+    border-radius: 10px;
+    cursor:pointer;
 }
 
 .settings-right .header{
@@ -121,6 +131,8 @@
     font-family: 'Satoshi';
     font-size: 14px;
     color: var(--text);
+    align-items: flex-start;
+
 }
 
 .settings-right .name-settings{

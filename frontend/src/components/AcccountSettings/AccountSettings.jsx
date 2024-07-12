@@ -23,8 +23,6 @@ function AccountSettings({ settingsRightSide, width, handleBackClick, userInfo }
 
                 <div className='name-settings'>
                     <img src={userInfo.picture ? userInfo.picture : pfp} alt="" />
-
-
                     <div className='input-name'>
                         <h3>name:</h3>
                         <input type="James Liu" />

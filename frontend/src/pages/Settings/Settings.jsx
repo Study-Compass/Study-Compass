@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Header from '../../components/Header/Header';
 import AccountSettings from '../../components/AcccountSettings/AccountSettings.jsx';
+import StudyPreferences from '../../components/StudyPreferences.jsx';
 import './Settings.css';
 import pfp from '../../assets/defaultAvatar.svg';
 import preferences from '../../assets/Icons/Preferences.svg';
@@ -12,6 +13,7 @@ function Settings() {
     const [width, setWidth] = useState(window.innerWidth);
     const [settingsRightSide, setSettingsRightSide] = useState(false);
     const [userInfo, setUserInfo] = useState(null);
+    const [currentPage, setCurrentPage] = useState('AccountSettings');
 
     const { isAuthenticating, isAuthenticated, user } = useAuth();
 
@@ -32,7 +34,7 @@ function Settings() {
         }
     }, [isAuthenticating, isAuthenticated, user])
 
-    useEffect(() => { //useEffect for window resizing
+    useEffect(() => { 
         function handleResize() {
             setWidth(window.innerWidth);
         }
@@ -47,7 +49,8 @@ function Settings() {
         }
     }, [width]);
 
-    const handleArrowClick = () => {
+    const handleArrowClick = (page) => {
+        setCurrentPage(page);
         setSettingsRightSide(true);
     };
 
@@ -70,36 +73,43 @@ function Settings() {
                 <div className='settings-container'>
 
                     <div className='settings-left'>
-                        <div className='header'>
+                        <div className='header'  onClick={()=>{handleArrowClick('AccountSettings')}}>
                             <img src={userInfo.picture ? userInfo.picture : pfp} alt="" />
                             <div className='name'>
                                 <h1>{userInfo.username}</h1>
                                 <p>{userInfo.email}</p>
                             </div>
                             {width <= 700 && (
-                                <button className='right-arrow' onClick={handleArrowClick} >
+                                <button className='right-arrow'  >
                                     <img src={rightarrow} alt="" />
                                 </button>
                             )}
 
                         </div>
-                        <div className='preferences'>
+                        <div className='preferences'  onClick={()=>{handleArrowClick('StudyPreferences')}}>
                             <img src={preferences} alt="" />
                             <p>Study Preferences</p>
                             {width <= 700 && (
-                                <button className='right-arrow' onClick={handleArrowClick} >
+                                <button className='right-arrow' >
                                     <img src={rightarrow} alt="" />
                                 </button>
                             )}
 
                         </div>
                     </div>
-                    <AccountSettings settingsRightSide={settingsRightSide} 
-                        width={width} 
-                        handleBackClick={handleBackClick}
+                    {currentPage === 'AccountSettings' ? ( 
+                        <AccountSettings 
+                            settingsRightSide={settingsRightSide} 
+                            width={width} 
+                            handleBackClick={handleBackClick}
+                            userInfo={userInfo}
+                        />
+                    ) : (
+                        <StudyPreferences
                         userInfo={userInfo}
-                    />
-
+                        handleBackClick={handleBackClick}
+                        />
+                    )}
                 </div>
             </div>
             <div>
