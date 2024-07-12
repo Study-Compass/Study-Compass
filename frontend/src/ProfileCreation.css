@@ -1,4 +1,4 @@
-.whole_page{
+.whole-page{
     position: fixed; 
     top: 0;
     left: 0;
@@ -10,19 +10,19 @@
     transition: background-color 0.5s ease, opacity 0.5s ease;
 }
 
-.whole_page.in{
+.whole-page.in{
     background-color: rgba(0, 0, 0, 0.3);
     opacity: 1;
 }
 
-.whole_page.out {
+.whole-page.out {
     background-color: rgba(0, 0, 0, 0);
     opacity: 0;
     pointer-events: none;
 }
 
 
-.pop_up{
+.pop-up{
     box-sizing: border-box;
     padding-top: 50px;
     padding-left: 420px;
@@ -47,20 +47,20 @@
     transition: opacity 0.5s ease;
 }
 
-.pop_up.in {
+.pop-up.in {
     opacity: 1;
 }
 
-.pop_up.out {
+.pop-up.out {
     opacity: 0;
     pointer-events: none;
 }
 
-.pop_up .loader{
+.pop-up .loader{
     height: 15%;
 }
 
-.left_benifits{
+.left-benefits{
     position: absolute;
     left: 0;
     top: 0;
@@ -70,7 +70,7 @@
     background-color: var(--salmon);
 }
 
-.whole_page h1{
+.whole-page h1{
     width: 100%;
     font-size: 20px;
     text-align: left;
@@ -78,14 +78,14 @@
     padding-left: 0;
 }
 
-.whole_page p{
+.whole-page p{
     color: var(--black);
     font-size: 13px;
     text-align: left;
     margin-bottom: 47%;
 }
 
-.whole_page .button{
+.whole-page .button{
     font-family: 'Satoshi';
     font-size: 15px;
     outline: none;
@@ -116,11 +116,11 @@
 
 
 @media (max-width:500px) {
-    .left_benifits{
+    .left-benefits{
         width: 0%;
     }
 
-    .pop_up{
+    .pop-up{
         padding-left: 30px;
         width: 250px;
     }

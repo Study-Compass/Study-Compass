@@ -42,9 +42,9 @@ export const ProfileCreationProvider = ({ children }) => {
     return(
         <ProfileCreationContext.Provider value={{handleOpen}}>
             {children}
-            <div className={`whole_page ${isUp ? 'in' : 'out'}`}>
-                <div className={`pop_up ${isUp ? 'in' : 'out'}`} ref={ref}>
-                    <div className="left_benifits"></div>
+            <div className={`whole-page ${isUp ? 'in' : 'out'}`}>
+                <div className={`pop-up ${isUp ? 'in' : 'out'}`} ref={ref}>
+                    <div className="left-benefits"></div>
                     <Loader/>
                     <button className="close-button" onClick={handleClose}>
                         <img src={x} alt="close" />
