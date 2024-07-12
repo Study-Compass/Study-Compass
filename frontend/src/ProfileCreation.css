@@ -113,3 +113,15 @@
 .close-button img{
     height: 15px;
 }
+
+
+@media (max-width:500px) {
+    .left_benifits{
+        width: 0%;
+    }
+
+    .pop_up{
+        padding-left: 30px;
+        width: 250px;
+    }
+}
