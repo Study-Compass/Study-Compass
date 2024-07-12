@@ -18,6 +18,7 @@ import SortIcon from '../../assets/Icons/Sort.svg';
 import Github from '../../assets/Icons/Github.svg';
 
 import { debounce} from '../../Query.js';
+import ProfilePicture from '../../components/ProfilePicture/ProfilePicture.jsx';
 
 /** 
 documentation:
