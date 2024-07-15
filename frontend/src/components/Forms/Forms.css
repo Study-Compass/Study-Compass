@@ -111,6 +111,11 @@
     overflow: hidden;
 }
 
+.error img{
+    width: 20px;
+    height: 20px;
+}
+
 .error::before{
     content:'';
     position:absolute;

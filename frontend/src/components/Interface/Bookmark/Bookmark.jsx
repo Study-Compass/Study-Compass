@@ -3,11 +3,17 @@ import './Bookmark.css';
 import useAuth from '../../../hooks/useAuth';
 import { save } from '../../../DBInteractions';
 import { useNotification } from '../../../NotificationContext';
+import { useProfileCreation } from '../../../ProfileCreationContext';
+import { useNavigate } from 'react-router-dom';
+
 
 function Bookmark({ room }) {    
     const [isChecked, setIsChecked] = useState(false);
     const { user, isAuthenticated, validateToken } = useAuth();
     const { addNotification } = useNotification();
+    const { handleOpen } = useProfileCreation();
+
+    const navigate = useNavigate();
 
     useEffect(() => {
         if(room && isAuthenticated) {
@@ -17,7 +23,7 @@ function Bookmark({ room }) {
 
     const onCheck = async (e) => {
         if (!isAuthenticated) {
-            addNotification({ title: "Please log in", message: "You must be logged in to save a room", type: "error" });
+            handleOpen();
             return;
         }
         const operation = e.target.checked;
