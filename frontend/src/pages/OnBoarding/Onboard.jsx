@@ -4,19 +4,27 @@ import PurpleGradient from '../../assets/PurpleGrad.svg';
 import YellowRedGradient from '../../assets/YellowRedGrad.svg';
 import Loader from '../../components/Loader/Loader.jsx';
 import DragList from './DragList/DragList.jsx';
+import useAuth from '../../hooks/useAuth.js';
 import Recommendation from './Recommendation/Recommendation.jsx';
 import { useNavigate } from 'react-router-dom';
+import { onboardUser } from './OnboardHelpers.js';
+import { useError } from '../../ErrorContext.js'; 
+
 
 function Onboard(){
     const [current, setCurrent] = useState(0);
     const [show, setShow] = useState(0);
     const [currentTransition, setCurrentTransition] = useState(0);
     const [containerHeight, setContainerHeight] = useState(175);
+    const { isAuthenticated, isAuthenticating, user } = useAuth();
+    const [userInfo, setUserInfo] = useState(null);
+    const [name, setName] = useState("");
+    const [sliderValue, setSliderValue] = useState(2);
 
     const navigate = useNavigate();
+    const { newError } = useError();
 
     const [buttonActive, setButtonActive] = useState(true);
-
     
 
     const containerRef = useRef(null);
@@ -35,7 +43,27 @@ function Onboard(){
             setContainerHeight(contentRefs.current[0].clientHeight+10);
         }
     }, []);
+
+    useEffect(()=>{
+        console.log(name)
+    }, [name]);    
     
+    useEffect(() => {
+        if(isAuthenticating){
+            return;
+        }
+        if (!isAuthenticated) {
+            navigate('/login');
+        } else {
+            if(user){
+                if(user.onboarded){
+                    navigate('/room/none');
+                }
+                setUserInfo(user);
+            }
+        }
+    }, [isAuthenticating, isAuthenticated, user]);
+
 
     useEffect(()=>{
         if(current === 0){return;}
@@ -58,7 +86,12 @@ function Onboard(){
             setCurrent(current+1);
         }, 500);
 
-        if(current === 2){
+        if(current === 3){
+            try{
+                onboardUser(name, null, items, sliderValue);
+            } catch (error){
+                newError(error, navigate);
+            }
             navigate('/room/none');
         }
 
@@ -75,6 +108,16 @@ function Onboard(){
         setViewport((window.innerHeight) + 'px');
     },[]);
 
+    if(isAuthenticating || !userInfo){
+        return(
+            <div className="onboard"></div>
+        )
+    }
+
+    const handleNameChange = (e) => {
+        setName(e.target.value);
+    }
+
     return (
         <div className="onboard" style={{height: viewport}}>
             <img src={YellowRedGradient} alt="" className="yellow-red" />
@@ -84,7 +127,6 @@ function Onboard(){
                 <div >
                     { current === 0 &&
                         <div className={`content ${show === 1 ? "going": ""}`} ref={el => contentRefs.current[0] = el}>
-                            {/* <img src={Compass} alt="Logo" className="logo" /> */}
                             <Loader/>
                             <h2>welcome to study compass</h2>
                             <p>Study Compass is a student-created tool designed to help students find study spaces according to their preferences</p>
@@ -92,7 +134,15 @@ function Onboard(){
                     }
                     { current === 1 &&
                         <div className={`content ${show === 2 ? "going": ""} ${1 === currentTransition ? "": "beforeOnboard"}`} ref={el => contentRefs.current[1] = el}>
-                            {/* <img src={Compass} alt="Logo" className="logo" /> */}
+                            <Loader/>
+                            <h2>set your name</h2>
+                            <p>This is the name you will be visible to other users as (your screen name):</p>
+                            <input type="text" value={name} onChange={handleNameChange} className="text-input"/>
+                        </div>
+                    }
+                    { current === 2  &&
+                        <div className={`content ${show === 3 ? "going": ""} ${2 === currentTransition ? "": "beforeOnboard"}`} ref={el => contentRefs.current[2] = el}>
+                            <Loader/>
                             <h2>rank your classroom preferences</h2>
                             <p>What features do you find most important in your study spaces? Rank them from top to bottom.</p>
                             <div className="preference-list">
@@ -102,15 +152,15 @@ function Onboard(){
                             </div>
                         </div>
                     }
-                    { current === 2 &&
-                        <div className={`content ${current === 3 ? "going": ""} ${2 === currentTransition ? "": "beforeOnboard"}`} ref={el => contentRefs.current[2] = el}>
-                            <Recommendation />
+                    { current === 3 &&
+                        <div className={`content ${current === 4 ? "going": ""} ${3 === currentTransition ? "": "beforeOnboard"}`} ref={el => contentRefs.current[3] = el}>
+                            <Recommendation sliderValue={sliderValue} setSliderValue={setSliderValue}/>
                         </div>
                     }
                 </div>
             </div>
-                <button className={`${buttonActive ? "":"deactivated"}`} onClick={()=>{setShow(show+1)}}>
-                    {current === 2 ? "finish" : "next"}
+                <button className={`${ current === 1 && name === "" ? "deactivated" : buttonActive ? "":"deactivated"}`} onClick={()=>{setShow(show+1)}}>
+                    {current === 3  ? "finish" : "next"}
                 </button>
                 
         </div>

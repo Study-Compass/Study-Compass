@@ -21,6 +21,7 @@ app.use(cors(corsOptions));
 const authRoutes = require('./routes/authRoutes.js');
 const dataRoutes = require('./routes/dataRoutes.js');
 const friendRoutes = require('./routes/friendRoutes.js');
+const userRoutes = require('./routes/userRoutes.js');
 // const maintenanceRoutes = require('./routes/maintenanceRoutes.js'); //comment out for production
 
 
@@ -28,6 +29,7 @@ app.use(express.json());
 app.use(authRoutes);
 app.use(dataRoutes);
 app.use(friendRoutes);
+app.use(userRoutes);
 // app.use(maintenanceRoutes); //comment out for production
 app.use(cors());
 app.use(cookieParser());

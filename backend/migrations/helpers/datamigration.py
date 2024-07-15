@@ -33,6 +33,19 @@ def updateClassroom():
         }
         schedules.insert_one(schedule)
 
+
+
+def updateVersion(uri, version):
+    client = MongoClient(uri, server_api=ServerApi('1')) 
+    db = client['studycompass']
+    collection = db['version']
+    collection.drop()
+    collection.insert_one({
+        "version" : version,
+    })
+
+
+
 def findNoPics():
     load_dotenv() # loading .env file
     uri = os.environ.get('MONGO_URL1') # fetching URI string
@@ -119,9 +132,9 @@ def migrateClassrooms():
             print(f"Blank schedule created for classroom '{classroom1['name']}'.")
 
 # collectionName should be a string, attribute should be an object like { 'username' : '' }
-def addNewField(collectionName, attribute):
+def addNewField(uri, collectionName, attribute):
     load_dotenv() # loading .env file
-    uri = os.environ.get('MONGO_URL') # fetching URI string
+    # uri = os.environ.get(uriString) # fetching URI string
     client = MongoClient(uri, server_api=ServerApi('1')) 
     try: # send a ping to confirm a successful connection
         client.admin.command('ping')
@@ -284,4 +297,4 @@ def updateImages():
 # addNewField('users',{'contributions': 0})
 # migrateClassrooms()
 # forceUpdate('users', {'visited': [], 'partners': [], 'sessions': [], 'hours': 0, 'contributions': 0})
-updateImages()
+# updateImages()

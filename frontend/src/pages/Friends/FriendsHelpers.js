@@ -49,7 +49,7 @@ const updateFriendRequest = async (friendshipId, status) => {
             console.error('Invalid status');
             return;
         }
-        let response
+        let response;
         if(status === 'accept'){
             response = await axios.post(`/friend-request/accept/${friendshipId}`, {}, {
                 headers: {
