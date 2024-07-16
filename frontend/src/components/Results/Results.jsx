@@ -64,6 +64,9 @@ function Results({ results, loadedResults, numLoaded, setNumLoaded, debouncedFet
                 contentState={contentState}
             />
         ))}
+        {
+            results.length === 0 && loadedResults.length === 0 ? <div className="no-results"> <p>no results found</p></div> : ""
+        }
         {!(loadedResults.length === results.length) ? <div className="loader-container"><Loader/></div> : ""}
         </ul>
 
