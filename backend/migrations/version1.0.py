@@ -21,7 +21,6 @@ elif (database == "p"):
         uri = os.environ.get('MONGO_URL')
     else:
         exit(1)
-
 else: 
     print(f"Improper usage: invalid input {database}")
 
