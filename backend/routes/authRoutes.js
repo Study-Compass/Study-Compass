@@ -11,19 +11,6 @@ const { authenticateWithGoogle, loginUser, registerUser } = require('../services
 
 const User = require('../schemas/user.js');
 
-function validateUsername(username) { //keeping logic external, for easier testing
-    // Define the regex pattern
-    const regex = /^[a-zA-Z0-9]{3,20}$/;
-  
-    // Test the username against the regex pattern
-    return regex.test(username);
-  }
-
-(arg1) => {
-    arg1 +=1;
-};
-
-
 function validateUsername(username) {
     // Define the regex pattern
     const regex = /^[a-zA-Z0-9]{3,20}$/;
