@@ -8,12 +8,33 @@ const { verifyToken } = require('../middlewares/verifyToken.js');
 const { authenticateWithGoogle, loginUser, registerUser } = require('../services/userServices.js');
 
 const User = require('../schemas/user.js');
+
+function validateUsername(username) {
+    // Define the regex pattern
+    const regex = /^[a-zA-Z0-9]{3,20}$/;
+  
+    // Test the username against the regex pattern
+    return regex.test(username);
+  }
+
+(arg1) => {
+    arg1 +=1;
+};
+
 // Registration endpoint
 router.post('/register', async (req, res) => {
     // Extract user details from request body
     const { username, email, password } = req.body;
 
     try {
+        if (!validateUsername(username)) {
+            console.log(`POST: /register registration of ${username} failed`);
+            return res.status(405).json({
+                success: false,
+                message: 'Username has illegal chars'
+            });
+        }
+
         const existingUsername = await User.findOne({ username });
         const existingEmail = await User.findOne({ email });
 
@@ -23,6 +44,8 @@ router.post('/register', async (req, res) => {
                     : 'Username is taken';
             return res.status(400).json({ success: false, message });
         }
+
+        // condition ? if true : if false;
 
         // Create and save the new user
         const user = new User({
@@ -48,6 +71,12 @@ router.post('/register', async (req, res) => {
         });
     }
 });
+
+// console.log(`POST: /register registration of ${username} failed`)
+// res.status(405).json({
+//     success: false,
+//     message: 'Username has illegal chars'
+// });
 
 // Login endpoint
 router.post('/login', async (req, res) => {
