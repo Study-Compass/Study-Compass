@@ -319,6 +319,25 @@ select{
     }
 }
 
+@media (max-height:696px) {
+    .content-container{
+        padding: 0px 20px 0px 20px;
+    }
+    .DayColumn{
+        height:400px;
+    }
+}
+
+@media (max-height:600px) {
+    .content-container{
+        padding: 0px 20px 0px 20px;
+    }
+    .DayColumn{
+        height:350px;
+    }
+}
+
+
 @keyframes pulse {
     0% {
       transform: scale(0.5);
@@ -351,6 +370,8 @@ select{
     .content-container{
         padding:0px 10px 10px 10px;
         width:97%;
+        height:calc(100% - 80px);
+        max-height: calc(100% - 80px);
     }
     .dot{
         height:18px;
@@ -361,3 +382,4 @@ select{
         padding-left:13px;
     }
 }
+

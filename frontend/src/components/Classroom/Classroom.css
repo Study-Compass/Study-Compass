@@ -4,13 +4,12 @@
     width:100%;
     /* padding: 20px 20px 40px 20px; */
     box-sizing: border-box;
-    top:0;
-    left:0;
     display:flex;
     flex-direction: column;
     background-color: white;
     z-index: 1;
-    border-radius: 19px
+    border-radius: 19px;
+    border: 1px solid var(--lighterborder);
 }
 
 .classroom-component h1{
