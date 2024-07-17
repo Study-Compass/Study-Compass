@@ -13,7 +13,7 @@ import { findNext, fetchDataHelper, fetchFreeRoomsHelper, fetchFreeNowHelper, fe
 import Results from '../../components/Results/Results.jsx';
 import Sort from '../../components/Sort/Sort.jsx';
 import Footer from '../../components/Footer/Footer.jsx';
-
+import Recommended from '../../components/Recommended/Recommended.jsx';
 import chevronUp from '../../assets/chevronup.svg';
 import SortIcon from '../../assets/Icons/Sort.svg';
 import Github from '../../assets/Icons/Github.svg';
@@ -265,6 +265,7 @@ function Room() {
             <div className="content-container">
                 <div className="calendar-container">
                     <div className={width < 800 ? "left-mobile" : "left"}>
+                        {contentState === "empty" ? <Recommended />: ""}
                         <SearchBar data={rooms} onEnter={changeURL2} room={contentState === "classroom" || contentState === "calendarSearchResult" ? roomName : searchQuery } onX={onX} onSearch={onSearch} query={searchQuery} />
                         {contentState === "classroom" || contentState === "calendarSearchResult"  ? <Classroom  
                             room={room} 
@@ -302,10 +303,10 @@ function Room() {
                             />: ""
                         }
                         {contentState === "empty" ? <div className={`instructions-container ${width < 800 ? "mobile-instructions" : ""}`}>
-                            <div className="instructions">
+                            {/* <div className="instructions">
                                 <p>search by name or {width < 800 ? "see which rooms are" : "by selecting a timeslot, or see which rooms are"}</p>
                                 <button onClick={fetchFreeNow} className="free-now">free now</button>
-                            </div>
+                            </div> */}
                         </div> : ""}
                     </div>
                     {width < 800 || viewport < 700? (

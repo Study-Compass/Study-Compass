@@ -1,0 +1,19 @@
+.recommended{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-top: 20px;
+    outline: none;
+    border-radius: 6px;
+    background-color: var(--offwhite);
+    border: none;
+    color: white;
+    width: calc(84%);
+    height: 40%;
+}
+
+.recommended p{
+    font-family: 'Satoshi';
+    font-size: 15px;
+}
