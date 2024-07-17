@@ -310,13 +310,18 @@ function Room() {
                     {width < 800 || viewport < 700 ? contentState === "calendarSearchResult" || contentState === "classroom" ? <button className="show-calendar" onClick={() => { setShowMobileCalendar(true) }}> <img src={chevronUp} alt="show schedule" /> </button> : "" : ""}
                 </div>
             </div>
-            <div className="mini-footer">
-                <p>© {new Date().getFullYear()} Study Compass</p> 
-                <p>|</p>
-                <p>MIT license</p>
-                <p>|</p>
-                <a href="https://github.com/AZ0228/Study-Compass" className="github" ><img src={Github} alt="" className="github" /></a>
-            </div>
+            {
+                width > 800 ? 
+                    <div className="mini-footer">
+                        <p>© {new Date().getFullYear()} Study Compass</p> 
+                        <p>|</p>
+                        <p>MIT license</p>
+                        <p>|</p>
+                        <a href="https://github.com/AZ0228/Study-Compass" className="github" ><img src={Github} alt="" className="github" /></a>
+                    </div>
+                
+                : ""
+            }
         </div>
     );
 }
