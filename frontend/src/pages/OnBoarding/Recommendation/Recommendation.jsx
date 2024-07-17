@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Loader from '../../../components/Loader/Loader';
+import '../Onboard.css';
+import './Recommendation.css';
 
-function Recommendation() {
+function Recommendation({ justSlider }) {
     const [sliderValue, setSliderValue] = useState(2);
     const sliderRef = useRef(null);
 
@@ -79,6 +81,25 @@ function Recommendation() {
         setSliderText(messages[slider.value]);
         setSliderTextColor(getColor(slider.value));
         setSliderValue(slider.value);
+    }
+
+    if(justSlider){
+        return(
+            <div className="content">
+                <div className="sliderContainer">
+                    <p className="sliderText" style={{ color: `${sliderTextColor}` }}>{sliderText}</p>
+                    <div className="sliderInput" >
+                        <div className="thumb" style={{ left: thumbPosition }}></div>
+                        <input type="range" className="slider" min="0" max="4" defaultValue="2" onChange={handleSliderChange} ref={sliderRef} />
+                    </div>
+                    <div className="rangeText">
+                        <p className="routine">routine</p>
+                        <p className="novelty">variety</p>
+                    </div>
+                </div>
+            </div>
+
+        )
     }
 
     return (
