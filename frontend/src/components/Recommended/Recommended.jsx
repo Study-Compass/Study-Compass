@@ -1,18 +1,22 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import "./Recommended.css";
 import Result from "../Results/Result/Result";
 import { useCache } from '../../CacheContext.js';
 import { useNavigate } from "react-router-dom";
 import { useError } from '../../ErrorContext.js';
 import Loader from "../Loader/Loader.jsx";
+import { set } from "mongoose";
 
-function Recommended({id, debouncedFetchData, changeURLHelper, findNext, setContentState}) {
+function Recommended({id, debouncedFetchData, changeURLHelper, findNext, hide}) {
     const [room, setRoom] = useState(null);
+    const [height, setHeight] = useState("auto");
 
     const { getRoom } = useCache();
     const { newError } = useError();
     
     const navigate = useNavigate();
+
+    const containerRef = useRef(null);
 
     const fetchDataHelper = async (id) => {
         try{
@@ -25,6 +29,21 @@ function Recommended({id, debouncedFetchData, changeURLHelper, findNext, setCont
         }
     };
 
+    useEffect(()=>{
+        if(!containerRef.current){
+            return;
+        }
+      
+        const scrollHeight = height === "auto" ? containerRef.current.scrollHeight - 20 : containerRef.current.scrollHeight;
+        setHeight(`${scrollHeight}px`);
+        if(hide){
+            setHeight("0px");
+        } else {
+            setHeight(`${scrollHeight}px`);
+        }
+
+    },[hide,containerRef.current]);
+
     useEffect(() => {
         fetchDataHelper(id);
     }, [id]);
@@ -32,23 +51,25 @@ function Recommended({id, debouncedFetchData, changeURLHelper, findNext, setCont
     if(!room){
         return(
             <div className="recommended">        
+                <p>recommended for you</p>
                 <Loader/>
             </div>
         )
     }
     
-    
     return(
-        <div className="recommended">
-            <p>recommended for you</p>
-            <Result 
-                result={room} 
-                attributes={room.room.attributes}
-                debouncedFetchData={debouncedFetchData} 
-                changeURL={changeURLHelper}
-                findNext={findNext}
-                contentState={"nameSearch"}
-            />
+        <div className={`recommended-container ${hide ? "hide" : ""}`} ref={containerRef} style={{height: height}} >
+            <div className="recommended">
+                <p>recommended for you</p>
+                <Result 
+                    result={room} 
+                    attributes={room.room.attributes}
+                    debouncedFetchData={debouncedFetchData} 
+                    changeURL={changeURLHelper}
+                    findNext={findNext}
+                    contentState={"nameSearch"}
+                />
+            </div>
         </div>
     )
 }

@@ -3,6 +3,7 @@ import './SearchBar.css';
 import x from '../../assets/x.svg';
 import { useNavigate } from 'react-router-dom';
 import tab from '../../assets/tab.svg';
+import useOutsideClick from '../../hooks/useClickOutside';
 
 /** 
 documentation:
@@ -10,7 +11,7 @@ https://incongruous-reply-44a.notion.site/Frontend-SearchBar-Component-35e616d52
 */
 
 //need to add support for abbreviated versions
-function SearchBar({ data, onEnter, onSearch, room, onX, onClick }) {
+function SearchBar({ data, onEnter, onSearch, room, onX, onBlur }) {
     let navigate =  useNavigate();
     const itemRefs = useRef([]);
 
@@ -27,7 +28,7 @@ function SearchBar({ data, onEnter, onSearch, room, onX, onClick }) {
 
     useEffect(() => {
         if (isFocused)
-            onClick();
+            onBlur(true);   
     }, [isFocused]);
 
     const abbreviations = {
@@ -275,6 +276,11 @@ function SearchBar({ data, onEnter, onSearch, room, onX, onClick }) {
     useEffect(() => {
         console.log("searchInput", searchInput);
     }, [searchInput]);
+
+
+    useOutsideClick(inputRef, () => {
+        onBlur(false);
+    }, []);
 
     return (
         <div className="search-container">
