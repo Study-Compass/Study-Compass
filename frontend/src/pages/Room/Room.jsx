@@ -249,6 +249,12 @@ function Room() {
         setSearchAttributes(attributes);
         setSearchSort(sort);
     }
+
+    const [isClicked, setisClicked] = useState(false);
+
+    function onClickSearch(){
+        setisClicked(true);
+    }
     
     const [showMobileCalendar, setShowMobileCalendar] = useState(false);
 
@@ -265,8 +271,8 @@ function Room() {
             <div className="content-container">
                 <div className="calendar-container">
                     <div className={width < 800 ? "left-mobile" : "left"}>
-                        {contentState === "empty" ? <Recommended />: ""}
-                        <SearchBar data={rooms} onEnter={changeURL2} room={contentState === "classroom" || contentState === "calendarSearchResult" ? roomName : searchQuery } onX={onX} onSearch={onSearch} query={searchQuery} />
+                        {contentState === "empty" && !isClicked ? <Recommended />: ""}
+                        <SearchBar data={rooms} onEnter={changeURL2} room={contentState === "classroom" || contentState === "calendarSearchResult" ? roomName : searchQuery } onX={onX} onSearch={onSearch} query={searchQuery} onClick={onClickSearch}/>
                         {contentState === "classroom" || contentState === "calendarSearchResult"  ? <Classroom  
                             room={room} 
                             state={contentState} 

@@ -10,7 +10,7 @@ https://incongruous-reply-44a.notion.site/Frontend-SearchBar-Component-35e616d52
 */
 
 //need to add support for abbreviated versions
-function SearchBar({ data, onEnter, onSearch, room, onX }) {
+function SearchBar({ data, onEnter, onSearch, room, onX, onClick }) {
     let navigate =  useNavigate();
     const itemRefs = useRef([]);
 
@@ -20,7 +20,15 @@ function SearchBar({ data, onEnter, onSearch, room, onX }) {
     const [dataAbb, setDataAbb] = useState([]);
 
     const [isFocused, setIsFocused] = useState(false);
+
+
+
     const [selected, setSelected] = useState(0);
+
+    useEffect(() => {
+        if (isFocused)
+            onClick();
+    }, [isFocused]);
 
     const abbreviations = {
         "Darrin Communications Center": "DCC",
