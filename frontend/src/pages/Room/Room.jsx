@@ -271,16 +271,16 @@ function Room() {
             <div className="content-container">
                 <div className="calendar-container">
                     <div className={width < 800 ? "left-mobile" : "left"}>
-                        {/* {contentState === "empty" && !isClicked ?  */}
+                        {contentState === "empty" && !isClicked ? 
                             <Recommended 
                                 id={"65dd0786d6b91fde155c0097"}
                                 debouncedFetchData={debouncedFetchData}
-                                changeURLHelper={changeURL}
+                                changeURLHelper={changeURL2}
                                 findNext={findNext}
                                 contentState={contentState}
                                 setContentState={setContentState}
                             />
-                         {/* : ""} */}
+                        : ""}
                         <SearchBar data={rooms} onEnter={changeURL2} room={contentState === "classroom" || contentState === "calendarSearchResult" ? roomName : searchQuery } onX={onX} onSearch={onSearch} query={searchQuery} onClick={onClickSearch}/>
                         {contentState === "classroom" || contentState === "calendarSearchResult"  ? <Classroom  
                             room={room} 
