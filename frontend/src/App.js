@@ -37,6 +37,7 @@ function App() {
                                         <Route path="/onboard" element={<Onboard />}/>
                                         <Route path="/profile" element={<Profile/>}/>
                                         <Route path="/friends" element={<Friends/>}/>
+                                        <Route path="/settings" element={<Settings/>}/>
                                     </Routes>
                                     </ProfileCreationProvider>
                                 </Router>
