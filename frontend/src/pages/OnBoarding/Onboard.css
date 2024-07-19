@@ -42,6 +42,19 @@
     gap:20px;
     transition: all 0.5s ease-in-out;
     max-width: 400px;
+    margin-bottom:10px;
+}
+
+.onboard .content .text-input{
+    padding:10px 20px;
+    font-family: 'Inter';
+    font-weight:600;
+    color:var(--text);
+    border:none;
+    outline:none;
+    background-color: var(--light);
+    border-radius: 10px;
+    font-size:15px;
 }
 
 .onboard .content .loader{
