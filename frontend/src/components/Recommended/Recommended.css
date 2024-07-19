@@ -13,17 +13,19 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    gap: 13px;
     outline: none;
     border-radius: 15px;
     background-color: var(--offwhite);
     border: none;
-    margin: 30px 30px 0 30px;
+    margin: 20px 20px 0 30px;
     width: calc(100% - 60px);
     /* height: 40%; */
     z-index: 20;
 }
 
 .recommended p{
+    margin-top: 10px;
     font-family: 'Satoshi';
     font-size: 18px;
 }
