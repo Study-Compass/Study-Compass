@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Header from '../../components/Header/Header';
 import AccountSettings from '../../components/AcccountSettings/AccountSettings.jsx';
-import StudyPreferences from '../../components/StudyPreferences.jsx';
+import StudyPreferences from '../../components/StudyPreferences/StudyPreferences.jsx';
 import './Settings.css';
 import pfp from '../../assets/defaultAvatar.svg';
 import preferences from '../../assets/Icons/Preferences.svg';
@@ -13,7 +13,7 @@ function Settings() {
     const [width, setWidth] = useState(window.innerWidth);
     const [settingsRightSide, setSettingsRightSide] = useState(false);
     const [userInfo, setUserInfo] = useState(null);
-    const [currentPage, setCurrentPage] = useState('AccountSettings');
+    const [currentPage, setCurrentPage] = useState('Settings');
 
     const { isAuthenticating, isAuthenticated, user } = useAuth();
 
@@ -71,7 +71,6 @@ function Settings() {
             <Header />
             <div className='content-container'>
                 <div className='settings-container'>
-
                     <div className='settings-left'>
                         <div className='header'  onClick={()=>{handleArrowClick('AccountSettings')}}>
                             <img src={userInfo.picture ? userInfo.picture : pfp} alt="" />
@@ -96,20 +95,19 @@ function Settings() {
                             )}
 
                         </div>
-                    </div>
-                    {currentPage === 'AccountSettings' ? ( 
-                        <AccountSettings 
-                            settingsRightSide={settingsRightSide} 
-                            width={width} 
-                            handleBackClick={handleBackClick}
-                            userInfo={userInfo}
-                        />
-                    ) : (
-                        <StudyPreferences
+                    </div>                        
+                    <AccountSettings 
+                        settingsRightSide={currentPage === "AccountSettings" ?  settingsRightSide : false} 
+                        width={width} 
+                        handleBackClick={handleBackClick}
+                        userInfo={userInfo}
+                    />
+                    <StudyPreferences
+                    settingsRightSide={currentPage === "StudyPreferences" ?  settingsRightSide : false}
                         userInfo={userInfo}
                         handleBackClick={handleBackClick}
-                        />
-                    )}
+                        width={width} 
+                    />
                 </div>
             </div>
             <div>

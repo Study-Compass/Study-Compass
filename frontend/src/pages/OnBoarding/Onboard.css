@@ -113,7 +113,7 @@
     height:50px;
 }
 
-.onboard .slider{
+.content .slider{
     background: linear-gradient(to right, #FA756D, #87AFF1);
     -webkit-appearance: none;
     appearance: none;
@@ -162,7 +162,7 @@
     width:100%;
 }
 
-.onboard .content .rangeText p{
+.content .rangeText p{
     font-family: 'Satoshi';
     font-size: 16px;
     font-weight: bold;
@@ -234,7 +234,7 @@
         font-size:20px;
     }
 
-    .onboard .content p{
+    .content p{
         font-size:16px;
     }
 }

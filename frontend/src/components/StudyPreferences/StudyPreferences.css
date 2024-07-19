@@ -1,0 +1,31 @@
+.study-preferences{
+    display: flex;
+    flex-direction: column;
+}
+
+.study-preferences .drag-items{
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    padding-top: 10px;
+}
+
+.study-preferences .drag-items .left-bar{
+    display: flex;
+    flex-direction: column;
+}
+
+.study-preferences .drag-items .right-bar{
+    display: flex;
+    flex-direction: column;
+    width: 70%;
+}
+
+.study-preferences .drag-items .left-bar p{
+    display: flex;
+    margin-bottom: 10px;
+    padding: 15px 15px;
+    font-size: 14px;
+    /* font-family:'Inter' */
+    line-height: 1.31;
+}
