@@ -6,6 +6,7 @@ import rightarrow from '../../assets/Icons/RightArrow.svg';
 
 const StudyPreferences = ({ settingsRightSide, width, handleBackClick }) => {
     const [items, setItems] = useState(["outlets", "classroom type", "printer", "table type", "windows"]);
+    const [sliderValue, setSliderValue] = useState(2);
     const details = {
         // "outlets": "having outlet access from a majority of seats",
         // "classroom type": "ex: lecture hall, classroom, auditorium",
@@ -28,7 +29,7 @@ const StudyPreferences = ({ settingsRightSide, width, handleBackClick }) => {
             <div className='profile'>
                 <h2>recommendation settings</h2>
                 <hr />
-                <Recommendation justSlider={true}/>
+                <Recommendation justSlider={true} sliderValue={sliderValue} setSliderValue={setSliderValue}/>
                 <h2>classroom preferences</h2>
                 <hr />
                 <div className='drag-items'>

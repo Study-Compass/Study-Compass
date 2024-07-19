@@ -8,7 +8,6 @@ import preferences from '../../assets/Icons/Preferences.svg';
 import rightarrow from '../../assets/Icons/RightArrow.svg';
 import useAuth from '../../hooks/useAuth.js';
 import { useNavigate } from 'react-router-dom';
-import { set } from 'mongoose';
 
 function Settings() {
     const [width, setWidth] = useState(window.innerWidth);
