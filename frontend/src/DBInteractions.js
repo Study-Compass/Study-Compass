@@ -62,4 +62,24 @@ const save = async (roomId, userId, operation) => {
     }
 };
 
-export { changeClasroom, save };
+const checkUsername = async (username) => {
+    try {
+        const response = await axios.post(`/check-username/`, { username });
+        console.log(response);
+        const responseBody = response.data;
+        if (!responseBody.success) {
+            // Log the error if the response status is not OK
+            console.error("Error checking username:", responseBody.message);
+            return null;
+        }
+        if (!responseBody.success) {
+            return false;
+        }
+        return true;
+    } catch (error) {
+
+        throw error;
+    }
+}
+
+export { changeClasroom, save, checkUsername };
