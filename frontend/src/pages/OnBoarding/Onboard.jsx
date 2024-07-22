@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import './Onboard.css';
 import PurpleGradient from '../../assets/PurpleGrad.svg';
 import YellowRedGradient from '../../assets/YellowRedGrad.svg';
@@ -14,13 +14,13 @@ import { checkUsername } from '../../DBInteractions.js';
 import { useCache } from '../../CacheContext.js';
 import { debounce} from '../../Query.js';
 
-
 function Onboard(){
     const [current, setCurrent] = useState(0);
     const [show, setShow] = useState(0);
     const [currentTransition, setCurrentTransition] = useState(0);
     const [containerHeight, setContainerHeight] = useState(175);
     const { isAuthenticated, isAuthenticating, user } = useAuth();
+    // const { debounce } = useCache();
     const { newNotification } = useNotification();
     const [userInfo, setUserInfo] = useState(null);
     const [name, setName] = useState("");
@@ -29,7 +29,7 @@ function Onboard(){
     const [sliderValue, setSliderValue] = useState(2);
     const [isGoogle, setIsGoogle] = useState(null);
 
-    const [usernameValid, setUsernameValid] = useState(0); // 0 is checking, 1 is valid, 2 is invalid
+    const [usernameValid, setUsernameValid] = useState(1); // 0 is checking, 1 is valid, 2 is invalid
     const checkUsernameDebounced = debounce(checkUsername, 500);
 
     const navigate = useNavigate();
@@ -76,7 +76,7 @@ function Onboard(){
         }
     };
 
-    const debounced = debounce(validUsername, 5000);
+    const debounced = useCallback(debounce(validUsername, 500),[]);
     
     useEffect(() => {
         if(isAuthenticating){
@@ -97,17 +97,18 @@ function Onboard(){
         }
     }, [isAuthenticating, isAuthenticated, user]);
 
-    // useEffect(() => {
-    //     if (username === null || username === "") {
-    //         return;
-    //     }
-    //     if (username === initialUsername) {
-    //         setUsernameValid(1);
-    //         return;
-    //     }
-    //     setUsernameValid(0);
-    //     checkUsernameDebounced(username);
-    // }, [username]);
+    useEffect(() => {
+        if (username === null || username === "") {
+            setUsernameValid(3);
+            return;
+        }
+        if (username === initialUsername) {
+            setUsernameValid(1);
+            return;
+        }
+        setUsernameValid(0);
+        debounced(username);
+    }, [username]);
 
 
 
@@ -166,7 +167,6 @@ function Onboard(){
 
     const handleUsernameChange = (e) => {
         setUsername(e.target.value);
-        debounced(e.target.value);
     }
 
     return (
@@ -192,12 +192,14 @@ function Onboard(){
                             { isGoogle && 
                                 <div className="content">
                                     <div className="status">
-                                        { usernameValid === 0 && <p>checking username...</p>}
-                                        { usernameValid === 1 && <p>username is available</p>}
-                                        { usernameValid === 2 && <p>username is taken</p>}
+
                                     </div>
                                     <h2>set your username</h2>
                                     <p>Since you signed up with Google, we generated a username for you, feel free to change it below:</p>
+                                        { usernameValid === 0 && <p className="checking">checking username...</p>}
+                                        { usernameValid === 1 && <p className="available">username is available</p>}
+                                        { usernameValid === 2 && <p className="taken">username is taken</p>}
+                                        { usernameValid === 3 && <p className="invalid">invalid username</p>}
                                     <input type="text" value={username} onChange={handleUsernameChange} className="text-input"/>
                                 </div>
                             }
