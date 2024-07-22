@@ -9,6 +9,10 @@ import Recommendation from './Recommendation/Recommendation.jsx';
 import { useNavigate } from 'react-router-dom';
 import { onboardUser } from './OnboardHelpers.js';
 import { useError } from '../../ErrorContext.js'; 
+import { useNotification } from '../../NotificationContext.js';
+import { checkUsername } from '../../DBInteractions.js';
+import { useCache } from '../../CacheContext.js';
+import { debounce} from '../../Query.js';
 
 
 function Onboard(){
@@ -17,10 +21,16 @@ function Onboard(){
     const [currentTransition, setCurrentTransition] = useState(0);
     const [containerHeight, setContainerHeight] = useState(175);
     const { isAuthenticated, isAuthenticating, user } = useAuth();
+    const { newNotification } = useNotification();
     const [userInfo, setUserInfo] = useState(null);
     const [name, setName] = useState("");
+    const [username, setUsername] = useState(null);
+    const [initialUsername, setInitialUsername] = useState(null);
     const [sliderValue, setSliderValue] = useState(2);
     const [isGoogle, setIsGoogle] = useState(null);
+
+    const [usernameValid, setUsernameValid] = useState(0); // 0 is checking, 1 is valid, 2 is invalid
+    const checkUsernameDebounced = debounce(checkUsername, 500);
 
     const navigate = useNavigate();
     const { newError } = useError();
@@ -44,6 +54,29 @@ function Onboard(){
             setContainerHeight(contentRefs.current[0].clientHeight+10);
         }
     }, []);
+
+    const validUsername = async (username) => {
+        if (username === null || username === "") {
+            return;
+        }
+        if (username === initialUsername) {
+            setUsernameValid(1);
+            return;
+        }
+        setUsernameValid(0);
+        try{
+            const response = await checkUsername(username);
+            if(response){
+                setUsernameValid(1);
+            } else {
+                setUsernameValid(2);
+            }
+        } catch (error){
+            newNotification("error", "Error checking username");
+        }
+    };
+
+    const debounced = debounce(validUsername, 5000);
     
     useEffect(() => {
         if(isAuthenticating){
@@ -58,9 +91,24 @@ function Onboard(){
                 }
                 setUserInfo(user);
                 setIsGoogle(user.google);
+                setUsername(user.google ? user.username : null);
+                setInitialUsername(user.google ? user.username : null);
             }
         }
     }, [isAuthenticating, isAuthenticated, user]);
+
+    // useEffect(() => {
+    //     if (username === null || username === "") {
+    //         return;
+    //     }
+    //     if (username === initialUsername) {
+    //         setUsernameValid(1);
+    //         return;
+    //     }
+    //     setUsernameValid(0);
+    //     checkUsernameDebounced(username);
+    // }, [username]);
+
 
 
     useEffect(()=>{
@@ -86,7 +134,7 @@ function Onboard(){
 
         if(current === 3){
             try{
-                onboardUser(name, null, items, sliderValue);
+                onboardUser(name, username, items, sliderValue);
             } catch (error){
                 newError(error, navigate);
             }
@@ -116,6 +164,11 @@ function Onboard(){
         setName(e.target.value);
     }
 
+    const handleUsernameChange = (e) => {
+        setUsername(e.target.value);
+        debounced(e.target.value);
+    }
+
     return (
         <div className="onboard" style={{height: viewport}}>
             <img src={YellowRedGradient} alt="" className="yellow-red" />
@@ -138,9 +191,14 @@ function Onboard(){
                             <input type="text" value={name} onChange={handleNameChange} className="text-input"/>
                             { isGoogle && 
                                 <div className="content">
+                                    <div className="status">
+                                        { usernameValid === 0 && <p>checking username...</p>}
+                                        { usernameValid === 1 && <p>username is available</p>}
+                                        { usernameValid === 2 && <p>username is taken</p>}
+                                    </div>
                                     <h2>set your username</h2>
-
-                                    <input type="text" value={userInfo.username} className="text-input"/>
+                                    <p>Since you signed up with Google, we generated a username for you, feel free to change it below:</p>
+                                    <input type="text" value={username} onChange={handleUsernameChange} className="text-input"/>
                                 </div>
                             }
                             
