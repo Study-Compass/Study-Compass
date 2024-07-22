@@ -44,4 +44,21 @@ router.post("/check-username", async (req, res) =>{
     }
 });
 
+// check if username is available
+router.post("/check-username", async (req, res) =>{
+    const { username } = req.body;
+    try{
+        const user = await User.findOne({ username: username });
+        if(user){
+            console.log(`POST: /check-username ${username} is taken`)
+            return res.status(200).json({ success: false, message: 'Username is taken' });
+        }
+        console.log(`POST: /check-username ${username} is available`)
+        return res.status(200).json({ success: true, message: 'Username is available' });
+    } catch(error){
+        console.log(`POST: /check-username ${username} failed`)
+        return res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+});
+
 module.exports = router;
