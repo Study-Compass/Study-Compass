@@ -2,6 +2,7 @@ const google = require('googleapis').google;
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../schemas/user.js');
+const crypto = require('crypto');
 
 
 const login = new google.auth.OAuth2(
@@ -79,12 +80,14 @@ async function authenticateWithGoogle(code, isRegister = false) {
             throw new Error('Email already exists');
         }
 
+        const randomUsername = await generateUniqueUsername();
+
         user = new User({
             googleId: userInfo.data.id,
             email: userInfo.data.email,
-            username: userInfo.data.name,
-            picture: userInfo.data.picture,
-            tags: ["beta tester"]
+            name: userInfo.data.name,
+            username: randomUsername, //replace this with a random username generated
+            picture: userInfo.data.picture
         });
         await user.save();
     }
@@ -94,5 +97,18 @@ async function authenticateWithGoogle(code, isRegister = false) {
     return { user, token: jwtToken };
 }
 
+async function generateUniqueUsername() {
+    let username;
+    let isUnique = false;
 
+    while (!isUnique) {
+        username = 'user-' + crypto.randomBytes(4).toString('hex');
+        const existingUser = await User.findOne({ username });
+        if (!existingUser) {
+            isUnique = true;
+        }
+    }
+
+    return username;
+}
 module.exports  = { registerUser, loginUser, authenticateWithGoogle };
