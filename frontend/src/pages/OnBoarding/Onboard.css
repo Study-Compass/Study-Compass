@@ -194,6 +194,41 @@
     transition: left 0.3s ease;
 }
 
+.onboard .username-input{
+    position: relative;
+    display: grid;
+    margin-bottom:10px;
+}
+
+.onboard .status{
+    position: absolute;
+    bottom: -35px;
+    align-self: center;
+    justify-self: center;
+}
+
+.onboard .status p{
+    font-size:14px;
+    font-weight: 500;
+}
+
+.onboard .checking{
+    color: var(--yellow) !important;
+}
+
+.onboard .available{
+    color: var(--green) !important;
+}
+
+.onboard .taken{
+    color: var(--red) !important;
+
+}
+
+.onboard .invalid{
+    color: var(--red) !important;
+}
+
 
 @media (max-width: 1000px) {
     .onboard .yellow-red,

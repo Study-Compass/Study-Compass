@@ -21,7 +21,7 @@ function Onboard(){
     const [containerHeight, setContainerHeight] = useState(175);
     const { isAuthenticated, isAuthenticating, user } = useAuth();
     // const { debounce } = useCache();
-    const { newNotification } = useNotification();
+    const { addNotification } = useNotification();
     const [userInfo, setUserInfo] = useState(null);
     const [name, setName] = useState("");
     const [username, setUsername] = useState(null);
@@ -72,7 +72,7 @@ function Onboard(){
                 setUsernameValid(2);
             }
         } catch (error){
-            newNotification("error", "Error checking username");
+            addNotification({title: 'Error checking username', message: error.message, type: 'error'});
         }
     };
 
@@ -139,7 +139,10 @@ function Onboard(){
             } catch (error){
                 newError(error, navigate);
             }
-            navigate('/room/none');
+            setTimeout(() => {
+                
+                navigate('/room/none');
+            }, 1000);
         }
 
         setButtonActive(false);
@@ -191,20 +194,20 @@ function Onboard(){
                             <input type="text" value={name} onChange={handleNameChange} className="text-input"/>
                             { isGoogle && 
                                 <div className="content">
-                                    <div className="status">
-
-                                    </div>
+                                    
                                     <h2>set your username</h2>
                                     <p>Since you signed up with Google, we generated a username for you, feel free to change it below:</p>
-                                        { usernameValid === 0 && <p className="checking">checking username...</p>}
-                                        { usernameValid === 1 && <p className="available">username is available</p>}
-                                        { usernameValid === 2 && <p className="taken">username is taken</p>}
-                                        { usernameValid === 3 && <p className="invalid">invalid username</p>}
-                                    <input type="text" value={username} onChange={handleUsernameChange} className="text-input"/>
+                                    <div className="username-input">
+                                        <div className="status">
+                                            { usernameValid === 0 && <p className="checking">checking username...</p>}
+                                            { usernameValid === 1 && <p className="available">username is available</p>}
+                                            { usernameValid === 2 && <p className="taken">username is taken</p>}
+                                            { usernameValid === 3 && <p className="invalid">invalid username</p>}   
+                                        </div>
+                                        <input type="text" value={username} onChange={handleUsernameChange} className="text-input"/>
+                                    </div>
                                 </div>
                             }
-                            
-                            
                         </div>
                     }
                     { current === 2  &&
@@ -224,9 +227,9 @@ function Onboard(){
                             <Recommendation sliderValue={sliderValue} setSliderValue={setSliderValue}/>
                         </div>
                     }
-                </div>
+                </div>  
             </div>
-                <button className={`${ current === 1 && name === "" ? "deactivated" : buttonActive ? "":"deactivated"}`} onClick={()=>{setShow(show+1)}}>
+                <button className={`${ current !== 1 || (name !== "" && (!isGoogle || usernameValid === 1)) ? buttonActive ? "":"deactivated" : "deactivated"}`} onClick={()=>{setShow(show+1)}}>
                     {current === 3  ? "finish" : "next"}
                 </button>
                 
