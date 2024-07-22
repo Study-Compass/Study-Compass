@@ -38,7 +38,7 @@ function Room() {
     const [rooms, setRooms] = useState(null);
     const [roomIds, setRoomIds] = useState({});
     const [ready, setReady] = useState(false);
-    const { isAuthenticated } = useAuth();
+    const { isAuthenticated, isAuthenticating, user } = useAuth();
     const { getRooms, getFreeRooms, getRoom, getBatch, search } = useCache();
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -123,6 +123,14 @@ function Room() {
 
 
     useEffect(() => { // FETCH ROOM DATA , triggers on url change
+        if(isAuthenticating){
+            return;
+        }
+        if(isAuthenticated){
+            if(user.onboarded === false){
+                navigate('/onboard');
+            }
+        }
         const searchParams = new URLSearchParams(window.location.search);
         const searchQuery = searchParams.get('query');
         const attributes = searchParams.get('attributes') ? JSON.parse(searchParams.get('attributes')) : null;
@@ -159,7 +167,7 @@ function Room() {
             }
         }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [isAuthenticated, roomIds]);
+    }, [isAuthenticating, roomIds]);
 
     useEffect(()=>{
         const updateLoadedResults = async ()=>{

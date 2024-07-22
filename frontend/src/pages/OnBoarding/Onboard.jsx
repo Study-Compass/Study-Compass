@@ -20,6 +20,7 @@ function Onboard(){
     const [userInfo, setUserInfo] = useState(null);
     const [name, setName] = useState("");
     const [sliderValue, setSliderValue] = useState(2);
+    const [isGoogle, setIsGoogle] = useState(null);
 
     const navigate = useNavigate();
     const { newError } = useError();
@@ -43,10 +44,6 @@ function Onboard(){
             setContainerHeight(contentRefs.current[0].clientHeight+10);
         }
     }, []);
-
-    useEffect(()=>{
-        console.log(name)
-    }, [name]);    
     
     useEffect(() => {
         if(isAuthenticating){
@@ -60,6 +57,7 @@ function Onboard(){
                     navigate('/room/none');
                 }
                 setUserInfo(user);
+                setIsGoogle(user.google);
             }
         }
     }, [isAuthenticating, isAuthenticated, user]);
@@ -136,8 +134,17 @@ function Onboard(){
                         <div className={`content ${show === 2 ? "going": ""} ${1 === currentTransition ? "": "beforeOnboard"}`} ref={el => contentRefs.current[1] = el}>
                             <Loader/>
                             <h2>set your name</h2>
-                            <p>This is the name you will be visible to other users as (your screen name):</p>
+                            <p>This is the name you will be visible to other users as (putting you real name here is advised):</p>
                             <input type="text" value={name} onChange={handleNameChange} className="text-input"/>
+                            { isGoogle && 
+                                <div className="content">
+                                    <h2>set your username</h2>
+
+                                    <input type="text" value={userInfo.username} className="text-input"/>
+                                </div>
+                            }
+                            
+                            
                         </div>
                     }
                     { current === 2  &&
