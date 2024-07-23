@@ -144,11 +144,19 @@ const fetchSearchHelper = async (query, attributes, sort, setContentState, setCa
     setSearchQuery(query);
 };
 
-const allPurposeFetchHelper = async (allSearch, nameQuery, timeQuery, attributeQuery, sortQuery) => {
+const allPurposeFetchHelper = async (allSearch, nameQuery, timeQuery, attributeQuery, sortQuery, setCalendarLoading, setResults, setLoadedResults, setNumLoaded ) => {
+    // handle state setting here
+
+    //
+    setCalendarLoading(true);
+    setResults([]);
+    setLoadedResults([]);
+    setNumLoaded(0);
     try{
         const roomNames = await allSearch(nameQuery, timeQuery, attributeQuery, sortQuery);
-        console.log("All Purpose")
-        console.log(roomNames);
+        setResults(roomNames);
+        setNumLoaded(10);
+        setCalendarLoading(false);
     } catch (error){
         console.error(error);
     }
