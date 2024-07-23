@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Loader from '../../../components/Loader/Loader';
 
-function Recommendation() {
-    const [sliderValue, setSliderValue] = useState(2);
+function Recommendation({ sliderValue, setSliderValue }) {
     const sliderRef = useRef(null);
 
 

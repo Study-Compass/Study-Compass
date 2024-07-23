@@ -83,7 +83,8 @@ async function authenticateWithGoogle(code, isRegister = false) {
             googleId: userInfo.data.id,
             email: userInfo.data.email,
             username: userInfo.data.name,
-            picture: userInfo.data.picture
+            picture: userInfo.data.picture,
+            tags: ["beta tester"]
         });
         await user.save();
     }

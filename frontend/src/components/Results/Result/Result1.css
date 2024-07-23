@@ -8,7 +8,7 @@ li.result{
     margin-bottom: 15px;;
     display:flex;
     flex-direction: column;
-    gap:10px;
+    gap:6px;
     pointer-events: all !important;
     /* margin:5px; */
 }
@@ -38,7 +38,7 @@ li.result{
     
 }
 
-.result .saved{
+.result .saved-img{
     position: absolute;
     top:-8px;
     right:10px;
@@ -81,7 +81,7 @@ li.result{
     flex-direction: column;
 }
 
-.rating{
+.result .rating{
     display:flex;
     flex-direction: row;
     gap:5px;
@@ -89,14 +89,14 @@ li.result{
 
 }
 
-.rating p{
+.result .rating p{
     margin:0;
     font-size:14px;
     font-family:'Inter';
     font-weight:700;
 }
 
-.rating img{
+.result .rating img{
     width:15px;
     height:15px;
 

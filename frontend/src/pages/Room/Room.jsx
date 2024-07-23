@@ -18,6 +18,7 @@ import SortIcon from '../../assets/Icons/Sort.svg';
 import Github from '../../assets/Icons/Github.svg';
 
 import { debounce} from '../../Query.js';
+import ProfilePicture from '../../components/ProfilePicture/ProfilePicture.jsx';
 
 /** 
 documentation:
@@ -229,7 +230,6 @@ function Room() {
     function changeURL2(option) {
         navigate(`/room/${option}`);
         fetchData(roomIds[option]);
-
         setContentState("classroom");
     }
 
@@ -258,6 +258,7 @@ function Room() {
     const [viewport, setViewport] = useState("100vh");
     useEffect(() => {
         setViewport((window.innerHeight) + 'px');
+        //add listener
     },[]);
 
 
@@ -310,7 +311,7 @@ function Room() {
                             </div>
                         </div> : ""}
                     </div>
-                    {width < 800 ? (
+                    {width < 800 || viewport < 700? (
                         <div className={`calendar-content-container ${showMobileCalendar ? "active" : ""}`}>
                             <MobileCalendar className={"s"} data={data} isloading={loading} addQuery={addQuery} removeQuery={removeQuery} query={query} show={showMobileCalendar} setShow={setShowMobileCalendar} />
                         </div>
@@ -319,16 +320,21 @@ function Room() {
                             <Calendar className={room ? room.name ? room.name : "none": ""} data={data} isloading={loading} addQuery={addQuery} removeQuery={removeQuery} query={query} />
                         </div>
                     )}
-                    {width < 800 ? contentState === "calendarSearchResult" || contentState === "classroom" ? <button className="show-calendar" onClick={() => { setShowMobileCalendar(true) }}> <img src={chevronUp} alt="show schedule" /> </button> : "" : ""}
+                    {width < 800 || viewport < 700 ? contentState === "calendarSearchResult" || contentState === "classroom" ? <button className="show-calendar" onClick={() => { setShowMobileCalendar(true) }}> <img src={chevronUp} alt="show schedule" /> </button> : "" : ""}
                 </div>
             </div>
-            <div className="mini-footer">
-                <p>© {new Date().getFullYear()} Study Compass</p> 
-                <p>|</p>
-                <p>MIT license</p>
-                <p>|</p>
-                <a href="https://github.com/AZ0228/Study-Compass" className="github" ><img src={Github} alt="" className="github" /></a>
-            </div>
+            {
+                width > 800 ? 
+                    <div className="mini-footer">
+                        <p>© {new Date().getFullYear()} Study Compass</p> 
+                        <p>|</p>
+                        <p>MIT license</p>
+                        <p>|</p>
+                        <a href="https://github.com/AZ0228/Study-Compass" className="github" ><img src={Github} alt="" className="github" /></a>
+                    </div>
+                
+                : ""
+            }
         </div>
     );
 }

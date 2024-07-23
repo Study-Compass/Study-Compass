@@ -9,10 +9,18 @@ const userSchema = new mongoose.Schema({
     },
     username: {
         type: String,
-        required: true,
+        required: false,
         unique: true,
         trim: true, // trims whitespace
         minlength: 3 // Minimum length of the username
+    },
+    name:{
+        type:String,
+        trim:true,
+    },
+    onboarded:{
+        type: Boolean,
+        default:false,
     },
     email: {
         type: String,
@@ -50,7 +58,27 @@ const userSchema = new mongoose.Schema({
     sessions: {
         type: Array,
         default: [],
+    }, 
+    hours: {
+        type: Number,
+        default: 0,
     },
+    contributions:{
+        type:Number,
+        default:0,
+    }, 
+    classroomPreferences:{
+        type:String,
+        default:"",
+    },
+    recommendationPreferences: {
+        type:Number,
+        default:3,
+    },
+    tags: {
+        type:Array,
+        default: [],
+    }
     
     // you can add more fields here if needed, like 'createdAt', 'updatedAt', etc.
 }, {

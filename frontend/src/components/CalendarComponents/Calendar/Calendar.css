@@ -42,6 +42,14 @@
     border-radius: 20px;
 } */
 
+
+@media screen and (max-width: 1150px){
+    .Calendar-header{
+        width:500px;
+    }
+}
+
+
 @media screen and (max-width: 875px){
     .Calendar-header{
         transform:translateX(25px);

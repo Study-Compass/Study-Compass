@@ -8,12 +8,15 @@ import Redirect from './pages/Redirect/Redirect';
 import Error from './pages/Error/Error';
 import Onboard from './pages/OnBoarding/Onboard';
 import Friends from './pages/Friends/Friends';
+import Profile from './pages/Profile/Profile';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './AuthContext';
 import { CacheProvider } from './CacheContext';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { NotificationProvider } from './NotificationContext';
 import { ErrorProvider } from './ErrorContext';
+import { ProfileCreationProvider } from './ProfileCreationContext';
+
 
 function App() {
     return (

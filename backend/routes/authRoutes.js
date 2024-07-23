@@ -10,12 +10,33 @@ const { verifyToken } = require('../middlewares/verifyToken.js');
 const { authenticateWithGoogle, loginUser, registerUser } = require('../services/userServices.js');
 
 const User = require('../schemas/user.js');
+
+function validateUsername(username) { //keeping logic external, for easier testing
+    // Define the regex pattern
+    const regex = /^[a-zA-Z0-9]{3,20}$/;
+  
+    // Test the username against the regex pattern
+    return regex.test(username);
+  }
+
+(arg1) => {
+    arg1 +=1;
+};
+
 // Registration endpoint
 router.post('/register', async (req, res) => {
     // Extract user details from request body
     const { username, email, password } = req.body;
 
     try {
+        if (!validateUsername(username)) {
+            console.log(`POST: /register registration of ${username} failed`);
+            return res.status(405).json({
+                success: false,
+                message: 'Username has illegal chars'
+            });
+        }
+
         const existingUsername = await User.findOne({ username });
         const existingEmail = await User.findOne({ email });
 
@@ -26,9 +47,11 @@ router.post('/register', async (req, res) => {
             return res.status(400).json({ success: false, message });
         }
 
+        // condition ? if true : if false;
+
         // Create and save the new user
         const user = new User({
-            username: username, email: email, password: password
+            username: username, email: email, password: password, tags: ["beta tester"]
         });
         await user.save();
 
@@ -50,6 +73,12 @@ router.post('/register', async (req, res) => {
         });
     }
 });
+
+// console.log(`POST: /register registration of ${username} failed`)
+// res.status(405).json({
+//     success: false,
+//     message: 'Username has illegal chars'
+// });
 
 // Login endpoint
 router.post('/login', async (req, res) => {
@@ -98,10 +127,20 @@ router.get('/validate-token', verifyToken, async (req, res) => {
                     _id: user._id,
                     username: user.username,
                     email: user.email,
+                    name: user.name,
                     picture : user.picture,
                     admin : user.admin,
                     saved: user.saved,
+                    visited: user.visited,
+                    partners: user.partners,
+                    sessions: user.sessions,
+                    hours: user.hours,
+                    contributions: user.contributions,
+                    onboarded: user.onboarded,
+                    classroomPreferences: user.classroomPreferences,
+                    recommendationPreferences: user.recommendationPreferences,
                     google: user.googleId ? true : false
+
                 }
             }
         });
