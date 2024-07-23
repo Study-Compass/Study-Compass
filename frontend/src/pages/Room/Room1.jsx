@@ -9,7 +9,7 @@ import { useCache } from '../../CacheContext.js';
 import { useError } from '../../ErrorContext.js'; 
 import Classroom from '../../components/Classroom/Classroom.jsx';
 import MobileCalendar from '../../components/CalendarComponents/MobileCalendar/MobileCalendar.jsx';
-import { findNext, fetchDataHelper, fetchFreeRoomsHelper, fetchFreeNowHelper, fetchSearchHelper, addQueryHelper, removeQueryHelper, allPurposeFetchHelper } from "./RoomHelpers.js";
+import { findNext, fetchDataHelper, fetchFreeRoomsHelper, fetchFreeNowHelper, fetchSearchHelper, addQueryHelper, removeQueryHelper } from "./RoomHelpers.js";
 import Results from '../../components/Results/Results.jsx';
 import Sort from '../../components/Sort/Sort.jsx';
 
@@ -19,8 +19,6 @@ import Github from '../../assets/Icons/Github.svg';
 
 import { debounce} from '../../Query.js';
 import ProfilePicture from '../../components/ProfilePicture/ProfilePicture.jsx';
-import { all } from 'axios';
-import { set } from 'mongoose';
 
 /** 
 documentation:
@@ -40,8 +38,8 @@ function Room() {
     const [rooms, setRooms] = useState(null);
     const [roomIds, setRoomIds] = useState({});
     const [ready, setReady] = useState(false);
-    const { isAuthenticated, isAuthenticating } = useAuth();
-    const { getRooms, getFreeRooms, getRoom, getBatch, search, allSearch } = useCache();
+    const { isAuthenticated } = useAuth();
+    const { getRooms, getFreeRooms, getRoom, getBatch, search } = useCache();
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [calendarLoading, setCalendarLoading] = useState(true);
@@ -155,9 +153,6 @@ function Room() {
 //=========================================== FETCHING LOGIC ===============================================================================================
 
     useEffect(() => { // FETCH ROOM DATA , triggers on url change
-        if(isAuthenticating){
-            return;
-        }
         const searchParams = new URLSearchParams(window.location.search);
         const searchQueryParams = searchParams.get('query');
         const attributes = searchParams.get('attributes') ? JSON.parse(searchParams.get('attributes')) : null;
