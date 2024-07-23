@@ -218,11 +218,11 @@ function Room() {
     
     useEffect(() => { 
         // if query is changed and noquery is true, set contentstate to empty unless query cleaered using classroom
-        if ((noquery === true && contentState === "calendarSearchResult") || roomid === "none") {
-            setContentState("empty");
-        } else if(contentState !== "classroom"){
-            setContentState("calendarSearch");  
-        }
+        // if ((noquery === true && contentState === "calendarSearchResult") || roomid === "none") {
+        //     setContentState("empty");
+        // } else if(contentState !== "classroom"){ 
+        //     setContentState("calendarSearch");  
+        // }
      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [query])
 
