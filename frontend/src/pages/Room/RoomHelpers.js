@@ -147,6 +147,7 @@ const fetchSearchHelper = async (query, attributes, sort, setContentState, setCa
 const allPurposeFetchHelper = async (allSearch, nameQuery, timeQuery, attributeQuery, sortQuery) => {
     try{
         const roomNames = await allSearch(nameQuery, timeQuery, attributeQuery, sortQuery);
+        console.log("All Purpose")
         console.log(roomNames);
     } catch (error){
         console.error(error);

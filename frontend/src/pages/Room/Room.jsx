@@ -9,7 +9,7 @@ import { useCache } from '../../CacheContext.js';
 import { useError } from '../../ErrorContext.js'; 
 import Classroom from '../../components/Classroom/Classroom.jsx';
 import MobileCalendar from '../../components/CalendarComponents/MobileCalendar/MobileCalendar.jsx';
-import { findNext, fetchDataHelper, fetchFreeRoomsHelper, fetchFreeNowHelper, fetchSearchHelper, addQueryHelper, removeQueryHelper, allPurposeFetchHelper } from "./RoomHelpers.js";
+import { findNext, fetchDataHelper, fetchFreeRoomsHelper, fetchFreeNowHelper, fetchSearchHelper, addQueryHelper, removeQueryHelper } from "./RoomHelpers.js";
 import Results from '../../components/Results/Results.jsx';
 import Sort from '../../components/Sort/Sort.jsx';
 
@@ -38,8 +38,8 @@ function Room() {
     const [rooms, setRooms] = useState(null);
     const [roomIds, setRoomIds] = useState({});
     const [ready, setReady] = useState(false);
-    const { isAuthenticated, isAuthenticating } = useAuth();
-    const { getRooms, getFreeRooms, getRoom, getBatch, search, allSearch } = useCache();
+    const { isAuthenticated } = useAuth();
+    const { getRooms, getFreeRooms, getRoom, getBatch, search } = useCache();
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [calendarLoading, setCalendarLoading] = useState(true);
@@ -66,16 +66,11 @@ function Room() {
 
     const [width, setWidth] = useState(window.innerWidth);
 
-
-    // data fetching helpers
     const fetchData = async (id) => fetchDataHelper(id, setLoading, setData, setRoom, navigate, getRoom, setRoomName, newError);
-    const debouncedFetchData = debounce(fetchData, 500); // Adjust delay as needed
     const fetchFreeRooms = async () => fetchFreeRoomsHelper(setContentState, setCalendarLoading, getFreeRooms, setResults, setNumLoaded, query, newError);
+    const debouncedFetchData = debounce(fetchData, 500); // Adjust delay as needed
     const fetchFreeNow = async () => fetchFreeNowHelper(setContentState, setCalendarLoading, setResults, setNumLoaded, getFreeRooms);
     const fetchSearch = async (query, attributes, sort) => fetchSearchHelper(query, attributes, sort, setContentState, setCalendarLoading, setResults, setLoadedResults, search, setNumLoaded, navigate, newError, setSearchQuery);
-    const allPurposeSearch = async () => allPurposeFetchHelper(allSearch, searchQuery, query, searchAttributes, searchSort);
-    
-    // query formatting helpers
     const addQuery = (key, newValue) => addQueryHelper(key, newValue, setNoQuery, setContentState, setQuery);
     const removeQuery = (key, value) => removeQueryHelper(key, value, setQuery, setNoQuery);
 
@@ -128,28 +123,23 @@ function Room() {
 
 
     useEffect(() => { // FETCH ROOM DATA , triggers on url change
-        if(isAuthenticating){
-            return;
-        }
         const searchParams = new URLSearchParams(window.location.search);
-        const searchQueryParam = searchParams.get('query'); 
+        const searchQuery = searchParams.get('query');
         const attributes = searchParams.get('attributes') ? JSON.parse(searchParams.get('attributes')) : null;
         const sort = searchParams.get('sort');
-        console.log("searchQuery", searchQueryParam);
-        console.log("attributes", attributes);
-        console.log("sort", sort);
-        if(searchQueryParam){
+        // console.log("searchQuery", searchQuery);
+        // console.log("attributes", attributes);
+        // console.log("sort", sort);
+        if(searchQuery){
             if(!ready){
                 return;
             }
-            fetchSearch(searchQueryParam, attributes, sort);
+            fetchSearch(searchQuery, attributes, sort);
             setSearchAttributes(attributes);
             setSearchSort(sort);    
-            setSearchQuery(searchQueryParam);
             console.log("searching");
             setContentState("nameSearch");
             fetchData("none");
-            // allPurposeSearch();
 
         } else {
             if(roomIds[roomid] === undefined && roomid !== "none"){
@@ -169,7 +159,7 @@ function Room() {
             }
         }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [isAuthenticated, roomIds, isAuthenticating]);
+    }, [isAuthenticated, roomIds]);
 
     useEffect(()=>{
         const updateLoadedResults = async ()=>{
@@ -206,8 +196,7 @@ function Room() {
         setResults([]);
         if (!noquery) {
             fetchFreeRooms();
-            // allPurposeSearch();         
-         }
+        }
         console.log(numLoaded + " " + loadedResults.length + " " + results.length);
         console.log(noquery);
      // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -241,16 +230,13 @@ function Room() {
         setLoadedResults([]);
     }
 
-    function onSearch(nameQuery, attributes, sort){
-        const queryString = new URLSearchParams({ query: nameQuery, attributes: JSON.stringify(attributes), sort }).toString();
+    function onSearch(query, attributes, sort){
+        const queryString = new URLSearchParams({ query, attributes: JSON.stringify(attributes), sort }).toString();
         navigate(`/room/search?${queryString}`, { replace: true });        
         // console.log(sort);
-        fetchSearch(nameQuery, attributes, sort); //sets search query
-        // allPurposeSearch();
-        console.log(query);
+        fetchSearch(query, attributes, sort); //sets search query
         setSearchAttributes(attributes);
         setSearchSort(sort);
-        setContentState("nameSearch");
     }
     
     const [showMobileCalendar, setShowMobileCalendar] = useState(false);

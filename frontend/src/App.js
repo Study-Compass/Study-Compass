@@ -26,6 +26,7 @@ function App() {
                     <AuthProvider>
                         <CacheProvider>
                             <Router>
+                                <ProfileCreationProvider>
                                 <Routes>
                                     <Route path="/" element={<Redirect/> }/>
                                     <Route path="/room/:roomid" element={<Room />}/>
@@ -37,6 +38,7 @@ function App() {
                                     <Route path="/onboard" element={<Onboard />}/>
                                     <Route path="/friends" element={<Friends />}/>
                                 </Routes>
+                                </ProfileCreationProvider>
                             </Router>
                         </CacheProvider>
                     </AuthProvider>

@@ -9,7 +9,7 @@ import { useCache } from '../../CacheContext.js';
 import { useError } from '../../ErrorContext.js'; 
 import Classroom from '../../components/Classroom/Classroom.jsx';
 import MobileCalendar from '../../components/CalendarComponents/MobileCalendar/MobileCalendar.jsx';
-import { findNext, fetchDataHelper, fetchFreeRoomsHelper, fetchFreeNowHelper, fetchSearchHelper, addQueryHelper, removeQueryHelper, allPurposeFetchHelper } from "./RoomHelpers.js";
+import { findNext, fetchDataHelper, fetchFreeRoomsHelper, fetchFreeNowHelper, fetchSearchHelper, addQueryHelper, removeQueryHelper } from "./RoomHelpers.js";
 import Results from '../../components/Results/Results.jsx';
 import Sort from '../../components/Sort/Sort.jsx';
 
@@ -18,6 +18,7 @@ import SortIcon from '../../assets/Icons/Sort.svg';
 import Github from '../../assets/Icons/Github.svg';
 
 import { debounce} from '../../Query.js';
+import ProfilePicture from '../../components/ProfilePicture/ProfilePicture.jsx';
 
 /** 
 documentation:
@@ -29,7 +30,7 @@ STATES
 contentState: "empty", "classroom", "calendarSearch" , "calendarSearchResult", "nameSearch" , "freeNowSearch" 
 */ 
 
-function Room1() {
+function Room() {
     let { roomid } = useParams();
     let navigate = useNavigate();
     const [room, setRoom] = useState(null);
@@ -37,8 +38,8 @@ function Room1() {
     const [rooms, setRooms] = useState(null);
     const [roomIds, setRoomIds] = useState({});
     const [ready, setReady] = useState(false);
-    const { isAuthenticated, isAuthenticating } = useAuth();
-    const { getRooms, getFreeRooms, getRoom, getBatch, search, allSearch } = useCache();
+    const { isAuthenticated } = useAuth();
+    const { getRooms, getFreeRooms, getRoom, getBatch, search } = useCache();
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [calendarLoading, setCalendarLoading] = useState(true);
@@ -65,71 +66,22 @@ function Room1() {
 
     const [width, setWidth] = useState(window.innerWidth);
 
-
-    // data fetching helpers
     const fetchData = async (id) => fetchDataHelper(id, setLoading, setData, setRoom, navigate, getRoom, setRoomName, newError);
-    const debouncedFetchData = debounce(fetchData, 500); // Adjust delay as needed
     const fetchFreeRooms = async () => fetchFreeRoomsHelper(setContentState, setCalendarLoading, getFreeRooms, setResults, setNumLoaded, query, newError);
+    const debouncedFetchData = debounce(fetchData, 500); // Adjust delay as needed
     const fetchFreeNow = async () => fetchFreeNowHelper(setContentState, setCalendarLoading, setResults, setNumLoaded, getFreeRooms);
     const fetchSearch = async (query, attributes, sort) => fetchSearchHelper(query, attributes, sort, setContentState, setCalendarLoading, setResults, setLoadedResults, search, setNumLoaded, navigate, newError, setSearchQuery);
-    const allPurposeSearch = async () => allPurposeFetchHelper(allSearch, searchQuery, query, searchAttributes, searchSort);
-    
-    // query formatting helpers
     const addQuery = (key, newValue) => addQueryHelper(key, newValue, setNoQuery, setContentState, setQuery);
-    const removeQuery = (key, value) => removeQueryHelper(key, value, setQuery, setNoQuery);    
-    
-    
-    //=========================================== UI LOGIC =====================================================================================================
+    const removeQuery = (key, value) => removeQueryHelper(key, value, setQuery, setNoQuery);
 
     useEffect(() => { //useEffect for window resizing
-        function handleResize() {
-          setWidth(window.innerWidth);
-        }
-        window.addEventListener('resize', handleResize);
-    
-        return () => window.removeEventListener('resize', handleResize);
-      }, []);
-
-      
-    useEffect(()=>{
-        if(contentState === "empty"){
-            setNumLoaded(0);
-            setLoadedResults([]);
-        }
-        console.log(contentState);
-    },[contentState]);
-    
-    function changeURL(option) {
-        navigate(`/room/${option}`);
-        fetchData(roomIds[option]);
-        setContentState("calendarSearchResult");
-    }
-
-    function changeURL2(option) {
-        navigate(`/room/${option}`);
-        fetchData(roomIds[option]);
-        setContentState("classroom");
-    }
-    
-    function onX(){ //make a reset function soon
-        setContentState('empty');
-        fetchData('none');
-        setResults([]);
-        clearQuery();
-        setLoadedResults([]);
-    } 
-    
-    const [showMobileCalendar, setShowMobileCalendar] = useState(false);
-    
-    const [viewport, setViewport] = useState("100vh");
-    useEffect(() => {
-        setViewport((window.innerHeight) + 'px');
-    },[]);
-    
-    //==========================================================================================================================================================
-    
-
-    //=========================================== FETCHING LOGIC ===============================================================================================
+      function handleResize() {
+        setWidth(window.innerWidth);
+      }
+      window.addEventListener('resize', handleResize);
+  
+      return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
     useEffect(()=>{
         if(contentState === "calendarSearch" || contentState === "freeNowSearch"){
@@ -168,31 +120,26 @@ function Room1() {
         };
         fetchRooms();
     }, []);
-    
+
 
     useEffect(() => { // FETCH ROOM DATA , triggers on url change
-        if(isAuthenticating){
-            return;
-        }
         const searchParams = new URLSearchParams(window.location.search);
-        const searchQueryParam = searchParams.get('query'); 
+        const searchQuery = searchParams.get('query');
         const attributes = searchParams.get('attributes') ? JSON.parse(searchParams.get('attributes')) : null;
         const sort = searchParams.get('sort');
-        console.log("searchQuery", searchQueryParam);
-        console.log("attributes", attributes);
-        console.log("sort", sort);
-        if(searchQueryParam){
+        // console.log("searchQuery", searchQuery);
+        // console.log("attributes", attributes);
+        // console.log("sort", sort);
+        if(searchQuery){
             if(!ready){
                 return;
             }
-            fetchSearch(searchQueryParam, attributes, sort);
+            fetchSearch(searchQuery, attributes, sort);
             setSearchAttributes(attributes);
             setSearchSort(sort);    
-            setSearchQuery(searchQueryParam);
             console.log("searching");
             setContentState("nameSearch");
             fetchData("none");
-            allPurposeSearch();
 
         } else {
             if(roomIds[roomid] === undefined && roomid !== "none"){
@@ -212,8 +159,7 @@ function Room1() {
             }
         }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [isAuthenticated, roomIds, isAuthenticating]);
-
+    }, [isAuthenticated, roomIds]);
 
     useEffect(()=>{
         const updateLoadedResults = async ()=>{
@@ -238,7 +184,6 @@ function Room1() {
         updateLoadedResults();
     },[numLoaded]);
 
-    
     useEffect(() => { 
         setLoadedResults([]);
         setNumLoaded(0);
@@ -251,27 +196,56 @@ function Room1() {
         setResults([]);
         if (!noquery) {
             fetchFreeRooms();
-            allPurposeSearch();         
-         }
+        }
         console.log(numLoaded + " " + loadedResults.length + " " + results.length);
         console.log(noquery);
      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [query])
+
+    useEffect(()=>{
+        if(contentState === "empty"){
+            setNumLoaded(0);
+            setLoadedResults([]);
+        }
+        console.log(contentState);
+    },[contentState]);
     
-    function onSearch(nameQuery, attributes, sort){
-        const queryString = new URLSearchParams({ query: nameQuery, attributes: JSON.stringify(attributes), sort }).toString();
-        navigate(`/room/search?${queryString}`, { replace: true });        
-        // console.log(sort);
-        fetchSearch(nameQuery, attributes, sort); //sets search query
-        allPurposeSearch();
-        console.log(query);
-        setSearchAttributes(attributes);
-        setSearchSort(sort);
-        setContentState("nameSearch");
+    function changeURL(option) {
+        navigate(`/room/${option}`);
+        fetchData(roomIds[option]);
+        setContentState("calendarSearchResult");
     }
 
-    //==========================================================================================================================================================
+    function changeURL2(option) {
+        navigate(`/room/${option}`);
+        fetchData(roomIds[option]);
+        setContentState("classroom");
+    }
 
+    function onX(){ //make a reset function soon
+        setContentState('empty');
+        fetchData('none');
+        setResults([]);
+        clearQuery();
+        setLoadedResults([]);
+    }
+
+    function onSearch(query, attributes, sort){
+        const queryString = new URLSearchParams({ query, attributes: JSON.stringify(attributes), sort }).toString();
+        navigate(`/room/search?${queryString}`, { replace: true });        
+        // console.log(sort);
+        fetchSearch(query, attributes, sort); //sets search query
+        setSearchAttributes(attributes);
+        setSearchSort(sort);
+    }
+    
+    const [showMobileCalendar, setShowMobileCalendar] = useState(false);
+
+    const [viewport, setViewport] = useState("100vh");
+    useEffect(() => {
+        setViewport((window.innerHeight) + 'px');
+        //add listener
+    },[]);
 
 
     return (    
@@ -323,7 +297,7 @@ function Room1() {
                             </div>
                         </div> : ""}
                     </div>
-                    {width < 800 ? (
+                    {width < 800 || viewport < 700? (
                         <div className={`calendar-content-container ${showMobileCalendar ? "active" : ""}`}>
                             <MobileCalendar className={"s"} data={data} isloading={loading} addQuery={addQuery} removeQuery={removeQuery} query={query} show={showMobileCalendar} setShow={setShowMobileCalendar} />
                         </div>
@@ -332,18 +306,23 @@ function Room1() {
                             <Calendar className={room ? room.name ? room.name : "none": ""} data={data} isloading={loading} addQuery={addQuery} removeQuery={removeQuery} query={query} />
                         </div>
                     )}
-                    {width < 800 ? contentState === "calendarSearchResult" || contentState === "classroom" ? <button className="show-calendar" onClick={() => { setShowMobileCalendar(true) }}> <img src={chevronUp} alt="show schedule" /> </button> : "" : ""}
+                    {width < 800 || viewport < 700 ? contentState === "calendarSearchResult" || contentState === "classroom" ? <button className="show-calendar" onClick={() => { setShowMobileCalendar(true) }}> <img src={chevronUp} alt="show schedule" /> </button> : "" : ""}
                 </div>
             </div>
-            <div className="mini-footer">
-                <p>© {new Date().getFullYear()} Study Compass</p> 
-                <p>|</p>
-                <p>MIT license</p>
-                <p>|</p>
-                <a href="https://github.com/AZ0228/Study-Compass" className="github" ><img src={Github} alt="" className="github" /></a>
-            </div>
+            {
+                width > 800 ? 
+                    <div className="mini-footer">
+                        <p>© {new Date().getFullYear()} Study Compass</p> 
+                        <p>|</p>
+                        <p>MIT license</p>
+                        <p>|</p>
+                        <a href="https://github.com/AZ0228/Study-Compass" className="github" ><img src={Github} alt="" className="github" /></a>
+                    </div>
+                
+                : ""
+            }
         </div>
     );
 }
 
-export default Room1;
+export default Room
