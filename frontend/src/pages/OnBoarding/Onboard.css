@@ -210,22 +210,34 @@
 .onboard .status p{
     font-size:14px;
     font-weight: 500;
+    margin-bottom:2px;
 }
 
-.onboard .checking{
+.onboard .status div{
+    display:flex;
+    gap:8px;
+    align-items: center;
+}
+
+.onboard .status img{
+    width:15px;
+    height:15px;
+}
+
+.onboard .checking p{
     color: var(--yellow) !important;
 }
 
-.onboard .available{
+.onboard .available p{
     color: var(--green) !important;
 }
 
-.onboard .taken{
+.onboard .taken p{
     color: var(--red) !important;
 
 }
 
-.onboard .invalid{
+.onboard .invalid p{
     color: var(--red) !important;
 }
 

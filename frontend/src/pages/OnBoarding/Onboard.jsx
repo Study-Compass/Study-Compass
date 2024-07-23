@@ -13,6 +13,10 @@ import { useNotification } from '../../NotificationContext.js';
 import { checkUsername } from '../../DBInteractions.js';
 import { useCache } from '../../CacheContext.js';
 import { debounce} from '../../Query.js';
+import check from '../../assets/Icons/Check.svg';
+import waiting from '../../assets/Icons/Waiting.svg';
+import error from '../../assets/circle-warning.svg';
+import unavailable from '../../assets/Icons/Circle-X.svg';
 
 function Onboard(){
     const [current, setCurrent] = useState(0);
@@ -199,10 +203,10 @@ function Onboard(){
                                     <p>Since you signed up with Google, we generated a username for you, feel free to change it below:</p>
                                     <div className="username-input">
                                         <div className="status">
-                                            { usernameValid === 0 && <p className="checking">checking username...</p>}
-                                            { usernameValid === 1 && <p className="available">username is available</p>}
-                                            { usernameValid === 2 && <p className="taken">username is taken</p>}
-                                            { usernameValid === 3 && <p className="invalid">invalid username</p>}   
+                                            { usernameValid === 0 && <div className="checking"><img src={waiting} alt="" /><p>checking username...</p></div>}
+                                            { usernameValid === 1 && <div className="available"><img src={check} alt="" /><p>username is available</p></div>}
+                                            { usernameValid === 2 && <div className="taken"><img src={unavailable} alt="" /><p>username is taken</p></div>}
+                                            { usernameValid === 3 && <div className="invalid"><img src={error} alt="" /><p>invalid username</p></div>}   
                                         </div>
                                         <input type="text" value={username} onChange={handleUsernameChange} className="text-input"/>
                                     </div>
