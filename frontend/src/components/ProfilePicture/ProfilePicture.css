@@ -130,7 +130,10 @@ hr{
     gap:10px;
     /* margin:5px 0; */
     padding:5px;
-    padding-left:15px;
+    padding-left:10px;
+    width:100%;
+    box-sizing: border-box;
+    margin: 0px 5px;
 }
 
 .menu-item .icon{

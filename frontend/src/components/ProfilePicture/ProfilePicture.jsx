@@ -48,20 +48,26 @@ function ProfilePicture(){
                         <p>Profile</p>
                     </div>
                 </Link>
-                <div className="menu-item">
-                    <img className="icon" src={Settings} alt="settings" />
-                    <p>Settings</p>
-                </div>
+                <Link to="/settings">
+                    <div className="menu-item">
+                        <img className="icon" src={Settings} alt="settings" />
+                        <p>Settings</p>
+                    </div>
+                </Link>
                 <hr />
-                <div className="menu-item">
-                    <img className="icon" src={Guide} alt="guide" />
-                    <p>Guide</p>
-                </div>
+                <Link to="/">
+                    <div className="menu-item">
+                        <img className="icon" src={Guide} alt="guide" />
+                        <p>Guide</p>
+                    </div>
+                </Link>
                 <hr />
-                <div className="menu-item" onClick={logout}>
-                    <img className="icon" src={Logout} alt="log out" />
-                    <p>Logout</p>
-                </div>
+                <Link to="">
+                    <div className="menu-item" onClick={logout}>
+                        <img className="icon" src={Logout} alt="log out" />
+                        <p>Logout</p>
+                    </div>
+                </Link>
                 {/* { showPopup ? <button onClick={logout}>logout</button>: "" } */}
             </div>
         </div>
