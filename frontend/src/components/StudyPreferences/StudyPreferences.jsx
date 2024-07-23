@@ -3,8 +3,9 @@ import './StudyPreferences.css';
 import DragList from '../../pages/OnBoarding/DragList/DragList';
 import Recommendation from '../../pages/OnBoarding/Recommendation/Recommendation';
 import rightarrow from '../../assets/Icons/RightArrow.svg';
+import { set } from 'mongoose';
 
-const StudyPreferences = ({ settingsRightSide, width, handleBackClick }) => {
+const StudyPreferences = ({ settingsRightSide, width, handleBackClick, userInfo }) => {
     const [items, setItems] = useState(["outlets", "classroom type", "printer", "table type", "windows"]);
     const [sliderValue, setSliderValue] = useState(2);
     const details = {
@@ -14,6 +15,28 @@ const StudyPreferences = ({ settingsRightSide, width, handleBackClick }) => {
         // "table type": "ex: small desks, large tables,",
     }
 
+    let initialItems;
+
+
+    useEffect(() => {
+        setSliderValue(userInfo.recommendationPreferences);
+        const classroomPreferences = userInfo.classroomPreferences;
+
+        const classroom = {
+            "o": "outlets",
+            "c": "classroom type",
+            "p": "printer",
+            "t": "table type",
+            "w": "windows"
+        };
+
+        const newItems = classroomPreferences.split('').map(char => classroom[char]);
+        
+        setItems(newItems);
+        // initialItems =
+        
+
+    },[userInfo])
     
     return (
         <div className={`study-preferences settings-right ${settingsRightSide ? "active" : "not-active"}`}>
@@ -44,10 +67,13 @@ const StudyPreferences = ({ settingsRightSide, width, handleBackClick }) => {
                     <div className='right-bar'>
                         <DragList items={items} setItems={setItems} details={details}/>
                     </div>
-
-
-                    
                 </div>
+
+                <div className='save-button'>
+                    <button> save </button>
+                </div>
+
+
             </div>
             
         </div>

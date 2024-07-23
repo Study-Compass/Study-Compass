@@ -110,10 +110,10 @@ function Settings() {
                     {
                         (width < 700 || currentPage === "StudyPreferences" ) && (
                             <StudyPreferences
-                            settingsRightSide={currentPage === "StudyPreferences" ?  settingsRightSide : false}
+                                settingsRightSide={currentPage === "StudyPreferences" ?  settingsRightSide : false}
                                 userInfo={userInfo}
                                 handleBackClick={handleBackClick}
-                                width={width} 
+                                width={width}
                             />
                         )
                     }

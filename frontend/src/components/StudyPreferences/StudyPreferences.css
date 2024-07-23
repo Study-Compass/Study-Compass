@@ -29,3 +29,17 @@
     /* font-family:'Inter' */
     line-height: 1.31;
 }
+
+.study-preferences .save-button button{
+    display: flex;
+    flex-direction: column;
+    font-family: 'Inter';
+    font-weight:500;
+    color: var(--text);
+    font-size: 13px;
+    padding: 5px 9px;
+    height: fit-content;
+    outline: none;
+    border: none;
+    border-radius: 6px;
+}
