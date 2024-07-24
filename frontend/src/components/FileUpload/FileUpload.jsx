@@ -32,6 +32,9 @@ const FileUpload = ({ classroomName }) => {
                 }
             });
             setMessage('File uploaded successfully');
+            setTimeout(() => {
+                window.location.reload();
+            }, 500);
         } catch (error) {
             console.error('Error uploading file:', error);
             setMessage('Error uploading file');
