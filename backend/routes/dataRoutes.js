@@ -4,6 +4,10 @@ const Schedule = require('../schemas/schedule.js');
 const User = require('../schemas/user.js');
 const { verifyToken, verifyTokenOptional } = require('../middlewares/verifyToken');
 const { sortByAvailability } = require('../helpers.js');
+const multer = require('multer');
+const path = require('path');
+const s3 = require('../aws-config');
+
 
 const router = express.Router();
 
@@ -436,6 +440,49 @@ router.post('/save', verifyToken, async (req, res) => {
         console.log(`POST: /save/${roomId}/${userId} failed`);
         res.status(500).json({ success: false, message: 'Error saving room', error: error.message });
     }
+});
+
+
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 5 * 1024 * 1024, // 5 MB
+  },
+});
+
+router.post('/upload-image/:classroomName', upload.single('image'), async (req, res) => {
+  const classroomName = req.params.classroomName;
+  const file = req.file;
+
+  if (!file) {
+    return res.status(400).send('No file uploaded.');
+  }
+
+  const s3Params = {
+    Bucket: process.env.AWS_S3_BUCKET_NAME,
+    Key: `${classroomName}/${Date.now()}_${path.basename(file.originalname)}`,
+    Body: file.buffer,
+    ContentType: file.mimetype,
+    // ACL: 'public-read', // Make the file publicly accessible
+  };
+
+  try {
+    // Upload image to S3
+    const s3Response = await s3.upload(s3Params).promise();
+    const imageUrl = s3Response.Location;
+
+    // Find the classroom and update the image attribute
+    const classroom = await Classroom.findOneAndUpdate(
+      { name: classroomName },
+      { image: imageUrl },
+      { new: true, upsert: true }
+    );
+
+    res.status(200).json({ message: 'Image uploaded and classroom updated.', classroom });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('An error occurred while uploading the image or updating the classroom.');
+  }
 });
 
 module.exports = router;
