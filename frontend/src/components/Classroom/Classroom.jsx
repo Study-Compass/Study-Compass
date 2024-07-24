@@ -7,12 +7,14 @@ import useAuth from '../../hooks/useAuth.js';
 import '../../assets/fonts.css'
 import EditAttributes from './EditAttributes/EditAttributes.jsx';
 import Loader from '../Loader/Loader.jsx';
+import Flag from '../Flag/Flag.jsx';
 
 import Edit from '../../assets/Icons/Edit.svg';
 import Outlets from '../../assets/Icons/Outlets.svg';
 import Windows from '../../assets/Icons/Windows.svg';
 import Printer from '../../assets/Icons/Printer.svg';
 import FilledStar from '../../assets/Icons/FilledStar.svg';
+import circleWarning from '../../assets/gray-circle-warning.svg';
 
 import { findNext } from '../../pages/Room/RoomHelpers.js';
 
@@ -30,7 +32,7 @@ function Classroom({ room, state, setState, schedule, roomName }) {
         "outlets": Outlets,
         "windows": Windows,
         "printer": Printer
-    };
+    }; 
 
     const navigate = useNavigate();
 
@@ -117,6 +119,9 @@ function Classroom({ room, state, setState, schedule, roomName }) {
                         );
                     })}
                     {user && user.admin ? <div className="attribute" onClick={() => { setEdit(!edit) }}><img src={Edit} alt="" /></div> : ""}
+                </div>
+                <div>
+                    <Flag functions={backtoResults} primary={"rgba(176, 175, 175, .13)"} img={circleWarning} accent={"#D9D9D9"} color={"#737373"} text={"As Study Compass is still in beta, certain information may be incorrect. Reporting incorrect information is an important part of our troubleshooting process, so please help us out!"}/>
                 </div>
             </div>
             {user && user.admin ? room ? edit ? <EditAttributes room={room} attributes={room.attributes} setEdit={setEdit} /> : "" : "" : ""}

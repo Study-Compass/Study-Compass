@@ -6,6 +6,7 @@ import useAuth from '../../../hooks/useAuth';
 import { useGoogleLogin } from '@react-oauth/google';
 import circleWarning from '../../../assets/circle-warning.svg';
 import { generalIcons } from '../../../Icons';
+import Flag from '../../Flag/Flag';
 
 
 
@@ -130,10 +131,7 @@ function RegisterForm() {
         <form onSubmit={handleSubmit} className='form'>
             <h1>Register</h1>
             {errorText !== "" && 
-                <div className="error"
-                    ><img src={circleWarning} alt="error"></img>
-                    {errorText}
-                </div>
+                <Flag text={errorText} img={circleWarning} color={"#FD5858"} primary={"rgba(250, 117, 109, 0.16)"} accent={"#FD5858"} /> 
             }
 
             <div className="username">
