@@ -7,6 +7,7 @@ import useAuth from '../../hooks/useAuth.js';
 import '../../assets/fonts.css'
 import EditAttributes from './EditAttributes/EditAttributes.jsx';
 import Loader from '../Loader/Loader.jsx';
+import FileUpload from '../FileUpload/FileUpload.jsx';
 
 import Edit from '../../assets/Icons/Edit.svg';
 import Outlets from '../../assets/Icons/Outlets.svg';
@@ -120,6 +121,7 @@ function Classroom({ room, state, setState, schedule, roomName }) {
                 </div>
             </div>
             {user && user.admin ? room ? edit ? <EditAttributes room={room} attributes={room.attributes} setEdit={setEdit} /> : "" : "" : ""}
+            <FileUpload classroomName={room.name}/>
         </div>
     );
 }
