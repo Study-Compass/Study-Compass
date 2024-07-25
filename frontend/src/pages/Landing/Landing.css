@@ -45,7 +45,7 @@
 
 .landing .content button{
     font-family: 'Satoshi';
-    font-size:1.2em;
+    font-size:1.4em;
     color: white;
     background-color: var(--red);
     font-weight: bold;
@@ -53,8 +53,28 @@
     outline: none;
     padding: 5px 25px;
     border-radius: 10px;
-
+    position: relative;
 }
+
+.landing .try-button::after{
+    transition: all 0.5s;
+    content: '';
+    background-image: radial-gradient( circle farthest-corner at 10% 20%,  #F2374C 17.8%, #F9E298 100.2% );
+    filter: blur(0px);
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    position: absolute;
+    left: 0;
+    top: 0;
+    opacity: 0;
+}
+
+.landing .try-button:hover::after {
+    filter: blur(20px);
+    opacity: 1;
+  }
+  
 
 
 @media (max-width:500px) {
