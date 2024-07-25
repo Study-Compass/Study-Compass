@@ -11,6 +11,7 @@ li.result{
     gap:6px;
     pointer-events: all !important;
     /* margin:5px; */
+    position: relative;
 }
 
 .restricted::before{

@@ -208,6 +208,11 @@ function Room() {
         // if(searchQuery === ""){
         //     return;
         // }
+        console.log(noquery);
+        if(noquery && searchQuery === "" && searchAttributes.length === 0){
+            setContentState("empty");
+            return;
+        }
         console.log(searchQuery);
         console.log(searchAttributes);
         console.log(searchSort);
