@@ -119,11 +119,7 @@ const fetchFreeNowHelper = async (setContentState, setCalendarLoading, setResult
     } else {
         nowQuery[days[day-1]] = [{start_time: hour*60, end_time: (hour*60)+30}];
     }
-    const roomNames = await getFreeRooms(nowQuery);
-    setResults(roomNames.sort());
-    setNumLoaded(10);
-    // setLoadedResults(roomNames.sort().slice(0,10));
-    setCalendarLoading(false);
+    return nowQuery;
 }
 
 const fetchSearchHelper = async (query, attributes, sort, setContentState, setCalendarLoading, setResults, setLoadedResults, search, setNumLoaded, navigate, newError, setSearchQuery) => {

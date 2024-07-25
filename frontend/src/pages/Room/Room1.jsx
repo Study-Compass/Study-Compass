@@ -20,6 +20,7 @@ import Github from '../../assets/Icons/Github.svg';
 import { debounce} from '../../Query.js';
 import ProfilePicture from '../../components/ProfilePicture/ProfilePicture.jsx';
 import { all } from 'axios';
+import { set } from 'mongoose';
 
 /** 
 documentation:
@@ -75,6 +76,7 @@ function Room() {
     const addQuery = (key, newValue) => addQueryHelper(key, newValue, setNoQuery, setContentState, setQuery);
     const removeQuery = (key, value) => removeQueryHelper(key, value, setQuery, setNoQuery);
     const allPurposeSearch = async () => allPurposeFetchHelper(allSearch, searchQuery, query, searchAttributes, searchSort, setCalendarLoading, setResults, setLoadedResults, setNumLoaded);
+    const allPurposeFreeNow = async (query1) => allPurposeFetchHelper(allSearch, searchQuery, query1, searchAttributes, searchSort, setCalendarLoading, setResults, setLoadedResults, setNumLoaded);
     const debouncedAllPurposeSearch = useCallback(debounce(allPurposeSearch, 500), [searchQuery, searchAttributes, searchSort, query]);
 
 //=========================================== UI LOGIC =====================================================================================================
@@ -271,6 +273,11 @@ function Room() {
         updateLoadedResults();
     },[numLoaded]);
 
+    const handleFreeNow = async () => {
+        const query = fetchFreeNow();
+        allPurposeFreeNow(query);
+    }
+
 //==========================================================================================================================================================
 
     return (    
@@ -319,7 +326,7 @@ function Room() {
                         {contentState === "empty" ? <div className={`instructions-container ${width < 800 ? "mobile-instructions" : ""}`}>
                             <div className="instructions">
                                 <p>search by name or {width < 800 ? "see which rooms are" : "by selecting a timeslot, or see which rooms are"}</p>
-                                <button onClick={fetchFreeNow} className="free-now">free now</button>
+                                <button onClick={handleFreeNow} className="free-now">free now</button>
                             </div>
                         </div> : ""}
                     </div>

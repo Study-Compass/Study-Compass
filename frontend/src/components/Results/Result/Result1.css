@@ -74,6 +74,7 @@ li.result{
     margin: 0;
     hyphens:auto;
     -webkit-hyphens: auto;
+    color:var(--text);
 }
 
 .result-info{
