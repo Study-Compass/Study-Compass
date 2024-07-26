@@ -30,6 +30,12 @@
     line-height: 1.31;
 }
 
+.study-preferences .save-button button.active{
+    background-color:var(--red);
+    color: white;
+}
+
+
 .study-preferences .save-button button{
     display: flex;
     flex-direction: column;
@@ -42,4 +48,11 @@
     outline: none;
     border: none;
     border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
 }
+
+.study-preferences .sliderContainer{
+    gap:6px;
+}
+

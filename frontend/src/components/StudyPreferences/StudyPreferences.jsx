@@ -14,9 +14,10 @@ const StudyPreferences = ({ settingsRightSide, width, handleBackClick, userInfo 
         // "printer": "having a printer in the room",
         // "table type": "ex: small desks, large tables,",
     }
+    const [initialItems, setInitialItems] = useState([]);
+    const [active, setActive] = useState(false);
 
-    let initialItems;
-
+    // let initialItems;
 
     useEffect(() => {
         setSliderValue(userInfo.recommendationPreferences);
@@ -31,13 +32,28 @@ const StudyPreferences = ({ settingsRightSide, width, handleBackClick, userInfo 
         };
 
         const newItems = classroomPreferences.split('').map(char => classroom[char]);
+        setInitialItems(newItems);
         
         setItems(newItems);
+        // console.log(newItems);
         // initialItems =
         
 
-    },[userInfo])
-    
+    },[userInfo]);
+
+    useEffect(() => {
+        setActive(JSON.stringify(items) !== JSON.stringify(initialItems));
+    }, [items, initialItems]);
+
+
+    const handleSaveClick = () => {
+        userInfo.classroomPreferences = items.map(item => item[0]).join('');
+        setInitialItems(items);
+        setActive(false);
+        console.log("Preferences saved:", items);
+    };
+
+
     return (
         <div className={`study-preferences settings-right ${settingsRightSide ? "active" : "not-active"}`}>
             <div className="header">
@@ -63,14 +79,17 @@ const StudyPreferences = ({ settingsRightSide, width, handleBackClick, userInfo 
                         <p>4</p>
                         <p>5</p>
                     </div>
-
                     <div className='right-bar'>
                         <DragList items={items} setItems={setItems} details={details}/>
                     </div>
                 </div>
 
                 <div className='save-button'>
-                    <button> save </button>
+                    <button 
+                        className={`${active ? "active" : ""}`}
+                        onClick = {handleSaveClick}
+                        disabled={!active}
+                    > save </button>
                 </div>
 
 
