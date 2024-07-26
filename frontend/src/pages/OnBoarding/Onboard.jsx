@@ -17,13 +17,15 @@ import check from '../../assets/Icons/Check.svg';
 import waiting from '../../assets/Icons/Waiting.svg';
 import error from '../../assets/circle-warning.svg';
 import unavailable from '../../assets/Icons/Circle-X.svg';
+import CardHeader from '../../components/ProfileCard/CardHeader/CardHeader.jsx';
+import { set } from 'mongoose';
 
 function Onboard(){
     const [current, setCurrent] = useState(0);
     const [show, setShow] = useState(0);
     const [currentTransition, setCurrentTransition] = useState(0);
     const [containerHeight, setContainerHeight] = useState(175);
-    const { isAuthenticated, isAuthenticating, user } = useAuth();
+    const { isAuthenticated, isAuthenticating, user, validateToken } = useAuth();
     // const { debounce } = useCache();
     const { addNotification } = useNotification();
     const [userInfo, setUserInfo] = useState(null);
@@ -32,6 +34,7 @@ function Onboard(){
     const [initialUsername, setInitialUsername] = useState(null);
     const [sliderValue, setSliderValue] = useState(2);
     const [isGoogle, setIsGoogle] = useState(null);
+    const [onboarded, setOnboarded] = useState(false);
 
     const [usernameValid, setUsernameValid] = useState(1); // 0 is checking, 1 is valid, 2 is invalid
     const checkUsernameDebounced = debounce(checkUsername, 500);
@@ -90,7 +93,7 @@ function Onboard(){
             navigate('/login');
         } else {
             if(user){
-                if(user.onboarded){
+                if(user.onboarded && (!onboarded)){
                     navigate('/room/none');
                 }
                 setUserInfo(user);
@@ -114,8 +117,6 @@ function Onboard(){
         debounced(username);
     }, [username]);
 
-
-
     useEffect(()=>{
         if(current === 0){return;}
         setTimeout(() => {
@@ -131,6 +132,19 @@ function Onboard(){
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [current]);
 
+    async function handleOnboardUser(name, username, items, sliderValue){
+        try{
+            const response = await onboardUser(name, username, items, sliderValue);
+            if(response.success){
+                setOnboarded(true);
+                await validateToken();
+            }
+            
+        } catch (error){
+            newError(error, navigate);
+        }
+    }
+
     useEffect(()=>{
         if(show === 0){return;}
         setTimeout(() => {
@@ -139,14 +153,10 @@ function Onboard(){
 
         if(current === 3){
             try{
-                onboardUser(name, username, items, sliderValue);
+                handleOnboardUser(name, username, items, sliderValue);
             } catch (error){
                 newError(error, navigate);
             }
-            setTimeout(() => {
-                
-                navigate('/room/none');
-            }, 1000);
         }
 
         setButtonActive(false);
@@ -231,10 +241,20 @@ function Onboard(){
                             <Recommendation sliderValue={sliderValue} setSliderValue={setSliderValue}/>
                         </div>
                     }
+                    { current === 4 &&
+                        <div className={`content ${current === 5 ? "going": ""} ${4 === currentTransition ? "": "beforeOnboard"}`} ref={el => contentRefs.current[4] = el}>
+                            <h2>welcome to study compass, <br></br>{userInfo.name}!</h2>
+                            <p>Here's your study compass id, you only get one, so make sure not to lose it! It'll showcase all your progress using study-compass, let's get those numbers up!</p>
+                            <div className="card-container">
+                                <CardHeader userInfo={userInfo} settings={false}/>
+                            </div>
+                        </div>
+                    }
                 </div>  
             </div>
+            
                 <button className={`${ current !== 1 || (name !== "" && (!isGoogle || usernameValid === 1)) ? buttonActive ? "":"deactivated" : "deactivated"}`} onClick={()=>{setShow(show+1)}}>
-                    {current === 3  ? "finish" : "next"}
+                    {current === 4  ? "finish" : "next"}
                 </button>
                 
         </div>
