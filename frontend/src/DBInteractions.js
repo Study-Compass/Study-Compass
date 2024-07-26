@@ -62,6 +62,23 @@ const save = async (roomId, userId, operation) => {
     }
 };
 
+const saveUser = async (name, username, email, password, recommendation, classroom) => {
+    try{
+        const response = await axios.post('/update-user', {name, email, username, classroom, recommendation, onboarded : true}, {headers: {'Authorization': `Bearer ${localStorage.getItem('token')}`}});
+        const responseBody = response.body;
+
+        if (responseBody.success) {
+            console.log("User saved successfully");
+        } else {
+            console.error("User save unsuccessful");
+        }
+    } catch(error){
+        throw error;
+    }
+
+}
+
+export { changeClasroom, save, saveUser};
 const checkUsername = async (username) => {
     try {
         const response = await axios.post(/check-username/, { username });

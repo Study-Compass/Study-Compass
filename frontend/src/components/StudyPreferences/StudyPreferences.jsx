@@ -3,7 +3,7 @@ import './StudyPreferences.css';
 import DragList from '../../pages/OnBoarding/DragList/DragList';
 import Recommendation from '../../pages/OnBoarding/Recommendation/Recommendation';
 import rightarrow from '../../assets/Icons/RightArrow.svg';
-import { set } from 'mongoose';
+import { saveUser } from '../../DBInteractions';
 
 const StudyPreferences = ({ settingsRightSide, width, handleBackClick, userInfo }) => {
     const [items, setItems] = useState(["outlets", "classroom type", "printer", "table type", "windows"]);
@@ -47,10 +47,12 @@ const StudyPreferences = ({ settingsRightSide, width, handleBackClick, userInfo 
 
 
     const handleSaveClick = () => {
-        userInfo.classroomPreferences = items.map(item => item[0]).join('');
-        setInitialItems(items);
-        setActive(false);
-        console.log("Preferences saved:", items);
+        if (!active){
+            return;
+        } 
+        // grab the first letter of the word in classroom
+        // ["outlets", "classroom type", "printer", "table type", "windows"] => ocptw
+
     };
 
 
