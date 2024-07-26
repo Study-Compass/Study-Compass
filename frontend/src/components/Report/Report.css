@@ -8,11 +8,39 @@
     background-color: rgba(0, 0, 0, 0);
     opacity: 0;
     transition: background-color 0.5s ease, opacity 0.5s ease;
+    font-size: 13px;
+    font-weight: 400;
+    color: black;
 }
+
+.classroom-name{
+    padding: 8px 20px;
+    background-color: var(--lighter);
+    border: none;
+    border-radius: 10px;
+    font-family: Inter, sans-serif;
+    cursor: pointer;
+    text-align: center;
+    width: 48%;
+    margin-bottom: 15px;
+}
+
+textarea{
+    padding: 8px 20px;
+    background-color: var(--lighter);
+    border: none;
+    border-radius: 10px;
+    font-family: Inter, sans-serif;
+    cursor: pointer;
+    width: 75%;
+    height: 65%;
+}
+
 .whole_page.in{
     background-color: rgba(0, 0, 0, 0.3);
     opacity: 1;
 }
+
 .whole_page.out {
     background-color: rgba(0, 0, 0, 0);
     opacity: 0;
@@ -24,7 +52,7 @@
     box-sizing: border-box;
     border-radius:10px;
     display:flex;
-    padding: 50px 100px;
+    padding: 35px 50px;
     flex-direction: column;
     align-items: center;
     justify-content: center;
@@ -34,7 +62,7 @@
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     background-color: white;
     height: 400px;
-    width: 550px;
+    width: 500px;
     position: fixed; 
     border-radius: 8px; 
     gap: 3%;
@@ -57,7 +85,28 @@
 
 .whole_page h1{
     font-size: 20px;
-    text-align: left;
+    text-align: center;
     margin-left: 0;
     padding-left: 0;
+}
+
+.send-button{
+    margin-top: 15px;
+    padding: 6px 60px;
+    background-color: var(--lightborder);
+    color: white;
+    border: none;
+    border-radius: 7px;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-family: Inter, sans-serif;
+    font-weight:700;
+}
+
+.send-button.alt {
+    background-color: var(--red);
+}
+
+.send-button.alt:hover {
+    filter: brightness(0.9);
 }

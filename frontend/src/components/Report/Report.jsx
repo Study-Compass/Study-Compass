@@ -5,12 +5,20 @@ import Loader from '../Loader/Loader';
 import x from '../../assets/x.svg';
 
 
-function Report(){
+function Report({text}){
+    const [verified, setVerified] = useState(false);
+
     const [isUp, setIsUp] = useState(true);
 
     const handleClose = () => {
         setIsUp(false);
       };
+
+    const [description, setDescription] = useState('');
+
+    const handleDescriptionChange = (event) => {
+        setDescription(event.target.value);
+    };
 
     return(
         <div className={`whole_page ${isUp ? 'in' : 'out'}`}>
@@ -19,8 +27,15 @@ function Report(){
                     <img src={x} alt="close" />
                 </button>
                 <h1>Report Incorrect Information</h1>
-                <p>Describe the incorrect information</p> 
-                <button className="button">send</button>
+                <div className="classroom-name">
+                    <p>text</p> 
+                </div>
+                <p>Describe the incorrect information</p>
+                <textarea 
+                    value={description} 
+                    onChange={handleDescriptionChange} 
+                /> 
+                <button className={`send-button ${verified ? 'alt' : ''}`}>send</button>
             </div>
         </div>
     )

@@ -1,15 +1,5 @@
-@media (max-width:500px) {
-    .collapsible-header{
-        margin-left: auto;
-        margin-right: 10px;
-        border: none;
-        outline: none;
-        background-color: var(--white);
-        transform: rotate(180deg);
-        display: block;
-    }
-}
 
+ 
 
 .collapsible-header{
     display: none;
@@ -37,4 +27,16 @@
 .study-history.open{
     max-height: 34px;
     overflow: hidden;
+}
+
+@media (max-width:500px) {
+    .collapsible-header{
+        margin-left: auto;
+        margin-right: 10px;
+        border: none;
+        outline: none;
+        background-color: var(--white);
+        transform: rotate(180deg);
+        display: block;
+    }
 }
