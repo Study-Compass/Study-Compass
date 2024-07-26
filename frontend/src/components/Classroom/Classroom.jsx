@@ -7,6 +7,7 @@ import useAuth from '../../hooks/useAuth.js';
 import '../../assets/fonts.css'
 import EditAttributes from './EditAttributes/EditAttributes.jsx';
 import Loader from '../Loader/Loader.jsx';
+import FileUpload from '../FileUpload/FileUpload.jsx';
 import Flag from '../Flag/Flag.jsx';
 
 import Edit from '../../assets/Icons/Edit.svg';
@@ -23,9 +24,11 @@ import '../../pages/Room/Room.css';
 function Classroom({ room, state, setState, schedule, roomName }) {
 
     const [image, setImage] = useState("")
-    const { user } = useAuth();
+    const { isAuthenticating, isAuthenticated, user } = useAuth();
     const [success, setSuccess] = useState(false);
     const [message, setMessage] = useState("");
+    const [defaultImage, setDefaultImage] = useState(false);
+
 
     const [edit, setEdit] = useState(false);
     const attributeIcons = {
@@ -44,12 +47,11 @@ function Classroom({ room, state, setState, schedule, roomName }) {
         if (room === null || room === undefined) {
             return;
         }
-        if (room.image === "/") {
-            // console.log("image is /");
-            setImage("https://www.jmzarchitects.com/wp-content/uploads/2020/03/17112901-2-scaled.jpg");
-        } else {
-            setImage(`${process.env.PUBLIC_URL}${room.image}`);
+        if (room.image === "https://studycompass.s3.amazonaws.com/downsizedPlaceholder.jpeg"){
+            setDefaultImage(true);
+
         }
+        setImage(room.image);
     }, [room]);
 
         // useEffect(() => { console.log(state) }, [state]);
@@ -125,6 +127,10 @@ function Classroom({ room, state, setState, schedule, roomName }) {
                 </div>
             </div>
             {user && user.admin ? room ? edit ? <EditAttributes room={room} attributes={room.attributes} setEdit={setEdit} /> : "" : "" : ""}
+            {
+                defaultImage && (!isAuthenticating) && isAuthenticated && user.admin ? <FileUpload classroomName={room.name}/> : ""
+            }
+            
         </div>
     );
 }
