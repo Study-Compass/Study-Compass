@@ -78,7 +78,6 @@ const saveUser = async (name, username, email, password, recommendation, classro
 
 }
 
-export { changeClasroom, save, saveUser};
 const checkUsername = async (username) => {
     try {
         const response = await axios.post(/check-username/, { username });
@@ -101,4 +100,4 @@ const checkUsername = async (username) => {
 
 
 
-export { changeClasroom, save, checkUsername };
+export { changeClasroom, save, checkUsername, saveUser };
