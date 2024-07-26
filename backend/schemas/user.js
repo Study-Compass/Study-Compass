@@ -74,6 +74,10 @@ const userSchema = new mongoose.Schema({
     recommendationPreferences: {
         type:Number,
         default:3,
+    },
+    tags: {
+        type:Array,
+        default: [],
     }
     
     // you can add more fields here if needed, like 'createdAt', 'updatedAt', etc.

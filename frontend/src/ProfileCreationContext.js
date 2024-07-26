@@ -46,13 +46,19 @@ export const ProfileCreationProvider = ({ children }) => {
                 <div className={`pop-up ${isUp ? 'in' : 'out'}`} ref={ref}>
                     <div className="left-benefits"></div>
                     <Loader/>
-                    <button className="close-button" onClick={handleClose}>
-                        <img src={x} alt="close" />
-                    </button>
+                    {isUp && (
+                        <button className="close-button" onClick={handleClose}>
+                            <img src={x} alt="close" />
+                        </button>
+                    )}
                     <h1>Create an Account</h1>
                     <p>You'll need an account to do this. Please log in or create an account.</p> 
-                    <button className="button" onClick={goToLogin}>log in</button>
-                    <button className="button" onClick={goToRegister}>register</button>
+                    {isUp && (
+                        <button className="button" onClick={goToLogin}>log in</button>
+                    )}
+                    {isUp && (
+                        <button className="button" onClick={goToRegister}>register</button>
+                    )}
                 </div>
             </div>
         </ProfileCreationContext.Provider>
