@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import './Landing.css';
 import logo from '../../assets/red_logo.svg';
 import landing from '../../assets/Landing.png';
@@ -13,6 +13,8 @@ function Landing() {
         //add listener
     },[]);
 
+    const navigate = useNavigate();
+
     return(
         <div className="landing" style={{height: viewport}}>
             <Header/>
@@ -20,7 +22,7 @@ function Landing() {
             <img src={landingGrad} alt=""  className="hero-gradient"/>
             <div className="content">
                 <h1>wish you could see rpi classroom schedules? they're all here.</h1>
-                <button>try it out !</button>
+                <button className="try-button" onClick={()=>{navigate('/room/none')}}>try it out !</button>
             </div>
         </div>
     )
