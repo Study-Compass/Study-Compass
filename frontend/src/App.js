@@ -28,7 +28,7 @@ function App() {
                                 <Router>
                                     <ProfileCreationProvider>
                                     <Routes>
-                                        <Route path="/" element={<Redirect/> }/>
+                                        <Route path="/" element={<Landing/> }/>
                                         <Route path="/room/:roomid" element={<Room />}/>
                                         <Route path="/register" element={<Register />}/>
                                         <Route path="/login" element={<Login />}/>
