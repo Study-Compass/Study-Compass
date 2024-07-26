@@ -19,6 +19,7 @@ import Github from '../../assets/Icons/Github.svg';
 
 import { debounce} from '../../Query.js';
 import ProfilePicture from '../../components/ProfilePicture/ProfilePicture.jsx';
+import Report from '../../components/Report/Report.jsx';
 
 /** 
 documentation:
@@ -253,6 +254,7 @@ function Room() {
 
     return (    
         <div className="room" style={{ height: width < 800 ? viewport : '100vh' }}>
+            <Report />
             <Header />
             <div className="content-container">
                 <div className="calendar-container">
