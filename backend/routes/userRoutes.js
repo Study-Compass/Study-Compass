@@ -19,9 +19,28 @@ router.post("/update-user", verifyToken, async (req, res) =>{
         user.onboarded = onboarded ? onboarded : user.onboarded;
         
         await user.save();
-        console.log(`POST: /update-user ${req.user.userId} successful`)
+        console.log(`POST: /update-user ${req.user.userId} successful`);
+        return res.status(200).json({ success: true, message: 'User updated successfully' });
     } catch(error){
+        console.log(`POST: /update-user ${req.user.userId} failed`)
+        return res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+});
 
+// check if username is available
+router.post("/check-username", async (req, res) =>{
+    const { username } = req.body;
+    try{
+        const user = await User.findOne({ username: username });
+        if(user){
+            console.log(`POST: /check-username ${username} is taken`)
+            return res.status(200).json({ success: false, message: 'Username is taken' });
+        }
+        console.log(`POST: /check-username ${username} is available`)
+        return res.status(200).json({ success: true, message: 'Username is available' });
+    } catch(error){
+        console.log(`POST: /check-username ${username} failed`)
+        return res.status(500).json({ success: false, message: 'Internal server error' });
     }
 });
 

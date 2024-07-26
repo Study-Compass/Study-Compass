@@ -12,7 +12,7 @@ function ProfileCard({userInfo}){
         <div className="card">
             <div className="left-profile">
                 <div className="header">
-                    <CardHeader userInfo={userInfo}/>
+                    <CardHeader userInfo={userInfo} settings={true}/>
                 </div>
                 <SavedClassrooms userInfo={userInfo}/>
             </div>

@@ -7,6 +7,13 @@
     height: 100%;
     box-shadow: var(--shadow);  
     border-radius: 21px;
+    background-color: white;
+}
+
+.card-header h2.watermark{
+    color:#D45B53;
+    font-family: 'Satoshi';
+    font-size:20px;
 }
 
 .card-header .personal{

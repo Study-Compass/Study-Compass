@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import './Onboard.css';
 import PurpleGradient from '../../assets/PurpleGrad.svg';
 import YellowRedGradient from '../../assets/YellowRedGrad.svg';
@@ -9,17 +9,35 @@ import Recommendation from './Recommendation/Recommendation.jsx';
 import { useNavigate } from 'react-router-dom';
 import { onboardUser } from './OnboardHelpers.js';
 import { useError } from '../../ErrorContext.js'; 
-
+import { useNotification } from '../../NotificationContext.js';
+import { checkUsername } from '../../DBInteractions.js';
+import { useCache } from '../../CacheContext.js';
+import { debounce} from '../../Query.js';
+import check from '../../assets/Icons/Check.svg';
+import waiting from '../../assets/Icons/Waiting.svg';
+import error from '../../assets/circle-warning.svg';
+import unavailable from '../../assets/Icons/Circle-X.svg';
+import CardHeader from '../../components/ProfileCard/CardHeader/CardHeader.jsx';
+import { set } from 'mongoose';
 
 function Onboard(){
     const [current, setCurrent] = useState(0);
     const [show, setShow] = useState(0);
     const [currentTransition, setCurrentTransition] = useState(0);
     const [containerHeight, setContainerHeight] = useState(175);
-    const { isAuthenticated, isAuthenticating, user } = useAuth();
+    const { isAuthenticated, isAuthenticating, user, validateToken } = useAuth();
+    // const { debounce } = useCache();
+    const { addNotification } = useNotification();
     const [userInfo, setUserInfo] = useState(null);
     const [name, setName] = useState("");
+    const [username, setUsername] = useState(null);
+    const [initialUsername, setInitialUsername] = useState(null);
     const [sliderValue, setSliderValue] = useState(2);
+    const [isGoogle, setIsGoogle] = useState(null);
+    const [onboarded, setOnboarded] = useState(false);
+
+    const [usernameValid, setUsernameValid] = useState(1); // 0 is checking, 1 is valid, 2 is invalid
+    const checkUsernameDebounced = debounce(checkUsername, 500);
 
     const navigate = useNavigate();
     const { newError } = useError();
@@ -44,9 +62,28 @@ function Onboard(){
         }
     }, []);
 
-    useEffect(()=>{
-        console.log(name)
-    }, [name]);    
+    const validUsername = async (username) => {
+        if (username === null || username === "") {
+            return;
+        }
+        if (username === initialUsername) {
+            setUsernameValid(1);
+            return;
+        }
+        setUsernameValid(0);
+        try{
+            const response = await checkUsername(username);
+            if(response){
+                setUsernameValid(1);
+            } else {
+                setUsernameValid(2);
+            }
+        } catch (error){
+            addNotification({title: 'Error checking username', message: error.message, type: 'error'});
+        }
+    };
+
+    const debounced = useCallback(debounce(validUsername, 500),[]);
     
     useEffect(() => {
         if(isAuthenticating){
@@ -56,14 +93,29 @@ function Onboard(){
             navigate('/login');
         } else {
             if(user){
-                if(user.onboarded){
+                if(user.onboarded && (!onboarded)){
                     navigate('/room/none');
                 }
                 setUserInfo(user);
+                setIsGoogle(user.google);
+                setUsername(user.google ? user.username : null);
+                setInitialUsername(user.google ? user.username : null);
             }
         }
     }, [isAuthenticating, isAuthenticated, user]);
 
+    useEffect(() => {
+        if (username === null || username === "") {
+            setUsernameValid(3);
+            return;
+        }
+        if (username === initialUsername) {
+            setUsernameValid(1);
+            return;
+        }
+        setUsernameValid(0);
+        debounced(username);
+    }, [username]);
 
     useEffect(()=>{
         if(current === 0){return;}
@@ -80,6 +132,19 @@ function Onboard(){
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [current]);
 
+    async function handleOnboardUser(name, username, items, sliderValue){
+        try{
+            const response = await onboardUser(name, username, items, sliderValue);
+            if(response.success){
+                setOnboarded(true);
+                await validateToken();
+            }
+            
+        } catch (error){
+            newError(error, navigate);
+        }
+    }
+
     useEffect(()=>{
         if(show === 0){return;}
         setTimeout(() => {
@@ -88,11 +153,10 @@ function Onboard(){
 
         if(current === 3){
             try{
-                onboardUser(name, null, items, sliderValue);
+                handleOnboardUser(name, username, items, sliderValue);
             } catch (error){
                 newError(error, navigate);
             }
-            navigate('/room/none');
         }
 
         setButtonActive(false);
@@ -118,6 +182,10 @@ function Onboard(){
         setName(e.target.value);
     }
 
+    const handleUsernameChange = (e) => {
+        setUsername(e.target.value);
+    }
+
     return (
         <div className="onboard" style={{height: viewport}}>
             <img src={YellowRedGradient} alt="" className="yellow-red" />
@@ -136,8 +204,24 @@ function Onboard(){
                         <div className={`content ${show === 2 ? "going": ""} ${1 === currentTransition ? "": "beforeOnboard"}`} ref={el => contentRefs.current[1] = el}>
                             <Loader/>
                             <h2>set your name</h2>
-                            <p>This is the name you will be visible to other users as (your screen name):</p>
+                            <p>This is the name you will be visible to other users as (putting you real name here is advised):</p>
                             <input type="text" value={name} onChange={handleNameChange} className="text-input"/>
+                            { isGoogle && 
+                                <div className="content">
+                                    
+                                    <h2>set your username</h2>
+                                    <p>Since you signed up with Google, we generated a username for you, feel free to change it below:</p>
+                                    <div className="username-input">
+                                        <div className="status">
+                                            { usernameValid === 0 && <div className="checking"><img src={waiting} alt="" /><p>checking username...</p></div>}
+                                            { usernameValid === 1 && <div className="available"><img src={check} alt="" /><p>username is available</p></div>}
+                                            { usernameValid === 2 && <div className="taken"><img src={unavailable} alt="" /><p>username is taken</p></div>}
+                                            { usernameValid === 3 && <div className="invalid"><img src={error} alt="" /><p>invalid username</p></div>}   
+                                        </div>
+                                        <input type="text" value={username} onChange={handleUsernameChange} className="text-input"/>
+                                    </div>
+                                </div>
+                            }
                         </div>
                     }
                     { current === 2  &&
@@ -157,10 +241,20 @@ function Onboard(){
                             <Recommendation sliderValue={sliderValue} setSliderValue={setSliderValue}/>
                         </div>
                     }
-                </div>
+                    { current === 4 &&
+                        <div className={`content ${current === 5 ? "going": ""} ${4 === currentTransition ? "": "beforeOnboard"}`} ref={el => contentRefs.current[4] = el}>
+                            <h2>welcome to study compass, <br></br>{userInfo.name}!</h2>
+                            <p>Here's your study compass id, you only get one, so make sure not to lose it! It'll showcase all your progress using study-compass, let's get those numbers up!</p>
+                            <div className="card-container">
+                                <CardHeader userInfo={userInfo} settings={false}/>
+                            </div>
+                        </div>
+                    }
+                </div>  
             </div>
-                <button className={`${ current === 1 && name === "" ? "deactivated" : buttonActive ? "":"deactivated"}`} onClick={()=>{setShow(show+1)}}>
-                    {current === 3  ? "finish" : "next"}
+            
+                <button className={`${ current !== 1 || (name !== "" && (!isGoogle || usernameValid === 1)) ? buttonActive ? "":"deactivated" : "deactivated"}`} onClick={()=>{setShow(show+1)}}>
+                    {current === 4  ? "finish" : "next"}
                 </button>
                 
         </div>
