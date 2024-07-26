@@ -10,6 +10,7 @@ const onboardUser = async (name, username, classroom, recommendation) => {
         const response = await axios.post('/update-user', {name, username, classroom : classroomPreferences, recommendation, onboarded : true}, {headers: {'Authorization': `Bearer ${localStorage.getItem('token')}`}});
         const responseBody = response.data;
         console.log(responseBody);
+        return responseBody;
 
     } catch (error){
         throw(error);

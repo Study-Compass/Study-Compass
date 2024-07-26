@@ -80,7 +80,7 @@ async function authenticateWithGoogle(code, isRegister = false) {
             throw new Error('Email already exists');
         }
 
-        const randomUsername = await generateUniqueUsername();
+        const randomUsername = await generateUniqueUsername(userInfo.data.email);
 
         user = new User({
             googleId: userInfo.data.id,
@@ -97,17 +97,19 @@ async function authenticateWithGoogle(code, isRegister = false) {
     return { user, token: jwtToken };
 }
 
-async function generateUniqueUsername() {
-    let username;
+async function generateUniqueUsername(email) {
+    let username =  email.split('@')[0].replace(/[^a-zA-Z0-9]/g, '');
     let isUnique = false;
 
-    while (!isUnique) {
-        username = 'user-' + crypto.randomBytes(4).toString('hex');
+    do {
         const existingUser = await User.findOne({ username });
         if (!existingUser) {
             isUnique = true;
+        } else {
+            username += crypto.randomBytes(1).toString('hex');
         }
-    }
+    } while (!isUnique);
+
 
     return username;
 }
