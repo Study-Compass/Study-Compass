@@ -85,6 +85,7 @@ async function authenticateWithGoogle(code, isRegister = false) {
         user = new User({
             googleId: userInfo.data.id,
             email: userInfo.data.email,
+            tags: ["beta tester"],
             name: userInfo.data.name,
             username: randomUsername, //replace this with a random username generated
             picture: userInfo.data.picture
