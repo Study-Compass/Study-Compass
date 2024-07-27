@@ -75,8 +75,6 @@
     opacity: 1;
   }
   
-
-
 @media (max-width:500px) {
     .hero-picture{
         bottom:0;
@@ -93,10 +91,16 @@
        width:300px;
        margin-top:50px;
     }
-
+    
     .landing .content h1{
         font-size:1.5em;
-    };
+    }
+    
+    .landing .content button{
+        font-size:1.1em;
+        color: white;
+
+    }
 }
 
 

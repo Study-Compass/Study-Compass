@@ -159,6 +159,10 @@ function Onboard(){
             }
         }
 
+        if(current === 4){
+            navigate('/room/none');
+        }
+
         setButtonActive(false);
         setTimeout(() => {
             setButtonActive(true);
