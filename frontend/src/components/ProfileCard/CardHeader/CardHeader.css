@@ -33,6 +33,7 @@
     margin-left: 4%;
     margin-top: 2%;
     position: relative;
+    height: 100px;
 }
 
 .card-header .personal img{

@@ -5,8 +5,6 @@ import defaultAvatar from "../../../assets/defaultAvatar.svg"
 import ProfilePicture from '../../ProfilePicture/ProfilePicture';
 import '../../ProfilePicture/ProfilePicture.css';
 
-
-
 function CardHeader({userInfo, settings}){
     console.log(userInfo);
     return (
