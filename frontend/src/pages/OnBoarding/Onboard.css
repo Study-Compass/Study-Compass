@@ -7,7 +7,6 @@
     align-items: center;
     justify-content: center ;
     flex-direction: column;
-    
 }
 
 .onboard .content h2{
@@ -43,7 +42,6 @@
     transition: all 0.5s ease-in-out;
     max-width: 400px;
     margin-bottom:10px;
-    width:400px;
 }
 
 .onboard .content .card-container{
@@ -312,5 +310,10 @@
 
     .onboard .content p{
         font-size:16px;
+        max-width: 100%;
+    }
+
+    .onboard .card-container{
+        scale:0.9;
     }
 }
