@@ -8,10 +8,15 @@ const s3 = require('./aws-config');
 const multer = require('multer');
 require('dotenv').config();
 const { google } = require('googleapis');
+const { createServer } = require('http');
+const WebSocket = require('ws');
 
 const app = express();
 // const port = 5001;
 const port = process.env.PORT || 5001;
+
+const server = createServer(app);
+const wss = new WebSocket.Server({server});
 
 const corsOptions = {
     origin: 'http://localhost:3000', // replace with production domain
@@ -123,8 +128,21 @@ if (process.env.NODE_ENV === 'production') {
     });
 }
 
+// WebSocket functionality
+wss.on('connection', (ws) => {
+    console.log('Client connected');
+    ws.on('message', (message) => {
+        console.log(`Received: ${message}`);
+        ws.send(`Echo: ${message}`);
+    });
+
+    ws.on('close', () => {
+        console.log('Client disconnected');
+    });
+});
 
 
-app.listen(port, () => {
+// Start the server
+server.listen(port, () => {
     console.log(`Backend server is running on http://localhost:${port}`);
 });
