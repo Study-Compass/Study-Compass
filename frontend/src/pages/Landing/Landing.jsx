@@ -22,7 +22,7 @@ function Landing() {
             <img src={landingGrad} alt=""  className="hero-gradient"/>
             <div className="content">
                 <h1>wish you could see rpi classroom schedules? they're all here.</h1>
-                <button className="try-button" onClick={()=>{navigate('/room/none')}}>try it out !</button>
+                <button className="try-button" onClick={()=>{navigate('/room/none')}}>try it out!</button>
             </div>
         </div>
     )
