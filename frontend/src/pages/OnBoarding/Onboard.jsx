@@ -21,6 +21,7 @@ import CardHeader from '../../components/ProfileCard/CardHeader/CardHeader.jsx';
 import { set } from 'mongoose';
 
 function Onboard(){
+    const [start, setStart] = useState(false);
     const [current, setCurrent] = useState(0);
     const [show, setShow] = useState(0);
     const [currentTransition, setCurrentTransition] = useState(0);
@@ -84,6 +85,12 @@ function Onboard(){
     };
 
     const debounced = useCallback(debounce(validUsername, 500),[]);
+
+    useEffect(() => {
+        setTimeout(() => {
+            setStart(true);
+        }, 500);
+    },[]);
     
     useEffect(() => {
         if(isAuthenticating){
@@ -100,6 +107,7 @@ function Onboard(){
                 setIsGoogle(user.google);
                 setUsername(user.google ? user.username : null);
                 setInitialUsername(user.google ? user.username : null);
+                setName(user.name);
             }
         }
     }, [isAuthenticating, isAuthenticated, user]);
@@ -191,7 +199,7 @@ function Onboard(){
     }
 
     return (
-        <div className="onboard" style={{height: viewport}}>
+        <div className={`onboard ${start ? "visible" : ""}`} style={{height: viewport}}>
             <img src={YellowRedGradient} alt="" className="yellow-red" />
             <img src={PurpleGradient} alt="" className="purple" />
 
