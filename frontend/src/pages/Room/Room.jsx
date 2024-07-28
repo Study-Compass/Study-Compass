@@ -12,6 +12,7 @@ import MobileCalendar from '../../components/CalendarComponents/MobileCalendar/M
 import { findNext, fetchDataHelper, fetchFreeRoomsHelper, fetchFreeNowHelper, fetchSearchHelper, addQueryHelper, removeQueryHelper } from "./RoomHelpers.js";
 import Results from '../../components/Results/Results.jsx';
 import Sort from '../../components/Sort/Sort.jsx';
+import Footer from '../../components/Footer/Footer.jsx';
 
 import chevronUp from '../../assets/chevronup.svg';
 import SortIcon from '../../assets/Icons/Sort.svg';
@@ -319,13 +320,7 @@ function Room() {
             </div>
             {
                 width > 800 ? 
-                    <div className="mini-footer">
-                        <p>© {new Date().getFullYear()} Study Compass</p> 
-                        <p>|</p>
-                        <p>MIT license</p>
-                        <p>|</p>
-                        <a href="https://github.com/AZ0228/Study-Compass" className="github" ><img src={Github} alt="" className="github" /></a>
-                    </div>
+                    <Footer/>
                 
                 : ""
             }

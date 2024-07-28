@@ -159,6 +159,10 @@ function Onboard(){
             }
         }
 
+        if(current === 4){
+            navigate('/room/none');
+        }
+
         setButtonActive(false);
         setTimeout(() => {
             setButtonActive(true);
@@ -226,7 +230,6 @@ function Onboard(){
                     }
                     { current === 2  &&
                         <div className={`content ${show === 3 ? "going": ""} ${2 === currentTransition ? "": "beforeOnboard"}`} ref={el => contentRefs.current[2] = el}>
-                            <Loader/>
                             <h2>rank your classroom preferences</h2>
                             <p>What features do you find most important in your study spaces? Rank them from top to bottom.</p>
                             <div className="preference-list">
