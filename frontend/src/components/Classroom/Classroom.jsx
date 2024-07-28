@@ -8,6 +8,7 @@ import '../../assets/fonts.css'
 import EditAttributes from './EditAttributes/EditAttributes.jsx';
 import Loader from '../Loader/Loader.jsx';
 import FileUpload from '../FileUpload/FileUpload.jsx';
+import RatingComponent from '../Rating/Rating.jsx';
 
 import Edit from '../../assets/Icons/Edit.svg';
 import Outlets from '../../assets/Icons/Outlets.svg';
@@ -18,6 +19,7 @@ import FilledStar from '../../assets/Icons/FilledStar.svg';
 import { findNext } from '../../pages/Room/RoomHelpers.js';
 
 import '../../pages/Room/Room.css';
+import Rating from 'react-rating';
 
 function Classroom({ room, state, setState, schedule, roomName }) {
 
@@ -26,6 +28,8 @@ function Classroom({ room, state, setState, schedule, roomName }) {
     const [success, setSuccess] = useState(false);
     const [message, setMessage] = useState("");
     const [defaultImage, setDefaultImage] = useState(false);
+
+    const [rating, setRating] = useState(0);
 
 
     const [edit, setEdit] = useState(false);
@@ -121,6 +125,7 @@ function Classroom({ room, state, setState, schedule, roomName }) {
                     {user && user.admin ? <div className="attribute" onClick={() => { setEdit(!edit) }}><img src={Edit} alt="" /></div> : ""}
                 </div>
             </div>
+            <RatingComponent rating={rating} setRating={setRating} />
             {user && user.admin ? room ? edit ? <EditAttributes room={room} attributes={room.attributes} setEdit={setEdit} /> : "" : "" : ""}
             {
                 defaultImage && (!isAuthenticating) && isAuthenticated && user.admin ? <FileUpload classroomName={room.name}/> : ""
