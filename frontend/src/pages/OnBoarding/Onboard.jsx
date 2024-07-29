@@ -36,6 +36,7 @@ function Onboard(){
     const [sliderValue, setSliderValue] = useState(2);
     const [isGoogle, setIsGoogle] = useState(null);
     const [onboarded, setOnboarded] = useState(false);
+    const [usernameValid, setUsernameValid] = useState(0);
 
     const navigate = useNavigate();
     const { newError } = useError();

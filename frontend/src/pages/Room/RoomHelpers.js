@@ -93,7 +93,7 @@ const fetchFreeRoomsHelper = async (setContentState, setCalendarLoading, getFree
     }
 };
 
-const fetchFreeNowHelper = async (setContentState, setCalendarLoading, setResults, setNumLoaded, getFreeRooms) => {
+const fetchFreeNowHelper = (setContentState, setCalendarLoading, setResults, setNumLoaded, getFreeRooms) => {
     setContentState("freeNowSearch")
     setCalendarLoading(true)
     let nowQuery = {

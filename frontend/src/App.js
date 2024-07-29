@@ -30,7 +30,7 @@ function App() {
                                     <ProfileCreationProvider>
                                     <Routes>
                                         <Route path="/" element={<Landing/> }/>
-                                        <Route path="/room/:roomid" element={<Room />}/>
+                                        <Route path="/room/:roomid" element={<Room1 />}/>
                                         <Route path="/room1/:roomid" element={<Room1 />}/>
                                         <Route path="/register" element={<Register />}/>
                                         <Route path="/login" element={<Login />}/>

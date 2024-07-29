@@ -284,6 +284,7 @@ router.get('/all-purpose-search', verifyTokenOptional, async (req, res) => {
     const sort = req.query.sort;
     const userId = req.user ? req.user.userId : null;
     let user;
+    console.log(`GET: /all-purpose-search?query=${query}&attributes=${attributes}&sort=${sort}&time=${timePeriod}`);
 
     const createTimePeriodQuery = (queryObject) => {
         let conditions = [];
@@ -390,7 +391,6 @@ router.get('/all-purpose-search', verifyTokenOptional, async (req, res) => {
         // Extract only the names from the result set
         const names = sortedClassrooms.map(classroom => classroom.name);
 
-        console.log(`GET: /all-purpose-search?query=${query}&attributes=${attributes}&sort=${sort}&time=${timePeriod}`);
         res.json({ success: true, message: "Rooms found", data: names });
 
         
