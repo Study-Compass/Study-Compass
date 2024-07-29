@@ -41,6 +41,7 @@ function Room() {
     const [ready, setReady] = useState(false);
     const { isAuthenticated, isAuthenticating, user } = useAuth();
     const { getRooms, getFreeRooms, getRoom, getBatch, search, allSearch } = useCache();
+
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [calendarLoading, setCalendarLoading] = useState(true);
@@ -132,9 +133,6 @@ function Room() {
                 navigate('/onboard');
             }
         }
-        if(isAuthenticating){
-            return;
-        }
         const searchParams = new URLSearchParams(window.location.search);
         const searchQuery = searchParams.get('query');
         const attributes = searchParams.get('attributes') ? JSON.parse(searchParams.get('attributes')) : null;
@@ -172,6 +170,7 @@ function Room() {
         }
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isAuthenticated, roomIds, isAuthenticating]);
+
 
     useEffect(()=>{
         const updateLoadedResults = async ()=>{

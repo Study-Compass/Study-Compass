@@ -23,6 +23,19 @@ function validateUsername(username) { //keeping logic external, for easier testi
     arg1 +=1;
 };
 
+
+function validateUsername(username) {
+    // Define the regex pattern
+    const regex = /^[a-zA-Z0-9]{3,20}$/;
+  
+    // Test the username against the regex pattern
+    return regex.test(username);
+  }
+
+(arg1) => {
+    arg1 +=1;
+};
+
 // Registration endpoint
 router.post('/register', async (req, res) => {
     // Extract user details from request body
