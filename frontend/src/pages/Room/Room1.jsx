@@ -199,6 +199,7 @@ function Room() {
                 clearQuery();
             }
         }
+        console.log(roomid);
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isAuthenticated, isAuthenticating, roomIds]);
 
@@ -218,7 +219,7 @@ function Room() {
         //     return;
         // }
         console.log(noquery);
-        if(noquery && searchQuery === "" && searchAttributes.length === 0){
+        if(noquery && searchQuery === "" && searchAttributes.length === 0 && contentState !== "classroom"){
             setContentState("empty");
             return;
         }
