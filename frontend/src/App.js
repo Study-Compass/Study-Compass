@@ -1,6 +1,7 @@
 import React from 'react';
 import './App.css';
 import Room from './pages/Room/Room';
+import Room1 from './pages/Room/Room1';
 import Login from './pages/Login';
 import Register from './pages/Register/Register';
 import Redirect from './pages/Redirect/Redirect';
@@ -8,6 +9,7 @@ import Error from './pages/Error/Error';
 import Onboard from './pages/OnBoarding/Onboard';
 import Friends from './pages/Friends/Friends';
 import Profile from './pages/Profile/Profile';
+import Landing from './pages/Landing/Landing';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './AuthContext';
 import { CacheProvider } from './CacheContext';
@@ -27,8 +29,9 @@ function App() {
                                 <Router>
                                     <ProfileCreationProvider>
                                     <Routes>
-                                        <Route path="/" element={<Redirect/> }/>
-                                        <Route path="/room/:roomid" element={<Room />}/>
+                                        <Route path="/" element={<Landing/> }/>
+                                        <Route path="/room/:roomid" element={<Room1 />}/>
+                                        <Route path="/room1/:roomid" element={<Room1 />}/>
                                         <Route path="/register" element={<Register />}/>
                                         <Route path="/login" element={<Login />}/>
                                         <Route path="*" element={<Error />}/>
@@ -36,6 +39,7 @@ function App() {
                                         <Route path="/onboard" element={<Onboard />}/>
                                         <Route path="/profile" element={<Profile/>}/>
                                         <Route path="/friends" element={<Friends/>}/>
+                                        <Route path="/landing" element={<Landing/>}/>
                                     </Routes>
                                     </ProfileCreationProvider>
                                 </Router>

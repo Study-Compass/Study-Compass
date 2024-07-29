@@ -4,6 +4,10 @@ const Schedule = require('../schemas/schedule.js');
 const User = require('../schemas/user.js');
 const { verifyToken, verifyTokenOptional } = require('../middlewares/verifyToken');
 const { sortByAvailability } = require('../helpers.js');
+const multer = require('multer');
+const path = require('path');
+const s3 = require('../aws-config');
+
 
 const router = express.Router();
 
@@ -280,6 +284,7 @@ router.get('/all-purpose-search', verifyTokenOptional, async (req, res) => {
     const sort = req.query.sort;
     const userId = req.user ? req.user.userId : null;
     let user;
+    console.log(`GET: /all-purpose-search?query=${query}&attributes=${attributes}&sort=${sort}&time=${timePeriod}`);
 
     const createTimePeriodQuery = (queryObject) => {
         let conditions = [];
@@ -360,7 +365,33 @@ router.get('/all-purpose-search', verifyTokenOptional, async (req, res) => {
             ]);
         }
 
-        console.log({ name: { $regex: query, $options: 'i' }, attributes: { $all: attributes } },{ name: 1} );
+        const classrooms = await findQuery;
+
+        let sortedClassrooms = [];
+
+        if (userId && user) {
+            const savedSet = new Set(user.saved); // Convert saved items to a Set for efficient lookups
+
+            // Split classrooms into saved and not saved
+            const { saved, notSaved } = classrooms.reduce((acc, classroom) => {
+                if (savedSet.has(classroom._id.toString())) { 
+                    acc.saved.push(classroom);
+                } else {
+                    acc.notSaved.push(classroom);
+                }
+                return acc;
+            }, { saved: [], notSaved: [] });
+
+            // Concatenate saved items in front of not saved items
+            sortedClassrooms = saved.concat(notSaved);
+        } else {
+            sortedClassrooms = classrooms; // No user or saved info, use original order
+        }
+
+        // Extract only the names from the result set
+        const names = sortedClassrooms.map(classroom => classroom.name);
+
+        res.json({ success: true, message: "Rooms found", data: names });
 
         
     } catch (error) {
@@ -409,6 +440,49 @@ router.post('/save', verifyToken, async (req, res) => {
         console.log(`POST: /save/${roomId}/${userId} failed`);
         res.status(500).json({ success: false, message: 'Error saving room', error: error.message });
     }
+});
+
+
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 5 * 1024 * 1024, // 5 MB
+  },
+});
+
+router.post('/upload-image/:classroomName', upload.single('image'), async (req, res) => {
+  const classroomName = req.params.classroomName;
+  const file = req.file;
+
+  if (!file) {
+    return res.status(400).send('No file uploaded.');
+  }
+
+  const s3Params = {
+    Bucket: process.env.AWS_S3_BUCKET_NAME,
+    Key: `${classroomName}/${Date.now()}_${path.basename(file.originalname)}`,
+    Body: file.buffer,
+    ContentType: file.mimetype,
+    // ACL: 'public-read', // Make the file publicly accessible
+  };
+
+  try {
+    // Upload image to S3
+    const s3Response = await s3.upload(s3Params).promise();
+    const imageUrl = s3Response.Location;
+
+    // Find the classroom and update the image attribute
+    const classroom = await Classroom.findOneAndUpdate(
+      { name: classroomName },
+      { image: imageUrl },
+      { new: true, upsert: true }
+    );
+
+    res.status(200).json({ message: 'Image uploaded and classroom updated.', classroom });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('An error occurred while uploading the image or updating the classroom.');
+  }
 });
 
 module.exports = router;

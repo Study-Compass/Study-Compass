@@ -107,14 +107,16 @@ function SearchBar({ data, onEnter, onSearch, room, onX, onBlur }) {
 
     useEffect(() => {
         if(room === null){
+            console.log("null");
             setSearchInput("");
         } else {
+            console.log(room);
             setSearchInput(room);
         }
     },[room]);
 
     useEffect(() => {
-        setSearchInput(searchInput.toLowerCase());
+        setSearchInput(prev => prev.toLowerCase());
         if(searchInput === "none"){
             setSearchInput("");
         }
@@ -154,7 +156,7 @@ function SearchBar({ data, onEnter, onSearch, room, onX, onBlur }) {
     }, [searchInput, dataAbb]);
 
     function next(){
-        setSearchInput(searchInput.toLowerCase());
+        setSearchInput(prev => prev.toLowerCase());
         setLower("");
         setResults([]);
         if(searchInput === results[selected].toLowerCase()){
@@ -271,10 +273,10 @@ function SearchBar({ data, onEnter, onSearch, room, onX, onBlur }) {
         };
     }, []);
 
-
     useOutsideClick(inputRef, () => {
         onBlur(false);
     }, []);
+
 
     return (
         <div className="search-container">
