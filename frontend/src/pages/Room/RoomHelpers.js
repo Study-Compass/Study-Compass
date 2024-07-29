@@ -93,7 +93,7 @@ const fetchFreeRoomsHelper = async (setContentState, setCalendarLoading, getFree
     }
 };
 
-const fetchFreeNowHelper = async (setContentState, setCalendarLoading, setResults, setNumLoaded, getFreeRooms) => {
+const fetchFreeNowHelper = (setContentState, setCalendarLoading, setResults, setNumLoaded, getFreeRooms) => {
     setContentState("freeNowSearch")
     setCalendarLoading(true)
     let nowQuery = {
@@ -119,11 +119,7 @@ const fetchFreeNowHelper = async (setContentState, setCalendarLoading, setResult
     } else {
         nowQuery[days[day-1]] = [{start_time: hour*60, end_time: (hour*60)+30}];
     }
-    const roomNames = await getFreeRooms(nowQuery);
-    setResults(roomNames.sort());
-    setNumLoaded(10);
-    // setLoadedResults(roomNames.sort().slice(0,10));
-    setCalendarLoading(false);
+    return nowQuery;
 }
 
 const fetchSearchHelper = async (query, attributes, sort, setContentState, setCalendarLoading, setResults, setLoadedResults, search, setNumLoaded, navigate, newError, setSearchQuery) => {
@@ -143,6 +139,26 @@ const fetchSearchHelper = async (query, attributes, sort, setContentState, setCa
     } 
     setSearchQuery(query);
 };
+
+const allPurposeFetchHelper = async (allSearch, nameQuery, timeQuery, attributeQuery, sortQuery, setCalendarLoading, setResults, setLoadedResults, setNumLoaded ) => {
+    // handle state setting here
+
+    //
+    setCalendarLoading(true);
+    setResults([]);
+    setLoadedResults([]);
+    setNumLoaded(0);
+    try{
+        const roomNames = await allSearch(nameQuery, timeQuery, attributeQuery, sortQuery);
+        setResults(roomNames);
+        setNumLoaded(10);
+        setCalendarLoading(false);
+    } catch (error){
+        console.error(error);
+    }
+    
+}
+
 
 const addQueryHelper = (key, newValue, setNoQuery, setContentState, setQuery) => {
     setNoQuery(false);
@@ -190,7 +206,7 @@ const removeQueryHelper = (key, value, setQuery, setNoQuery ) => {
             const newQuery = { ...prev, [key]: filtered };
             const isQueryEmpty = Object.values(newQuery).every(arr => arr.length === 0);
             setNoQuery(isQueryEmpty);
-            return  newQuery;
+            return newQuery;
         }
     });
     
@@ -198,4 +214,4 @@ const removeQueryHelper = (key, value, setQuery, setNoQuery ) => {
 }
 
 
-export { findNext, fetchDataHelper, fetchFreeRoomsHelper, fetchFreeNowHelper, fetchSearchHelper, addQueryHelper, removeQueryHelper };
+export { findNext, fetchDataHelper, fetchFreeRoomsHelper, fetchFreeNowHelper, fetchSearchHelper, addQueryHelper, removeQueryHelper, allPurposeFetchHelper };

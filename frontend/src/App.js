@@ -1,6 +1,7 @@
 import React from 'react';
 import './App.css';
 import Room from './pages/Room/Room';
+import Room1 from './pages/Room/Room1';
 import Login from './pages/Login';
 import Register from './pages/Register/Register';
 import Redirect from './pages/Redirect/Redirect';
@@ -29,7 +30,8 @@ function App() {
                                     <ProfileCreationProvider>
                                     <Routes>
                                         <Route path="/" element={<Landing/> }/>
-                                        <Route path="/room/:roomid" element={<Room />}/>
+                                        <Route path="/room/:roomid" element={<Room1 />}/>
+                                        <Route path="/room1/:roomid" element={<Room1 />}/>
                                         <Route path="/register" element={<Register />}/>
                                         <Route path="/login" element={<Login />}/>
                                         <Route path="*" element={<Error />}/>
