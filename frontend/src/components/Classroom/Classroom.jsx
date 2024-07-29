@@ -21,13 +21,14 @@ import { findNext } from '../../pages/Room/RoomHelpers.js';
 
 import '../../pages/Room/Room.css';
 
-function Classroom({ room, state, setState, schedule, roomName }) {
+function Classroom({ room, state, setState, schedule, roomName, setIsUp}) {
 
     const [image, setImage] = useState("")
     const { isAuthenticating, isAuthenticated, user } = useAuth();
     const [success, setSuccess] = useState(false);
     const [message, setMessage] = useState("");
     const [defaultImage, setDefaultImage] = useState(false);
+
 
 
     const [edit, setEdit] = useState(false);
@@ -123,7 +124,7 @@ function Classroom({ room, state, setState, schedule, roomName }) {
                     {user && user.admin ? <div className="attribute" onClick={() => { setEdit(!edit) }}><img src={Edit} alt="" /></div> : ""}
                 </div>
                 <div>
-                    <Flag functions={backtoResults} primary={"rgba(176, 175, 175, .13)"} img={circleWarning} accent={"#D9D9D9"} color={"#737373"} text={"As Study Compass is still in beta, certain information may be incorrect. Reporting incorrect information is an important part of our troubleshooting process, so please help us out!"}/>
+                    <Flag functions={setIsUp} primary={"rgba(176, 175, 175, .13)"} img={circleWarning} accent={"#D9D9D9"} color={"#737373"} text={"As Study Compass is still in beta, certain information may be incorrect. Reporting incorrect information is an important part of our troubleshooting process, so please help us out!"}/>
                 </div>
             </div>
             {user && user.admin ? room ? edit ? <EditAttributes room={room} attributes={room.attributes} setEdit={setEdit} /> : "" : "" : ""}
