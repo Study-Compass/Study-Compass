@@ -17,6 +17,14 @@
     right:0;
     width: 100%;
     z-index: 2;
+    transition: all 1s;
+    transform:translateY(200px);
+    opacity: 0;
+}
+
+.hero-picture.active{
+    transform:translateY(0px);
+    opacity: 1;
 }
 
 .hero-gradient{
@@ -25,6 +33,14 @@
     left:-600px;
     width: 170%;
     z-index: 1;
+    transition: all 1s;
+    transform:translateY(200px);
+    opacity: 0;
+}
+
+.hero-gradient.active{
+    transform:translateY(0px);
+    opacity: 1;
 }
 
 .landing .content{
@@ -74,6 +90,11 @@
     filter: blur(20px);
     opacity: 1;
   }
+
+.landing .try-button.active::after {
+    filter: blur(20px);
+    opacity: 1;
+}
   
 @media (max-width:500px) {
     .hero-picture{
