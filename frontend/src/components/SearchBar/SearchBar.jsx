@@ -273,9 +273,10 @@ function SearchBar({ data, onEnter, onSearch, room, onX, onBlur }) {
         };
     }, []);
 
-    useEffect(() => {
-        console.log("searchInput", searchInput);
-    }, [searchInput]);
+    useOutsideClick(inputRef, () => {
+        onBlur(false);
+    }, []);
+
 
 
     useOutsideClick(inputRef, () => {

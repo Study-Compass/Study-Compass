@@ -12,6 +12,7 @@ import MobileCalendar from '../../components/CalendarComponents/MobileCalendar/M
 import { findNext, fetchDataHelper, fetchFreeRoomsHelper, fetchFreeNowHelper, fetchSearchHelper, addQueryHelper, removeQueryHelper } from "./RoomHelpers.js";
 import Results from '../../components/Results/Results.jsx';
 import Sort from '../../components/Sort/Sort.jsx';
+import Recommended from '../../components/Recommended/Recommended.jsx';
 import Footer from '../../components/Footer/Footer.jsx';
 import Recommended from '../../components/Recommended/Recommended.jsx';
 import chevronUp from '../../assets/chevronup.svg';

@@ -11,6 +11,7 @@ function Recommended({id, debouncedFetchData, changeURLHelper, findNext, hide}) 
     const [room, setRoom] = useState(null);
     const [height, setHeight] = useState("auto");
 
+
     const { isAuthenticating, isAuthenticated } = useAuth();
 
     const { getRoom } = useCache();
@@ -50,9 +51,11 @@ function Recommended({id, debouncedFetchData, changeURLHelper, findNext, hide}) 
         fetchDataHelper(id);
     }, [id]);
 
+
     if(!room || isAuthenticating){
         return(
             <div className="recommended">        
+                <p>recommended for you</p>
                 <Loader/>
             </div>
         )
