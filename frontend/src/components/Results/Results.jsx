@@ -4,7 +4,7 @@ import Result from './Result/Result.jsx';
 
 import Loader from '../Loader/Loader.jsx';
 
-function Results({ results, loadedResults, numLoaded, setNumLoaded, debouncedFetchData, contentState, changeURL, findNext}) {
+function Results({ results, loadedResults, numLoaded, setNumLoaded, debouncedFetchData, contentState, changeURL, findNext, calendarLoading}) {
     const resultRef = useRef(null);
     let scrollLoading = false;
 

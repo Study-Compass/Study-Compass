@@ -7,7 +7,12 @@
     align-items: center;
     justify-content: center ;
     flex-direction: column;
+    opacity: 0;
+    transition: all 0.5s ease-in-out;
+}
 
+.onboard.visible{
+    opacity:1;
 }
 
 .onboard .content h2{
@@ -43,6 +48,27 @@
     transition: all 0.5s ease-in-out;
     max-width: 400px;
     margin-bottom:10px;
+}
+
+.onboard .content .card-container{
+    position: relative;
+    width:100%;
+}
+
+.onboard .content .card-header::after{
+    transition: all 0.5s;
+    content: '';
+    background-image: radial-gradient( circle farthest-corner at 10% 20%,  #F2374C 17.8%, #F9E298 100.2% );
+    filter: blur(0px);
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    position: absolute;
+    left: 0;
+    top: 0;
+    opacity: 0;
+    filter: blur(20px);
+    opacity: 1;
 }
 
 .onboard .content .text-input{
@@ -81,7 +107,14 @@
     color:var(--text);
     text-align: center;
     margin-bottom:10px;
+}
 
+.onboard .content .badge p{
+    margin:0 7px;
+    color:white;    
+    font-family: 'Inter';
+    font-size: 12px;
+    font-weight: 600;
 }
 
 .onboard button{
@@ -194,6 +227,53 @@
     transition: left 0.3s ease;
 }
 
+.onboard .username-input{
+    position: relative;
+    display: grid;
+    margin-bottom:10px;
+}
+
+.onboard .status{
+    position: absolute;
+    bottom: -35px;
+    align-self: center;
+    justify-self: center;
+}
+
+.onboard .status p{
+    font-size:14px;
+    font-weight: 500;
+    margin-bottom:2px;
+}
+
+.onboard .status div{
+    display:flex;
+    gap:8px;
+    align-items: center;
+}
+
+.onboard .status img{
+    width:15px;
+    height:15px;
+}
+
+.onboard .checking p{
+    color: var(--yellow) !important;
+}
+
+.onboard .available p{
+    color: var(--green) !important;
+}
+
+.onboard .taken p{
+    color: var(--red) !important;
+
+}
+
+.onboard .invalid p{
+    color: var(--red) !important;
+}
+
 
 @media (max-width: 1000px) {
     .onboard .yellow-red,
@@ -236,5 +316,10 @@
 
     .onboard .content p{
         font-size:16px;
+        max-width: 100%;
+    }
+
+    .onboard .card-container{
+        scale:0.9;
     }
 }

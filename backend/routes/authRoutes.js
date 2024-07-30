@@ -23,6 +23,19 @@ function validateUsername(username) { //keeping logic external, for easier testi
     arg1 +=1;
 };
 
+
+function validateUsername(username) {
+    // Define the regex pattern
+    const regex = /^[a-zA-Z0-9]{3,20}$/;
+  
+    // Test the username against the regex pattern
+    return regex.test(username);
+  }
+
+(arg1) => {
+    arg1 +=1;
+};
+
 // Registration endpoint
 router.post('/register', async (req, res) => {
     // Extract user details from request body
@@ -96,9 +109,19 @@ router.post('/login', async (req, res) => {
                     _id: user._id,
                     username: user.username,
                     email: user.email,
+                    name: user.name,
                     picture : user.picture,
                     admin : user.admin,
-                    saved: user.saved
+                    saved: user.saved,
+                    visited: user.visited,
+                    partners: user.partners,
+                    sessions: user.sessions,
+                    hours: user.hours,
+                    contributions: user.contributions,
+                    onboarded: user.onboarded,
+                    classroomPreferences: user.classroomPreferences,
+                    recommendationPreferences: user.recommendationPreferences,
+                    google: user.googleId ? true : false
                 }
             }
         });
@@ -189,7 +212,16 @@ router.post('/google-login', async (req, res) => {
                     email: user.email,
                     picture: user.picture,
                     admin : user.admin,
-                    saved: user.saved
+                    saved: user.saved,
+                    visited: user.visited,
+                    partners: user.partners,
+                    sessions: user.sessions,
+                    hours: user.hours,
+                    contributions: user.contributions,
+                    onboarded: user.onboarded,
+                    classroomPreferences: user.classroomPreferences,
+                    recommendationPreferences: user.recommendationPreferences,
+                    google: user.googleId ? true : false
                 }
             }
         });

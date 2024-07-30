@@ -11,6 +11,7 @@ li.result{
     gap:6px;
     pointer-events: all;
     /* margin:5px; */
+    position: relative;
 }
 
 .restricted::before{
@@ -74,6 +75,7 @@ li.result{
     margin: 0;
     hyphens:auto;
     -webkit-hyphens: auto;
+    color:var(--text);
 }
 
 .result-info{

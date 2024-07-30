@@ -5,11 +5,14 @@ import { useCache } from '../../CacheContext.js';
 import { useNavigate } from "react-router-dom";
 import { useError } from '../../ErrorContext.js';
 import Loader from "../Loader/Loader.jsx";
-import { set } from "mongoose";
+import useAuth from '../../hooks/useAuth.js';
 
 function Recommended({id, debouncedFetchData, changeURLHelper, findNext, hide}) {
     const [room, setRoom] = useState(null);
     const [height, setHeight] = useState("auto");
+
+
+    const { isAuthenticating, isAuthenticated } = useAuth();
 
     const { getRoom } = useCache();
     const { newError } = useError();
@@ -48,7 +51,8 @@ function Recommended({id, debouncedFetchData, changeURLHelper, findNext, hide}) 
         fetchDataHelper(id);
     }, [id]);
 
-    if(!room){
+
+    if(!room || isAuthenticating){
         return(
             <div className="recommended">        
                 <p>recommended for you</p>
@@ -56,11 +60,11 @@ function Recommended({id, debouncedFetchData, changeURLHelper, findNext, hide}) 
             </div>
         )
     }
-    
+
     return(
         <div className={`recommended-container ${hide ? "hide" : ""}`} ref={containerRef} style={{height: height}} >
             <div className="recommended">
-                <p>recommended for you</p>
+                {isAuthenticated ? <p>recommended for you</p> : <p>popular right now</p>}
                 <Result 
                     result={room} 
                     attributes={room.room.attributes}

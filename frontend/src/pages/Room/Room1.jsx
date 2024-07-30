@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Calendar from '../../components/CalendarComponents/Calendar/Calendar.jsx';
 import './Room.css';
@@ -9,18 +9,18 @@ import { useCache } from '../../CacheContext.js';
 import { useError } from '../../ErrorContext.js'; 
 import Classroom from '../../components/Classroom/Classroom.jsx';
 import MobileCalendar from '../../components/CalendarComponents/MobileCalendar/MobileCalendar.jsx';
-import { findNext, fetchDataHelper, fetchFreeRoomsHelper, fetchFreeNowHelper, fetchSearchHelper, addQueryHelper, removeQueryHelper } from "./RoomHelpers.js";
+import { findNext, fetchDataHelper, fetchFreeRoomsHelper, fetchFreeNowHelper, fetchSearchHelper, addQueryHelper, removeQueryHelper , allPurposeFetchHelper} from "./RoomHelpers.js";
 import Results from '../../components/Results/Results.jsx';
 import Sort from '../../components/Sort/Sort.jsx';
-import Recommended from '../../components/Recommended/Recommended.jsx';
 import Footer from '../../components/Footer/Footer.jsx';
+import Recommended from '../../components/Recommended/Recommended.jsx';
+
 import chevronUp from '../../assets/chevronup.svg';
 import SortIcon from '../../assets/Icons/Sort.svg';
 import Github from '../../assets/Icons/Github.svg';
 
 import { debounce} from '../../Query.js';
 import ProfilePicture from '../../components/ProfilePicture/ProfilePicture.jsx';
-import Report from '../../components/Report/Report.jsx';
 
 /** 
 documentation:
@@ -42,7 +42,6 @@ function Room() {
     const [ready, setReady] = useState(false);
     const { isAuthenticated, isAuthenticating, user } = useAuth();
     const { getRooms, getFreeRooms, getRoom, getBatch, search, allSearch } = useCache();
-
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [calendarLoading, setCalendarLoading] = useState(true);
@@ -58,8 +57,8 @@ function Room() {
     const [searchQuery, setSearchQuery] = useState(""); // for search bar
     const [searchAttributes, setSearchAttributes] = useState([]);
     const [searchSort, setSearchSort] = useState("name"); 
-    const [reportIsUp, setReportIsUp] = useState(true); 
 
+    const [searchFocus, setSearchFocus] = useState(false);
     const [showFilter, setShowFilter] = useState(false); 
 
     function clearQuery(){ setQuery({'M': [],'T': [],'W': [],'R': [],'F': [],});
@@ -73,10 +72,15 @@ function Room() {
     const fetchData = async (id) => fetchDataHelper(id, setLoading, setData, setRoom, navigate, getRoom, setRoomName, newError);
     const fetchFreeRooms = async () => fetchFreeRoomsHelper(setContentState, setCalendarLoading, getFreeRooms, setResults, setNumLoaded, query, newError);
     const debouncedFetchData = debounce(fetchData, 500); // Adjust delay as needed
-    const fetchFreeNow = async () => fetchFreeNowHelper(setContentState, setCalendarLoading, setResults, setNumLoaded, getFreeRooms);
+    const fetchFreeNow = () => fetchFreeNowHelper(setContentState, setCalendarLoading, setResults, setNumLoaded, getFreeRooms);
     const fetchSearch = async (query, attributes, sort) => fetchSearchHelper(query, attributes, sort, setContentState, setCalendarLoading, setResults, setLoadedResults, search, setNumLoaded, navigate, newError, setSearchQuery);
     const addQuery = (key, newValue) => addQueryHelper(key, newValue, setNoQuery, setContentState, setQuery);
     const removeQuery = (key, value) => removeQueryHelper(key, value, setQuery, setNoQuery);
+    const allPurposeSearch = async () => allPurposeFetchHelper(allSearch, searchQuery, query, searchAttributes, searchSort, setCalendarLoading, setResults, setLoadedResults, setNumLoaded);
+    const allPurposeFreeNow = async (query1) => allPurposeFetchHelper(allSearch, searchQuery, query1, searchAttributes, searchSort, setCalendarLoading, setResults, setLoadedResults, setNumLoaded);
+    const debouncedAllPurposeSearch = useCallback(debounce(allPurposeSearch, 500), [searchQuery, searchAttributes, searchSort, query]);
+
+//=========================================== UI LOGIC =====================================================================================================
 
     useEffect(() => { //useEffect for window resizing
       function handleResize() {
@@ -106,25 +110,50 @@ function Room() {
 
     },[roomid]);
 
-    useEffect(() => { //useEffect fetch all room names
-        const fetchRooms = async () => {
-            try{
-                const rooms = await getRooms();
-                setRooms(Object.keys(rooms).sort());
-                setRoomIds(rooms);
-                setReady(true);
-            } catch (error){
-                console.log(error);
-                const fetchError = {
-                    message: "Failed to fetch rooms list, likely due to proxy error. Please try again later.",
-                    status: 500,
-                }
-                newError(fetchError, navigate);
-            }
-        };
-        fetchRooms();
-    }, []);
+    function changeURL(option) {
+        navigate(`/room/${option}`);
+        fetchData(roomIds[option]);
+        setContentState("calendarSearchResult");
+    }
 
+    function changeURL2(option) {
+        navigate(`/room/${option}`);
+        fetchData(roomIds[option]);
+        setContentState("classroom");
+    }
+
+    function onX(){ //make a reset function soon
+        setContentState('empty');
+        fetchData('none');
+        setResults([]);
+        clearQuery();
+        setLoadedResults([]);
+    }
+
+    useEffect(()=>{
+        if(contentState === "empty"){
+            setNumLoaded(0);
+            setLoadedResults([]);
+        }
+        console.log(contentState);
+    },[contentState]);
+
+        
+    const [showMobileCalendar, setShowMobileCalendar] = useState(false);
+
+    const [viewport, setViewport] = useState("100vh");
+    useEffect(() => {
+        setViewport((window.innerHeight) + 'px');
+        //add listener
+    },[]);
+
+
+
+//==========================================================================================================================================================
+
+
+
+//=========================================== FETCHING LOGIC ===============================================================================================
 
     useEffect(() => { // FETCH ROOM DATA , triggers on url change
         if(isAuthenticating){
@@ -135,20 +164,22 @@ function Room() {
                 navigate('/onboard');
             }
         }
+        if(isAuthenticating){
+            return;
+        }
         const searchParams = new URLSearchParams(window.location.search);
-        const searchQuery = searchParams.get('query');
+        const searchQueryParams = searchParams.get('query');
         const attributes = searchParams.get('attributes') ? JSON.parse(searchParams.get('attributes')) : null;
         const sort = searchParams.get('sort');
-        // console.log("searchQuery", searchQuery);
-        // console.log("attributes", attributes);
-        // console.log("sort", sort);
-        if(searchQuery){
+        if(searchQueryParams){
             if(!ready){
                 return;
             }
-            fetchSearch(searchQuery, attributes, sort);
+            console.log("hi there");
+            console.log(searchQueryParams);
             setSearchAttributes(attributes);
-            setSearchSort(sort);    
+            setSearchSort(sort); 
+            setSearchQuery(searchQueryParams);   
             console.log("searching");
             setContentState("nameSearch");
             fetchData("none");
@@ -170,21 +201,77 @@ function Room() {
                 clearQuery();
             }
         }
+        console.log(roomid);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [isAuthenticated, roomIds, isAuthenticating]);
+    }, [isAuthenticated, isAuthenticating, roomIds]);
+
+    function onSearch(query, attributes, sort){
+        const queryString = new URLSearchParams({ query, attributes: JSON.stringify(attributes), sort }).toString();
+        navigate(`/room1/search?${queryString}`, { replace: true });        
+        setSearchAttributes(attributes);
+        setSearchSort(sort);
+        setSearchQuery(query);
+    }
+
+    useEffect(() => {
+        if(isAuthenticating){
+            return;
+        }
+        // if(searchQuery === ""){
+        //     return;
+        // }
+        console.log(noquery);
+        if(noquery && searchQuery === "" && searchAttributes.length === 0 && contentState !== "classroom"){
+            setContentState("empty");
+            return;
+        }
+        console.log(searchQuery);
+        console.log(searchAttributes);
+        console.log(searchSort);
+        console.log(query);
+        allPurposeSearch();
+    }, [searchQuery, searchAttributes, searchSort, query]);
+
+    
+    useEffect(() => { 
+        // if query is changed and noquery is true, set contentstate to empty unless query cleaered using classroom
+        // if ((noquery === true && contentState === "calendarSearchResult") || roomid === "none") {
+        //     setContentState("empty");
+        // } else if(contentState !== "classroom"){ 
+        //     setContentState("calendarSearch");  
+        // }
+     // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [query])
 
 
-    useEffect(()=>{
+//=========================================== DONT TOUCH HERE ===============================================================================================
+    
+
+    useEffect(() => { //useEffect fetch all room names
+        const fetchRooms = async () => {
+            try{
+                const rooms = await getRooms();
+                setRooms(Object.keys(rooms).sort());
+                setRoomIds(rooms);
+                setReady(true);
+            } catch (error){
+                console.log(error);
+                const fetchError = {
+                    message: "Failed to fetch rooms list, likely due to proxy error. Please try again later.",
+                    status: 500,
+                }
+                newError(fetchError, navigate);
+            }
+        };
+        fetchRooms();
+    }, []);
+
+    useEffect(()=>{ // don't touch logic here
         const updateLoadedResults = async ()=>{
             if(numLoaded === 0){
-                console.log("0");
-
                 setLoadedResults([]);
             }
-            // setResultsLoading(true);
             try{
-                // console.log(loadedResults.length, numLoaded, results.length)
-                // console.log(results.slice(loadedResults.length, Math.min(numLoaded, results.length)).map(room => roomIds[room]));
                 let batchResults = await getBatch(results.slice(loadedResults.length, Math.min(numLoaded, results.length)).map(room => roomIds[room]));
                 let newResults = [...loadedResults, ...batchResults];
                 setLoadedResults(newResults);
@@ -193,107 +280,40 @@ function Room() {
                 newError(error, navigate);
             }
         };
-        console.log("numLoaded:", numLoaded);
         updateLoadedResults();
     },[numLoaded]);
 
-    useEffect(() => { 
-        setLoadedResults([]);
-        setNumLoaded(0);
-        // if query is changed and noquery is true, set contentstate to empty unless query cleaered using classroom
-        if ((noquery === true && contentState === "calendarSearchResult") || roomid === "none") {
-            setContentState("empty");
-        } else if(contentState !== "classroom"){
-            setContentState("calendarSearch");  
-        }
-        setResults([]);
-        if (!noquery) {
-            fetchFreeRooms();
-        }
-        console.log(numLoaded + " " + loadedResults.length + " " + results.length);
-        console.log(noquery);
-     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [query])
-
-    useEffect(()=>{
-        if(contentState === "empty"){
-            setNumLoaded(0);
-            setLoadedResults([]);
-        }
-        console.log(contentState);
-    },[contentState]);
-    
-    function changeURL(option) {
-        navigate(`/room/${option}`);
-        fetchData(roomIds[option]);
-        setContentState("calendarSearchResult");
+    const handleFreeNow = async () => {
+        const query = fetchFreeNow();
+        allPurposeFreeNow(query);
     }
 
-    function changeURL2(option) {
-        navigate(`/room/${option}`);
-        fetchData(roomIds[option]);
-        setContentState("classroom");
-    }
-
-    function onX(){ //make a reset function soon
-        setContentState('empty');
-        fetchData('none');
-        setResults([]);
-        clearQuery();
-        setLoadedResults([]);
-    }
-
-    function onSearch(query, attributes, sort){
-        const queryString = new URLSearchParams({ query, attributes: JSON.stringify(attributes), sort }).toString();
-        navigate(`/room/search?${queryString}`, { replace: true });        
-        // console.log(sort);
-        fetchSearch(query, attributes, sort); //sets search query
-        setSearchAttributes(attributes);
-        setSearchSort(sort);
-    }
-
-    function setReportUp(){
-        setReportIsUp(!reportIsUp);
-    }
-
-    const [searchFocus, setSearchFocus] = useState(false);
-
-    
-    const [showMobileCalendar, setShowMobileCalendar] = useState(false);
-
-    const [viewport, setViewport] = useState("100vh");
-    useEffect(() => {
-        setViewport((window.innerHeight) + 'px');
-        //add listener
-    },[]);
-
+//==========================================================================================================================================================
 
     return (    
         <div className="room" style={{ height: width < 800 ? viewport : '100vh' }}>
-            <Report text={roomName} isUp={reportIsUp} setIsUp={setReportUp}/>
             <Header />
             <div className="content-container">
                 <div className="calendar-container">
                     <div className={width < 800 ? "left-mobile" : "left"}>
 
-                            <Recommended 
-                                id={"65dd0786d6b91fde155c0097"}
+                            {ready && contentState !== "classroom" && <Recommended 
+                                id={roomIds["Low Center for Industrial Inn. 4034"]}
                                 debouncedFetchData={debouncedFetchData}
                                 changeURLHelper={changeURL2}
                                 findNext={findNext}
                                 contentState={contentState}
                                 setContentState={setContentState}
                                 hide={searchFocus || contentState !== "empty"}
-                            />
+                            />}
 
-                        <SearchBar data={rooms} onEnter={changeURL2} room={contentState === "classroom" || contentState === "calendarSearchResult" ? roomName : searchQuery } onX={onX} onSearch={onSearch} query={searchQuery} onBlur={setSearchFocus}/>
+                        <SearchBar data={rooms} onEnter={changeURL2} room={contentState === "classroom" || contentState === "calendarSearchResult" ? roomName : searchQuery } onX={onX} onSearch={onSearch} query={searchQuery} onBlur={setSearchFocus} />
                         {contentState === "classroom" || contentState === "calendarSearchResult"  ? <Classroom  
                             room={room} 
                             state={contentState} 
                             setState={setContentState}
                             schedule={data}
                             roomName={roomid}
-                            setIsUp={setReportUp}
                         /> : ""}
                         {contentState === "calendarSearch" || contentState === "freeNowSearch" || contentState === "nameSearch" ? calendarLoading ? "" : 
                             <div className="resultsCountContainer">
@@ -321,14 +341,10 @@ function Room() {
                                 contentState={contentState}
                                 changeURL={changeURL}
                                 findNext={findNext}
+                                calendarLoading={calendarLoading}
                             />: ""
                         }
-                        {contentState === "empty" ? <div className={`instructions-container ${width < 800 ? "mobile-instructions" : ""}`}>
-                            {/* <div className="instructions">
-                                <p>search by name or {width < 800 ? "see which rooms are" : "by selecting a timeslot, or see which rooms are"}</p>
-                                <button onClick={fetchFreeNow} className="free-now">free now</button>
-                            </div> */}
-                        </div> : ""}
+                        {contentState === "empty" ? " ": ""}
                     </div>
                     {width < 800 || viewport < 700? (
                         <div className={`calendar-content-container ${showMobileCalendar ? "active" : ""}`}>
@@ -345,11 +361,10 @@ function Room() {
             {
                 width > 800 ? 
                     <Footer/>
-                
                 : ""
             }
         </div>
     );
 }
 
-export default Room
+export default Room;
