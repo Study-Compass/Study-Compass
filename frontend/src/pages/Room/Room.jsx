@@ -253,7 +253,7 @@ function Room() {
     }
 
     function setReportUp(){
-        setReportIsUp(!reportIsUp);
+        //setReportIsUp(!reportIsUp);
     }
 
     const [searchFocus, setSearchFocus] = useState(false);

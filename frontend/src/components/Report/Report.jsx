@@ -2,17 +2,29 @@ import React, { useState, useRef }from 'react'
 import './Report.css';
 import useOutsideClick from '../../hooks/useClickOutside';
 import x from '../../assets/x.svg';
+import { sendError } from '../../DBInteractions';
+import { useNotification } from '../../NotificationContext';
 
 
 function Report({text, isUp, setIsUp}){
+
+const { addNotification } = useNotification();
 
     const handleClose = () => {
         setIsUp();
     };
 
-    const send = () => {
-        setDescription('');
-        setIsUp();
+    const send = async () => {  
+        try{
+            await sendError(description, text);
+            setDescription('');
+            setIsUp();
+        } catch (error){
+            console.error(error);
+            setDescription('');
+            setIsUp();
+            addNotification({title: "Error", message: "Failed to send report", type: "error"});
+        }
     }
 
     const ref = useRef();
@@ -33,6 +45,7 @@ function Report({text, isUp, setIsUp}){
     };
 
     return(
+        (isUp &&
         <div className={`whole_page ${isUp ? 'in' : 'out'}`}>
             <div className={`pop_up ${isUp ? 'in' : 'out'}`} ref={ref}>
                 <button className="close-button" onClick={handleClose}>
@@ -50,6 +63,7 @@ function Report({text, isUp, setIsUp}){
                 <button className={`send-button ${isValid ? 'alt' : ''}`} onClick={send}>send</button>
             </div>
         </div>
+        )
     )
 }
 

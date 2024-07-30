@@ -15,6 +15,7 @@ import Sort from '../../components/Sort/Sort.jsx';
 import Footer from '../../components/Footer/Footer.jsx';
 import Recommended from '../../components/Recommended/Recommended.jsx';
 import Report from '../../components/Report/Report.jsx';
+import { useProfileCreation } from '../../ProfileCreationContext';
 
 import chevronUp from '../../assets/chevronup.svg';
 import SortIcon from '../../assets/Icons/Sort.svg';
@@ -63,6 +64,8 @@ function Room() {
     const [searchFocus, setSearchFocus] = useState(false);
     const [showFilter, setShowFilter] = useState(false);
     const [reportIsUp, setReportIsUp] = useState(false);  
+
+    const { handleOpen } = useProfileCreation();
 
     function clearQuery(){ setQuery({'M': [],'T': [],'W': [],'R': [],'F': [],});
         setNoQuery(true);
@@ -134,7 +137,12 @@ function Room() {
     }
 
     function setReportUp(){
-        setReportIsUp(!reportIsUp);
+        if (!isAuthenticated) {
+            handleOpen();
+        }
+        else{
+            setReportIsUp(!reportIsUp);
+        }
     }
 
     useEffect(()=>{
@@ -322,7 +330,7 @@ function Room() {
                             setState={setContentState}
                             schedule={data}
                             roomName={roomid}
-                            setIsUp={setReportIsUp}
+                            setIsUp={setReportUp}
                         /> : ""}
                         {contentState === "calendarSearch" || contentState === "freeNowSearch" || contentState === "nameSearch" ? calendarLoading ? "" : 
                             <div className="resultsCountContainer">

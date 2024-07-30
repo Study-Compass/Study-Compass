@@ -12,7 +12,7 @@ const reportSchema = new Schema({
         required: true
     },
     report: {
-        type: String,
+        type: Object,
         required: true
     },
 });
