@@ -18,6 +18,17 @@
   .ui-bookmark input[type="checkbox"], .ui-bookmark input[type="checkbox"] + .bookmark {
     -webkit-tap-highlight-color: transparent;
   }
+
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-2px); }
+    50% { transform: translateX(2px); }
+    75% { transform: translateX(-2px); }
+  }
+
+  .bookmark.animate{
+    animation: shake 0.5s;
+  }
   
   .ui-bookmark .bookmark {
     width: var(--icon-size);
