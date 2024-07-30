@@ -14,10 +14,12 @@ import Results from '../../components/Results/Results.jsx';
 import Sort from '../../components/Sort/Sort.jsx';
 import Footer from '../../components/Footer/Footer.jsx';
 import Recommended from '../../components/Recommended/Recommended.jsx';
+import Report from '../../components/Report/Report.jsx';
 
 import chevronUp from '../../assets/chevronup.svg';
 import SortIcon from '../../assets/Icons/Sort.svg';
 import Github from '../../assets/Icons/Github.svg';
+
 
 import { debounce} from '../../Query.js';
 import ProfilePicture from '../../components/ProfilePicture/ProfilePicture.jsx';
@@ -59,7 +61,8 @@ function Room() {
     const [searchSort, setSearchSort] = useState("name"); 
 
     const [searchFocus, setSearchFocus] = useState(false);
-    const [showFilter, setShowFilter] = useState(false); 
+    const [showFilter, setShowFilter] = useState(false);
+    const [reportIsUp, setReportIsUp] = useState(false);  
 
     function clearQuery(){ setQuery({'M': [],'T': [],'W': [],'R': [],'F': [],});
         setNoQuery(true);
@@ -128,6 +131,10 @@ function Room() {
         setResults([]);
         clearQuery();
         setLoadedResults([]);
+    }
+
+    function setReportUp(){
+        setReportIsUp(!reportIsUp);
     }
 
     useEffect(()=>{
@@ -292,6 +299,7 @@ function Room() {
 
     return (    
         <div className="room" style={{ height: width < 800 ? viewport : '100vh' }}>
+            <Report text={roomName} isUp={reportIsUp} setIsUp={setReportUp}/>
             <Header />
             <div className="content-container">
                 <div className="calendar-container">
@@ -314,6 +322,7 @@ function Room() {
                             setState={setContentState}
                             schedule={data}
                             roomName={roomid}
+                            setIsUp={setReportIsUp}
                         /> : ""}
                         {contentState === "calendarSearch" || contentState === "freeNowSearch" || contentState === "nameSearch" ? calendarLoading ? "" : 
                             <div className="resultsCountContainer">

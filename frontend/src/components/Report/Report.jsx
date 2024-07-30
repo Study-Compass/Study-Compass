@@ -1,7 +1,6 @@
 import React, { useState, useRef }from 'react'
-import './Report.css'
-import logo from '../../assets/red_logo.svg';
-import Loader from '../Loader/Loader';
+import './Report.css';
+import useOutsideClick from '../../hooks/useClickOutside';
 import x from '../../assets/x.svg';
 
 
@@ -9,7 +8,20 @@ function Report({text, isUp, setIsUp}){
 
     const handleClose = () => {
         setIsUp();
-      };
+    };
+
+    const send = () => {
+        setDescription('');
+        setIsUp();
+    }
+
+    const ref = useRef();
+    
+    useOutsideClick(ref, () => {
+        if (isUp){
+            setIsUp();
+        }
+    });
 
     const [description, setDescription] = useState('');
 
@@ -17,12 +29,12 @@ function Report({text, isUp, setIsUp}){
 
     const handleDescriptionChange = (event) => {
         setDescription(event.target.value);
-        setIsValid(event.target.value.length >= 1 && event.target.value.length <= 250);
+        setIsValid(event.target.value.length >= 1 && event.target.value.length <= 500);
     };
 
     return(
         <div className={`whole_page ${isUp ? 'in' : 'out'}`}>
-            <div className={`pop_up ${isUp ? 'in' : 'out'}`}>
+            <div className={`pop_up ${isUp ? 'in' : 'out'}`} ref={ref}>
                 <button className="close-button" onClick={handleClose}>
                     <img src={x} alt="close" />
                 </button>
@@ -35,7 +47,7 @@ function Report({text, isUp, setIsUp}){
                     value={description} 
                     onChange={handleDescriptionChange} 
                 /> 
-                <button className={`send-button ${isValid ? 'alt' : ''}`} onClick={setIsUp}>send</button>
+                <button className={`send-button ${isValid ? 'alt' : ''}`} onClick={send}>send</button>
             </div>
         </div>
     )
