@@ -278,6 +278,11 @@ function SearchBar({ data, onEnter, onSearch, room, onX, onBlur }) {
     }, []);
 
 
+
+    useOutsideClick(inputRef, () => {
+        onBlur(false);
+    }, []);
+
     return (
         <div className="search-container">
             <input

@@ -13,6 +13,7 @@ import { findNext, fetchDataHelper, fetchFreeRoomsHelper, fetchFreeNowHelper, fe
 import Results from '../../components/Results/Results.jsx';
 import Sort from '../../components/Sort/Sort.jsx';
 import Footer from '../../components/Footer/Footer.jsx';
+import Recommended from '../../components/Recommended/Recommended.jsx';
 
 import chevronUp from '../../assets/chevronup.svg';
 import SortIcon from '../../assets/Icons/Sort.svg';
@@ -57,6 +58,7 @@ function Room() {
     const [searchAttributes, setSearchAttributes] = useState([]);
     const [searchSort, setSearchSort] = useState("name"); 
 
+    const [searchFocus, setSearchFocus] = useState(false);
     const [showFilter, setShowFilter] = useState(false); 
 
     function clearQuery(){ setQuery({'M': [],'T': [],'W': [],'R': [],'F': [],});
@@ -199,6 +201,7 @@ function Room() {
                 clearQuery();
             }
         }
+        console.log(roomid);
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isAuthenticated, isAuthenticating, roomIds]);
 
@@ -218,7 +221,7 @@ function Room() {
         //     return;
         // }
         console.log(noquery);
-        if(noquery && searchQuery === "" && searchAttributes.length === 0){
+        if(noquery && searchQuery === "" && searchAttributes.length === 0 && contentState !== "classroom"){
             setContentState("empty");
             return;
         }
@@ -293,7 +296,18 @@ function Room() {
             <div className="content-container">
                 <div className="calendar-container">
                     <div className={width < 800 ? "left-mobile" : "left"}>
-                        <SearchBar data={rooms} onEnter={changeURL2} room={searchQuery} onX={onX} onSearch={onSearch}  />
+
+                            {ready && contentState !== "classroom" && <Recommended 
+                                id={roomIds["Low Center for Industrial Inn. 4034"]}
+                                debouncedFetchData={debouncedFetchData}
+                                changeURLHelper={changeURL2}
+                                findNext={findNext}
+                                contentState={contentState}
+                                setContentState={setContentState}
+                                hide={searchFocus || contentState !== "empty"}
+                            />}
+
+                        <SearchBar data={rooms} onEnter={changeURL2} room={contentState === "classroom" || contentState === "calendarSearchResult" ? roomName : searchQuery } onX={onX} onSearch={onSearch} query={searchQuery} onBlur={setSearchFocus} />
                         {contentState === "classroom" || contentState === "calendarSearchResult"  ? <Classroom  
                             room={room} 
                             state={contentState} 
@@ -330,12 +344,7 @@ function Room() {
                                 calendarLoading={calendarLoading}
                             />: ""
                         }
-                        {contentState === "empty" ? <div className={`instructions-container ${width < 800 ? "mobile-instructions" : ""}`}>
-                            <div className="instructions">
-                                <p>search by name or {width < 800 ? "see which rooms are" : "by selecting a timeslot, or see which rooms are"}</p>
-                                <button onClick={handleFreeNow} className="free-now">free now</button>
-                            </div>
-                        </div> : ""}
+                        {contentState === "empty" ? " ": ""}
                     </div>
                     {width < 800 || viewport < 700? (
                         <div className={`calendar-content-container ${showMobileCalendar ? "active" : ""}`}>

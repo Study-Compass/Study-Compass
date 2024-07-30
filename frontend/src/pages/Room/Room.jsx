@@ -14,6 +14,7 @@ import Results from '../../components/Results/Results.jsx';
 import Sort from '../../components/Sort/Sort.jsx';
 import Recommended from '../../components/Recommended/Recommended.jsx';
 import Footer from '../../components/Footer/Footer.jsx';
+import Recommended from '../../components/Recommended/Recommended.jsx';
 import chevronUp from '../../assets/chevronup.svg';
 import SortIcon from '../../assets/Icons/Sort.svg';
 import Github from '../../assets/Icons/Github.svg';
