@@ -16,8 +16,7 @@ const StudyPreferences = ({ settingsRightSide, width, handleBackClick, userInfo 
     }
     const [initialItems, setInitialItems] = useState([]);
     const [active, setActive] = useState(false);
-
-    // let initialItems;
+    const [initialSliderValue, setInitialSliderValue] = useState(0);
 
     useEffect(() => {
         setSliderValue(userInfo.recommendationPreferences);
@@ -33,8 +32,10 @@ const StudyPreferences = ({ settingsRightSide, width, handleBackClick, userInfo 
 
         const newItems = classroomPreferences.split('').map(char => classroom[char]);
         setInitialItems(newItems);
+        setInitialSliderValue(sliderValue);
         
         setItems(newItems);
+
         // console.log(newItems);
         // initialItems =
         
@@ -47,12 +48,13 @@ const StudyPreferences = ({ settingsRightSide, width, handleBackClick, userInfo 
 
 
     const handleSaveClick = () => {
-        if (!active){
+        if (!active && sliderValue === initialSliderValue){
             return;
         } 
         // grab the first letter of the word in classroom
         // ["outlets", "classroom type", "printer", "table type", "windows"] => ocptw
-
+        const firstLetters = items.map(item => item[0]).join('');
+        
     };
 
 

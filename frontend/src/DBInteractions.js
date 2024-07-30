@@ -80,7 +80,7 @@ const saveUser = async (name, username, email, password, recommendation, classro
 
 const checkUsername = async (username) => {
     try {
-        const response = await axios.post(/check-username/, { username });
+        const response = await axios.post("/check-username/", { username });
         console.log(response);
         const responseBody = response.data;
         if (!responseBody.success) {
