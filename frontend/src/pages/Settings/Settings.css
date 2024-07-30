@@ -135,6 +135,16 @@
 
 }
 
+.settings-right .profile button{
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.settings-right .profile button.active{
+    background-color:var(--red);
+    color: white;
+}
+
 .settings-right .name-settings{
     display: flex;
     flex-direction: row;

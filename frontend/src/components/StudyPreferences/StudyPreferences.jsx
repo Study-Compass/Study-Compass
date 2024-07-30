@@ -16,7 +16,7 @@ const StudyPreferences = ({ settingsRightSide, width, handleBackClick, userInfo 
     }
     const [initialItems, setInitialItems] = useState([]);
     const [active, setActive] = useState(false);
-    const [initialSliderValue, setInitialSliderValue] = useState(0);
+    const [initialSliderValue, setInitialSliderValue] = useState(null);
 
     useEffect(() => {
         setSliderValue(userInfo.recommendationPreferences);
@@ -32,7 +32,7 @@ const StudyPreferences = ({ settingsRightSide, width, handleBackClick, userInfo 
 
         const newItems = classroomPreferences.split('').map(char => classroom[char]);
         setInitialItems(newItems);
-        setInitialSliderValue(sliderValue);
+        setInitialSliderValue(userInfo.recommendationPreferences);
         
         setItems(newItems);
 
@@ -46,15 +46,21 @@ const StudyPreferences = ({ settingsRightSide, width, handleBackClick, userInfo 
         setActive(JSON.stringify(items) !== JSON.stringify(initialItems));
     }, [items, initialItems]);
 
+    useEffect(()=>{
+        console.log(initialSliderValue === sliderValue);
+    }, [sliderValue])
+
 
     const handleSaveClick = () => {
-        if (!active && sliderValue === initialSliderValue){
+        if(!active && (sliderValue == initialSliderValue)){
             return;
-        } 
+        }
         // grab the first letter of the word in classroom
         // ["outlets", "classroom type", "printer", "table type", "windows"] => ocptw
         const firstLetters = items.map(item => item[0]).join('');
         
+        //saveUser(name, username, email, password, recommendation, classroom)
+        saveUser(null, null, null, null, sliderValue, firstLetters);
     };
 
 
@@ -90,9 +96,9 @@ const StudyPreferences = ({ settingsRightSide, width, handleBackClick, userInfo 
 
                 <div className='save-button'>
                     <button 
-                        className={`${active ? "active" : ""}`}
+                        className={`${active || (sliderValue != initialSliderValue) ? "active" : ""}`}
                         onClick = {handleSaveClick}
-                        disabled={!active}
+                        disabled={!active && (sliderValue == initialSliderValue)}
                     > save </button>
                 </div>
 

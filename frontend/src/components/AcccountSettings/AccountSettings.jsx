@@ -2,8 +2,23 @@ import React, { useEffect, useState } from 'react';
 import './AccountSettings.css';
 import rightarrow from '../../assets/Icons/RightArrow.svg';
 import pfp from '../../assets/defaultAvatar.svg';
+import { saveUser } from '../../DBInteractions';
 
 function AccountSettings({ settingsRightSide, width, handleBackClick, userInfo }) {
+
+    // const [active, setActive] = useState(false);
+
+    // const [changeUsername, setChangeUsername] = 
+    const [name, setName] = useState(userInfo.name);
+
+    // useEffect(() => {
+
+
+    // } );
+
+    const handleNameChange = (e) => {
+        setName(e.target.value);
+    };
 
     return (
         <div className={`settings-right ${settingsRightSide ? "active" : "not-active"}`}>
@@ -25,7 +40,7 @@ function AccountSettings({ settingsRightSide, width, handleBackClick, userInfo }
                     <img src={userInfo.picture ? userInfo.picture : pfp} alt="" />
                     <div className='input-name'>
                         <h3>name:</h3>
-                        <input type="James Liu" />
+                        <input type="text" value={name} onChange={handleNameChange}/>
                     </div>
 
                 </div>
@@ -38,7 +53,7 @@ function AccountSettings({ settingsRightSide, width, handleBackClick, userInfo }
                             <h3>{userInfo.username}</h3>
                             <p>@id</p>
                         </div>
-                        <button>change usename</button>
+                        <button>change username</button>
 
                     </div>
                     <div className='user-container'>

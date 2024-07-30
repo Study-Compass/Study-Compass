@@ -64,10 +64,10 @@ const save = async (roomId, userId, operation) => {
 
 const saveUser = async (name, username, email, password, recommendation, classroom) => {
     try{
-        const response = await axios.post('/update-user', {name, email, username, classroom, recommendation, onboarded : true}, {headers: {'Authorization': `Bearer ${localStorage.getItem('token')}`}});
+        const response = await axios.post('/update-user', {name, email, username, classroom, recommendation, onboarded :null}, {headers: {'Authorization': `Bearer ${localStorage.getItem('token')}`}});
         const responseBody = response.body;
-
-        if (responseBody.success) {
+        console.log(response);
+        if (response.data.success) {
             console.log("User saved successfully");
         } else {
             console.error("User save unsuccessful");
