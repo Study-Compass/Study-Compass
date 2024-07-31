@@ -33,7 +33,7 @@
     height: 100%;
     box-sizing: border-box;
     /* padding: 20px 0 0 0; */  
-    /* border: 1px solid #B0AFAF; */
+    border: 1px solid var(--lightborder);
     border-radius: 20px;
     position: relative;
 }
