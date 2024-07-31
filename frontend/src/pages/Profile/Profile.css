@@ -35,7 +35,6 @@
         width:calc(100% - 40px);
         height:calc(100% - 15px);
         max-height: min(calc(100% - 15px), 1000px);
-        overflow:hidden;
         position: relative;
     }
 
@@ -49,5 +48,9 @@
         height:150vh;
         max-height:150vh;
         position: relative;
+    }
+
+    .profile .content-container{
+        justify-content: flex-start;
     }
 }

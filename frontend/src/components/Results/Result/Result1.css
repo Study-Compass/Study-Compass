@@ -9,8 +9,9 @@ li.result{
     display:flex;
     flex-direction: column;
     gap:6px;
-    pointer-events: all !important;
+    pointer-events: all;
     /* margin:5px; */
+    position: relative;
 }
 
 .restricted::before{
@@ -59,6 +60,7 @@ li.result{
     height:auto;
     position: absolute;
     z-index: 1;
+    pointer-events: none;
 }
 
 .result:hover{
@@ -73,6 +75,7 @@ li.result{
     margin: 0;
     hyphens:auto;
     -webkit-hyphens: auto;
+    color:var(--text);
 }
 
 .result-info{

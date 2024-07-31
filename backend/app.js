@@ -4,12 +4,19 @@ const { spawn } = require('child_process');
 const cors = require('cors');
 const path = require('path'); 
 const cookieParser = require('cookie-parser');
+const s3 = require('./aws-config');
+const multer = require('multer');
 require('dotenv').config();
 const { google } = require('googleapis');
+const { createServer } = require('http');
+const WebSocket = require('ws');
 
 const app = express();
 // const port = 5001;
 const port = process.env.PORT || 5001;
+
+const server = createServer(app);
+const wss = new WebSocket.Server({server});
 
 const corsOptions = {
     origin: 'http://localhost:3000', // replace with production domain
@@ -48,6 +55,12 @@ mongoose.connection.on('connected', () => {
     mongoConnection = false;
 });
 
+const upload = multer({
+    storage: multer.memoryStorage(),
+    limits: {
+      fileSize: 5 * 1024 * 1024, // 5 MB
+    },
+  });
 
 app.get('/update-database', (req, res) => {
     const pythonProcess = spawn('python3', ['courseScraper.py']);
@@ -70,6 +83,41 @@ app.get('/api/greet', async (req, res) => {
     res.json({ message: 'Hello from the backend!' });
 });
 
+app.post('/upload-image/:classroomName', upload.single('image'), async (req, res) => {
+    const classroomName = req.params.classroomName;
+    const file = req.file;
+  
+    if (!file) {
+      return res.status(400).send('No file uploaded.');
+    }
+  
+    const s3Params = {
+      Bucket: process.env.AWS_S3_BUCKET_NAME,
+      Key: `${classroomName}/${Date.now()}_${path.basename(file.originalname)}`,
+      Body: file.buffer,
+      ContentType: file.mimetype,
+      ACL: 'public-read', // Make the file publicly accessible
+    };
+  
+    try {
+      // Upload image to S3
+      const s3Response = await s3.upload(s3Params).promise();
+      const imageUrl = s3Response.Location;
+  
+      // Find the classroom and update the image attribute
+      const classroom = await Classroom.findOneAndUpdate(
+        { name: classroomName },
+        { image: imageUrl },
+        { new: true, upsert: true }
+      );
+  
+      res.status(200).json({ message: 'Image uploaded and classroom updated.', classroom });
+    } catch (error) {
+      console.error(error);
+      res.status(500).send('An error occurred while uploading the image or updating the classroom.');
+    }
+  });
+
 // Serve static files from the React app in production
 if (process.env.NODE_ENV === 'production') {
     app.use(express.static(path.join(__dirname, '../frontend/build')));
@@ -80,8 +128,21 @@ if (process.env.NODE_ENV === 'production') {
     });
 }
 
+// WebSocket functionality
+wss.on('connection', (ws) => {
+    console.log('Client connected');
+    ws.on('message', (message) => {
+        console.log(`Received: ${message}`);
+        ws.send(`Echo: ${message}`);
+    });
+
+    ws.on('close', () => {
+        console.log('Client disconnected');
+    });
+});
 
 
-app.listen(port, () => {
+// Start the server
+server.listen(port, () => {
     console.log(`Backend server is running on http://localhost:${port}`);
 });

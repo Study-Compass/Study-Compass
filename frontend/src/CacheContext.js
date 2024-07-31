@@ -162,6 +162,30 @@ export const CacheProvider = ({children}) =>{
         }
     };
 
+    const allSearch = async (nameQuery, timeQuery, attributes, sort) => {
+        try{
+            // add cacheing logic
+            const response = await axios.get('/all-purpose-search', {
+                params:{
+                    query : nameQuery,
+                    timePeriod : timeQuery,
+                    attributes : attributes,
+                    sort : sort,
+                }, headers: {
+                    'Authorization' : `Bearer ${localStorage.getItem('token')}`
+                }
+            });
+            const responseBody = response.data;
+            if(!responseBody.success){
+                console.error('Error fetching search data:', responseBody.message);
+                return;
+            }
+            return responseBody.data;
+        } catch (error){
+            throw error;
+        }
+    }
+
     function debounce(func, wait) { //move logic to other file
         let timeout;
         return function executedFunction(...args) {
@@ -176,7 +200,7 @@ export const CacheProvider = ({children}) =>{
 
 
     return (
-        <CacheContext.Provider value={{ getRooms, getRoom, getFreeRooms, getBatch, search, debounce }}>
+        <CacheContext.Provider value={{ getRooms, getRoom, getFreeRooms, getBatch, search, allSearch, debounce }}>
             {children}
         </CacheContext.Provider>
     );

@@ -130,7 +130,7 @@
     transform: scale(1.2);
 }
 
-.result{
+.search-container .result{
     pointer-events: none;
 }
 

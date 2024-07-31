@@ -30,7 +30,7 @@ function RegisterForm() {
     useEffect(() => {
         async function google(code) {
             try{
-                const codeResponse = await googleLogin(code, false);
+                const codeResponse = await googleLogin(code, true);
                 console.log("codeResponse: " + codeResponse);
             } catch (error){
                 if(error.response.status  === 409){

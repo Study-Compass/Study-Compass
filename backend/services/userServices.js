@@ -2,6 +2,7 @@ const google = require('googleapis').google;
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../schemas/user.js');
+const crypto = require('crypto');
 
 
 const login = new google.auth.OAuth2(
@@ -16,6 +17,20 @@ const register = new google.auth.OAuth2(
     process.env.GOOGLE_CLIENT_SECRET,
     process.env.GOOGLE_REDIRECT_URI_REGISTER
 );
+
+const loginwww = new google.auth.OAuth2(
+    process.env.GOOGLE_CLIENT_ID,
+    process.env.GOOGLE_CLIENT_SECRET,
+    process.env.GOOGLE_REDIRECT_URI_WWW
+);
+
+
+const registerwww = new google.auth.OAuth2(
+    process.env.GOOGLE_CLIENT_ID,
+    process.env.GOOGLE_CLIENT_SECRET,
+    process.env.GOOGLE_REDIRECT_URI_REGISTER_WWW
+);
+
 
 
 async function registerUser({ username, email, password }) {
@@ -56,8 +71,13 @@ async function loginUser({ email, password }) {
     return { user, token };
 }
 
-async function authenticateWithGoogle(code, isRegister = false) {
-    const client = isRegister ? register : login;
+async function authenticateWithGoogle(code, isRegister = false, url) {
+    let www = false;
+    if (url.startsWith('http://www.') || url.startsWith('https://www.')) {
+        www = true;
+    }
+
+    const client = www ? isRegister ? registerwww : loginwww : isRegister ? register : login;
 
     const { tokens } = await client.getToken(code);
     client.setCredentials(tokens);
@@ -79,12 +99,15 @@ async function authenticateWithGoogle(code, isRegister = false) {
             throw new Error('Email already exists');
         }
 
+        const randomUsername = await generateUniqueUsername(userInfo.data.email);
+
         user = new User({
             googleId: userInfo.data.id,
             email: userInfo.data.email,
-            username: userInfo.data.name,
-            picture: userInfo.data.picture,
-            tags: ["beta tester"]
+            tags: ["beta tester"],
+            name: userInfo.data.name,
+            username: randomUsername, //replace this with a random username generated
+            picture: userInfo.data.picture
         });
         await user.save();
     }
@@ -94,5 +117,20 @@ async function authenticateWithGoogle(code, isRegister = false) {
     return { user, token: jwtToken };
 }
 
+async function generateUniqueUsername(email) {
+    let username =  email.split('@')[0].replace(/[^a-zA-Z0-9]/g, '');
+    let isUnique = false;
 
+    do {
+        const existingUser = await User.findOne({ username });
+        if (!existingUser) {
+            isUnique = true;
+        } else {
+            username += crypto.randomBytes(1).toString('hex');
+        }
+    } while (!isUnique);
+
+
+    return username;
+}
 module.exports  = { registerUser, loginUser, authenticateWithGoogle };

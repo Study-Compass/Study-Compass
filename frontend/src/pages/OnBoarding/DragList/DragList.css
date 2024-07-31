@@ -96,3 +96,29 @@
     width: 300px;
     background: #fff;
 }
+
+@media (max-width:500px) {
+    .DragList ul,
+    .DragList li {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        font-weight: 500;
+        font-size: 15px;
+        font-weight: 600;
+        font-family: 'Inter';
+    }
+
+
+    .DragList li h3{
+        font-size: 13px;
+        font-weight: 700;
+        font-family: 'Inter';
+        margin: 0;
+    }
+
+    .DragList li{
+        padding: 12px 15px;
+        margin-bottom:5px
+    }
+}

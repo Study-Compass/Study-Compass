@@ -9,7 +9,7 @@
     background-color: white;
     z-index: 1;
     border-radius: 19px;
-    border: 1px solid var(--lighterborder);
+    /* border: 1px solid var(--lighterborder); */
 }
 
 .classroom-component h1{
@@ -18,6 +18,7 @@
     font-weight: 800;
     color: #414141;
     margin: 0;
+    margin-right:10px
 }
 
 .image{
