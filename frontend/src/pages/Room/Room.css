@@ -69,12 +69,12 @@
     align-items: center;
     width:30%;
     height:100%;
-    /* box-sizing: border-box; */
+    box-sizing: border-box;
     /* padding: 20px 0 0 0; */
     border: 1px solid  var(--lightborder);
     border-radius: 20px;
     position: relative;
-    transform: translate(-1px,-1px);
+    /* transform: translate(-1px,-1px); */
 }
 
 select{
