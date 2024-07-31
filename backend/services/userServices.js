@@ -18,6 +18,20 @@ const register = new google.auth.OAuth2(
     process.env.GOOGLE_REDIRECT_URI_REGISTER
 );
 
+const loginwww = new google.auth.OAuth2(
+    process.env.GOOGLE_CLIENT_ID,
+    process.env.GOOGLE_CLIENT_SECRET,
+    process.env.GOOGLE_REDIRECT_URI_WWW
+);
+
+
+const registerwww = new google.auth.OAuth2(
+    process.env.GOOGLE_CLIENT_ID,
+    process.env.GOOGLE_CLIENT_SECRET,
+    process.env.GOOGLE_REDIRECT_URI_REGISTER_WWW
+);
+
+
 
 async function registerUser({ username, email, password }) {
     const existingUsername = await User.findOne({ username });
@@ -57,8 +71,13 @@ async function loginUser({ email, password }) {
     return { user, token };
 }
 
-async function authenticateWithGoogle(code, isRegister = false) {
-    const client = isRegister ? register : login;
+async function authenticateWithGoogle(code, isRegister = false, url) {
+    let www = false;
+    if (url.startsWith('http://www.') || url.startsWith('https://www.')) {
+        www = true;
+    }
+
+    const client = www ? isRegister ? registerwww : loginwww : isRegister ? register : login;
 
     const { tokens } = await client.getToken(code);
     client.setCredentials(tokens);
