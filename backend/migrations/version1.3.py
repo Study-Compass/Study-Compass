@@ -26,5 +26,5 @@ else:
 
 # =====================================================================================
 
-addNewField(uri, "classroom1", {"number_of_ratings" : 0})
-addNewField(uri, "classroom1", {"average_rating" : 0})
+addNewField(uri, "classrooms1", {"number_of_ratings" : 0})
+addNewField(uri, "classrooms1", {"average_rating" : 0})
