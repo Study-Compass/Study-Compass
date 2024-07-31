@@ -190,7 +190,7 @@ router.post('/verify-email', async (req, res) => {
   });
 
 router.post('/google-login', async (req, res) => {
-    const { code, isRegister } = req.body;
+    const { code, isRegister, url } = req.body;
 
     if (!code) {
         return res.status(400).json({
@@ -200,7 +200,7 @@ router.post('/google-login', async (req, res) => {
     }
 
     try {
-        const { user, token } = await authenticateWithGoogle(code, isRegister);
+        const { user, token } = await authenticateWithGoogle(code, isRegister, url);
         res.status(200).json({
             success: true,
             message: 'Google login successful',

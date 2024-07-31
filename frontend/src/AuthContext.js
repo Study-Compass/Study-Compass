@@ -79,7 +79,8 @@ export const AuthProvider = ({ children }) => {
 
     const googleLogin = async (code, isRegister) => {
         try {
-            const response = await axios.post('/google-login', { code, isRegister });
+            const url = window.location.href;
+            const response = await axios.post('/google-login', { code, isRegister, url });
             // Handle response from the backend (e.g., storing the token, redirecting the user)
             console.log('Backend response:', response.data);
             localStorage.setItem('token', response.data.data.token);
