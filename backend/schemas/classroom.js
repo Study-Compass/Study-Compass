@@ -13,6 +13,12 @@ const classroomSchema = new Schema({
     attributes: {
         type: Array,
         required: true
+    },
+    number_of_ratings: {
+        type: Number
+    },
+    average_rating: {
+        type: Number
     }
 });
 

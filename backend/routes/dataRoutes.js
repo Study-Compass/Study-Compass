@@ -1,6 +1,7 @@
 const express = require('express');
 const Classroom = require('../schemas/classroom.js');
 const Schedule = require('../schemas/schedule.js');
+const Rating = require('../schemas/rating.js');
 const User = require('../schemas/user.js');
 const { verifyToken, verifyTokenOptional } = require('../middlewares/verifyToken');
 const { sortByAvailability } = require('../helpers.js');
@@ -408,6 +409,74 @@ router.post('/save', verifyToken, async (req, res) => {
     } catch (error) {
         console.log(`POST: /save/${roomId}/${userId} failed`);
         res.status(500).json({ success: false, message: 'Error saving room', error: error.message });
+    }
+});
+
+// Route to get all number of ratings and average for Classroom 
+router.post('/average_rating', verifyToken, async (req, res) => {
+    const classroomId = req.body.classroomId;
+    const userId = req.body.userId;
+
+    try {
+        //get all ratings
+        const ratings = await Rating.find({ classroom_id: classroomId });
+        if (ratings.length === 0) {
+            return res.status(404).json({ success: false, message: 'No ratings found for this classroom' });
+        }
+
+        const totalScore = ratings.reduce((sum, rating) => sum + rating.score, 0);
+        const averageScore = totalScore / ratings.length;
+
+        res.json({ success: true, average_rating: averageScore, number_of_ratings: ratings.length });
+
+    } catch (error) {
+        res.status(500).json({ success: false, message: 'Error searching for average ratings', error: error.message });
+    }
+    
+});
+
+// Route to update rating to Classroom Schema
+router.post('/update_rating', verifyToken, async (req, res) => {
+    const { classroomId, userId, comment, score, upvotes, downvotes } = req.body;
+
+    try {
+        let rating = await Rating.findOne({ classroom_id: classroomId, user_id: userId });
+
+        if (rating) {
+            rating.comment = comment;
+            rating.score = score;
+            rating.upvotes = upvotes;
+            rating.downvotes = downvotes;
+            await rating.save();
+        } else {
+            rating = new Rating({
+                classroom_id: classroomId,
+                user_id: userId,
+                comment,
+                score,
+                upvotes,
+                downvotes
+            });
+            await rating.save();
+        }
+
+        const ratings = await Rating.find({ classroom_id: classroomId });
+        const totalScore = ratings.reduce((sum, rating) => sum + rating.score, 0);
+        const averageScore = totalScore / ratings.length;
+
+        const classroom = await Classroom.findOne({ _id: classroomId });
+        if (classroom) {
+            classroom.number_of_ratings = ratings.length;
+            classroom.average_rating = averageScore;
+            await classroom.save();
+        } else {
+            res.status(500).json({ success: false, message: 'Classroom does not exist'});
+        }
+
+        res.json({ success: true, rating, average_score: averageScore, number_of_ratings: ratings.length });
+        res.status(200).json({ success: true, message: 'Successfully updated rating', data: {score: averageScore, num_ratings:ratings.length} });
+    } catch (error) {
+        res.status(500).json({ success: false, message: 'Error updating or retrieving ratings', error: error.message });
     }
 });
 
