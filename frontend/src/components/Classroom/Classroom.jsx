@@ -19,7 +19,7 @@ import { findNext } from '../../pages/Room/RoomHelpers.js';
 
 import '../../pages/Room/Room.css';
 
-function Classroom({ room, state, setState, schedule, roomName }) {
+function Classroom({ room, state, setState, schedule, roomName, width, setShowMobileCalendar }) {
 
     const [image, setImage] = useState("")
     const { isAuthenticating, isAuthenticated, user } = useAuth();
@@ -126,6 +126,21 @@ function Classroom({ room, state, setState, schedule, roomName }) {
                 defaultImage && (!isAuthenticating) && isAuthenticated && user.admin ? <FileUpload classroomName={room.name}/> : ""
             }
             
+            {/* {isAuthenticated && } */}
+            <div className="check-in">
+                <div className={`${success ? 'free-until' : 'class-until'}`}>
+                    <div className="dot">
+                        <div className="outer-dot"></div>
+                        <div className="inner-dot"></div>
+                    </div>
+                    
+                    {success ? "free" : "class in session"} {message}                    
+                </div>
+                <div className="button-container">
+                    {width < 800 && <button className="schedule-button" onClick={()=>{setShowMobileCalendar(true)}}>view-schedule</button>} 
+                    <button disabled={!success} className="check-in-button">check in</button>
+                </div>
+            </div>
         </div>
     );
 }

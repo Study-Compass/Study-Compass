@@ -232,6 +232,7 @@ select{
     color:var(--green);
     padding:0 15px;
     position: relative;
+    font-family: 'Inter';
 }
 
 .class-until{
@@ -348,8 +349,6 @@ select{
         width:97%;
         height: calc(100% - 80px);
         max-height: calc(100% - 80px);
-
-        
     }
     .dot{
         height:18px;
