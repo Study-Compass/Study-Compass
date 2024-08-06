@@ -117,15 +117,18 @@ function Classroom({ room, state, setState, schedule, roomName, width, setShowMo
                 <div className="info-row">
                     <div className="rating">
                         <img src={FilledStar} alt="star" />
-                        <p>4.6</p>
+                        <p>0</p>
                     </div>
-                    <div className={`${success ? 'free-until' : 'class-until'}`}>
+                    <div className="rating-num">
+                        0 ratings
+                    </div>
+                    {/* <div className={`${success ? 'free-until' : 'class-until'}`}>
                         <div className="dot">
                             <div className="outer-dot"></div>
                             <div className="inner-dot"></div>
                         </div>
                         {success ? "free" : "class in session"} {message}                    
-                    </div>
+                    </div> */}
                 </div>
                 <div className="attributes">
                     {room && room.attributes.map((attribute, index) => {

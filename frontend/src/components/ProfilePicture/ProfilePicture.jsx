@@ -12,6 +12,8 @@ import Badges from '../Badges/Badges';
 
 import useOutsideClick from '../../hooks/useClickOutside';
 
+import { useNotification } from '../../NotificationContext';
+
 import {Link} from 'react-router-dom'
 
 function ProfilePicture(){
@@ -19,6 +21,12 @@ function ProfilePicture(){
     const { logout, user } = useAuth();
 
     const ref = useRef();
+
+    const { addNotification } = useNotification();
+
+    const notYet = () => {
+        addNotification({title: "This feature is not yet implemented", message: "The settings feature is coming soon, stay tuned!", type: "error"});
+    }
     
     useOutsideClick(ref, () => {
         setShowPopup(false);
@@ -50,8 +58,8 @@ function ProfilePicture(){
                         <p>Profile</p>
                     </div>
                 </Link>
-                <Link to="/settings">
-                    <div className="menu-item">
+                <Link>
+                    <div className="menu-item" onClick={notYet}>
                         <img className="icon" src={Settings} alt="settings" />
                         <p>Settings</p>
                     </div>
