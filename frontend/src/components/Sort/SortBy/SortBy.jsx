@@ -33,9 +33,9 @@ function SortBy({setSelected, sortBy, onApply}){
                 <div className={sort === "name" ? "option selected" : "option"} onClick={()=>handleSelect("name")}>
                     <p>Name</p>
                 </div>
-                <div className={sort === "capacity" ? "option selected" : "option"} onClick={()=>handleSelect("capacity")}>
+                {/* <div className={sort === "capacity" ? "option selected" : "option"} onClick={()=>handleSelect("capacity")}>
                     <p>Rating</p>
-                </div>
+                </div> */}
                 <div className={sort === "availability" ? "option selected" : "option"} onClick={()=>handleSelect("availability")}>
                     <p>Availability</p>
                 </div>

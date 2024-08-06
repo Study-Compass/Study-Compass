@@ -4,7 +4,7 @@ import Result from './Result/Result.jsx';
 
 import Loader from '../Loader/Loader.jsx';
 
-function Results({ results, loadedResults, numLoaded, setNumLoaded, debouncedFetchData, contentState, changeURL, findNext}) {
+function Results({ results, loadedResults, numLoaded, setNumLoaded, debouncedFetchData, contentState, changeURL, findNext, calendarLoading}) {
     const resultRef = useRef(null);
     let scrollLoading = false;
 
@@ -65,7 +65,7 @@ function Results({ results, loadedResults, numLoaded, setNumLoaded, debouncedFet
             />
         ))}
         {
-            results.length === 0 && loadedResults.length === 0 ? <div className="no-results"> <p>no results found</p></div> : ""
+            // results.length === 0 && loadedResults.length === 0 ? <div className="no-results"> <p>no results found</p></div> : ""
         }
         {!(loadedResults.length === results.length) ? <div className="loader-container"><Loader/></div> : ""}
         </ul>

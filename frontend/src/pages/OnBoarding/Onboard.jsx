@@ -21,6 +21,7 @@ import CardHeader from '../../components/ProfileCard/CardHeader/CardHeader.jsx';
 import { set } from 'mongoose';
 
 function Onboard(){
+    const [start, setStart] = useState(false);
     const [current, setCurrent] = useState(0);
     const [show, setShow] = useState(0);
     const [currentTransition, setCurrentTransition] = useState(0);
@@ -35,9 +36,7 @@ function Onboard(){
     const [sliderValue, setSliderValue] = useState(2);
     const [isGoogle, setIsGoogle] = useState(null);
     const [onboarded, setOnboarded] = useState(false);
-
-    const [usernameValid, setUsernameValid] = useState(1); // 0 is checking, 1 is valid, 2 is invalid
-    const checkUsernameDebounced = debounce(checkUsername, 500);
+    const [usernameValid, setUsernameValid] = useState(0);
 
     const navigate = useNavigate();
     const { newError } = useError();
@@ -84,6 +83,12 @@ function Onboard(){
     };
 
     const debounced = useCallback(debounce(validUsername, 500),[]);
+
+    useEffect(() => {
+        setTimeout(() => {
+            setStart(true);
+        }, 500);
+    },[]);
     
     useEffect(() => {
         if(isAuthenticating){
@@ -100,6 +105,7 @@ function Onboard(){
                 setIsGoogle(user.google);
                 setUsername(user.google ? user.username : null);
                 setInitialUsername(user.google ? user.username : null);
+                setName(user.name);
             }
         }
     }, [isAuthenticating, isAuthenticated, user]);
@@ -191,7 +197,7 @@ function Onboard(){
     }
 
     return (
-        <div className="onboard" style={{height: viewport}}>
+        <div className={`onboard ${start ? "visible" : ""}`} style={{height: viewport}}>
             <img src={YellowRedGradient} alt="" className="yellow-red" />
             <img src={PurpleGradient} alt="" className="purple" />
 

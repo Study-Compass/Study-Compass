@@ -32,12 +32,11 @@
     align-items: center;
     height: 100%;
     box-sizing: border-box;
-    /* padding: 20px 0 0 0; */
-    /* border: 1px solid #B0AFAF; */
+    /* padding: 20px 0 0 0; */  
+    border: 1px solid var(--lightborder);
     border-radius: 20px;
     position: relative;
 }
-
 .content-container{
     display:flex;
     flex-direction: column;
@@ -48,7 +47,6 @@
     max-height:calc(100% - 115px);
     padding: 20px 20px 40px 20px;
     box-sizing: border-box;
-    
 }
 .right{
     display:flex;
@@ -61,6 +59,7 @@
     align-items: center;
     padding:30px 20px 10px 20px;
     box-sizing: border-box;
+    position: relative;
 }
 
 .left{
@@ -70,9 +69,12 @@
     align-items: center;
     width:30%;
     height:100%;
+    box-sizing: border-box;
+    /* padding: 20px 0 0 0; */
     border: 1px solid  var(--lightborder);
     border-radius: 20px;
     position: relative;
+    /* transform: translate(-1px,-1px); */
 }
 
 select{
@@ -153,12 +155,60 @@ select{
     gap:5px
 }
 
-.instructions p{
-    font-size: 17px;
+.instruction p{
+    font-size: 16px;
     font-weight: 400;
     color: var(--border);
     font-family:'Inter',sans-serif;
     margin:0;
+}
+
+.instruction{
+    padding:30px;
+    padding-bottom:100px;
+    display:flex;
+    flex-grow: 1;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    flex-direction: column;
+}
+
+.instruction .example{
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--border);
+    font-family:'Inter',sans-serif;
+    margin:0;
+    padding:1px 20px;
+    border-radius: 5px;
+    background-color: var(--lightborder);
+    margin:5px 0;
+}
+
+.calendar-instruction{
+    position: absolute;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    display:flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 16px;
+    font-weight: 400;
+    color: var(--border);
+    font-family: 'Inter';
+    background-color: rgba(255,255,255,0.5);
+    z-index: 200;
+    pointer-events: none;
+    transition: all 0.3s;
+
+}
+
+.right:hover .calendar-instruction{
+    opacity: 0;
+    
 }
 
 .calendar-content-container{
@@ -231,6 +281,7 @@ select{
     color:var(--green);
     padding:0 15px;
     position: relative;
+    font-family: 'Inter';
 }
 
 .class-until{
@@ -313,31 +364,6 @@ select{
     transform-origin: center;
 }
 
-@media (max-height:730px) {
-    .content-container{
-        padding: 10px 20px 20px 20px;
-    }
-}
-
-@media (max-height:696px) {
-    .content-container{
-        padding: 0px 20px 0px 20px;
-    }
-    .DayColumn{
-        height:400px;
-    }
-}
-
-@media (max-height:600px) {
-    .content-container{
-        padding: 0px 20px 0px 20px;
-    }
-    .DayColumn{
-        height:350px;
-    }
-}
-
-
 @keyframes pulse {
     0% {
       transform: scale(0.5);
@@ -370,7 +396,7 @@ select{
     .content-container{
         padding:0px 10px 10px 10px;
         width:97%;
-        height:calc(100% - 80px);
+        height: calc(100% - 80px);
         max-height: calc(100% - 80px);
     }
     .dot{
@@ -382,4 +408,3 @@ select{
         padding-left:13px;
     }
 }
-

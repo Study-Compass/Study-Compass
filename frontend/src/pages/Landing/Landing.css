@@ -17,6 +17,14 @@
     right:0;
     width: 100%;
     z-index: 2;
+    transition: all 1s;
+    transform:translateY(200px);
+    opacity: 0;
+}
+
+.hero-picture.active{
+    transform:translateY(0px);
+    opacity: 1;
 }
 
 .hero-gradient{
@@ -25,6 +33,14 @@
     left:-600px;
     width: 170%;
     z-index: 1;
+    transition: all 1s;
+    transform:translateY(200px);
+    opacity: 0;
+}
+
+.hero-gradient.active{
+    transform:translateY(0px);
+    opacity: 1;
 }
 
 .landing .content{
@@ -74,8 +90,50 @@
     filter: blur(20px);
     opacity: 1;
   }
+
+.landing .try-button.active::after {
+    filter: blur(20px);
+    opacity: 1;
+}
+
+
+
+@media (max-width:1500px) and (max-height:750px) {
+    
+    .hero-picture{
+        position: absolute;
+        bottom:-70px;
+        right:0;
+    }
+}
+
+@media (max-width:1500px) and (max-height:700px) {
+    .landing .content{
+        transform:translateY(-30px);
+    }
+    .hero-picture{
+        position: absolute;
+        bottom:-100px;
+        right:0;
+    }
+}
+
+@media (max-width:1500px) and (max-height:600px) {
+    .landing .content{
+        transform:translateY(-50px);
+    }
+    .hero-picture{
+        position: absolute;
+        bottom:-150px;
+        right:0;
+    }
+}
+
   
 @media (max-width:500px) {
+    .landing .content{
+        transform:translateY(0px);
+    }
     .hero-picture{
         bottom:0;
         right:0;
@@ -100,15 +158,5 @@
         font-size:1.1em;
         color: white;
 
-    }
-}
-
-
-@media (max-width:1500px) and (max-height:580px) {
-    
-    .hero-picture{
-        position: absolute;
-        bottom:-200px;
-        right:0;
     }
 }

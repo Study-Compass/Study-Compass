@@ -8,6 +8,7 @@ import ProfileIcon from '../../assets/Icons/Profile.svg'
 import Settings from '../../assets/Icons/Settings.svg'
 import Guide from '../../assets/Icons/Guide.svg'
 import Logout from '../../assets/Icons/Logout.svg'
+import Badges from '../Badges/Badges';
 
 import useOutsideClick from '../../hooks/useClickOutside';
 
@@ -30,15 +31,16 @@ function ProfilePicture(){
                 <div className="popup-content">
                     <img className="profile" src ={user.picture ? user.picture : pfp}></img>
                     <div className="profile-info">
-                        <h3>James Liu</h3>
-                        <div className="badges">
+                        <h3>{user.name ? user.name : user.username}</h3>
+                        {/* <div className="badges">
                             <div className="badge" style={{backgroundColor:"#A0C4FF"}}>
                                 <p>beta tester</p>
                             </div>
                             <div className="badge" style={{backgroundColor:"#EA4335"}}>
                                 <p>admin</p>
                             </div>
-                        </div>
+                        </div> */}
+                        <Badges badges={user.tags ? user.tags : []}/>
                     </div>
                 </div>
                 <hr />
@@ -68,7 +70,6 @@ function ProfilePicture(){
                         <p>Logout</p>
                     </div>
                 </Link>
-                {/* { showPopup ? <button onClick={logout}>logout</button>: "" } */}
             </div>
         </div>
     )

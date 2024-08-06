@@ -23,6 +23,19 @@ function validateUsername(username) { //keeping logic external, for easier testi
     arg1 +=1;
 };
 
+
+function validateUsername(username) {
+    // Define the regex pattern
+    const regex = /^[a-zA-Z0-9]{3,20}$/;
+  
+    // Test the username against the regex pattern
+    return regex.test(username);
+  }
+
+(arg1) => {
+    arg1 +=1;
+};
+
 // Registration endpoint
 router.post('/register', async (req, res) => {
     // Extract user details from request body
@@ -108,7 +121,8 @@ router.post('/login', async (req, res) => {
                     onboarded: user.onboarded,
                     classroomPreferences: user.classroomPreferences,
                     recommendationPreferences: user.recommendationPreferences,
-                    google: user.googleId ? true : false
+                    google: user.googleId ? true : false,
+                    tags: user.tags
                 }
             }
         });
@@ -149,8 +163,8 @@ router.get('/validate-token', verifyToken, async (req, res) => {
                     onboarded: user.onboarded,
                     classroomPreferences: user.classroomPreferences,
                     recommendationPreferences: user.recommendationPreferences,
-                    google: user.googleId ? true : false
-
+                    google: user.googleId ? true : false,
+                    tags: user.tags                    
                 }
             }
         });
@@ -177,7 +191,7 @@ router.post('/verify-email', async (req, res) => {
   });
 
 router.post('/google-login', async (req, res) => {
-    const { code, isRegister } = req.body;
+    const { code, isRegister, url } = req.body;
 
     if (!code) {
         return res.status(400).json({
@@ -187,7 +201,7 @@ router.post('/google-login', async (req, res) => {
     }
 
     try {
-        const { user, token } = await authenticateWithGoogle(code, isRegister);
+        const { user, token } = await authenticateWithGoogle(code, isRegister, url);
         res.status(200).json({
             success: true,
             message: 'Google login successful',
@@ -196,6 +210,7 @@ router.post('/google-login', async (req, res) => {
                 user: {
                     _id: user._id,
                     username: user.username,
+                    name: user.name,
                     email: user.email,
                     picture: user.picture,
                     admin : user.admin,
@@ -208,7 +223,8 @@ router.post('/google-login', async (req, res) => {
                     onboarded: user.onboarded,
                     classroomPreferences: user.classroomPreferences,
                     recommendationPreferences: user.recommendationPreferences,
-                    google: user.googleId ? true : false
+                    google: user.googleId ? true : false,
+                    tags: user.tags
                 }
             }
         });

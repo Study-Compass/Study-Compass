@@ -9,7 +9,7 @@ const getFriends = async () => {
             }
         });
         const responseBody = response.data;
-    
+        console.log(responseBody);
         if (!responseBody.success) {
             console.error('Error fetching friends:', responseBody.message);
             return [];
