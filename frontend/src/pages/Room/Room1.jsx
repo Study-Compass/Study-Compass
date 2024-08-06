@@ -62,6 +62,8 @@ function Room() {
     const [searchFocus, setSearchFocus] = useState(false);
     const [showFilter, setShowFilter] = useState(false); 
 
+    const [bannerVisible, setBannerVisible] = useState(false);
+
     function clearQuery(){ setQuery({'M': [],'T': [],'W': [],'R': [],'F': [],});
         setNoQuery(true);
     }
@@ -293,9 +295,9 @@ function Room() {
 
     return (    
         <div className="room" style={{ height: width < 800 ? viewport : '100vh' }}>
-            <Banner />
+            <Banner visible={bannerVisible} setVisible={setBannerVisible}/>
             <Header />
-            <div className="content-container">
+            <div className="content-container" style={{height: bannerVisible ? "max(100% - 135px)":  "max(100% - 115px)", maxHeight: bannerVisible ? "max(100% - 135px)":  "max(100% - 115px)"}}>
                 <div className="calendar-container">
                     <div className={width < 800 ? "left-mobile" : "left"}>
 
@@ -348,7 +350,11 @@ function Room() {
                                 calendarLoading={calendarLoading}
                             />: ""
                         }
-                        {contentState === "empty" ? " ": ""}
+                        { contentState === "empty" ? <div className="instruction">
+                            <p>try searching for specific classroom like <span className="example">dcc 318</span> or a building like <span className="example">low</span></p>
+                            
+                        </div> : ""}
+
                     </div>
                     {width < 800 || viewport < 700? (
                         <div className={`calendar-content-container ${showMobileCalendar ? "active" : ""}`}>
@@ -356,6 +362,7 @@ function Room() {
                         </div>
                     ) : (
                         <div className="right">
+                            {contentState === "empty" && <div className="calendar-instruction">select a timeslot</div> }
                             <Calendar className={room ? room.name ? room.name : "none": ""} data={data} isloading={loading} addQuery={addQuery} removeQuery={removeQuery} query={query} />
                         </div>
                     )}

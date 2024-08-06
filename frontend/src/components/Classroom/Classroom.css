@@ -206,11 +206,12 @@
     font-size: 13px;
     font-family: 'Inter';
     font-weight: 500;
-    color: var(--text);
+    color: var(--border);
     margin: 0;
     width:100%;
     text-align: center;
     margin-top:10px;
+
 }
 
 /* .check-in-button::after{

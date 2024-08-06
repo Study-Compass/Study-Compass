@@ -5,10 +5,8 @@ import useAuth from '../../hooks/useAuth.js';
 import Badges from '../Badges/Badges.jsx';
 import x_white from '../../assets/x_white.svg';
 
-function Banner() {
+function Banner({visible, setVisible}) {
     const { isAuthenticating, isAuthenticated, user } = useAuth();
-
-    const [visible, setVisible] = useState(false);
 
     const navigate = useNavigate();
 
@@ -20,7 +18,8 @@ function Banner() {
 
 
     return(
-        <div className={`banner ${visible && "visible"}`} onClick={()=>{navigate('/register')}}>
+        <div className={`banner ${visible && "visible"}`}>
+            
             create an account now for the <Badges badges={["beta tester"]}/> badge! 
             <div className="exit"><img src={x_white} onClick={()=>{setVisible(false)}} alt="" /></div>
         </div>
