@@ -202,6 +202,34 @@
     background-color: var(--blue);
 }
 
+.check-in p{
+    font-size: 13px;
+    font-family: 'Inter';
+    font-weight: 500;
+    color: var(--text);
+    margin: 0;
+    width:100%;
+    text-align: center;
+    margin-top:10px;
+}
+
+/* .check-in-button::after{
+    content: "check-in feature coming soon";
+    font-size: 10px;
+    color: var(--text);
+    font-family: 'Inter';
+    font-weight: 500;
+    position: absolute;
+    width: calc(100% - 80px);
+    top:-40px;
+    left:0;
+    border-radius: 5px;
+    margin: 0 30px;
+    padding: 5px 10px;
+
+    border: 1px solid var(--lighterborder);
+} */
+
 @media (max-width:500px) {
     .classroom-component .check-in button{
         font-size:15px;
