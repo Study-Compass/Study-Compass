@@ -14,6 +14,7 @@ import Results from '../../components/Results/Results.jsx';
 import Sort from '../../components/Sort/Sort.jsx';
 import Footer from '../../components/Footer/Footer.jsx';
 import Recommended from '../../components/Recommended/Recommended.jsx';
+import Banner from '../../components/Banner/Banner.jsx';
 
 import chevronUp from '../../assets/chevronup.svg';
 import SortIcon from '../../assets/Icons/Sort.svg';
@@ -292,6 +293,7 @@ function Room() {
 
     return (    
         <div className="room" style={{ height: width < 800 ? viewport : '100vh' }}>
+            <Banner />
             <Header />
             <div className="content-container">
                 <div className="calendar-container">

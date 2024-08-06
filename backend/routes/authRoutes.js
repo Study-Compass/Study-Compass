@@ -210,6 +210,7 @@ router.post('/google-login', async (req, res) => {
                 user: {
                     _id: user._id,
                     username: user.username,
+                    name: user.name,
                     email: user.email,
                     picture: user.picture,
                     admin : user.admin,

@@ -1,0 +1,48 @@
+.banner{
+    width:100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--red);
+    color:white;
+    font-size:14px;
+    font-weight: 500;
+    font-family: 'Inter';
+    height:0px;
+    overflow: hidden;
+    gap:5px;
+    border-radius: 0;
+    transition: all 0.5s;
+}
+
+.banner.visible{
+    height:20px;
+}
+
+.banner .exit{
+    position: absolute;
+    right: 20px;
+    cursor: pointer;
+    height: 10px;
+    width: 10px;
+    align-self: center;
+    display: flex;
+
+}
+
+.banner .exit img{
+    height: 100%;
+    width: 100%;
+    
+}
+
+@media (max-width:500px){
+    .banner{
+        font-size: 10px;
+    }
+
+    .banner .badge p{
+        font-size: 10px;
+    }
+    
+}

@@ -366,7 +366,14 @@ router.get('/all-purpose-search', verifyTokenOptional, async (req, res) => {
             ]);
         }
 
-        const classrooms = await findQuery;
+        findQuery = findQuery.sort('name'); 
+
+        let classrooms = await findQuery;
+
+        if(sort === "availability"){
+            classrooms = sortByAvailability(classrooms);
+            // console.log(classrooms);
+        }
 
         let sortedClassrooms = [];
 

@@ -56,11 +56,11 @@ function Sort({query, searchAttributes, setSearchAttributes, searchSort, setSear
                 <p>Sort</p>
                 <img src={selected === 'sort' ? ChevronUp : ChevronDown} alt="" />
             </div>
-            <div className={`more ${selected === 'more' ? "selected" : ""}`} onClick={()=>{handleSelect('more')}}>
+            {/* <div className={`more ${selected === 'more' ? "selected" : ""}`} onClick={()=>{handleSelect('more')}}>
                 <img src={selected === 'more' ? MoreSelected : More} alt="" />
                 <p>More</p>
                 <img src={selected === 'more' ? ChevronUp : ChevronDown} alt="" />
-            </div>
+            </div> */}
         </div>
     );
 }
