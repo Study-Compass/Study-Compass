@@ -30,4 +30,6 @@ yarn-error.log*
 __pycache__/
 venv/
 
+.vscode/
+
 scripts/

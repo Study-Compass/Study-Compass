@@ -20,6 +20,7 @@ import Github from '../../assets/Icons/Github.svg';
 
 import { debounce} from '../../Query.js';
 import ProfilePicture from '../../components/ProfilePicture/ProfilePicture.jsx';
+import Report from '../../components/Report/Report.jsx';
 
 /** 
 documentation:
@@ -57,6 +58,7 @@ function Room() {
     const [searchQuery, setSearchQuery] = useState(""); // for search bar
     const [searchAttributes, setSearchAttributes] = useState([]);
     const [searchSort, setSearchSort] = useState("name"); 
+    const [reportIsUp, setReportIsUp] = useState(true); 
 
     const [showFilter, setShowFilter] = useState(false); 
 
@@ -250,6 +252,10 @@ function Room() {
         setSearchSort(sort);
     }
 
+    function setReportUp(){
+        //setReportIsUp(!reportIsUp);
+    }
+
     const [searchFocus, setSearchFocus] = useState(false);
 
     
@@ -264,6 +270,7 @@ function Room() {
 
     return (    
         <div className="room" style={{ height: width < 800 ? viewport : '100vh' }}>
+            <Report text={roomName} isUp={reportIsUp} setIsUp={setReportUp}/>
             <Header />
             <div className="content-container">
                 <div className="calendar-container">
@@ -286,6 +293,7 @@ function Room() {
                             setState={setContentState}
                             schedule={data}
                             roomName={roomid}
+                            setIsUp={setReportUp}
                         /> : ""}
                         {contentState === "calendarSearch" || contentState === "freeNowSearch" || contentState === "nameSearch" ? calendarLoading ? "" : 
                             <div className="resultsCountContainer">

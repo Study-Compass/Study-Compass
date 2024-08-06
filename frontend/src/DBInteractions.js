@@ -82,4 +82,29 @@ const checkUsername = async (username) => {
     }
 }
 
-export { changeClasroom, save, checkUsername };
+
+
+const sendError = async (description, roomid) => {
+    try {
+        const reportData = {
+            report: {
+                roomid: roomid,
+                description: description
+            },
+            type: "incorrectData"
+        };
+
+            
+        await axios.post('/send-report', reportData, {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
+    } catch (error) {
+        throw error;
+    }
+}
+
+export { changeClasroom, save, checkUsername, sendError };

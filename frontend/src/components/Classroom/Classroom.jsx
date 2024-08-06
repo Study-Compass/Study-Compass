@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import './Classroom.css';
 import leftArrow from '../../assets/leftarrow.svg';
 import { useNavigate } from 'react-router-dom';
@@ -9,12 +9,15 @@ import EditAttributes from './EditAttributes/EditAttributes.jsx';
 import Loader from '../Loader/Loader.jsx';
 import FileUpload from '../FileUpload/FileUpload.jsx';
 import useWebSocket from '../../hooks/useWebSocket.js';
+import Flag from '../Flag/Flag.jsx';
+
 
 import Edit from '../../assets/Icons/Edit.svg';
 import Outlets from '../../assets/Icons/Outlets.svg';
 import Windows from '../../assets/Icons/Windows.svg';
 import Printer from '../../assets/Icons/Printer.svg';
 import FilledStar from '../../assets/Icons/FilledStar.svg';
+import circleWarning from '../../assets/gray-circle-warning.svg';
 
 import { findNext } from '../../pages/Room/RoomHelpers.js';
 import { useNotification } from '../../NotificationContext.js';
@@ -22,7 +25,7 @@ import { useNotification } from '../../NotificationContext.js';
 import '../../pages/Room/Room.css';
 import axios from 'axios';
 
-function Classroom({ room, state, setState, schedule, roomName, width, setShowMobileCalendar }) {
+function Classroom({ room, state, setState, schedule, roomName, width, setShowMobileCalendar, setIsUp }) {
 
     // const { sendMessage } = useWebSocket({
     //     ping: () => {
@@ -35,17 +38,26 @@ function Classroom({ room, state, setState, schedule, roomName, width, setShowMo
     const [success, setSuccess] = useState(false);
     const [message, setMessage] = useState("");
     const [defaultImage, setDefaultImage] = useState(false);
+    const [fillerHeight, setFillerHeight] = useState(0);
 
+    const checkInRef = useRef(null);
 
     const [edit, setEdit] = useState(false);
     const attributeIcons = {
         "outlets": Outlets,
         "windows": Windows,
         "printer": Printer
-    };
+    }; 
 
     const { addNotification } = useNotification();
     const navigate = useNavigate();
+
+    useEffect(() => {
+        if (checkInRef.current) {
+            setFillerHeight(checkInRef.current.clientHeight + 10);
+            console.log(checkInRef.current.clientHeight);
+        }
+    }, [checkInRef.current]);
 
     useEffect(() => {
         setImage("");
@@ -141,14 +153,20 @@ function Classroom({ room, state, setState, schedule, roomName, width, setShowMo
                     })}
                     {user && user.admin ? <div className="attribute" onClick={() => { setEdit(!edit) }}><img src={Edit} alt="" /></div> : ""}
                 </div>
+                <div>
+                    <Flag functions={setIsUp} primary={"rgba(176, 175, 175, .13)"} img={circleWarning} accent={"#D9D9D9"} color={"#737373"} text={"As Study Compass is still in beta, certain information may be incorrect. Reporting incorrect information is an important part of our troubleshooting process, so please help us out!"}/>
+                </div>
+                <div className="filler" style={{height:`${fillerHeight}px`}}>
+
+                </div>
             </div>
             {user && user.admin ? room ? edit ? <EditAttributes room={room} attributes={room.attributes} setEdit={setEdit} /> : "" : "" : ""}
             {
                 defaultImage && (!isAuthenticating) && isAuthenticated && user.admin ? <FileUpload classroomName={room.name}/> : ""
             }
-            
+
             {/* {isAuthenticated && } */}
-            <div className="check-in">
+            <div className="check-in" ref={checkInRef}>
                 <div className={`${success ? 'free-until' : 'class-until'}`}>
                     <div className="dot">
                         <div className="outer-dot"></div>

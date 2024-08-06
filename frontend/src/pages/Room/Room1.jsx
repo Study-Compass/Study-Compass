@@ -15,10 +15,13 @@ import Sort from '../../components/Sort/Sort.jsx';
 import Footer from '../../components/Footer/Footer.jsx';
 import Recommended from '../../components/Recommended/Recommended.jsx';
 import Banner from '../../components/Banner/Banner.jsx';
+import Report from '../../components/Report/Report.jsx';
+import { useProfileCreation } from '../../ProfileCreationContext';
 
 import chevronUp from '../../assets/chevronup.svg';
 import SortIcon from '../../assets/Icons/Sort.svg';
 import Github from '../../assets/Icons/Github.svg';
+
 
 import { debounce} from '../../Query.js';
 import ProfilePicture from '../../components/ProfilePicture/ProfilePicture.jsx';
@@ -60,11 +63,14 @@ function Room() {
     const [searchSort, setSearchSort] = useState("name"); 
 
     const [searchFocus, setSearchFocus] = useState(false);
-    const [showFilter, setShowFilter] = useState(false); 
+    const [showFilter, setShowFilter] = useState(false);
 
     const [calendarEmpty, setCalendarEmpty] = useState(false);
 
     const [bannerVisible, setBannerVisible] = useState(false);
+    const [reportIsUp, setReportIsUp] = useState(false);  
+
+    const { handleOpen } = useProfileCreation();
 
     function clearQuery(){ setQuery({'M': [],'T': [],'W': [],'R': [],'F': [],});
         setNoQuery(true);
@@ -133,6 +139,15 @@ function Room() {
         setResults([]);
         clearQuery();
         setLoadedResults([]);
+    }
+
+    function setReportUp(){
+        if (!isAuthenticated) {
+            handleOpen();
+        }
+        else{
+            setReportIsUp(!reportIsUp);
+        }
     }
 
     useEffect(()=>{
@@ -298,6 +313,7 @@ function Room() {
     return (    
         <div className="room" style={{ height: width < 800 ? viewport : '100vh' }}>
             <Banner visible={bannerVisible} setVisible={setBannerVisible}/>
+            <Report text={roomName} isUp={reportIsUp} setIsUp={setReportUp}/>
             <Header />
             <div className="content-container" style={{height: bannerVisible ? "max(100% - 135px)":  "max(100% - 115px)", maxHeight: bannerVisible ? "max(100% - 135px)":  "max(100% - 115px)"}}>
                 <div className="calendar-container">
@@ -322,6 +338,7 @@ function Room() {
                             roomName={roomid}
                             width={width}
                             setShowMobileCalendar={setShowMobileCalendar}
+                            setIsUp={setReportUp}
                         /> : ""}
                         {contentState === "calendarSearch" || contentState === "freeNowSearch" || contentState === "nameSearch" ? calendarLoading ? "" : 
                             <div className="resultsCountContainer">
