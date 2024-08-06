@@ -33,8 +33,8 @@ function Friend({ friend, isFriendRequest, reload, setReload }) {
                     <img src={friend.picture ? friend.picture : pfp} alt="" />
                 </div>
                 <div className="user-content">
-                    <h1>{friend.username}</h1>
-                    <p>@{friend._id}</p>
+                    <h1>{friend.name}</h1>
+                    <p>@{friend.username}</p>
                 </div>
             </div>
             {
