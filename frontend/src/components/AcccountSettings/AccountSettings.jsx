@@ -12,8 +12,9 @@ function AccountSettings({ settingsRightSide, width, handleBackClick, userInfo }
     const [name, setName] = useState(userInfo.name);
     const [username, setUsername] = useState(userInfo.username);
     const [editUsername, setEditUsername] = useState(false);
-    const [editEmail, setEditEmail] = useState(false);
 
+    
+    const [editEmail, setEditEmail] = useState(false);
     const [email, setEmail] = useState(userInfo.email);
 
     // useEffect(() => {
@@ -34,9 +35,13 @@ function AccountSettings({ settingsRightSide, width, handleBackClick, userInfo }
     };
 
     const saveUsername = () => {
-        saveUser(name, username, email, null, null, null);
-        setEditUsername(false);
-        setEditEmail(false);
+        if (editUsername){
+            saveUser(name, username, email, null, null, null);
+        }
+        setEditUsername(!editUsername);
+
+        // setEditUsername(false);
+        // setEditEmail(false);
     };
 
     return (
@@ -70,10 +75,9 @@ function AccountSettings({ settingsRightSide, width, handleBackClick, userInfo }
                     <div className='user-container'>
                         <div className='user'>
                         {editUsername ? (
-                                <input
-                                    type="text" value={username} onChange={handleUsernameChange}
-                                    onBlur={saveUsername}
-                                    autoFocus
+                                <input type="text" value={username} onChange={handleUsernameChange}
+                                    // onBlur={saveUsername}
+                                    // autoFocus
                                 /> ): 
                                 (
                                 <>
@@ -84,7 +88,9 @@ function AccountSettings({ settingsRightSide, width, handleBackClick, userInfo }
                         }
                         
                         </div>
-                        <button onClick={() => setEditUsername(true)}>change username</button>
+                        {/* <button onClick={(saveUsername) => setEditUsername(true)}>change username</button> */}
+                        
+                        <button onClick={(saveUsername)}> {setEditUsername ? 'change username' : 'change username'} </button>
 
                     </div>
                     <div className='user-container'>

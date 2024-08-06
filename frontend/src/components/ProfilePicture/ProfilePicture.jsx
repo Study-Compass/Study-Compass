@@ -58,8 +58,8 @@ function ProfilePicture(){
                         <p>Profile</p>
                     </div>
                 </Link>
-                <Link>
-                    <div className="menu-item" onClick={notYet}>
+                <Link  to="/settings">
+                    <div className="menu-item" >
                         <img className="icon" src={Settings} alt="settings" />
                         <p>Settings</p>
                     </div>
