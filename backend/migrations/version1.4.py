@@ -2,14 +2,13 @@ from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
 import os
 from dotenv import load_dotenv
-import helpers.datamigration
 
 from helpers.datamigration import addNewField, updateVersion
 
 
 # ============================== starter code ==========================================
 
-VERSION = 1.2 # set version here
+VERSION = 1.4 # set version here
 
 load_dotenv()
 uri = os.environ.get('MONGO_URL_LOCAL')
@@ -22,12 +21,9 @@ elif (database == "p"):
         uri = os.environ.get('MONGO_URL')
     else:
         exit(1)
-
 else: 
     print(f"Improper usage: invalid input {database}")
 
 # =====================================================================================
 
-addNewField(uri, "users", {"tags" : ["beta tester"]})
-
-updateVersion(uri, VERSION)
+addNewField(uri, "classrooms1", {"checked-in" : []})

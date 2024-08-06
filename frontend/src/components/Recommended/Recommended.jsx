@@ -52,7 +52,7 @@ function Recommended({id, debouncedFetchData, changeURLHelper, findNext, hide}) 
     }, [id]);
 
 
-    if(!room || isAuthenticating){
+    if(!room|| isAuthenticating){
         return(
             <div className="recommended">        
                 <p>recommended for you</p>

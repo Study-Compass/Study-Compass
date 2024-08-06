@@ -18,6 +18,7 @@ import { GoogleOAuthProvider } from '@react-oauth/google';
 import { NotificationProvider } from './NotificationContext';
 import { ErrorProvider } from './ErrorContext';
 import { ProfileCreationProvider } from './ProfileCreationContext';
+// import { WebSocketProvider } from './WebSocketContext';
 
 
 function App() {
