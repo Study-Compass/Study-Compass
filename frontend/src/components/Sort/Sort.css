@@ -74,11 +74,12 @@
     gap: 5px;
     padding: 15px 20px;
     z-index: 100;
-    height: 360px;
+    height: 320px;
     opacity: 1;
     width:calc(100% - 40px);
     overflow-x:hidden;
     justify-content: space-between;
+    max-width:300px;
 }
 
 .sort-popup .heading h1{

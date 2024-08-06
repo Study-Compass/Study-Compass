@@ -28,6 +28,6 @@ else:
 
 # =====================================================================================
 
-addNewField(uri, "users", {"tags" : []})
+addNewField(uri, "users", {"tags" : ["beta tester"]})
 
 updateVersion(uri, VERSION)

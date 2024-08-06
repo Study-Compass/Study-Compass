@@ -115,12 +115,12 @@ function Friends() {
                                 <img src={pfp} alt="" />
                             </div>
                                 <div className="user-content">
-                                    <h1>{user.username}</h1>
+                                    <h1>{user.name}</h1>
                                     <p>@{user.username}</p>
                                 </div>
                         </div>
                         <form className="add-friend" onSubmit={handleSubmit}>
-                            <input type="text" placeholder="add a friend" value={addValue} onChange={handleAddChange}/>
+                            <input type="text" placeholder="add a friend by username" value={addValue} onChange={handleAddChange}/>
                             <div className="add-friend-icon">
                                 <img src={AddFriend} alt=""/>
                             </div>
