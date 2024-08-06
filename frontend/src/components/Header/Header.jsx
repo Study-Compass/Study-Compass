@@ -58,10 +58,18 @@ const Header = React.memo(()=>{
 
                     : "" 
                 }
-                 
-            <Link to='/'>
+            {
+                isAuthenticated ? 
+
+                <Link to='/room/none'>
+                    <img className="logo" src={ isAuthenticated || isAuthenticating ? width < 800 ? MobileLogo : logo : logo} alt="logo"/>
+                </Link>
+                :
+                <Link to='/'>
                 <img className="logo" src={ isAuthenticated || isAuthenticating ? width < 800 ? MobileLogo : logo : logo} alt="logo"/>
-            </Link>
+                </Link>
+            }
+
 
             {page === "/login" || page === "/register" ? "" :
                 <div className="header-right">

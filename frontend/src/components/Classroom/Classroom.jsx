@@ -8,6 +8,7 @@ import '../../assets/fonts.css'
 import EditAttributes from './EditAttributes/EditAttributes.jsx';
 import Loader from '../Loader/Loader.jsx';
 import FileUpload from '../FileUpload/FileUpload.jsx';
+import useWebSocket from '../../hooks/useWebSocket.js';
 import Flag from '../Flag/Flag.jsx';
 
 
@@ -19,10 +20,18 @@ import FilledStar from '../../assets/Icons/FilledStar.svg';
 import circleWarning from '../../assets/gray-circle-warning.svg';
 
 import { findNext } from '../../pages/Room/RoomHelpers.js';
+import { useNotification } from '../../NotificationContext.js';
 
 import '../../pages/Room/Room.css';
+import axios from 'axios';
 
-function Classroom({ room, state, setState, schedule, roomName, setIsUp}) {
+function Classroom({ room, state, setState, schedule, roomName, width, setShowMobileCalendar }) {
+
+    // const { sendMessage } = useWebSocket({
+    //     ping: () => {
+    //         sendMessage('pong');
+    //     }
+    // });
 
     const [image, setImage] = useState("")
     const { isAuthenticating, isAuthenticated, user } = useAuth();
@@ -39,6 +48,7 @@ function Classroom({ room, state, setState, schedule, roomName, setIsUp}) {
         "printer": Printer
     }; 
 
+    const { addNotification } = useNotification();
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -46,6 +56,7 @@ function Classroom({ room, state, setState, schedule, roomName, setIsUp}) {
     }, [room])
 
     useEffect(() => {
+        
         if (room === null || room === undefined) {
             return;
         }
@@ -79,7 +90,14 @@ function Classroom({ room, state, setState, schedule, roomName, setIsUp}) {
         navigate(-1);
     };
 
-
+    const checkIn = () => {
+        try{
+            const response = axios.post('/check-in', { classroomId: room._id });
+        } catch (error){
+            console.log(error);
+            addNotification({title: "An error occured", message: "an internal error occured", type: "derror"})
+        }
+    }
 
     return (
         <div className='classroom-component'>
@@ -103,15 +121,18 @@ function Classroom({ room, state, setState, schedule, roomName, setIsUp}) {
                 <div className="info-row">
                     <div className="rating">
                         <img src={FilledStar} alt="star" />
-                        <p>4.6</p>
+                        <p>0</p>
                     </div>
-                    <div className={`${success ? 'free-until' : 'class-until'}`}>
+                    <div className="rating-num">
+                        0 ratings
+                    </div>
+                    {/* <div className={`${success ? 'free-until' : 'class-until'}`}>
                         <div className="dot">
                             <div className="outer-dot"></div>
                             <div className="inner-dot"></div>
                         </div>
                         {success ? "free" : "class in session"} {message}                    
-                    </div>
+                    </div> */}
                 </div>
                 <div className="attributes">
                     {room && room.attributes.map((attribute, index) => {
@@ -133,6 +154,22 @@ function Classroom({ room, state, setState, schedule, roomName, setIsUp}) {
                 defaultImage && (!isAuthenticating) && isAuthenticated && user.admin ? <FileUpload classroomName={room.name}/> : ""
             }
             
+            {/* {isAuthenticated && } */}
+            <div className="check-in">
+                <div className={`${success ? 'free-until' : 'class-until'}`}>
+                    <div className="dot">
+                        <div className="outer-dot"></div>
+                        <div className="inner-dot"></div>
+                    </div>
+                    
+                    {success ? "free" : "class in session"} {message}                    
+                </div>
+                <div className="button-container">
+                    {width < 800 && <button className="schedule-button" onClick={()=>{setShowMobileCalendar(true)}}>view-schedule</button>} 
+                    <button disabled={!success || !isAuthenticated || true} className="check-in-button">check in</button>
+                </div>
+                <p>check-in functionality coming soon!</p>
+            </div>
         </div>
     );
 }

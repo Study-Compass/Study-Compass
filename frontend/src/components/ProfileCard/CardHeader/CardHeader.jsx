@@ -2,7 +2,7 @@ import React from 'react';
 import './CardHeader.css';
 import WhiteSettings from "../../../assets/Icons/WhiteSettings.svg"
 import defaultAvatar from "../../../assets/defaultAvatar.svg"
-import ProfilePicture from '../../ProfilePicture/ProfilePicture';
+import Badges from '../../Badges/Badges';
 import '../../ProfilePicture/ProfilePicture.css';
 
 function CardHeader({userInfo, settings}){
@@ -20,14 +20,15 @@ function CardHeader({userInfo, settings}){
                 <div className="profile-info">
                     <p className="name">{userInfo.name}</p>
                     <p className="user">@{userInfo.username}</p>
-                    <div className="tags">
+                    {/* <div className="tags">
                         <div className="badge" style={{backgroundColor:"#A0C4FF"}}>
                             <p>beta tester</p>
                         </div>
                         <div className="badge" style={{backgroundColor:"#A0C4FF"}}>
                             <p>jeremy</p>
                         </div>
-                    </div>
+                    </div> */}
+                    <Badges badges={userInfo.tags ? userInfo.tags : []}/>
                 </div>
             </div>
             

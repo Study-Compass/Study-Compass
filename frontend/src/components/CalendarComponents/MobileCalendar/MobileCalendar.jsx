@@ -95,7 +95,7 @@ function MobileCalendar({ className, data, isLoading, addQuery, removeQuery, que
                 backgroundColor: 'white',
                 width: '100%', // Adjusted for full width
                 height: '90%',
-                transform:  y.to(y => `translate(-1px,${y}px)`),
+                transform:  y.to(y => `translate(0px,${y}px)`),
                 touchAction: 'none',
             }}
         >
@@ -108,10 +108,11 @@ function MobileCalendar({ className, data, isLoading, addQuery, removeQuery, que
                 <Swiper
                     modules={[Pagination]}
                     initialSlide={0 < currentDay < 6 ? currentDay-1:1}
-                    slidesPerView={1}
+                    slidesPerView={1.5}
                     pagination={{ clickable: true }} // Enables clickable pagination dots
                     onSlideChange={() => console.log('slide change')}
                     onSwiper={setSwiper}
+                    centeredSlides={true}
                 >   
                     {days.map((day) => (
                         <SwiperSlide>
@@ -120,6 +121,7 @@ function MobileCalendar({ className, data, isLoading, addQuery, removeQuery, que
                                 <DayColumn
                                     key={day}
                                     day={day}
+                                    
                                     dayEvents={isLoading ? load : data ? data["weekly_schedule"][day] : load} eventColors={isLoading ? loadColors : data ? eventColors : loadColors}
                                     empty={empty}
                                     add={addQuery}
