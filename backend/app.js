@@ -123,34 +123,34 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 // Socket.io functionality
-io.on('connection', (socket) => {
-    console.log('Client connected');
+// io.on('connection', (socket) => {
+//     console.log('Client connected');
 
-    socket.on('message', (message) => {
-        console.log(`Received: ${message}`);
-        socket.emit('message', `Echo: ${message}`);
-    });
+//     socket.on('message', (message) => {
+//         console.log(`Received: ${message}`);
+//         socket.emit('message', `Echo: ${message}`);
+//     });
 
-    socket.on('disconnect', () => {
-        console.log('Client disconnected');
-    });
+//     socket.on('disconnect', () => {
+//         console.log('Client disconnected');
+//     });
 
-    // Example: Custom event for friend requests
-    socket.on('friendRequest', (data) => {
-        console.log('Friend request received:', data);
-        // Handle friend request
-        io.emit('friendRequest', data); // Broadcast to all connected clients
-    });
+//     // Example: Custom event for friend requests
+//     socket.on('friendRequest', (data) => {
+//         console.log('Friend request received:', data);
+//         // Handle friend request
+//         io.emit('friendRequest', data); // Broadcast to all connected clients
+//     });
 
-    // Heartbeat mechanism
-    setInterval(() => {
-        socket.emit('ping');
-    }, 25000); // Send ping every 25 seconds
+//     // Heartbeat mechanism
+//     setInterval(() => {
+//         socket.emit('ping');
+//     }, 25000); // Send ping every 25 seconds
 
-    socket.on('pong', () => {
-        // console.log('Heartbeat pong received');
-    });
-});
+//     socket.on('pong', () => {
+//         // console.log('Heartbeat pong received');
+//     });
+// });
 
 // Start the server
 server.listen(port, () => {
