@@ -62,10 +62,15 @@ const findNext = (schedule) => {
     }
 };
 
-const fetchDataHelper = async (id, setLoading, setData, setRoom, navigate, getRoom, setRoomName, newError) => {
+const fetchDataHelper = async (id, setLoading, setData, setRoom, navigate, getRoom, setRoomName, newError, setCalendarEmpty) => {
     setRoom(null);
     setLoading(true);
     setData(null);
+    if(id === "none"){
+        setCalendarEmpty(true);
+    } else {
+        setCalendarEmpty(false);
+    }
     try{
         const data = await getRoom(id);
         setLoading(false);

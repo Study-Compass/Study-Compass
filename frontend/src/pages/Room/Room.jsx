@@ -68,7 +68,7 @@ function Room() {
 
     const [width, setWidth] = useState(window.innerWidth);
 
-    const fetchData = async (id) => fetchDataHelper(id, setLoading, setData, setRoom, navigate, getRoom, setRoomName, newError);
+    const fetchData = async (id) => fetchDataHelper(id, setLoading, setData, setRoom, navigate, getRoom, setRoomName, newError, setContentState);
     const fetchFreeRooms = async () => fetchFreeRoomsHelper(setContentState, setCalendarLoading, getFreeRooms, setResults, setNumLoaded, query, newError);
     const debouncedFetchData = debounce(fetchData, 500); // Adjust delay as needed
     const fetchFreeNow = async () => fetchFreeNowHelper(setContentState, setCalendarLoading, setResults, setNumLoaded, getFreeRooms);

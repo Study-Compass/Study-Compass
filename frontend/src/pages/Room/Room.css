@@ -190,8 +190,8 @@ select{
     position: absolute;
     top:0;
     left:0;
-    width:100%;
-    height:100%;
+    width:calc(100% - 6px);
+    height: calc(100% - 6px);
     display:flex;
     justify-content: center;
     align-items: center;
@@ -200,10 +200,18 @@ select{
     color: var(--border);
     font-family: 'Inter';
     background-color: rgba(255,255,255,0.5);
-    z-index: 200;
+    z-index: 1;
     pointer-events: none;
     transition: all 0.3s;
+    margin:3px;
+    box-sizing: border-box;
+    opacity: 0;
 
+}
+
+.calendar-instruction.visible{
+    opacity: 1;
+    /* pointer-events: all; */
 }
 
 .right:hover .calendar-instruction{
