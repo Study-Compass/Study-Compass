@@ -61,14 +61,18 @@ textarea{
     transform: translate(-50%, -50%);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     background-color: white;
-    height: 400px;
-    width: 500px;
+    max-height: 400px;
+    max-width: 500px;
     position: fixed; 
     border-radius: 8px; 
     gap: 3%;
     opacity: 0;
     z-index: 9999; 
     transition: opacity 0.5s ease;
+    width:calc(100% - 60px);
+    height:calc(100% - 60px);
+    /* margin: 0 30px;  */
+    box-sizing: border-box;
 }
 .pop_up.in {
     opacity: 1;
