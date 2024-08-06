@@ -283,8 +283,6 @@
     pointer-events: none;
 }
 
-
-
 .img-pop-up img{
     top: 50%; 
     left: 50%; 
@@ -312,5 +310,9 @@
     .classroom-component .check-in button{
         font-size:15px;
     }
-}
 
+    .img-pop-up img{
+        height: 200px;
+        width: 300px;
+    }
+}
