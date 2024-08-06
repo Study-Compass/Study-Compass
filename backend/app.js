@@ -1,66 +1,60 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const { spawn } = require('child_process');
 const cors = require('cors');
 const path = require('path'); 
 const cookieParser = require('cookie-parser');
-const s3 = require('./aws-config');
 const multer = require('multer');
 require('dotenv').config();
-const { google } = require('googleapis');
 const { createServer } = require('http');
-const WebSocket = require('ws');
+const { Server } = require('socket.io');
 
 const app = express();
-// const port = 5001;
 const port = process.env.PORT || 5001;
 
 const server = createServer(app);
-const wss = new WebSocket.Server({server});
+const io = new Server(server);
 
-const corsOptions = {
-    origin: 'http://localhost:3000', // replace with production domain
-    optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
-  };
-app.use(cors(corsOptions));
+if (process.env.NODE_ENV === 'production') {
+    const corsOptions = {
+        origin: ['https://www.study-compass.com', 'https://studycompass.com'],
+        optionsSuccessStatus: 200 // for legacy browser support
+    };
+    app.use(cors(corsOptions));
+}
 
-
-const authRoutes = require('./routes/authRoutes.js');
-const dataRoutes = require('./routes/dataRoutes.js');
-const friendRoutes = require('./routes/friendRoutes.js');
-const userRoutes = require('./routes/userRoutes.js');
-// const maintenanceRoutes = require('./routes/maintenanceRoutes.js'); //comment out for production
-
-
+// Other middleware
 app.use(express.json());
-app.use(authRoutes);
-app.use(dataRoutes);
-app.use(friendRoutes);
-app.use(userRoutes);
-// app.use(maintenanceRoutes); //comment out for production
-app.use(cors());
 app.use(cookieParser());
 
-if(process.env.NODE_ENV === 'production') {
+if (process.env.NODE_ENV === 'production') {
     mongoose.connect(process.env.MONGO_URL);
 } else {
     mongoose.connect(process.env.MONGO_URL_LOCAL);
 }
 mongoose.connection.on('connected', () => {
     console.log('Mongoose connected to DB.');
-    mongoConnection = true;
-    });
-    mongoose.connection.on('error', (err) => {
+});
+mongoose.connection.on('error', (err) => {
     console.log('Mongoose connection error:', err);
-    mongoConnection = false;
 });
 
 const upload = multer({
     storage: multer.memoryStorage(),
     limits: {
-      fileSize: 5 * 1024 * 1024, // 5 MB
+        fileSize: 5 * 1024 * 1024, // 5 MB
     },
-  });
+});
+
+// Define your routes and other middleware
+const authRoutes = require('./routes/authRoutes.js');
+const dataRoutes = require('./routes/dataRoutes.js');
+const friendRoutes = require('./routes/friendRoutes.js');
+const userRoutes = require('./routes/userRoutes.js');
+
+app.use(authRoutes);
+app.use(dataRoutes);
+app.use(friendRoutes);
+app.use(userRoutes);
 
 app.get('/update-database', (req, res) => {
     const pythonProcess = spawn('python3', ['courseScraper.py']);
@@ -79,44 +73,44 @@ app.get('/update-database', (req, res) => {
 });
 
 app.get('/api/greet', async (req, res) => {
-    console.log('GET: /api/greet')
+    console.log('GET: /api/greet');
     res.json({ message: 'Hello from the backend!' });
 });
 
 app.post('/upload-image/:classroomName', upload.single('image'), async (req, res) => {
     const classroomName = req.params.classroomName;
     const file = req.file;
-  
+
     if (!file) {
-      return res.status(400).send('No file uploaded.');
+        return res.status(400).send('No file uploaded.');
     }
-  
+
     const s3Params = {
-      Bucket: process.env.AWS_S3_BUCKET_NAME,
-      Key: `${classroomName}/${Date.now()}_${path.basename(file.originalname)}`,
-      Body: file.buffer,
-      ContentType: file.mimetype,
-      ACL: 'public-read', // Make the file publicly accessible
+        Bucket: process.env.AWS_S3_BUCKET_NAME,
+        Key: `${classroomName}/${Date.now()}_${path.basename(file.originalname)}`,
+        Body: file.buffer,
+        ContentType: file.mimetype,
+        ACL: 'public-read', // Make the file publicly accessible
     };
-  
+
     try {
-      // Upload image to S3
-      const s3Response = await s3.upload(s3Params).promise();
-      const imageUrl = s3Response.Location;
-  
-      // Find the classroom and update the image attribute
-      const classroom = await Classroom.findOneAndUpdate(
-        { name: classroomName },
-        { image: imageUrl },
-        { new: true, upsert: true }
-      );
-  
-      res.status(200).json({ message: 'Image uploaded and classroom updated.', classroom });
+        // Upload image to S3
+        const s3Response = await s3.upload(s3Params).promise();
+        const imageUrl = s3Response.Location;
+
+        // Find the classroom and update the image attribute
+        const classroom = await Classroom.findOneAndUpdate(
+            { name: classroomName },
+            { image: imageUrl },
+            { new: true, upsert: true }
+        );
+
+        res.status(200).json({ message: 'Image uploaded and classroom updated.', classroom });
     } catch (error) {
-      console.error(error);
-      res.status(500).send('An error occurred while uploading the image or updating the classroom.');
+        console.error(error);
+        res.status(500).send('An error occurred while uploading the image or updating the classroom.');
     }
-  });
+});
 
 // Serve static files from the React app in production
 if (process.env.NODE_ENV === 'production') {
@@ -128,19 +122,35 @@ if (process.env.NODE_ENV === 'production') {
     });
 }
 
-// WebSocket functionality
-wss.on('connection', (ws) => {
+// Socket.io functionality
+io.on('connection', (socket) => {
     console.log('Client connected');
-    ws.on('message', (message) => {
+
+    socket.on('message', (message) => {
         console.log(`Received: ${message}`);
-        ws.send(`Echo: ${message}`);
+        socket.emit('message', `Echo: ${message}`);
     });
 
-    ws.on('close', () => {
+    socket.on('disconnect', () => {
         console.log('Client disconnected');
     });
-});
 
+    // Example: Custom event for friend requests
+    socket.on('friendRequest', (data) => {
+        console.log('Friend request received:', data);
+        // Handle friend request
+        io.emit('friendRequest', data); // Broadcast to all connected clients
+    });
+
+    // Heartbeat mechanism
+    setInterval(() => {
+        socket.emit('ping');
+    }, 25000); // Send ping every 25 seconds
+
+    socket.on('pong', () => {
+        // console.log('Heartbeat pong received');
+    });
+});
 
 // Start the server
 server.listen(port, () => {

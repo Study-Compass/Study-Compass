@@ -8,6 +8,7 @@ import '../../assets/fonts.css'
 import EditAttributes from './EditAttributes/EditAttributes.jsx';
 import Loader from '../Loader/Loader.jsx';
 import FileUpload from '../FileUpload/FileUpload.jsx';
+import useWebSocket from '../../hooks/useWebSocket.js';
 
 import Edit from '../../assets/Icons/Edit.svg';
 import Outlets from '../../assets/Icons/Outlets.svg';
@@ -20,6 +21,12 @@ import { findNext } from '../../pages/Room/RoomHelpers.js';
 import '../../pages/Room/Room.css';
 
 function Classroom({ room, state, setState, schedule, roomName, width, setShowMobileCalendar }) {
+
+    // const { sendMessage } = useWebSocket({
+    //     ping: () => {
+    //         sendMessage('pong');
+    //     }
+    // });
 
     const [image, setImage] = useState("")
     const { isAuthenticating, isAuthenticated, user } = useAuth();
@@ -42,6 +49,7 @@ function Classroom({ room, state, setState, schedule, roomName, width, setShowMo
     }, [room])
 
     useEffect(() => {
+        
         if (room === null || room === undefined) {
             return;
         }
