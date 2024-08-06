@@ -73,6 +73,7 @@ const saveUser = async (name, username, email, password, recommendation, classro
             console.error("User save unsuccessful");
         }
     } catch(error){
+        console.error("Error saving user");
         throw error;
     }
 

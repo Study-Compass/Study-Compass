@@ -10,6 +10,11 @@ function AccountSettings({ settingsRightSide, width, handleBackClick, userInfo }
 
     // const [changeUsername, setChangeUsername] = 
     const [name, setName] = useState(userInfo.name);
+    const [username, setUsername] = useState(userInfo.username);
+    const [editUsername, setEditUsername] = useState(false);
+    const [editEmail, setEditEmail] = useState(false);
+
+    const [email, setEmail] = useState(userInfo.email);
 
     // useEffect(() => {
 
@@ -18,6 +23,20 @@ function AccountSettings({ settingsRightSide, width, handleBackClick, userInfo }
 
     const handleNameChange = (e) => {
         setName(e.target.value);
+    };
+
+    const handleUsernameChange = (e) => {
+        setUsername(e.target.value);
+    };
+
+    const handleEmailChange = (e) => {
+        setEmail(e.target.value);
+    };
+
+    const saveUsername = () => {
+        saveUser(name, username, email, null, null, null);
+        setEditUsername(false);
+        setEditEmail(false);
     };
 
     return (
@@ -50,18 +69,41 @@ function AccountSettings({ settingsRightSide, width, handleBackClick, userInfo }
                 <div className="settings-rows-container">
                     <div className='user-container'>
                         <div className='user'>
-                            <h3>{userInfo.username}</h3>
-                            <p>@id</p>
+                        {editUsername ? (
+                                <input
+                                    type="text" value={username} onChange={handleUsernameChange}
+                                    onBlur={saveUsername}
+                                    autoFocus
+                                /> ): 
+                                (
+                                <>
+                                    <h3>{username}</h3>
+                                    <p>@id</p>
+                                </>
+                                )
+                        }
+                        
                         </div>
-                        <button>change username</button>
+                        <button onClick={() => setEditUsername(true)}>change username</button>
 
                     </div>
                     <div className='user-container'>
                         <div className='email'>
-                            <h3>email</h3>
-                            <p>{userInfo.email}</p>
+                        {editEmail ? (
+                                <input
+                                    type="text" value={email} onChange={handleEmailChange}
+                                    onBlur={saveUsername}
+                                    autoFocus
+                                /> ): 
+                                (
+                                <>
+                                    <h3>email</h3>
+                                    <p>{userInfo.email}</p>
+                                </>
+                                )  
+                        }
                         </div>
-                        <button>change email</button>
+                        <button onClick={() => setEditEmail(true)}>change email</button>
 
                     </div>
                     <div className='user-container'>
