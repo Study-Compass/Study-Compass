@@ -62,6 +62,8 @@ function Room() {
     const [searchFocus, setSearchFocus] = useState(false);
     const [showFilter, setShowFilter] = useState(false); 
 
+    const [calendarEmpty, setCalendarEmpty] = useState(false);
+
     const [bannerVisible, setBannerVisible] = useState(false);
 
     function clearQuery(){ setQuery({'M': [],'T': [],'W': [],'R': [],'F': [],});
@@ -72,7 +74,7 @@ function Room() {
 
     const [width, setWidth] = useState(window.innerWidth);
 
-    const fetchData = async (id) => fetchDataHelper(id, setLoading, setData, setRoom, navigate, getRoom, setRoomName, newError);
+    const fetchData = async (id) => fetchDataHelper(id, setLoading, setData, setRoom, navigate, getRoom, setRoomName, newError, setCalendarEmpty);
     const fetchFreeRooms = async () => fetchFreeRoomsHelper(setContentState, setCalendarLoading, getFreeRooms, setResults, setNumLoaded, query, newError);
     const debouncedFetchData = debounce(fetchData, 500); // Adjust delay as needed
     const fetchFreeNow = () => fetchFreeNowHelper(setContentState, setCalendarLoading, setResults, setNumLoaded, getFreeRooms);
@@ -362,7 +364,7 @@ function Room() {
                         </div>
                     ) : (
                         <div className="right">
-                            {contentState === "empty" && <div className="calendar-instruction">select a timeslot</div> }
+                            <div className={`calendar-instruction ${(contentState === "empty" && calendarEmpty) ? "visible": ""}`}>select a timeslot</div>
                             <Calendar className={room ? room.name ? room.name : "none": ""} data={data} isloading={loading} addQuery={addQuery} removeQuery={removeQuery} query={query} />
                         </div>
                     )}

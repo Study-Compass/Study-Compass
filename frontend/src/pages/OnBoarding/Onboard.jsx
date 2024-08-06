@@ -253,7 +253,7 @@ function Onboard(){
                     { current === 4 &&
                         <div className={`content ${current === 5 ? "going": ""} ${4 === currentTransition ? "": "beforeOnboard"}`} ref={el => contentRefs.current[4] = el}>
                             <h2>welcome to study compass, <br></br>{userInfo.name}!</h2>
-                            <p>Here's your study compass id, you only get one, so make sure not to lose it! It'll showcase all your progress using study-compass, let's get those numbers up!</p>
+                            <p>Here's your study compass id, make sure to hold onto it!</p>
                             <div className="card-container">
                                 <CardHeader userInfo={userInfo} settings={false}/>
                             </div>
