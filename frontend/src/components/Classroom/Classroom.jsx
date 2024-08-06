@@ -8,6 +8,7 @@ import '../../assets/fonts.css'
 import EditAttributes from './EditAttributes/EditAttributes.jsx';
 import Loader from '../Loader/Loader.jsx';
 import FileUpload from '../FileUpload/FileUpload.jsx';
+import useWebSocket from '../../hooks/useWebSocket.js';
 
 import Edit from '../../assets/Icons/Edit.svg';
 import Outlets from '../../assets/Icons/Outlets.svg';
@@ -16,10 +17,18 @@ import Printer from '../../assets/Icons/Printer.svg';
 import FilledStar from '../../assets/Icons/FilledStar.svg';
 
 import { findNext } from '../../pages/Room/RoomHelpers.js';
+import { useNotification } from '../../NotificationContext.js';
 
 import '../../pages/Room/Room.css';
+import axios from 'axios';
 
-function Classroom({ room, state, setState, schedule, roomName }) {
+function Classroom({ room, state, setState, schedule, roomName, width, setShowMobileCalendar }) {
+
+    // const { sendMessage } = useWebSocket({
+    //     ping: () => {
+    //         sendMessage('pong');
+    //     }
+    // });
 
     const [image, setImage] = useState("")
     const { isAuthenticating, isAuthenticated, user } = useAuth();
@@ -35,6 +44,7 @@ function Classroom({ room, state, setState, schedule, roomName }) {
         "printer": Printer
     };
 
+    const { addNotification } = useNotification();
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -42,6 +52,7 @@ function Classroom({ room, state, setState, schedule, roomName }) {
     }, [room])
 
     useEffect(() => {
+        
         if (room === null || room === undefined) {
             return;
         }
@@ -75,7 +86,14 @@ function Classroom({ room, state, setState, schedule, roomName }) {
         navigate(-1);
     };
 
-
+    const checkIn = () => {
+        try{
+            const response = axios.post('/check-in', { classroomId: room._id });
+        } catch (error){
+            console.log(error);
+            addNotification({title: "An error occured", message: "an internal error occured", type: "derror"})
+        }
+    }
 
     return (
         <div className='classroom-component'>
@@ -126,6 +144,22 @@ function Classroom({ room, state, setState, schedule, roomName }) {
                 defaultImage && (!isAuthenticating) && isAuthenticated && user.admin ? <FileUpload classroomName={room.name}/> : ""
             }
             
+            {/* {isAuthenticated && } */}
+            <div className="check-in">
+                <div className={`${success ? 'free-until' : 'class-until'}`}>
+                    <div className="dot">
+                        <div className="outer-dot"></div>
+                        <div className="inner-dot"></div>
+                    </div>
+                    
+                    {success ? "free" : "class in session"} {message}                    
+                </div>
+                <div className="button-container">
+                    {width < 800 && <button className="schedule-button" onClick={()=>{setShowMobileCalendar(true)}}>view-schedule</button>} 
+                    <button disabled={!success || !isAuthenticated || true} className="check-in-button">check in</button>
+                </div>
+                <p>check-in functionality coming soon!</p>
+            </div>
         </div>
     );
 }

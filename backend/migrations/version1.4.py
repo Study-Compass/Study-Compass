@@ -8,7 +8,7 @@ from helpers.datamigration import addNewField, updateVersion
 
 # ============================== starter code ==========================================
 
-VERSION = 1.3 # set version here
+VERSION = 1.4 # set version here
 
 load_dotenv()
 uri = os.environ.get('MONGO_URL_LOCAL')
@@ -26,5 +26,4 @@ else:
 
 # =====================================================================================
 
-addNewField(uri, "classrooms1", {"number_of_ratings" : 0})
-addNewField(uri, "classrooms1", {"average_rating" : 0})
+addNewField(uri, "classrooms1", {"checked-in" : []})

@@ -134,3 +134,106 @@
     align-items: center;
     margin: 7px 0;
 }
+
+.classroom-component .check-in{
+    width: calc(100% - 30px);
+    margin:15px;
+    position: absolute;
+    bottom:0;
+    left:0;
+    border-radius: 10px;
+    border: 1px solid var(--lighterborder);
+    box-shadow: var(--shadow);
+    padding:15px;
+    box-sizing: border-box;
+    background-color: white;
+}
+
+.classroom-component .check-in .free-until,
+.classroom-component .check-in .class-until{
+    font-weight:500;
+    /* margin: 5px 0 10px 0; */
+    font-size:14px;
+    display:flex;
+    align-items:center;
+    gap:5px;
+    color:var(--green);
+    padding:0 15px;
+    position: relative;
+    font-family: 'Inter';
+}
+    
+.classroom-component .check-in .class-until{
+    color:var(--red);
+}
+
+
+.classroom-component .button-container{
+    display: flex;
+    gap:10px;
+    margin-top:10px;
+    width:100%;
+}
+
+.classroom-component .check-in button{
+    font-size: 14px;
+    font-family: 'Inter';
+    font-weight: 650;
+    color: white;
+    background-color: var(--green);
+    border: none;
+    border-radius: 8px;
+    padding: 8px 20px;
+    flex-grow:1;
+    cursor: pointer;
+}
+
+.classrorom-component .check-in button:hover{
+    cursor:pointer;
+}
+
+.classroom-component .check-in button:disabled{
+    background-color: var(--lighterborder);
+    color: var(--border);
+    cursor: not-allowed;
+}
+
+.classroom-component button.schedule-button{
+    background-color: var(--blue);
+}
+
+.check-in p{
+    font-size: 13px;
+    font-family: 'Inter';
+    font-weight: 500;
+    color: var(--border);
+    margin: 0;
+    width:100%;
+    text-align: center;
+    margin-top:10px;
+
+}
+
+/* .check-in-button::after{
+    content: "check-in feature coming soon";
+    font-size: 10px;
+    color: var(--text);
+    font-family: 'Inter';
+    font-weight: 500;
+    position: absolute;
+    width: calc(100% - 80px);
+    top:-40px;
+    left:0;
+    border-radius: 5px;
+    margin: 0 30px;
+    padding: 5px 10px;
+
+    border: 1px solid var(--lighterborder);
+} */
+
+@media (max-width:500px) {
+    .classroom-component .check-in button{
+        font-size:15px;
+    }
+}
+
