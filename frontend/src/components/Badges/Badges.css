@@ -1,0 +1,27 @@
+
+.badges{
+    height:15px;
+    display: flex;
+    gap:5px
+}
+
+.badge{
+    border-radius: 5px;
+    width: fit-content;
+}
+
+.badge p{
+    margin:0 7px;
+    color:white;
+    font-size:12px;
+    font-family: 'Inter';
+    font-weight:600;
+}
+
+.badge.beta-tester{
+    background-color: #A0C4FF;
+}
+
+.badge.admin{
+    background-color: #EA4335;
+}

@@ -5,7 +5,7 @@ import useOutsideClick from '../../../hooks/useClickOutside';
 
 function Tags({ setSelected, searchAttributes, setSearchAttributes, onApply }){
     const [tagsState, setTagsState] = useState(true); //true for include, false for exclude
-    const tags = ["windows", "outlets", "printer", "small desks", "tables", "empty"];
+    const tags = ["windows", "outlets", "printer", "small desks", "tables"];
 
     const [include, setInclude] = useState([...searchAttributes]);
     const [exclude, setExclude] = useState([]);
@@ -51,13 +51,13 @@ function Tags({ setSelected, searchAttributes, setSearchAttributes, onApply }){
                 <h1>Tags</h1>
                 <p onClick={handleClear} className="clear">clear</p>
             </div>
-            <label className="switch">
+            {/* <label className="switch">
                 <input type="checkbox" onChange={()=>{setTagsState(!tagsState)}}/>
                 <div className="slider">
                     <span>include</span>
                     <span>exclude</span>
                 </div>
-            </label>
+            </label> */}
             <div className="tags-container">
                 <div className={`tags-content ${tagsState ? "" : "next"}`}>
                     <div className="include">

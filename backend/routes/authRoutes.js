@@ -121,7 +121,8 @@ router.post('/login', async (req, res) => {
                     onboarded: user.onboarded,
                     classroomPreferences: user.classroomPreferences,
                     recommendationPreferences: user.recommendationPreferences,
-                    google: user.googleId ? true : false
+                    google: user.googleId ? true : false,
+                    tags: user.tags
                 }
             }
         });
@@ -162,8 +163,8 @@ router.get('/validate-token', verifyToken, async (req, res) => {
                     onboarded: user.onboarded,
                     classroomPreferences: user.classroomPreferences,
                     recommendationPreferences: user.recommendationPreferences,
-                    google: user.googleId ? true : false
-
+                    google: user.googleId ? true : false,
+                    tags: user.tags                    
                 }
             }
         });
@@ -221,7 +222,8 @@ router.post('/google-login', async (req, res) => {
                     onboarded: user.onboarded,
                     classroomPreferences: user.classroomPreferences,
                     recommendationPreferences: user.recommendationPreferences,
-                    google: user.googleId ? true : false
+                    google: user.googleId ? true : false,
+                    tags: user.tags
                 }
             }
         });
