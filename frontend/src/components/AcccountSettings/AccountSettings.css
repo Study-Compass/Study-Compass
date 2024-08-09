@@ -1,4 +1,4 @@
-.settings-right .profile input{
+.settings-right .profile input:not(.slider){
     border: none;
     border-radius: 6px;
     background-color:var(--light);

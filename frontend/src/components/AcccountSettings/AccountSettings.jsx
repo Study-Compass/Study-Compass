@@ -3,6 +3,7 @@ import './AccountSettings.css';
 import rightarrow from '../../assets/Icons/RightArrow.svg';
 import pfp from '../../assets/defaultAvatar.svg';
 import { saveUser } from '../../DBInteractions';
+import { useNotification } from '../../NotificationContext';
 
 function AccountSettings({ settingsRightSide, width, handleBackClick, userInfo }) {
 
@@ -23,7 +24,7 @@ function AccountSettings({ settingsRightSide, width, handleBackClick, userInfo }
     // } );
 
     const handleNameChange = (e) => {
-        setName(e.target.value);
+            // setName(e.target.value);
     };
 
     const handleUsernameChange = (e) => {
@@ -81,8 +82,8 @@ function AccountSettings({ settingsRightSide, width, handleBackClick, userInfo }
                                 /> ): 
                                 (
                                 <>
-                                    <h3>{username}</h3>
-                                    <p>@id</p>
+                                    <h3>username</h3>
+                                    <p>@{username}</p>
                                 </>
                                 )
                         }
@@ -90,7 +91,7 @@ function AccountSettings({ settingsRightSide, width, handleBackClick, userInfo }
                         </div>
                         {/* <button onClick={(saveUsername) => setEditUsername(true)}>change username</button> */}
                         
-                        <button onClick={(saveUsername)}> {setEditUsername ? 'change username' : 'change username'} </button>
+                        <button onClick={(saveUsername)}> {editUsername ? 'save' : 'change username'} </button>
 
                     </div>
                     <div className='user-container'>
@@ -129,10 +130,8 @@ function AccountSettings({ settingsRightSide, width, handleBackClick, userInfo }
                         <div className='delete'>
                             <button>
                                 <h3>delete account</h3>
-
                             </button>
                             <p>warning: this is a permanent action !</p>
-
                         </div>
                     </div>
                 </div>
