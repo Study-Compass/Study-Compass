@@ -128,7 +128,5 @@ const sendError = async (description, roomid) => {
     }
 }
 
-export { changeClasroom, save, checkUsername, sendError };
 
-
-export { changeClasroom, save, checkUsername, saveUser };
+export { changeClasroom, save, checkUsername, saveUser, sendError };
