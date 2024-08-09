@@ -3,6 +3,7 @@ const Classroom = require('../schemas/classroom.js');
 const Schedule = require('../schemas/schedule.js');
 const Rating = require('../schemas/rating.js');
 const User = require('../schemas/user.js');
+const Report = require('../schemas/report.js');
 const { verifyToken, verifyTokenOptional } = require('../middlewares/verifyToken');
 const { sortByAvailability } = require('../helpers.js');
 const multer = require('multer');
@@ -559,6 +560,25 @@ router.post('/update_rating', verifyToken, async (req, res) => {
     } catch (error) {
         res.status(500).json({ success: false, message: 'Error updating or retrieving ratings', error: error.message });
     }
+});
+
+router.post('/send-report', verifyToken, async (req, res) => {
+    const userId = req.user.userId;
+    const report = req.body.report;
+    const type = req.body.type;
+    try{
+        const user = await User.findOne({ _id: userId });
+        if (!user) {
+            return res.status(404).json({ success: false, message: "User not found" });
+        }
+        //store report in mongo
+        await Report.create({ user_id: userId, type: type, report: report });
+        console.log(`POST: /send-report/${userId}`);
+        res.json({ success: true, message: "Report saved" });
+    } catch(error){
+        return res.status(500).json({ success: false, message: 'Error finding user', error: error.message});
+    }
+
 });
 
 module.exports = router;
