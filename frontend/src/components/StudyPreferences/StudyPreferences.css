@@ -56,3 +56,15 @@
     gap:6px;
 }
 
+@media (max-width:500px){
+    .profile .content .slider{
+        width:100%;
+    }
+
+    .study-preferences .drag-items .left-bar p {
+        padding: 12px 15px;
+        margin-bottom:5px;
+        line-height: 1.26;
+    }
+}
+
