@@ -158,7 +158,7 @@
     flex-direction: column;
     font-family: 'Satoshi';
     /* gap: 200px; */
-    width: 237px;
+    width: 200px;
     height: 31px;
 }
 
@@ -398,6 +398,7 @@
     }
 
     .settings-right.active{
+        overflow-x: hidden;
         transform:translateX(0px);
     }
 
@@ -411,7 +412,7 @@
 
     .settings-right .header{
         position: relative;
-        padding-left: 35px;
+        padding-left: 20px;
 
     }
 
@@ -426,7 +427,7 @@
         justify-content: center;
         position:absolute;
         top:0px;
-        left:0px;
+        left:-15px;
         background: none;
         border: none;
         height: calc(100% - 10px);
