@@ -31,6 +31,10 @@ const changeClasroom = async (id, attributes, imageUrl) => {
         throw error;
     }
 };  
+
+
+
+
 //expects roomid, userid, and operation, true for save, false for unsave
 const save = async (roomId, userId, operation) => {
     try {
@@ -62,9 +66,26 @@ const save = async (roomId, userId, operation) => {
     }
 };
 
+const saveUser = async (name, username, email, password, recommendation, classroom) => {
+    try{
+        const response = await axios.post('/update-user', {name, email, username, classroom, recommendation, onboarded :null}, {headers: {'Authorization': `Bearer ${localStorage.getItem('token')}`}});
+        const responseBody = response.body;
+        console.log(response);
+        if (response.data.success) {
+            console.log("User saved successfully");
+        } else {
+            console.error("User save unsuccessful");
+        }
+    } catch(error){
+        console.error("Error saving user");
+        throw error;
+    }
+
+}
+
 const checkUsername = async (username) => {
     try {
-        const response = await axios.post(`/check-username/`, { username });
+        const response = await axios.post("/check-username/", { username });
         console.log(response);
         const responseBody = response.data;
         if (!responseBody.success) {
@@ -82,4 +103,30 @@ const checkUsername = async (username) => {
     }
 }
 
-export { changeClasroom, save, checkUsername };
+
+
+const sendError = async (description, roomid) => {
+    try {
+        const reportData = {
+            report: {
+                roomid: roomid,
+                description: description
+            },
+            type: "incorrectData"
+        };
+
+            
+        await axios.post('/send-report', reportData, {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
+    } catch (error) {
+        throw error;
+    }
+}
+
+
+export { changeClasroom, save, checkUsername, saveUser, sendError };

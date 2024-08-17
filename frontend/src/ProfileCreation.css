@@ -9,7 +9,7 @@
     opacity: 0;
     transition: background-color 0.5s ease, opacity 0.5s ease;
 }
-
+ 
 .whole-page.in{
     background-color: rgba(0, 0, 0, 0.3);
     opacity: 1;
@@ -24,12 +24,9 @@
 
 .pop-up{
     box-sizing: border-box;
-    padding-top: 50px;
-    padding-left: 420px;
-    padding-right: 20px;
     border-radius:10px;
     display:flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
     justify-content: flex-start;
     top: 50%; 
@@ -41,11 +38,28 @@
     width: 630px;
     position: fixed; 
     border-radius: 8px; 
-    gap: 3%;
     opacity: 0;
     z-index: 9999; 
     transition: opacity 0.5s ease;
 }
+
+.left-benefits{
+    position: relative;
+    border-radius: 8px 0 0 8px ;
+    width: 63%;
+    height: 100%;
+    background-color: var(--salmon);
+}
+
+.right-benefits{
+    margin: 5% 3%;
+    width: 33%;
+    display:flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+}
+
 
 .pop-up.in {
     opacity: 1;
@@ -58,16 +72,8 @@
 
 .pop-up .loader{
     height: 15%;
-}
-
-.left-benefits{
-    position: absolute;
-    left: 0;
-    top: 0;
-    border-radius: 8px 0 0 8px ;
-    width: 62%;
-    height: 100%;
-    background-color: var(--salmon);
+    margin-top: 6%;
+    margin-bottom: 3%;
 }
 
 .whole-page h1{
@@ -82,7 +88,7 @@
     color: var(--black);
     font-size: 13px;
     text-align: left;
-    margin-bottom: 47%;
+    margin-bottom: 55%;
 }
 
 .whole-page .button{
@@ -93,7 +99,7 @@
     background-color: var(--red);
     border: none;
     padding: 0px 0px;
-    margin: 0px;
+    margin-top: 10px;
     color: white;
     height: 27px;
     width: calc(100%);

@@ -177,3 +177,10 @@
         margin:3px 3px 4px 3px;
     }
 }
+
+@media(max-height: 775px){
+
+   .DayColumn{
+        height:350px;
+   }
+}

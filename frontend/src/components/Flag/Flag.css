@@ -1,0 +1,59 @@
+.insides{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.insides button{
+    width: 200px;
+    height: 30px;
+    border-radius: 5px;
+    padding: 5px 5px;
+    background-color: var(--accent-color);
+    transition: all 0.3s;
+    color: white;
+    box-sizing: border-box;
+    outline: none;
+    border:none;
+    position: relative;
+    font-family: Inter, sans-serif;
+    font-size:12px;
+    font-weight:500;
+}
+
+.insides button:hover{
+    filter: brightness(0.9);
+}
+
+
+.flag{
+    font-family: Inter, sans-serif;
+    font-size:12px;
+    font-weight:500;
+    color: var(--text-color);
+    position: relative;
+    padding: 15px 15px;
+    background-color: var(--primary-color);
+    border-radius: 10px;
+    box-sizing: border-box;
+    width:100%;
+    display:flex;
+    gap:10px;
+    overflow: hidden;
+}
+
+.flag img{
+    width: 24px;
+    height: 24px;
+}
+
+.flag::before{
+    content:'';
+    position:absolute;
+    top:0;
+    left:0; 
+    height:100%;
+    background-color: var(--accent-color);
+    width:5px;
+    border-radius: 15px 0 0 15px;
+}

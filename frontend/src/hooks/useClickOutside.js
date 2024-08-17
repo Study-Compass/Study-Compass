@@ -13,6 +13,7 @@ function useOutsideClick(ref, onOutsideClick, exclude = []) {
       if (exclude.length > 0) {
         for (let i = 0; i < exclude.length; i++) {
           if (typeof event.target.className!=="string" || event.target.className.includes(exclude[i])) {
+            console.log("excluded");
             return;
           }
         }
