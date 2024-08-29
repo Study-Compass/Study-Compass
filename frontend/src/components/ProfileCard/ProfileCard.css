@@ -39,7 +39,7 @@
 
 
 .card .saved{
-    background-color: white;
+    background-color: var(--background);
     border-radius: 21px;
     border: 1px solid var(--lightborder);
     /* height: 52%; */
@@ -52,7 +52,7 @@
 
 .card .study-history{
     flex-grow:1;
-    background-color: white;
+    background-color: var(--background);
     border-radius: 21px;
     border: 1px solid var(--lightborder);
     height: 100%;

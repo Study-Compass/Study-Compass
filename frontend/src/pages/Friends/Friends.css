@@ -9,6 +9,11 @@
     padding:0 15px;
 }
 
+.friends-container .profile-picture img{
+    border-radius: 50%;
+    background-color: white;
+}
+
 .friends-content{
     display:flex;
     flex-direction: column;
@@ -71,7 +76,7 @@
     border-radius: 0 10px 10px 0;
     background: var(--border);
     border:none;
-    color:white;
+    color:var(--background);
     font-family:'Inter';
     font-weight:700;
     font-size:16px;
@@ -201,7 +206,7 @@
 .friends .pending-count p{
     line-height: 0.7;
     font-size:11px;
-    color: white;
+    color: var(--background);
 }
 
 .friends .friends-list-header .pending:hover{
@@ -210,7 +215,7 @@
 
 .friends .friends-list-header .pending.active{
     background-color: var(--border);
-    color:white;    
+    color:var(--background);    
 }
 
 .friends .left-staging{

@@ -137,6 +137,11 @@ function Classroom({ room, state, setState, schedule, roomName, width, setShowMo
                     <div className="rating-num">
                         0 ratings
                     </div>
+                    { isAuthenticated &&                  
+                        <button className="add-rating" >
+                            <p>add your rating</p>
+                        </button>
+                    }
                     {/* <div className={`${success ? 'free-until' : 'class-until'}`}>
                         <div className="dot">
                             <div className="outer-dot"></div>
@@ -159,15 +164,15 @@ function Classroom({ room, state, setState, schedule, roomName, width, setShowMo
                 <div>
                     <Flag functions={setIsUp} primary={"rgba(176, 175, 175, .13)"} img={circleWarning} accent={"#D9D9D9"} color={"#737373"} text={"As Study Compass is still in beta, certain information may be incorrect. Reporting incorrect information is an important part of our troubleshooting process, so please help us out!"}/>
                 </div>
-                <div className="filler" style={{height:`${fillerHeight}px`}}>
-
-                </div>
+                <RatingComponent rating={rating} setRating={setRating} />
+                {user && user.admin ? room ? edit ? <EditAttributes room={room} attributes={room.attributes} setEdit={setEdit} /> : "" : "" : ""}
+                {
+                    defaultImage && (!isAuthenticating) && isAuthenticated && user.admin ? <FileUpload classroomName={room.name}/> : ""
+                }
             </div>
-            <RatingComponent rating={rating} setRating={setRating} />
-            {user && user.admin ? room ? edit ? <EditAttributes room={room} attributes={room.attributes} setEdit={setEdit} /> : "" : "" : ""}
-            {
-                defaultImage && (!isAuthenticating) && isAuthenticated && user.admin ? <FileUpload classroomName={room.name}/> : ""
-            }
+            <div className="filler" style={{height:`${fillerHeight}px`}}>
+
+            </div>
 
             {/* {isAuthenticated && } */}
             <div className="check-in" ref={checkInRef}>

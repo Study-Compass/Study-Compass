@@ -10,6 +10,7 @@
     position: relative;
     margin:5px;
     border-radius: 50%;
+    background-color: white;
 }
 
 .profile-picture:hover{
@@ -24,7 +25,7 @@
     top:50px;
     box-sizing: border-box;
     border-radius: 15px;
-    background-color: white;
+    background-color: var(--background);
     transition:opacity 0.3s,
                max-height 1s;
     position: absolute;
@@ -40,7 +41,7 @@
 .popup-active{
     border: 1px solid var(--lighterborder);
     opacity: 1;
-    background-color: white;
+    background-color: var(--background);
     pointer-events: all;
     box-shadow: var(--shadow);
 }

@@ -6,7 +6,7 @@
     box-sizing: border-box;
     display:flex;
     flex-direction: column;
-    background-color: white;
+    background-color: var(--background);
     z-index: 1;
     border-radius: 19px;
     /* border: 1px solid var(--lighterborder); */
@@ -16,7 +16,7 @@
     font-family: 'Inter', sans-serif;
     font-size: 23px;
     font-weight: 800;
-    color: #414141;
+    color: var(--text);
     margin: 0;
     margin-right:10px
 }
@@ -237,6 +237,31 @@
     border-radius:5px;
     background-color: var(--text);
 }
+
+.classroom-component .add-rating{
+    display:flex;
+    padding: 2px 10px;
+    background-color: var(--light);
+    align-items: center;
+    justify-content: center;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s;
+    outline: none;
+    border:none;
+}
+
+.classroom-component .add-rating:hover{
+    background-color: var(--lighterborder);
+}
+
+
+.classroom-component .add-rating p{
+    font-size:12px;
+    font-weight:500;
+}
+
+
 
 /* .check-in-button::after{
     content: "check-in feature coming soon";

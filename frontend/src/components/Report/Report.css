@@ -60,7 +60,7 @@ textarea{
     left: 50%; 
     transform: translate(-50%, -50%);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    background-color: white;
+    background-color: var(--background );
     max-height: 400px;
     max-width: 500px;
     position: fixed; 

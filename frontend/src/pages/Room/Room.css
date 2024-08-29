@@ -3,7 +3,7 @@
     flex-direction: column;
     justify-content: flex-start;
     align-items: center;
-    background-color: #FFFF;
+    background-color: var(--background);
     height:100vh;
     max-height:100vh;
     position: relative;
@@ -12,7 +12,7 @@
 .calendar-container{
     display:flex;
     max-width:1500px;
-    background-color: white;
+    background-color: var(--background);
     border-radius: 21px;
     /* padding:20px 20px 60px 20px; */
     flex-direction: row;
@@ -209,6 +209,10 @@ select{
 
 }
 
+.dark-mode .calendar-instruction{
+    background-color: rgba(40,40,40,0.5);
+}
+
 .calendar-instruction.visible{
     opacity: 1;
     /* pointer-events: all; */
@@ -244,7 +248,7 @@ select{
     height:40px;
     width:40px;
     outline:none;
-    background-color: white;
+    background-color: var(--background);
     border: none;
 }
 
@@ -257,7 +261,7 @@ select{
     font-weight: 400;
     color: var(--border);
     font-family:'Inter',sans-serif;
-    background-color: white;
+    background-color: var(--background);
     outline:none;
     border:1px solid var(--border);
     border-radius: 5px;
@@ -422,6 +426,6 @@ select{
     ::-webkit-scrollbar-thumb {
         background: var(--lightborder);
         border-radius: 10px;
-        border: 3px solid white;
+        border: 3px solid var(--background);
     }
 }

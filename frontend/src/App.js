@@ -22,6 +22,7 @@ import { ProfileCreationProvider } from './ProfileCreationContext';
 
 
 function App() {
+    // document.documentElement.classList.add('dark-mode')
     return (
         <GoogleOAuthProvider clientId="639818062398-k4qnm9l320phu967ctc2l1jt1sp9ib7p.apps.googleusercontent.com">
             <ErrorProvider>

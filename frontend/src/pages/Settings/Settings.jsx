@@ -68,7 +68,7 @@ function Settings() {
     }
 
     return (
-        <div className='settings'>
+        <div className='settings component'>
             <Header />
             <div className='content-container'>
                 <div className='settings-container'>
