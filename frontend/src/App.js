@@ -43,6 +43,7 @@ function App() {
                                         <Route path="/friends" element={<Friends/>}/>
                                         <Route path="/landing" element={<Landing/>}/>
                                         <Route path="/settings" element={<Settings/>}/>
+                                        <Route path="/documentation" element={<Redirect/>}/>
                                     </Routes>
                                     </ProfileCreationProvider>
                                 </Router>
