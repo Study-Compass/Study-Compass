@@ -7,7 +7,7 @@ function Redirect() {
 
     useEffect(() => {
         
-        navigate('/room/none');
+        window.location.href = "https://study-compass.github.io/Study-Compass-Documentation/";
     })
     return "";
 }
