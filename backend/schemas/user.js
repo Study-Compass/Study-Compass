@@ -78,6 +78,10 @@ const userSchema = new mongoose.Schema({
     tags: {
         type:Array,
         default: [],
+    },
+    developer: {
+        type: Number,
+        default: 0,
     }
     
     // you can add more fields here if needed, like 'createdAt', 'updatedAt', etc.
