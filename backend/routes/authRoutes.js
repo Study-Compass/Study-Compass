@@ -192,25 +192,7 @@ router.post('/google-login', async (req, res) => {
             message: 'Google login successful',
             data: {
                 token,
-                user: {
-                    _id: user._id,
-                    username: user.username,
-                    name: user.name,
-                    email: user.email,
-                    picture: user.picture,
-                    admin : user.admin,
-                    saved: user.saved,
-                    visited: user.visited,
-                    partners: user.partners,
-                    sessions: user.sessions,
-                    hours: user.hours,
-                    contributions: user.contributions,
-                    onboarded: user.onboarded,
-                    classroomPreferences: user.classroomPreferences,
-                    recommendationPreferences: user.recommendationPreferences,
-                    google: user.googleId ? true : false,
-                    tags: user.tags
-                }
+                user: user
             }
         });
 

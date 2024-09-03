@@ -6,6 +6,7 @@
     height:100vh;
     max-height:100vh;
     position: relative;
+    z-index: 1;
 }
 
 .settings-container{
@@ -22,6 +23,7 @@
     overflow:hidden;
     position: relative;
     box-shadow: inset 0px 0px 0px 1px var(--lightborder),var(--shadow);
+    z-index: 2;
 }
 
 .settings-left{
@@ -31,6 +33,7 @@
     width:230px;
     height:100%;
     border-right: 1px solid var(--lightborder);
+    position: relative;
 
 }
 
@@ -304,6 +307,41 @@
     border-radius: 50%;
 }
 
+.settings button.developer{
+    font-family: 'Satoshi';
+    font-size:0.8em;
+    color: white;
+    background-color: var(--developerBlue);
+    font-weight: normal;
+    margin:20px;
+    box-sizing: border-box;
+    border:none;
+    outline: none;
+    padding: 5px 25px;
+    border-radius: 10px;
+    position: absolute;
+    bottom:0;
+    width:calc(100% - 40px);
+    position: absolute;
+    cursor: pointer;
+    
+}
+
+.settings button.developer::after{
+    transition: all 0.5s;
+    content: '';
+    background-image: radial-gradient( circle farthest-corner at 10% 20%,  #45A1FC 17.8%, #8052FB 100.2% );
+    filter: blur(20px);
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    position: absolute;
+    left: 0;
+    top: 0;
+    opacity: 1;
+}
+
+
 @media (max-width:700px) {
     .settings-left{
         display:block;
@@ -385,6 +423,7 @@
         max-height:100%;
         flex-direction: column;
         overflow:hidden;
+
     }
     .settings-right{
         width: 100%;

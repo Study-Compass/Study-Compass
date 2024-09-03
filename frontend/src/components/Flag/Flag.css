@@ -1,3 +1,7 @@
+.flag-container{
+    width:100%
+}
+
 .insides{
     display: flex;
     flex-direction: column;
