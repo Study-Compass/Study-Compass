@@ -57,7 +57,9 @@ async function registerUser({ username, email, password }) {
 }
 
 async function loginUser({ email, password }) {
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email })
+        .select('-password -googleId') // Add fields to exclude
+        .lean();
     if (!user) {
         throw new Error('User not found');
     }
@@ -89,7 +91,9 @@ async function authenticateWithGoogle(code, isRegister = false, url) {
 
     const userInfo = await oauth2.userinfo.get();
     console.log('Google user info:', userInfo.data)
-    let user = await User.findOne({ googleId: userInfo.data.id });
+    let user = await User.findOne({ googleId: userInfo.data.id })
+        .select('-password -googleId') // Add fields to exclude
+        .lean();
 
 
     if (!user) {

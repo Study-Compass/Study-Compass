@@ -1,7 +1,6 @@
 import React, { createContext, useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNotification } from './NotificationContext';
-import { set } from 'mongoose';
 
 /** 
 documentation:
@@ -102,8 +101,31 @@ export const AuthProvider = ({ children }) => {
         addNotification({title: 'Logged out successfully',success: 'success'});
     };
 
+    const getDeveloper = async () => {
+        try {
+            const token = localStorage.getItem('token');
+            const config = {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            };
+            const response = await axios.get('/get-developer', config);
+            
+            if (response.data.success) {
+                const responseBody = response.data;
+                console.log('Developer:', responseBody);
+                return responseBody;
+            } else {
+                return { developer: null};
+            }
+        }
+        catch (error) {
+            console.error('Error fetching developer:', error);
+        }
+    }
+
     return (
-        <AuthContext.Provider value={{ isAuthenticated, user, login, logout, googleLogin, validateToken, isAuthenticating }}>
+        <AuthContext.Provider value={{ isAuthenticated, user, login, logout, googleLogin, validateToken, isAuthenticating, getDeveloper }}>
             {children}
         </AuthContext.Provider>
     );

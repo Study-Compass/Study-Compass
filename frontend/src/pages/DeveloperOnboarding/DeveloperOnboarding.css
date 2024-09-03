@@ -1,0 +1,48 @@
+.onboard h2 b{
+    background: -webkit-linear-gradient(135deg, #45A1FC, #8052FB);
+    -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+
+.onboard .holo-text{
+    background: -webkit-linear-gradient(135deg, #45A1FC, #8052FB);
+    -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.onboard .content .options{
+    display:flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 80%;
+}
+
+.onboard .content .options .option{
+    display: flex;
+    flex-direction: column;
+    background-color: var(--background);
+    border: 1px solid var(--lightborder);
+    align-items: center;
+    padding: 10px;
+    height:fit-content;
+    gap:5px;
+}
+
+.onboard .content .option h3{
+    font-size:14px;
+    font-family: 'Inter';
+    color:var(--text);
+    margin:0;
+}
+
+.onboard .content .option.selected{
+    background-color: var(--light);
+}
+
+.onboard .preference-list h2{
+    font-size: 1em;
+    font-family: 'Satoshi';
+    color: var(--text);
+    margin: 0;
+    margin-bottom:10px;
+}

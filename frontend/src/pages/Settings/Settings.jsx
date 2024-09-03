@@ -8,14 +8,16 @@ import preferences from '../../assets/Icons/Preferences.svg';
 import rightarrow from '../../assets/Icons/RightArrow.svg';
 import useAuth from '../../hooks/useAuth.js';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 function Settings() {
     const [width, setWidth] = useState(window.innerWidth);
     const [settingsRightSide, setSettingsRightSide] = useState(false);
     const [userInfo, setUserInfo] = useState(null);
     const [currentPage, setCurrentPage] = useState('Settings');
+    const [isDeveloper, setIsDeveloper] = useState(null);
 
-    const { isAuthenticating, isAuthenticated, user } = useAuth();
+    const { isAuthenticating, isAuthenticated, user, getDeveloper } = useAuth();
 
     const navigate = useNavigate();
 
@@ -42,6 +44,23 @@ function Settings() {
 
         return () => window.removeEventListener('resize', handleResize);
     }, []);
+
+    useEffect(() => {
+        const getDeveloperStatus = async () => {
+            const response = await getDeveloper();
+            if (response.developer){
+                setIsDeveloper(true);
+            } else {
+                setIsDeveloper(false);
+            }
+        }
+        
+        if (userInfo) {
+            if (userInfo.developer !== 0) {
+                getDeveloperStatus();
+            }
+        }
+    }, [userInfo]);
 
     useEffect(() => {
         if (width > 700) {
@@ -94,9 +113,17 @@ function Settings() {
                                     <img src={rightarrow} alt="" />
                                 </button>
                             )}
-
-                        </div>
+                        </div>       
+                        {
+                            isDeveloper !== null && !isDeveloper && (
+                                <button className='developer' onClick={()=>{navigate('/developer-onboarding')}}>
+                                    Activate Developer Account
+                                </button>
+                            )
+                        }
                     </div>     
+
+
                     {
                         (width < 700 || currentPage === "AccountSettings" ) && (
                             <AccountSettings 
