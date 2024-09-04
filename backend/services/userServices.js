@@ -58,7 +58,7 @@ async function registerUser({ username, email, password }) {
 
 async function loginUser({ email, password }) {
     const user = await User.findOne({ email })
-        .select('-password -googleId') // Add fields to exclude
+        .select('-googleId') // Add fields to exclude
         .lean();
     if (!user) {
         throw new Error('User not found');
@@ -68,7 +68,7 @@ async function loginUser({ email, password }) {
     if (!passwordMatch) {
         throw new Error('Invalid credentials');
     }
-
+    delete user.password;
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '12h' });
     return { user, token };
 }
