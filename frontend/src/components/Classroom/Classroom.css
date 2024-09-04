@@ -352,7 +352,7 @@
     }
 
     .img-pop-up img{
-        height: 200px;
-        width: 300px;
+        width:90%;
+        height:auto;
     }
 }
