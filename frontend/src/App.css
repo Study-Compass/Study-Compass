@@ -21,11 +21,16 @@
     --offwhite: #F6F6F6;
 
     --yellow: #FBBC05;
-    --translucent: rgba(227,227,227, 0.13);
+    --translucent: rgba(175,175,175, 0.13);
     --yellow: #DBAB0A;
     --yellow: #FBBC05;
     --offwhite: #F6F6F6;
     --offwhite: #F6F6F6;
+
+    --developerBlue: #45A1FC;
+    --developerPurple: #8052FB;
+
+    --text-rgba: 65, 65, 65;
 }
 
 .App {

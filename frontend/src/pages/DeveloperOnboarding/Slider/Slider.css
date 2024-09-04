@@ -1,0 +1,16 @@
+.sliderContainer p {
+    margin-bottom:10px
+}
+
+.slider.dev{
+    background: linear-gradient(to right, #45A1FC, #8052FB)  !important;
+
+}
+
+p.leftText{
+    color: #45A1FC !important;
+}
+
+p.rightText{
+    color: #8052FB !important;
+}

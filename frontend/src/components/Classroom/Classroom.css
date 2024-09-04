@@ -11,8 +11,9 @@
     /* border: 1px solid var(--lighterborder); */
 }
 
-.z-index{
+.classroom-component .z-index{
     z-index: 1;
+    max-height:100%;
 }
 
 .classroom-component h1{
@@ -35,12 +36,51 @@
     display:flex;
     align-items: center;
     justify-content: center;
+    position: relative;
+    gap:5px;
+    background: var(--lighterborder);
 }
 
-.image img{
+.classroom-component .image .open-image{
+    position: absolute;
+    bottom:13px;
+    z-index: 10;
+    display:flex;
+    background-color: rgba(var(--text-rgba), 0.8);
+    padding:3px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.5s;
+    opacity:1;
+}
+
+.classroom-component .image .open-image.out{
+    opacity:0;
+}
+
+.classroom-component .image .open-image img{
+    width: 14px;
+    height: 14px;
+}
+
+.classroom-component .image .open-image p{
+    font-family: 'Inter';
+    font-weight: 500;
+    color: white;
+    font-size: 14px;
+    margin:0;
+    margin-left:5px;
+}
+
+.image img:not(.open-image > img){
     min-width:100%;
     min-height:100%;
     /* object-fit:cover; */
+    transition: all 0.5s;
+}
+
+.image img:not(.open-image > img).out{
+    opacity:0;
 }
 
 .classroom-info{

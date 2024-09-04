@@ -136,9 +136,11 @@
     height: 60%;
 }
 
+
+
 .card-header .bar{
+    background-color: var(--red);
     display:flex;
-    background-color:var(--red);
     justify-content: right;
     flex-direction: row;
     align-items: center;

@@ -1,5 +1,6 @@
 const express = require('express');
 const User = require('../schemas/user.js');
+const Developer = require('../schemas/developer.js');
 const { verifyToken, verifyTokenOptional } = require('../middlewares/verifyToken');
 const Classroom = require('../schemas/classroom.js');
 const cron = require('node-cron');
@@ -25,7 +26,7 @@ router.post("/update-user", verifyToken, async (req, res) =>{
         return res.status(200).json({ success: true, message: 'User updated successfully' });
     } catch(error){
         console.log(`POST: /update-user ${req.user.userId} failed`)
-        return res.status(500).json({ success: false, message: 'Internal server error' });
+        return res.status(500).json({ success: false, message: error.message });
     }
 });
 
@@ -98,5 +99,58 @@ router.post("/check-out", verifyToken, async (req, res) =>{
         return res.status(500).json({ success: false, message: 'Internal server error', error });
     }
 });
+
+router.get("/get-developer", verifyToken, async (req, res) =>{
+    try{
+        const developer = await Developer.findOne({ user_id: req.user.userId });
+        console.log(`GET: /get-developer ${req.user.userId} successful`);
+        if(!developer){
+            return res.status(204).json({ success: false, message: 'Developer not found' });
+        }
+        return res.status(200).json({ success: true, message: 'Developer retrieved', developer });
+
+    } catch(error){
+        console.log(`GET: /get-developer ${req.user.userId} failed`)
+        return res.status(500).json({ success: false, message: 'Internal server error', error });
+    }
+});
+
+router.post("/update-developer", verifyToken, async (req, res) =>{
+    const { type, commitment, goals, skills } = req.body;
+    try{
+        const developer = await Developer.findOne({ userId: req.user.userId });
+        const user = await User.findById(req.user.userId);
+        
+        if(!developer){
+            //craete developer
+            const newDeveloper = new Developer({
+                user_id: req.user.userId,
+                name : user.name,
+                type,
+                commitment,
+                goals,
+                skills
+            });
+            await newDeveloper.save();
+            user.developer = type;
+            user.tags.push("developer");
+            await user.save();
+            console.log(`POST: /update-developer ${req.user.userId} successful`);
+            return res.status(200).json({ success: true, message: 'Developer created successfully' });
+        }
+        developer.name = name ? name : developer.name;
+        developer.type = type ? type : developer.type;
+        developer.commitment = commitment ? commitment : developer.commitment;
+        developer.goals = goals ? goals : developer.goals;
+        developer.skills = skills ? skills : developer.skills;
+        await developer.save();
+        console.log(`POST: /update-developer ${req.user.userId} successful`);
+        return res.status(200).json({ success: true, message: 'Developer updated successfully' });
+    } catch(error){
+        console.log(`POST: /update-developer ${req.user.userId} failed`)
+        return res.status(500).json({ success: false, message: 'Internal server error', error });
+    }
+});
+
 
 module.exports = router;

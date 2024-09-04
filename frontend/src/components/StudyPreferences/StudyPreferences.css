@@ -1,0 +1,70 @@
+.study-preferences{
+    display: flex;
+    flex-direction: column;
+}
+
+.study-preferences .drag-items{
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    padding-top: 10px;
+}
+
+.study-preferences .drag-items .left-bar{
+    display: flex;
+    flex-direction: column;
+}
+
+.study-preferences .drag-items .right-bar{
+    display: flex;
+    flex-direction: column;
+    width: 70%;
+}
+
+.study-preferences .drag-items .left-bar p{
+    display: flex;
+    margin-bottom: 10px;
+    padding: 15px 15px;
+    font-size: 14px;
+    /* font-family:'Inter' */
+    line-height: 1.31;
+}
+
+.study-preferences .save-button button.active{
+    background-color:var(--red);
+    color: white;
+}
+
+
+.study-preferences .save-button button{
+    display: flex;
+    flex-direction: column;
+    font-family: 'Inter';
+    font-weight:500;
+    color: var(--text);
+    font-size: 13px;
+    padding: 5px 9px;
+    height: fit-content;
+    outline: none;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.study-preferences .sliderContainer{
+    gap:6px;
+}
+
+@media (max-width:500px){
+    .profile .content .slider{
+        width:100%;
+    }
+
+    .study-preferences .drag-items .left-bar p {
+        padding: 12px 15px;
+        margin-bottom:5px;
+        line-height: 1.26;
+    }
+}
+

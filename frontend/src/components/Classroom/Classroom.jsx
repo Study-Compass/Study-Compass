@@ -11,7 +11,6 @@ import FileUpload from '../FileUpload/FileUpload.jsx';
 import useWebSocket from '../../hooks/useWebSocket.js';
 import Flag from '../Flag/Flag.jsx';
 
-
 import Edit from '../../assets/Icons/Edit.svg';
 import Outlets from '../../assets/Icons/Outlets.svg';
 import Windows from '../../assets/Icons/Windows.svg';
@@ -19,6 +18,8 @@ import Printer from '../../assets/Icons/Printer.svg';
 import FilledStar from '../../assets/Icons/FilledStar.svg';
 import circleWarning from '../../assets/gray-circle-warning.svg';
 import useOutsideClick from '../../hooks/useClickOutside';
+
+import Image from '../../assets/Icons/Image.svg';
 
 import { findNext } from '../../pages/Room/RoomHelpers.js';
 import { useNotification } from '../../NotificationContext.js';
@@ -46,7 +47,7 @@ function Classroom({ room, state, setState, schedule, roomName, width, setShowMo
         setClassImgOpen(true);
     };
 
-    const closeImage = () => { 
+    const closeImage = () => {
         setClassImgOpen(false);
     };
 
@@ -63,7 +64,7 @@ function Classroom({ room, state, setState, schedule, roomName, width, setShowMo
         "outlets": Outlets,
         "windows": Windows,
         "printer": Printer
-    }; 
+    };
 
     const { addNotification } = useNotification();
     const navigate = useNavigate();
@@ -80,32 +81,32 @@ function Classroom({ room, state, setState, schedule, roomName, width, setShowMo
     }, [room])
 
     useEffect(() => {
-        
+
         if (room === null || room === undefined) {
             return;
         }
-        if (room.image === "https://studycompass.s3.amazonaws.com/downsizedPlaceholder.jpeg"){
+        if (room.image === "https://studycompass.s3.amazonaws.com/downsizedPlaceholder.jpeg") {
             setDefaultImage(true);
 
         }
         setImage(room.image);
     }, [room]);
 
-        // useEffect(() => { console.log(state) }, [state]);
+    // useEffect(() => { console.log(state) }, [state]);
     useEffect(() => {
         setSuccess(schedule ? findNext(schedule.weekly_schedule).free : true);
         setMessage(schedule ? findNext(schedule.weekly_schedule).message : "");
     }, [schedule]);
 
     if (!room) {
-        return <Loader/>;
+        return <Loader />;
     }
 
-    if(room.name === "none"|| room.attributes === undefined){
+    if (room.name === "none" || room.attributes === undefined) {
         return "";
     }
 
-    if(!roomName){
+    if (!roomName) {
         return "";
     }
 
@@ -115,28 +116,35 @@ function Classroom({ room, state, setState, schedule, roomName, width, setShowMo
     };
 
     const checkIn = () => {
-        try{
+        try {
             const response = axios.post('/check-in', { classroomId: room._id });
-        } catch (error){
+        } catch (error) {
             console.log(error);
-            addNotification({title: "An error occured", message: "an internal error occured", type: "derror"})
+            addNotification({ title: "An error occured", message: "an internal error occured", type: "derror" })
         }
     }
 
     return (
         <div className='classroom-component'>
             <div className={`whole-page ${isClassImgOpen ? 'in' : 'out'}`}>
-                    <div className={`img-pop-up ${isClassImgOpen ? 'in' : 'out'}`} ref={ref}>
-                        <img src={image} alt="classroom"></img>
-                    </div>
+                <div className={`img-pop-up ${isClassImgOpen ? 'in' : 'out'}`} ref={ref}>
+                    <img src={image} alt="classroom"></img>
                 </div>
+            </div>
             <div className='z-index'>
                 <div className={`image ${image === "" ? "shimmer" : ""}`}>
                     {!(image === "") ?
-                        <img src={image} onClick={handleImageClick} alt="classroom"></img>
-                        : ""}
+                        <img src={image} alt="classroom" className={`${isClassImgOpen ? 'out' : 'in'}`}></img>
+                    : ""}
+                    {
+                        (room.image !=="https://studycompass.s3.amazonaws.com/downsizedPlaceholder.jpeg") && 
+                        <div className={`open-image ${isClassImgOpen ? 'out' : 'in'}`} onClick={handleImageClick}>
+                            <img src={Image} alt="open image" />
+                            <p>View</p>
+                        </div>
+                    }
                 </div>
-
+                
                 <div className="classroom-info">
                     {state === "calendarSearchResult" ? <div className="back-to-results" onClick={backtoResults}>
                         <img src={leftArrow} alt="back arrow" ></img>
@@ -175,36 +183,40 @@ function Classroom({ room, state, setState, schedule, roomName, width, setShowMo
                         })}
                         {user && user.admin ? <div className="attribute" onClick={() => { setEdit(!edit) }}><img src={Edit} alt="" /></div> : ""}
                     </div>
+                    {
+                        defaultImage && (!isAuthenticating) && isAuthenticated && user.admin ? <FileUpload classroomName={room.name} /> : ""
+                    }
                     <div>
-                        <Flag functions={setIsUp} primary={"rgba(176, 175, 175, .13)"} img={circleWarning} accent={"#D9D9D9"} color={"#737373"} text={"As Study Compass is still in beta, certain information may be incorrect. Reporting incorrect information is an important part of our troubleshooting process, so please help us out!"}/>
+                        <Flag functions={setIsUp} primary={"rgba(176, 175, 175, .13)"} img={circleWarning} accent={"#D9D9D9"} color={"#737373"} text={"As Study Compass is still in beta, certain information may be incorrect. Reporting incorrect information is an important part of our troubleshooting process, so please help us out!"} />
                     </div>
-                    <div className="filler" style={{height:`${fillerHeight}px`}}>
+                    <div className="filler" style={{ height: `${fillerHeight}px` }}>
 
                     </div>
                 </div>
                 {user && user.admin ? room ? edit ? <EditAttributes room={room} attributes={room.attributes} setEdit={setEdit} /> : "" : "" : ""}
-                {
-                    defaultImage && (!isAuthenticating) && isAuthenticated && user.admin ? <FileUpload classroomName={room.name}/> : ""
-                }
+                {/* </div>
+                </div>
+                { user && user.admin ? room ? edit ? <EditAttributes room={room} attributes={room.attributes} setEdit={setEdit} /> : "" : "" : "" } */}
 
-                {/* {isAuthenticated && } */}
+
+                {/* {isAuthenticated && } */ }
                 <div className="check-in" ref={checkInRef}>
                     <div className={`${success ? 'free-until' : 'class-until'}`}>
                         <div className="dot">
                             <div className="outer-dot"></div>
                             <div className="inner-dot"></div>
                         </div>
-                        
-                        {success ? "free" : "class in session"} {message}                    
+
+                        {success ? "free" : "class in session"} {message}
                     </div>
                     <div className="button-container">
-                        {width < 800 && <button className="schedule-button" onClick={()=>{setShowMobileCalendar(true)}}>view-schedule</button>} 
+                        {width < 800 && <button className="schedule-button" onClick={() => { setShowMobileCalendar(true) }}>view-schedule</button>}
                         <button disabled={!success || !isAuthenticated || true} className="check-in-button">check in</button>
                     </div>
                     <p>check-in functionality coming soon!</p>
                 </div>
-            </div>
-        </div>
+            </div >
+        </div >
     );
 }
 

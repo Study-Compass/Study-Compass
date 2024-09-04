@@ -213,7 +213,7 @@ function Onboard(){
                     { current === 1 &&
                         <div className={`content ${show === 2 ? "going": ""} ${1 === currentTransition ? "": "beforeOnboard"}`} ref={el => contentRefs.current[1] = el}>
                             <Loader/>
-                            <h2>set your name</h2>
+                            <h2>what should we call you?</h2>
                             <p>This is the name you will be visible to other users as (putting you real name here is advised):</p>
                             <input type="text" value={name} onChange={handleNameChange} className="text-input"/>
                             { isGoogle && 

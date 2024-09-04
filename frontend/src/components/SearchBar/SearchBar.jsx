@@ -250,7 +250,6 @@ function SearchBar({ data, onEnter, onSearch, room, onX, onBlur }) {
         } else {
             const input = shadowRef.current;
             if(input){
-                console.log(input.scrollWidth);
                 return input.scrollWidth;
             }
         }
@@ -273,15 +272,12 @@ function SearchBar({ data, onEnter, onSearch, room, onX, onBlur }) {
         };
     }, []);
 
-    useOutsideClick(inputRef, () => {
-        onBlur(false);
-    }, []);
 
 
 
     useOutsideClick(inputRef, () => {
         onBlur(false);
-    }, []);
+    }, [ "search-bar center", "search-suggestion"]);
 
     return (
         <div className="search-container">
@@ -308,7 +304,7 @@ function SearchBar({ data, onEnter, onSearch, room, onX, onBlur }) {
                 <img src={x} className="x" alt="x" onClick={handleX} />
             </div>
             {results.length > 0 && (
-                <ul>
+                <ul className="suggestions-list">
                     <div className="spacer"></div>
                     {results.map((item, index) => {
                         const matchIndex = item.toLowerCase().indexOf(searchInput.toLowerCase());
@@ -328,7 +324,7 @@ function SearchBar({ data, onEnter, onSearch, room, onX, onBlur }) {
                                 ref={(el) => (itemRefs.current[index] = el)}
                                 key={index} 
                                 value={index} 
-                                className={index === selected ? "chosen" : ""} 
+                                className={`search-suggestion ${index === selected ? "chosen" : ""}`} 
                                 onClick={click}
                             >
                                 <span className="result non-match">{beforeMatch}</span>

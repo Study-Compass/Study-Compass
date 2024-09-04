@@ -1,21 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Loader from '../../../components/Loader/Loader';
-import '../Onboard.css';
-import './Recommendation.css';
+import '../../OnBoarding/Onboard.css';
+import './Slider.css';
 
-function Recommendation({ justSlider, sliderValue, setSliderValue }) {
+function Slider({ justSlider, sliderValue, setSliderValue, messages, leftText, rightText, uniqueId }) {
     const sliderRef = useRef(null);
 
-
-    const messages = [
-        "I stick to a strict routine that rarely changes",
-        "I follow a consistent routine with occasional changes",
-        "I prefer an even mix of routine and variety",
-        "I prefer a flexible routine that changes often",
-        "I prefer an ever-changing routine that is rarely the same"   
-    ];
-
-    const [sliderText, setSliderText] = useState("I prefer an even mix of routine and variety");
+    const [sliderText, setSliderText] = useState(messages[sliderValue]);
     const [thumbPosition, setThumbPosition] = useState(0);
 
 
@@ -37,8 +28,8 @@ function Recommendation({ justSlider, sliderValue, setSliderValue }) {
     };
 
     const getColor = (value) => {
-        const color1 = [250, 117, 109]; // RGB for #FA756D
-        const color2 = [135, 175, 241]; // RGB for #87AFF1
+        const color1 = [69, 169, 252]; // RGB for #45A1FC
+        const color2 = [128, 82, 251]; // RGB for #8052FB
         const factor = value / 4;
         const interpolatedColor = interpolateColor(color1, color2, factor);
         return rgbToHex(interpolatedColor[0], interpolatedColor[1], interpolatedColor[2]);
@@ -76,7 +67,7 @@ function Recommendation({ justSlider, sliderValue, setSliderValue }) {
 
     
     const handleSliderChange = () => {
-        const slider = document.querySelector('.slider');
+        const slider = document.querySelector(`.${uniqueId}`);
         setSliderText(messages[slider.value]);
         setSliderTextColor(getColor(slider.value));
         setSliderValue(slider.value);
@@ -84,44 +75,34 @@ function Recommendation({ justSlider, sliderValue, setSliderValue }) {
 
     if(justSlider){
         return(
-            <div className="content">
-                <div className="sliderContainer">
-                    <p className="sliderText" style={{ color: `${sliderTextColor}` }}>{sliderText}</p>
-                    <div className="sliderInput" >
-                        <div className="thumb" style={{ left: thumbPosition }}></div>
-                        <input type="range" className="slider" min="0" max="4" defaultValue="2" onChange={handleSliderChange} ref={sliderRef} />
-                    </div>
-                    <div className="rangeText">
-                        <p className="routine">routine</p>
-                        <p className="novelty">variety</p>
-                    </div>
-                </div>
-            </div>
-
-        )
-    }
-
-    return (
-        <div className="content">
-            {/* <img src={Compass} alt="Logo" className="logo" /> */}
-            <Loader />
-
-            <h2>recommendation preferences</h2>
-            <p>Would you like Study Compass to recommend familiar classrooms for routine, or new classrooms for variety?</p>
             <div className="sliderContainer">
                 <p className="sliderText" style={{ color: `${sliderTextColor}` }}>{sliderText}</p>
                 <div className="sliderInput" >
                     <div className="thumb" style={{ left: thumbPosition }}></div>
-                    <input type="range" className="slider" min="0" max="4" defaultValue="2" onChange={handleSliderChange} ref={sliderRef} />
+                    <input type="range" className={`slider dev ${uniqueId}`} min="0" max="4" defaultValue="2" onChange={handleSliderChange} ref={sliderRef} />
                 </div>
                 <div className="rangeText">
-                    <p className="routine">routine</p>
-                    <p className="novelty">variety</p>
+                    <p className="leftText">{leftText}</p>
+                    <p className="rightText">{rightText}</p>
                 </div>
+            </div>
+        )
+    }
+
+    return (
+        <div className="sliderContainer">
+            <p className="sliderText" style={{ color: `${sliderTextColor}` }}>{sliderText}</p>
+            <div className="sliderInput" >
+                <div className="thumb" style={{ left: thumbPosition }}></div>
+                <input type="range" className={`slider dev ${uniqueId}`} min="0" max="4" defaultValue="2" onChange={handleSliderChange} ref={sliderRef} />
+            </div>
+            <div className="rangeText">
+            <p className="leftText">{leftText}</p>
+            <p className="rightText">{rightText}</p>
             </div>
         </div>
     );
 }
 
-export default Recommendation;
+export default Slider;
 
