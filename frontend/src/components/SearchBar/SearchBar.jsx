@@ -4,6 +4,7 @@ import x from '../../assets/x.svg';
 import { useNavigate } from 'react-router-dom';
 import tab from '../../assets/tab.svg';
 import useOutsideClick from '../../hooks/useClickOutside';
+import { set } from 'mongoose';
 
 /** 
 documentation:
@@ -273,6 +274,25 @@ function SearchBar({ data, onEnter, onSearch, room, onX, onBlur }) {
     }, []);
 
 
+    // useEffect(() => {
+    //     setTimeout(() => {
+    //         const searchbar = document.querySelector('.search-bar');
+    //         searchbar.focus();
+    //         //type
+    //         setTimeout(() => {
+    //             setSearchInput("sage");
+                
+    //             setTimeout(() => {
+    //                 // onSearch("sage", [], "name");
+    //                 const enterEvent = new Event('keydown', { key: 'Enter' }, { bubbles: true });
+    //                 inputRef.current.dispatchEvent(enterEvent);
+
+    //                 //reload
+                    
+    //             }, 1000);
+    //         }, 1000);
+    //       }, 5000);
+    // }, []);
 
 
     useOutsideClick(inputRef, () => {

@@ -128,5 +128,37 @@ const sendError = async (description, roomid) => {
     }
 }
 
+const checkIn = async (classroomId) => {
+    try{
+        const response = await axios.post('/check-in', {classroomId}, {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        console.log("successful");
+        const responseBody = response.data;
+        return response;
+    } catch (error){
+        throw error;
+    }
+}
 
-export { changeClasroom, save, checkUsername, saveUser, sendError };
+const checkOut = async (classroomId) => {
+    try{
+        const response = await axios.post('/check-in', {classroomId}, {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        console.log("successful");
+        const responseBody = response.data;
+        return response;
+    } catch(error){
+        
+    }
+}
+
+
+export { changeClasroom, save, checkUsername, saveUser, sendError, checkIn };

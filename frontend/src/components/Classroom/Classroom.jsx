@@ -21,6 +21,7 @@ import useOutsideClick from '../../hooks/useClickOutside';
 
 import Image from '../../assets/Icons/Image.svg';
 
+import { checkIn } from '../../DBInteractions.js';
 import { findNext } from '../../pages/Room/RoomHelpers.js';
 import { useNotification } from '../../NotificationContext.js';
 
@@ -115,9 +116,11 @@ function Classroom({ room, state, setState, schedule, roomName, width, setShowMo
         navigate(-1);
     };
 
-    const checkIn = () => {
+    const handleCheckIn = async () => {
         try {
-            const response = axios.post('/check-in', { classroomId: room._id });
+            const response = await checkIn(room._id);
+            console.log(response);  
+            room.checked_in.push(user._id);
         } catch (error) {
             console.log(error);
             addNotification({ title: "An error occured", message: "an internal error occured", type: "derror" })
@@ -125,7 +128,7 @@ function Classroom({ room, state, setState, schedule, roomName, width, setShowMo
     }
 
     return (
-        <div className='classroom-component'>
+        <div className={`classroom-component ${room.checked_in.includes(user._id) ? "checked-in" : ""}`}>
             <div className={`whole-page ${isClassImgOpen ? 'in' : 'out'}`}>
                 <div className={`img-pop-up ${isClassImgOpen ? 'in' : 'out'}`} ref={ref}>
                     <img src={image} alt="classroom"></img>
@@ -211,7 +214,12 @@ function Classroom({ room, state, setState, schedule, roomName, width, setShowMo
                     </div>
                     <div className="button-container">
                         {width < 800 && <button className="schedule-button" onClick={() => { setShowMobileCalendar(true) }}>view-schedule</button>}
-                        <button disabled={!success || !isAuthenticated || true} className="check-in-button">check in</button>
+                        {
+                            room.checked_in.includes(user._id) ?  
+                            <button className="out">check out</button>
+                            :
+                            <button disabled={!success || !isAuthenticated} className="check-in-button" onClick={handleCheckIn}>check in</button>
+                        }
                     </div>
                     <p>check-in functionality coming soon!</p>
                 </div>

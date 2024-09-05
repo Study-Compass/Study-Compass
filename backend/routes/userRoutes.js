@@ -49,7 +49,6 @@ router.post("/check-username", async (req, res) =>{
 
 router.post("/check-in", verifyToken, async (req, res) =>{
     const { classroomId } = req.body;
-
     try{
         //check if user is checked in elsewhere
         const classrooms = await Classroom.find({ checkIns: req.user.userId });
@@ -57,20 +56,22 @@ router.post("/check-in", verifyToken, async (req, res) =>{
             console.log(`POST: /check-in ${req.user.userId} is already checked in`)
             return res.status(400).json({ success: false, message: 'User is already checked in' });
         }
-        const classroom = Classroom.findOne({ _id: classroomId });
-        classroom.checkIns.push(req.user.userId);
+        const classroom = await Classroom.findOne({ _id: classroomId });
+        console.log(JSON.stringify(classroom));
+        classroom.checked_in.push(req.user.userId);
         await classroom.save();
-        const checkoutTime = new Date(Date.now() + 3 * 60 * 60 * 1000); // 3 hours later
-        cron.schedule(checkoutTime, async () => {
-            classroom.checkIns = classroom.checkIns.filter(userId => userId !== req.user.userId);
-            await classroom.save();
-            console.log(`User ${req.user.userId} checked out of classroom ${classroom.name}`);
-        });
+        // const checkoutTime = new Date(Date.now() + 3 * 60 * 60 * 1000); // 3 hours later
+        // cron.schedule(checkoutTime, async () => {
+        //     classroom.checkIns = classroom.checkIns.filter(userId => userId !== req.user.userId);
+        //     await classroom.save();
+        //     console.log(`User ${req.user.userId} checked out of classroom ${classroom.name}`);
+        // });
 
-        console.log(`POST: /check-in ${req.user.userId} into ${classroom.name} successful`)
+        console.log(`POST: /check-in ${req.user.userId} into ${classroom.name} successful`);
         return res.status(200).json({ success: true, message: 'Checked in successfully' });
     } catch(error){
-        console.log(`POST: /check-in ${req.user.userId} failed`)
+        console.log(`POST: /check-in ${req.user.userId} failed`);
+        console.log(error);
         return res.status(500).json({ success: false, message: 'Internal server error', error });
     }
 });

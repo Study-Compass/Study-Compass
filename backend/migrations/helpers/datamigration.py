@@ -280,6 +280,24 @@ def updateImages():
                 collection.update_one({'_id': classroom['_id']}, {'$set': {'image': new_image}})
                 print(f"Updated image for classroom '{classroom['name']}'.")
 
+def renameField(uri, collection, previousName, newName):
+    load_dotenv() # loading .env file
+    client = MongoClient(uri, server_api=ServerApi('1')) 
+    db = client['studycompass']
+    collection = db[collection]
+
+    # replace /classrooms/ with https://studycompass.s3.amazonaws.com/
+    documents = collection.find({"checked-in": {"$exists": True}})
+    count = 0
+    for doc in documents:
+        collection.update_one(
+            {"_id": doc["_id"]},  # Match document by ID
+            {"$rename": {previousName: newName}}  # Rename field
+        )
+        count += 1
+
+    print("Field renaming completed, " + str(count) + " documents updated")
+
 
 
 # write_items_with_root_image_to_file("not-done.txt") # call the function to add new field to the collection
