@@ -146,19 +146,18 @@ const checkIn = async (classroomId) => {
 
 const checkOut = async (classroomId) => {
     try{
-        const response = await axios.post('/check-in', {classroomId}, {
+        const response = await axios.post('/check-out', {classroomId}, {
             headers: {
                 'Authorization': `Bearer ${localStorage.getItem('token')}`,
                 'Content-Type': 'application/json'
             }
         });
         console.log("successful");
-        const responseBody = response.data;
         return response;
     } catch(error){
-        
+        throw error;
     }
 }
 
 
-export { changeClasroom, save, checkUsername, saveUser, sendError, checkIn };
+export { changeClasroom, save, checkUsername, saveUser, sendError, checkIn, checkOut };

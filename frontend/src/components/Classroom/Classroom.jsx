@@ -21,14 +21,14 @@ import useOutsideClick from '../../hooks/useClickOutside';
 
 import Image from '../../assets/Icons/Image.svg';
 
-import { checkIn } from '../../DBInteractions.js';
+import { checkIn, checkOut } from '../../DBInteractions.js';
 import { findNext } from '../../pages/Room/RoomHelpers.js';
 import { useNotification } from '../../NotificationContext.js';
 
 import '../../pages/Room/Room.css';
 import axios from 'axios';
 
-function Classroom({ room, state, setState, schedule, roomName, width, setShowMobileCalendar, setIsUp }) {
+function Classroom({ room, state, setState, schedule, roomName, width, setShowMobileCalendar, setIsUp, reload }) {
 
     // const { sendMessage } = useWebSocket({
     //     ping: () => {
@@ -43,6 +43,8 @@ function Classroom({ room, state, setState, schedule, roomName, width, setShowMo
     const [defaultImage, setDefaultImage] = useState(false);
     const [fillerHeight, setFillerHeight] = useState(0);
     const [isClassImgOpen, setClassImgOpen] = useState(false);
+
+    const [checkoutText, setCheckoutText] = useState(false);
 
     const handleImageClick = () => {
         setClassImgOpen(true);
@@ -120,10 +122,21 @@ function Classroom({ room, state, setState, schedule, roomName, width, setShowMo
         try {
             const response = await checkIn(room._id);
             console.log(response);  
-            room.checked_in.push(user._id);
+            reload();
         } catch (error) {
             console.log(error);
-            addNotification({ title: "An error occured", message: "an internal error occured", type: "derror" })
+            addNotification({ title: "An error occured", message: "an internal error occured", type: "error" })
+        }
+    }
+
+    const handleCheckOut = async () => {
+        try {
+            const response = await checkOut(room._id);
+            console.log(response);  
+            reload();
+        } catch (error) {
+            console.log(error);
+            addNotification({ title: "An error occured", message: "an internal error occured", type: "error" })
         }
     }
 
@@ -216,7 +229,7 @@ function Classroom({ room, state, setState, schedule, roomName, width, setShowMo
                         {width < 800 && <button className="schedule-button" onClick={() => { setShowMobileCalendar(true) }}>view-schedule</button>}
                         {
                             room.checked_in.includes(user._id) ?  
-                            <button className="out">check out</button>
+                            <button className={`${checkoutText && "out"}`} onClick={handleCheckOut} onMouseOver={()=>setCheckoutText(true)} onMouseLeave={()=>setCheckoutText(false)}> {checkoutText ? "check out" : "checked in"}</button>
                             :
                             <button disabled={!success || !isAuthenticated} className="check-in-button" onClick={handleCheckIn}>check in</button>
                         }

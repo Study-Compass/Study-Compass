@@ -234,6 +234,12 @@ function Room() {
         setSearchQuery(query);
     }
 
+    function reloadClassroom(){
+        fetchData(roomIds[roomid]);
+        setContentState("classroom");
+        clearQuery();
+    }
+
     useEffect(() => {
         if(isAuthenticating){
             return;
@@ -340,6 +346,7 @@ function Room() {
                             width={width}
                             setShowMobileCalendar={setShowMobileCalendar}
                             setIsUp={setReportUp}
+                            reload={reloadClassroom}
                         /> : ""}
                         {contentState === "calendarSearch" || contentState === "freeNowSearch" || contentState === "nameSearch" ? calendarLoading ? "" : 
                             <div className="resultsCountContainer">

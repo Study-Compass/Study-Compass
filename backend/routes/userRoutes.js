@@ -90,13 +90,14 @@ router.get("/checked-in", verifyToken, async (req, res) =>{
 router.post("/check-out", verifyToken, async (req, res) =>{
     const { classroomId } = req.body;
     try{
-        const classroom = Classroom.findOne({ _id: classroomId });
-        classroom.checkIns = classroom.checkIns.filter(userId => userId !== req.user.userId);
+        const classroom = await Classroom.findOne({ _id: classroomId });
+        classroom.checked_in = classroom.checked_in.filter(userId => userId !== req.user.userId);
         await classroom.save();
         console.log(`POST: /check-out ${req.user.userId} from ${classroom.name} successful`)
         return res.status(200).json({ success: true, message: 'Checked out successfully' });
     } catch(error){
-        console.log(`POST: /check-out ${req.user.userId} failed`)
+        console.log(`POST: /check-out ${req.user.userId} failed`);
+        console.log(error);
         return res.status(500).json({ success: false, message: 'Internal server error', error });
     }
 });
