@@ -45,7 +45,7 @@ function Room() {
     const [roomIds, setRoomIds] = useState({});
     const [ready, setReady] = useState(false);
     const { isAuthenticated, isAuthenticating, user } = useAuth();
-    const { getRooms, getFreeRooms, getRoom, getBatch, search, allSearch } = useCache();
+    const { getRooms, getRoomUpdate, getFreeRooms, getRoom, getBatch, search, allSearch } = useCache();
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [calendarLoading, setCalendarLoading] = useState(true);
@@ -81,6 +81,7 @@ function Room() {
     const [width, setWidth] = useState(window.innerWidth);
 
     const fetchData = async (id) => fetchDataHelper(id, setLoading, setData, setRoom, navigate, getRoom, setRoomName, newError, setCalendarEmpty);
+    const fetchDataUpdate = async (id) => fetchDataHelper(id, setLoading, setData, setRoom, navigate, getRoomUpdate, setRoomName, newError, setCalendarEmpty);
     const fetchFreeRooms = async () => fetchFreeRoomsHelper(setContentState, setCalendarLoading, getFreeRooms, setResults, setNumLoaded, query, newError);
     const debouncedFetchData = debounce(fetchData, 500); // Adjust delay as needed
     const fetchFreeNow = () => fetchFreeNowHelper(setContentState, setCalendarLoading, setResults, setNumLoaded, getFreeRooms);
@@ -235,7 +236,7 @@ function Room() {
     }
 
     function reloadClassroom(){
-        fetchData(roomIds[roomid]);
+        fetchDataUpdate(roomIds[roomid]);
         setContentState("classroom");
         clearQuery();
     }

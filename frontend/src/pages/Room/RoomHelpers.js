@@ -85,29 +85,6 @@ const fetchDataHelper = async (id, setLoading, setData, setRoom, navigate, getRo
     }
 };
 
-const fetchDataHelperReload = async (id, setLoading, setData, setRoom, navigate, getRoom, setRoomName, newError, setCalendarEmpty) => {
-    setRoom(null);
-    setLoading(true);
-    setData(null);
-    if(id === "none"){
-        setCalendarEmpty(true);
-    } else {
-        setCalendarEmpty(false);
-    }
-    try{
-        const data = await getRoom(id);
-        setLoading(false);
-        setRoom(data.room);
-        setRoomName(data.room.name);
-        setData(data.data);
-        // console.log(data.room);
-    } catch (error){
-        console.log(error);
-        // navigate("/error/500");
-        newError(error, navigate);
-    }
-};
-
 const fetchFreeRoomsHelper = async (setContentState, setCalendarLoading, getFreeRooms, setResults, setNumLoaded, query, newError) => {
     setContentState("calendarSearch")
     setCalendarLoading(true)
