@@ -108,7 +108,7 @@ function MobileCalendar({ className, data, isLoading, addQuery, removeQuery, que
                 <Swiper
                     modules={[Pagination]}
                     initialSlide={0 < currentDay < 6 ? currentDay-1:1}
-                    slidesPerView={1.5}
+                    slidesPerView={1.2}
                     pagination={{ clickable: true }} // Enables clickable pagination dots
                     onSlideChange={() => console.log('slide change')}
                     onSwiper={setSwiper}

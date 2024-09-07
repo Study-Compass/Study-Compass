@@ -14,6 +14,7 @@ li.result1{
 }
 
 .result1 .image{
+    overflow:hidden;
     border-radius: 5px;
     width:75px;
     height:70px;

@@ -57,7 +57,9 @@ async function registerUser({ username, email, password }) {
 }
 
 async function loginUser({ email, password }) {
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email })
+        .select('-googleId') // Add fields to exclude
+        .lean();
     if (!user) {
         throw new Error('User not found');
     }
@@ -66,7 +68,7 @@ async function loginUser({ email, password }) {
     if (!passwordMatch) {
         throw new Error('Invalid credentials');
     }
-
+    delete user.password;
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '12h' });
     return { user, token };
 }
@@ -89,7 +91,9 @@ async function authenticateWithGoogle(code, isRegister = false, url) {
 
     const userInfo = await oauth2.userinfo.get();
     console.log('Google user info:', userInfo.data)
-    let user = await User.findOne({ googleId: userInfo.data.id });
+    let user = await User.findOne({ googleId: userInfo.data.id })
+        .select('-password -googleId') // Add fields to exclude
+        .lean();
 
 
     if (!user) {

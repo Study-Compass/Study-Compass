@@ -184,9 +184,23 @@
     }
 }
 
-@media(max-height: 775px){
+@media(max-height: 735px){
 
    .DayColumn{
-        height:350px;
+        height:400px;
    }
 }
+
+@media(max-height: 645px){
+
+    .DayColumn{
+         height:350px;
+    }
+ }
+
+ @media(max-height: 585px){
+
+    .DayColumn{
+         height:300px;
+    }
+ }

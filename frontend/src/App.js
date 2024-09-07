@@ -11,6 +11,7 @@ import Settings from './pages/Settings/Settings';
 import Friends from './pages/Friends/Friends';
 import Profile from './pages/Profile/Profile';
 import Landing from './pages/Landing/Landing';
+import DeveloperOnboard from './pages/DeveloperOnboarding/DeveloperOnboarding';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './AuthContext';
 import { CacheProvider } from './CacheContext';
@@ -44,6 +45,8 @@ function App() {
                                         <Route path="/friends" element={<Friends/>}/>
                                         <Route path="/landing" element={<Landing/>}/>
                                         <Route path="/settings" element={<Settings/>}/>
+                                        <Route path="/documentation" element={<Redirect/>}/>
+                                        <Route path="/developer-onboarding" element={<DeveloperOnboard/>}/>
                                     </Routes>
                                     </ProfileCreationProvider>
                                 </Router>

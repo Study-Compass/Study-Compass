@@ -105,25 +105,7 @@ router.post('/login', async (req, res) => {
             message: 'Logged in successfully',
             data: {
                 token,
-                user: {
-                    _id: user._id,
-                    username: user.username,
-                    email: user.email,
-                    name: user.name,
-                    picture : user.picture,
-                    admin : user.admin,
-                    saved: user.saved,
-                    visited: user.visited,
-                    partners: user.partners,
-                    sessions: user.sessions,
-                    hours: user.hours,
-                    contributions: user.contributions,
-                    onboarded: user.onboarded,
-                    classroomPreferences: user.classroomPreferences,
-                    recommendationPreferences: user.recommendationPreferences,
-                    google: user.googleId ? true : false,
-                    tags: user.tags
-                }
+                user: user
             }
         });
     } catch (error) {
@@ -137,7 +119,9 @@ router.post('/login', async (req, res) => {
 
 router.get('/validate-token', verifyToken, async (req, res) => {
     try {
-        const user = await User.findById(req.user.userId); // Assuming Mongoose for DB operations
+        const user = await User.findById(req.user.userId)
+            .select('-password -googleId') // Add fields you want to exclude
+            .lean(); // Assuming Mongoose for DB operations
         if (!user) {
             console.log(`GET: /validate-token token is invalid`)
             return res.status(404).json({ success: false, message: 'User not found' });
@@ -147,25 +131,26 @@ router.get('/validate-token', verifyToken, async (req, res) => {
             success: true,
             message: 'Token is valid',
             data: {
-                user: {
-                    _id: user._id,
-                    username: user.username,
-                    email: user.email,
-                    name: user.name,
-                    picture : user.picture,
-                    admin : user.admin,
-                    saved: user.saved,
-                    visited: user.visited,
-                    partners: user.partners,
-                    sessions: user.sessions,
-                    hours: user.hours,
-                    contributions: user.contributions,
-                    onboarded: user.onboarded,
-                    classroomPreferences: user.classroomPreferences,
-                    recommendationPreferences: user.recommendationPreferences,
-                    google: user.googleId ? true : false,
-                    tags: user.tags                    
-                }
+                // user: {
+                //     _id: user._id,
+                //     username: user.username,
+                //     email: user.email,
+                //     name: user.name,
+                //     picture : user.picture,
+                //     admin : user.admin,
+                //     saved: user.saved,
+                //     visited: user.visited,
+                //     partners: user.partners,
+                //     sessions: user.sessions,
+                //     hours: user.hours,
+                //     contributions: user.contributions,
+                //     onboarded: user.onboarded,
+                //     classroomPreferences: user.classroomPreferences,
+                //     recommendationPreferences: user.recommendationPreferences,
+                //     google: user.googleId ? true : false,
+                //     tags: user.tags                    
+                // }
+                user : user
             }
         });
     } catch (error) {
@@ -207,25 +192,7 @@ router.post('/google-login', async (req, res) => {
             message: 'Google login successful',
             data: {
                 token,
-                user: {
-                    _id: user._id,
-                    username: user.username,
-                    name: user.name,
-                    email: user.email,
-                    picture: user.picture,
-                    admin : user.admin,
-                    saved: user.saved,
-                    visited: user.visited,
-                    partners: user.partners,
-                    sessions: user.sessions,
-                    hours: user.hours,
-                    contributions: user.contributions,
-                    onboarded: user.onboarded,
-                    classroomPreferences: user.classroomPreferences,
-                    recommendationPreferences: user.recommendationPreferences,
-                    google: user.googleId ? true : false,
-                    tags: user.tags
-                }
+                user: user
             }
         });
 

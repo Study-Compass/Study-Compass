@@ -12,6 +12,11 @@
     /* border: 1px solid var(--lighterborder); */
 }
 
+.classroom-component .z-index{
+    z-index: 1;
+    max-height:100%;
+}
+
 .classroom-component h1{
     font-family: 'Inter', sans-serif;
     font-size: 23px;
@@ -32,12 +37,51 @@
     display:flex;
     align-items: center;
     justify-content: center;
+    position: relative;
+    gap:5px;
+    background: var(--lighterborder);
 }
 
-.image img{
+.classroom-component .image .open-image{
+    position: absolute;
+    bottom:13px;
+    z-index: 10;
+    display:flex;
+    background-color: rgba(var(--text-rgba), 0.8);
+    padding:3px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.5s;
+    opacity:1;
+}
+
+.classroom-component .image .open-image.out{
+    opacity:0;
+}
+
+.classroom-component .image .open-image img{
+    width: 14px;
+    height: 14px;
+}
+
+.classroom-component .image .open-image p{
+    font-family: 'Inter';
+    font-weight: 500;
+    color: white;
+    font-size: 14px;
+    margin:0;
+    margin-left:5px;
+}
+
+.image img:not(.open-image > img){
     min-width:100%;
     min-height:100%;
     /* object-fit:cover; */
+    transition: all 0.5s;
+}
+
+.image img:not(.open-image > img).out{
+    opacity:0;
 }
 
 .classroom-info{
@@ -138,6 +182,7 @@
     align-items: center;
     margin: 7px 0;
 }
+
 
 .classroom-component .check-in{
     width: calc(100% - 30px);
@@ -280,9 +325,60 @@
     border: 1px solid var(--lighterborder);
 } */
 
+
+.whole-page{
+    position: fixed; 
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 9998;  
+    background-color: rgba(0, 0, 0, 0);
+    opacity: 0;
+    transition: background-color 0.5s ease, opacity 0.5s ease;
+}
+ 
+.whole-page.in{
+    background-color: rgba(0, 0, 0, 0.3);
+    opacity: 1;
+}
+
+.whole-page.out {
+    background-color: rgba(0, 0, 0, 0);
+    opacity: 0;
+    pointer-events: none;
+}
+
+.img-pop-up img{
+    top: 50%; 
+    left: 50%; 
+    transform: translate(-50%, -50%);
+    height: 400px;
+    width: 600px;
+    position: fixed; 
+    z-index: 9999; 
+    border-radius: 8px; 
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    opacity: 1;
+    transition: opacity 0.5s ease;
+}
+
+.img-pop-up.in img{
+    opacity: 1;
+}
+
+.img-pop-up.out img{
+    opacity: 0;
+    pointer-events: none;
+}
+
 @media (max-width:500px) {
     .classroom-component .check-in button{
         font-size:15px;
     }
-}
 
+    .img-pop-up img{
+        width:90%;
+        height:auto;
+    }
+}

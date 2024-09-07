@@ -28,3 +28,7 @@
 .badge.admin{
     background-color: #EA4335;
 }
+
+.badge.developer{
+    background-color: var(--developerBlu);
+}
