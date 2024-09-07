@@ -159,5 +159,34 @@ const checkOut = async (classroomId) => {
     }
 }
 
+const getUser = async (userId) => {
+    try{
+        const response = await axios.get('/get-user', {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`,
+            },
+            params: { userId }  // Pass the userId as query parameter
+        });
+        console.log("successful");
+        return response.data.user;
+    } catch(error){
+        throw error;
+    }
+}
 
-export { changeClasroom, save, checkUsername, saveUser, sendError, checkIn, checkOut };
+const getUsers = async (userIds) => {
+    try{
+        const response = await axios.get('/get-users', {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`,
+            },
+            params: { userIds }  // Pass the userIds as query parameter
+        });
+        console.log("successful");
+        return response.data.users;
+    } catch(error){
+        throw error;
+    }
+}
+
+export { changeClasroom, save, checkUsername, saveUser, sendError, checkIn, checkOut, getUser, getUsers };
