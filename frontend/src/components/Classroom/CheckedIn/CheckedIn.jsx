@@ -24,7 +24,7 @@ function CheckedIn({users}){
     return (
         <div className="checked-in-component">
             {users.length > 0 &&
-                <h3>{users && users[0].name} {users && users.length > 1 ? `and ${users.length-1} others` : "is"} checked in</h3>
+                <h3>{users[0] && users[0].name} {users && users.length > 1 ? `and ${users.length-1} others` : "is"} checked in</h3>
             }
             <div className="user-images">
                 {users.map((user, index) => {
