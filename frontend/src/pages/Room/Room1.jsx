@@ -45,7 +45,7 @@ function Room() {
     const [roomIds, setRoomIds] = useState({});
     const [ready, setReady] = useState(false);
     const { isAuthenticated, isAuthenticating, user } = useAuth();
-    const { getRooms, getFreeRooms, getRoom, getBatch, search, allSearch } = useCache();
+    const { getRooms, getRoomUpdate, getFreeRooms, getRoom, getBatch, search, allSearch } = useCache();
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [calendarLoading, setCalendarLoading] = useState(true);
@@ -80,7 +80,8 @@ function Room() {
 
     const [width, setWidth] = useState(window.innerWidth);
 
-    const fetchData = async (id) => fetchDataHelper(id, setLoading, setData, setRoom, navigate, getRoom, setRoomName, newError, setCalendarEmpty);
+    const fetchData = async (id) => fetchDataHelper(id, setLoading, setData, setRoom, navigate, getRoom, setRoomName, newError, setCalendarEmpty, false);
+    const fetchDataUpdate = async (id) => fetchDataHelper(id, setLoading, setData, setRoom, navigate, getRoomUpdate, setRoomName, newError, setCalendarEmpty, true);
     const fetchFreeRooms = async () => fetchFreeRoomsHelper(setContentState, setCalendarLoading, getFreeRooms, setResults, setNumLoaded, query, newError);
     const debouncedFetchData = debounce(fetchData, 500); // Adjust delay as needed
     const fetchFreeNow = () => fetchFreeNowHelper(setContentState, setCalendarLoading, setResults, setNumLoaded, getFreeRooms);
@@ -98,7 +99,8 @@ function Room() {
         setWidth(window.innerWidth);
       }
       window.addEventListener('resize', handleResize);
-  
+
+
       return () => window.removeEventListener('resize', handleResize);
     }, []);
 
@@ -233,6 +235,12 @@ function Room() {
         setSearchQuery(query);
     }
 
+    function reloadClassroom(){
+        fetchDataUpdate(roomIds[roomid]);
+        setContentState("classroom");
+        clearQuery();
+    }
+
     useEffect(() => {
         if(isAuthenticating){
             return;
@@ -339,6 +347,7 @@ function Room() {
                             width={width}
                             setShowMobileCalendar={setShowMobileCalendar}
                             setIsUp={setReportUp}
+                            reload={reloadClassroom}
                         /> : ""}
                         {contentState === "calendarSearch" || contentState === "freeNowSearch" || contentState === "nameSearch" ? calendarLoading ? "" : 
                             <div className="resultsCountContainer">

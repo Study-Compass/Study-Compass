@@ -128,5 +128,65 @@ const sendError = async (description, roomid) => {
     }
 }
 
+const checkIn = async (classroomId) => {
+    try{
+        const response = await axios.post('/check-in', {classroomId}, {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        console.log("successful");
+        const responseBody = response.data;
+        return response;
+    } catch (error){
+        throw error;
+    }
+}
 
-export { changeClasroom, save, checkUsername, saveUser, sendError };
+const checkOut = async (classroomId) => {
+    try{
+        const response = await axios.post('/check-out', {classroomId}, {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        console.log("successful");
+        return response;
+    } catch(error){
+        throw error;
+    }
+}
+
+const getUser = async (userId) => {
+    try{
+        const response = await axios.get('/get-user', {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`,
+            },
+            params: { userId }  // Pass the userId as query parameter
+        });
+        console.log("successful");
+        return response.data.user;
+    } catch(error){
+        throw error;
+    }
+}
+
+const getUsers = async (userIds) => {
+    try{
+        const response = await axios.get('/get-users', {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`,
+            },
+            params: { userIds }  // Pass the userIds as query parameter
+        });
+        console.log("successful");
+        return response.data.users;
+    } catch(error){
+        throw error;
+    }
+}
+
+export { changeClasroom, save, checkUsername, saveUser, sendError, checkIn, checkOut, getUser, getUsers };

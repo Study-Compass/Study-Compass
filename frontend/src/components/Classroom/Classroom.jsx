@@ -6,9 +6,11 @@ import Bookmark from '../Interface/Bookmark/Bookmark';
 import useAuth from '../../hooks/useAuth.js';
 import '../../assets/fonts.css'
 import EditAttributes from './EditAttributes/EditAttributes.jsx';
+import CheckedIn from './CheckedIn/CheckedIn.jsx';
 import Loader from '../Loader/Loader.jsx';
 import FileUpload from '../FileUpload/FileUpload.jsx';
 import useWebSocket from '../../hooks/useWebSocket.js';
+// import { useWebSocket1 } from '../../WebSocketContext.js';
 import Flag from '../Flag/Flag.jsx';
 
 import Edit from '../../assets/Icons/Edit.svg';
@@ -21,19 +23,85 @@ import useOutsideClick from '../../hooks/useClickOutside';
 
 import Image from '../../assets/Icons/Image.svg';
 
+import { checkIn, checkOut, getUser, getUsers } from '../../DBInteractions.js';
 import { findNext } from '../../pages/Room/RoomHelpers.js';
 import { useNotification } from '../../NotificationContext.js';
 
 import '../../pages/Room/Room.css';
 import axios from 'axios';
 
-function Classroom({ room, state, setState, schedule, roomName, width, setShowMobileCalendar, setIsUp }) {
+import io from 'socket.io-client';
+
+function Classroom({ room, state, setState, schedule, roomName, width, setShowMobileCalendar, setIsUp, reload }) {
 
     // const { sendMessage } = useWebSocket({
     //     ping: () => {
     //         sendMessage('pong');
     //     }
     // });
+
+    useEffect(() => {
+        if(!room){
+            return;
+        }
+        console.log(room);
+        // Connect to WebSocket server
+        
+        //get all users currently checked in
+        const getCheckedInUsers = async () => {
+            try{
+                const users = await getUsers(room.checked_in);
+                const checkedInUsers = {};
+                users.forEach(user => {
+                    checkedInUsers[user._id] = user;
+                });
+                setCheckedInUsers(checkedInUsers);
+            } catch (error){
+                console.log(error);
+                addNotification({ title: "An error occured", message: "an internal error occured", type: "error" })
+            }
+        }
+
+        getCheckedInUsers();
+                
+
+        const socket = io(
+            process.env.NODE_ENV === 'production' ? 'https://www.study-compass.com' : 'http://localhost:5001',             {
+            transports: ['websocket'],  // Force WebSocket transport
+            }
+        );
+
+        // Join the room for this classroom
+        socket.emit('join-classroom', room._id);
+
+        // Listen for check-in events
+        socket.on('check-in', (data) => {
+            if (data.classroomId === room._id) {
+                console.log('another user checked in');
+                reload();
+                handleNewUserCheckIn();
+            }
+        });     
+
+        // Listen for check-out events
+        socket.on('check-out', (data) => {
+            if (data.classroomId === room._id) {
+                console.log('another user checked out');
+                reload();
+                // remove user from checked in
+                setCheckedInUsers(prevState => {
+                    const newState = { ...prevState };
+                    delete newState[data.userId];
+                    return newState;
+                });
+            }
+        });
+
+        // Clean up on component unmount
+        return () => {
+            socket.disconnect();
+        };
+    }, [room]);
 
     const [image, setImage] = useState("")
     const { isAuthenticating, isAuthenticated, user } = useAuth();
@@ -42,6 +110,10 @@ function Classroom({ room, state, setState, schedule, roomName, width, setShowMo
     const [defaultImage, setDefaultImage] = useState(false);
     const [fillerHeight, setFillerHeight] = useState(0);
     const [isClassImgOpen, setClassImgOpen] = useState(false);
+
+    const [checkoutText, setCheckoutText] = useState(false);
+
+    const [checkedInUsers, setCheckedInUsers] = useState({});
 
     const handleImageClick = () => {
         setClassImgOpen(true);
@@ -115,17 +187,49 @@ function Classroom({ room, state, setState, schedule, roomName, width, setShowMo
         navigate(-1);
     };
 
-    const checkIn = () => {
+    const handleCheckIn = async () => {
         try {
-            const response = axios.post('/check-in', { classroomId: room._id });
+            const response = await checkIn(room._id);
+            console.log(response);  
+            await reload();
         } catch (error) {
             console.log(error);
-            addNotification({ title: "An error occured", message: "an internal error occured", type: "derror" })
+            addNotification({ title: "An error occured", message: "an internal error occured", type: "error" })
+        }
+    }
+
+    const handleCheckOut = async () => {
+        try {
+            const response = await checkOut(room._id);
+            console.log(response);  
+            await reload();
+
+        } catch (error) {
+            console.log(error);
+            addNotification({ title: "An error occured", message: "an internal error occured", type: "error" })
+        }
+    }
+
+    const handleNewUserCheckIn = async () => {
+        try{
+            //get new user id from room.checked_in, not in checkedInUsers
+            const id = room.checked_in.filter(userId => !(userId in checkedInUsers))[0];
+            const user = await getUser(id);
+            //add user to checkedInUsers
+            setCheckedInUsers(prevState => {
+                return {
+                    ...prevState,
+                    [id]: user
+                }
+            });
+        } catch (error){
+            console.log(error);
+            addNotification({ title: "An error occured", message: "an internal error occured", type: "error" })
         }
     }
 
     return (
-        <div className='classroom-component'>
+        <div className={`classroom-component  ${user && room.checked_in.includes(user._id) ? "checked-in" : ""}`}>
             <div className={`whole-page ${isClassImgOpen ? 'in' : 'out'}`}>
                 <div className={`img-pop-up ${isClassImgOpen ? 'in' : 'out'}`} ref={ref}>
                     <img src={image} alt="classroom"></img>
@@ -206,14 +310,21 @@ function Classroom({ room, state, setState, schedule, roomName, width, setShowMo
                             <div className="outer-dot"></div>
                             <div className="inner-dot"></div>
                         </div>
-
                         {success ? "free" : "class in session"} {message}
                     </div>
+                    { room && room.checked_in && room.checked_in.length > 0 &&
+                        <CheckedIn users={Object.values(checkedInUsers)} />
+                    }
                     <div className="button-container">
                         {width < 800 && <button className="schedule-button" onClick={() => { setShowMobileCalendar(true) }}>view-schedule</button>}
-                        <button disabled={!success || !isAuthenticated || true} className="check-in-button">check in</button>
+                        {
+                            user && room.checked_in.includes(user._id) ?  
+                            <button className={`${checkoutText && "out"}`} onClick={handleCheckOut} onMouseOver={()=>setCheckoutText(true)} onMouseLeave={()=>setCheckoutText(false)}> {checkoutText ? "check out" : "checked in"}</button>
+                            :
+                            <button disabled={!success || !isAuthenticated} className="check-in-button" onClick={handleCheckIn}>check in</button>
+                        }
                     </div>
-                    <p>check-in functionality coming soon!</p>
+                    {/* <p>check-in functionality coming soon!</p> */}
                 </div>
             </div >
         </div >
