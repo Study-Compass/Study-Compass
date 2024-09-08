@@ -177,7 +177,7 @@ select{
 .instruction .example{
     font-size: 13px;
     font-weight: 400;
-    color: var(--border);
+    color: var(--darkborder);
     font-family:'Inter',sans-serif;
     margin:0;
     padding:1px 20px;

@@ -12,6 +12,7 @@
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
     --border:#DDDCDC;
+    --darkborder: #b0afaf;
     --lightborder:#DDDCDC;
     --lighterborder:#E4E5E6;
     /* --green: #4DAA57; */

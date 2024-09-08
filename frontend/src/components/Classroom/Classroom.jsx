@@ -10,6 +10,7 @@ import Loader from '../Loader/Loader.jsx';
 import FileUpload from '../FileUpload/FileUpload.jsx';
 import RatingComponent from '../Rating/Rating.jsx';
 import Flag from '../Flag/Flag.jsx';
+import Popup from '../Popup/Popup.jsx';
 
 import Edit from '../../assets/Icons/Edit.svg';
 import Outlets from '../../assets/Icons/Outlets.svg';
@@ -100,6 +101,11 @@ function Classroom({ room, state, setState, schedule, roomName, width, setShowMo
         setSuccess(schedule ? findNext(schedule.weekly_schedule).free : true);
         setMessage(schedule ? findNext(schedule.weekly_schedule).message : "");
     }, [schedule]);
+    
+    const [isRatingPopupOpen, setIsRatingPopupOpen] = useState(false);
+
+    const handleOpenRatingPopup = () => setIsRatingPopupOpen(true);
+    const handleCloseRatingPopup = () => setIsRatingPopupOpen(false);
 
     if (!room) {
         return <Loader />;
@@ -127,8 +133,12 @@ function Classroom({ room, state, setState, schedule, roomName, width, setShowMo
         }
     }
 
+
     return (
         <div className='classroom-component'>
+            <Popup isOpen={isRatingPopupOpen} onClose={handleCloseRatingPopup}>
+                <RatingComponent rating={rating} setRating={setRating} name={room.name}/>
+            </Popup>
             <div className={`whole-page ${isClassImgOpen ? 'in' : 'out'}`}>
                 <div className={`img-pop-up ${isClassImgOpen ? 'in' : 'out'}`} ref={ref}>
                     <img src={image} alt="classroom"></img>
@@ -168,7 +178,7 @@ function Classroom({ room, state, setState, schedule, roomName, width, setShowMo
                             0 ratings
                         </div>
                         { isAuthenticated &&                  
-                        <button className="add-rating" >
+                        <button className="add-rating" onClick={handleOpenRatingPopup} >
                             <p>add your rating</p>
                         </button>
                         }
@@ -197,7 +207,6 @@ function Classroom({ room, state, setState, schedule, roomName, width, setShowMo
                     <div>
                         <Flag functions={setIsUp} primary={"rgba(176, 175, 175, .13)"} img={circleWarning} accent={"#D9D9D9"} color={"#737373"} text={"As Study Compass is still in beta, certain information may be incorrect. Reporting incorrect information is an important part of our troubleshooting process, so please help us out!"} />
                     </div>
-                    <RatingComponent rating={rating} setRating={setRating} />
 
                     <div className="filler" style={{ height: `${fillerHeight}px` }}>
 
