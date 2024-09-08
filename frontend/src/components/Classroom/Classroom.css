@@ -8,9 +8,12 @@
     flex-direction: column;
     background-color: var(--background);
     z-index: 1;
-    border-radius: 19px;
-    /* border: 1px solid var(--lighterborder); */
+    border-radius: 20px;
+    overflow: hidden;
+    transition: all 0.5s;
 }
+
+
 
 .classroom-component .z-index{
     z-index: 1;
@@ -235,6 +238,11 @@
     padding: 8px 20px;
     flex-grow:1;
     cursor: pointer;
+    transition: all 0.3s;
+}
+
+.classroom-component .check-in button.out{
+    background-color: var(--red);
 }
 
 .classrorom-component .check-in button:hover{

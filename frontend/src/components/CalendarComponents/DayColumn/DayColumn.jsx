@@ -13,6 +13,8 @@ function DayColumn({day, dayEvents, eventColors, empty, add, remove, queries}){
 
     const isToday = dates.indexOf(day) === new Date().getDay() -1;
 
+    const isWeekend = new Date().getDay() === 0 || new Date().getDay() === 6;
+
     useEffect(() => {
         setLoading(false);
     }, [dayEvents]);
@@ -150,7 +152,7 @@ function DayColumn({day, dayEvents, eventColors, empty, add, remove, queries}){
     }
     
     return (
-        <div className="DayColumn">
+        <div className={`DayColumn ${isToday ? "tutorial-column" : isWeekend && day === "M" ? "tutorial-column" : "" }`}>
             <Grid />
  
             {dayEvents.map((event,index) => {

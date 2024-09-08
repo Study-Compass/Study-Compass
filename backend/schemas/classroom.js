@@ -19,6 +19,10 @@ const classroomSchema = new Schema({
     },
     average_rating: {
         type: Number
+    },
+    checked_in:{
+        type:Array,
+        default:[]
     }
 });
 

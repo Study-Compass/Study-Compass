@@ -12,7 +12,17 @@ const app = express();
 const port = process.env.PORT || 5001;
 
 const server = createServer(app);
-const io = new Server(server);
+const io = new Server(server, {
+    transports: ['websocket', 'polling'], // WebSocket first, fallback to polling if necessary
+    cors: {
+        origin: process.env.NODE_ENV === 'production'
+            ? ['https://www.study-compass.com', 'https://studycompass.com']
+            : 'http://localhost:3000',  // Allow localhost during development
+        methods: ['GET', 'POST'],
+        allowedHeaders: ['Content-Type'],
+        credentials: true
+    }
+});
 
 if (process.env.NODE_ENV === 'production') {
     const corsOptions = {
@@ -123,34 +133,46 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 // Socket.io functionality
-// io.on('connection', (socket) => {
-//     console.log('Client connected');
+io.on('connection', (socket) => {
+    console.log('Client connected');
 
-//     socket.on('message', (message) => {
-//         console.log(`Received: ${message}`);
-//         socket.emit('message', `Echo: ${message}`);
-//     });
+    socket.on('message', (message) => {
+        console.log(`Received: ${message}`);
+        socket.emit('message', `Echo: ${message}`);
+    });
 
-//     socket.on('disconnect', () => {
-//         console.log('Client disconnected');
-//     });
+    socket.on('disconnect', () => {
+        console.log('Client disconnected');
+    });
 
-//     // Example: Custom event for friend requests
-//     socket.on('friendRequest', (data) => {
-//         console.log('Friend request received:', data);
-//         // Handle friend request
-//         io.emit('friendRequest', data); // Broadcast to all connected clients
-//     });
+    // Example: Custom event for friend requests
+    socket.on('friendRequest', (data) => {
+        console.log('Friend request received:', data);
+        // Handle friend request
+        io.emit('friendRequest', data); // Broadcast to all connected clients
+    });
 
-//     // Heartbeat mechanism
-//     setInterval(() => {
-//         socket.emit('ping');
-//     }, 25000); // Send ping every 25 seconds
+    socket.on('join-classroom', (classroomId) => {
+        socket.join(classroomId);
+        console.log(`User joined classroom: ${classroomId}`);
+    });
 
-//     socket.on('pong', () => {
-//         // console.log('Heartbeat pong received');
-//     });
-// });
+    socket.on('leave-classroom', (classroomId) => {
+        socket.leave(classroomId);
+        console.log(`User left classroom: ${classroomId}`);
+    });
+
+    // Heartbeat mechanism
+    setInterval(() => {
+        socket.emit('ping');
+    }, 25000); // Send ping every 25 seconds
+
+    socket.on('pong', () => {
+        // console.log('Heartbeat pong received');
+    });
+});
+
+app.set('io', io);
 
 // Start the server
 server.listen(port, () => {

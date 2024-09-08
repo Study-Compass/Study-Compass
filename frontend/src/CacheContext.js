@@ -56,6 +56,20 @@ export const CacheProvider = ({children}) =>{
             console.error("Error fetching data: ", error);
         }
     };
+
+    const getRoomUpdate = async (id) => {
+        try {
+            const queryString = `/getroom/${id}`;
+            const response = await fetch(`/getroom/${id}`);
+            const data = await response.json();
+            //console.log(data.data);
+            cache[queryString] = data;
+            return data;
+            
+        } catch (error) {
+            console.error("Error fetching data: ", error);
+        }
+    };
     
     const getFreeRooms = async (query) => {
         try {
@@ -200,7 +214,7 @@ export const CacheProvider = ({children}) =>{
 
 
     return (
-        <CacheContext.Provider value={{ getRooms, getRoom, getFreeRooms, getBatch, search, allSearch, debounce }}>
+        <CacheContext.Provider value={{ getRooms, getRoom, getRoomUpdate, getFreeRooms, getBatch, search, allSearch, debounce }}>
             {children}
         </CacheContext.Provider>
     );
