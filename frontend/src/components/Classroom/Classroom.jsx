@@ -66,10 +66,12 @@ function Classroom({ room, state, setState, schedule, roomName, width, setShowMo
                 
 
         const socket = io(
-            process.env.NODE_ENV === 'production' ? 'https://www.study-compass.com' : 'http://localhost:5001',             {
+            process.env.NODE_ENV === 'production' ? 'https://www.study-compass.com' : 'http://localhost:5001', {
             transports: ['websocket'],  // Force WebSocket transport
             }
         );
+
+        console.log(process.env.NODE_ENV);
 
         // Join the room for this classroom
         socket.emit('join-classroom', room._id);
