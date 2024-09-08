@@ -38,11 +38,18 @@ const Popup = ({ children, isOpen, onClose }) => {
     return null;
   }
 
+  const renderChildrenWithClose = () => {
+    if (React.isValidElement(children)) {
+      return React.cloneElement(children, { handleClose });
+    }
+    return children; // In case children are not valid React elements
+  };    
+
   return ReactDOM.createPortal(
     <div className={`popup-overlay ${show ? 'fade-in' : 'fade-out'}`}>
       <div className={`popup-content ${show ? 'slide-in' : 'slide-out'}`} ref={ref}>
         <img src={X} alt="" onClick={handleClose} className="close-popup" />
-        {children}
+        {renderChildrenWithClose()} {/* Render children with handleClose prop */}
       </div>
     </div>,
     document.body // Render the popup outside the root component for proper overlaying

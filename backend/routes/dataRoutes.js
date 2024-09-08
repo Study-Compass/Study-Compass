@@ -552,12 +552,15 @@ router.post('/update_rating', verifyToken, async (req, res) => {
             classroom.average_rating = averageScore;
             await classroom.save();
         } else {
+            console.log(`POST: /update_rating/${classroomId}/${userId} failed`);
             res.status(500).json({ success: false, message: 'Classroom does not exist'});
         }
 
-        res.json({ success: true, rating, average_score: averageScore, number_of_ratings: ratings.length });
+        console.log(`POST: /update_rating/${classroomId}/${userId} successful`);
         res.status(200).json({ success: true, message: 'Successfully updated rating', data: {score: averageScore, num_ratings:ratings.length} });
     } catch (error) {
+        console.error(error);
+        console.log(`POST: /update_rating/${classroomId}/${userId} faled`);
         res.status(500).json({ success: false, message: 'Error updating or retrieving ratings', error: error.message });
     }
 });

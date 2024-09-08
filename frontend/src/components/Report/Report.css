@@ -31,7 +31,6 @@ textarea{
     border: none;
     border-radius: 10px;
     font-family: Inter, sans-serif;
-    cursor: pointer;
     width: 75%;
     height: 65%;
 }

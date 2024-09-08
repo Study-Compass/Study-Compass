@@ -242,7 +242,7 @@ function Classroom({ room, state, setState, schedule, roomName, width, setShowMo
     return (
         <div className={`classroom-component  ${user && room.checked_in.includes(user._id) ? "checked-in" : ""}`}>
             <Popup isOpen={isRatingPopupOpen} onClose={handleCloseRatingPopup}>
-                <RatingComponent rating={rating} setRating={setRating} name={room.name}/>
+                <RatingComponent classroomId={room._id} rating={rating} setRating={setRating} name={room.name} reload={reload}/>
             </Popup>
             <div className={`whole-page ${isClassImgOpen ? 'in' : 'out'}`}>
                 <div className={`img-pop-up ${isClassImgOpen ? 'in' : 'out'}`} ref={ref}>
@@ -277,10 +277,10 @@ function Classroom({ room, state, setState, schedule, roomName, width, setShowMo
                     <div className="info-row">
                         <div className="rating">
                             <img src={FilledStar} alt="star" />
-                            <p>0</p>
+                            <p>{room.average_rating}</p>
                         </div>
                         <div className="rating-num">
-                            0 ratings
+                            {room.number_of_ratings === 1 ? <p>{room.number_of_ratings} rating</p> : <p>{room.number_of_ratings} ratings</p>}
                         </div>
                         { isAuthenticated &&                  
                         <button className="add-rating" onClick={handleOpenRatingPopup} >
