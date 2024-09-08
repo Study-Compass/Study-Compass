@@ -47,7 +47,7 @@ router.post("/check-username", async (req, res) =>{
     }
 });
 
-router.post("/check-in", async (req, res) =>{
+router.post("/check-in", verifyToken, async (req, res) =>{
     const { classroomId } = req.body;
     try{
         //check if user is checked in elsewhere
@@ -159,27 +159,27 @@ router.post("/update-developer", verifyToken, async (req, res) =>{
     }
 });
 
-router.get("/get-user", verifyToken, async (req, res) =>{
+router.get("/get-user", async (req, res) =>{
     const userId = req.query.userId;
     try{
         const user = await User.findById(userId);
-        console.log(`GET: /get-user ${req.user.userId} successful`);
+        console.log(`GET: /get-user ${req.query.userId} successful`);
         return res.status(200).json({ success: true, message: 'User retrieved', user });
     } catch(error){
-        console.log(`GET: /get-user ${req.user.userId} failed`)
+        console.log(`GET: /get-user ${req.query.userId} failed`)
         return res.status(500).json({ success: false, message: 'Internal server error', error });
     }
 });
 
 //route to get mulitple users, specified in array
-router.get("/get-users", verifyToken, async (req, res) =>{
+router.get("/get-users", async (req, res) =>{
     const userIds = req.query.userIds;
     try{
         const users = await User.find({ _id: { $in: userIds } });
-        console.log(`GET: /get-users ${req.user.userId} successful`);
+        console.log(`GET: /get-users ${req.query.userId} successful`);
         return res.status(200).json({ success: true, message: 'Users retrieved', users });
     } catch(error){
-        console.log(`GET: /get-users ${req.user.userId} failed`)
+        console.log(`GET: /get-users ${req.query.userId} failed`)
         return res.status(500).json({ success: false, message: 'Internal server error', error });
     }
 });
