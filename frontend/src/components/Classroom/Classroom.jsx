@@ -113,8 +113,6 @@ function Classroom({ room, state, setState, schedule, roomName, width, setShowMo
     const [fillerHeight, setFillerHeight] = useState(0);
     const [isClassImgOpen, setClassImgOpen] = useState(false);
 
-    const [checkoutText, setCheckoutText] = useState(false);
-
     const [checkedInUsers, setCheckedInUsers] = useState({});
 
     const handleImageClick = () => {
@@ -321,7 +319,7 @@ function Classroom({ room, state, setState, schedule, roomName, width, setShowMo
                         {width < 800 && <button className="schedule-button" onClick={() => { setShowMobileCalendar(true) }}>view-schedule</button>}
                         {
                             user && room.checked_in.includes(user._id) ?  
-                            <button className={`${checkoutText && "out"}`} onClick={handleCheckOut} onMouseOver={()=>setCheckoutText(true)} onMouseLeave={()=>setCheckoutText(false)}> {checkoutText ? "check out" : "checked in"}</button>
+                            <button className="out" onClick={handleCheckOut}>check out</button>
                             :
                             <button disabled={!success || !isAuthenticated} className="check-in-button" onClick={handleCheckIn}>check in</button>
                         }
