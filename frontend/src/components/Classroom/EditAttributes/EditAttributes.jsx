@@ -10,7 +10,7 @@ import Delete from '../../../assets/Icons/Delete.svg';
 import X from '../../../assets/x.svg';
 
 
-import { changeClasroom } from '../../../DBInteractions.js';
+import { changeClasroom, mainSearchChange } from '../../../DBInteractions.js';
 
 import { useNotification } from '../../../NotificationContext.js';
 
@@ -29,6 +29,7 @@ function EditAttributes({room, attributes, setEdit}){
     const [attributesAdmin, setAttributes] = useState([...attributes]);
     const [adding, setAdding] = useState("");
     const [imageUrl, setImageUrl] = useState("");
+    const [mainSearch, setMainSearch] = useState(room.mainSearch);
 
     const addAttribute = (attribute) => {
         if(attribute === "" || attributesAdmin.includes(attribute)){
@@ -53,6 +54,9 @@ function EditAttributes({room, attributes, setEdit}){
     const handleSubmit = () => {
         try{
             changeClasroom(room._id, attributesAdmin, imageUrl.trim());
+            if(mainSearch !== room.mainSearch){
+                mainSearchChange(room._id);
+            }
         } catch (error){
             console.error(error);
             reloadNotification({title: "Error updating attributes", message: "please try again", type: "error"});
@@ -62,6 +66,10 @@ function EditAttributes({room, attributes, setEdit}){
         }
 
     };
+
+    const handleMainSearch = (e) =>{
+        setMainSearch(e.target.checked);
+    }
 
     console.log(room);
 
@@ -80,14 +88,19 @@ function EditAttributes({room, attributes, setEdit}){
                             console.log(newAttributes);
                             setAttributes(newAttributes);
                         }}/>}
+
                     </div>
+
                 );
             })}
             <div className="addNew">
                 <input type="text" value={adding} onChange={handleChange} className="input" placeholder='add new attributes'/>
                 <button className="add" onClick={()=>{addAttribute(adding)}}>add</button>
             </div>
-            <input className="input image-change" type="text" value={imageUrl} onChange={imageChange} placeholder='add new image url'/>
+            <div className="addNew">
+                <input type="checkbox" checked={mainSearch} onChange={handleMainSearch}/>
+                <p>mainSearch?</p>
+            </div>
             <button className="save" onClick={handleSubmit}>save</button>
             <button className="save" onClick={()=>{setEdit(false)}}>cancel</button>
 

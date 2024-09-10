@@ -299,7 +299,7 @@ function Classroom({ room, state, setState, schedule, roomName, width, setShowMo
                         
                         <div className="rating">
                             <img src={FilledStar} alt="star" />
-                            <p>{ room.average_rating.toFixed(1)}</p> 
+                            <p>{room.average_rating.toFixed(1)}</p> 
                         </div>
                         <div className="rating-num">
                             {room.number_of_ratings === 1 ? <p>{room.number_of_ratings} rating</p> : <p>{room.number_of_ratings} ratings</p>}

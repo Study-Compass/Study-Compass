@@ -221,6 +221,21 @@ const userRated = async (classroomId, userId) => {
     }
 }
 
+const mainSearchChange = async (classroomId) => {
+    try{
+        const response = await axios.post('/main-search-change', {classroomId}, {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        console.log("successful");
+        return response;
+    }
+    catch(error){
+        throw error;
+    }
+}
 
 
-export { changeClasroom, save, checkUsername, saveUser, sendError, checkIn, checkOut, getUser, getUsers, updateRating, userRated };
+export { changeClasroom, save, checkUsername, saveUser, sendError, checkIn, checkOut, getUser, getUsers, updateRating, userRated, mainSearchChange };

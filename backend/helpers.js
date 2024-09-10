@@ -1,5 +1,7 @@
+
 function sortByAvailability(objects) {
     let availability = {};
+    // save input to json file
     for (let i = 0; i < objects.length; i++) {
         const room = objects[i];
         availability[room.name] = findNext(room.weekly_schedule);
@@ -12,6 +14,7 @@ function sortByAvailability(objects) {
         }
         return availability[b.name] - availability[a.name];
     });
+    //write output to json file
     return objects;
 
 }

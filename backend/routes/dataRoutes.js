@@ -321,13 +321,13 @@ router.get('/all-purpose-search', verifyTokenOptional, async (req, res) => {
     try {
         // Define the base query with projection to only include the name field
         let findQuery = Classroom.find(
-            { name: { $regex: query, $options: 'i' }, attributes: { $all: attributes } },
+            { name: { $regex: query, $options: 'i' }, attributes: { $all: attributes },  mainSearch: { $ne: false } },
             { name: 1 } // Project only the name field
         );
 
         if(attributes.length === 0){
             findQuery = Classroom.find(
-                { name: { $regex: query, $options: 'i' }},
+                { name: { $regex: query, $options: 'i' },  mainSearch: { $ne: false }},
                 { name: 1 } // Project only the name field
             );
         }
@@ -344,13 +344,14 @@ router.get('/all-purpose-search', verifyTokenOptional, async (req, res) => {
             findQuery =  Classroom.aggregate([
                 {
                     $match: {
-                        name: { $regex: query, $options: 'i' } // Filters classrooms by name using regex
+                        name: { $regex: query, $options: 'i' }, // Filters classrooms by name using regex
+                        mainSearch: { $ne: false }
                     }
                 },
                 {
                     $lookup: {
-                        from: "schedules", // Assumes "schedules" is the collection name
-                        localField: "_id", // Field in the 'classroom' documents
+                        from: "schedules", 
+                        localField: "_id", 
                         foreignField: "classroom_id", // Corresponding field in 'schedule' documents
                         as: "schedule_info" // Temporarily holds the entire joined schedule documents
                     }
@@ -379,6 +380,9 @@ router.get('/all-purpose-search', verifyTokenOptional, async (req, res) => {
         let sortedClassrooms = [];
 
         if (userId && user) {
+            if(sort === "availability"){
+                return;
+            }
             const savedSet = new Set(user.saved); // Convert saved items to a Set for efficient lookups
 
             // Split classrooms into saved and not saved
@@ -624,5 +628,33 @@ router.post('/send-report', verifyToken, async (req, res) => {
         return res.status(500).json({ success: false, message: 'Error finding user', error: error.message});
     }
 });
+
+router.post('/main-search-change', verifyToken, async (req, res) => {
+    const userId = req.user.userId;
+    const classroomId = req.body.classroomId;
+    try{
+        const user = await User.findOne({ _id: userId });
+        if (!user) {
+            console.log(`POST: /main-search-change/${userId} failed`);
+            return res.status(404).json({ success: false, message: "User not found" });
+        }
+        if(!user.admin){
+            console.log(`POST: /main-search-change/${userId} failed`);
+            return res.status(403).json({ success: false, message: "User not authorized" });
+        }
+        const classroom = await Classroom.findOne({ _id: classroomId });
+        if (!classroom) {
+            console.log(`POST: /main-search-change/${userId} failed`);
+            return res.status(404).json({ success: false, message: "Classroom not found" });
+        }
+        classroom.mainSearch = !classroom.mainSearch;
+        await classroom.save();
+        console.log(`POST: /main-search-change/${userId}`);
+        res.json({ success: true, message: "Main search changed" });
+    } catch(error){
+        return res.status(500).json({ success: false, message: 'Error finding user', error: error.message});
+    }
+});
+
 
 module.exports = router;
