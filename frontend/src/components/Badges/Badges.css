@@ -2,7 +2,8 @@
 .badges{
     height:15px;
     display: flex;
-    gap:5px
+    gap:5px;
+    flex-wrap:nowrap;
 }
 
 .badge{
@@ -13,12 +14,24 @@
     justify-content: center;
 }
 
-.badge p{
-    margin:0 7px;
-    color:white;
+.badge.normal p{
+    margin:0 7px !important;
+    color:white !important;
     font-size:12px;
-    font-family: 'Inter';
-    font-weight:600;
+    font-family: 'Inter' !important;
+    font-weight:600 !important;
+    text-wrap: nowrap;
+
+}
+
+.badge.small p{
+    margin:0 5px !important;
+    line-height: 0.7;
+    color:white !important;
+    font-family: 'Inter' !important;
+    font-weight:500 !important;
+    text-wrap: nowrap;
+
 }
 
 .badge.beta-tester{

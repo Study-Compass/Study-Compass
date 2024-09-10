@@ -13,6 +13,7 @@ import RatingComponent from '../Rating/Rating.jsx';
 // import { useWebSocket1 } from '../../WebSocketContext.js';
 import Flag from '../Flag/Flag.jsx';
 import Popup from '../Popup/Popup.jsx';
+import UserRating from './UserRating/UserRating.jsx';
 
 import Edit from '../../assets/Icons/Edit.svg';
 import Outlets from '../../assets/Icons/Outlets.svg';
@@ -24,7 +25,7 @@ import useOutsideClick from '../../hooks/useClickOutside';
 
 import Image from '../../assets/Icons/Image.svg';
 
-import { checkIn, checkOut, getUser, getUsers } from '../../DBInteractions.js';
+import { checkIn, checkOut, getUser, getUsers, userRated } from '../../DBInteractions.js';
 import { findNext } from '../../pages/Room/RoomHelpers.js';
 import { useNotification } from '../../NotificationContext.js';
 
@@ -34,12 +35,18 @@ import { io } from 'socket.io-client';
 import Rating from 'react-rating';
 
 function Classroom({ room, state, setState, schedule, roomName, width, setShowMobileCalendar, setIsUp, reload }) {
+    const [image, setImage] = useState("")
+    const { isAuthenticating, isAuthenticated, user } = useAuth();
+    const [success, setSuccess] = useState(false);
+    const [message, setMessage] = useState("");
+    const [defaultImage, setDefaultImage] = useState(false);
+    const [fillerHeight, setFillerHeight] = useState(0);
+    const [isClassImgOpen, setClassImgOpen] = useState(false);
 
-    // const { sendMessage } = useWebSocket({
-    //     ping: () => {
-    //         sendMessage('pong');
-    //     }
-    // });
+    const [checkedInUsers, setCheckedInUsers] = useState({});
+
+    const [userRating, setUserRating] = useState(null);
+
 
     useEffect(() => {
         if(!room){
@@ -64,7 +71,25 @@ function Classroom({ room, state, setState, schedule, roomName, width, setShowMo
         }
 
         getCheckedInUsers();
-                
+
+        const getRating = async () => {
+            if(!isAuthenticated){
+                return;
+            }
+            try{
+                const rated = await userRated(room._id);
+                console.log(rated);
+                if(rated.data.success){
+                    console.log(rated.data.data);
+                    setUserRating(rated.data.data);
+                }
+            } catch (error){
+                console.log(error);
+                addNotification({ title: "An error occured", message: "an internal error occured", type: "error" })
+            }
+        }
+        
+        getRating();
 
         const socket = io(
             process.env.NODE_ENV === 'production' ? 'https://www.study-compass.com' : 'http://localhost:5001', {
@@ -106,15 +131,11 @@ function Classroom({ room, state, setState, schedule, roomName, width, setShowMo
         };
     }, [room]);
 
-    const [image, setImage] = useState("")
-    const { isAuthenticating, isAuthenticated, user } = useAuth();
-    const [success, setSuccess] = useState(false);
-    const [message, setMessage] = useState("");
-    const [defaultImage, setDefaultImage] = useState(false);
-    const [fillerHeight, setFillerHeight] = useState(0);
-    const [isClassImgOpen, setClassImgOpen] = useState(false);
+    useEffect(() => {
 
-    const [checkedInUsers, setCheckedInUsers] = useState({});
+    }, [isAuthenticating]);
+
+
 
     const handleImageClick = () => {
         setClassImgOpen(true);
@@ -146,7 +167,7 @@ function Classroom({ room, state, setState, schedule, roomName, width, setShowMo
 
     useEffect(() => {
         if (checkInRef.current) {
-            setFillerHeight(checkInRef.current.clientHeight + 10);
+            setFillerHeight(checkInRef.current.clientHeight + 100);
             console.log(checkInRef.current.clientHeight);
         }
     }, [checkInRef.current]);
@@ -209,8 +230,10 @@ function Classroom({ room, state, setState, schedule, roomName, width, setShowMo
     const handleCheckOut = async () => {
         try {
             const response = await checkOut(room._id);
+            handleOpenRatingPopup();
             console.log(response);  
             await reload();
+
 
         } catch (error) {
             console.log(error);
@@ -235,7 +258,6 @@ function Classroom({ room, state, setState, schedule, roomName, width, setShowMo
             addNotification({ title: "An error occured", message: "an internal error occured", type: "error" })
         }
     }
-
 
     return (
         <div className={`classroom-component  ${user && room.checked_in.includes(user._id) ? "checked-in" : ""}`}>
@@ -272,18 +294,20 @@ function Classroom({ room, state, setState, schedule, roomName, width, setShowMo
                             <Bookmark room={room} />
                         </div>
                     </div>
+
                     <div className="info-row">
+                        
                         <div className="rating">
                             <img src={FilledStar} alt="star" />
-                            <p>{room.average_rating}</p>
+                            <p>{ room.average_rating.toFixed(1)}</p> 
                         </div>
                         <div className="rating-num">
                             {room.number_of_ratings === 1 ? <p>{room.number_of_ratings} rating</p> : <p>{room.number_of_ratings} ratings</p>}
                         </div>
-                        { isAuthenticated &&                  
-                        <button className="add-rating" onClick={handleOpenRatingPopup} >
-                            <p>add your rating</p>
-                        </button>
+                        { isAuthenticated && userRating === null &&                
+                            <button className="add-rating" onClick={handleOpenRatingPopup} >
+                                <p>add your rating</p>
+                            </button>
                         }
                         {/* <div className={`${success ? 'free-until' : 'class-until'}`}>
                             <div className="dot">
@@ -293,6 +317,7 @@ function Classroom({ room, state, setState, schedule, roomName, width, setShowMo
                             {success ? "free" : "class in session"} {message}                    
                         </div> */}
                     </div>
+                            
                     <div className="attributes">
                         {room && room.attributes.map((attribute, index) => {
                             return (
@@ -304,6 +329,8 @@ function Classroom({ room, state, setState, schedule, roomName, width, setShowMo
                         })}
                         {user && user.admin ? <div className="attribute" onClick={() => { setEdit(!edit) }}><img src={Edit} alt="" /></div> : ""}
                     </div>
+                    { userRating && <UserRating rating={userRating} />}
+                        
                     {
                         defaultImage && (!isAuthenticating) && isAuthenticated && user.admin ? <FileUpload classroomName={room.name} /> : ""
                     }

@@ -565,6 +565,48 @@ router.post('/update_rating', verifyToken, async (req, res) => {
     }
 });
 
+router.get('/get-user-ratings', verifyToken, async (req, res) => {
+    const userId = req.user.userId;
+    try{
+        const ratings = await Rating.find({ user_id: userId });
+        console.log(`POST: /get-user-ratings/${userId}`);
+        res.json({ success: true, message: "Ratings fetched", data: ratings });
+    } catch(error){
+        console.log(`POST: /get-user-ratings/${userId} failed`);
+        return res.status(500).json({ success: false, message: 'Error finding user', error: error.message});
+    }
+});
+
+router.get('/user-rated', verifyToken, async (req, res) => {
+    const userId = req.user.userId;
+    const classroomId = req.query.classroomId;
+    try{
+        const rating = await Rating.findOne({ user_id: userId, classroom_id: classroomId });
+        if(!rating){
+            res.json({ success: true, message: "Rating not found", data: null });
+            return;
+        }
+        console.log(`GET: /user-rated/${userId}/${classroomId}`);
+        res.json({ success: true, message: "Rating found", data: rating });
+    } catch(error){
+        console.log(`GET: /user-rated/${userId}/${classroomId} failed`);
+        return res.status(500).json({ success: false, message: 'Error finding rating', error: error.message});
+    }
+
+});
+
+router.get('/get-ratings', async (req, res) => {
+    const classroomId = req.query.classroomId;
+    try{
+        const ratings = await Rating.find({ classroom_id: classroomId });
+        console.log(`GET: /get-ratings/${classroomId}`);
+        res.json({ success: true, message: "Ratings fetched", data: ratings });
+    } catch(error){
+        console.log(`GET: /get-ratings/${classroomId} failed`);
+        return res.status(500).json({ success: false, message: 'Error finding ratings', error: error.message});
+    }
+});
+
 router.post('/send-report', verifyToken, async (req, res) => {
     const userId = req.user.userId;
     const report = req.body.report;
@@ -581,7 +623,6 @@ router.post('/send-report', verifyToken, async (req, res) => {
     } catch(error){
         return res.status(500).json({ success: false, message: 'Error finding user', error: error.message});
     }
-
 });
 
 module.exports = router;

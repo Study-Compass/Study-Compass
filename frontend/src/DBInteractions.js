@@ -206,4 +206,21 @@ const updateRating = async (classroomId, userId, comment, score, upvotes, downvo
     }
 }
 
-export { changeClasroom, save, checkUsername, saveUser, sendError, checkIn, checkOut, getUser, getUsers, updateRating };
+const userRated = async (classroomId, userId) => {
+    try{
+        const response = await axios.get('/user-rated', {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`,
+            },
+            params: {classroomId, userId}
+        });
+        console.log("successful");
+        return response;
+    } catch(error){
+        throw error;
+    }
+}
+
+
+
+export { changeClasroom, save, checkUsername, saveUser, sendError, checkIn, checkOut, getUser, getUsers, updateRating, userRated };
