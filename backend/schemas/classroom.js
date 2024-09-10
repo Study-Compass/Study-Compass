@@ -23,7 +23,12 @@ const classroomSchema = new Schema({
     checked_in:{
         type:Array,
         default:[]
-    }
+    },
+    mainSearch:{
+        type:Boolean,
+        default:true,
+        required:true
+    },
 });
 
 

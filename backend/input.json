@@ -1,0 +1,2421 @@
+[
+  {
+    "_id": "65dd0788d6b91fde155c00e1",
+    "name": "Russell Sage Laboratory 1211",
+    "weekly_schedule": {
+      "M": [
+        {
+          "class_name": "ARTS 2210",
+          "start_time": 720,
+          "end_time": 840
+        },
+        {
+          "class_name": "ARTS 4210",
+          "start_time": 840,
+          "end_time": 960
+        },
+        {
+          "class_name": "INQR 1060",
+          "start_time": 600,
+          "end_time": 720
+        }
+      ],
+      "T": [],
+      "W": [],
+      "R": [
+        {
+          "class_name": "ARTS 2210",
+          "start_time": 720,
+          "end_time": 840
+        },
+        {
+          "class_name": "ARTS 4210",
+          "start_time": 840,
+          "end_time": 960
+        },
+        {
+          "class_name": "INQR 1060",
+          "start_time": 600,
+          "end_time": 720
+        }
+      ],
+      "F": []
+    }
+  },
+  {
+    "_id": "65dd0787d6b91fde155c00c3",
+    "name": "Russell Sage Laboratory 2112",
+    "weekly_schedule": {
+      "M": [
+        {
+          "class_name": "CIVL 6240",
+          "start_time": 840,
+          "end_time": 960
+        },
+        {
+          "class_name": "COMM 4420",
+          "start_time": 480,
+          "end_time": 600
+        },
+        {
+          "class_name": "COMM 6420",
+          "start_time": 480,
+          "end_time": 600
+        },
+        {
+          "class_name": "PSYC 2310",
+          "start_time": 600,
+          "end_time": 720
+        }
+      ],
+      "T": [
+        {
+          "class_name": "ARCH 4050",
+          "start_time": 840,
+          "end_time": 960
+        },
+        {
+          "class_name": "CHME 2050",
+          "start_time": 720,
+          "end_time": 840
+        },
+        {
+          "class_name": "ECON 6710",
+          "start_time": 600,
+          "end_time": 720
+        },
+        {
+          "class_name": "INQR 1776",
+          "start_time": 480,
+          "end_time": 600
+        }
+      ],
+      "W": [
+        {
+          "class_name": "ARCH 4200",
+          "start_time": 720,
+          "end_time": 840
+        },
+        {
+          "class_name": "CHEM 4965",
+          "start_time": 840,
+          "end_time": 930
+        },
+        {
+          "class_name": "CHEM 6965",
+          "start_time": 840,
+          "end_time": 930
+        }
+      ],
+      "R": [
+        {
+          "class_name": "CIVL 6240",
+          "start_time": 840,
+          "end_time": 960
+        },
+        {
+          "class_name": "COMM 4420",
+          "start_time": 480,
+          "end_time": 600
+        },
+        {
+          "class_name": "COMM 6420",
+          "start_time": 480,
+          "end_time": 600
+        },
+        {
+          "class_name": "PSYC 2310",
+          "start_time": 600,
+          "end_time": 720
+        }
+      ],
+      "F": [
+        {
+          "class_name": "CHME 2050",
+          "start_time": 720,
+          "end_time": 840
+        },
+        {
+          "class_name": "ECON 6710",
+          "start_time": 600,
+          "end_time": 720
+        },
+        {
+          "class_name": "INQR 1776",
+          "start_time": 480,
+          "end_time": 600
+        }
+      ]
+    }
+  },
+  {
+    "_id": "65dd078bd6b91fde155c016d",
+    "name": "Russell Sage Laboratory 2211",
+    "weekly_schedule": {
+      "M": [
+        {
+          "class_name": "MANE 2220",
+          "start_time": 720,
+          "end_time": 840
+        },
+        {
+          "class_name": "STSO 4605",
+          "start_time": 540,
+          "end_time": 720
+        }
+      ],
+      "T": [
+        {
+          "class_name": "MANE 4220",
+          "start_time": 720,
+          "end_time": 840
+        },
+        {
+          "class_name": "MANE 4220",
+          "start_time": 840,
+          "end_time": 960
+        },
+        {
+          "class_name": "STSO 2020",
+          "start_time": 540,
+          "end_time": 720
+        }
+      ],
+      "W": [],
+      "R": [
+        {
+          "class_name": "MANE 2220",
+          "start_time": 720,
+          "end_time": 840
+        },
+        {
+          "class_name": "STSO 4605",
+          "start_time": 540,
+          "end_time": 720
+        }
+      ],
+      "F": [
+        {
+          "class_name": "MANE 4220",
+          "start_time": 720,
+          "end_time": 840
+        },
+        {
+          "class_name": "MANE 4220",
+          "start_time": 840,
+          "end_time": 960
+        },
+        {
+          "class_name": "STSO 2020",
+          "start_time": 540,
+          "end_time": 720
+        }
+      ]
+    }
+  },
+  {
+    "_id": "65dd0788d6b91fde155c00e5",
+    "name": "Russell Sage Laboratory 2411",
+    "weekly_schedule": {
+      "M": [
+        {
+          "class_name": "ARTS 2610",
+          "start_time": 720,
+          "end_time": 840
+        },
+        {
+          "class_name": "COMM 2570",
+          "start_time": 480,
+          "end_time": 600
+        },
+        {
+          "class_name": "COMM 2660",
+          "start_time": 840,
+          "end_time": 960
+        },
+        {
+          "class_name": "INQR 1562",
+          "start_time": 600,
+          "end_time": 720
+        }
+      ],
+      "T": [
+        {
+          "class_name": "ARTS 2230",
+          "start_time": 480,
+          "end_time": 600
+        },
+        {
+          "class_name": "ARTS 4280",
+          "start_time": 600,
+          "end_time": 720
+        },
+        {
+          "class_name": "69293",
+          "start_time": 840,
+          "end_time": 960
+        },
+        {
+          "class_name": "GSAS 4200",
+          "start_time": 720,
+          "end_time": 840
+        }
+      ],
+      "W": [
+        {
+          "class_name": "ARTS 6400",
+          "start_time": 840,
+          "end_time": 960
+        },
+        {
+          "class_name": "GSAS 4510",
+          "start_time": 840,
+          "end_time": 1080
+        }
+      ],
+      "R": [
+        {
+          "class_name": "ARTS 2610",
+          "start_time": 720,
+          "end_time": 840
+        },
+        {
+          "class_name": "COMM 2570",
+          "start_time": 480,
+          "end_time": 600
+        },
+        {
+          "class_name": "COMM 2660",
+          "start_time": 840,
+          "end_time": 960
+        },
+        {
+          "class_name": "INQR 1562",
+          "start_time": 600,
+          "end_time": 720
+        }
+      ],
+      "F": [
+        {
+          "class_name": "ARTS 2230",
+          "start_time": 480,
+          "end_time": 600
+        },
+        {
+          "class_name": "ARTS 4280",
+          "start_time": 600,
+          "end_time": 720
+        },
+        {
+          "class_name": "69293",
+          "start_time": 840,
+          "end_time": 960
+        },
+        {
+          "class_name": "GSAS 4200",
+          "start_time": 720,
+          "end_time": 840
+        }
+      ]
+    }
+  },
+  {
+    "_id": "65dd0788d6b91fde155c00ed",
+    "name": "Russell Sage Laboratory 2510",
+    "weekly_schedule": {
+      "M": [
+        {
+          "class_name": "GSAS 2510",
+          "start_time": 480,
+          "end_time": 600
+        },
+        {
+          "class_name": "GSAS 2510",
+          "start_time": 600,
+          "end_time": 720
+        },
+        {
+          "class_name": "GSAS 4961",
+          "start_time": 840,
+          "end_time": 960
+        }
+      ],
+      "T": [
+        {
+          "class_name": "ARTS 2020",
+          "start_time": 720,
+          "end_time": 840
+        },
+        {
+          "class_name": "GSAS 2510",
+          "start_time": 600,
+          "end_time": 720
+        },
+        {
+          "class_name": "GSAS 6400",
+          "start_time": 960,
+          "end_time": 1140
+        }
+      ],
+      "W": [
+        {
+          "class_name": "GSAS 6100",
+          "start_time": 1080,
+          "end_time": 1260
+        },
+        {
+          "class_name": "GSAS 6200",
+          "start_time": 840,
+          "end_time": 1020
+        }
+      ],
+      "R": [
+        {
+          "class_name": "GSAS 2510",
+          "start_time": 480,
+          "end_time": 600
+        },
+        {
+          "class_name": "GSAS 2510",
+          "start_time": 600,
+          "end_time": 720
+        },
+        {
+          "class_name": "GSAS 4961",
+          "start_time": 840,
+          "end_time": 960
+        }
+      ],
+      "F": [
+        {
+          "class_name": "ARTS 2020",
+          "start_time": 720,
+          "end_time": 840
+        },
+        {
+          "class_name": "GSAS 2510",
+          "start_time": 600,
+          "end_time": 720
+        }
+      ]
+    }
+  },
+  {
+    "_id": "65dd0787d6b91fde155c00c9",
+    "name": "Russell Sage Laboratory 2701",
+    "weekly_schedule": {
+      "M": [
+        {
+          "class_name": "ECON 4570",
+          "start_time": 600,
+          "end_time": 720
+        },
+        {
+          "class_name": "ENVE 4350",
+          "start_time": 720,
+          "end_time": 840
+        },
+        {
+          "class_name": "MANE 6967",
+          "start_time": 840,
+          "end_time": 930
+        }
+      ],
+      "T": [
+        {
+          "class_name": "ECON 2100",
+          "start_time": 720,
+          "end_time": 840
+        },
+        {
+          "class_name": "ECON 4170",
+          "start_time": 600,
+          "end_time": 720
+        },
+        {
+          "class_name": "ECON 6170",
+          "start_time": 600,
+          "end_time": 720
+        },
+        {
+          "class_name": "LANG 1410",
+          "start_time": 840,
+          "end_time": 960
+        }
+      ],
+      "W": [
+        {
+          "class_name": "ARCH 4200",
+          "start_time": 720,
+          "end_time": 840
+        }
+      ],
+      "R": [
+        {
+          "class_name": "ECON 4570",
+          "start_time": 600,
+          "end_time": 720
+        },
+        {
+          "class_name": "ENVE 4350",
+          "start_time": 720,
+          "end_time": 840
+        },
+        {
+          "class_name": "MANE 6967",
+          "start_time": 840,
+          "end_time": 930
+        },
+        {
+          "class_name": "PHYS 1101",
+          "start_time": 480,
+          "end_time": 540
+        }
+      ],
+      "F": [
+        {
+          "class_name": "ECON 2100",
+          "start_time": 720,
+          "end_time": 840
+        },
+        {
+          "class_name": "ECON 4170",
+          "start_time": 600,
+          "end_time": 720
+        },
+        {
+          "class_name": "ECON 6170",
+          "start_time": 600,
+          "end_time": 720
+        },
+        {
+          "class_name": "LANG 1410",
+          "start_time": 840,
+          "end_time": 960
+        }
+      ]
+    }
+  },
+  {
+    "_id": "65dd0786d6b91fde155c009d",
+    "name": "Russell Sage Laboratory 2704",
+    "weekly_schedule": {
+      "M": [
+        {
+          "class_name": "69401",
+          "start_time": 720,
+          "end_time": 840
+        },
+        {
+          "class_name": "69502",
+          "start_time": 720,
+          "end_time": 840
+        },
+        {
+          "class_name": "PSYC 4310",
+          "start_time": 840,
+          "end_time": 960
+        }
+      ],
+      "T": [
+        {
+          "class_name": "ARCH 4963",
+          "start_time": 600,
+          "end_time": 720
+        },
+        {
+          "class_name": "MATH 6790",
+          "start_time": 840,
+          "end_time": 960
+        },
+        {
+          "class_name": "WRIT 2340",
+          "start_time": 720,
+          "end_time": 840
+        }
+      ],
+      "W": [
+        {
+          "class_name": "USAF 2050",
+          "start_time": 720,
+          "end_time": 900
+        }
+      ],
+      "R": [
+        {
+          "class_name": "BIOL 4500",
+          "start_time": 600,
+          "end_time": 720
+        },
+        {
+          "class_name": "BIOL 6500",
+          "start_time": 600,
+          "end_time": 720
+        },
+        {
+          "class_name": "69401",
+          "start_time": 720,
+          "end_time": 840
+        },
+        {
+          "class_name": "69502",
+          "start_time": 720,
+          "end_time": 840
+        },
+        {
+          "class_name": "PSYC 4310",
+          "start_time": 840,
+          "end_time": 960
+        }
+      ],
+      "F": [
+        {
+          "class_name": "MATH 6790",
+          "start_time": 840,
+          "end_time": 960
+        },
+        {
+          "class_name": "WRIT 2340",
+          "start_time": 720,
+          "end_time": 840
+        }
+      ]
+    }
+  },
+  {
+    "_id": "65dd078bd6b91fde155c0179",
+    "name": "Russell Sage Laboratory 2707",
+    "weekly_schedule": {
+      "M": [
+        {
+          "class_name": "BIOL 4140",
+          "start_time": 600,
+          "end_time": 720
+        },
+        {
+          "class_name": "BIOL 6140",
+          "start_time": 600,
+          "end_time": 720
+        },
+        {
+          "class_name": "IHSS 6790",
+          "start_time": 840,
+          "end_time": 1020
+        }
+      ],
+      "T": [
+        {
+          "class_name": "CHME 4962",
+          "start_time": 510,
+          "end_time": 600
+        },
+        {
+          "class_name": "CHME 6962",
+          "start_time": 510,
+          "end_time": 600
+        },
+        {
+          "class_name": "MANE 4160",
+          "start_time": 840,
+          "end_time": 930
+        },
+        {
+          "class_name": "MANE 4400",
+          "start_time": 600,
+          "end_time": 720
+        },
+        {
+          "class_name": "MANE 6962",
+          "start_time": 720,
+          "end_time": 810
+        }
+      ],
+      "W": [
+        {
+          "class_name": "ARCH 4200",
+          "start_time": 720,
+          "end_time": 840
+        },
+        {
+          "class_name": "ENVE 4220",
+          "start_time": 960,
+          "end_time": 1140
+        }
+      ],
+      "R": [
+        {
+          "class_name": "ARCH 4320",
+          "start_time": 600,
+          "end_time": 780
+        }
+      ],
+      "F": [
+        {
+          "class_name": "CHME 4962",
+          "start_time": 510,
+          "end_time": 600
+        },
+        {
+          "class_name": "CHME 6962",
+          "start_time": 510,
+          "end_time": 600
+        },
+        {
+          "class_name": "MANE 4160",
+          "start_time": 840,
+          "end_time": 930
+        },
+        {
+          "class_name": "MANE 4400",
+          "start_time": 600,
+          "end_time": 720
+        },
+        {
+          "class_name": "MANE 6962",
+          "start_time": 720,
+          "end_time": 810
+        }
+      ]
+    }
+  },
+  {
+    "_id": "65dd078bd6b91fde155c017b",
+    "name": "Russell Sage Laboratory 2715",
+    "weekly_schedule": {
+      "M": [
+        {
+          "class_name": "CSCI 4340",
+          "start_time": 720,
+          "end_time": 960
+        },
+        {
+          "class_name": "CSCI 6340",
+          "start_time": 720,
+          "end_time": 960
+        },
+        {
+          "class_name": "PSYC 4110",
+          "start_time": 600,
+          "end_time": 720
+        }
+      ],
+      "T": [
+        {
+          "class_name": "CHME 6610",
+          "start_time": 840,
+          "end_time": 960
+        },
+        {
+          "class_name": "CIVL 6260",
+          "start_time": 720,
+          "end_time": 840
+        },
+        {
+          "class_name": "INQR 1965",
+          "start_time": 600,
+          "end_time": 720
+        }
+      ],
+      "W": [
+        {
+          "class_name": "PHYS 1962",
+          "start_time": 840,
+          "end_time": 900
+        },
+        {
+          "class_name": "PHYS 1962",
+          "start_time": 900,
+          "end_time": 960
+        },
+        {
+          "class_name": "PHYS 1962",
+          "start_time": 1020,
+          "end_time": 1080
+        },
+        {
+          "class_name": "PHYS 1962",
+          "start_time": 1080,
+          "end_time": 1140
+        }
+      ],
+      "R": [
+        {
+          "class_name": "PSYC 4110",
+          "start_time": 600,
+          "end_time": 720
+        }
+      ],
+      "F": [
+        {
+          "class_name": "CHME 6610",
+          "start_time": 840,
+          "end_time": 960
+        },
+        {
+          "class_name": "CIVL 6260",
+          "start_time": 720,
+          "end_time": 840
+        },
+        {
+          "class_name": "INQR 1965",
+          "start_time": 600,
+          "end_time": 720
+        }
+      ]
+    }
+  },
+  {
+    "_id": "65dd0789d6b91fde155c010d",
+    "name": "Russell Sage Laboratory 3101",
+    "weekly_schedule": {
+      "M": [
+        {
+          "class_name": "ARCH 4590",
+          "start_time": 600,
+          "end_time": 720
+        },
+        {
+          "class_name": "BIOL 2120",
+          "start_time": 720,
+          "end_time": 840
+        },
+        {
+          "class_name": "ENGR 2530",
+          "start_time": 480,
+          "end_time": 600
+        },
+        {
+          "class_name": "INQR 1140",
+          "start_time": 840,
+          "end_time": 930
+        },
+        {
+          "class_name": "INQR 1140",
+          "start_time": 960,
+          "end_time": 1050
+        }
+      ],
+      "T": [
+        {
+          "class_name": "ARCH 4540",
+          "start_time": 1080,
+          "end_time": 1200
+        },
+        {
+          "class_name": "CSCI 4160",
+          "start_time": 600,
+          "end_time": 720
+        },
+        {
+          "class_name": "CSCI 6963",
+          "start_time": 600,
+          "end_time": 720
+        },
+        {
+          "class_name": "ECON 2020",
+          "start_time": 720,
+          "end_time": 840
+        },
+        {
+          "class_name": "ECSE 4965",
+          "start_time": 600,
+          "end_time": 720
+        },
+        {
+          "class_name": "ECSE 6965",
+          "start_time": 600,
+          "end_time": 720
+        },
+        {
+          "class_name": "MATH 4040",
+          "start_time": 840,
+          "end_time": 960
+        }
+      ],
+      "W": [
+        {
+          "class_name": "CSCI 2500",
+          "start_time": 600,
+          "end_time": 720
+        },
+        {
+          "class_name": "CSCI 2500",
+          "start_time": 720,
+          "end_time": 840
+        },
+        {
+          "class_name": "CSCI 2500",
+          "start_time": 840,
+          "end_time": 960
+        },
+        {
+          "class_name": "CSCI 6969",
+          "start_time": 540,
+          "end_time": 600
+        }
+      ],
+      "R": [
+        {
+          "class_name": "ARCH 4540",
+          "start_time": 1080,
+          "end_time": 1140
+        },
+        {
+          "class_name": "BIOL 2120",
+          "start_time": 720,
+          "end_time": 840
+        },
+        {
+          "class_name": "CHEM 1100",
+          "start_time": 660,
+          "end_time": 720
+        },
+        {
+          "class_name": "CHEM 1100",
+          "start_time": 600,
+          "end_time": 660
+        },
+        {
+          "class_name": "ENGR 2530",
+          "start_time": 480,
+          "end_time": 600
+        },
+        {
+          "class_name": "INQR 1140",
+          "start_time": 840,
+          "end_time": 930
+        },
+        {
+          "class_name": "INQR 1140",
+          "start_time": 960,
+          "end_time": 1050
+        }
+      ],
+      "F": [
+        {
+          "class_name": "CSCI 4160",
+          "start_time": 600,
+          "end_time": 720
+        },
+        {
+          "class_name": "CSCI 6963",
+          "start_time": 600,
+          "end_time": 720
+        },
+        {
+          "class_name": "ECON 2020",
+          "start_time": 720,
+          "end_time": 840
+        },
+        {
+          "class_name": "ECSE 4965",
+          "start_time": 600,
+          "end_time": 720
+        },
+        {
+          "class_name": "ECSE 6965",
+          "start_time": 600,
+          "end_time": 720
+        },
+        {
+          "class_name": "MATH 4040",
+          "start_time": 840,
+          "end_time": 960
+        }
+      ]
+    }
+  },
+  {
+    "_id": "65dd078ad6b91fde155c0151",
+    "name": "Russell Sage Laboratory 3205",
+    "weekly_schedule": {
+      "M": [
+        {
+          "class_name": "COMM 2520",
+          "start_time": 600,
+          "end_time": 720
+        },
+        {
+          "class_name": "COMM 2520",
+          "start_time": 720,
+          "end_time": 840
+        },
+        {
+          "class_name": "COMM 4288",
+          "start_time": 840,
+          "end_time": 960
+        },
+        {
+          "class_name": "ECON 4290",
+          "start_time": 960,
+          "end_time": 1080
+        },
+        {
+          "class_name": "ECON 6290",
+          "start_time": 960,
+          "end_time": 1080
+        }
+      ],
+      "T": [
+        {
+          "class_name": "GSAS 2520",
+          "start_time": 600,
+          "end_time": 720
+        },
+        {
+          "class_name": "LITR 4880",
+          "start_time": 720,
+          "end_time": 840
+        },
+        {
+          "class_name": "STSO 2100",
+          "start_time": 960,
+          "end_time": 1080
+        },
+        {
+          "class_name": "WRIT 2330",
+          "start_time": 840,
+          "end_time": 960
+        }
+      ],
+      "W": [],
+      "R": [
+        {
+          "class_name": "COMM 2520",
+          "start_time": 600,
+          "end_time": 720
+        },
+        {
+          "class_name": "COMM 2520",
+          "start_time": 720,
+          "end_time": 840
+        },
+        {
+          "class_name": "COMM 4288",
+          "start_time": 840,
+          "end_time": 960
+        },
+        {
+          "class_name": "ECON 4290",
+          "start_time": 960,
+          "end_time": 1080
+        },
+        {
+          "class_name": "ECON 6290",
+          "start_time": 960,
+          "end_time": 1080
+        }
+      ],
+      "F": [
+        {
+          "class_name": "GSAS 2520",
+          "start_time": 600,
+          "end_time": 720
+        },
+        {
+          "class_name": "LITR 4880",
+          "start_time": 720,
+          "end_time": 840
+        },
+        {
+          "class_name": "STSO 2100",
+          "start_time": 960,
+          "end_time": 1080
+        },
+        {
+          "class_name": "WRIT 2330",
+          "start_time": 840,
+          "end_time": 960
+        }
+      ]
+    }
+  },
+  {
+    "_id": "65dd078ad6b91fde155c0135",
+    "name": "Russell Sage Laboratory 3303",
+    "weekly_schedule": {
+      "M": [
+        {
+          "class_name": "BMED 4260",
+          "start_time": 720,
+          "end_time": 840
+        },
+        {
+          "class_name": "CSCI 2500",
+          "start_time": 480,
+          "end_time": 600
+        },
+        {
+          "class_name": "INQR 1140",
+          "start_time": 1140,
+          "end_time": 1230
+        },
+        {
+          "class_name": "MATH 2400",
+          "start_time": 600,
+          "end_time": 690
+        },
+        {
+          "class_name": "PSYC 1200",
+          "start_time": 840,
+          "end_time": 960
+        },
+        {
+          "class_name": "PSYC 1200",
+          "start_time": 960,
+          "end_time": 1080
+        }
+      ],
+      "T": [
+        {
+          "class_name": "CSCI 1200",
+          "start_time": 840,
+          "end_time": 960
+        },
+        {
+          "class_name": "ECSE 2110",
+          "start_time": 750,
+          "end_time": 840
+        },
+        {
+          "class_name": "ECSE 2610",
+          "start_time": 600,
+          "end_time": 720
+        }
+      ],
+      "W": [
+        {
+          "class_name": "MATH 1010",
+          "start_time": 840,
+          "end_time": 960
+        },
+        {
+          "class_name": "MANE 6900",
+          "start_time": 600,
+          "end_time": 720
+        }
+      ],
+      "R": [
+        {
+          "class_name": "BMED 4260",
+          "start_time": 720,
+          "end_time": 780
+        },
+        {
+          "class_name": "CSCI 2500",
+          "start_time": 480,
+          "end_time": 600
+        },
+        {
+          "class_name": "MATH 2400",
+          "start_time": 600,
+          "end_time": 690
+        },
+        {
+          "class_name": "PSYC 1200",
+          "start_time": 840,
+          "end_time": 960
+        },
+        {
+          "class_name": "PSYC 1200",
+          "start_time": 960,
+          "end_time": 1080
+        }
+      ],
+      "F": [
+        {
+          "class_name": "CSCI 1200",
+          "start_time": 840,
+          "end_time": 960
+        },
+        {
+          "class_name": "ECSE 2110",
+          "start_time": 750,
+          "end_time": 840
+        },
+        {
+          "class_name": "ECSE 2610",
+          "start_time": 600,
+          "end_time": 720
+        }
+      ]
+    }
+  },
+  {
+    "_id": "65dd078bd6b91fde155c016b",
+    "name": "Russell Sage Laboratory 3510",
+    "weekly_schedule": {
+      "M": [
+        {
+          "class_name": "CHEM 2230",
+          "start_time": 1020,
+          "end_time": 1080
+        },
+        {
+          "class_name": "CSCI 4100",
+          "start_time": 840,
+          "end_time": 960
+        },
+        {
+          "class_name": "CSCI 4800",
+          "start_time": 720,
+          "end_time": 840
+        },
+        {
+          "class_name": "CSCI 6100",
+          "start_time": 840,
+          "end_time": 960
+        },
+        {
+          "class_name": "MATH 2010",
+          "start_time": 600,
+          "end_time": 690
+        },
+        {
+          "class_name": "MATH 4800",
+          "start_time": 720,
+          "end_time": 840
+        }
+      ],
+      "T": [
+        {
+          "class_name": "ERTH 1100",
+          "start_time": 600,
+          "end_time": 720
+        },
+        {
+          "class_name": "ECSE 4770",
+          "start_time": 750,
+          "end_time": 840
+        }
+      ],
+      "W": [
+        {
+          "class_name": "ECSE 6900",
+          "start_time": 900,
+          "end_time": 1110
+        },
+        {
+          "class_name": "MATH 1020",
+          "start_time": 600,
+          "end_time": 720
+        }
+      ],
+      "R": [
+        {
+          "class_name": "CSCI 4100",
+          "start_time": 840,
+          "end_time": 960
+        },
+        {
+          "class_name": "CSCI 4800",
+          "start_time": 720,
+          "end_time": 840
+        },
+        {
+          "class_name": "CSCI 6100",
+          "start_time": 840,
+          "end_time": 960
+        },
+        {
+          "class_name": "MATH 2010",
+          "start_time": 600,
+          "end_time": 690
+        },
+        {
+          "class_name": "MATH 4800",
+          "start_time": 720,
+          "end_time": 840
+        }
+      ],
+      "F": [
+        {
+          "class_name": "ERTH 1100",
+          "start_time": 600,
+          "end_time": 720
+        },
+        {
+          "class_name": "ECSE 4770",
+          "start_time": 750,
+          "end_time": 840
+        }
+      ]
+    }
+  },
+  {
+    "_id": "65dd0787d6b91fde155c00cf",
+    "name": "Russell Sage Laboratory 3704",
+    "weekly_schedule": {
+      "M": [
+        {
+          "class_name": "LITR 2110",
+          "start_time": 480,
+          "end_time": 600
+        },
+        {
+          "class_name": "LITR 2110",
+          "start_time": 600,
+          "end_time": 720
+        },
+        {
+          "class_name": "MGMT 4080",
+          "start_time": 840,
+          "end_time": 960
+        },
+        {
+          "class_name": "MGMT 6080",
+          "start_time": 840,
+          "end_time": 960
+        }
+      ],
+      "T": [
+        {
+          "class_name": "BIOL 4200",
+          "start_time": 840,
+          "end_time": 960
+        },
+        {
+          "class_name": "COGS 4330",
+          "start_time": 720,
+          "end_time": 840
+        },
+        {
+          "class_name": "PSYC 4330",
+          "start_time": 720,
+          "end_time": 840
+        }
+      ],
+      "W": [
+        {
+          "class_name": "INQR 1100",
+          "start_time": 840,
+          "end_time": 960
+        },
+        {
+          "class_name": "STSO 1100",
+          "start_time": 840,
+          "end_time": 960
+        }
+      ],
+      "R": [
+        {
+          "class_name": "LITR 2110",
+          "start_time": 480,
+          "end_time": 600
+        },
+        {
+          "class_name": "LITR 2110",
+          "start_time": 600,
+          "end_time": 720
+        },
+        {
+          "class_name": "MGMT 4080",
+          "start_time": 840,
+          "end_time": 960
+        },
+        {
+          "class_name": "MGMT 6080",
+          "start_time": 840,
+          "end_time": 960
+        }
+      ],
+      "F": [
+        {
+          "class_name": "BIOL 4200",
+          "start_time": 840,
+          "end_time": 960
+        },
+        {
+          "class_name": "CHEM 2230",
+          "start_time": 480,
+          "end_time": 660
+        },
+        {
+          "class_name": "COGS 4330",
+          "start_time": 720,
+          "end_time": 840
+        },
+        {
+          "class_name": "PSYC 4330",
+          "start_time": 720,
+          "end_time": 840
+        }
+      ]
+    }
+  },
+  {
+    "_id": "65dd0787d6b91fde155c00bd",
+    "name": "Russell Sage Laboratory 3705",
+    "weekly_schedule": {
+      "M": [
+        {
+          "class_name": "CHME 6570",
+          "start_time": 840,
+          "end_time": 960
+        }
+      ],
+      "T": [
+        {
+          "class_name": "COGS 6963",
+          "start_time": 840,
+          "end_time": 1080
+        },
+        {
+          "class_name": "COMM 4960",
+          "start_time": 600,
+          "end_time": 720
+        },
+        {
+          "class_name": "COMM 6960",
+          "start_time": 600,
+          "end_time": 720
+        }
+      ],
+      "W": [
+        {
+          "class_name": "PHYS 1101",
+          "start_time": 600,
+          "end_time": 660
+        },
+        {
+          "class_name": "PHYS 1101",
+          "start_time": 660,
+          "end_time": 720
+        },
+        {
+          "class_name": "PHYS 1101",
+          "start_time": 780,
+          "end_time": 840
+        },
+        {
+          "class_name": "PHYS 1101",
+          "start_time": 900,
+          "end_time": 960
+        },
+        {
+          "class_name": "PHYS 1101",
+          "start_time": 1080,
+          "end_time": 1140
+        },
+        {
+          "class_name": "PHYS 1101",
+          "start_time": 720,
+          "end_time": 780
+        },
+        {
+          "class_name": "PHYS 1101",
+          "start_time": 840,
+          "end_time": 900
+        },
+        {
+          "class_name": "PHYS 1101",
+          "start_time": 480,
+          "end_time": 540
+        }
+      ],
+      "R": [
+        {
+          "class_name": "ARCH 4320",
+          "start_time": 600,
+          "end_time": 780
+        },
+        {
+          "class_name": "CHME 6570",
+          "start_time": 840,
+          "end_time": 960
+        },
+        {
+          "class_name": "PHYS 1101",
+          "start_time": 1020,
+          "end_time": 1080
+        },
+        {
+          "class_name": "PHYS 1101",
+          "start_time": 1080,
+          "end_time": 1140
+        }
+      ],
+      "F": [
+        {
+          "class_name": "COMM 4960",
+          "start_time": 600,
+          "end_time": 720
+        },
+        {
+          "class_name": "COMM 6960",
+          "start_time": 600,
+          "end_time": 720
+        },
+        {
+          "class_name": "PHYS 1101",
+          "start_time": 840,
+          "end_time": 900
+        },
+        {
+          "class_name": "PHYS 1101",
+          "start_time": 900,
+          "end_time": 960
+        }
+      ]
+    }
+  },
+  {
+    "_id": "65dd078bd6b91fde155c0173",
+    "name": "Russell Sage Laboratory 3713",
+    "weekly_schedule": {
+      "M": [
+        {
+          "class_name": "COGS 4330",
+          "start_time": 840,
+          "end_time": 960
+        },
+        {
+          "class_name": "CSCI 4960",
+          "start_time": 600,
+          "end_time": 720
+        },
+        {
+          "class_name": "CSCI 6960",
+          "start_time": 600,
+          "end_time": 720
+        },
+        {
+          "class_name": "ITWS 4310",
+          "start_time": 720,
+          "end_time": 840
+        },
+        {
+          "class_name": "PSYC 4330",
+          "start_time": 840,
+          "end_time": 960
+        }
+      ],
+      "T": [
+        {
+          "class_name": "MGMT 1100",
+          "start_time": 600,
+          "end_time": 720
+        },
+        {
+          "class_name": "MGMT 1100",
+          "start_time": 720,
+          "end_time": 840
+        },
+        {
+          "class_name": "MANE 2110",
+          "start_time": 840,
+          "end_time": 960
+        }
+      ],
+      "W": [],
+      "R": [
+        {
+          "class_name": "COGS 4330",
+          "start_time": 840,
+          "end_time": 960
+        },
+        {
+          "class_name": "CSCI 4960",
+          "start_time": 600,
+          "end_time": 720
+        },
+        {
+          "class_name": "CSCI 6960",
+          "start_time": 600,
+          "end_time": 720
+        },
+        {
+          "class_name": "ITWS 4310",
+          "start_time": 720,
+          "end_time": 840
+        },
+        {
+          "class_name": "PSYC 4330",
+          "start_time": 840,
+          "end_time": 960
+        }
+      ],
+      "F": [
+        {
+          "class_name": "MGMT 1100",
+          "start_time": 600,
+          "end_time": 720
+        },
+        {
+          "class_name": "MGMT 1100",
+          "start_time": 720,
+          "end_time": 840
+        },
+        {
+          "class_name": "MANE 2110",
+          "start_time": 840,
+          "end_time": 960
+        }
+      ]
+    }
+  },
+  {
+    "_id": "65dd078ad6b91fde155c0155",
+    "name": "Russell Sage Laboratory 4101",
+    "weekly_schedule": {
+      "M": [
+        {
+          "class_name": "ENGR 1100",
+          "start_time": 840,
+          "end_time": 960
+        },
+        {
+          "class_name": "ENGR 2530",
+          "start_time": 720,
+          "end_time": 840
+        },
+        {
+          "class_name": "MATH 4600",
+          "start_time": 600,
+          "end_time": 720
+        }
+      ],
+      "T": [
+        {
+          "class_name": "CSCI 4220",
+          "start_time": 720,
+          "end_time": 840
+        },
+        {
+          "class_name": "ENGR 2090",
+          "start_time": 840,
+          "end_time": 960
+        },
+        {
+          "class_name": "ECSE 2410",
+          "start_time": 600,
+          "end_time": 690
+        }
+      ],
+      "W": [
+        {
+          "class_name": "INQR 1100",
+          "start_time": 840,
+          "end_time": 960
+        },
+        {
+          "class_name": "MATH 1020",
+          "start_time": 600,
+          "end_time": 720
+        },
+        {
+          "class_name": "STSO 1100",
+          "start_time": 840,
+          "end_time": 960
+        }
+      ],
+      "R": [
+        {
+          "class_name": "ENGR 1100",
+          "start_time": 840,
+          "end_time": 960
+        },
+        {
+          "class_name": "ENGR 2530",
+          "start_time": 720,
+          "end_time": 840
+        },
+        {
+          "class_name": "MATH 4600",
+          "start_time": 600,
+          "end_time": 720
+        }
+      ],
+      "F": [
+        {
+          "class_name": "CSCI 4220",
+          "start_time": 720,
+          "end_time": 840
+        },
+        {
+          "class_name": "ENGR 2090",
+          "start_time": 840,
+          "end_time": 960
+        },
+        {
+          "class_name": "ECSE 2410",
+          "start_time": 600,
+          "end_time": 690
+        }
+      ]
+    }
+  },
+  {
+    "_id": "65dd0789d6b91fde155c010b",
+    "name": "Russell Sage Laboratory 4112",
+    "weekly_schedule": {
+      "M": [
+        {
+          "class_name": "BMED 4650",
+          "start_time": 480,
+          "end_time": 570
+        },
+        {
+          "class_name": "69532",
+          "start_time": 840,
+          "end_time": 960
+        },
+        {
+          "class_name": "MTLE 2100",
+          "start_time": 720,
+          "end_time": 840
+        },
+        {
+          "class_name": "MANE 6730",
+          "start_time": 600,
+          "end_time": 690
+        },
+        {
+          "class_name": "69533",
+          "start_time": 840,
+          "end_time": 960
+        }
+      ],
+      "T": [
+        {
+          "class_name": "BMED 4590",
+          "start_time": 510,
+          "end_time": 600
+        },
+        {
+          "class_name": "BMED 6590",
+          "start_time": 510,
+          "end_time": 600
+        },
+        {
+          "class_name": "69283",
+          "start_time": 600,
+          "end_time": 720
+        },
+        {
+          "class_name": "MANE 4140",
+          "start_time": 720,
+          "end_time": 810
+        },
+        {
+          "class_name": "MANE 6140",
+          "start_time": 720,
+          "end_time": 810
+        },
+        {
+          "class_name": "68795",
+          "start_time": 840,
+          "end_time": 960
+        }
+      ],
+      "W": [
+        {
+          "class_name": "CHEM 4020",
+          "start_time": 600,
+          "end_time": 660
+        },
+        {
+          "class_name": "CHEM 4030",
+          "start_time": 600,
+          "end_time": 660
+        },
+        {
+          "class_name": "CHEM 4900",
+          "start_time": 720,
+          "end_time": 780
+        }
+      ],
+      "R": [
+        {
+          "class_name": "BMED 4650",
+          "start_time": 480,
+          "end_time": 570
+        },
+        {
+          "class_name": "69532",
+          "start_time": 840,
+          "end_time": 960
+        },
+        {
+          "class_name": "MTLE 2100",
+          "start_time": 720,
+          "end_time": 840
+        },
+        {
+          "class_name": "MANE 6730",
+          "start_time": 600,
+          "end_time": 690
+        },
+        {
+          "class_name": "69533",
+          "start_time": 840,
+          "end_time": 960
+        }
+      ],
+      "F": [
+        {
+          "class_name": "BMED 4590",
+          "start_time": 510,
+          "end_time": 600
+        },
+        {
+          "class_name": "BMED 6590",
+          "start_time": 510,
+          "end_time": 600
+        },
+        {
+          "class_name": "69283",
+          "start_time": 600,
+          "end_time": 720
+        },
+        {
+          "class_name": "MANE 4140",
+          "start_time": 720,
+          "end_time": 810
+        },
+        {
+          "class_name": "MANE 6140",
+          "start_time": 720,
+          "end_time": 810
+        }
+      ]
+    }
+  },
+  {
+    "_id": "65dd078ad6b91fde155c013d",
+    "name": "Russell Sage Laboratory 4203",
+    "weekly_schedule": {
+      "M": [
+        {
+          "class_name": "ECON 4270",
+          "start_time": 480,
+          "end_time": 600
+        },
+        {
+          "class_name": "ECON 4320",
+          "start_time": 600,
+          "end_time": 720
+        },
+        {
+          "class_name": "ECON 6270",
+          "start_time": 480,
+          "end_time": 600
+        },
+        {
+          "class_name": "ECON 6320",
+          "start_time": 600,
+          "end_time": 720
+        },
+        {
+          "class_name": "GSAS 4240",
+          "start_time": 720,
+          "end_time": 840
+        },
+        {
+          "class_name": "INQR 1110",
+          "start_time": 840,
+          "end_time": 960
+        }
+      ],
+      "T": [
+        {
+          "class_name": "BIOL 4720",
+          "start_time": 720,
+          "end_time": 1020
+        },
+        {
+          "class_name": "ISYE 6900",
+          "start_time": 600,
+          "end_time": 720
+        }
+      ],
+      "W": [
+        {
+          "class_name": "PHYS 1101",
+          "start_time": 720,
+          "end_time": 780
+        },
+        {
+          "class_name": "PHYS 1101",
+          "start_time": 840,
+          "end_time": 900
+        },
+        {
+          "class_name": "PHYS 1101",
+          "start_time": 480,
+          "end_time": 540
+        },
+        {
+          "class_name": "PHYS 1101",
+          "start_time": 600,
+          "end_time": 660
+        },
+        {
+          "class_name": "PHYS 1101",
+          "start_time": 660,
+          "end_time": 720
+        },
+        {
+          "class_name": "PHYS 1101",
+          "start_time": 780,
+          "end_time": 840
+        },
+        {
+          "class_name": "PHYS 1101",
+          "start_time": 900,
+          "end_time": 960
+        },
+        {
+          "class_name": "PHYS 1101",
+          "start_time": 1080,
+          "end_time": 1140
+        }
+      ],
+      "R": [
+        {
+          "class_name": "ECON 4270",
+          "start_time": 480,
+          "end_time": 600
+        },
+        {
+          "class_name": "ECON 4320",
+          "start_time": 600,
+          "end_time": 720
+        },
+        {
+          "class_name": "ECON 6270",
+          "start_time": 480,
+          "end_time": 600
+        },
+        {
+          "class_name": "ECON 6320",
+          "start_time": 600,
+          "end_time": 720
+        },
+        {
+          "class_name": "GSAS 4240",
+          "start_time": 720,
+          "end_time": 840
+        },
+        {
+          "class_name": "INQR 1110",
+          "start_time": 840,
+          "end_time": 960
+        },
+        {
+          "class_name": "PHYS 1101",
+          "start_time": 1020,
+          "end_time": 1080
+        },
+        {
+          "class_name": "PHYS 1101",
+          "start_time": 1080,
+          "end_time": 1140
+        }
+      ],
+      "F": [
+        {
+          "class_name": "ISYE 6900",
+          "start_time": 600,
+          "end_time": 720
+        },
+        {
+          "class_name": "PHYS 1101",
+          "start_time": 900,
+          "end_time": 960
+        },
+        {
+          "class_name": "PHYS 1101",
+          "start_time": 840,
+          "end_time": 900
+        }
+      ]
+    }
+  },
+  {
+    "_id": "66d152ee47b86b235cf6a83b",
+    "name": "Russell Sage Laboratory 4304",
+    "weekly_schedule": {
+      "M": [
+        {
+          "class_name": "PSYC 4450",
+          "start_time": 600,
+          "end_time": 720
+        }
+      ],
+      "T": [],
+      "W": [],
+      "R": [
+        {
+          "class_name": "PSYC 4450",
+          "start_time": 600,
+          "end_time": 720
+        }
+      ],
+      "F": []
+    }
+  },
+  {
+    "_id": "65dd078ad6b91fde155c0153",
+    "name": "Russell Sage Laboratory 4510",
+    "weekly_schedule": {
+      "M": [
+        {
+          "class_name": "COGS 2340",
+          "start_time": 720,
+          "end_time": 840
+        },
+        {
+          "class_name": "MGMT 6140",
+          "start_time": 600,
+          "end_time": 690
+        }
+      ],
+      "T": [
+        {
+          "class_name": "BIOL 2160",
+          "start_time": 600,
+          "end_time": 720
+        },
+        {
+          "class_name": "ERTH 2160",
+          "start_time": 600,
+          "end_time": 720
+        },
+        {
+          "class_name": "ISYE 6780",
+          "start_time": 720,
+          "end_time": 840
+        },
+        {
+          "class_name": "MGMT 1240",
+          "start_time": 840,
+          "end_time": 960
+        },
+        {
+          "class_name": "MATP 6600",
+          "start_time": 720,
+          "end_time": 840
+        }
+      ],
+      "W": [
+        {
+          "class_name": "INQR 1100",
+          "start_time": 840,
+          "end_time": 960
+        },
+        {
+          "class_name": "STSO 1100",
+          "start_time": 840,
+          "end_time": 960
+        }
+      ],
+      "R": [
+        {
+          "class_name": "COGS 2340",
+          "start_time": 720,
+          "end_time": 840
+        },
+        {
+          "class_name": "MGMT 6140",
+          "start_time": 600,
+          "end_time": 690
+        }
+      ],
+      "F": [
+        {
+          "class_name": "BIOL 2160",
+          "start_time": 600,
+          "end_time": 720
+        },
+        {
+          "class_name": "ERTH 2160",
+          "start_time": 600,
+          "end_time": 720
+        },
+        {
+          "class_name": "ISYE 6780",
+          "start_time": 720,
+          "end_time": 840
+        },
+        {
+          "class_name": "MATP 6600",
+          "start_time": 720,
+          "end_time": 840
+        },
+        {
+          "class_name": "68795",
+          "start_time": 840,
+          "end_time": 960
+        }
+      ]
+    }
+  },
+  {
+    "_id": "65dd078cd6b91fde155c0187",
+    "name": "Russell Sage Laboratory 4711",
+    "weekly_schedule": {
+      "M": [
+        {
+          "class_name": "GSAS 4990",
+          "start_time": 600,
+          "end_time": 720
+        },
+        {
+          "class_name": "LANG 1410",
+          "start_time": 720,
+          "end_time": 840
+        },
+        {
+          "class_name": "LANG 4420",
+          "start_time": 840,
+          "end_time": 960
+        },
+        {
+          "class_name": "LITR 4960",
+          "start_time": 960,
+          "end_time": 1080
+        }
+      ],
+      "T": [
+        {
+          "class_name": "COMM 4580",
+          "start_time": 600,
+          "end_time": 720
+        },
+        {
+          "class_name": "LANG 4430",
+          "start_time": 720,
+          "end_time": 840
+        },
+        {
+          "class_name": "LITR 4150",
+          "start_time": 840,
+          "end_time": 960
+        }
+      ],
+      "W": [],
+      "R": [
+        {
+          "class_name": "GSAS 4990",
+          "start_time": 600,
+          "end_time": 720
+        },
+        {
+          "class_name": "LANG 1410",
+          "start_time": 720,
+          "end_time": 840
+        },
+        {
+          "class_name": "LANG 4420",
+          "start_time": 840,
+          "end_time": 960
+        },
+        {
+          "class_name": "LITR 4960",
+          "start_time": 960,
+          "end_time": 1080
+        }
+      ],
+      "F": [
+        {
+          "class_name": "COMM 4580",
+          "start_time": 600,
+          "end_time": 720
+        },
+        {
+          "class_name": "LANG 4430",
+          "start_time": 720,
+          "end_time": 840
+        },
+        {
+          "class_name": "LITR 4150",
+          "start_time": 840,
+          "end_time": 960
+        }
+      ]
+    }
+  },
+  {
+    "_id": "65dd078bd6b91fde155c0159",
+    "name": "Russell Sage Laboratory 5101",
+    "weekly_schedule": {
+      "M": [
+        {
+          "class_name": "CSCI 4510",
+          "start_time": 720,
+          "end_time": 840
+        },
+        {
+          "class_name": "CSCI 4964",
+          "start_time": 600,
+          "end_time": 720
+        },
+        {
+          "class_name": "CSCI 6510",
+          "start_time": 720,
+          "end_time": 840
+        },
+        {
+          "class_name": "CSCI 6964",
+          "start_time": 600,
+          "end_time": 720
+        },
+        {
+          "class_name": "MATH 4700",
+          "start_time": 840,
+          "end_time": 960
+        }
+      ],
+      "T": [
+        {
+          "class_name": "CHME 4030",
+          "start_time": 660,
+          "end_time": 780
+        },
+        {
+          "class_name": "CHEM 2110",
+          "start_time": 600,
+          "end_time": 660
+        },
+        {
+          "class_name": "ECON 2010",
+          "start_time": 480,
+          "end_time": 600
+        },
+        {
+          "class_name": "ECON 2010",
+          "start_time": 840,
+          "end_time": 960
+        }
+      ],
+      "W": [
+        {
+          "class_name": "CHME 1010",
+          "start_time": 660,
+          "end_time": 720
+        },
+        {
+          "class_name": "CHEM 2110",
+          "start_time": 600,
+          "end_time": 660
+        },
+        {
+          "class_name": "INQR 1100",
+          "start_time": 840,
+          "end_time": 960
+        },
+        {
+          "class_name": "STSO 1100",
+          "start_time": 840,
+          "end_time": 960
+        }
+      ],
+      "R": [
+        {
+          "class_name": "CSCI 4510",
+          "start_time": 720,
+          "end_time": 840
+        },
+        {
+          "class_name": "CSCI 4964",
+          "start_time": 600,
+          "end_time": 720
+        },
+        {
+          "class_name": "CSCI 6510",
+          "start_time": 720,
+          "end_time": 840
+        },
+        {
+          "class_name": "CSCI 6964",
+          "start_time": 600,
+          "end_time": 720
+        },
+        {
+          "class_name": "MATH 4700",
+          "start_time": 840,
+          "end_time": 960
+        }
+      ],
+      "F": [
+        {
+          "class_name": "CHME 4030",
+          "start_time": 660,
+          "end_time": 780
+        },
+        {
+          "class_name": "CHEM 1100",
+          "start_time": 780,
+          "end_time": 840
+        },
+        {
+          "class_name": "CHEM 2110",
+          "start_time": 600,
+          "end_time": 660
+        },
+        {
+          "class_name": "ECON 2010",
+          "start_time": 480,
+          "end_time": 600
+        },
+        {
+          "class_name": "ECON 2010",
+          "start_time": 840,
+          "end_time": 960
+        }
+      ]
+    }
+  },
+  {
+    "_id": "66d152ec47b86b235cf6a81b",
+    "name": "Russell Sage Laboratory 5203",
+    "weekly_schedule": {
+      "M": [
+        {
+          "class_name": "COMM 4420",
+          "start_time": 600,
+          "end_time": 720
+        },
+        {
+          "class_name": "COMM 6420",
+          "start_time": 600,
+          "end_time": 720
+        }
+      ],
+      "T": [],
+      "W": [],
+      "R": [
+        {
+          "class_name": "COMM 4420",
+          "start_time": 600,
+          "end_time": 720
+        },
+        {
+          "class_name": "COMM 6420",
+          "start_time": 600,
+          "end_time": 720
+        }
+      ],
+      "F": []
+    }
+  },
+  {
+    "_id": "65dd0789d6b91fde155c0125",
+    "name": "Russell Sage Laboratory 5510",
+    "weekly_schedule": {
+      "M": [
+        {
+          "class_name": "ENGR 2600",
+          "start_time": 720,
+          "end_time": 810
+        },
+        {
+          "class_name": "ECSE 4840",
+          "start_time": 840,
+          "end_time": 930
+        },
+        {
+          "class_name": "ECSE 6400",
+          "start_time": 600,
+          "end_time": 720
+        },
+        {
+          "class_name": "MANE 6600",
+          "start_time": 600,
+          "end_time": 720
+        }
+      ],
+      "T": [
+        {
+          "class_name": "BMED 4250",
+          "start_time": 600,
+          "end_time": 720
+        },
+        {
+          "class_name": "MATH 4400",
+          "start_time": 720,
+          "end_time": 840
+        },
+        {
+          "class_name": "MANE 4250",
+          "start_time": 840,
+          "end_time": 960
+        },
+        {
+          "class_name": "MANE 4900",
+          "start_time": 510,
+          "end_time": 600
+        }
+      ],
+      "W": [],
+      "R": [
+        {
+          "class_name": "ENGR 2600",
+          "start_time": 720,
+          "end_time": 810
+        },
+        {
+          "class_name": "ECSE 4840",
+          "start_time": 840,
+          "end_time": 930
+        },
+        {
+          "class_name": "ECSE 6400",
+          "start_time": 600,
+          "end_time": 720
+        },
+        {
+          "class_name": "MANE 6600",
+          "start_time": 600,
+          "end_time": 720
+        }
+      ],
+      "F": [
+        {
+          "class_name": "BMED 4250",
+          "start_time": 600,
+          "end_time": 720
+        },
+        {
+          "class_name": "MATH 4400",
+          "start_time": 720,
+          "end_time": 840
+        },
+        {
+          "class_name": "MANE 4250",
+          "start_time": 840,
+          "end_time": 960
+        },
+        {
+          "class_name": "MANE 4900",
+          "start_time": 510,
+          "end_time": 600
+        }
+      ]
+    }
+  },
+  {
+    "_id": "65dd078cd6b91fde155c018b",
+    "name": "Russell Sage Laboratory 5711",
+    "weekly_schedule": {
+      "M": [],
+      "T": [],
+      "W": [],
+      "R": [
+        {
+          "class_name": "STSO 6010",
+          "start_time": 540,
+          "end_time": 720
+        }
+      ],
+      "F": [
+        {
+          "class_name": "STSO 6960",
+          "start_time": 540,
+          "end_time": 720
+        }
+      ]
+    }
+  }
+]

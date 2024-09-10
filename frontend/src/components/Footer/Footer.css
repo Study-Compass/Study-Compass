@@ -9,7 +9,7 @@
 }
 
 .mini-footer p{
-    color:var(--border);
+    color:var(--darkborder);
     font-size:15px;
     margin:0;
 }

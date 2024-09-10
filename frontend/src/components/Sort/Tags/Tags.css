@@ -15,7 +15,7 @@
         right: 0;
         bottom: 0;
     background-color: var(--lightborder);
-    color: var(--border);
+    color: var(--darkborder);
     font-weight: 600;
     border-radius: 7px;
     display: flex;

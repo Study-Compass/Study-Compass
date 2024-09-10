@@ -1,7 +1,7 @@
 li.result1{
     border-radius: 0;
     padding:10px;
-    background-color: white;
+    background-color: var(text);
     width:95%;
     border: 1px solid var(--lightborder);
     margin:5px 0;

@@ -321,13 +321,13 @@ router.get('/all-purpose-search', verifyTokenOptional, async (req, res) => {
     try {
         // Define the base query with projection to only include the name field
         let findQuery = Classroom.find(
-            { name: { $regex: query, $options: 'i' }, attributes: { $all: attributes } },
+            { name: { $regex: query, $options: 'i' }, attributes: { $all: attributes },  mainSearch: { $ne: false } },
             { name: 1 } // Project only the name field
         );
 
         if(attributes.length === 0){
             findQuery = Classroom.find(
-                { name: { $regex: query, $options: 'i' }},
+                { name: { $regex: query, $options: 'i' },  mainSearch: { $ne: false }},
                 { name: 1 } // Project only the name field
             );
         }
@@ -344,13 +344,14 @@ router.get('/all-purpose-search', verifyTokenOptional, async (req, res) => {
             findQuery =  Classroom.aggregate([
                 {
                     $match: {
-                        name: { $regex: query, $options: 'i' } // Filters classrooms by name using regex
+                        name: { $regex: query, $options: 'i' }, // Filters classrooms by name using regex
+                        mainSearch: { $ne: false }
                     }
                 },
                 {
                     $lookup: {
-                        from: "schedules", // Assumes "schedules" is the collection name
-                        localField: "_id", // Field in the 'classroom' documents
+                        from: "schedules", 
+                        localField: "_id", 
                         foreignField: "classroom_id", // Corresponding field in 'schedule' documents
                         as: "schedule_info" // Temporarily holds the entire joined schedule documents
                     }
@@ -379,6 +380,9 @@ router.get('/all-purpose-search', verifyTokenOptional, async (req, res) => {
         let sortedClassrooms = [];
 
         if (userId && user) {
+            if(sort === "availability"){
+                return;
+            }
             const savedSet = new Set(user.saved); // Convert saved items to a Set for efficient lookups
 
             // Split classrooms into saved and not saved
@@ -552,13 +556,58 @@ router.post('/update_rating', verifyToken, async (req, res) => {
             classroom.average_rating = averageScore;
             await classroom.save();
         } else {
+            console.log(`POST: /update_rating/${classroomId}/${userId} failed`);
             res.status(500).json({ success: false, message: 'Classroom does not exist'});
         }
 
-        res.json({ success: true, rating, average_score: averageScore, number_of_ratings: ratings.length });
+        console.log(`POST: /update_rating/${classroomId}/${userId} successful`);
         res.status(200).json({ success: true, message: 'Successfully updated rating', data: {score: averageScore, num_ratings:ratings.length} });
     } catch (error) {
+        console.error(error);
+        console.log(`POST: /update_rating/${classroomId}/${userId} faled`);
         res.status(500).json({ success: false, message: 'Error updating or retrieving ratings', error: error.message });
+    }
+});
+
+router.get('/get-user-ratings', verifyToken, async (req, res) => {
+    const userId = req.user.userId;
+    try{
+        const ratings = await Rating.find({ user_id: userId });
+        console.log(`POST: /get-user-ratings/${userId}`);
+        res.json({ success: true, message: "Ratings fetched", data: ratings });
+    } catch(error){
+        console.log(`POST: /get-user-ratings/${userId} failed`);
+        return res.status(500).json({ success: false, message: 'Error finding user', error: error.message});
+    }
+});
+
+router.get('/user-rated', verifyToken, async (req, res) => {
+    const userId = req.user.userId;
+    const classroomId = req.query.classroomId;
+    try{
+        const rating = await Rating.findOne({ user_id: userId, classroom_id: classroomId });
+        if(!rating){
+            res.json({ success: true, message: "Rating not found", data: null });
+            return;
+        }
+        console.log(`GET: /user-rated/${userId}/${classroomId}`);
+        res.json({ success: true, message: "Rating found", data: rating });
+    } catch(error){
+        console.log(`GET: /user-rated/${userId}/${classroomId} failed`);
+        return res.status(500).json({ success: false, message: 'Error finding rating', error: error.message});
+    }
+
+});
+
+router.get('/get-ratings', async (req, res) => {
+    const classroomId = req.query.classroomId;
+    try{
+        const ratings = await Rating.find({ classroom_id: classroomId });
+        console.log(`GET: /get-ratings/${classroomId}`);
+        res.json({ success: true, message: "Ratings fetched", data: ratings });
+    } catch(error){
+        console.log(`GET: /get-ratings/${classroomId} failed`);
+        return res.status(500).json({ success: false, message: 'Error finding ratings', error: error.message});
     }
 });
 
@@ -578,7 +627,34 @@ router.post('/send-report', verifyToken, async (req, res) => {
     } catch(error){
         return res.status(500).json({ success: false, message: 'Error finding user', error: error.message});
     }
-
 });
+
+router.post('/main-search-change', verifyToken, async (req, res) => {
+    const userId = req.user.userId;
+    const classroomId = req.body.classroomId;
+    try{
+        const user = await User.findOne({ _id: userId });
+        if (!user) {
+            console.log(`POST: /main-search-change/${userId} failed`);
+            return res.status(404).json({ success: false, message: "User not found" });
+        }
+        if(!user.admin){
+            console.log(`POST: /main-search-change/${userId} failed`);
+            return res.status(403).json({ success: false, message: "User not authorized" });
+        }
+        const classroom = await Classroom.findOne({ _id: classroomId });
+        if (!classroom) {
+            console.log(`POST: /main-search-change/${userId} failed`);
+            return res.status(404).json({ success: false, message: "Classroom not found" });
+        }
+        classroom.mainSearch = !classroom.mainSearch;
+        await classroom.save();
+        console.log(`POST: /main-search-change/${userId}`);
+        res.json({ success: true, message: "Main search changed" });
+    } catch(error){
+        return res.status(500).json({ success: false, message: 'Error finding user', error: error.message});
+    }
+});
+
 
 module.exports = router;

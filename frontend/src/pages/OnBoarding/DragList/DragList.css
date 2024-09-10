@@ -33,7 +33,7 @@
     box-sizing: border-box;
     padding: 15px 18px;
     /* position: relative; */
-    background-color: white;
+    background-color: var(--background);
     border-radius: 10px;
     display: flex;
     flex-direction: column;
@@ -41,7 +41,7 @@
     align-items: left;
     flex-shrink: 0;
     cursor: grab;
-    border: 1px solid var(--lighterborder);
+    border: 1px solid var(--lightborder);
     box-shadow: var(--shadow);
     color: var(--text);
 }

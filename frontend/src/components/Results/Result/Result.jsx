@@ -30,7 +30,7 @@ function Result({ result, attributes, debouncedFetchData, changeURL, findNext, c
                 <div className="info-row">      
                     <div className="rating">
                         <img src={FilledStar} alt="star" />
-                        <p>0</p>
+                        <p>{result.room.average_rating.toFixed(1)}</p>
                     </div>
                     { contentState === "nameSearch" || contentState === "freeNowSearch" ?
 

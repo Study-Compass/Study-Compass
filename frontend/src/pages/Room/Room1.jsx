@@ -338,17 +338,19 @@ function Room() {
                             />}
 
                         <SearchBar data={rooms} onEnter={changeURL2} room={contentState === "classroom" || contentState === "calendarSearchResult" ? roomName : searchQuery } onX={onX} onSearch={onSearch} query={searchQuery} onBlur={setSearchFocus} />
-                        {contentState === "classroom" || contentState === "calendarSearchResult"  ? <Classroom  
-                            room={room} 
-                            state={contentState} 
-                            setState={setContentState}
-                            schedule={data}
-                            roomName={roomid}
-                            width={width}
-                            setShowMobileCalendar={setShowMobileCalendar}
-                            setIsUp={setReportUp}
+                        {contentState === "classroom" || contentState === "calendarSearchResult"  ? 
+                            <Classroom  
+                                room={room} 
+                                state={contentState} 
+                                setState={setContentState}
+                                schedule={data}
+                                roomName={roomid}
+                                width={width}
+                                setShowMobileCalendar={setShowMobileCalendar}
+                                setIsUp={setReportUp}
                             reload={reloadClassroom}
-                        /> : ""}
+                            /> 
+                        : ""}
                         {contentState === "calendarSearch" || contentState === "freeNowSearch" || contentState === "nameSearch" ? calendarLoading ? "" : 
                             <div className="resultsCountContainer">
                                 <h1 className="resultCount">{results.length} results {contentState === "nameSearch" ? searchQuery ? `for "${searchQuery.slice(0,width < 800 ? 8:15)}${searchQuery.length>(width < 800 ? 8:15) ? "..." : ""}"` : "" : ""}</h1> 

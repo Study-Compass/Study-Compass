@@ -189,4 +189,53 @@ const getUsers = async (userIds) => {
     }
 }
 
-export { changeClasroom, save, checkUsername, saveUser, sendError, checkIn, checkOut, getUser, getUsers };
+//all purpose rating route, can be used to create new ratings, update ratings (update downvote), and edit ratings
+const updateRating = async (classroomId, userId, comment, score, upvotes, downvotes) => {
+    try{
+        const response = await axios.post('/update_rating', {classroomId, userId, comment, score, upvotes, downvotes}, {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        console.log("successful");
+        return response;
+    }
+    catch(error){
+        throw error;
+    }
+}
+
+const userRated = async (classroomId, userId) => {
+    try{
+        const response = await axios.get('/user-rated', {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`,
+            },
+            params: {classroomId, userId}
+        });
+        console.log("successful");
+        return response;
+    } catch(error){
+        throw error;
+    }
+}
+
+const mainSearchChange = async (classroomId) => {
+    try{
+        const response = await axios.post('/main-search-change', {classroomId}, {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        console.log("successful");
+        return response;
+    }
+    catch(error){
+        throw error;
+    }
+}
+
+
+export { changeClasroom, save, checkUsername, saveUser, sendError, checkIn, checkOut, getUser, getUsers, updateRating, userRated, mainSearchChange };

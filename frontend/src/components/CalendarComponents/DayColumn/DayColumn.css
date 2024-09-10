@@ -35,6 +35,10 @@
     text-align: left;
     font-size:12px;
 }
+.dark-mode .event{
+    opacity: 1;
+    color: #414141;
+}
 
 
 .remove-event{
@@ -100,9 +104,9 @@
 .grid-item{
     position: relative;
     box-sizing: border-box;
-    border-top: 2px solid #DDDCDC;
+    border-top: 2px solid var(--border);
     margin: 0 2px;
-    border-bottom: 2px solid white;
+    border-bottom: 2px solid var(--background);
 }
 
 .noborder{
@@ -125,6 +129,7 @@
     font-family: 'Satoshi';
     font-weight: normal;
     margin: 0 0 1px 0 ;
+    color: #414141;
 }
 
 .search .time{
@@ -134,7 +139,8 @@
 
 .class-name{
     font-size:13px;
-    margin:0
+    margin:0;
+    color: #414141;
 
 }
 

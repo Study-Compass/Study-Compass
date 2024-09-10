@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import './DayColumn.css';
 import '../../../assets/fonts.css'
 import TimeLabelColumn from '../TimeLabelColumn/TimeLabelColumn';
@@ -21,7 +21,7 @@ function DayColumn({day, dayEvents, eventColors, empty, add, remove, queries}){
 
     const handleMouseDown = (gridPosition) => {
         if(!empty){
-            return
+            return;
         }
         setSelectionStart(gridPosition);
         setSelectionEnd(gridPosition+2);
@@ -30,7 +30,7 @@ function DayColumn({day, dayEvents, eventColors, empty, add, remove, queries}){
 
     const handleMouseMove = (gridPosition) => {
         if(!empty){
-            return
+            return;
         }
         if (isSelecting) {
             setSelectionEnd(gridPosition+2);
@@ -39,7 +39,7 @@ function DayColumn({day, dayEvents, eventColors, empty, add, remove, queries}){
 
     const handleMouseUp = () => {
         if(!empty){
-            return
+            return;
         }
         setIsSelecting(false);
 
@@ -58,7 +58,6 @@ function DayColumn({day, dayEvents, eventColors, empty, add, remove, queries}){
             
         }
 
-        console.log(timeslot);
         add(day, timeslot);
     };
 
@@ -98,6 +97,53 @@ function DayColumn({day, dayEvents, eventColors, empty, add, remove, queries}){
             return color;
         }
     }
+    // tried implementing query dragging, but it was too buggy and not really necessary
+    
+    // const [movingQuery, setMovingQuery] = useState(false);
+    // const [moveDistance, setMoveDistance] = useState(0);
+    // const initialY = useRef(0);
+
+
+    // const handleQueryMouseDown = (e) => {
+    //     setMovingQuery(true);
+    //     initialY.current = e.clientY;
+    // };
+
+    // const handleQueryMouseMove = (e) => {
+    //     if (movingQuery) {
+    //         const deltaY = e.clientY - initialY.current;
+    //         if(deltaY >18){
+    //             const index = e.target.getAttribute('data');
+    //             const query = queries[day][index];
+    //             const copy = {...query};
+    //             remove(day, query);
+    //             add(day, {
+    //                 class_name: "search",
+    //                 start_time: copy.start_time + 30,
+    //                 end_time: copy.end_time + 30,
+    //             })
+    //             initialY.current = e.clientY;
+    //         } else if(deltaY < -18){
+    //             const index = e.target.getAttribute('data');
+    //             const query = queries[day][index];
+    //             const copy = {...query};
+    //             remove(day, query);
+    //             add(day, {
+    //                 class_name: "search",
+    //                 start_time: copy.start_time - 30,
+    //                 end_time: copy.end_time - 30,
+    //             })
+    //             initialY.current = e.clientY;
+    //         }
+    //     }
+    // };
+
+    // const handleQueryMouseUp = () => {
+    //     setMovingQuery(false);
+    // };
+
+    
+
     
     const start_times = [];
     const end_times = [];
@@ -217,7 +263,7 @@ function DayColumn({day, dayEvents, eventColors, empty, add, remove, queries}){
                 );
             })}
             {queries[day] ? 
-                queries[day].map((query) => {
+                queries[day].map((query, index) => {
                     const rowStart = calculateTime(query.start_time);
                     const rowEnd = calculateTime(query.end_time);
                     let timelabel;
@@ -229,10 +275,14 @@ function DayColumn({day, dayEvents, eventColors, empty, add, remove, queries}){
                         <div 
                             key={`${day}-${query.start_time}`}
                             className="event search"
+                            data={index}
                             style={{
                                 gridRowStart: rowStart,
                                 gridRowEnd: rowEnd,
                             }}
+                            // onMouseDown={handleQueryMouseDown}
+                            // onMouseMove={handleQueryMouseMove}
+                            // onMouseUp={handleQueryMouseUp}
                         >
                             {timelabel ? <p className="time">{minutesToTime(query.start_time)} - {minutesToTime(query.end_time)}</p>: ""}
                             <button 

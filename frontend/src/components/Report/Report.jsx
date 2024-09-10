@@ -1,4 +1,4 @@
-import React, { useState, useRef }from 'react'
+import React, { useState, useRef, useEffect }from 'react'
 import './Report.css';
 import useOutsideClick from '../../hooks/useClickOutside';
 import x from '../../assets/x.svg';
@@ -8,11 +8,13 @@ import { useNotification } from '../../NotificationContext';
 
 function Report({text, isUp, setIsUp}){
 
-const { addNotification } = useNotification();
+    const { addNotification } = useNotification();
 
     const handleClose = () => {
         setIsUp();
     };
+
+    const [visible, setVisible] = useState(false);
 
     const send = async () => {  
         try{
@@ -27,7 +29,15 @@ const { addNotification } = useNotification();
         }
     }
 
-    const ref = useRef();
+    useEffect(()=>{
+        if(isUp){
+            setVisible(true);
+        } else {
+            setVisible(false);
+        }
+    }, [isUp])
+
+    const ref = useRef();   
     
     useOutsideClick(ref, () => {
         if (isUp){
@@ -46,8 +56,8 @@ const { addNotification } = useNotification();
 
     return(
         (isUp &&
-        <div className={`whole_page ${isUp ? 'in' : 'out'}`}>
-            <div className={`pop_up ${isUp ? 'in' : 'out'}`} ref={ref}>
+        <div className={`whole_page ${visible ? 'in' : 'out'}`}>
+            <div className={`pop_up ${visible ? 'in' : 'out'}`} ref={ref}>
                 <button className="close-button" onClick={handleClose}>
                     <img src={x} alt="close" />
                 </button>
