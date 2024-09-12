@@ -6,8 +6,6 @@ import useAuth from '../../hooks/useAuth.js';
 import { useNotification } from '../../NotificationContext.js';
 
 import { getAllEvents } from './EventHelpers.js'
-import { addPointerEvent } from 'framer-motion';
-
 
 function EventsViewer({events}){
     const navigate = useNavigate();
