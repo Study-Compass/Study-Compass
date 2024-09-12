@@ -127,6 +127,16 @@ a:hover{
 	}
 }
 
+.page{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    background-color: var(--background);
+    width: 100%;
+    
+}
+
 .shimmer {
 	animation: shimmering 2s linear infinite;
 	background: var(--dark);

@@ -11,6 +11,7 @@ import Settings from './pages/Settings/Settings';
 import Friends from './pages/Friends/Friends';
 import Profile from './pages/Profile/Profile';
 import Landing from './pages/Landing/Landing';
+import Events from './pages/Events/Events';
 import DeveloperOnboard from './pages/DeveloperOnboarding/DeveloperOnboarding';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './AuthContext';
@@ -47,6 +48,7 @@ function App() {
                                         <Route path="/settings" element={<Settings/>}/>
                                         <Route path="/documentation" element={<Redirect/>}/>
                                         <Route path="/developer-onboarding" element={<DeveloperOnboard/>}/>
+                                        <Route path="/events" element={<Events/>}/>
                                     </Routes>
                                     </ProfileCreationProvider>
                                 </Router>

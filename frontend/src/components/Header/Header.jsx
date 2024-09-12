@@ -33,6 +33,10 @@ const Header = React.memo(()=>{
             setTimeout(() => {
                 setPageClass("friends");
             }, 100);
+        } else if(page.includes("/events")){
+            setTimeout(() => {
+                setPageClass("events");
+            }, 100);
         }
     },[page]);
 
@@ -47,16 +51,16 @@ const Header = React.memo(()=>{
 
     return(
         <div className="Header">
-                {page === "/login" || page === "/register" ? "" :
-                    isAuthenticated ? 
+                {page === "/login" || page === "/register"  || page === "/"  ? "" :
                     <div className="nav-container">
                         <nav>
-                            <Link className={`nav-link ${ pageClass === "room" ? "active" : ""}`} to="/room/none" ><h2>search</h2></Link>
-                            <Link className={`nav-link ${ pageClass === "friends" ? "active" : ""}`} to="/friends" ><h2>friends</h2></Link>
+                            {isAuthenticated && <Link className={`nav-link ${ pageClass === "room" ? "active" : ""}`} to="/room/none" ><h2>search</h2></Link>}
+                            {isAuthenticated && <Link className={`nav-link ${ pageClass === "friends" ? "active" : ""}`} to="/friends" ><h2>friends</h2></Link>}
+                            <Link className={`nav-link ${ pageClass === "events" ? "active" : ""}`} to="/events" ><h2>events</h2></Link>                            
                         </nav>  
                     </div>
 
-                    : "" 
+                    
                 }
             {
                 isAuthenticated ? 
