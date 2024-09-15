@@ -1,0 +1,10 @@
+.events-column{
+    width:calc((100% - 20px) / 3);
+    overflow:show;
+    transform:translateY(100%);
+    transition:2s;
+}
+
+.events-column.active{
+    transform:translateY(0);
+}

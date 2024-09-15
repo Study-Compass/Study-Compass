@@ -27,6 +27,7 @@ router.post('/create-event', verifyToken, async (req, res) => {
             message: 'Event created successfully.'
         });
     } catch (error) {
+        console.log(error);
         res.status(500).json({
             success: false,
             message: error.message

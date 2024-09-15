@@ -1,23 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import './EventsGrid.css';
+import './EventsColumn.css';
+import Event from './Event/Event.jsx';
 
-function EventsColumn({events}){
-    const navigate = useNavigate();
-
-    const handleEventClick = (event) => {
-        navigate(`/event/${event.id}`);
-    }
-
+function EventsColumn({events, triggerAnimation}){
     return(
-        <div className="events-column"> 
+        <div className={ `events-column ${triggerAnimation && "active"}`}> 
             {events.map(event => {
-                return <div className="event" onClick={() => handleEventClick(event)}>
-                    <h1>{event.title}</h1>
-                    <p>{event.description}</p>
-                    <p>{event.location}</p>
-                    <p>{event.date}</p>
-                    <p>{event.time}</p>
-                </div>
+                return <Event event={event}/>
             })}
         </div>
     );

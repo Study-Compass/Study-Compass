@@ -27,4 +27,21 @@ const getAllEvents = async () => {
     }
 }
 
-export { getAllEvents };
+const createEvent = async (name, type, hosting, location, date, description, image, classroom_id) => {
+    try{
+        const response = await axios.post('/create-event', {
+            name, type, hosting, location, date, description, image, classroom_id
+        }, {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`,
+            }
+        });
+        return response.data;
+    }
+    catch(error){
+        throw error;
+    }
+}
+
+
+export { getAllEvents, createEvent };
