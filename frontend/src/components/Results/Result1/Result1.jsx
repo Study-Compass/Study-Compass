@@ -10,7 +10,7 @@ function Result1({ result, attributes, debouncedFetchData, changeURL, findNext, 
     const message = findNext(schedule).message;
 
     const { user } = useAuth();
-
+    console.log(result);
     return (
         <li
             className={`result1 ${attributes.includes('restricted access') ? "restricted": "" }`}
@@ -25,7 +25,7 @@ function Result1({ result, attributes, debouncedFetchData, changeURL, findNext, 
                 <div className="info-row">      
                     <div className="rating">
                         <img src={FilledStar} alt="star" />
-                        <p>{result.average_rating.toFixed(1)}</p>
+                        <p>{result.room.average_rating && result.room.average_rating.toFixed(1)}</p>
                     </div>
                     { contentState === "nameSearch" || contentState === "freeNowSearch" ?
 
