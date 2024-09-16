@@ -1,9 +1,9 @@
 
 .badges{
-    height:15px;
+    height:fit-content;
     display: flex;
     gap:5px;
-    flex-wrap:nowrap;
+    flex-wrap:wrap;
 }
 
 .badge{
