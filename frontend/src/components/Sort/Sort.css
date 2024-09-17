@@ -8,28 +8,51 @@
     margin-top:10px;
     box-sizing: border-box;
     position: relative;
+
+    .free-now{
+
+    }
 }
 
 /* .sort-row div:hover{
     cursor: pointer;
-} */
+} */    
 
 .sort-row .tags,
 .sort-row .sort-by,
-.sort-row .more{
+.sort-row .more,
+.sort-row .free-now{
     border: 1px solid var(--border);
-    border-radius: 5px;
+    border-radius: 10px;
     display:flex;
     justify-content: center;
     align-items: center;
     gap:5px;
-    padding: 3px 7px;
+    padding:3px 10px;
+
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text);
+    font-family:'Inter',sans-serif;
+    background-color: var(--background);
+    outline:none;
+    border:1px solid var(--border);
+    border-radius: 10px;
+    box-shadow:var(--shadow);
+    transform: all 0.3s;
+
     cursor:pointer;
     -webkit-user-select: none; /* Safari */
     -moz-user-select: none;    /* Firefox */
     -ms-user-select: none;     /* Internet Explorer/Edge */
     user-select: none;         /* Non-prefixed version, currently supported by Chrome, Edge, Opera, and Firefox */
 
+}
+
+.free-now.active{
+    background-color: var(--red);
+    color:var(--background);
+    border: 1px solid var(--red);
 }
 
 .sort-row .tags img,
@@ -43,7 +66,6 @@
 .sort-row .tags p,
 .sort-row .sort-by p,
 .sort-row .more p{
-    color: var(--border);
     font-size: 12px;
     font-weight: 500;
     font-family: 'Inter', sans-serif;
@@ -61,6 +83,7 @@
 .sort-row .selected p{
     color: white;
 }
+
 .sort-popup{
     position: absolute;
     top: 30px;
@@ -80,6 +103,10 @@
     overflow-x:hidden;
     justify-content: space-between;
     max-width:300px;
+}
+
+.sort-popup button{
+    margin-top:0;
 }
 
 .sort-popup .heading h1{
@@ -106,7 +133,8 @@
     padding:10px;
     gap:10px;
     align-items: center;
-    background-color: var(--lightborder);
+    background-color: var(--background);
+    border:1px solid var(--lightborder);
     border-radius:7px;
     box-sizing: border-box;
     -webkit-user-select: none; /* Safari */
@@ -115,7 +143,7 @@
     user-select: none;         /* Non-prefixed version, currently supported by Chrome, Edge, Opera, and Firefox */
     transition: all 0.2s;
     cursor: pointer;
-    height:40px;
+    height:30px;
 }
 
 .option img{

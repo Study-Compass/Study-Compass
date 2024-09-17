@@ -50,6 +50,8 @@ function Room() {
     const [loading, setLoading] = useState(true);
     const [calendarLoading, setCalendarLoading] = useState(true);
 
+    const [freeNow, setFreeNow] = useState(false);
+
     const [contentState, setContentState] = useState("empty")
 
     const [results, setResults] = useState([]);
@@ -141,6 +143,7 @@ function Room() {
         setResults([]);
         clearQuery();
         setLoadedResults([]);
+        setFreeNow(false);
     }
 
     function setReportUp(){
@@ -314,6 +317,7 @@ function Room() {
     const handleFreeNow = async () => {
         const query = fetchFreeNow();
         allPurposeFreeNow(query);
+        setFreeNow(true);
     }
 
 //==========================================================================================================================================================
@@ -351,13 +355,16 @@ function Room() {
                             reload={reloadClassroom}
                             /> 
                         : ""}
+                        {/* {contentState !== "classroom" &&
+
+                        } */}
                         {contentState === "calendarSearch" || contentState === "freeNowSearch" || contentState === "nameSearch" ? calendarLoading ? "" : 
                             <div className="resultsCountContainer">
                                 <h1 className="resultCount">{results.length} results {contentState === "nameSearch" ? searchQuery ? `for "${searchQuery.slice(0,width < 800 ? 8:15)}${searchQuery.length>(width < 800 ? 8:15) ? "..." : ""}"` : "" : ""}</h1> 
                                 {/* <img src={SortIcon} alt="sort" onClick={()=>{setShowFilter(!showFilter)}}/> */}
                             </div>
                         : ""}
-                        { (contentState === "calendarSearch" || contentState === "freeNowSearch" || contentState === "nameSearch")? 
+                        { (contentState !== "classroom" )? 
                             <Sort
                                 query={searchQuery}
                                 searchAttributes={searchAttributes}
@@ -365,6 +372,10 @@ function Room() {
                                 searchSort={searchSort}
                                 setSearchSort={setSearchSort}
                                 onSearch={onSearch}
+                                handleFreeNow={handleFreeNow}
+                                contentState={contentState}
+                                freeNow={freeNow}
+                                setFreeNow={setFreeNow}
                             /> 
                         : ""}
                         {contentState === "calendarSearch" || contentState === "freeNowSearch" || contentState === "nameSearch" ? 
