@@ -256,15 +256,23 @@ select{
     transform: translateY(-700px);
 }
 
-.free-now{
-    font-size: 16px;
-    font-weight: 400;
-    color: var(--darkborder);
-    font-family:'Inter',sans-serif;
-    background-color: var(--background);
-    outline:none;
-    border:1px solid var(--darkborder);
-    border-radius: 5px;
+
+.search-methods{
+    display:flex;
+    width:calc(100% - 60px);
+    margin-top:15px;
+    .free-now{
+        font-size: 14px;
+        font-weight: 400;
+        color: var(--text);
+        font-family:'Inter',sans-serif;
+        background-color: var(--background);
+        outline:none;
+        border:1px solid var(--border);
+        border-radius: 10px;
+        box-shadow:var(--shadow);
+        padding:3px 10px;
+    }
 }
 
 .free-now:hover{
@@ -375,6 +383,7 @@ select{
     transform: scale(0.5);
     transform-origin: center;
 }
+
 
 @keyframes pulse {
     0% {

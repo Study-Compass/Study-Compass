@@ -381,22 +381,24 @@ router.get('/all-purpose-search', verifyTokenOptional, async (req, res) => {
 
         if (userId && user) {
             if(sort === "availability"){
-                return;
+                sortedClassrooms = classrooms;
+                
+            } else {
+                const savedSet = new Set(user.saved); // Convert saved items to a Set for efficient lookups
+    
+                // Split classrooms into saved and not saved
+                const { saved, notSaved } = classrooms.reduce((acc, classroom) => {
+                    if (savedSet.has(classroom._id.toString())) { 
+                        acc.saved.push(classroom);
+                    } else {
+                        acc.notSaved.push(classroom);
+                    }
+                    return acc;
+                }, { saved: [], notSaved: [] });
+    
+                // Concatenate saved items in front of not saved items
+                sortedClassrooms = saved.concat(notSaved);
             }
-            const savedSet = new Set(user.saved); // Convert saved items to a Set for efficient lookups
-
-            // Split classrooms into saved and not saved
-            const { saved, notSaved } = classrooms.reduce((acc, classroom) => {
-                if (savedSet.has(classroom._id.toString())) { 
-                    acc.saved.push(classroom);
-                } else {
-                    acc.notSaved.push(classroom);
-                }
-                return acc;
-            }, { saved: [], notSaved: [] });
-
-            // Concatenate saved items in front of not saved items
-            sortedClassrooms = saved.concat(notSaved);
         } else {
             sortedClassrooms = classrooms; // No user or saved info, use original order
         }

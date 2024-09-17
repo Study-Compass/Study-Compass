@@ -11,7 +11,8 @@ router.post('/friend-request/:friendUsername', verifyToken, async (req, res) => 
     let friendId;
 
     try{
-        const friend = await User.findOne({ username: friendUsername });
+        //case insensitive search
+        const friend = await User.findOne({ username: { $regex: new RegExp(friendUsername, 'i') } });
         if(!friend){
             console.log(`POST: /friend-request/:friendId friend not found`)
             return res.status(404).json({
@@ -43,8 +44,10 @@ router.post('/friend-request/:friendUsername', verifyToken, async (req, res) => 
 
     // check if friendship already exists
     const existingFriendship = await Friendship.findOne({
-        requester: requester,
-        recipient: friendId
+        $or: [
+            { requester: requester, recipient: friendId },
+            { requester: friendId, recipient: requester }
+        ]
     });
 
     if(existingFriendship){
