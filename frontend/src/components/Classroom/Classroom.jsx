@@ -230,7 +230,10 @@ function Classroom({ room, state, setState, schedule, roomName, width, setShowMo
     const handleCheckOut = async () => {
         try {
             const response = await checkOut(room._id);
-            handleOpenRatingPopup();
+            if(!userRated){
+
+                handleOpenRatingPopup();
+            }
             console.log(response);  
             await reload();
 
