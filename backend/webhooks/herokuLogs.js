@@ -6,13 +6,6 @@ const router = express.Router();
 // Discord webhook URL
 const discordWebhookURL = 'https://discord.com/api/webhooks/1286383972989014109/XN5T3CrExOjuwOoneRykElF3-4WeQcLBMhX_Ns7l4kJU8wF-dVHdqf9f5juTyQmiVBZY';
 
-let isAppReady = false;
-
-app.listen(PORT, () => {
-    isAppReady = true; // Set the flag to true after the app is ready
-    console.log(`Server is running on port ${PORT}`);
-  });
-  
 // Function to filter the logs
 function filterLogs(logData) {
     // Ensure logData is a string
@@ -34,10 +27,7 @@ function filterLogs(logData) {
 
 // Route handler for Heroku logs
 router.post('/heroku-logs', async (req, res) => {
-    if (!isAppReady) {
-        return res.status(503).send('App is still starting, try again later');
-      }
-    
+
    const logData = req.body;
 
    const filteredLogData = filterLogs(logData);
