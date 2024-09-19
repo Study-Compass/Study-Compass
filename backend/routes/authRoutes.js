@@ -3,6 +3,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const axios = require('axios');
 require('dotenv').config();
+const { sendDiscordMessage } = require('../services/discordWebookService');
 
 const router = express.Router();
 const { verifyToken } = require('../middlewares/verifyToken.js');
@@ -70,7 +71,8 @@ router.post('/register', async (req, res) => {
 
         // Generate a token for the new user
         const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-        console.log(`POST: /register new user ${username}`)
+        console.log(`POST: /register new user ${username}`);
+        sendDiscordMessage(`New user registered`, `user ${username} registered`, "newUser");
         // Send the token to the client
         res.status(201).json({
             success: true,
