@@ -143,8 +143,6 @@ function DayColumn({day, dayEvents, eventColors, empty, add, remove, queries}){
     // };
 
     
-
-    
     const start_times = [];
     const end_times = [];
 

@@ -50,8 +50,10 @@ router.post("/check-username", async (req, res) =>{
 router.post("/check-in", verifyToken, async (req, res) =>{
     const { classroomId } = req.body;
     try{
-        //check if user is checked in elsewhere
-        const classrooms = await Classroom.find({ checkIns: req.user.userId });
+        //check if user is checked in elsewhere in the checked_in array
+        const classrooms = await Classroom.find({checked_in: { $in: [req.user.userId] }});
+        
+        // const classrooms = await Classroom.find({ checkIns: req.user.userId });
         if(classrooms.length > 0){
             console.log(`POST: /check-in ${req.user.userId} is already checked in`)
             return res.status(400).json({ success: false, message: 'User is already checked in' });
@@ -63,12 +65,6 @@ router.post("/check-in", verifyToken, async (req, res) =>{
 
         const io = req.app.get('io');
         io.to(classroomId).emit('check-in', { classroomId, userId: req.user.userId });
-        // const checkoutTime = new Date(Date.now() + 3 * 60 * 60 * 1000); // 3 hours later
-        // cron.schedule(checkoutTime, async () => {
-        //     classroom.checkIns = classroom.checkIns.filter(userId => userId !== req.user.userId);
-        //     await classroom.save();
-        //     console.log(`User ${req.user.userId} checked out of classroom ${classroom.name}`);
-        // });
 
         console.log(`POST: /check-in ${req.user.userId} into ${classroom.name} successful`);
         return res.status(200).json({ success: true, message: 'Checked in successfully' });
@@ -81,7 +77,7 @@ router.post("/check-in", verifyToken, async (req, res) =>{
 
 router.get("/checked-in", verifyToken, async (req, res) =>{
     try{
-        const classrooms = await Classroom.find({ checkIns: req.user.userId });
+        const classrooms = await Classroom.find({ checked_in: { $in: [req.user.userId] } });
         console.log(`GET: /checked-in ${req.user.userId} successful`)
         return res.status(200).json({ success: true, message: 'Checked in classrooms retrieved', classrooms });
     } catch(error){
