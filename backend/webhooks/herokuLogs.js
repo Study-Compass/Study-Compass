@@ -33,7 +33,7 @@ router.post('/heroku-logs', async (req, res) => {
        });
        res.status(200).send('Filtered log sent to Discord');
      } catch (error) {
-       console.error('Error sending to Discord:', error);
+    //    console.error('Error sending to Discord:', error);
        res.status(500).send('Failed to send filtered log to Discord');
      }
    } else {
