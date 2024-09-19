@@ -19,8 +19,8 @@ import { GoogleOAuthProvider } from '@react-oauth/google';
 import { NotificationProvider } from './NotificationContext';
 import { ErrorProvider } from './ErrorContext';
 import { ProfileCreationProvider } from './ProfileCreationContext';
-// import { WebSocketProvider } from './WebSocketContext';
-
+import { WebSocketProvider } from './WebSocketContext';
+import Layout from './pages/Layout/Layout';
 
 function App() {
     // document.documentElement.classList.add('dark-mode');
@@ -28,6 +28,7 @@ function App() {
         <GoogleOAuthProvider clientId="639818062398-k4qnm9l320phu967ctc2l1jt1sp9ib7p.apps.googleusercontent.com">
             <ErrorProvider>
                 <NotificationProvider>
+                    <WebSocketProvider>
                         <AuthProvider>
                             <CacheProvider>
                                 <Router>
@@ -52,6 +53,7 @@ function App() {
                                 </Router>
                             </CacheProvider>
                         </AuthProvider>
+                    </WebSocketProvider>
                 </NotificationProvider>
             </ErrorProvider>
         </GoogleOAuthProvider>

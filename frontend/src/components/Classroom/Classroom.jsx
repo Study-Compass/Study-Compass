@@ -28,15 +28,15 @@ import Image from '../../assets/Icons/Image.svg';
 import { checkIn, checkOut, getUser, getUsers, userRated } from '../../DBInteractions.js';
 import { findNext } from '../../pages/Room/RoomHelpers.js';
 import { useNotification } from '../../NotificationContext.js';
+import { useWebSocket } from '../../WebSocketContext.js';
 
 import '../../pages/Room/Room.css';
 import axios from 'axios';
-import { io } from 'socket.io-client';
 import Rating from 'react-rating';
 
 function Classroom({ room, state, setState, schedule, roomName, width, setShowMobileCalendar, setIsUp, reload }) {
     const [image, setImage] = useState("")
-    const { isAuthenticating, isAuthenticated, user } = useAuth();
+    const { isAuthenticating, isAuthenticated, user, getCheckedIn } = useAuth();
     const [success, setSuccess] = useState(false);
     const [message, setMessage] = useState("");
     const [defaultImage, setDefaultImage] = useState(false);
@@ -46,90 +46,76 @@ function Classroom({ room, state, setState, schedule, roomName, width, setShowMo
     const [checkedInUsers, setCheckedInUsers] = useState({});
 
     const [userRating, setUserRating] = useState(null);
+    
+    const { emit, on, off } = useWebSocket();
 
+    //get all users currently checked in
+    const getCheckedInUsers = async () => {
+        try{
+            const users = await getUsers(room.checked_in);
+            const checkedInUsers = {};
+            users.forEach(user => {
+                checkedInUsers[user._id] = user;
+            });
+            setCheckedInUsers(checkedInUsers);
+        } catch (error){
+            console.log(error);
+            addNotification({ title: "An error occured", message: "an internal error occured", type: "error" })
+        }
+    }
+
+    const getRating = async () => {
+        if(!isAuthenticated){
+            return;
+        }
+        try{
+            const rated = await userRated(room._id);
+            console.log(rated);
+            if(rated.data.success){
+                console.log(rated.data.data);
+                setUserRating(rated.data.data);
+            }
+        } catch (error){
+            console.log(error);
+            addNotification({ title: "An error occured", message: "an internal error occured", type: "error" })
+        }
+    }
+
+    const handleCheckInEvent = (data) => {
+        if (data.classroomId === room._id) {
+          console.log('another user checked in');
+          reload();
+          handleNewUserCheckIn();
+        }
+      };
+  
+      const handleCheckOutEvent = (data) => {
+        if (data.classroomId === room._id) {
+          console.log('another user checked out');
+          reload();
+          // ... your existing logic
+        }
+      };
 
     useEffect(() => {
         if(!room){
             return;
         }
-        console.log(room);
-        // Connect to WebSocket server
-        
-        //get all users currently checked in
-        const getCheckedInUsers = async () => {
-            try{
-                const users = await getUsers(room.checked_in);
-                const checkedInUsers = {};
-                users.forEach(user => {
-                    checkedInUsers[user._id] = user;
-                });
-                setCheckedInUsers(checkedInUsers);
-            } catch (error){
-                console.log(error);
-                addNotification({ title: "An error occured", message: "an internal error occured", type: "error" })
-            }
-        }
-
-        getCheckedInUsers();
-
-        const getRating = async () => {
-            if(!isAuthenticated){
-                return;
-            }
-            try{
-                const rated = await userRated(room._id);
-                console.log(rated);
-                if(rated.data.success){
-                    console.log(rated.data.data);
-                    setUserRating(rated.data.data);
-                }
-            } catch (error){
-                console.log(error);
-                addNotification({ title: "An error occured", message: "an internal error occured", type: "error" })
-            }
-        }
-        
+        getCheckedInUsers();        
         getRating();
-
-        const socket = io(
-            process.env.NODE_ENV === 'production' ? 'https://www.study-compass.com' : 'http://localhost:5001', {
-            transports: ['websocket'],  // Force WebSocket transport
-            }
-        );
-
-        console.log(process.env.NODE_ENV);
-
         // Join the room for this classroom
-        socket.emit('join-classroom', room._id);
+        emit('join-classroom', room._id);
 
         // Listen for check-in events
-        socket.on('check-in', (data) => {
-            if (data.classroomId === room._id) {
-                console.log('another user checked in');
-                reload();
-                handleNewUserCheckIn();
-            }
-        });     
-
-        // Listen for check-out events
-        socket.on('check-out', (data) => {
-            if (data.classroomId === room._id) {
-                console.log('another user checked out');
-                reload();
-                // remove user from checked in
-                setCheckedInUsers(prevState => {
-                    const newState = { ...prevState };
-                    delete newState[data.userId];
-                    return newState;
-                });
-            }
-        });
-
+        on('check-in', handleCheckInEvent);
+        on('check-out', handleCheckOutEvent);
+    
         // Clean up on component unmount
         return () => {
-            socket.disconnect();
+          off('check-in', handleCheckInEvent);
+          off('check-out', handleCheckOutEvent);
         };
-    }, [room]);
+      }, [room]);
 
     useEffect(() => {
 
@@ -221,19 +207,25 @@ function Classroom({ room, state, setState, schedule, roomName, width, setShowMo
             const response = await checkIn(room._id);
             console.log(response);  
             await reload();
+            getCheckedIn();
         } catch (error) {
             console.log(error);
-            addNotification({ title: "An error occured", message: "an internal error occured", type: "error" })
+            if(error.response.status === 400){
+                addNotification({ title: "You are already checked in to another classroom", message: "Check out and try again", type: "error" })
+            } else {
+                addNotification({ title: "An error occured", message: "an internal error occured", type: "error" })
+            }
         }
     }
 
     const handleCheckOut = async () => {
         try {
             const response = await checkOut(room._id);
-            if(!userRated){
-
+            if(!userRating){
                 handleOpenRatingPopup();
+                console.log("user has not rated this room yet");
             }
+            console.log(userRated, "user has rated this room");
             console.log(response);  
             await reload();
 
