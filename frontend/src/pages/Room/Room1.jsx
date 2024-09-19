@@ -324,7 +324,7 @@ function Room() {
 
     return (    
         <div className="room" style={{ height: width < 800 ? viewport : '100vh' }}>
-            <Banner visible={bannerVisible} setVisible={setBannerVisible}/>
+            {/* <Banner visible={bannerVisible} setVisible={setBannerVisible}/> */}
             <Report text={roomName} isUp={reportIsUp} setIsUp={setReportUp}/>
             <Header />
             <div className="content-container" style={{height: width < 800 ? bannerVisible ? "max(100% - 10px)":  "max(100% - 80px)"  : bannerVisible ? "max(100% - 135px)":  "max(100% - 115px)", maxHeight:width < 800 ? bannerVisible ? "max(100% - 10px)":  "max(100% - 80px)"  : bannerVisible ? "max(100% - 135px)":  "max(100% - 115px)"}}>

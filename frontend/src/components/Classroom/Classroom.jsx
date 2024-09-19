@@ -37,7 +37,7 @@ import Rating from 'react-rating';
 function Classroom({ room, state, setState, schedule, roomName, width, setShowMobileCalendar, setIsUp, reload }) {
     const [image, setImage] = useState("")
     const { isAuthenticating, isAuthenticated, user, getCheckedIn } = useAuth();
-    const [success, setSuccess] = useState(false);
+    const [success, setSuccess] = useState(null);
     const [message, setMessage] = useState("");
     const [defaultImage, setDefaultImage] = useState(false);
     const [fillerHeight, setFillerHeight] = useState(0);
@@ -161,6 +161,16 @@ function Classroom({ room, state, setState, schedule, roomName, width, setShowMo
     useEffect(() => {
         setImage("");
     }, [room])
+
+    useEffect(() => {
+        if(isAuthenticated){
+            if(room && room.checked_in.includes(user._id)){
+                if(success === false){
+                    handleCheckOut();
+                }
+            }
+        }
+    }, [success, room]);
 
     useEffect(() => {
 
