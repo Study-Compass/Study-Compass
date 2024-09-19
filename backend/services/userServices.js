@@ -3,7 +3,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../schemas/user.js');
 const crypto = require('crypto');
-
+const { sendDiscordMessage } = require('./discordWebookService');
 
 const login = new google.auth.OAuth2(
     process.env.GOOGLE_CLIENT_ID,
@@ -114,6 +114,7 @@ async function authenticateWithGoogle(code, isRegister = false, url) {
             picture: userInfo.data.picture
         });
         await user.save();
+        sendDiscordMessage(`New user registered`, `user ${user.username} registered`, "newUser");
     }
 
     const jwtToken = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '12h' });

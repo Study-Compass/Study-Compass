@@ -4,6 +4,9 @@ const Developer = require('../schemas/developer.js');
 const { verifyToken, verifyTokenOptional } = require('../middlewares/verifyToken');
 const Classroom = require('../schemas/classroom.js');
 const cron = require('node-cron');
+const axios = require('axios');
+
+const { sendDiscordMessage } = require('../services/discordWebookService');
 
 const router = express.Router();
 
@@ -59,10 +62,11 @@ router.post("/check-in", verifyToken, async (req, res) =>{
             return res.status(400).json({ success: false, message: 'User is already checked in' });
         }
         const classroom = await Classroom.findOne({ _id: classroomId });
-        console.log(JSON.stringify(classroom));
         classroom.checked_in.push(req.user.userId);
         await classroom.save();
-
+        if(req.user.userId !== "65f474445dca7aca4fb5acaf"){
+            sendDiscordMessage(`User check-in`,`user ${req.user.userId} checked in to ${classroom.name}`,"normal");
+        }
         const io = req.app.get('io');
         io.to(classroomId).emit('check-in', { classroomId, userId: req.user.userId });
 
@@ -94,7 +98,10 @@ router.post("/check-out", verifyToken, async (req, res) =>{
         await classroom.save();
         const io = req.app.get('io');
         io.to(classroomId).emit('check-out', { classroomId, userId: req.user.userId });
-        console.log(`POST: /check-out ${req.user.userId} from ${classroom.name} successful`)
+        console.log(`POST: /check-out ${req.user.userId} from ${classroom.name} successful`);
+        if(req.user.userId !== "65f474445dca7aca4fb5acaf"){
+            sendDiscordMessage(`User check-out`,`user ${req.user.userId} checked out of ${classroom.name}`,"normal");
+        }
         return res.status(200).json({ success: true, message: 'Checked out successfully' });
     } catch(error){
         console.log(`POST: /check-out ${req.user.userId} failed`);
