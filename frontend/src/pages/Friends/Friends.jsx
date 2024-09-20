@@ -6,7 +6,7 @@ import Header from '../../components/Header/Header.jsx';
 import pfp from '../../assets/defaultAvatar.svg'
 import Friend from './Friend/Friend.jsx';
 import AddFriend from '../../assets/Icons/Add-Friend.svg';
-import { getFriends, sendFriendRequest, updateFriendRequest, getFriendRequests } from './FriendsHelpers.js';
+import { getFriends, sendFriendRequest, updateFriendRequest, getFriendRequests, debounceUserSearch } from './FriendsHelpers.js';
 import { useNotification } from '../../NotificationContext.js';
 import FriendRequest from './FriendRequest/FriendRequest.jsx';
 
@@ -63,12 +63,12 @@ function Friends() {
     }, [isAuthenticated, reload]);
 
     useEffect(() => {
-        if(addValue.length === 1 && addValue[0] !== '@'){
-            setAddValue('@' + addValue);
+        const search = async () => {
+            if(addValue.length > 1){
+                const result = debounceUserSearch(addValue);
+            }
         }
-        if(addValue === '@'){
-            setAddValue('');
-        }
+        search();
     },[addValue]);
 
     const handleAddChange = (e) => {

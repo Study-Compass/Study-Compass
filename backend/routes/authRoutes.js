@@ -122,7 +122,7 @@ router.post('/login', async (req, res) => {
 router.get('/validate-token', verifyToken, async (req, res) => {
     try {
         const user = await User.findById(req.user.userId)
-            .select('-password -googleId') // Add fields you want to exclude
+            .select('-password') // Add fields you want to exclude
             .lean(); // Assuming Mongoose for DB operations
         if (!user) {
             console.log(`GET: /validate-token token is invalid`)
