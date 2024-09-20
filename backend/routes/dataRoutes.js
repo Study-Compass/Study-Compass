@@ -670,8 +670,7 @@ router.get('/get-recommendation', verifyTokenOptional, async (req, res) => {
         const hour = currentTime.getHours();
         const minute = currentTime.getMinutes();
         const time = hour * 60 + minute;
-        console.log(`time: ${time}`);
-        
+        console.log(`day: ${day}`);
         let query;
         if (userId) {
             user = await User.findOne({ _id: userId });

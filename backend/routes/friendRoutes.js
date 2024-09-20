@@ -5,6 +5,29 @@ const { verifyToken } = require('../middlewares/verifyToken');
 const Friendship = require('../schemas/friendship');
 const User = require('../schemas/user');
 
+router.get('/user-search/:searchTerm', verifyToken, async (req, res) => {
+    const { searchTerm } = req.params;
+    try {
+        const users = await User.find({ username: { $regex: new RegExp(searchTerm, 'i') } });
+        //order by relevance
+        users.sort((a, b) => {
+            const aIndex = a.username.toLowerCase().indexOf(searchTerm.toLowerCase());
+            const bIndex = b.username.toLowerCase().indexOf(searchTerm.toLowerCase());
+            return aIndex - bIndex;
+        });
+        res.json({
+            success: true,
+            message: 'Users found',
+            data: users
+        });
+    } catch (error) {
+        res.json({
+            success: false,
+            message: error.message
+        });
+    }
+});
+
 router.post('/friend-request/:friendUsername', verifyToken, async (req, res) => {
     const { friendUsername } = req.params;
     const requester = req.user.userId;

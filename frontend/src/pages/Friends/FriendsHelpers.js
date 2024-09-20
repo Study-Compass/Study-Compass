@@ -1,5 +1,38 @@
 import axios from 'axios';
 
+function debounce(func, wait) { //move logic to other file
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
+const userSearch = async (query) => {
+    try{
+        const response = await axios.get(`/user-search/${query}`, {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`
+            }
+        });
+        const responseBody = response.data;
+        if(!responseBody.success){
+            console.error('Error fetching search data:', responseBody.message);
+            return [];
+        }
+        console.log(responseBody.data);
+        return responseBody.data;
+    } catch (error){
+        console.error('Error fetching search data:', error);
+        return [];
+    }
+}
+
+const debounceUserSearch = debounce(userSearch, 500);
 
 const getFriends = async () => {
     try{
@@ -115,4 +148,4 @@ const unFriend = async (friendId) => {
     }
 }
 
-export { getFriends, sendFriendRequest, updateFriendRequest, getFriendRequests, unFriend };
+export { getFriends, sendFriendRequest, updateFriendRequest, getFriendRequests, unFriend, debounceUserSearch };

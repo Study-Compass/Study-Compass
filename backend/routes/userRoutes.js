@@ -34,11 +34,14 @@ router.post("/update-user", verifyToken, async (req, res) =>{
 });
 
 // check if username is available
-router.post("/check-username", async (req, res) =>{
+router.post("/check-username", verifyToken, async (req, res) =>{
     const { username } = req.body;
+    const userId = req.user.userId;
     try{
-        const user = await User.findOne({ username: username });
-        if(user){
+        //check if username is taken, regardless of casing
+        const reqUser = await User.findById(userId);
+        const user = await User.findOne({ username: { $regex: new RegExp(username, "i") } });
+        if(user && user._id.toString() !== userId){
             console.log(`POST: /check-username ${username} is taken`)
             return res.status(200).json({ success: false, message: 'Username is taken' });
         }

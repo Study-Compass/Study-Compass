@@ -102,9 +102,10 @@ function Onboard(){
                     navigate('/room/none');
                 }
                 setUserInfo(user);
-                setIsGoogle(user.google);
-                setUsername(user.google ? user.username : null);
-                setInitialUsername(user.google ? user.username : null);
+                setIsGoogle(user.googleId);
+                console.log(user);
+                setUsername(user.googleId ? user.username : null);
+                setInitialUsername(user.googleId ? user.username : null);
                 setName(user.name);
             }
         }
