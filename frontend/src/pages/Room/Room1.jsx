@@ -17,6 +17,7 @@ import Recommended from '../../components/Recommended/Recommended.jsx';
 import Banner from '../../components/Banner/Banner.jsx';
 import Report from '../../components/Report/Report.jsx';
 import { useProfileCreation } from '../../ProfileCreationContext';
+import { getRecommendation } from '../../DBInteractions.js';
 
 import chevronUp from '../../assets/chevronup.svg';
 import SortIcon from '../../assets/Icons/Sort.svg';
@@ -273,6 +274,18 @@ function Room() {
         // }
      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [query])
+
+    useEffect(() => {
+        const getRecommendationData = async () => {
+            try{
+                const recommendation = await getRecommendation();
+                console.log(recommendation);
+            } catch (error){
+                console.log(error);
+            }
+        }
+        getRecommendationData();
+    },[]);
 
 
 //=========================================== DONT TOUCH HERE ===============================================================================================

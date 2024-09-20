@@ -164,7 +164,7 @@ function Classroom({ room, state, setState, schedule, roomName, width, setShowMo
 
     useEffect(() => {
         if(isAuthenticated){
-            if(room && room.checked_in.includes(user._id)){
+            if(room && room.checked_in && room.checked_in.includes(user._id)){
                 if(success === false){
                     handleCheckOut();
                 }
