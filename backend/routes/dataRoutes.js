@@ -684,7 +684,9 @@ router.get('/get-recommendation', verifyTokenOptional, async (req, res) => {
             } else {
                 query = {
                     [`weekly_schedule.${day}`]: {
-                        $elemMatch: { start_time: { $lt: time }, end_time: { $gt: time } }
+                        $not:{
+                            $elemMatch: { start_time: { $lt: time }, end_time: { $gt: time } }
+                        }                    
                     },
                     classroom_id: { $in: savedClassrooms }
                 };
@@ -709,7 +711,9 @@ router.get('/get-recommendation', verifyTokenOptional, async (req, res) => {
         } else {
             query = {
                 [`weekly_schedule.${day}`]: {
-                    $elemMatch: { start_time: { $lt: time }, end_time: { $gt: time } }
+                    $not:{
+                        $elemMatch: { start_time: { $lt: time }, end_time: { $gt: time } }
+                    }
                 }
             };
         }

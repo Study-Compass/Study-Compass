@@ -73,6 +73,8 @@ function Room() {
     const [bannerVisible, setBannerVisible] = useState(false);
     const [reportIsUp, setReportIsUp] = useState(false);  
 
+    const [recommendedRoom, setRecommendedRoom] = useState(null);
+
     const { handleOpen } = useProfileCreation();
 
     function clearQuery(){ setQuery({'M': [],'T': [],'W': [],'R': [],'F': [],});
@@ -277,13 +279,16 @@ function Room() {
 
     useEffect(() => {
         const getRecommendationData = async () => {
+            
             try{
                 const recommendation = await getRecommendation();
-                console.log(recommendation);
+                console.log(recommendation.data.data);
+                setRecommendedRoom(recommendation.data.data);
             } catch (error){
                 console.log(error);
             }
         }
+
         getRecommendationData();
     },[]);
 
@@ -343,17 +348,18 @@ function Room() {
             <div className="content-container" style={{height: width < 800 ? bannerVisible ? "max(100% - 10px)":  "max(100% - 80px)"  : bannerVisible ? "max(100% - 135px)":  "max(100% - 115px)", maxHeight:width < 800 ? bannerVisible ? "max(100% - 10px)":  "max(100% - 80px)"  : bannerVisible ? "max(100% - 135px)":  "max(100% - 115px)"}}>
                 <div className="calendar-container">
                     <div className={width < 800 ? "left-mobile" : "left"}>
-
-                            {ready && contentState !== "classroom" && <Recommended 
-                                id={roomIds["Low Center for Industrial Inn. 4034"]}
+                        {ready && contentState !== "classroom" && 
+                            <Recommended 
+                                id={recommendedRoom ? recommendedRoom._id : null}
                                 debouncedFetchData={debouncedFetchData}
                                 changeURLHelper={changeURL2}
                                 findNext={findNext}
                                 contentState={contentState}
                                 setContentState={setContentState}
                                 hide={searchFocus || contentState !== "empty"}
-                            />}
-
+                                givenRoom={recommendedRoom}
+                            />
+                        }
                         <SearchBar data={rooms} onEnter={changeURL2} room={contentState === "classroom" || contentState === "calendarSearchResult" ? roomName : searchQuery } onX={onX} onSearch={onSearch} query={searchQuery} onBlur={setSearchFocus} />
                         {contentState === "classroom" || contentState === "calendarSearchResult"  ? 
                             <Classroom  
