@@ -237,5 +237,20 @@ const mainSearchChange = async (classroomId) => {
     }
 }
 
+const getRecommendation = async () => {
+    const token = localStorage.getItem('token');;
+    try{
+        const response = await axios.get('/get-recommendation', {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+            }
+        });
+        console.log("successful");
+        return response;
+    } catch(error){
+        throw error;
+    }
+}
 
-export { changeClasroom, save, checkUsername, saveUser, sendError, checkIn, checkOut, getUser, getUsers, updateRating, userRated, mainSearchChange };
+
+export { changeClasroom, save, checkUsername, saveUser, sendError, checkIn, checkOut, getUser, getUsers, updateRating, userRated, mainSearchChange, getRecommendation };

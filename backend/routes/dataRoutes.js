@@ -9,6 +9,7 @@ const { sortByAvailability } = require('../helpers.js');
 const multer = require('multer');
 const path = require('path');
 const s3 = require('../aws-config');
+const mongoose = require('mongoose');
 
 
 const router = express.Router();
@@ -655,6 +656,84 @@ router.post('/main-search-change', verifyToken, async (req, res) => {
         res.json({ success: true, message: "Main search changed" });
     } catch(error){
         return res.status(500).json({ success: false, message: 'Error finding user', error: error.message});
+    }
+});
+
+router.get('/get-recommendation', verifyTokenOptional, async (req, res) => {
+    const userId = req.user ? req.user.userId : null;
+    try {
+        let user;
+        let randomClassroom;
+        const currentTime = new Date();
+        const days = ['X', 'M', 'T', 'W', 'R', 'F', 'X']; // You might need to handle weekends more explicitly
+        const day = days[currentTime.getDay()];
+        const hour = currentTime.getHours();
+        const minute = currentTime.getMinutes();
+        const time = hour * 60 + minute;
+        console.log(`time: ${time}`);
+        
+        let query;
+        if (userId) {
+            user = await User.findOne({ _id: userId });
+            const savedClassrooms = user.saved.map(id => new mongoose.Types.ObjectId(id)); // Ensure ObjectId for classroom IDs
+            // const savedClassrooms = user.saved; 
+            if (day === 'X') {
+                query = {
+                    classroom_id: { $in: savedClassrooms }
+                };
+            } else {
+                query = {
+                    [`weekly_schedule.${day}`]: {
+                        $not:{
+                            $elemMatch: { start_time: { $lt: time }, end_time: { $gt: time } }
+                        }                    
+                    },
+                    classroom_id: { $in: savedClassrooms }
+                };
+            }
+
+            randomClassroom = await Schedule.aggregate([
+                { $match: query },
+                { $sample: { size: 1 } }
+            ]);
+
+            if (randomClassroom && randomClassroom.length > 0) {
+                randomClassroom = randomClassroom[0];
+                randomClassroom = await Classroom.findOne({ _id: randomClassroom.classroom_id });
+                console.log(`GET: /get-recommendation/${userId}`);
+                return res.status(200).json({ success: true, message: 'Recommendation found', data: randomClassroom });
+            }
+        }
+
+        // If no user or no saved classrooms, return a random classroom that is free
+        if (day === 'X') {
+            query = {};  // Weekend fallback
+        } else {
+            query = {
+                [`weekly_schedule.${day}`]: {
+                    $not:{
+                        $elemMatch: { start_time: { $lt: time }, end_time: { $gt: time } }
+                    }
+                }
+            };
+        }
+        randomClassroom = await Schedule.aggregate([
+            { $match: query },
+            { $sample: { size: 1 } }
+        ]);
+
+        if (randomClassroom && randomClassroom.length > 0) {
+            randomClassroom = randomClassroom[0];
+            randomClassroom = await Classroom.findOne({ _id: randomClassroom.classroom_id });
+            console.log(`GET: /get-recommendation`);
+            return res.status(200).json({ success: true, message: 'Recommendation found', data: randomClassroom });
+        }
+
+        console.log(`GET: /get-recommendation`);
+        return res.status(404).json({ success: false, message: 'No recommendations found' });
+    } catch (error) {
+        console.log(`GET: /get-recommendation failed`, error);
+        return res.status(500).json({ success: false, message: 'Error finding user', error: error.message });
     }
 });
 

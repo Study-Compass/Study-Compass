@@ -48,11 +48,31 @@ function Recommended({id, debouncedFetchData, changeURLHelper, findNext, hide}) 
     },[hide,containerRef.current]);
 
     useEffect(() => {
-        fetchDataHelper(id);
+        if(id !== null){
+            console.log("hi");
+            fetchDataHelper(id);
+        }
     }, [id]);
 
+    // useEffect(() => {
+    //     if(givenRoom){
+    //         const formattedRoom = {
+    //             room: givenRoom,
+    //             data: givenRoom,
+    //         };
+    //         setRoom(formattedRoom);
+    //     } 
+    //     // else {
+    //     //     fetchDataHelper(id);
+    //     // }
+    // }, [id, givenRoom]);
 
-    if(!room|| isAuthenticating){
+    useEffect(() => {
+        console.log("room", room);
+    }, [room]);
+
+
+    if(room === null|| isAuthenticating){
         return(
             <div className="recommended">        
                 <p>recommended for you</p>

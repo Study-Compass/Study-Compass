@@ -34,20 +34,22 @@ function App() {
                                 <Router>
                                     <ProfileCreationProvider>
                                     <Routes>
-                                        <Route path="/" element={<Landing/> }/>
-                                        <Route path="/room/:roomid" element={<Room1 />}/>
-                                        <Route path="/room1/:roomid" element={<Room1 />}/>
-                                        <Route path="/register" element={<Register />}/>
-                                        <Route path="/login" element={<Login />}/>
-                                        <Route path="*" element={<Error />}/>
-                                        <Route path="/error/:errorCode" element={<Error />}/>
-                                        <Route path="/onboard" element={<Onboard />}/>
-                                        <Route path="/profile" element={<Profile/>}/>
-                                        <Route path="/friends" element={<Friends/>}/>
-                                        <Route path="/landing" element={<Landing/>}/>
-                                        <Route path="/settings" element={<Settings/>}/>
-                                        <Route path="/documentation" element={<Redirect/>}/>
-                                        <Route path="/developer-onboarding" element={<DeveloperOnboard/>}/>
+                                        <Route path='/' element={<Layout/>}>
+                                            <Route index element={<Landing/> }/>
+                                            <Route path="/room/:roomid" element={<Room1 />}/>
+                                            <Route path="/room1/:roomid" element={<Room1 />}/>
+                                            <Route path="/register" element={<Register />}/>
+                                            <Route path="/login" element={<Login />}/>
+                                            <Route path="*" element={<Error />}/>
+                                            <Route path="/error/:errorCode" element={<Error />}/>
+                                            <Route path="/onboard" element={<Onboard />}/>
+                                            <Route path="/profile" element={<Profile/>}/>
+                                            <Route path="/friends" element={<Friends/>}/>
+                                            <Route path="/landing" element={<Landing/>}/>
+                                            <Route path="/settings" element={<Settings/>}/>
+                                            <Route path="/documentation" element={<Redirect/>}/>
+                                            <Route path="/developer-onboarding" element={<DeveloperOnboard/>}/>
+                                        </Route>
                                     </Routes>
                                     </ProfileCreationProvider>
                                 </Router>
