@@ -1,0 +1,30 @@
+
+.display-settings.settings-right{
+    .settings-left .display{
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        padding: 10px 18px;
+        gap: 10px;
+        /* height:43px; */
+        width:100%;
+        box-sizing: border-box;
+        font-family: 'Satoshi';
+        font-size: 14px;
+        color: var(--text);
+        transition: all 0.3s;
+        border-radius: 10px;
+        cursor:pointer;
+    }
+    
+    .settings-left .display button {
+        background: none;
+        border: none;
+    }
+    
+     img {
+        flex-direction: row;
+        border-radius: 0%;
+    }
+
+}

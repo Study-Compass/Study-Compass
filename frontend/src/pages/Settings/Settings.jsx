@@ -2,10 +2,12 @@ import React, { useEffect, useState } from 'react';
 import Header from '../../components/Header/Header';
 import AccountSettings from '../../components/AcccountSettings/AccountSettings.jsx';
 import StudyPreferences from '../../components/StudyPreferences/StudyPreferences.jsx';
+import DisplaySettings from '../../components/DisplaySettings/DisplaySettings.jsx';
 import './Settings.css';
 import pfp from '../../assets/defaultAvatar.svg';
 import preferences from '../../assets/Icons/Preferences.svg';
 import rightarrow from '../../assets/Icons/RightArrow.svg';
+import display from '../../assets/Icons/DisplaySettings.svg'
 import useAuth from '../../hooks/useAuth.js';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -105,7 +107,7 @@ function Settings() {
                             )}
 
                         </div>
-                        <div className='preferences'  onClick={()=>{handleArrowClick('StudyPreferences')}}>
+                        <div className={`preferences ${currentPage === "StudyPreferences" && 'selected'}`}  onClick={()=>{handleArrowClick('StudyPreferences')}}>
                             <img src={preferences} alt="" />
                             <p>Study Preferences</p>
                             {width <= 700 && (
@@ -114,6 +116,16 @@ function Settings() {
                                 </button>
                             )}
                         </div>       
+                        <div className={`preferences ${currentPage === "DisplaySettings" && 'selected'}`} onClick={()=>{handleArrowClick('DisplaySettings')}}>
+                            <img src={display} alt="" />
+                            <p>Display Settings</p>
+                            {width <= 700 && (
+                                <button className='right-arrow' >
+                                    <img src={rightarrow} alt="" />
+                                </button>
+                            )}
+                        </div>
+                        
                         {
                             isDeveloper !== null && !isDeveloper && (
                                 <button className='developer' onClick={()=>{navigate('/developer-onboarding')}}>
@@ -121,6 +133,7 @@ function Settings() {
                                 </button>
                             )
                         }
+
                     </div>     
 
 
@@ -144,6 +157,17 @@ function Settings() {
                             />
                         )
                     }
+                    {
+                        (width < 700 || currentPage === "DisplaySettings" ) && (
+                            <DisplaySettings
+                                settingsRightSide={currentPage === "DisplaySettings" ?  settingsRightSide : false}
+                                userInfo={userInfo}
+                                handleBackClick={handleBackClick}
+                                width={width}
+                            />
+                        )
+                    }
+
                 </div>
             </div>
             <div>

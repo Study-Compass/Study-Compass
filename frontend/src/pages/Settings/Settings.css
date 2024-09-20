@@ -34,7 +34,7 @@
     height:100%;
     border-right: 1px solid var(--lightborder);
     position: relative;
-
+    /* gap:10px; */
 }
 
 .settings-right{
@@ -71,7 +71,7 @@
     display: flex;
     flex-direction: column;
     /* height: 37px; */
-    width: 128px;
+    /* width: 128px; */
     padding-left: 10px;
 }
 
@@ -87,6 +87,7 @@
 .settings-left .header p{
     display: flex;
     flex-direction: column;
+    overflow:hidden;
     font-family: 'Satoshi';
     font-size: 14px;
     color: var(--border);
@@ -117,6 +118,24 @@
     transition: all 0.3s;
     border-radius: 10px;
     cursor:pointer;
+    position: relative;
+}
+
+.settings-left .preferences::before{
+    content:'';
+    position: absolute;
+    height:80%;
+    left:1px;
+    width:5px;
+    border-radius: 0 5px 5px 0;
+    background-color: transparent;
+    transition: 0.3s;
+}
+
+.settings-left .preferences.selected::before{
+    content:'';
+    position: absolute;
+    background-color: var(--red);
 }
 
 .settings-right .header{
@@ -345,7 +364,6 @@
 
 @media (max-width:700px) {
     .settings-left{
-        display:block;
         width:100%;
         border-right:none;
     }
@@ -388,14 +406,16 @@
 
     .settings-left .header p{
         font-size: 17px;
-        
+
     }
 
     .settings-left .preferences{
         font-size: 17px;
-        padding: 0px 24px;
+        /* padding: 0px 24px; */
         position: relative;
     }
+
+
 
     .settings-left .preferences img{
         width: 25px;
