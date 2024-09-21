@@ -12,7 +12,7 @@ function debounce(func, wait) { //move logic to other file
     };
 }
 
-const userSearch = async (query) => {
+const userSearch = async (query, setResults) => {
     try{
         const response = await axios.get(`/user-search/${query}`, {
             headers: {
@@ -25,6 +25,7 @@ const userSearch = async (query) => {
             return [];
         }
         console.log(responseBody.data);
+        setResults(responseBody.data);
         return responseBody.data;
     } catch (error){
         console.error('Error fetching search data:', error);

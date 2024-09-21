@@ -12,7 +12,10 @@ function Layout() {
       
       {/* This will render the content of the page (children) */}
       <main>
-        <Outlet />
+        <div className="out" style={{height:visible ? `calc(100vh - 20px)` : `100vh`}}>
+
+          <Outlet />
+        </div>
       </main>
     </div>
   );

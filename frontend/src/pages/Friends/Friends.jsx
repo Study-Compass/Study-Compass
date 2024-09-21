@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './Friends.css';
 import { useNavigate } from 'react-router-dom';
 import useAuth from '../../hooks/useAuth.js';
@@ -9,15 +9,23 @@ import AddFriend from '../../assets/Icons/Add-Friend.svg';
 import { getFriends, sendFriendRequest, updateFriendRequest, getFriendRequests, debounceUserSearch } from './FriendsHelpers.js';
 import { useNotification } from '../../NotificationContext.js';
 import FriendRequest from './FriendRequest/FriendRequest.jsx';
+import FriendGradient from '../../assets/FriendGrad.png';
+import useClickOutside from '../../hooks/useClickOutside.js';
+import useOutsideClick from '../../hooks/useClickOutside.js';
 
 function Friends() {
-    const { isAuthenticated, isAuthenticating, user } = useAuth();
+    const { isAuthenticated, isAuthenticating, user, checkedIn } = useAuth();
     const navigate = useNavigate();
     const [addValue, setAddValue] = useState("");
     const [contentState, setContentState] = useState('friends');
     const [friends, setFriends] = useState([]);
     const [friendRequests, setFriendRequests] = useState([]);
     const [reload, setReload] = useState(0);
+
+    const [results, setResults] = useState([]);
+    const [showSearch, setShowSearch] = useState(false);
+
+    const wrapperRef = useRef(null);
     
     const { addNotification } = useNotification();
 
@@ -64,8 +72,11 @@ function Friends() {
 
     useEffect(() => {
         const search = async () => {
-            if(addValue.length > 1){
-                const result = debounceUserSearch(addValue);
+            if(addValue.length > 0){
+                const result = debounceUserSearch(addValue, setResults);
+                // console.log(result);
+            } else {
+                setResults([]);
             }
         }
         search();
@@ -77,12 +88,29 @@ function Friends() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const result = await sendFriendRequest(addValue.slice(1));
+        // const result = await sendFriendRequest(addValue.slice(1));
+        // console.log(result);
+        // setReload(reload + 1);
+        // if(result === 'Friend request sent'){
+        //     addNotification({title: 'Friend request sent', message: 'Friend request sent successfully', type: 'success'});
+        //     setAddValue('');
+        //     return;
+        // }
+        // if(result === 'User not found'){
+        //     addNotification({title: 'User not found', message: 'We could not find a user with that username', type: 'error'});
+        // } else {
+        //     addNotification({title: 'Error sending friend request', message: result, type: 'error'});
+        // }
+        // setAddValue('');
+    }
+
+    const handleFriendRequest = async (friendUsername) => {
+        console.log(friendUsername);
+        const result = await sendFriendRequest(friendUsername);
         console.log(result);
         setReload(reload + 1);
         if(result === 'Friend request sent'){
             addNotification({title: 'Friend request sent', message: 'Friend request sent successfully', type: 'success'});
-            setAddValue('');
             return;
         }
         if(result === 'User not found'){
@@ -90,22 +118,35 @@ function Friends() {
         } else {
             addNotification({title: 'Error sending friend request', message: result, type: 'error'});
         }
-        setAddValue('');
     }
+
+    useOutsideClick(wrapperRef, () => {
+        setShowSearch(false);
+    }, ['add-friend-icon', 'add-friend', 'friends-results']);
+
 
     const [viewport, setViewport] = useState("100vh");
     useEffect(() => {
-        setViewport((window.innerHeight) + 'px');
-    },[]);
+        let height = window.innerHeight;
+        if(checkedIn!==null){
+            height -= 20;
+        }
+        setViewport(height);
+    },[checkedIn]);
 
     const handlePending = () =>{
         console.log('pending');
         setContentState(contentState === 'pending' ? 'friends' : 'pending');
     };
 
+    const handleShowSearch = () => {    
+        setShowSearch(!showSearch);
+    }
+
     return (
         
         <div className="friends component" style={{height: viewport}}>
+            <div className={`dark-overlay ${showSearch ? "active" : ""}`}></div>
             <Header />
             { user && isAuthenticated &&
                 <div className="friends-container">
@@ -114,17 +155,29 @@ function Friends() {
                             <div className="profile-picture">
                                 <img src={pfp} alt="" />
                             </div>
-                                <div className="user-content">
-                                    <h1>{user.name}</h1>
-                                    <p>@{user.username}</p>
-                                </div>
+                            <div className="user-content">
+                                <h1>{user.name}</h1>
+                                <p>@{user.username}</p>
+                            </div>
+                            <div className="gradient">
+                                <img src={FriendGradient} alt="" />
+                            </div>
                         </div>
-                        <form className="add-friend" onSubmit={handleSubmit}>
-                            <input type="text" placeholder="add a friend by username" value={addValue} onChange={handleAddChange}/>
+                        <form className={`add-friend ${showSearch ? "active" : ""}`} onSubmit={handleSubmit} ref={wrapperRef}>
+                            <input type="text" placeholder="add a friend by username" value={addValue} onChange={handleAddChange} onFocus={handleShowSearch}/>
                             <div className="add-friend-icon">
                                 <img src={AddFriend} alt=""/>
                             </div>
-                            <button type="submit">add</button>
+                            <div className={`friends-results ${showSearch ? "active" : ""}`}>
+                                {
+                                    results.map(user => {
+                                        return <div onClick={()=>{handleFriendRequest(user.username)}}>
+                                            <Friend friend={user} key={user._id} isFriendRequest={true} reload={reload} setReload={setReload}/>
+                                        </div>
+
+                                    })
+                                }
+                            </div>
                         </form>
 
                         <div className="friends-list">

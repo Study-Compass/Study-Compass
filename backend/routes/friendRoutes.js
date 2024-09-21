@@ -8,7 +8,12 @@ const User = require('../schemas/user');
 router.get('/user-search/:searchTerm', verifyToken, async (req, res) => {
     const { searchTerm } = req.params;
     try {
-        const users = await User.find({ username: { $regex: new RegExp(searchTerm, 'i') } });
+        //find users with username containing searchTerm, ignore current user
+        const users = await User.find({
+            username: { $regex: new RegExp(searchTerm, 'i') },
+            _id: { $ne: req.user.userId }
+        });
+        // const users = await User.find({ username: { $regex: new RegExp(searchTerm, 'i') } });
         //order by relevance
         users.sort((a, b) => {
             const aIndex = a.username.toLowerCase().indexOf(searchTerm.toLowerCase());
