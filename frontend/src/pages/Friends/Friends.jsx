@@ -88,20 +88,20 @@ function Friends() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const result = await sendFriendRequest(addValue.slice(1));
-        console.log(result);
-        setReload(reload + 1);
-        if(result === 'Friend request sent'){
-            addNotification({title: 'Friend request sent', message: 'Friend request sent successfully', type: 'success'});
-            setAddValue('');
-            return;
-        }
-        if(result === 'User not found'){
-            addNotification({title: 'User not found', message: 'We could not find a user with that username', type: 'error'});
-        } else {
-            addNotification({title: 'Error sending friend request', message: result, type: 'error'});
-        }
-        setAddValue('');
+        // const result = await sendFriendRequest(addValue.slice(1));
+        // console.log(result);
+        // setReload(reload + 1);
+        // if(result === 'Friend request sent'){
+        //     addNotification({title: 'Friend request sent', message: 'Friend request sent successfully', type: 'success'});
+        //     setAddValue('');
+        //     return;
+        // }
+        // if(result === 'User not found'){
+        //     addNotification({title: 'User not found', message: 'We could not find a user with that username', type: 'error'});
+        // } else {
+        //     addNotification({title: 'Error sending friend request', message: result, type: 'error'});
+        // }
+        // setAddValue('');
     }
 
     const handleFriendRequest = async (friendUsername) => {
@@ -168,7 +168,6 @@ function Friends() {
                             <div className="add-friend-icon">
                                 <img src={AddFriend} alt=""/>
                             </div>
-                            <button type="submit">add</button>
                             <div className={`friends-results ${showSearch ? "active" : ""}`}>
                                 {
                                     results.map(user => {
