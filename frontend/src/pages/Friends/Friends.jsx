@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './Friends.css';
 import { useNavigate } from 'react-router-dom';
 import useAuth from '../../hooks/useAuth.js';
@@ -9,6 +9,9 @@ import AddFriend from '../../assets/Icons/Add-Friend.svg';
 import { getFriends, sendFriendRequest, updateFriendRequest, getFriendRequests, debounceUserSearch } from './FriendsHelpers.js';
 import { useNotification } from '../../NotificationContext.js';
 import FriendRequest from './FriendRequest/FriendRequest.jsx';
+import FriendGradient from '../../assets/FriendGrad.png';
+import useClickOutside from '../../hooks/useClickOutside.js';
+import useOutsideClick from '../../hooks/useClickOutside.js';
 
 function Friends() {
     const { isAuthenticated, isAuthenticating, user, checkedIn } = useAuth();
@@ -21,6 +24,8 @@ function Friends() {
 
     const [results, setResults] = useState([]);
     const [showSearch, setShowSearch] = useState(false);
+
+    const wrapperRef = useRef(null);
     
     const { addNotification } = useNotification();
 
@@ -99,6 +104,27 @@ function Friends() {
         setAddValue('');
     }
 
+    const handleFriendRequest = async (friendUsername) => {
+        console.log(friendUsername);
+        const result = await sendFriendRequest(friendUsername);
+        console.log(result);
+        setReload(reload + 1);
+        if(result === 'Friend request sent'){
+            addNotification({title: 'Friend request sent', message: 'Friend request sent successfully', type: 'success'});
+            return;
+        }
+        if(result === 'User not found'){
+            addNotification({title: 'User not found', message: 'We could not find a user with that username', type: 'error'});
+        } else {
+            addNotification({title: 'Error sending friend request', message: result, type: 'error'});
+        }
+    }
+
+    useOutsideClick(wrapperRef, () => {
+        setShowSearch(false);
+    }, ['add-friend-icon', 'add-friend', 'friends-results']);
+
+
     const [viewport, setViewport] = useState("100vh");
     useEffect(() => {
         let height = window.innerHeight;
@@ -129,13 +155,16 @@ function Friends() {
                             <div className="profile-picture">
                                 <img src={pfp} alt="" />
                             </div>
-                                <div className="user-content">
-                                    <h1>{user.name}</h1>
-                                    <p>@{user.username}</p>
-                                </div>
+                            <div className="user-content">
+                                <h1>{user.name}</h1>
+                                <p>@{user.username}</p>
+                            </div>
+                            <div className="gradient">
+                                <img src={FriendGradient} alt="" />
+                            </div>
                         </div>
-                        <form className={`add-friend ${showSearch ? "active" : ""}`} onSubmit={handleSubmit} >
-                            <input type="text" placeholder="add a friend by username" value={addValue} onChange={handleAddChange} onFocus={handleShowSearch} onBlur={handleShowSearch}/>
+                        <form className={`add-friend ${showSearch ? "active" : ""}`} onSubmit={handleSubmit} ref={wrapperRef}>
+                            <input type="text" placeholder="add a friend by username" value={addValue} onChange={handleAddChange} onFocus={handleShowSearch}/>
                             <div className="add-friend-icon">
                                 <img src={AddFriend} alt=""/>
                             </div>
@@ -143,7 +172,10 @@ function Friends() {
                             <div className={`friends-results ${showSearch ? "active" : ""}`}>
                                 {
                                     results.map(user => {
-                                        return <Friend friend={user} key={user._id} isFriendRequest={true} reload={reload} setReload={setReload}/>
+                                        return <div onClick={()=>{handleFriendRequest(user.username)}}>
+                                            <Friend friend={user} key={user._id} isFriendRequest={true} reload={reload} setReload={setReload}/>
+                                        </div>
+
                                     })
                                 }
                             </div>

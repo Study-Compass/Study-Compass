@@ -8,6 +8,7 @@
     border-bottom: 1px solid var(--lightborder);
     position: relative;
     align-items: center;
+    cursor: pointer;
 }
 
 .friend .friend-content{
