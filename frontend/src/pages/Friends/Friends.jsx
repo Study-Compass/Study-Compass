@@ -11,13 +11,16 @@ import { useNotification } from '../../NotificationContext.js';
 import FriendRequest from './FriendRequest/FriendRequest.jsx';
 
 function Friends() {
-    const { isAuthenticated, isAuthenticating, user } = useAuth();
+    const { isAuthenticated, isAuthenticating, user, checkedIn } = useAuth();
     const navigate = useNavigate();
     const [addValue, setAddValue] = useState("");
     const [contentState, setContentState] = useState('friends');
     const [friends, setFriends] = useState([]);
     const [friendRequests, setFriendRequests] = useState([]);
     const [reload, setReload] = useState(0);
+
+    const [results, setResults] = useState([]);
+    const [showSearch, setShowSearch] = useState(false);
     
     const { addNotification } = useNotification();
 
@@ -64,8 +67,11 @@ function Friends() {
 
     useEffect(() => {
         const search = async () => {
-            if(addValue.length > 1){
-                const result = debounceUserSearch(addValue);
+            if(addValue.length > 0){
+                const result = debounceUserSearch(addValue, setResults);
+                // console.log(result);
+            } else {
+                setResults([]);
             }
         }
         search();
@@ -95,17 +101,26 @@ function Friends() {
 
     const [viewport, setViewport] = useState("100vh");
     useEffect(() => {
-        setViewport((window.innerHeight) + 'px');
-    },[]);
+        let height = window.innerHeight;
+        if(checkedIn!==null){
+            height -= 20;
+        }
+        setViewport(height);
+    },[checkedIn]);
 
     const handlePending = () =>{
         console.log('pending');
         setContentState(contentState === 'pending' ? 'friends' : 'pending');
     };
 
+    const handleShowSearch = () => {    
+        setShowSearch(!showSearch);
+    }
+
     return (
         
         <div className="friends component" style={{height: viewport}}>
+            <div className={`dark-overlay ${showSearch ? "active" : ""}`}></div>
             <Header />
             { user && isAuthenticated &&
                 <div className="friends-container">
@@ -119,12 +134,19 @@ function Friends() {
                                     <p>@{user.username}</p>
                                 </div>
                         </div>
-                        <form className="add-friend" onSubmit={handleSubmit}>
-                            <input type="text" placeholder="add a friend by username" value={addValue} onChange={handleAddChange}/>
+                        <form className={`add-friend ${showSearch ? "active" : ""}`} onSubmit={handleSubmit} >
+                            <input type="text" placeholder="add a friend by username" value={addValue} onChange={handleAddChange} onFocus={handleShowSearch} onBlur={handleShowSearch}/>
                             <div className="add-friend-icon">
                                 <img src={AddFriend} alt=""/>
                             </div>
                             <button type="submit">add</button>
+                            <div className={`friends-results ${showSearch ? "active" : ""}`}>
+                                {
+                                    results.map(user => {
+                                        return <Friend friend={user} key={user._id} isFriendRequest={true} reload={reload} setReload={setReload}/>
+                                    })
+                                }
+                            </div>
                         </form>
 
                         <div className="friends-list">

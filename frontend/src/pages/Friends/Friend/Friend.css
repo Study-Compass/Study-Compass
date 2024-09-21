@@ -4,8 +4,8 @@
     justify-content:space-between;
     padding:12px;
     box-sizing: border-box;
-    background-color: var(--lighter);
-    border-radius: 10px;
+    background-color: var(--background);
+    border-bottom: 1px solid var(--lightborder);
     position: relative;
     align-items: center;
 }
