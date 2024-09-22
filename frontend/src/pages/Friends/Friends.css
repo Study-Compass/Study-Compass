@@ -16,7 +16,7 @@
         width: 100vw;
         height: 100vh;
         background-color: rgba(0, 0, 0, 0.1);
-        z-index: 99;
+        z-index: 18;
         display: block;
         top:0;
         left:0;
@@ -111,7 +111,7 @@
 
 .friends .add-friend.active{
     transform: scale(1.01);
-    z-index: 101;
+    z-index: 19;
 }
 
 .friends .add-friend .friends-results::-webkit-scrollbar {
@@ -129,7 +129,7 @@
     background-color: var(--light);
     border-radius: 0 0 10px 10px;
     box-shadow: var(--shadow);
-    z-index: 100;
+    z-index: 19;
     max-height: 200px;
     overflow-y: scroll;
     display:none;
@@ -169,7 +169,7 @@
     justify-content:center;
     align-items:center;
     cursor:pointer;
-    z-index: 101;
+    z-index: 19;
 }
 
 .friends .add-friend button:hover{
@@ -189,7 +189,7 @@
     color: var(--text);
     font-weight:500;
     padding-left:40px;
-    z-index: 101;
+    z-index: 19;
     position: relative; 
 }
 

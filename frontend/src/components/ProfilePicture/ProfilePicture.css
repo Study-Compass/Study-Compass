@@ -1,6 +1,7 @@
 .profile-picture{
     height:50px;
     position: relative;
+    
 }
 
 .profile-picture .profile{
@@ -73,11 +74,13 @@
     width:100%; 
     align-items: center;
     justify-content: flex-start;
+    z-index: 1000;
 }
 
 .popup-content .profile{
     height:40px;
     width:40px;
+    z-index: 1000;
 }
 
 .popup-content h3{
