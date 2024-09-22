@@ -64,15 +64,23 @@
 
 .landing .content button{
     font-family: 'Satoshi';
-    font-size:1.4em;
+    font-size:2em;
     color: white;
     background-color: var(--red);
     font-weight: bold;
     border:none;
     outline: none;
     padding: 5px 25px;
-    border-radius: 10px;
+    border-radius: 15px;
     position: relative;
+    display:flex;
+    gap:10px;
+    align-items: center;
+}
+
+.landing .content button img{
+    width: 20px;
+    height: 20px;
 }
 
 .landing .try-button::after{

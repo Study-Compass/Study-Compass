@@ -603,9 +603,22 @@ router.get('/user-rated', verifyToken, async (req, res) => {
 });
 
 router.get('/get-ratings', async (req, res) => {
-    const classroomId = req.query.classroomId;
+    let classroomId = req.query.classroomId;
     try{
-        const ratings = await Rating.find({ classroom_id: classroomId });
+        classroomId = new mongoose.Types.ObjectId(classroomId);
+        //attach user object to each rating
+        const ratings = await Rating.aggregate([
+            { $match: { classroom_id: classroomId } },
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "user_id",
+                    foreignField: "_id",
+                    as: "user_info"
+                }
+            }
+        ]);
+        // const ratings = await Rating.find({ classroom_id: classroomId });
         console.log(`GET: /get-ratings/${classroomId}`);
         res.json({ success: true, message: "Ratings fetched", data: ratings });
     } catch(error){
@@ -613,6 +626,44 @@ router.get('/get-ratings', async (req, res) => {
         return res.status(500).json({ success: false, message: 'Error finding ratings', error: error.message});
     }
 });
+
+router.post('/delete-rating', verifyToken, async (req, res) => {
+    const userId = req.user.userId;
+    const classroomId = req.body.classroomId;
+    try{
+        const rating = await Rating.findOne({ user_id: userId, classroom_id: classroomId });
+        if(!rating){
+            return res.status(404).json({ success: false, message: "Rating not found" });
+        }
+        await rating.delete();
+        console.log(`POST: /delete-rating/${userId}/${classroomId}`);
+        res.json({ success: true, message: "Rating deleted" });
+    }
+    catch(error){
+        return res.status(500).json({ success: false, message: 'Error finding rating', error: error.message});
+    }
+});
+
+// router.post('/get-detailed-rating-batch', async (req, res) => {
+//     let queries = req.body.queries;
+//     try {
+//         //attach user info to each rating
+//         queries = queries.map(id => new mongoose.Types.ObjectId(id));
+//         const results = Rating.aggregate([
+//             { $match: { classroom_id: { $in: queries } } },
+//             {
+//                 $lookup: {
+//                     from: "users",
+//                     localField: "user_id",
+//                     foreignField: "_id",
+//                     as: "user_info"
+//                 }
+//             }
+//         ]);
+//     } catch (error) {   
+//         return res.status(500).json({ success: false, message: 'Error finding ratings', error: error.message});
+//     }
+// }); 
 
 router.post('/send-report', verifyToken, async (req, res) => {
     const userId = req.user.userId;

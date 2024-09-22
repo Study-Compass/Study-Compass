@@ -6,6 +6,8 @@ import landing from '../../assets/Landing.png';
 import landingGrad from '../../assets/LandingGradient.png';
 import Header from "../../components/Header/Header";
 import Typing from "../../components/Typing/Typing";
+import rightarrow from '../../assets/rightarrow.svg';
+
 
 function Landing() {
     const [viewport, setViewport] = useState("100vh");
@@ -52,9 +54,11 @@ function Landing() {
             <img src={landing} alt="" className={`hero-picture ${graphicActive ? "active" : ""}`}  onLoad={()=>{setHeroLoaded(true)}}/>
             <img src={landingGrad} alt=""  className={`hero-gradient ${gradientActive ? "active" : ""}`} onLoad={()=>{setGradientLoaded(true)}}/>
             <div className="content">
-                <h1>where are <b>you</b> studing?</h1>
+                <h1>where are <b>you</b> studying?</h1>
                 <button className={`try-button ${buttonActive ? "active" : ""} `} onClick={()=>{navigate('/room/none')}}>
                     <Typing entries={typingEntries} showCaret={true}/>
+                    {/* <img src={rightarrow} alt="" /> */}
+
                 </button>
             </div>
         </div>

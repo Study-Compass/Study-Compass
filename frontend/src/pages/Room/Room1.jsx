@@ -203,7 +203,7 @@ function Room() {
                 navigate('/onboard');
             }
         }
-        if(isAuthenticating){
+        if(!roomIds){
             return;
         }
         const searchParams = new URLSearchParams(window.location.search);

@@ -14,6 +14,7 @@ import RatingComponent from '../Rating/Rating.jsx';
 import Flag from '../Flag/Flag.jsx';
 import Popup from '../Popup/Popup.jsx';
 import UserRating from './UserRating/UserRating.jsx';
+import AllRatings from './AllRatings/AllRatings.jsx';
 
 import Edit from '../../assets/Icons/Edit.svg';
 import Outlets from '../../assets/Icons/Outlets.svg';
@@ -25,7 +26,7 @@ import useOutsideClick from '../../hooks/useClickOutside';
 
 import Image from '../../assets/Icons/Image.svg';
 
-import { checkIn, checkOut, getUser, getUsers, userRated } from '../../DBInteractions.js';
+import { checkIn, checkOut, getUser, getUsers, userRated, getRatings } from '../../DBInteractions.js';
 import { findNext } from '../../pages/Room/RoomHelpers.js';
 import { useNotification } from '../../NotificationContext.js';
 import { useWebSocket } from '../../WebSocketContext.js';
@@ -83,7 +84,6 @@ function Classroom({ room, state, setState, schedule, roomName, width, setShowMo
 
     const handleCheckInEvent = (data) => {
         if (data.classroomId === room._id) {
-          console.log('another user checked in');
           reload();
           handleNewUserCheckIn();
         }
@@ -91,18 +91,22 @@ function Classroom({ room, state, setState, schedule, roomName, width, setShowMo
   
       const handleCheckOutEvent = (data) => {
         if (data.classroomId === room._id) {
-          console.log('another user checked out');
           reload();
           // ... your existing logic
         }
       };
 
+      let fetched = false;
     useEffect(() => {
         if(!room){
             return;
         }
+        if(fetched){
+            return;
+        }
         getCheckedInUsers();        
         getRating();
+        fetched = true;
         // Join the room for this classroom
         emit('join-classroom', room._id);
 
@@ -115,7 +119,7 @@ function Classroom({ room, state, setState, schedule, roomName, width, setShowMo
           off('check-in', handleCheckInEvent);
           off('check-out', handleCheckOutEvent);
         };
-      }, [room]);
+    }, [room]);
 
     useEffect(() => {
 
@@ -191,9 +195,12 @@ function Classroom({ room, state, setState, schedule, roomName, width, setShowMo
     }, [schedule]);
     
     const [isRatingPopupOpen, setIsRatingPopupOpen] = useState(false);
+    const [isAllRatingsOpen, setIsAllRatingsOpen] = useState(false);
 
     const handleOpenRatingPopup = () => setIsRatingPopupOpen(true);
     const handleCloseRatingPopup = () => setIsRatingPopupOpen(false);
+    const handleOpenAllRatings = () => setIsAllRatingsOpen(true);
+    const handleCloseAllRatings = () => setIsAllRatingsOpen(false);
 
     if (!room) {
         return <Loader />;
@@ -266,6 +273,9 @@ function Classroom({ room, state, setState, schedule, roomName, width, setShowMo
 
     return (
         <div className={`classroom-component  ${user && room.checked_in.includes(user._id) ? "checked-in" : ""}`}>
+            <Popup isOpen={isAllRatingsOpen} onClose={handleCloseAllRatings}>
+                {isAllRatingsOpen && <AllRatings classroomId={room._id} />}
+            </Popup>
             <Popup isOpen={isRatingPopupOpen} onClose={handleCloseRatingPopup}>
                 <RatingComponent classroomId={room._id} rating={rating} setRating={setRating} name={room.name} reload={reload}/>
             </Popup>
@@ -300,8 +310,7 @@ function Classroom({ room, state, setState, schedule, roomName, width, setShowMo
                         </div>
                     </div>
 
-                    <div className="info-row">
-                        
+                    <div className="info-row">      
                         <div className="rating">
                             <img src={FilledStar} alt="star" />
                             <p>{room.average_rating.toFixed(1)}</p> 
@@ -342,6 +351,9 @@ function Classroom({ room, state, setState, schedule, roomName, width, setShowMo
                     <div>
                         <Flag functions={setIsUp} primary={"rgba(176, 175, 175, .13)"} img={circleWarning} accent={"#D9D9D9"} color={"#737373"} text={"As Study Compass is still in beta, certain information may be incorrect. Reporting incorrect information is an important part of our troubleshooting process, so please help us out!"} />
                     </div>
+                    <button onClick={handleOpenAllRatings}>
+                        see all ratings
+                    </button>
 
                     <div className="filler" style={{ height: `${fillerHeight}px` }}>
 

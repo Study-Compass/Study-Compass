@@ -1,9 +1,7 @@
 .user-rating{
     display: flex;
-    background-color: var(--light);
-    border-radius: 10px;
     box-sizing: border-box;
-    margin: 30px 0 10px 0;
+    margin:5px;
     justify-content: flex-start;
     width:100%;
     position: relative;
@@ -38,6 +36,7 @@
             font-family: 'Inter';
             font-weight:700;
             color: var(--text);
+            flex-grow: 0;
         }
 
         .info-row{
@@ -79,13 +78,20 @@
 
 }
 
+.user-rating.own{
+    margin: 30px 0 10px 0;
+    background-color: var(--light);
+    border-radius: 10px;
+
+}
+
 .user-rating.placeholder{
     height:70px;
     align-items: center;
     justify-content: center;
 }
 
-.user-rating:after{
+.user-rating.own:after{
     content: "Your Rating";
     font-size:12px;
     font-family: 'Inter';
