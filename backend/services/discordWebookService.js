@@ -3,9 +3,9 @@ const express = require('express');
 const axios = require('axios');
 
 function sendDiscordMessage (title, message, type){
-    // if(process.env.NODE_ENV === "development"){
-    //     return;
-    // }
+    if(process.env.NODE_ENV === "development"){
+        return;
+    }
 
     const typeColors={
         error: 16711680,

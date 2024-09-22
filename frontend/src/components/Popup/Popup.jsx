@@ -4,7 +4,7 @@ import './Popup.css'; // Assuming this contains your animation and styling
 import useOutsideClick from '../../hooks/useClickOutside';
 import X from '../../assets/x.svg';
 
-const Popup = ({ children, isOpen, onClose }) => {
+const Popup = ({ children, isOpen, onClose, defaultStyling=true }) => {
     const [render, setRender] = useState(isOpen);
     const [show, setShow] = useState(false);
 
@@ -47,7 +47,7 @@ const Popup = ({ children, isOpen, onClose }) => {
 
   return ReactDOM.createPortal(
     <div className={`popup-overlay ${show ? 'fade-in' : 'fade-out'}`}>
-      <div className={`popup-content ${show ? 'slide-in' : 'slide-out'}`} ref={ref}>
+      <div className={`popup-content ${show ? 'slide-in' : 'slide-out'} ${defaultStyling ? "" : "no-styling"}`} ref={ref}>
         <img src={X} alt="" onClick={handleClose} className="close-popup" />
         {renderChildrenWithClose()} {/* Render children with handleClose prop */}
       </div>
