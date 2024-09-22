@@ -5,7 +5,7 @@ import logo from '../../assets/red_logo.svg';
 import landing from '../../assets/Landing.png';
 import landingGrad from '../../assets/LandingGradient.png';
 import Header from "../../components/Header/Header";
-import { set } from "mongoose";
+import Typing from "../../components/Typing/Typing";
 
 function Landing() {
     const [viewport, setViewport] = useState("100vh");
@@ -40,14 +40,22 @@ function Landing() {
     
     const navigate = useNavigate();
 
+    const typingEntries = [
+        { text: 'academy hall', time: 2000 },
+        { text: 'dcc', time: 2000 },
+        { text: 'jrowl', time: 2000 },
+    ];
+
     return(
         <div className="landing" style={{height: viewport}}>
             <Header/>   
             <img src={landing} alt="" className={`hero-picture ${graphicActive ? "active" : ""}`}  onLoad={()=>{setHeroLoaded(true)}}/>
             <img src={landingGrad} alt=""  className={`hero-gradient ${gradientActive ? "active" : ""}`} onLoad={()=>{setGradientLoaded(true)}}/>
             <div className="content">
-                <h1>wish you could see rpi classroom schedules? they're all here.</h1>
-                <button className={`try-button ${buttonActive ? "active" : ""} `} onClick={()=>{navigate('/room/none')}}>try it out!</button>
+                <h1>where are <b>you</b> studing?</h1>
+                <button className={`try-button ${buttonActive ? "active" : ""} `} onClick={()=>{navigate('/room/none')}}>
+                    <Typing entries={typingEntries} showCaret={true}/>
+                </button>
             </div>
         </div>
     )
