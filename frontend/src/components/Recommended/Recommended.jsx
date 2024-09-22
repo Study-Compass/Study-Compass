@@ -10,7 +10,7 @@ import useAuth from '../../hooks/useAuth.js';
 function Recommended({id, debouncedFetchData, changeURLHelper, findNext, hide}) {
     const [room, setRoom] = useState(null);
     const [height, setHeight] = useState("auto");
-
+    let fetched = false;
 
     const { isAuthenticating, isAuthenticated } = useAuth();
 
@@ -48,10 +48,12 @@ function Recommended({id, debouncedFetchData, changeURLHelper, findNext, hide}) 
     },[hide,containerRef.current]);
 
     useEffect(() => {
-        if(id !== null){
+        if(id !== null && !fetched){
             console.log("hi");
             fetchDataHelper(id);
+            fetched = true;
         }
+        
     }, [id]);
 
     // useEffect(() => {
