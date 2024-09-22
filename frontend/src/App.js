@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import './App.css';
 import Room from './pages/Room/Room';
 import Room1 from './pages/Room/Room1';
@@ -21,8 +21,24 @@ import { ErrorProvider } from './ErrorContext';
 import { ProfileCreationProvider } from './ProfileCreationContext';
 import { WebSocketProvider } from './WebSocketContext';
 import Layout from './pages/Layout/Layout';
+import axios from 'axios';
 
 function App() {
+    useEffect(() => {
+        // check if the user has already visited
+        const hasVisited = localStorage.getItem('hasVisited');
+
+        if (!hasVisited) {
+            // Log the visit to the backend
+            axios.post('/log-visit')
+                .then(response => {
+                    localStorage.setItem('hasVisited', true);  // Mark as visited
+                })
+                .catch(error => {
+                    console.error('Error logging visit', error);
+                });
+        }
+    }, []);
     // document.documentElement.classList.add('dark-mode');
     return (
         <GoogleOAuthProvider clientId="639818062398-k4qnm9l320phu967ctc2l1jt1sp9ib7p.apps.googleusercontent.com">

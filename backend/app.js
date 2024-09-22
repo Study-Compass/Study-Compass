@@ -60,11 +60,13 @@ const authRoutes = require('./routes/authRoutes.js');
 const dataRoutes = require('./routes/dataRoutes.js');
 const friendRoutes = require('./routes/friendRoutes.js');
 const userRoutes = require('./routes/userRoutes.js');
+const analyticsRoutes = require('./routes/analytics.js');
 
 app.use(authRoutes);
 app.use(dataRoutes);
 app.use(friendRoutes);
 app.use(userRoutes);
+app.use(analyticsRoutes);
 
 app.get('/update-database', (req, res) => {
     const pythonProcess = spawn('python3', ['courseScraper.py']);
