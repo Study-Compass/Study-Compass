@@ -26,6 +26,7 @@ import Github from '../../assets/Icons/Github.svg';
 
 import { debounce} from '../../Query.js';
 import ProfilePicture from '../../components/ProfilePicture/ProfilePicture.jsx';
+import { set } from 'mongoose';
 
 /** 
 documentation:
@@ -45,7 +46,7 @@ function Room() {
     const [rooms, setRooms] = useState(null);
     const [roomIds, setRoomIds] = useState({});
     const [ready, setReady] = useState(false);
-    const { isAuthenticated, isAuthenticating, user } = useAuth();
+    const { isAuthenticated, isAuthenticating, user, checkedIn } = useAuth();
     const { getRooms, getRoomUpdate, getFreeRooms, getRoom, getBatch, search, allSearch } = useCache();
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -171,10 +172,20 @@ function Room() {
 
     const [viewport, setViewport] = useState("100vh");
     useEffect(() => {
-        setViewport((window.innerHeight) + 'px');
-        //add listener
-    },[]);
+        let height = window.innerHeight;
+        if(checkedIn!==null){
+            height -= 20;
+        }
+        if(!isAuthenticated && !isAuthenticating){
+            height -= 20;
+            setViewport(height + 'px');
+            console.log(height);
+        }
+        
+        setViewport(height + 'px');
 
+        //add listener
+    },[checkedIn, isAuthenticated, isAuthenticating]);
 
 
 //==========================================================================================================================================================
@@ -341,7 +352,7 @@ function Room() {
 //==========================================================================================================================================================
 
     return (    
-        <div className="room" style={{ height: width < 800 ? viewport : '100vh' }}>
+        <div className="room" style={{ height: viewport }}>
             {/* <Banner visible={bannerVisible} setVisible={setBannerVisible}/> */}
             <Report text={roomName} isUp={reportIsUp} setIsUp={setReportUp}/>
             <Header />
