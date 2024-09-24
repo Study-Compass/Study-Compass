@@ -6,6 +6,12 @@ import dark from '../../assets/Icons/DarkMode.svg';
 
 
 const DisplaySettings = ( {settingsRightSide, width, handleBackClick, rightarrow} ) => {
+    const [selectedMode, setSelectedMode] = useState(light);
+
+    const handleModeSelect = (mode) => {
+        setSelectedMode(mode);
+      };
+    
 
     return( 
         <div className={`study-preferences display-settings settings-right ${settingsRightSide ? "active" : "not-active"}`}>
@@ -22,17 +28,24 @@ const DisplaySettings = ( {settingsRightSide, width, handleBackClick, rightarrow
                 <h2>light-dark mode preference</h2>
                 <hr />
 
-                <div className='mode'> 
-                    <img src={light} alt="" />
-                
-                    <img src={dark} alt="" />
+                <div className='mode'>
+                    <div className='light-mode'> 
+                        <button onClick={() => handleModeSelect('light')}> 
+                            <img src={light} alt="" className={selectedMode === 'light' ? 'selected' : ''}/>
+                        </button>
+                    </div>
+
+                    <div className='dark-mode'>
+                        <button onClick={() => handleModeSelect('dark')}> 
+                            <img src={dark} alt="" className={selectedMode === '' ? 'selected' : ''}/>
+                        </button>
+
+                    </div>
+
                 </div>
-                
              </div>
 
         </div>
-
-
     );
 }
 

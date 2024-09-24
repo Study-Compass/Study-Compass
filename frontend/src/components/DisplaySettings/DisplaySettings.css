@@ -21,10 +21,40 @@
         background: none;
         border: none;
     }
-    
-     img {
+
+    .profile .mode{
+        display: flex;
         flex-direction: row;
-        border-radius: 0%;
     }
+    .profile .light-mode{
+        margin: 10px;
+        align-items: center;
+    }
+
+    .profile .dark-mode{
+        margin: 10px;
+        align-items: center;
+    }
+    
+    img {
+        border-radius: 0%;
+        width: 100px;
+        height: 70px;
+        margin-left: 0px;
+    }
+    
+    .profile .mode button {
+        background: none;
+        /* border-radius: 10px; */
+        /* border-color: red; */
+        padding: 3px;
+        border: none;
+        
+    }
+    .profile .mode img.selected {
+        border-radius: 10%; 
+        border: 2px;
+        border-color: red;
+      }
 
 }
