@@ -274,7 +274,7 @@ function Classroom({ room, state, setState, schedule, roomName, width, setShowMo
     return (
         <div className={`classroom-component  ${user && room.checked_in.includes(user._id) ? "checked-in" : ""}`}>
             <Popup isOpen={isAllRatingsOpen} onClose={handleCloseAllRatings}>
-                {isAllRatingsOpen && <AllRatings classroomId={room._id} />}
+                {isAllRatingsOpen && <AllRatings classroomId={room._id}/>}
             </Popup>
             <Popup isOpen={isRatingPopupOpen} onClose={handleCloseRatingPopup}>
                 <RatingComponent classroomId={room._id} rating={rating} setRating={setRating} name={room.name} reload={reload}/>
