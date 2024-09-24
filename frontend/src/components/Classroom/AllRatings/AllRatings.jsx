@@ -24,7 +24,7 @@ function AllRatings({ classroomId }) {
 
     return (
         <div className="all-ratings">
-            <h2>ratings</h2>
+            <h2>all ratings</h2>
             {ratings && ratings.map((rating) => (
                 <UserRating key={rating.id} rating={rating} providedUser={rating.user_info}/>
             ))}

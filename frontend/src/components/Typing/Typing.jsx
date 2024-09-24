@@ -17,6 +17,8 @@ const TypingComponent = ({ entries, showCaret = false }) => {
             const { text, time } = entries[entryIndex];
             setCompletingText(text);
 
+            //delay for 500ms with fake promise
+
             if (!isDeleting && charIndex < text.length) {
                 // Typing forward
                 setIsBlinking(false); // Stop blinking when typing

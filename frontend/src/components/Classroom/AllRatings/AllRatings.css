@@ -1,3 +1,10 @@
 .all-ratings{
     width:100%;
+    h2{
+        font-size: 18px;
+        margin: 0;
+        font-family: 'Inter';
+        font-weight:800;
+        color: var(--text);
+    }
 }

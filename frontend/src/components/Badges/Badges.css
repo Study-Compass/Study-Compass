@@ -15,7 +15,7 @@
 }
 
 .badge.small{
-    border-radius: 4px;
+    border-radius: 5px;
 
 }
 
@@ -30,11 +30,11 @@
 }
 
 .badge.small p{
-    margin:3px 5px !important;
+    margin: 4px 5px 3px 5px!important;
     line-height: 0.7;
     color:white !important;
     font-family: 'Inter' !important;
-    font-weight:500 !important;
+    font-weight:600 !important;
     text-wrap: nowrap;
 
 }

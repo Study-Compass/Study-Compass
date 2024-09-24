@@ -351,9 +351,9 @@ function Classroom({ room, state, setState, schedule, roomName, width, setShowMo
                     <div>
                         <Flag functions={setIsUp} primary={"rgba(176, 175, 175, .13)"} img={circleWarning} accent={"#D9D9D9"} color={"#737373"} text={"As Study Compass is still in beta, certain information may be incorrect. Reporting incorrect information is an important part of our troubleshooting process, so please help us out!"} />
                     </div>
-                    {/* <button onClick={handleOpenAllRatings}>
+                    <button onClick={handleOpenAllRatings}>
                         see all ratings
-                    </button> */}
+                    </button>
 
                     <div className="filler" style={{ height: `${fillerHeight}px` }}>
 
