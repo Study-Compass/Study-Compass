@@ -43,9 +43,9 @@ function Landing() {
     const navigate = useNavigate();
 
     const typingEntries = [
-        { text: 'academy hall', time: 2000 },
-        { text: 'dcc', time: 2000 },
-        { text: 'jrowl', time: 2000 },
+        { text: 'academy hall', time: 4000 },
+        { text: 'dcc', time: 4000 },
+        { text: 'jrowl', time: 4000 },
     ];
 
     return(
