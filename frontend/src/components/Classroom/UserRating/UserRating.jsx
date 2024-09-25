@@ -14,7 +14,6 @@ function UserRating({ rating, providedUser }) {
     useEffect(() => {
         if(providedUser){
             setUserInfo(providedUser[0]);
-            console.log(providedUser);
             return
         }
         if(userInfo){
@@ -29,7 +28,6 @@ function UserRating({ rating, providedUser }) {
         if(!userInfo){
             return;
         }
-        console.log(userInfo);
     }, [userInfo]);
 
     if(isAuthenticating){

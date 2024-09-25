@@ -120,7 +120,7 @@ function Classroom({ room, state, setState, schedule, roomName, width, setShowMo
             return;
         }
         getCheckedInUsers();
-        getRating();
+        // getRating();
         fetched = true;
         // Join the room for this classroom
         emit('join-classroom', room._id);
@@ -135,6 +135,16 @@ function Classroom({ room, state, setState, schedule, roomName, width, setShowMo
             off('check-out', handleCheckOutEvent);
         };
     }, [room]);
+    
+    useEffect(() => {
+        if (ratings.find(rating => rating.user_info._id === user._id)!==null) {
+            setUserRating(ratings.find(rating => rating.user_id === user._id));
+        }    
+    }, [ratings, user]);
+
+    useEffect(() => {
+        console.log(userRating);
+    }, [userRating]);
 
     useEffect(() => {
 

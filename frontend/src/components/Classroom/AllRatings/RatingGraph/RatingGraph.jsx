@@ -6,7 +6,6 @@ function RatingGraph({ ratings, average_rating }) {
     if(!ratings){
         return '';
     }
-    console.log(ratings);
     return (
         <div className="rating-graph">
             <div className="number-col">
