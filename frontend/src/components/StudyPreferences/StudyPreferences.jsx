@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import './StudyPreferences.css';
+import './StudyPreferences.scss';
 import DragList from '../../pages/OnBoarding/DragList/DragList';
 import Recommendation from '../../pages/OnBoarding/Recommendation/Recommendation';
 import rightarrow from '../../assets/Icons/RightArrow.svg';

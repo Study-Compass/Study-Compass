@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import './Friends.css';
+import './Friends.scss';
 import { useNavigate } from 'react-router-dom';
 import useAuth from '../../hooks/useAuth.js';
 import Header from '../../components/Header/Header.jsx';

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Header from '../../components/Header/Header';
 import AccountSettings from '../../components/AcccountSettings/AccountSettings.jsx';
 import StudyPreferences from '../../components/StudyPreferences/StudyPreferences.jsx';
-import './Settings.css';
+import './Settings.scss';
 import pfp from '../../assets/defaultAvatar.svg';
 import preferences from '../../assets/Icons/Preferences.svg';
 import rightarrow from '../../assets/Icons/RightArrow.svg';

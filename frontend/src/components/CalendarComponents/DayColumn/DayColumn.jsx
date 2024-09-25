@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import './DayColumn.css';
-import '../../../assets/fonts.css'
+import './DayColumn.scss';
 import TimeLabelColumn from '../TimeLabelColumn/TimeLabelColumn';
 
 function DayColumn({day, dayEvents, eventColors, empty, add, remove, queries}){

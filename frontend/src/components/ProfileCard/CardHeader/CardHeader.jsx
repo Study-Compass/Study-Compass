@@ -1,9 +1,9 @@
 import React from 'react';
-import './CardHeader.css';
+import './CardHeader.scss';
 import WhiteSettings from "../../../assets/Icons/WhiteSettings.svg"
 import defaultAvatar from "../../../assets/defaultAvatar.svg"
 import Badges from '../../Badges/Badges';
-import '../../ProfilePicture/ProfilePicture.css';
+import '../../ProfilePicture/ProfilePicture.scss';
 import GrainTexture from '../../../assets/Grain-Texture.png';
 
 function CardHeader({userInfo, settings}){

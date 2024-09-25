@@ -1,7 +1,7 @@
 import React,{ useEffect, useState, useRef } from 'react'
 import { useNavigate,useLocation, Link } from 'react-router-dom';
 import logo from '../../assets/red_logo.svg';
-import './Header.css';
+import './Header.scss';
 import ProfilePicture from '../ProfilePicture/ProfilePicture';
 import useAuth from '../../hooks/useAuth';
 import MobileLogo from '../../assets/MobileLogo.svg';

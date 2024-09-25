@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import '../Forms.css';
+import '../Forms.scss';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import useAuth from '../../../hooks/useAuth';
 import { useGoogleLogin } from '@react-oauth/google';

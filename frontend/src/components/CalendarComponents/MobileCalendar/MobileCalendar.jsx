@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import './MobileCalendar.css';
+import './MobileCalendar.scss';
 import DayColumn from '../DayColumn/DayColumn';
 
 import { useSpring, animated } from 'react-spring';

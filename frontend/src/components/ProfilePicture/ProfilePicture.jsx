@@ -1,5 +1,5 @@
 import React, { useState, useRef }from 'react'
-import './ProfilePicture.css'
+import './ProfilePicture.scss'
 import pfp from '../../assets/defaultAvatar.svg'
 import useAuth from '../../hooks/useAuth';
 import '../../assets/fonts.css'

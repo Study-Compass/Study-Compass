@@ -1,5 +1,5 @@
 import React from 'react';
-import './Result.css';
+import './Result.scss';
 import FilledStar from '../../../assets/Icons/FilledStar.svg';
 import Bookmark from '../../../assets/Icons/Bookmark.svg';
 import useAuth from '../../../hooks/useAuth';

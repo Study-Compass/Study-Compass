@@ -1,10 +1,9 @@
 import React, { useEffect, useState, useRef } from 'react';
-import './Classroom.css';
+import './Classroom.scss';
 import leftArrow from '../../assets/leftarrow.svg';
 import { useNavigate } from 'react-router-dom';
 import Bookmark from '../Interface/Bookmark/Bookmark';
 import useAuth from '../../hooks/useAuth.js';
-import '../../assets/fonts.css'
 import EditAttributes from './EditAttributes/EditAttributes.jsx';
 import CheckedIn from './CheckedIn/CheckedIn.jsx';
 import Loader from '../Loader/Loader.jsx';
@@ -31,7 +30,7 @@ import { findNext } from '../../pages/Room/RoomHelpers.js';
 import { useNotification } from '../../NotificationContext.js';
 import { useWebSocket } from '../../WebSocketContext.js';
 
-import '../../pages/Room/Room.css';
+import '../../pages/Room/Room.scss';
 import axios from 'axios';
 import Rating from 'react-rating';
 

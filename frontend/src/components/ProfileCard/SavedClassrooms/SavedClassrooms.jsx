@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import './SavedClassrooms.css';
+import './SavedClassrooms.scss';
 import { useNavigate } from 'react-router-dom';
 import Bookmark from "../../../assets/Icons/Bookmark.svg"
 import DownArrow from "../../../assets/Icons/DownArrow.svg"

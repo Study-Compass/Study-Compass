@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import './FileUpload.css'
+import './FileUpload.scss'
 import Upload from '../../assets/Icons/Upload.svg';
 import CircleX from '../../assets/Icons/Circle-X.svg';
 

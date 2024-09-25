@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import './Banner.css';
+import './Banner.scss';
 import { useNavigate } from 'react-router-dom';
 import useAuth from '../../hooks/useAuth.js';
 import Badges from '../Badges/Badges.jsx';

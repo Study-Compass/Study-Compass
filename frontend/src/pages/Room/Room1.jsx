@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Calendar from '../../components/CalendarComponents/Calendar/Calendar.jsx';
-import './Room.css';
+import './Room.scss';
 import Header from '../../components/Header/Header.jsx';
 import SearchBar from '../../components/SearchBar/SearchBar.jsx';
 import useAuth from '../../hooks/useAuth.js';

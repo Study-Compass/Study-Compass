@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef }from "react";
-import './SortBy.css';
+import './SortBy.scss';
 import useOutsideClick from '../../../hooks/useClickOutside';
 
 function SortBy({setSelected, sortBy, onApply}){

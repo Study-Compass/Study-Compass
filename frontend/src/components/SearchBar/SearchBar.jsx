@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import './SearchBar.css';
+import './SearchBar.scss';
 import x from '../../assets/x.svg';
 import { useNavigate } from 'react-router-dom';
 import tab from '../../assets/tab.svg';

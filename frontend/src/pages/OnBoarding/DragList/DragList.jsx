@@ -1,6 +1,6 @@
 import { Reorder } from "framer-motion"
 import React, { useState } from "react"
-import "./DragList.css"
+import "./DragList.scss"
 import Item from "./Item/Item"
 
 function DragList({items, setItems, details}) {

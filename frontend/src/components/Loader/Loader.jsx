@@ -1,6 +1,6 @@
 import React from 'react';
 import logo from '../../assets/compass.svg'
-import './Loader.css'
+import './Loader.scss'
 
 function Loader(){
     return(
