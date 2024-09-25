@@ -137,6 +137,9 @@ function Classroom({ room, state, setState, schedule, roomName, width, setShowMo
     }, [room]);
     
     useEffect(() => {
+        if(!user){
+            return;
+        }
         if (ratings.find(rating => rating.user_info._id === user._id)!==null) {
             setUserRating(ratings.find(rating => rating.user_id === user._id));
         }    
@@ -191,6 +194,9 @@ function Classroom({ room, state, setState, schedule, roomName, width, setShowMo
 
     useEffect(() => {
         if (isAuthenticated) {
+            if(!user){
+                return;
+            }
             if (room && room.checked_in && room.checked_in.includes(user._id)) {
                 if (success === false) {
                     handleCheckOut();
