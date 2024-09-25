@@ -101,6 +101,8 @@ function RegisterForm() {
         } catch (error) {
             if(error.response.status === 400){
                 setErrorText("Username or Email already exists");
+            } else {
+                setErrorText(error.response.data.message);
             }
             // console.error('Registration failed:', error);
             // Handle errors (e.g., display error message)
