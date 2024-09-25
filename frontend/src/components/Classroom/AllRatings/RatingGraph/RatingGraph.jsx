@@ -1,5 +1,5 @@
 import React from 'react';
-import './RatingGraph.css';
+import './RatingGraph.scss';
 import FilledStar from '../../../../assets/Icons/FilledStar.svg';
 
 function RatingGraph({ ratings, average_rating }) {
@@ -10,7 +10,7 @@ function RatingGraph({ ratings, average_rating }) {
     return (
         <div className="rating-graph">
             <div className="number-col">
-                <div className="rating-num">
+                <div className="rating-score">
                     <img src={FilledStar} alt="" />
                     <h3>{average_rating}</h3>
                 </div>

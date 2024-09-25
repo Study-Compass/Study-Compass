@@ -5,7 +5,6 @@
     margin-top: 20px;
     width: 100%;
 
-    
     .number-col{
         display:flex;
         flex-direction: column;
@@ -21,11 +20,14 @@
             font-weight: 700;
             font-family: 'Inter';
         }
-        .rating-num{
+        .rating-score{
             display:flex;
             gap:5px;
             h3{
                 font-size:22px;
+                margin: 0;
+                font-family: "Inter";
+                color: var(--text)
             }
             img{
                 width:27px;
@@ -39,6 +41,8 @@
         flex-direction: column;
         gap:5px;
         flex-grow: 1;
+        padding-right:15px;
+        
         .rating-row{
             display:flex;
             align-items: center;

@@ -13,8 +13,6 @@
     transition: all 0.5s;
 }
 
-
-
 .classroom-component .z-index{
     z-index: 1;
     max-height:100%;
@@ -187,6 +185,41 @@
 }
 
 
+.classroom-component .ratings-preview{
+    background-color: var(--lighter);
+    border-radius: 10px;
+    margin-top:20px;
+    .ratings-header{
+        
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+
+        padding: 10px 15px 0 15px;
+
+        h2{
+            color: var(--text);
+            font-family: 'Inter';
+            font-size:16px;
+            margin:0;
+            
+        }
+        button{
+            outline: none;
+            border: none;
+            background-color: var(--darkborder);
+            border-radius: 5px;
+            padding: 5px 10px;
+            color: white;
+            font-family: 'Inter';
+            font-weight: 500;
+            font-size: 12px;
+            cursor: pointer;
+        }
+    }
+    
+}
+
 .classroom-component .check-in{
     width: calc(100% - 30px);
     margin:15px;
@@ -326,6 +359,7 @@
     font-weight:500;
     color: var(--text);
     position:relative;
+    cursor: pointer;
 }
 
 
