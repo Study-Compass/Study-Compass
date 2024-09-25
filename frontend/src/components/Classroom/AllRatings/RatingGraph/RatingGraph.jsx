@@ -1,10 +1,37 @@
 import React from 'react';
 import './RatingGraph.css';
+import FilledStar from '../../../../assets/Icons/FilledStar.svg';
 
-function RatingGraph() {
+function RatingGraph({ ratings, average_rating }) {
+    if(!ratings){
+        return '';
+    }
+    console.log(ratings);
     return (
         <div className="rating-graph">
-            <h2>Rating Graph</h2>
+            <div className="number-col">
+                <div className="rating-num">
+                    <img src={FilledStar} alt="" />
+                    <h3>{average_rating}</h3>
+                </div>
+                <p>{ratings.length} reviews</p>
+            </div>
+            <div className="ratings-col">
+                {/* 5 rows */}
+                {[5, 4, 3, 2, 1].map((rating) => {
+                    const ratingCount = ratings.filter((r) => r.score === rating).length;
+                    return (
+                        <div key={rating} className="rating-row">
+                            <div className="rating-stars">
+                                <p>{rating}</p>
+                            </div>
+                            <div className="bar">
+                                <div className="bar-fill" style={{ width: `${(ratingCount / ratings.length) * 100}%` }}></div>
+                            </div>
+                        </div>
+                    );
+                } )}
+            </div>
         </div>
     );
 }
