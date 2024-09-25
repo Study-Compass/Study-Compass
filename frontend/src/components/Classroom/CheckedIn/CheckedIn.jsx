@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import pfp from '../../../assets/defaultAvatar.svg';
-import './CheckedIn.css';
+import './CheckedIn.scss';
 
 function CheckedIn({users}){
     const [error, setError] = useState([]);

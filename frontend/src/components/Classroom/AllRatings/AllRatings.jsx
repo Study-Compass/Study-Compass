@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import './AllRatings.css';
+import './AllRatings.scss';
 import UserRating from '../UserRating/UserRating';
 import { getRatings } from '../../../DBInteractions';
 import Loader from '../../Loader/Loader';

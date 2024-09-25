@@ -1,4 +1,4 @@
-import './TimeLabelColumn.css';
+import './TimeLabelColumn.scss';
 
 function TimeLabelColumn(){
     return (

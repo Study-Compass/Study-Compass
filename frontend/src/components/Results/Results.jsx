@@ -1,5 +1,5 @@
 import React, {useRef, useEffect} from 'react';
-import './Results.css';
+import './Results.scss';
 import Result from './Result/Result.jsx';
 
 import Loader from '../Loader/Loader.jsx';

@@ -2,7 +2,7 @@ import React from 'react';
 // import Register from '../components/Forms/Register/Register';
 import LoginForm from '../components/Forms/LoginForm/LoginForm';
 import Header from '../components/Header/Header';
-import './Login.css';
+import './Login.scss';
 
 function Login(){
     return(

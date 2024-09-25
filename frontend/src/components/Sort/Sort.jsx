@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import './Sort.css';
+import './Sort.scss';
 import useOutsideClick from '../../hooks/useClickOutside';
 
 import Tags from '../../assets/Icons/sort/Tags.svg';

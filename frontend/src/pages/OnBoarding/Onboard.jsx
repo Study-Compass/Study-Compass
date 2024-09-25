@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import './Onboard.css';
+import './Onboard.scss';
 import PurpleGradient from '../../assets/PurpleGrad.svg';
 import YellowRedGradient from '../../assets/YellowRedGrad.svg';
 import Loader from '../../components/Loader/Loader.jsx';

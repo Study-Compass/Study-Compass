@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import './Typing.css';
+import './Typing.scss';
 
 const TypingComponent = ({ entries, showCaret = false }) => {
     const [currentText, setCurrentText] = useState('');

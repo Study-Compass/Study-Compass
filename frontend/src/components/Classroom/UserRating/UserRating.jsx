@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import './UserRating.css';
+import './UserRating.scss';
 import useAuth from '../../../hooks/useAuth';
 import Loader from '../../Loader/Loader';
 import Badges from '../../Badges/Badges';

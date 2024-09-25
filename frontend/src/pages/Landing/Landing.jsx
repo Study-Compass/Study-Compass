@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import './Landing.css';
+import './Landing.scss';
 import logo from '../../assets/red_logo.svg';
 import landing from '../../assets/Landing.png';
 import landingGrad from '../../assets/LandingGradient.png';

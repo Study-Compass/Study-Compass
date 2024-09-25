@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './StudyHistory.css';
+import './StudyHistory.scss';
 import History from "../../../assets/Icons/History.svg"
 import DownArrow from "../../../assets/Icons/DownArrow.svg"
 

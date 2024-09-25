@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Rating from 'react-rating'
-import './Rating.css';
+import './Rating.scss';
 import FilledStar from '../../assets/Icons/FilledStar.svg';
 import EmptyStar from '../../assets/Icons/EmptyStar.svg';
 import { updateRating } from "../../DBInteractions";
