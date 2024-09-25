@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import '../OnBoarding/Onboard.css';
-import './DeveloperOnboarding.css';
+import '../OnBoarding/Onboard.scss';
+import './DeveloperOnboarding.scss';
 import PurpleGradient from '../../assets/BlueGrad2.png';
 import YellowRedGradient from '../../assets/BlueGrad1.png';
 import Loader from '../../components/Loader/Loader.jsx';

@@ -1,5 +1,5 @@
 import React from "react";
-import './Flag.css';
+import './Flag.scss';
 
 function Flag({functions, primary, accent, color, text, img}) {
     return (

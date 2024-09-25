@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import './Calendar.css';
+import './Calendar.scss';
 import DayColumn from '../DayColumn/DayColumn';
 /** 
  * documentation:

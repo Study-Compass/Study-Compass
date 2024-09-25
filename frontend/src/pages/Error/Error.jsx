@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import './Error.css';
+import './Error.scss';
 import '../../assets/fonts.css'
 import { useNavigate, useParams } from 'react-router-dom';
 

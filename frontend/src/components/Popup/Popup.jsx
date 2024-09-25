@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import ReactDOM from 'react-dom';
-import './Popup.css'; // Assuming this contains your animation and styling
+import './Popup.scss'; // Assuming this contains your animation and styling
 import useOutsideClick from '../../hooks/useClickOutside';
 import X from '../../assets/x.svg';
 

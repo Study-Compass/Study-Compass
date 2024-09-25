@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import "./Recommended.css";
+import "./Recommended.scss";
 import Result from "../Results/Result/Result";
 import { useCache } from '../../CacheContext.js';
 import { useNavigate } from "react-router-dom";

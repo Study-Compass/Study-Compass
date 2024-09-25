@@ -1,5 +1,5 @@
 import React from 'react';
-import './ProfileCard.css';
+import './ProfileCard.scss';
 import CardHeader from './CardHeader/CardHeader';
 import SavedClassrooms from './SavedClassrooms/SavedClassrooms';
 import StudyHistory from './StudyHistory/StudyHistory';
