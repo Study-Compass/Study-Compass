@@ -138,6 +138,9 @@ export const AuthProvider = ({ children }) => {
 
             if (response.data.success) {
                 const responseBody = response.data;
+                if(responseBody.classrooms.length === 0){
+                    return { checkedIn: null };
+                }
                 console.log(responseBody.classrooms[0]);
                 setCheckedIn(responseBody.classrooms[0]);
             } else {

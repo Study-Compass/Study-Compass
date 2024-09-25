@@ -65,22 +65,23 @@ function Classroom({ room, state, setState, schedule, roomName, width, setShowMo
         }
     }
 
-    const getRating = async () => {
-        if (!isAuthenticated) {
-            return;
-        }
-        try {
-            const rated = await userRated(room._id);
-            console.log(rated);
-            if (rated.data.success) {
-                console.log(rated.data.data);
-                setUserRating(rated.data.data);
-            }
-        } catch (error) {
-            console.log(error);
-            addNotification({ title: "An error occured", message: "an internal error occured", type: "error" })
-        }
-    }
+    //legacy code
+    // const getRating = async () => {
+    //     if (!isAuthenticated) {
+    //         return;
+    //     }
+    //     try {
+    //         const rated = await userRated(room._id);
+    //         console.log(rated);
+    //         if (rated.data.success) {
+    //             console.log(rated.data.data);
+    //             setUserRating(rated.data.data);
+    //         }
+    //     } catch (error) {
+    //         console.log(error);
+    //         addNotification({ title: "An error occured", message: "an internal error occured", type: "error" })
+    //     }
+    // }
 
     const handleCheckInEvent = (data) => {
         if (data.classroomId === room._id) {
@@ -92,7 +93,6 @@ function Classroom({ room, state, setState, schedule, roomName, width, setShowMo
     const handleCheckOutEvent = (data) => {
         if (data.classroomId === room._id) {
             reload();
-            // ... your existing logic
         }
     };
 
@@ -140,13 +140,15 @@ function Classroom({ room, state, setState, schedule, roomName, width, setShowMo
         if(!user){
             return;
         }
-        if (ratings.find(rating => rating.user_info._id === user._id)!==null) {
+        if (ratings.find(rating => rating.user_id === user._id)!== undefined) {
             setUserRating(ratings.find(rating => rating.user_id === user._id));
+            console.log("user has rated this room");
         }    
     }, [ratings, user]);
 
     useEffect(() => {
-        console.log(userRating);
+        console.log(userRating === null);
+
     }, [userRating]);
 
     useEffect(() => {
@@ -348,7 +350,7 @@ function Classroom({ room, state, setState, schedule, roomName, width, setShowMo
                             {room.number_of_ratings === 1 ? <p>{room.number_of_ratings} rating</p> : <p>{room.number_of_ratings} ratings</p>}
                         </div>
                         {isAuthenticated && userRating === null &&
-                            <button className="add-rating" onClick={handleOpenRatingPopup} >
+                            <button className="add-rating" onClick={handleOpenRatingPopup}>
                                 <p>add your rating</p>
                             </button>
                         }
@@ -385,6 +387,11 @@ function Classroom({ room, state, setState, schedule, roomName, width, setShowMo
                             ratings.length > 0 ?
                             <UserRating rating={ratings[0]} providedUser={ratings[0].user_info} />
                             : ""
+                        }
+                        {isAuthenticated && userRating === null &&
+                            <button onClick={handleOpenRatingPopup}>
+                                add your review
+                            </button>
                         }
                     </div>
                     <div className="filler" style={{ height: `${fillerHeight}px` }}>
