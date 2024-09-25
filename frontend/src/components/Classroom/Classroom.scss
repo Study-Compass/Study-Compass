@@ -189,6 +189,22 @@
     background-color: var(--lighter);
     border-radius: 10px;
     margin-top:10px;
+    padding-bottom:15px;
+    button{
+        background-color: var(--darkborder);
+        outline: none;
+        border: none;
+        background-color: var(--darkborder);
+        padding: 6px 20px;
+        width: calc(100% - 30px);
+        margin: 0 15px;
+        border-radius: 8px;
+        color: white;
+        font-family: 'Inter';
+        font-weight: 500;
+        font-size: 13px;
+        cursor: pointer;
+    }
     .ratings-header{
         
         display: flex;
@@ -215,6 +231,8 @@
             font-weight: 500;
             font-size: 12px;
             cursor: pointer;
+            width:fit-content;
+            margin:0;
         }
     }
     
