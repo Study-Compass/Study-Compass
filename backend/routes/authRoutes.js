@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const axios = require('axios');
 require('dotenv').config();
 const { sendDiscordMessage } = require('../services/discordWebookService');
+const { isProfane } = require('../services/profanityFilterService');
 
 const router = express.Router();
 const { verifyToken } = require('../middlewares/verifyToken.js');
@@ -48,6 +49,13 @@ router.post('/register', async (req, res) => {
             return res.status(405).json({
                 success: false,
                 message: 'Username has illegal chars'
+            });
+        }
+        if(isProfane(username)){
+            console.log(`POST: /register registration of ${username} failed`);
+            return res.status(405).json({
+                success: false,
+                message: 'Username does not abide by community standards'
             });
         }
 
