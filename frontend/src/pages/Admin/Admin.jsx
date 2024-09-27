@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import Header from '../../components/Header/Header';
 import useAuth from '../../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
+import BlueGrad1 from '../../assets/BlueGrad1.png';
+import BlueGrad2 from '../../assets/BlueGrad2.png';
 
 import Analytics from '../../components/Analytics/Analytics';
 
@@ -59,16 +61,19 @@ function Admin(){
         <div className="admin">
             <Header />
             <div className="content">
-                <div className="header">
+                <div className="banner">
                     <h1>admin dashboard</h1>
-                    <div className="options">
-                        <button onClick={() => toggleAnalytics("analytics")}>
-                            analytics
-                        </button>
-                        <button onClick={() => toggleAnalytics("users")}>
-                            users
-                        </button>
-                    </div>
+                    <img src={BlueGrad1} alt="" className="tr"/>
+                    <img src={BlueGrad2} alt="" className="bl"/>
+
+                </div>
+                <div className="options">
+                    <button className={`${showPage === "analytics" ? "selected" : ""}`} onClick={() => toggleAnalytics("analytics")}>
+                        analytics
+                    </button>
+                    <button className={`${showPage === "users" ? "selected" : ""}`} onClick={() => toggleAnalytics("users")}>
+                        users
+                    </button>
                 </div>
                 {
                     showPage === "analytics" && <Analytics />
