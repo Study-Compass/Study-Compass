@@ -1,13 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import Header from '../../components/Header/Header';
 import useAuth from '../../hooks/useAuth';
+import { useNavigate } from 'react-router-dom';
 
-import './Admin.css';
+import Analytics from '../../components/Analytics/Analytics';
+
+import './Admin.scss';
 
 function Admin(){
     const [userInfo, setUserInfo] = useState(null);
     const [isAdmin, setIsAdmin] = useState(false);
     const { isAuthenticating, isAuthenticated, user } = useAuth();
+    const navigate = useNavigate();
+
+    const [showPage, setShowPage] = useState("");
     useEffect(() => {
         if (isAuthenticating) {
             return;
@@ -33,6 +39,15 @@ function Admin(){
         }
     }, [userInfo]);
 
+    const toggleAnalytics = (page) => {
+        if(showPage === page){
+            setShowPage("");
+            return;
+        }
+        setShowPage(page);
+    }
+
+
     if(!userInfo){
         return(
             <div className="admin">
@@ -43,7 +58,24 @@ function Admin(){
     return(
         <div className="admin">
             <Header />
-            <h1>Admin</h1>
+            <div className="content">
+                <div className="header">
+                    <h1>admin dashboard</h1>
+                    <div className="options">
+                        <button onClick={() => toggleAnalytics("analytics")}>
+                            analytics
+                        </button>
+                        <button onClick={() => toggleAnalytics("users")}>
+                            users
+                        </button>
+                    </div>
+                </div>
+                {
+                    showPage === "analytics" && <Analytics />
+                }
+            </div>
         </div>
     );
 }
+
+export default Admin
