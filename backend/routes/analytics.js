@@ -28,8 +28,6 @@ router.get('/visits-by-day', async (req, res) => {
 
         const startOfWeekDate = startOfWeek(parsedStartDate, { weekStartsOn: 0 }); // 1 = Monday
         const endOfWeekDate = endOfWeek(parsedStartDate, { weekStartsOn: 0 });        //print for debugging
-        console.log("startOfWeekDate: " + startOfWeekDate);
-        console.log("endOfWeekDate: " + endOfWeekDate);
 
 
         // Query visits within the week range and group by day
@@ -92,7 +90,6 @@ router.get('/visits-by-day', async (req, res) => {
 router.get('/visits-by-hour', async (req, res) => {
     try {
         const { startDate } = req.query;
-        console.log("startDate: " + startDate);
 
         // Validate the startDate
         if (!startDate || !isValid(parseISO(startDate))) {
@@ -161,6 +158,69 @@ router.get('/visits-by-hour', async (req, res) => {
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: 'An error occurred while fetching visits by hour' });
+    }
+});
+
+
+router.get('/visits-by-all', async (req, res) => {
+    try {
+        // Query to get the earliest and latest visit dates for padding the result
+        const firstVisit = await Visit.findOne().sort({ timestamp: 1 });
+        const lastVisit = await Visit.findOne().sort({ timestamp: -1 });
+
+        if (!firstVisit || !lastVisit) {
+            return res.json([]); // No visits in the database
+        }
+
+        // Get the date range (from the first to the last visit)
+        const startDate = new Date(firstVisit.timestamp);
+        const endDate = new Date(lastVisit.timestamp);
+
+        // Query to get all visits within the range, grouped by day
+        const visitsByAll = await Visit.aggregate([
+            {
+                $group: {
+                    _id: {
+                        year: { $year: "$timestamp" },
+                        month: { $month: "$timestamp" },
+                        day: { $dayOfMonth: "$timestamp" }
+                    },
+                    count: { $sum: 1 }
+                }
+            },
+            {
+                $sort: { "_id.year": 1, "_id.month": 1, "_id.day": 1 }
+            }
+        ]);
+
+        // Generate an array with all days in the date range
+        const daysInRange = eachDayOfInterval({
+            start: startDate,
+            end: endDate,
+        });
+
+        // Format and pad the result
+        const formattedResult = daysInRange.map((day) => {
+            const formattedDate = formatISO(day, { representation: 'date' });
+
+            // Find the matching day in the database result
+            const visitForDay = visitsByAll.find(item =>
+                item._id.year === day.getFullYear() &&
+                item._id.month === day.getMonth() + 1 &&
+                item._id.day === day.getDate()
+            );
+
+            // Return either the actual count or 0 if there was no visit for this day
+            return {
+                date: formattedDate,
+                count: visitForDay ? visitForDay.count : 0
+            };
+        });
+
+        res.json(formattedResult);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'An error occurred while fetching all-time visits' });
     }
 });
 
