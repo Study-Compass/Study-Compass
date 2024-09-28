@@ -300,6 +300,9 @@ def renameField(uri, collection, previousName, newName):
 
 
 
+
+
+
 # write_items_with_root_image_to_file("not-done.txt") # call the function to add new field to the collection
 # addNewField('users',{'saved' : []})
 # addNewField('classrooms1',{'attributes': []})

@@ -37,14 +37,7 @@ function Banner({visible, setVisible, bannerType}) {
     }
 
 
-    if(!isAuthenticated && !isAuthenticating){
-        return(
-            <div className={`banner ${visible && "visible"}`}>
-                create an account now for the <Badges badges={["beta tester"]}/> badge! 
-                <div className="exit"><img src={x_white} onClick={()=>{setVisible(false)}} alt="" /></div>
-            </div>
-        )
-    } else if(checkedInClassroom !== null){
+if(checkedInClassroom !== null){
         return(
             <div className={`banner ${visible && "visible checked-in"}`} onClick={handleCheckInClick}>
                 you are checked in to {checkedIn.name}
