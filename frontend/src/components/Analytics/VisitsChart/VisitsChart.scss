@@ -6,6 +6,7 @@
     box-shadow: 0px 0px 10px 0px rgba(100, 100, 111, 0.15);
     box-shadow: var(--shadow);
     border: 1px solid var(--lighterborder);
+    box-sizing: border-box;
     .header{
         display: flex;
         align-items: center;

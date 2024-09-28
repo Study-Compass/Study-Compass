@@ -10,6 +10,14 @@
 
 }
 
+@media (max-width:500px){
+    :root{
+        --horizontal-padding: 10px;
+        --vertical-padding: 5px;
+    }
+    
+}
+
 .switch{
     position: relative;
     display: flex;
