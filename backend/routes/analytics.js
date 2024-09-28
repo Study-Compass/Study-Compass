@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const { isValid, formatISO, parseISO, setHours, startOfWeek, endOfWeek, setMinutes, setSeconds, setMilliseconds, eachHourOfInterval, eachDayOfInterval } = require('date-fns');
 const Visit = require('../schemas/visit');  // Assuming Visit is a Mongoose model for storing visits
 
 // Route to log a visit
@@ -15,7 +16,32 @@ router.post('/log-visit', async (req, res) => {
 
 router.get('/visits-by-day', async (req, res) => {
     try {
+        const { startDate, endDate } = req.query;
+
+        // Validate the dates
+        if (!startDate || !isValid(parseISO(startDate))) {
+            return res.status(400).json({ error: 'Invalid startDate' });
+        }
+
+        const parsedStartDate = parseISO(startDate);
+        const parsedEndDate = endDate && isValid(parseISO(endDate)) ? parseISO(endDate) : new Date();
+
+        const startOfWeekDate = startOfWeek(parsedStartDate, { weekStartsOn: 0 }); // 1 = Monday
+        const endOfWeekDate = endOfWeek(parsedStartDate, { weekStartsOn: 0 });        //print for debugging
+        console.log("startOfWeekDate: " + startOfWeekDate);
+        console.log("endOfWeekDate: " + endOfWeekDate);
+
+
+        // Query visits within the week range and group by day
         const visitsByDay = await Visit.aggregate([
+            {
+                $match: {
+                    timestamp: {
+                        $gte: startOfWeekDate,
+                        $lt: endOfWeekDate
+                    }
+                }
+            },
             {
                 $group: {
                     _id: {
@@ -31,11 +57,29 @@ router.get('/visits-by-day', async (req, res) => {
             }
         ]);
 
-        // Format the response for easier readability
-        const formattedResult = visitsByDay.map(item => ({
-            date: `${item._id.year}-${String(item._id.month).padStart(2, '0')}-${String(item._id.day).padStart(2, '0')}`,
-            count: item.count
-        }));
+        // Generate an array with all days within the week range
+        const daysInRange = eachDayOfInterval({
+            start: startOfWeekDate,
+            end: endOfWeekDate,
+        });
+
+        // Format and pad the result
+        const formattedResult = daysInRange.map((day) => {
+            const formattedDate = formatISO(day, { representation: 'date' });
+
+            // Find the matching day in the database result
+            const visitForDay = visitsByDay.find(item =>
+                item._id.year === day.getFullYear() &&
+                item._id.month === day.getMonth() + 1 &&
+                item._id.day === day.getDate()
+            );
+
+            // Return either the actual count or 0 if there was no visit for this day
+            return {
+                date: formattedDate,
+                count: visitForDay ? visitForDay.count : 0
+            };
+        });
 
         res.json(formattedResult);
     } catch (err) {
@@ -44,9 +88,32 @@ router.get('/visits-by-day', async (req, res) => {
     }
 });
 
+// `/visits-by-hour` route: Fetches visits grouped by hour within the specified range and pads missing hours with 0 visits
 router.get('/visits-by-hour', async (req, res) => {
     try {
+        const { startDate } = req.query;
+        console.log("startDate: " + startDate);
+
+        // Validate the startDate
+        if (!startDate || !isValid(parseISO(startDate))) {
+            return res.status(400).json({ error: 'Invalid startDate' });
+        }
+
+        const parsedDate = parseISO(startDate);
+
+        // Define the start and end of the day explicitly using setHours, setMinutes, etc.
+        const startOfDay = setMilliseconds(setSeconds(setMinutes(setHours(parsedDate, 0), 0), 0), 0); // 00:00 of the given day
+        const endOfDay = setMilliseconds(setSeconds(setMinutes(setHours(parsedDate, 23), 59), 59), 999); // 23:59:59.999 of the same day
+        // Query visits within the day range and group by hour
         const visitsByHour = await Visit.aggregate([
+            {
+                $match: {
+                    timestamp: {
+                        $gte: startOfDay,
+                        $lte: endOfDay
+                    }
+                }
+            },
             {
                 $group: {
                     _id: {
@@ -65,10 +132,30 @@ router.get('/visits-by-hour', async (req, res) => {
             }
         ]);
 
-        const formattedResult = visitsByHour.map(item => ({
-            hour: `${item._id.year}-${String(item._id.month).padStart(2, '0')}-${String(item._id.day).padStart(2, '0')} ${String(item._id.hour).padStart(2, '0')}:00`,
-            count: item.count
-        }));
+        // Generate an array with all hours from 00:00 to 23:00
+        const hoursInRange = eachHourOfInterval({
+            start: startOfDay,
+            end: endOfDay
+        });
+
+        // Format and pad the result
+        const formattedResult = hoursInRange.map((hour) => {
+            const formattedHour = `${hour.getFullYear()}-${String(hour.getMonth() + 1).padStart(2, '0')}-${String(hour.getDate()).padStart(2, '0')} ${String(hour.getHours()).padStart(2, '0')}:00`;
+
+            // Find the matching hour in the database result
+            const visitForHour = visitsByHour.find(item =>
+                item._id.year === hour.getFullYear() &&
+                item._id.month === hour.getMonth() + 1 &&
+                item._id.day === hour.getDate() &&
+                item._id.hour === hour.getHours()
+            );
+
+            // Return either the actual count or 0 if there was no visit for this hour
+            return {
+                hour: formattedHour,
+                count: visitForHour ? visitForHour.count : 0
+            };
+        });
 
         res.json(formattedResult);
     } catch (err) {
@@ -76,6 +163,5 @@ router.get('/visits-by-hour', async (req, res) => {
         res.status(500).json({ error: 'An error occurred while fetching visits by hour' });
     }
 });
-
 
 module.exports = router;

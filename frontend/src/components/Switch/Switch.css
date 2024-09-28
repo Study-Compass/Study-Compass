@@ -1,0 +1,55 @@
+:root{
+    --switch-outer-bradius: 10px;
+    --gap: 2px;
+    --switch-inner-bradius: calc(var(--switch-outer-bradius) - var(--gap));
+    --horizontal-padding: 15px;
+    --vertical-padding:5px;
+    --transition: all 0.3s ease;
+    --font: 'Inter';
+    --font-weight: 500;
+
+}
+
+.switch{
+    position: relative;
+    display: flex;
+    gap: var(--gap);
+    padding:var(--gap);
+    border-radius: var(--switch-outer-bradius);
+    background-color: var(--light); 
+    box-sizing: border-box;
+}
+
+.switch .switch-option{
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    padding:var(--vertical-padding) var(--horizontal-padding);
+    border-radius: var(--switch-inner-bradius);
+    z-index: 1;
+    transition: var(--transition);
+}
+
+.switch-option p{
+    margin:0;
+    font-size: 15px;
+    font-family: var(--font);
+    font-weight: var(--font-weight);
+    color: var(--black);
+    transition: var(--transition)
+}
+
+.switch-option.selected p{
+    /* color: var(--);
+    font-weight:400; */
+}
+
+
+.highlight {
+    position: absolute;
+    height: calc(100% - var(--gap) * 2);
+    background-color: var(--background);
+    transition: var(--transition);
+    z-index: 0;
+    border-radius: var(--switch-inner-bradius);
+  }
