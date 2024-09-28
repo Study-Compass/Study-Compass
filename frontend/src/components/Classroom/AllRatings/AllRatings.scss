@@ -1,3 +1,20 @@
 .all-ratings{
     width:100%;
+
+    .ratings{
+        display:flex;
+        flex-direction: column;
+        max-height:300px;
+        overflow:auto;
+        overflow-x:hidden;
+        margin-top:10px;
+    }
+
+    h2{
+        font-size: 20px;
+        margin: 0;
+        font-family: 'Inter';
+        font-weight:700;
+        color: var(--text);
+    }
 }

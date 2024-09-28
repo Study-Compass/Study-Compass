@@ -14,7 +14,6 @@ function UserRating({ rating, providedUser }) {
     useEffect(() => {
         if(providedUser){
             setUserInfo(providedUser[0]);
-            console.log(providedUser);
             return
         }
         if(userInfo){
@@ -29,7 +28,6 @@ function UserRating({ rating, providedUser }) {
         if(!userInfo){
             return;
         }
-        console.log(userInfo);
     }, [userInfo]);
 
     if(isAuthenticating){
@@ -53,15 +51,22 @@ function UserRating({ rating, providedUser }) {
                 <div className="info-col">
                     <div className="info-row">
                         <h3>{userInfo && userInfo.name}</h3>
-                        <Badges badges={userInfo && userInfo.tags} size="9px"/>
                         {/* <Badges badges={["beta tester", "developer", "admin", "beta tester"]} size="9px"/> */}
+                    </div>
+                    <div className="info-row">
+                        <Badges badges={userInfo && userInfo.tags} size="9px"/>
                     </div>
                     <div className="info-row rating">
                         <img src={FilledStar} alt="" />
                         <p className="score">{rating.score}</p>
                     </div>
+
+                </div>
+            </div>
+            <div className="content-row">
+                <div className="info-col">
                     <div className="info-row">
-                        <p className="comment">{rating.comment}</p>
+                            <p className="comment">{rating.comment}</p>
                     </div>
                 </div>
             </div>

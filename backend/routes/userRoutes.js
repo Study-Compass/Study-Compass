@@ -5,6 +5,7 @@ const { verifyToken, verifyTokenOptional } = require('../middlewares/verifyToken
 const Classroom = require('../schemas/classroom.js');
 const cron = require('node-cron');
 const axios = require('axios');
+const { isProfane } = require('../services/profanityFilterService'); 
 
 const { sendDiscordMessage } = require('../services/discordWebookService');
 
@@ -13,7 +14,7 @@ const router = express.Router();
 router.post("/update-user", verifyToken, async (req, res) =>{
     const { name, username, classroom, recommendation, onboarded } = req.body
     try{
-        const user = await User.findById(req.user.userId); // Assuming Mongoose for DB operations
+        const user = await User.findById(req.user.userId);
         if (!user) {
             console.log(`POST: /update-user token is invalid`)
             return res.status(404).json({ success: false, message: 'User not found' });
@@ -39,6 +40,10 @@ router.post("/check-username", verifyToken, async (req, res) =>{
     const userId = req.user.userId;
     try{
         //check if username is taken, regardless of casing
+        if(isProfane(username)){
+            console.log(`POST: /check-username ${username} is profane`)
+            return res.status(200).json({ success: false, message: 'Username does not abide by community standards' });
+        }
         const reqUser = await User.findById(userId);
         const user = await User.findOne({ username: { $regex: new RegExp(username, "i") } });
         if(user && user._id.toString() !== userId){
