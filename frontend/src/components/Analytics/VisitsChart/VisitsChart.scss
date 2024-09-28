@@ -1,3 +1,80 @@
 .visit-chart {
-  width:100%;
+    width: 100%;
+    padding: 15px;
+    background-color: var(--background);
+    border-radius: 20px;
+    box-shadow: 0px 0px 10px 0px rgba(100, 100, 111, 0.15);
+    box-shadow: var(--shadow);
+    border: 1px solid var(--lighterborder);
+    box-sizing: border-box;
+    .header{
+        display: flex;
+        align-items: center;
+        height:fit-content;
+        justify-content: space-between;
+        .header-content{
+            display:flex;
+            flex-direction: row;
+        }
+        h2{
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text);
+            font-family: 'Inter';
+            margin:0;
+        }
+        img{
+            width: 20px;
+            height: 20px;
+            margin-right: 5px;
+        }
+    }
+    .dates{
+        display: flex;
+        justify-content: space-between;
+        margin-top: 15px;
+        height:30px;
+        align-items: center;
+        h3{
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text);
+            font-family: 'Inter';
+            margin:0;
+        }
+        button{
+            outline: none;
+            border:none;
+            background-color: var(--background);
+            img{
+                width:15px;
+                height:15px;
+
+            }
+        }
+        button.left-button{
+            img{
+                transform: rotate(180deg);
+            }
+        }
+    }
+    .row{
+        display:flex;
+        flex-direction: column;
+        margin: 10px 0;
+        h3{
+            font-size:1.5rem;
+            font-weight: 800;
+            color: var(--text);
+            font-family: 'Inter';
+            margin:0;
+        }
+        
+    }
+    .chart-container{
+        height:250px;
+        width:100%;
+    }
+
+
 }

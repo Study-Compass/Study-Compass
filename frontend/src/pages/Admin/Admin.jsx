@@ -15,7 +15,7 @@ function Admin(){
     const { isAuthenticating, isAuthenticated, user } = useAuth();
     const navigate = useNavigate();
 
-    const [showPage, setShowPage] = useState("");
+    const [showPage, setShowPage] = useState("analytics");
     useEffect(() => {
         if (isAuthenticating) {
             return;
