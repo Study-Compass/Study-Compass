@@ -5,16 +5,21 @@ import FilledStar from '../../assets/Icons/FilledStar.svg';
 import EmptyStar from '../../assets/Icons/EmptyStar.svg';
 import { updateRating } from "../../DBInteractions";
 import useAuth from "../../hooks/useAuth";
+import {Filter} from 'bad-words';
+import Flag from '../Flag/Flag';
+import circleWarning from '../../assets/circle-warning.svg';
 
 function RatingComponent({ classroomId, rating, setRating, name, handleClose, reload }) {
     const [hoverRating, setHoverRating] = useState(rating);
     const [displayRating, setDisplayRating] = useState(rating);
     const [comment, setComment] = useState("");
+    const [isProfane, setIsProfane] = useState(false);
 
     const [buttonActive, setButtonActive] = useState(false);
 
     const { user, isAuthenticated } = useAuth();
 
+    const filter = new Filter();
 
     useEffect(()=>{
         if(hoverRating === undefined) {
@@ -27,6 +32,7 @@ function RatingComponent({ classroomId, rating, setRating, name, handleClose, re
 
     useEffect(() => {
         setRating(rating);
+        setDisplayRating(rating);
         if(rating === 0) {
             setButtonActive(false);
         } else {
@@ -39,6 +45,11 @@ function RatingComponent({ classroomId, rating, setRating, name, handleClose, re
         try{
             if(!user || !isAuthenticated) {
                 console.log("User not authenticated");
+                return;
+            }
+            if(filter.isProfane(comment)) {
+                console.log("Profanity detected");
+                setIsProfane(true);
                 return;
             }
             const response = await updateRating(classroomId, user._id, comment, rating, 0, 0);
@@ -54,6 +65,7 @@ function RatingComponent({ classroomId, rating, setRating, name, handleClose, re
 
     return (
         <div className="rating-component">
+            {isProfane && <Flag text="Please refrain from using profanity" img={circleWarning} color={"#FD5858"} primary={"rgba(250, 117, 109, 0.16)"} accent={"#FD5858"} />}
             <h1>How would you rate {name && name}?</h1>
             <div className="stars">
                 <h2>{displayRating}</h2>
