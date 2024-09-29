@@ -6,7 +6,7 @@ import dark from '../../assets/Icons/DarkMode.svg';
 
 
 const DisplaySettings = ( {settingsRightSide, width, handleBackClick, rightarrow} ) => {
-    const [selectedMode, setSelectedMode] = useState(light);
+    const [selectedMode, setSelectedMode] = useState("light");
 
     const handleModeSelect = (mode) => {
         setSelectedMode(mode);
@@ -29,15 +29,16 @@ const DisplaySettings = ( {settingsRightSide, width, handleBackClick, rightarrow
                 <hr />
 
                 <div className='mode'>
-                    <div className='light-mode'> 
+                    <div className={`light-mode ${selectedMode === "light" && 'selected' }` }> 
                         <button onClick={() => handleModeSelect('light')}> 
-                            <img src={light} alt="" className={selectedMode === 'light' ? 'selected' : ''}/>
+                            <img src={light} alt=""/>
                         </button>
                     </div>
 
-                    <div className='dark-mode'>
+                    <div className={`dark-mode ${selectedMode === "dark" && 'selected' }` }>
+
                         <button onClick={() => handleModeSelect('dark')}> 
-                            <img src={dark} alt="" className={selectedMode === '' ? 'selected' : ''}/>
+                            <img src={dark} alt=""/>
                         </button>
 
                     </div>

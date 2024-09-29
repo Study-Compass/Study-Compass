@@ -29,11 +29,13 @@
     .profile .light-mode{
         margin: 10px;
         align-items: center;
+        position: relative;
     }
 
     .profile .dark-mode{
         margin: 10px;
         align-items: center;
+        position: relative;
     }
     
     img {
@@ -45,16 +47,28 @@
     
     .profile .mode button {
         background: none;
-        /* border-radius: 10px; */
-        /* border-color: red; */
-        padding: 3px;
+        /* padding: 3px; */
         border: none;
         
     }
-    .profile .mode img.selected {
-        border-radius: 10%; 
-        border: 2px;
-        border-color: red;
+    .profile .mode .img::before{
+      
+
+    }
+
+    .mode .selected::before{
+        content:'';
+        border-radius: 10px; 
+        border: 2px solid var(--red);
+        position: absolute;
+        top:-3px;
+        right:-2px;
+        width:calc(100%);
+        height: calc(100%);
+    }
+
+    .profile .mode img.selected::before {
+
       }
 
 }
