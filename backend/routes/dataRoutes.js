@@ -10,6 +10,7 @@ const multer = require('multer');
 const path = require('path');
 const s3 = require('../aws-config');
 const mongoose = require('mongoose');
+const { clean } = require('../services/profanityFilterService');
 
 
 const router = express.Router();
@@ -532,7 +533,7 @@ router.post('/update_rating', verifyToken, async (req, res) => {
         let rating = await Rating.findOne({ classroom_id: classroomId, user_id: userId });
 
         if (rating) {
-            rating.comment = comment;
+            rating.comment = clean(comment);
             rating.score = score;
             rating.upvotes = upvotes;
             rating.downvotes = downvotes;
