@@ -113,44 +113,71 @@ router.post('/free', async (req, res) => {
 router.post('/getbatch', async (req, res) => {
     const queries = req.body.queries;
     const exhaustive = req.body.exhaustive; // Option to retrieve just schedule data or both schedule and room data
-    let data = [];
 
     console.log(`POST: /getbatch`, JSON.stringify(req.body.queries));
-    
+
     try {
-        const results = await Promise.all(queries.map(async (query, index) => {
-            if (query === "none") {
-                // Use null or a specific structure to indicate early break, handle it later
-                return { index, result: { data: new Schedule() }};
-            }
+        // Map the queries to their indices to preserve order later
+        const indexedQueries = queries.map((query, index) => ({ query, index }));
 
-            let result = { room: "not found", data: "not found" };
-            if (exhaustive) {
-                const room = await Classroom.findOne({ _id: query });
-                result.room = room ? room : "not found";
-            }
+        // Filter out 'none' queries and convert IDs to ObjectId
+        const validQueries = indexedQueries.filter(item => item.query !== "none");
+        const queryIds = validQueries.map(item => new mongoose.Types.ObjectId(item.query));
 
-            const schedule = await Schedule.findOne({ classroom_id: query });
-            result.data = schedule ? schedule : "not found";
-            if(result.room === "not found" && result.data === "not found"){
-                return null;
-            }
-            // Attach the index to each result
-            return { index, result };
-        }));
+        // Build the aggregation pipeline
+        const aggregatePipeline = [
+            { $match: { classroom_id: { $in: queryIds } } }
+        ];
 
-        const filteredResults = results.filter(result => result !== null && result !== undefined);
-        // Sort results based on the original index to ensure order
-        const sortedResults = filteredResults.sort((a, b) => a.index - b.index).map(item => item.result);
-
-        // Send response after all operations are done and results are sorted
-        res.json({ success: true, message: "Rooms found", data: sortedResults });
-    } catch (error) {
-        // Check if it's a special case to stop the process early
-        if (error.message === "noneQueryFound") {
-            return res.json({ success: true, message: "Empty query processed", rooms: {}, schedules: {} });
+        if (exhaustive) {
+            aggregatePipeline.push({
+                $lookup: {
+                    from: 'classrooms1',
+                    localField: 'classroom_id',
+                    foreignField: '_id',
+                    as: 'room'
+                }
+            });
+            aggregatePipeline.push({ $unwind: { path: '$room', preserveNullAndEmptyArrays: true } });
         }
-        // If not, it's a real error
+
+        // Execute the aggregation pipeline
+        const aggregatedData = await Schedule.aggregate(aggregatePipeline);
+
+        // Create a mapping from classroom_id to data for quick access
+        const dataMap = {};
+        aggregatedData.forEach(item => {
+            dataMap[item.classroom_id.toString()] = item;
+        });
+
+        // Build the final results array
+        const results = indexedQueries.map(({ query, index }) => {
+            if (query === "none") {
+                return { index, result: { data: new Schedule() } };
+            }
+
+            const data = dataMap[query];
+            if (!data) {
+                return null; // Or handle not found cases as needed
+            }
+
+            const result = { data };
+            if (exhaustive) {
+                result.room = data.room || "not found";
+            }
+            return { index, result };
+        }).filter(item => item !== null);
+
+        // Sort the results to maintain the original order
+        results.sort((a, b) => a.index - b.index);
+
+        // Extract the result objects
+        const finalResults = results.map(item => item.result);
+
+        // Send the response
+        res.json({ success: true, message: "Rooms found", data: finalResults });
+    } catch (error) {
+        // Handle any errors
         return res.status(500).json({ success: false, message: 'Error retrieving data', error: error.message });
     }
 });

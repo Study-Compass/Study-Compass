@@ -252,3 +252,6 @@ router.get('/all-purpose-search', verifyTokenOptional, async (req, res) => {
     }
 });
 
+
+
+module.exports = router;

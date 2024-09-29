@@ -148,3 +148,6 @@ router.post('/main-search-change', verifyToken, async (req, res) => {
         return res.status(500).json({ success: false, message: 'Error finding user', error: error.message});
     }
 });
+
+
+module.exports = router;
