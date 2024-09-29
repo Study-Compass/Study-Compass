@@ -61,33 +61,35 @@ const dataRoutes = require('./routes/dataRoutes.js');
 const friendRoutes = require('./routes/friendRoutes.js');
 const userRoutes = require('./routes/userRoutes.js');
 const analyticsRoutes = require('./routes/analytics.js');
+const classroomChangeRoutes = require('./routes/classroomChangeRoutes.js');
+const ratingRoutes = require('./routes/ratingRoutes.js');
+const searchRoutes = require('./routes/searchRoutes.js');
 
 app.use(authRoutes);
 app.use(dataRoutes);
 app.use(friendRoutes);
 app.use(userRoutes);
 app.use(analyticsRoutes);
+app.use(classroomChangeRoutes);
+app.use(ratingRoutes);
+app.use(searchRoutes);
 
-app.get('/update-database', (req, res) => {
-    const pythonProcess = spawn('python3', ['courseScraper.py']);
+//deprecated, should lowk invest in this
+// app.get('/update-database', (req, res) => {
+//     const pythonProcess = spawn('python3', ['courseScraper.py']);
 
-    pythonProcess.stdout.on('data', (data) => {
-        res.send(data.toString());
-    });
+//     pythonProcess.stdout.on('data', (data) => {
+//         res.send(data.toString());
+//     });
 
-    pythonProcess.stderr.on('data', (data) => {
-        res.send(data.toString());
-    });
+//     pythonProcess.stderr.on('data', (data) => {
+//         res.send(data.toString());
+//     });
 
-    pythonProcess.on('close', (code) => {
-        console.log(`child process exited with code ${code}`);
-    });
-});
-
-app.get('/api/greet', async (req, res) => {
-    console.log('GET: /api/greet');
-    res.json({ message: 'Hello from the backend!' });
-});
+//     pythonProcess.on('close', (code) => {
+//         console.log(`child process exited with code ${code}`);
+//     });
+// });
 
 app.post('/upload-image/:classroomName', upload.single('image'), async (req, res) => {
     const classroomName = req.params.classroomName;
