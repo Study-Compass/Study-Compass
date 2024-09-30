@@ -18,7 +18,7 @@ function RatingGraph({ ratings, average_rating }) {
             <div className="ratings-col">
                 {/* 5 rows */}
                 {[5, 4, 3, 2, 1].map((rating) => {
-                    const ratingCount = ratings.filter((r) => r.score === rating).length;
+                    const ratingCount = ratings.filter((r) => Math.ceil(r.score) === rating).length;
                     return (
                         <div key={rating} className="rating-row">
                             <div className="rating-stars">
