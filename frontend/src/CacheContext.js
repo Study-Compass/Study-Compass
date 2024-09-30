@@ -142,7 +142,7 @@ export const CacheProvider = ({children}) =>{
                 cache[cacheKey] = data; 
                 results[cacheMisses[i]] = data; // insert data into the correct position
             });
-    
+            console.log(results);
             return results.filter(result => result);
         } catch (error) {
             console.error('Error fetching data:', error);
