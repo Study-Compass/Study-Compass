@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { Line } from 'react-chartjs-2';
 import axios from 'axios';
 import { format, subWeeks, addWeeks, subDays, addDays, startOfWeek, endOfWeek } from 'date-fns'; // Import date manipulation functions
-import './VisitsChart.scss';
+import './AnalyticsChart.scss';
 import Stats from '../../../assets/Icons/Stats.svg';
 import Switch from '../../Switch/Switch';
 import RightArrow from '../../../assets/Icons/RightArrow.svg';
@@ -31,12 +31,31 @@ ChartJS.register(
   Filler
 );
 
-const VisitsChart = () => {
+const AnalyticsChart = ({endpoint, heading, color}) => {
     const [chartData, setChartData] = useState({});
     const [viewMode, setViewMode] = useState('day'); // 'day', 'hour', or 'all'
     const [startDate, setStartDate] = useState(new Date()); // Track current start date
     const chartRef = useRef(null);
   
+    function hexToRgb(hex) {
+      // Remove the hash symbol if it's there
+      hex = hex.replace(/^#/, '');
+    
+      // If the hex code is in shorthand form (3 digits), convert to 6 digits
+      if (hex.length === 3) {
+        hex = hex.split('').map(char => char + char).join('');
+      }
+    
+      // Parse the hex string into RGB components
+      const r = parseInt(hex.slice(0, 2), 16);
+      const g = parseInt(hex.slice(2, 4), 16);
+      const b = parseInt(hex.slice(4, 6), 16);
+    
+      return { r, g, b };
+    }
+
+    let { r, g, b } = hexToRgb(color);
+
     // Function to move time range backward
     const handlePrev = () => {
       if (viewMode === 'day') {
@@ -59,8 +78,8 @@ const VisitsChart = () => {
       const chart = chartRef.current;
       const ctx = chart.ctx;
       const gradient = ctx.createLinearGradient(0, 0, 0, 250); // Customize start/end points of the gradient
-      gradient.addColorStop(0, 'rgba(69, 161, 252, 0.8)');
-      gradient.addColorStop(1, 'rgba(69, 161, 252, 0)');
+      gradient.addColorStop(0, `rgba(${r}, ${g}, ${b}, 0.8)`);
+      gradient.addColorStop(1, `rgba(${r}, ${g}, ${b}, 0)`);
 
       // Apply gradient to the chart
       chart.data.datasets[0].backgroundColor = gradient;
@@ -83,7 +102,7 @@ const VisitsChart = () => {
       };
   
       try {
-        const response = await axios.get(`/visits-by-${mode}`, { params });
+        const response = await axios.get(`/${endpoint}-by-${mode}`, { params });
         if (response.status === 200) {
           const data = response.data;
           const labels = data.map(item => {
@@ -104,8 +123,8 @@ const VisitsChart = () => {
                   data: counts,
                   fill: true,
                   backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                  borderColor: 'rgba(69, 161, 252, 0.8)',
-                  pointBackgroundColor: 'rgba(69, 161, 252, 1)',
+                  borderColor: `rgba(${r}, ${g}, ${b}, 0.8)`,
+                  pointBackgroundColor: `rgba(${r}, ${g}, ${b}, 1)`,
                   pointBorderColor: '#fff',
                   tension: 0.3,
                   borderWidth: 4,
@@ -139,12 +158,12 @@ const VisitsChart = () => {
           <div className="header">
               <div className="header-content">
                   <img src={Stats} alt="Stats" />
-                  <h2>Unique Visits</h2>
+                  <h2>{heading}</h2>
               </div>
               <Switch options={["week", "day", "all"]} onChange={handleViewModeChange} />
           </div>
           <div className="row">
-              <h3>{chartData.datasets ? chartData.datasets[0].data.reduce((a, b) => a + b, 0) : 0} visits</h3>
+              <h3>{chartData.datasets ? chartData.datasets[0].data.reduce((a, b) => a + b, 0) : 0} {endpoint}</h3>
           </div>
           <div className="chart-container">
             {chartData.labels ? (
@@ -282,4 +301,4 @@ const VisitsChart = () => {
   
   
 
-export default VisitsChart;
+export default AnalyticsChart;

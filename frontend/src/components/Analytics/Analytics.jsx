@@ -4,7 +4,7 @@ import './Analytics.scss';
 import useAuth from '../../hooks/useAuth';
 
 import { getVisitsByDay } from './AnalyticsHelpers';
-import VisitsChart from './VisitsChart/VisitsChart';
+import AnalyticsChart from './VisitsChart/AnalyticsChart';
 
 function Analytics() {
     const { isAuthenticated, user } = useAuth();
@@ -24,8 +24,8 @@ function Analytics() {
         <div className="analytics">
             <div className="heading">
             </div>
-            <VisitsChart />
-
+            <AnalyticsChart endpoint={"visits"} heading={"Unique Visits"} color={"#45A1FC"}/>
+            <AnalyticsChart endpoint={"users"} heading={"New Users"} color={"#8052FB"}/>
         </div>
     );
 }
