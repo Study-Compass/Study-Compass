@@ -75,7 +75,7 @@ function RatingComponent({ classroomId, rating, setRating, name, handleClose, re
                     fullSymbol={<img src={FilledStar} className="icon" />}
                     onChange={(rate) => setRating(rate)}
                     onHover={(rate) => setHoverRating(rate)}
-                    fractions={2}
+                    fractions={1}
                 />
             </div>
             <div className="comment">
