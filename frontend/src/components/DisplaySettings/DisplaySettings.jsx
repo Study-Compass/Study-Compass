@@ -3,10 +3,32 @@ import './DisplaySettings.css';
 import light from '../../assets/Icons/LightMode.svg';
 import dark from '../../assets/Icons/DarkMode.svg';
 
-
-
 const DisplaySettings = ( {settingsRightSide, width, handleBackClick, rightarrow} ) => {
     const [selectedMode, setSelectedMode] = useState("light");
+
+    useEffect(() => {
+        const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+        setSelectedMode(mediaQuery.matches ? 'dark' : 'light');
+
+        const handleChange = (e) => {
+            setSelectedMode(e.matches ? 'dark' : 'light');
+        };
+
+        mediaQuery.addEventListener('change', handleChange);
+
+        return () => {
+            mediaQuery.removeEventListener('change', handleChange);
+        };
+    }, []);
+
+    
+    useEffect( () => {
+        if (selectedMode === 'dark'){
+            document.documentElement.classList.add('dark-mode');
+        } else {
+            document.documentElement.classList.remove('dark-mode');
+        }
+ }, [selectedMode] );
 
     const handleModeSelect = (mode) => {
         setSelectedMode(mode);
