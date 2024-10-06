@@ -69,9 +69,13 @@
     color: white;
     width:calc(100% - 20px);
     pointer-events: all;
+    transition: all 0.5s;
 }
 
 .Header button:hover{
+    background-color: var(--background);
+    color: var(--red);
+    box-shadow: 0 0 10px 0 rgba(0,0,0,0.1);
     cursor:pointer;
 }
 
