@@ -128,7 +128,7 @@ function LoginForm() {
         }
         <div className="email">
             <p>Username/Email</p>
-            <input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="Valid username/email..." required />
+            <input type="text" name="email" value={formData.email} onChange={handleChange} placeholder="Valid username/email..." required />
         </div>
         <div className="password">
             <p>Password</p>

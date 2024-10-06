@@ -81,3 +81,9 @@
         filter: brightness(0.9);
     }
 }
+
+@media screen and (max-width: 500px){
+    .rating-component{
+        padding:0 20px;
+    }
+}

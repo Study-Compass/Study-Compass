@@ -9,6 +9,7 @@ import Settings from '../../assets/Icons/Settings.svg'
 import Guide from '../../assets/Icons/Guide.svg'
 import Logout from '../../assets/Icons/Logout.svg'
 import Badges from '../Badges/Badges';
+import Stats from '../../assets/Icons/Stats.svg';
 
 import useOutsideClick from '../../hooks/useClickOutside';
 
@@ -71,6 +72,19 @@ function ProfilePicture(){
                         <p>Guide</p>
                     </div>
                 </Link>
+                {
+                    user && user.admin && 
+                    <>
+                        <hr />
+
+                        <Link to="/admin">
+                            <div className="menu-item">
+                                <img className="icon" src={Stats} alt="guide" />
+                                <p>Admin</p>
+                            </div>
+                        </Link>
+                    </>
+                }
                 <hr />
                 <Link to="">
                     <div className="menu-item" onClick={logout}>

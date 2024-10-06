@@ -57,9 +57,17 @@ async function registerUser({ username, email, password }) {
 }
 
 async function loginUser({ email, password }) {
-    const user = await User.findOne({ email })
-        .select('-googleId') // Add fields to exclude
-        .lean();
+    //check if it is an email or username
+    let user;
+    if (!email.includes('@')) {
+        user = await User.findOne({ username: email })
+            .select('-googleId') // Add fields to exclude
+            .lean();
+    } else {
+        user = await User.findOne({ email })
+            .select('-googleId') // Add fields to exclude
+            .lean();
+    }
     if (!user) {
         throw new Error('User not found');
     }
