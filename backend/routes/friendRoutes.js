@@ -137,6 +137,9 @@ router.post('/friend-request/accept/:friendshipId', verifyToken, async (req, res
 
         friendship.status = 'accepted';
         await friendship.save();
+        //update stats for both users
+        await User.updateOne({ _id: friendship.requester }, { $inc: { partners: 1 } });
+        await User.updateOne({ _id: friendship.recipient }, { $inc: { partners: 1 } });
         console.log(`POST: /friend-request/accept/:friendshipId friend request accepted`)
         res.status(200).send({
             success: true,
