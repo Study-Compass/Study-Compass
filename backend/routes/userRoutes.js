@@ -3,10 +3,12 @@ const User = require('../schemas/user.js');
 const Developer = require('../schemas/developer.js');
 const { verifyToken, verifyTokenOptional } = require('../middlewares/verifyToken');
 const Classroom = require('../schemas/classroom.js');
+const Schedule = require('../schemas/schedule.js');
 const cron = require('node-cron');
 const axios = require('axios');
 const { isProfane } = require('../services/profanityFilterService'); 
-
+const StudyHistory = require('../schemas/studyHistory.js'); 
+const { findNext } = require('../helpers.js');
 const { sendDiscordMessage } = require('../services/discordWebookService');
 
 const router = express.Router();
@@ -75,6 +77,20 @@ router.post("/check-in", verifyToken, async (req, res) =>{
         if(req.user.userId !== "65f474445dca7aca4fb5acaf"){
             sendDiscordMessage(`User check-in`,`user ${req.user.userId} checked in to ${classroom.name}`,"normal");
         }
+        //create history object, preempt end time using findnext
+        const schedule = await Schedule.findOne({ classroom_id: classroomId });
+        if(schedule){
+            let endTime = findNext(schedule.days); //time in minutes from midnight
+            endTime = new Date(new Date().setHours(Math.floor(endTime/60), endTime%60, 0, 0));
+            const history = new StudyHistory({
+                user_id: req.user.userId,
+                classroom_id: classroomId,
+                start_time: new Date(),
+                end_time: endTime
+            });
+            await history.save();
+        }
+
         const io = req.app.get('io');
         io.to(classroomId).emit('check-in', { classroomId, userId: req.user.userId });
 
@@ -104,6 +120,23 @@ router.post("/check-out", verifyToken, async (req, res) =>{
         const classroom = await Classroom.findOne({ _id: classroomId });
         classroom.checked_in = classroom.checked_in.filter(userId => userId !== req.user.userId);
         await classroom.save();
+        const schedule = await Schedule.findOne({ classroom_id: classroomId });
+        if(schedule){
+            //find latest history object
+            const history = await StudyHistory.findOne({ user_id: req.user.userId, classroom_id: classroomId }).sort({ start_time: -1 });
+            const endTime = new Date();
+            const timeDiff = endTime - history.start_time;
+            //if time spent is less than 5 minutes, delete history object
+            if(history){
+                if(timeDiff < 300000){
+                    await history.deleteOne();
+                } else {
+                    //else update end time
+                    history.end_time = endTime;
+                    await history.save();
+                }
+            }
+        }
         const io = req.app.get('io');
         io.to(classroomId).emit('check-out', { classroomId, userId: req.user.userId });
         console.log(`POST: /check-out ${req.user.userId} from ${classroom.name} successful`);
@@ -194,6 +227,8 @@ router.get("/get-users", async (req, res) =>{
         return res.status(500).json({ success: false, message: 'Internal server error', error });
     }
 });
+
+
 
 
 module.exports = router;

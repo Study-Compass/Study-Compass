@@ -22,7 +22,6 @@ const studyHistory = new Schema({
     }
 });
 
-
 const History = mongoose.model('History', studyHistory, 'history');
 
 module.exports = History;
