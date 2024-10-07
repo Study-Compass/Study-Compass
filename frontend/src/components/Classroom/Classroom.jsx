@@ -53,6 +53,9 @@ function Classroom({ room, state, setState, schedule, roomName, width, setShowMo
     //get all users currently checked in
     const getCheckedInUsers = async () => {
         try {
+            if (room.checked_in.length === 0) {
+                return;
+            }
             const users = await getUsers(room.checked_in);
             const checkedInUsers = {};
             users.forEach(user => {

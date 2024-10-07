@@ -52,8 +52,8 @@ const userSchema = new mongoose.Schema({
         default: [],
     },
     partners: {
-        type: Array,
-        default: [],
+        type: Number,
+        default: 0,
     },
     sessions: {
         type: Array,

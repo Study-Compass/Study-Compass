@@ -270,10 +270,7 @@ function Room() {
             setContentState("empty");
             return;
         }
-        console.log(searchQuery);
-        console.log(searchAttributes);
-        console.log(searchSort);
-        console.log(query);
+
         allPurposeSearch();
     }, [searchQuery, searchAttributes, searchSort, query]);
 
@@ -349,6 +346,28 @@ function Room() {
         setFreeNow(true);
     }
 
+    const handleFreeNow1 = () => {
+        //if weekend
+        if(new Date().getDay() === 0 || new Date().getDay() === 6){
+            handleFreeNow();
+        }
+        const now = new Date();
+        const day = now.getDay();
+        let startTime = (now.getHours() * 60) + now.getMinutes() + 10;
+        //round down to nearest 30 minutes
+        startTime = Math.floor(startTime / 30) * 30;
+        let endTime = startTime + 30;
+        const timePeriod = {
+            class_name: "search",
+            start_time: startTime,
+            end_time: endTime,
+        }
+        const query = { 'M': [], 'T': [], 'W': [], 'R': [], 'F': [] };
+        query[["M", "T", "W", "R", "F"][day - 1]].push(timePeriod);
+        addQuery(["M", "T", "W", "R", "F"][day - 1], timePeriod);
+        setContentState("freeNowSearch");
+    }
+
 //==========================================================================================================================================================
 
     return (    
@@ -402,7 +421,7 @@ function Room() {
                                 searchSort={searchSort}
                                 setSearchSort={setSearchSort}
                                 onSearch={onSearch}
-                                handleFreeNow={handleFreeNow}
+                                handleFreeNow={handleFreeNow1}
                                 contentState={contentState}
                                 freeNow={freeNow}
                                 setFreeNow={setFreeNow}
