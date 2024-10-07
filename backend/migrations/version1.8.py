@@ -32,6 +32,8 @@ db = client["studycompass"]
 userscollection = db["users"]
 friendships = db["friendships"]
 users = userscollection.find()
+ratings = db["ratings"]
+
 for user in users:
     user_id = user["_id"]
     # find friendship where user_id is requester or recipient
@@ -43,10 +45,21 @@ for user in users:
     })
     # update user document directly
     userscollection.update_one({"_id": user_id}, {"$set": {"parnters": count}})
+    count = ratings.count_documents({"user_id": user_id})
+    # update user document directly
+    userscollection.update_one({"_id": user_id}, {"$set": {"contributions": count}})
 
-result = userscollection.update_many(
-    {},
-    { '$rename': { "parnters": "partners" } }
-)
+
+
+# for user in users:
+#     user_id = user["_id"]
+#     # find ratings where user_id is user_id
+#     count = ratings.count_documents({"user_id": user_id})
+#     print(count)
+#     # update user document directly
+#     userscollection.update_one({"_id": user_id}, {"$set": {"contributions": count}})
+    
+
+
 
 updateVersion(uri, VERSION)

@@ -61,6 +61,10 @@ router.post('/update_rating', verifyToken, async (req, res) => {
                 downvotes
             });
             await rating.save();
+            //update user stats
+            const user = await User.findOne({ _id: userId });
+            user.contributions += 1;
+            await user.save();
         }
 
         const ratings = await Rating.find({ classroom_id: classroomId });
