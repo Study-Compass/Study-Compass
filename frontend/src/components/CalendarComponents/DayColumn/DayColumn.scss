@@ -67,9 +67,10 @@
 }
 
 .search{
-    border:2px solid #A2ABAB;
+    border: 2px solid #A2ABAB;
     box-sizing: border-box;
-    background-color: #DDDCDC;
+    background-color: rgba(229,229,229,0.8);
+
 }
 
 .event:hover{
@@ -93,8 +94,9 @@
     height:calc(100% - 10px);   
     width:calc(100% - 10px);
     position: absolute;
-    background-color: #E5E5E5;
+    background-color: rgba(229,229,229,0.5);
     border-radius: 5px;
+    border:2px solid #A2ABAB;
     pointer-events: none;
     opacity:0.8;
     margin:6px;
@@ -104,7 +106,7 @@
 .grid-item{
     position: relative;
     box-sizing: border-box;
-    border-top: 2px solid var(--border);
+    border-top: 2px solid var(--lighterborder);
     margin: 0 2px;
     border-bottom: 2px solid var(--background);
 }
