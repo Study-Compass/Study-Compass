@@ -134,6 +134,14 @@ router.post("/check-out", verifyToken, async (req, res) =>{
                     //else update end time
                     history.end_time = endTime;
                     await history.save();
+                    //update user stats
+                    const user = await User.findOne({ _id: req.user.userId });
+                    user.hours += timeDiff/3600000;
+                    //find if new classroom visited
+                    const pastHistory = await StudyHistory.findOne({ user_id: req.user.userId, classroom_id: classroomId });
+                    if(!pastHistory){
+                        user.visited.push(classroomId);
+                    }
                 }
             }
         }
