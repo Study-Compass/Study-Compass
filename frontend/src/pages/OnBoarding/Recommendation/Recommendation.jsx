@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Loader from '../../../components/Loader/Loader';
-import '../Onboard.css';
-import './Recommendation.css';
+import '../Onboard.scss';
+import './Recommendation.scss';
 
 function Recommendation({ justSlider, sliderValue, setSliderValue }) {
     const sliderRef = useRef(null);

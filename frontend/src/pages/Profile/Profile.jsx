@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import './Profile.css';
+import './Profile.scss';
 import Header from '../../components/Header/Header';
 import Footer from '../../components/Footer/Footer.jsx';
 import ProfileCard from '../../components/ProfileCard/ProfileCard';

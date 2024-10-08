@@ -1,54 +1,24 @@
-.whole-page{
-    position: fixed; 
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 9998;  
-    background-color: rgba(0, 0, 0, 0);
-    opacity: 0;
-    transition: background-color 0.5s ease, opacity 0.5s ease;
-}
- 
-.whole-page.in{
-    background-color: rgba(0, 0, 0, 0.3);
-    opacity: 1;
-}
-
-.whole-page.out {
-    background-color: rgba(0, 0, 0, 0);
-    opacity: 0;
-    pointer-events: none;
-}
-
-
-.pop-up{
+.profile-creation{
     box-sizing: border-box;
-    border-radius:10px;
     display:flex;
     flex-direction: row;
     align-items: center;
     justify-content: flex-start;
-    top: 50%; 
-    left: 50%; 
-    transform: translate(-50%, -50%);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     background-color: white;
-    height: 400px;
-    width: 630px;
-    position: fixed; 
+    /* height: 400px;
+    width: 630px; */
     border-radius: 8px; 
-    opacity: 0;
-    z-index: 9999; 
-    transition: opacity 0.5s ease;
+    width:100%;
+    height:400px;
 }
 
 .left-benefits{
     position: relative;
-    border-radius: 8px 0 0 8px ;
     width: 63%;
     height: 100%;
     background-color: var(--salmon);
+    border-radius: 8px 0px 0px 8px;
 }
 
 .right-benefits{
@@ -76,22 +46,14 @@
     margin-bottom: 3%;
 }
 
-.whole-page h1{
-    width: 100%;
-    font-size: 20px;
-    text-align: left;
-    margin-left: 0;
-    padding-left: 0;
-}
-
-.whole-page p{
+.profile-creation p{
     color: var(--black);
     font-size: 13px;
     text-align: left;
     margin-bottom: 55%;
 }
 
-.whole-page .button{
+.profile-creation .button{
     font-family: 'Satoshi';
     font-size: 15px;
     outline: none;
@@ -122,12 +84,17 @@
 
 
 @media (max-width:500px) {
+    .profile-creation{
+        justify-content: center;
+    }
+
+    .profile-creation h1{
+        text-align: center;
+    }
     .left-benefits{
         width: 0%;
     }
-
-    .pop-up{
-        padding-left: 30px;
-        width: 250px;
+    .right-benefits{
+        width: 60%;
     }
 }

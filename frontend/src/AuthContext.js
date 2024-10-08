@@ -13,6 +13,7 @@ export const AuthProvider = ({ children }) => {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [isAuthenticating, setIsAuthenticating] = useState(true); // [1
     const [user, setUser] = useState(null);
+    const [checkedIn, setCheckedIn] = useState(null);
 
     const { addNotification } = useNotification();
 
@@ -35,6 +36,7 @@ export const AuthProvider = ({ children }) => {
                 console.log(response.data.data.user);
                 setIsAuthenticated(true);
                 setIsAuthenticating(false);
+                getCheckedIn();
             } else {
                 setIsAuthenticated(false);
                 setIsAuthenticating(false);
@@ -124,8 +126,33 @@ export const AuthProvider = ({ children }) => {
         }
     }
 
+    const getCheckedIn = async () => {
+        try {
+            const token = localStorage.getItem('token');
+            const config = {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            };
+            const response = await axios.get('/checked-in', config);
+
+            if (response.data.success) {
+                const responseBody = response.data;
+                if(responseBody.classrooms.length === 0){
+                    return { checkedIn: null };
+                }
+                console.log(responseBody.classrooms[0]);
+                setCheckedIn(responseBody.classrooms[0]);
+            } else {
+                return { checkedIn: null };
+            }
+        } catch (error) {
+            console.error('Error fetching checked in:', error);
+        }
+    }
+
     return (
-        <AuthContext.Provider value={{ isAuthenticated, user, login, logout, googleLogin, validateToken, isAuthenticating, getDeveloper }}>
+        <AuthContext.Provider value={{ isAuthenticated, user, login, logout, googleLogin, validateToken, isAuthenticating, getDeveloper, checkedIn, getCheckedIn }}>
             {children}
         </AuthContext.Provider>
     );

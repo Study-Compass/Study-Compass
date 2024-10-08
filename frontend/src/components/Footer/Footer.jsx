@@ -1,5 +1,5 @@
 import React from 'react';
-import './Footer.css';
+import './Footer.scss';
 import Github from '../../assets/Icons/Cute-Github.svg';
 
 

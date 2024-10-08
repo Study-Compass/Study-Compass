@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import '../Forms.css';
+import '../Forms.scss';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import useAuth from '../../../hooks/useAuth';
 import { useGoogleLogin } from '@react-oauth/google';
@@ -101,6 +101,8 @@ function RegisterForm() {
         } catch (error) {
             if(error.response.status === 400){
                 setErrorText("Username or Email already exists");
+            } else {
+                setErrorText(error.response.data.message);
             }
             // console.error('Registration failed:', error);
             // Handle errors (e.g., display error message)

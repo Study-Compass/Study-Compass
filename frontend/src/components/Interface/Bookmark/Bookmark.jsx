@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import './Bookmark.css';
+import './Bookmark.scss';
 import useAuth from '../../../hooks/useAuth';
 import { save } from '../../../DBInteractions';
 import { useNotification } from '../../../NotificationContext';

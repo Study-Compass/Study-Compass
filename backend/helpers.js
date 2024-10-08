@@ -29,6 +29,14 @@ const findChain = (schedule, time) => {
     return time;
 };
 
+/**
+ * Finds the next available time slot in the schedule.
+ * 
+ * @param {Object} schedule - The weekly schedule object where keys are days and values are arrays of events.
+ * @returns {number} - The next available time slot in minutes from midnight. 
+ *                     Returns 9999 if no available slot is found or if it's a weekend.
+ *                     Returns a negative number if currently occupied, representing the end time of the current event.
+ */
 const findNext = (schedule) => {
     const days = ["M", "T", "W", "R", "F"];
     const today = new Date();

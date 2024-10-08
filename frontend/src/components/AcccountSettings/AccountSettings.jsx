@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import './AccountSettings.css';
+import './AccountSettings.scss';
 import rightarrow from '../../assets/Icons/RightArrow.svg';
 import pfp from '../../assets/defaultAvatar.svg';
 import { saveUser } from '../../DBInteractions';

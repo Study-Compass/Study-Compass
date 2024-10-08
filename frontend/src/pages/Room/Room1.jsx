@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Calendar from '../../components/CalendarComponents/Calendar/Calendar.jsx';
-import './Room.css';
+import './Room.scss';
 import Header from '../../components/Header/Header.jsx';
 import SearchBar from '../../components/SearchBar/SearchBar.jsx';
 import useAuth from '../../hooks/useAuth.js';
@@ -17,6 +17,7 @@ import Recommended from '../../components/Recommended/Recommended.jsx';
 import Banner from '../../components/Banner/Banner.jsx';
 import Report from '../../components/Report/Report.jsx';
 import { useProfileCreation } from '../../ProfileCreationContext';
+import { getRecommendation } from '../../DBInteractions.js';
 
 import chevronUp from '../../assets/chevronup.svg';
 import SortIcon from '../../assets/Icons/Sort.svg';
@@ -25,6 +26,7 @@ import Github from '../../assets/Icons/Github.svg';
 
 import { debounce} from '../../Query.js';
 import ProfilePicture from '../../components/ProfilePicture/ProfilePicture.jsx';
+import { set } from 'mongoose';
 
 /** 
 documentation:
@@ -44,11 +46,13 @@ function Room() {
     const [rooms, setRooms] = useState(null);
     const [roomIds, setRoomIds] = useState({});
     const [ready, setReady] = useState(false);
-    const { isAuthenticated, isAuthenticating, user } = useAuth();
+    const { isAuthenticated, isAuthenticating, user, checkedIn } = useAuth();
     const { getRooms, getRoomUpdate, getFreeRooms, getRoom, getBatch, search, allSearch } = useCache();
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [calendarLoading, setCalendarLoading] = useState(true);
+
+    const [freeNow, setFreeNow] = useState(false);
 
     const [contentState, setContentState] = useState("empty")
 
@@ -69,6 +73,8 @@ function Room() {
 
     const [bannerVisible, setBannerVisible] = useState(false);
     const [reportIsUp, setReportIsUp] = useState(false);  
+
+    const [recommendedRoom, setRecommendedRoom] = useState(null);
 
     const { handleOpen } = useProfileCreation();
 
@@ -141,6 +147,7 @@ function Room() {
         setResults([]);
         clearQuery();
         setLoadedResults([]);
+        setFreeNow(false);
     }
 
     function setReportUp(){
@@ -165,10 +172,20 @@ function Room() {
 
     const [viewport, setViewport] = useState("100vh");
     useEffect(() => {
-        setViewport((window.innerHeight) + 'px');
-        //add listener
-    },[]);
+        let height = window.innerHeight;
+        if(checkedIn!==null){
+            height -= 20;
+        }
+        if(!isAuthenticated && !isAuthenticating){
+            height -= 20;
+            setViewport(height + 'px');
+            console.log(height);
+        }
+        
+        setViewport(height + 'px');
 
+        //add listener
+    },[checkedIn, isAuthenticated, isAuthenticating]);
 
 
 //==========================================================================================================================================================
@@ -186,7 +203,7 @@ function Room() {
                 navigate('/onboard');
             }
         }
-        if(isAuthenticating){
+        if(!roomIds){
             return;
         }
         const searchParams = new URLSearchParams(window.location.search);
@@ -253,10 +270,7 @@ function Room() {
             setContentState("empty");
             return;
         }
-        console.log(searchQuery);
-        console.log(searchAttributes);
-        console.log(searchSort);
-        console.log(query);
+
         allPurposeSearch();
     }, [searchQuery, searchAttributes, searchSort, query]);
 
@@ -270,6 +284,21 @@ function Room() {
         // }
      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [query])
+
+    useEffect(() => {
+        const getRecommendationData = async () => {
+            
+            try{
+                const recommendation = await getRecommendation();
+                console.log(recommendation.data.data);
+                setRecommendedRoom(recommendation.data.data);
+            } catch (error){
+                console.log(error);
+            }
+        }
+
+        getRecommendationData();
+    },[]);
 
 
 //=========================================== DONT TOUCH HERE ===============================================================================================
@@ -314,29 +343,53 @@ function Room() {
     const handleFreeNow = async () => {
         const query = fetchFreeNow();
         allPurposeFreeNow(query);
+        setFreeNow(true);
+    }
+
+    const handleFreeNow1 = () => {
+        //if weekend
+        if(new Date().getDay() === 0 || new Date().getDay() === 6){
+            handleFreeNow();
+        }
+        const now = new Date();
+        const day = now.getDay();
+        let startTime = (now.getHours() * 60) + now.getMinutes() + 10;
+        //round down to nearest 30 minutes
+        startTime = Math.floor(startTime / 30) * 30;
+        let endTime = startTime + 30;
+        const timePeriod = {
+            class_name: "search",
+            start_time: startTime,
+            end_time: endTime,
+        }
+        const query = { 'M': [], 'T': [], 'W': [], 'R': [], 'F': [] };
+        query[["M", "T", "W", "R", "F"][day - 1]].push(timePeriod);
+        addQuery(["M", "T", "W", "R", "F"][day - 1], timePeriod);
+        setContentState("freeNowSearch");
     }
 
 //==========================================================================================================================================================
 
     return (    
-        <div className="room" style={{ height: width < 800 ? viewport : '100vh' }}>
-            <Banner visible={bannerVisible} setVisible={setBannerVisible}/>
+        <div className="room" style={{ height: viewport }}>
+            {/* <Banner visible={bannerVisible} setVisible={setBannerVisible}/> */}
             <Report text={roomName} isUp={reportIsUp} setIsUp={setReportUp}/>
             <Header />
             <div className="content-container" style={{height: width < 800 ? bannerVisible ? "max(100% - 10px)":  "max(100% - 80px)"  : bannerVisible ? "max(100% - 135px)":  "max(100% - 115px)", maxHeight:width < 800 ? bannerVisible ? "max(100% - 10px)":  "max(100% - 80px)"  : bannerVisible ? "max(100% - 135px)":  "max(100% - 115px)"}}>
                 <div className="calendar-container">
                     <div className={width < 800 ? "left-mobile" : "left"}>
-
-                            {ready && contentState !== "classroom" && <Recommended 
-                                id={roomIds["Low Center for Industrial Inn. 4034"]}
+                        {ready && contentState !== "classroom" && 
+                            <Recommended 
+                                id={recommendedRoom ? recommendedRoom._id : null}
                                 debouncedFetchData={debouncedFetchData}
                                 changeURLHelper={changeURL2}
                                 findNext={findNext}
                                 contentState={contentState}
                                 setContentState={setContentState}
                                 hide={searchFocus || contentState !== "empty"}
-                            />}
-
+                                givenRoom={recommendedRoom}
+                            />
+                        }
                         <SearchBar data={rooms} onEnter={changeURL2} room={contentState === "classroom" || contentState === "calendarSearchResult" ? roomName : searchQuery } onX={onX} onSearch={onSearch} query={searchQuery} onBlur={setSearchFocus} />
                         {contentState === "classroom" || contentState === "calendarSearchResult"  ? 
                             <Classroom  
@@ -351,13 +404,16 @@ function Room() {
                             reload={reloadClassroom}
                             /> 
                         : ""}
+                        {/* {contentState !== "classroom" &&
+
+                        } */}
                         {contentState === "calendarSearch" || contentState === "freeNowSearch" || contentState === "nameSearch" ? calendarLoading ? "" : 
                             <div className="resultsCountContainer">
                                 <h1 className="resultCount">{results.length} results {contentState === "nameSearch" ? searchQuery ? `for "${searchQuery.slice(0,width < 800 ? 8:15)}${searchQuery.length>(width < 800 ? 8:15) ? "..." : ""}"` : "" : ""}</h1> 
                                 {/* <img src={SortIcon} alt="sort" onClick={()=>{setShowFilter(!showFilter)}}/> */}
                             </div>
                         : ""}
-                        { (contentState === "calendarSearch" || contentState === "freeNowSearch" || contentState === "nameSearch")? 
+                        { (contentState !== "classroom" )? 
                             <Sort
                                 query={searchQuery}
                                 searchAttributes={searchAttributes}
@@ -365,6 +421,10 @@ function Room() {
                                 searchSort={searchSort}
                                 setSearchSort={setSearchSort}
                                 onSearch={onSearch}
+                                handleFreeNow={handleFreeNow1}
+                                contentState={contentState}
+                                freeNow={freeNow}
+                                setFreeNow={setFreeNow}
                             /> 
                         : ""}
                         {contentState === "calendarSearch" || contentState === "freeNowSearch" || contentState === "nameSearch" ? 

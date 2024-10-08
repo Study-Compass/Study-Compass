@@ -1,5 +1,5 @@
 import React from 'react';
-import './FriendRequest.css';
+import './FriendRequest.scss';
 import Friend from '../Friend/Friend';
 import { useNotification } from '../../../NotificationContext';
 import { updateFriendRequest } from '../FriendsHelpers';

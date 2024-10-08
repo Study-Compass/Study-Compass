@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect }from 'react'
-import './Report.css';
+import './Report.scss';
 import useOutsideClick from '../../hooks/useClickOutside';
 import x from '../../assets/x.svg';
 import { sendError } from '../../DBInteractions';

@@ -1,0 +1,52 @@
+
+.badges{
+    height:fit-content;
+    display: flex;
+    gap:5px;
+    flex-wrap:wrap;
+}
+
+.badge{
+    border-radius: 5px;
+    width: fit-content;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.badge.small{
+    border-radius: 5px;
+
+}
+
+.badge.normal p{
+    margin:0 7px !important;
+    color:white !important;
+    font-size:12px;
+    font-family: 'Inter' !important;
+    font-weight:600 !important;
+    text-wrap: nowrap;
+
+}
+
+.badge.small p{
+    margin: 4px 5px 3px 5px!important;
+    line-height: 0.7;
+    color:white !important;
+    font-family: 'Inter' !important;
+    font-weight:600 !important;
+    text-wrap: nowrap;
+
+}
+
+.badge.beta-tester{
+    background-color: #A0C4FF;
+}
+
+.badge.admin{
+    background-color: #EA4335;
+}
+
+.badge.developer{
+    background-color: var(--developerBlue);
+}

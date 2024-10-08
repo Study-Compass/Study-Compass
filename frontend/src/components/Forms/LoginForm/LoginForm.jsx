@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
-import '../Forms.css';
+import '../Forms.scss';
 import { generalIcons } from '../../../Icons';
 import useAuth from '../../../hooks/useAuth';
 import circleWarning from '../../../assets/circle-warning.svg';
@@ -128,7 +128,7 @@ function LoginForm() {
         }
         <div className="email">
             <p>Username/Email</p>
-            <input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="Valid username/email..." required />
+            <input type="text" name="email" value={formData.email} onChange={handleChange} placeholder="Valid username/email..." required />
         </div>
         <div className="password">
             <p>Password</p>

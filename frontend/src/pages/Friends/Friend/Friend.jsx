@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import './Friend.css';
+import './Friend.scss';
 import pfp from '../../../assets/defaultAvatar.svg';
 import { unFriend } from '../FriendsHelpers';
 import { useNotification } from '../../../NotificationContext';

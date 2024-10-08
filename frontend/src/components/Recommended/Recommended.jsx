@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import "./Recommended.css";
+import "./Recommended.scss";
 import Result from "../Results/Result/Result";
 import { useCache } from '../../CacheContext.js';
 import { useNavigate } from "react-router-dom";
@@ -10,7 +10,7 @@ import useAuth from '../../hooks/useAuth.js';
 function Recommended({id, debouncedFetchData, changeURLHelper, findNext, hide}) {
     const [room, setRoom] = useState(null);
     const [height, setHeight] = useState("auto");
-
+    let fetched = false;
 
     const { isAuthenticating, isAuthenticated } = useAuth();
 
@@ -48,11 +48,33 @@ function Recommended({id, debouncedFetchData, changeURLHelper, findNext, hide}) 
     },[hide,containerRef.current]);
 
     useEffect(() => {
-        fetchDataHelper(id);
+        if(id !== null && !fetched){
+            console.log("hi");
+            fetchDataHelper(id);
+            fetched = true;
+        }
+        
     }, [id]);
 
+    // useEffect(() => {
+    //     if(givenRoom){
+    //         const formattedRoom = {
+    //             room: givenRoom,
+    //             data: givenRoom,
+    //         };
+    //         setRoom(formattedRoom);
+    //     } 
+    //     // else {
+    //     //     fetchDataHelper(id);
+    //     // }
+    // }, [id, givenRoom]);
 
-    if(!room|| isAuthenticating){
+    useEffect(() => {
+        console.log("room", room);
+    }, [room]);
+
+
+    if(room === null|| isAuthenticating){
         return(
             <div className="recommended">        
                 <p>recommended for you</p>
