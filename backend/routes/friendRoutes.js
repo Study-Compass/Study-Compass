@@ -187,7 +187,7 @@ router.post('/friend-request/reject/:friendshipId', verifyToken, async (req, res
     }
 });
 
-router.get('/getFriends', verifyToken, async (req, res) => {
+router.get('/get-friends', verifyToken, async (req, res) => {
     const userId = req.user.userId;
 
     try {
@@ -221,7 +221,7 @@ router.get('/getFriends', verifyToken, async (req, res) => {
     } catch (error) {
         res.json({
             success: false,
-            message: error.message
+            message: error
         })
     }
 });

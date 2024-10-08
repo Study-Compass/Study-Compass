@@ -37,7 +37,7 @@ const debounceUserSearch = debounce(userSearch, 500);
 
 const getFriends = async () => {
     try{
-        const response = await axios.get('/getFriends', {
+        const response = await axios.get('/get-friends', {
             headers: {
                 'Authorization': `Bearer ${localStorage.getItem('token')}`
             }
