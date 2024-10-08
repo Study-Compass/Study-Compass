@@ -12,6 +12,7 @@ import Friends from './pages/Friends/Friends';
 import Profile from './pages/Profile/Profile';
 import Landing from './pages/Landing/Landing';
 import DeveloperOnboard from './pages/DeveloperOnboarding/DeveloperOnboarding';
+import QR from './pages/QR/QR';
 import Admin  from './pages/Admin/Admin';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './AuthContext';
@@ -27,6 +28,10 @@ import axios from 'axios';
 function App() {
     useEffect(() => {
         // check if the user has already visited
+        //don't do anything if /qr
+        if (window.location.pathname === '/qr') {
+            return;
+        }
         const hasVisited = localStorage.getItem('hasVisited');
 
         if (!hasVisited) {
@@ -52,6 +57,7 @@ function App() {
                                     <ProfileCreationProvider>
                                     <Routes>
                                         <Route path='/' element={<Layout/>}>
+                                            <Route path="/qr/:id" element={<QR/>}/>
                                             <Route index element={<Landing/> }/>
                                             <Route path="/room/:roomid" element={<Room1 />}/>
                                             <Route path="/room1/:roomid" element={<Room1 />}/>
