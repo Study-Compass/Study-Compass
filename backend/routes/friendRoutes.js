@@ -188,7 +188,7 @@ router.post('/friend-request/reject/:friendshipId', verifyToken, async (req, res
 });
 
 router.get('/getFriends', verifyToken, async (req, res) => {
-    const userId = req.user.userId; // Assuming you have user authentication
+    const userId = req.user.userId;
 
     try {
         const friendships = await Friendship.find({

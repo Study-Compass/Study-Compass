@@ -80,7 +80,7 @@ router.post("/check-in", verifyToken, async (req, res) =>{
         //create history object, preempt end time using findnext
         const schedule = await Schedule.findOne({ classroom_id: classroomId });
         if(schedule){
-            let endTime = findNext(schedule.days); //time in minutes from midnight
+            let endTime = findNext(schedule.weekly_schedule); //time in minutes from midnight
             endTime = new Date(new Date().setHours(Math.floor(endTime/60), endTime%60, 0, 0));
             const history = new StudyHistory({
                 user_id: req.user.userId,
@@ -125,9 +125,9 @@ router.post("/check-out", verifyToken, async (req, res) =>{
             //find latest history object
             const history = await StudyHistory.findOne({ user_id: req.user.userId, classroom_id: classroomId }).sort({ start_time: -1 });
             const endTime = new Date();
-            const timeDiff = endTime - history.start_time;
             //if time spent is less than 5 minutes, delete history object
             if(history){
+                const timeDiff = endTime - history.start_time;
                 if(timeDiff < 300000){
                     await history.deleteOne();
                 } else {
