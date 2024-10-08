@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Header from '../../components/Header/Header';
 import AccountSettings from '../../components/AcccountSettings/AccountSettings.jsx';
 import StudyPreferences from '../../components/StudyPreferences/StudyPreferences.jsx';
+import DisplaySettings from '../../components/DisplaySettings/DisplaySettings.jsx';
 import './Settings.scss';
 import pfp from '../../assets/defaultAvatar.svg';
 import preferences from '../../assets/Icons/Preferences.svg';

@@ -22,6 +22,7 @@ import { NotificationProvider } from './NotificationContext';
 import { ErrorProvider } from './ErrorContext';
 import { ProfileCreationProvider } from './ProfileCreationContext';
 import { WebSocketProvider } from './WebSocketContext';
+import { DarkModeProvider } from './DarkModeContext';
 import Layout from './pages/Layout/Layout';
 import axios from 'axios';
 
@@ -53,30 +54,32 @@ function App() {
                     <WebSocketProvider>
                         <AuthProvider>
                             <CacheProvider>
-                                <Router>
-                                    <ProfileCreationProvider>
-                                    <Routes>
-                                        <Route path='/' element={<Layout/>}>
-                                            <Route path="/qr/:id" element={<QR/>}/>
-                                            <Route index element={<Landing/> }/>
-                                            <Route path="/room/:roomid" element={<Room1 />}/>
-                                            <Route path="/room1/:roomid" element={<Room1 />}/>
-                                            <Route path="/register" element={<Register />}/>
-                                            <Route path="/login" element={<Login />}/>
-                                            <Route path="*" element={<Error />}/>
-                                            <Route path="/error/:errorCode" element={<Error />}/>
-                                            <Route path="/onboard" element={<Onboard />}/>
-                                            <Route path="/profile" element={<Profile/>}/>
-                                            <Route path="/friends" element={<Friends/>}/>
-                                            <Route path="/landing" element={<Landing/>}/>
-                                            <Route path="/settings" element={<Settings/>}/>
-                                            <Route path="/documentation" element={<Redirect/>}/>
-                                            <Route path="/developer-onboarding" element={<DeveloperOnboard/>}/>
-                                            <Route path="/admin" element={<Admin/>}/>
-                                        </Route>
-                                    </Routes>
-                                    </ProfileCreationProvider>
-                                </Router>
+                                <DarkModeProvider>
+                                    <Router>
+                                        <ProfileCreationProvider>
+                                        <Routes>
+                                            <Route path='/' element={<Layout/>}>
+                                                <Route path="/qr/:id" element={<QR/>}/>
+                                                <Route index element={<Landing/> }/>
+                                                <Route path="/room/:roomid" element={<Room1 />}/>
+                                                <Route path="/room1/:roomid" element={<Room1 />}/>
+                                                <Route path="/register" element={<Register />}/>
+                                                <Route path="/login" element={<Login />}/>
+                                                <Route path="*" element={<Error />}/>
+                                                <Route path="/error/:errorCode" element={<Error />}/>
+                                                <Route path="/onboard" element={<Onboard />}/>
+                                                <Route path="/profile" element={<Profile/>}/>
+                                                <Route path="/friends" element={<Friends/>}/>
+                                                <Route path="/landing" element={<Landing/>}/>
+                                                <Route path="/settings" element={<Settings/>}/>
+                                                <Route path="/documentation" element={<Redirect/>}/>
+                                                <Route path="/developer-onboarding" element={<DeveloperOnboard/>}/>
+                                                <Route path="/admin" element={<Admin/>}/>
+                                            </Route>
+                                        </Routes>
+                                        </ProfileCreationProvider>
+                                    </Router>
+                                </DarkModeProvider>
                             </CacheProvider>
                         </AuthProvider>
                     </WebSocketProvider>
