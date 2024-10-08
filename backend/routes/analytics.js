@@ -3,6 +3,7 @@ const router = express.Router();
 const { isValid, formatISO, parseISO, setHours, startOfWeek, endOfWeek, setMinutes, setSeconds, setMilliseconds, eachHourOfInterval, eachDayOfInterval } = require('date-fns');
 const Visit = require('../schemas/visit'); 
 const User = require('../schemas/user');
+const QR = require('../schemas/qr');
 
 // Route to log a visit
 router.post('/log-visit', async (req, res) => {
@@ -430,6 +431,35 @@ router.get('/users-by-all', async (req, res) => {
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: 'An error occurred while fetching all-time users' });
+    }
+});
+
+router.post('/qr', async (req, res) => {
+    try {
+        const { name, repeat } = req.body;
+        const qr = await QR.findOne({ name: name });
+        if(!qr){
+            let newQR;
+            if(repeat){
+                newQR = new QR({ name, scans: 1, repeated: 1 });
+            } else {
+                newQR = new QR({ name, scans: 1, repeated: 0 });
+            }
+            await newQR.save();
+            console.log('QR scan registered');
+            return { success: true, message: 'QR scan registered' };
+        } else {
+            qr.scans++;
+            if(repeat){
+                qr.repeated++;
+            }
+            await qr.save();
+            console.log('QR scan registered');
+            return { success: true, message: 'QR scan registered' };
+        }
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success :false, error: 'An error occurred while generating the QR code' });
     }
 });
 
