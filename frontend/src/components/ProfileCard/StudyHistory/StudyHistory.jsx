@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import './StudyHistory.scss';
 import History from "../../../assets/Icons/History.svg"
 import DownArrow from "../../../assets/Icons/DownArrow.svg"
+import HistoryEntry from './HistoryEntry/HistoryEntry';
 
 
 
@@ -27,7 +28,7 @@ function StudyHistory({userInfo}){
                     </button>
                 </div>
                 <div className={`history-content ${isOpen ? 'open' : ''}`}>
-
+                    <HistoryEntry></HistoryEntry>
                 </div>
             </div>
         </div>

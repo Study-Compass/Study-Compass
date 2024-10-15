@@ -1,0 +1,42 @@
+.historyentry{
+    display: flex;
+    justify-content: space-between;
+
+    width: 770px;
+    height:78px;
+    border-radius: 10px;
+    box-sizing: border-box;
+    border: 1px solid var(--lightborder);
+    margin-top: 10px;
+    
+
+    h3{
+        font-size: 17px;
+        color:var(--text);
+        padding: 0px 20px;
+        margin-top: 10px;
+    }
+
+    h6{
+        margin-top: 7px;
+        height: 33px;
+    }
+
+    h4{
+        font-size: 15px;
+        color:var(--text);
+        padding: 0px 13px;
+        font-family: 'Inter';
+        font-weight: 100px;
+        
+    }
+
+    h5{
+        font-size: 15px;
+        color:var(--red);
+        margin-top: 5px;
+        font-weight: 100px;
+        font-family: 'Inter';
+
+    }
+}
