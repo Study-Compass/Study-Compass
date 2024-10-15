@@ -11,31 +11,48 @@ export const useDarkMode = () => useContext(DarkModeContext);
 export const DarkModeProvider = ({ children }) => {
   const [notifications, setNotifications] = useState([]);
 
-    // check for auth
-    const { isAuthenticating, isAuthenticated, user, getDeveloper } = useAuth();
+  // check for auth
+  const { isAuthenticating, isAuthenticated, user, getDeveloper } = useAuth();
+
+    const [darkMode, setDarkMode] = useState(() => {
+      const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      return systemPrefersDark;
+    });
 
     useEffect(() => {
-        if (isAuthenticating) {
-            return;
-        }
+      const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+      const handleChange = () => setDarkMode(mediaQuery.matches);
+      
+      // Listen for changes in system preference
+      mediaQuery.addEventListener('change', handleChange);
+      
+      // Clean up event listener
+      return () => mediaQuery.removeEventListener('change', handleChange);
+    }, []);
 
-        // if (!isAuthenticated) {
-        //     // navigate("/login");
-        // }
-        // if (!user) {
-        //     return;
-        // } else {
-        //     console.log(user);
-        // }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    useEffect(() => {
+      if (isAuthenticating) {
+          return;
+      }
+
+      if (isAuthenticated && user) {
+        const userPreference = user.darkModePreference; 
+        
+        if (userPreference !== undefined) {
+            setDarkMode(userPreference);
+        }
+      }
     }, [isAuthenticating, isAuthenticated, user])
     
     // check for user system preference
-        // use code from dusplay settings
+        // use code from display settings
 
-        
+    const toggleDarkMode = () => {
+      setDarkMode(prevMode => !prevMode);
+    };
+  
   return (
-    <DarkModeContext.Provider value={{}}>
+    <DarkModeContext.Provider value={{ darkMode, toggleDarkMode}}>
       {children}
 
     </DarkModeContext.Provider>

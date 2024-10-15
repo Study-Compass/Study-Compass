@@ -2,24 +2,27 @@ import React, { useEffect, useState } from 'react';
 import './DisplaySettings.css';
 import light from '../../assets/Icons/LightMode.svg';
 import dark from '../../assets/Icons/DarkMode.svg';
+import { useDarkMode } from '../../DarkModeContext';
 
 const DisplaySettings = ( {settingsRightSide, width, handleBackClick, rightarrow} ) => {
-    const [selectedMode, setSelectedMode] = useState("light");
+    const {darkMode, toggleDarkMode} = useDarkMode();
+    const [selectedMode, setSelectedMode] = useState(darkMode ? "dark" : "light");
 
     useEffect(() => {
-        const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-        setSelectedMode(mediaQuery.matches ? 'dark' : 'light');
+        // const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+        setSelectedMode(darkMode ? 'dark' : 'light');
+    }, [darkMode] );
 
-        const handleChange = (e) => {
-            setSelectedMode(e.matches ? 'dark' : 'light');
-        };
+        // const handleChange = (e) => {
+        //     setSelectedMode(e.matches ? 'dark' : 'light');
+        // };
 
-        mediaQuery.addEventListener('change', handleChange);
+        // mediaQuery.addEventListener('change', handleChange);
 
-        return () => {
-            mediaQuery.removeEventListener('change', handleChange);
-        };
-    }, []);
+    //     return () => {
+    //         mediaQuery.removeEventListener('change', handleChange);
+    //     };
+    // }, []);
 
     
     useEffect( () => {
@@ -32,6 +35,7 @@ const DisplaySettings = ( {settingsRightSide, width, handleBackClick, rightarrow
 
     const handleModeSelect = (mode) => {
         setSelectedMode(mode);
+        toggleDarkMode();
       };
     
 
