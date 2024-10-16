@@ -3,7 +3,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../schemas/user.js');
 const crypto = require('crypto');
-
+const { sendDiscordMessage } = require('./discordWebookService');
 
 const login = new google.auth.OAuth2(
     process.env.GOOGLE_CLIENT_ID,
@@ -57,9 +57,17 @@ async function registerUser({ username, email, password }) {
 }
 
 async function loginUser({ email, password }) {
-    const user = await User.findOne({ email })
-        .select('-googleId') // Add fields to exclude
-        .lean();
+    //check if it is an email or username
+    let user;
+    if (!email.includes('@')) {
+        user = await User.findOne({ username: email })
+            .select('-googleId') // Add fields to exclude
+            .lean();
+    } else {
+        user = await User.findOne({ email })
+            .select('-googleId') // Add fields to exclude
+            .lean();
+    }
     if (!user) {
         throw new Error('User not found');
     }
@@ -108,12 +116,12 @@ async function authenticateWithGoogle(code, isRegister = false, url) {
         user = new User({
             googleId: userInfo.data.id,
             email: userInfo.data.email,
-            tags: ["beta tester"],
             name: userInfo.data.name,
             username: randomUsername, //replace this with a random username generated
             picture: userInfo.data.picture
         });
         await user.save();
+        sendDiscordMessage(`New user registered`, `user ${user.username} registered`, "newUser");
     }
 
     const jwtToken = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '12h' });

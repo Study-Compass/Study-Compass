@@ -1,0 +1,20 @@
+.caret {
+    display: inline-block;
+    width: 2px;
+    height: 1em;
+    background-color: white;
+    vertical-align: bottom;
+    margin-bottom:3px;
+    margin-left:2px;
+  }
+  
+  .caret.blinking {
+    animation: blink 1s step-start infinite;
+  }
+  
+  @keyframes blink {
+    50% {
+      opacity: 0;
+    }
+  }
+  

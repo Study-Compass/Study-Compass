@@ -1,9 +1,9 @@
 import React from 'react';
-import './CardHeader.css';
+import './CardHeader.scss';
 import WhiteSettings from "../../../assets/Icons/WhiteSettings.svg"
 import defaultAvatar from "../../../assets/defaultAvatar.svg"
 import Badges from '../../Badges/Badges';
-import '../../ProfilePicture/ProfilePicture.css';
+import '../../ProfilePicture/ProfilePicture.scss';
 import GrainTexture from '../../../assets/Grain-Texture.png';
 
 function CardHeader({userInfo, settings}){
@@ -35,7 +35,7 @@ function CardHeader({userInfo, settings}){
             
             <div className="stats">
                 <p><p className="num">{userInfo.visited ? userInfo.visited.length : 0}</p>rooms visited</p>
-                <p><p className="num">{userInfo.partners ? userInfo.partners.length : 0}</p>study partners</p>
+                <p><p className="num">{userInfo.partners ? userInfo.partners : 0}</p>study partners</p>
                 <p><p className="num">{userInfo.sessions ? userInfo.sessions.length : 0}</p>study sessions</p>
                 <p><p className="num">{userInfo.hours ? userInfo.hours : 0}</p>hours studied</p>
                 <p><p className="num">{userInfo.contributions ? userInfo.contributions : 0}</p>community contributions</p>

@@ -85,7 +85,12 @@ const saveUser = async (name, username, email, password, recommendation, classro
 
 const checkUsername = async (username) => {
     try {
-        const response = await axios.post("/check-username/", { username });
+        const response = await axios.post("/check-username/", { username },{
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                'Content-Type': 'application/json'
+            }
+        });
         console.log(response);
         const responseBody = response.data;
         if (!responseBody.success) {
@@ -221,6 +226,21 @@ const userRated = async (classroomId, userId) => {
     }
 }
 
+const getRatings = async (classroomId) => {
+    try{
+        const response = await axios.get('/get-ratings', {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`,
+            },
+            params: {classroomId}
+        });
+        return response;
+    } catch(error){
+        throw error;
+    }
+}
+
+
 const mainSearchChange = async (classroomId) => {
     try{
         const response = await axios.post('/main-search-change', {classroomId}, {
@@ -237,5 +257,20 @@ const mainSearchChange = async (classroomId) => {
     }
 }
 
+const getRecommendation = async () => {
+    const token = localStorage.getItem('token');;
+    try{
+        const response = await axios.get('/get-recommendation', {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+            }
+        });
+        console.log("successful");
+        return response;
+    } catch(error){
+        throw error;
+    }
+}
 
-export { changeClasroom, save, checkUsername, saveUser, sendError, checkIn, checkOut, getUser, getUsers, updateRating, userRated, mainSearchChange };
+
+export { changeClasroom, save, checkUsername, saveUser, sendError, checkIn, checkOut, getUser, getUsers, updateRating, userRated, mainSearchChange, getRecommendation, getRatings };

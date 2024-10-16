@@ -1,6 +1,6 @@
 import RegisterForm from '../../components/Forms/RegisterForm/RegisterForm';
 import Header from '../../components/Header/Header';
-import './Register.css';
+import './Register.scss';
 
 function Register(){
     return(

@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import './Tags.css';
+import './Tags.scss';
 import { attributeIcons, selectedAttributeIcons } from '../../../Icons';
 import useOutsideClick from '../../../hooks/useClickOutside';
 

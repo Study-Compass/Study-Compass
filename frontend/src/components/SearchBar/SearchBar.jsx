@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import './SearchBar.css';
+import './SearchBar.scss';
 import x from '../../assets/x.svg';
 import { useNavigate } from 'react-router-dom';
 import tab from '../../assets/tab.svg';
@@ -120,6 +120,10 @@ function SearchBar({ data, onEnter, onSearch, room, onX, onBlur }) {
         setSearchInput(prev => prev.toLowerCase());
         if(searchInput === "none"){
             setSearchInput("");
+        }
+        if(searchInput === "free until"){
+            setLower("<span>free untils</span>");
+            return;
         }
         if (searchInput === '' || !isFocused) {
             setResults([]);
@@ -314,10 +318,11 @@ function SearchBar({ data, onEnter, onSearch, room, onX, onBlur }) {
                 ref={inputRef}
             />
             <div className={`shadow ${!isFocused ? "center":""} ${lower==="" ? "white":""}`}
-                placeholder={lower}
+                // placeholder={lower}
                 readOnly={true}
                 ref={shadowRef} 
-            >{lower==="" ? "." :lower}
+            >
+                {lower==="" ? "." :lower}
                 <img src={tab} alt="tab" className={`tab ${lower==="" ? "disappear":""}`} style={{right:`${tabShadow(lower)}px`}}/>
             </div>
             <div className="x-container">

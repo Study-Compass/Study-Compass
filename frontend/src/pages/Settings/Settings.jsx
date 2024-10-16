@@ -2,13 +2,12 @@ import React, { useEffect, useState } from 'react';
 import Header from '../../components/Header/Header';
 import AccountSettings from '../../components/AcccountSettings/AccountSettings.jsx';
 import StudyPreferences from '../../components/StudyPreferences/StudyPreferences.jsx';
-import './Settings.css';
+import './Settings.scss';
 import pfp from '../../assets/defaultAvatar.svg';
 import preferences from '../../assets/Icons/Preferences.svg';
 import rightarrow from '../../assets/Icons/RightArrow.svg';
 import useAuth from '../../hooks/useAuth.js';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
 
 function Settings() {
     const [width, setWidth] = useState(window.innerWidth);
@@ -34,6 +33,7 @@ function Settings() {
             setUserInfo(user);
             console.log(user);
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isAuthenticating, isAuthenticated, user])
 
     useEffect(() => { 

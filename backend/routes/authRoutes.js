@@ -3,6 +3,8 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const axios = require('axios');
 require('dotenv').config();
+const { sendDiscordMessage } = require('../services/discordWebookService');
+const { isProfane } = require('../services/profanityFilterService');
 
 const router = express.Router();
 const { verifyToken } = require('../middlewares/verifyToken.js');
@@ -49,6 +51,13 @@ router.post('/register', async (req, res) => {
                 message: 'Username has illegal chars'
             });
         }
+        if(isProfane(username)){
+            console.log(`POST: /register registration of ${username} failed`);
+            return res.status(405).json({
+                success: false,
+                message: 'Username does not abide by community standards'
+            });
+        }
 
         const existingUsername = await User.findOne({ username });
         const existingEmail = await User.findOne({ email });
@@ -64,13 +73,14 @@ router.post('/register', async (req, res) => {
 
         // Create and save the new user
         const user = new User({
-            username: username, email: email, password: password, tags: ["beta tester"]
+            username: username, email: email, password: password,
         });
         await user.save();
 
         // Generate a token for the new user
         const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-        console.log(`POST: /register new user ${username}`)
+        console.log(`POST: /register new user ${username}`);
+        sendDiscordMessage(`New user registered`, `user ${username} registered`, "newUser");
         // Send the token to the client
         res.status(201).json({
             success: true,
@@ -98,6 +108,7 @@ router.post('/login', async (req, res) => {
     const { email, password } = req.body;
 
     try {
+        //check if it is an email or username
         const { user, token } = await loginUser({ email, password });
         console.log(`POST: /login user ${user.username} logged in`)
         res.status(200).json({
@@ -120,7 +131,7 @@ router.post('/login', async (req, res) => {
 router.get('/validate-token', verifyToken, async (req, res) => {
     try {
         const user = await User.findById(req.user.userId)
-            .select('-password -googleId') // Add fields you want to exclude
+            .select('-password') // Add fields you want to exclude
             .lean(); // Assuming Mongoose for DB operations
         if (!user) {
             console.log(`GET: /validate-token token is invalid`)

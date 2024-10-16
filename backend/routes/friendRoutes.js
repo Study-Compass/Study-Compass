@@ -5,13 +5,42 @@ const { verifyToken } = require('../middlewares/verifyToken');
 const Friendship = require('../schemas/friendship');
 const User = require('../schemas/user');
 
+router.get('/user-search/:searchTerm', verifyToken, async (req, res) => {
+    const { searchTerm } = req.params;
+    try {
+        //find users with username containing searchTerm, ignore current user
+        const users = await User.find({
+            username: { $regex: new RegExp(searchTerm, 'i') },
+            _id: { $ne: req.user.userId }
+        });
+        // const users = await User.find({ username: { $regex: new RegExp(searchTerm, 'i') } });
+        //order by relevance
+        users.sort((a, b) => {
+            const aIndex = a.username.toLowerCase().indexOf(searchTerm.toLowerCase());
+            const bIndex = b.username.toLowerCase().indexOf(searchTerm.toLowerCase());
+            return aIndex - bIndex;
+        });
+        res.json({
+            success: true,
+            message: 'Users found',
+            data: users
+        });
+    } catch (error) {
+        res.json({
+            success: false,
+            message: error.message
+        });
+    }
+});
+
 router.post('/friend-request/:friendUsername', verifyToken, async (req, res) => {
     const { friendUsername } = req.params;
     const requester = req.user.userId;
     let friendId;
 
     try{
-        const friend = await User.findOne({ username: friendUsername });
+        //case insensitive search
+        const friend = await User.findOne({ username: { $regex: new RegExp(friendUsername, 'i') } });
         if(!friend){
             console.log(`POST: /friend-request/:friendId friend not found`)
             return res.status(404).json({
@@ -43,8 +72,10 @@ router.post('/friend-request/:friendUsername', verifyToken, async (req, res) => 
 
     // check if friendship already exists
     const existingFriendship = await Friendship.findOne({
-        requester: requester,
-        recipient: friendId
+        $or: [
+            { requester: requester, recipient: friendId },
+            { requester: friendId, recipient: requester }
+        ]
     });
 
     if(existingFriendship){
@@ -106,6 +137,9 @@ router.post('/friend-request/accept/:friendshipId', verifyToken, async (req, res
 
         friendship.status = 'accepted';
         await friendship.save();
+        //update stats for both users
+        await User.updateOne({ _id: friendship.requester }, { $inc: { partners: 1 } });
+        await User.updateOne({ _id: friendship.recipient }, { $inc: { partners: 1 } });
         console.log(`POST: /friend-request/accept/:friendshipId friend request accepted`)
         res.status(200).send({
             success: true,
@@ -154,7 +188,7 @@ router.post('/friend-request/reject/:friendshipId', verifyToken, async (req, res
 });
 
 router.get('/getFriends', verifyToken, async (req, res) => {
-    const userId = req.user.userId; // Assuming you have user authentication
+    const userId = req.user.userId;
 
     try {
         const friendships = await Friendship.find({

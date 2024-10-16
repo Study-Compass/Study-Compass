@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import './EditAttributes.css';
+import './EditAttributes.scss';
 import { useNavigate } from 'react-router-dom';
 import useAuth from '../../../hooks/useAuth.js';
 

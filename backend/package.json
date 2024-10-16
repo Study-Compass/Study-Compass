@@ -2,9 +2,11 @@
   "dependencies": {
     "aws-sdk": "^2.1662.0",
     "axios": "^1.7.2",
+    "bad-words": "^3.0.4",
     "bcrypt": "^5.1.1",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
+    "date-fns": "^4.1.0",
     "dotenv": "^16.3.2",
     "express": "^4.18.2",
     "google-auth-library": "^9.4.2",
@@ -13,6 +15,7 @@
     "mongoose": "^8.0.3",
     "multer": "^1.4.5-lts.1",
     "node-cron": "^3.0.3",
+    "nodemon": "^3.1.7",
     "socket.io": "^4.7.5",
     "ws": "^8.18.0"
   },

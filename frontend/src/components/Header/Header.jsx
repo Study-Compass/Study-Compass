@@ -1,16 +1,18 @@
 import React,{ useEffect, useState, useRef } from 'react'
 import { useNavigate,useLocation, Link } from 'react-router-dom';
 import logo from '../../assets/red_logo.svg';
-import './Header.css';
+import './Header.scss';
 import ProfilePicture from '../ProfilePicture/ProfilePicture';
 import useAuth from '../../hooks/useAuth';
 import MobileLogo from '../../assets/MobileLogo.svg';
+import { useWebSocket } from '../../WebSocketContext';
 
 const Header = React.memo(()=>{
-    const { isAuthenticating, isAuthenticated, logout, user } = useAuth();
+    const { isAuthenticating, isAuthenticated, logout, user, checkedIn } = useAuth();
     const [page, setPage] = useState(useLocation().pathname);
     const [pageClass, setPageClass] = useState(null);
     const navigate = useNavigate();
+    const [checkedInClassroom, setCheckedInClassroom] = useState(null);
 
     const [width, setWidth] = useState(window.innerWidth);
 
@@ -23,6 +25,12 @@ const Header = React.memo(()=>{
             navigate('/room/none',{replace : true});
         }
     }
+
+    useEffect(()=>{
+        if(checkedIn){
+            setCheckedInClassroom(checkedIn.classroom);
+        }
+    },[checkedIn]);
 
     useEffect(()=>{
         if(page.includes("/room")){
@@ -51,7 +59,9 @@ const Header = React.memo(()=>{
 
     return(
         <div className="Header">
-                {page === "/login" || page === "/register"  || page === "/"  ? "" :
+            <div className="header-content">
+                {page === "/login" || page === "/register" ? "" :
+                    isAuthenticated ? 
                     <div className="nav-container">
                         <nav>
                             {isAuthenticated && <Link className={`nav-link ${ pageClass === "room" ? "active" : ""}`} to="/room/none" ><h2>search</h2></Link>}
@@ -62,25 +72,27 @@ const Header = React.memo(()=>{
 
                     
                 }
-            {
-                isAuthenticated ? 
+                {
+                    isAuthenticated ? 
 
-                <Link to='/room/none'>
+                    <Link to='/room/none'>
+                        <img className="logo" src={ isAuthenticated || isAuthenticating ? width < 800 ? MobileLogo : logo : logo} alt="logo"/>
+                    </Link>
+                    :
+                    <Link to='/'>
                     <img className="logo" src={ isAuthenticated || isAuthenticating ? width < 800 ? MobileLogo : logo : logo} alt="logo"/>
-                </Link>
-                :
-                <Link to='/'>
-                <img className="logo" src={ isAuthenticated || isAuthenticating ? width < 800 ? MobileLogo : logo : logo} alt="logo"/>
-                </Link>
-            }
+                    </Link>
+                }
 
 
-            {page === "/login" || page === "/register" ? "" :
-                <div className="header-right">
-                    {isAuthenticated ? <ProfilePicture/> : ""}
-                    {!isAuthenticated ? <button onClick={goToLogin}>login</button> : ""}
-                </div>    
-            }
+                {page === "/login" || page === "/register" ? "" :
+                    <div className="header-right">
+                        {isAuthenticated ? <ProfilePicture/> : ""}
+                        {!isAuthenticated ? <button onClick={goToLogin}>login</button> : ""}
+                    </div>    
+                }
+            </div>
+
         </div>
     );
 });

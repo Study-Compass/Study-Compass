@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import './Badges.css';
+import './Badges.scss';
 
 function Badges({ badges, size }) {
     const numericalSize = size ? parseInt(size.replace("px", "")) : 99;

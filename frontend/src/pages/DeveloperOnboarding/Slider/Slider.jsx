@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Loader from '../../../components/Loader/Loader';
-import '../../OnBoarding/Onboard.css';
-import './Slider.css';
+import '../../OnBoarding/Onboard.scss';
+import './Slider.scss';
 
 function Slider({ justSlider, sliderValue, setSliderValue, messages, leftText, rightText, uniqueId }) {
     const sliderRef = useRef(null);

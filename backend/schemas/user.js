@@ -52,8 +52,8 @@ const userSchema = new mongoose.Schema({
         default: [],
     },
     partners: {
-        type: Array,
-        default: [],
+        type: Number,
+        default: 0,
     },
     sessions: {
         type: Array,
@@ -82,7 +82,11 @@ const userSchema = new mongoose.Schema({
     developer: {
         type: Number,
         default: 0,
-    }
+    },
+    darkModePreference: {
+        type: Boolean,
+        default: false,
+    },
     
     // you can add more fields here if needed, like 'createdAt', 'updatedAt', etc.
 }, {

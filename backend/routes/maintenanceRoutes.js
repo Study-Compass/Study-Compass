@@ -13,14 +13,12 @@ router.post('/update-classrooms', async (req, res) => {
 
         for (const doc of documents) {
             let needsUpdate = false;
-
             for (const path of schemaPaths) {
                 if (doc[path] === undefined) {
                     doc[path] = Classroom.paths[path].defaultValue;
                     needsUpdate = true;
                 }
             }
-
             if (needsUpdate) {
                 await doc.save();
             }
@@ -46,7 +44,6 @@ router.get('/update-users', async (req, res) => {
             return defaults;
         }, {});
 
-        console.log(defaultValues);
 
         let updatedPaths = [];
 
