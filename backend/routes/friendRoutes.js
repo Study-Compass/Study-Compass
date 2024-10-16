@@ -198,7 +198,6 @@ router.get('/getFriends', verifyToken, async (req, res) => {
             ]
         }).populate('requester recipient', 'username');
 
-
         const friends = friendships.map(friendship => {
             return friendship.requester._id.toString() === userId.toString()
                 ? friendship.recipient
@@ -207,22 +206,46 @@ router.get('/getFriends', verifyToken, async (req, res) => {
 
         const friendIds = friends.map(friend => friend._id);
 
-        // fetch friends objects
-        const friendsObjects= await User.find({
+        // Fetch friends objects
+        const friendsObjects = await User.find({
             _id: { $in: friendIds }
         });
-        
-        console.log(`GET: /friends friends found`);
+
+        // Fetch check-in information for all friends - need to double check this is correct checked-in syntax
+        const checkedInFriends = await Classroom.find(
+            { checked_in: { $in: friendIds } },
+            { checked_in: 1, _id: 1 }
+        );
+
+        const checkedInMap = new Map();
+        checkedInFriends.forEach(classroom => {
+            classroom.checked_in.forEach(friendId => {
+                checkedInMap.set(friendId.toString(), classroom._id);
+            });
+        });
+
+        // Attach check-in information to each friend - need to double check this is reformatted correctly.
+        const friendsWithCheckInData = friendsObjects.map(friend => {
+            const friendData = friend.toObject();
+            const classroomId = checkedInMap.get(friend._id.toString());
+            if (classroomId) {
+                friendData.checkedIn = classroomId.toString();
+            }
+            return friendData;
+        });
+
+        console.log(`GET: /getFriends friends found`);
         res.json({
             success: true,
             message: 'Friends found',
-            data: friendsObjects
-        })
+            data: friendsWithCheckInData
+        });
     } catch (error) {
+        console.log(`GET: /getFriends failed`);
         res.json({
             success: false,
             message: error.message
-        })
+        });
     }
 });
 
