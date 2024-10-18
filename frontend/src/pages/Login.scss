@@ -6,6 +6,7 @@
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
+    
 
 
     .login-container{
@@ -16,7 +17,8 @@
         align-items: center;
         align-content: flex-end;
         margin-bottom: 100px;
-        gap: 30px;
+        // gap: 50px;
+       
 
     }
 
@@ -33,9 +35,20 @@
     
     }
 
+
     
     .logo{
         height: 45px;
+        padding-bottom: 25px;
+        padding-top: 80px;
     }
     
+}
+
+@media (max-width: 500px){
+    .main-login{
+        .block{
+            display: none;
+        }
+    }
 }
