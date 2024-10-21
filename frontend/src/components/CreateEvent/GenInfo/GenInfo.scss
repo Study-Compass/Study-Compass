@@ -20,6 +20,14 @@
                     flex-direction: column;
                     gap: 3px;
 
+                    &.mandatory > p{
+                        &::after{
+                            content: "*";
+                            color: var(--red);
+                            margin-left:2px;
+                        }
+                    }
+
                     p {
                         font-family: 'Inter';
                         font-size: 14px;
@@ -53,6 +61,41 @@
                         font-family: 'Inter';
                         font-size: 14px;
                         font-weight: 500;
+                    }
+
+                    .visibility{
+                        display:flex;
+                        gap:10px;
+                        .option{
+                            height:100%;
+                            width:50%;
+                            display:flex;
+                            align-items:center;
+                            justify-content:center;
+                            border-radius:5px;
+                            flex-direction: column;
+                            gap:3px;
+                            box-sizing: border-box;
+                            padding-right: 5%;
+                            padding-left:5%;
+                            img{
+                                width:25px;
+                                height:25px;
+                            }
+                            h3{
+                                font-size:14px;
+                                font-weight:700;
+                                margin:0;
+                                color: var(--text)
+                            }
+                            p{
+                                font-size:12px;
+                                font-weight:500;
+                                margin:0;
+                                color: var(--text);
+                                text-align: center;
+                            }
+                        }
                     }
                 }
             }
