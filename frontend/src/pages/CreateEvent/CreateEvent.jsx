@@ -10,17 +10,21 @@ import Review from '../../components/CreateEvent/Review/Review';
 
 function CreateEvent(){
     const [step, setStep] = useState(0);
+    
+    const nextStep = () => {
+        setStep(step+1);
+    }
 
     const renderStep = () => {
         switch(step){
             case 0:
-                return <GenInfo/>
+                return <GenInfo next={nextStep}/>
             case 1:
-                return <WhenWhere/>
+                return <WhenWhere next={nextStep}/>
             case 2:
-                return <Review/>
+                return <Review next={nextStep}/>
             default:
-                return <GenInfo/>
+                return <GenInfo next={nextStep}/>
         }
     }
 

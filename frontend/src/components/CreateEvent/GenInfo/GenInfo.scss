@@ -12,7 +12,7 @@
 
             &.input-col {
                 width: 30%;
-                min-width: 200px;
+                min-width: 250px;
                 gap: 20px;
 
                 .input-field {
@@ -78,6 +78,7 @@
                             box-sizing: border-box;
                             padding-right: 5%;
                             padding-left:5%;
+                            transition: all 0.3s;
                             img{
                                 width:25px;
                                 height:25px;
@@ -94,6 +95,10 @@
                                 margin:0;
                                 color: var(--text);
                                 text-align: center;
+                            }
+                            &.selected{
+                                border: 1px solid var(--red);
+                                background-color: var(--lighter);
                             }
                         }
                     }

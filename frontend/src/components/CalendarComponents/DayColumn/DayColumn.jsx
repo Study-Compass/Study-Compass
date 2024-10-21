@@ -186,7 +186,7 @@ function DayColumn({day, dayEvents, eventColors, empty, add, remove, queries}){
         );
     }
 
-    if(day === "S"){
+    if(day === "G"){
         return (
             <div className="DayColumn TimeColumn" >
                 <TimeLabelColumn />

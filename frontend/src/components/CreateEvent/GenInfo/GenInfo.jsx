@@ -3,8 +3,7 @@ import '../CreateComponents.scss'
 import './GenInfo.scss'
 import Global from '../../../assets/Icons/Global.svg';
 import Internal from '../../../assets/Icons/Internal.svg';
-
-
+import FileUpload from '../../FileUpload/FileUpload';
 
 function GenInfo({next}){
     const [title, setTitle] = useState("");
@@ -12,16 +11,20 @@ function GenInfo({next}){
     const [eventType, setEventType] = useState("");
     const [visibility, setVisibility] = useState("");
 
+    const [nextActive, setNextActive] = useState(false);
+
     useEffect(()=>{
-        console.log(title);
-        console.log(description);
-        console.log(eventType);
-        console.log(visibility);
+        if(title && eventType && visibility){
+            setNextActive(true);
+        }
     }
     ,[title, description, eventType, visibility]);
 
     const handleChange = (e) => {
         const {name, value} = e.target;
+        console.log(e.target);
+        console.log(name);
+        console.log(value);
         switch(name){
             case "title":
                 setTitle(value);
@@ -33,13 +36,13 @@ function GenInfo({next}){
                 setEventType(value);
                 break;
             case "visibility":
+                console.log(value);
                 setVisibility(value);
                 break;
             default:
                 break;
         }
     }
-
 
     return(
         <div className="gen-info create-component">
@@ -65,18 +68,25 @@ function GenInfo({next}){
                     <div className="input-field mandatory">
                         <p className="label">Event Visibility</p>
                         <div className="visibility">
-                            <div className="option">
+                            <div className={`option ${visibility === "public" && "selected"}`} onClick={()=>{setVisibility("public")}}>
                                 <img src={Global} alt="" />
                                 <h3>public</h3>
                                 <p>visible to the entire student body</p>
                             </div>
-                            <div className="option">
+                            <div className={`option ${visibility === "internal" && "selected"}`} onClick={()=>{setVisibility("internal")}}>
                                 <img src={Internal} alt="" />
                                 <h3>internal</h3>
                                 <p>only visible to students part of your org</p>
                             </div>
                         </div>
                     </div>
+                    <div className="input-field">
+                        <p>Flier</p>
+                        <FileUpload/>
+                    </div>
+                    <button className={`next-button ${nextActive && "active"}`} onClick={next}>
+                        next
+                    </button>
                 </div>
             </div>
         </div>
