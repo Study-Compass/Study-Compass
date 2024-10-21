@@ -1,0 +1,65 @@
+.gen-info {
+    gap: 20px;
+    .col-container {
+        display: flex;
+        gap: 30px;
+        width: 100%;
+        flex-grow: 1;
+
+        .col {
+            display: flex;
+            flex-direction: column;
+
+            &.input-col {
+                width: 30%;
+                min-width: 200px;
+                gap: 20px;
+
+                .input-field {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 3px;
+
+                    p {
+                        font-family: 'Inter';
+                        font-size: 14px;
+                        font-weight: 500;
+                    }
+
+                    input,
+                    textarea,
+                    select {
+                        box-sizing: border-box;
+                        padding: 3px 10px;
+                        border-radius: 5px;
+                        border: 1px solid var(--lightborder);
+                        font-family: 'Inter';
+                        font-size: 14px;
+                        font-weight: 500;
+                        width: 100%;
+                        background-color: transparent;
+                        margin: 0;
+                        &:focus {
+                            outline: none;
+                        }
+                    }
+
+                    textarea {
+                        resize: none;
+                        height:50px;
+                    }
+
+                    select option {
+                        font-family: 'Inter';
+                        font-size: 14px;
+                        font-weight: 500;
+                    }
+                }
+            }
+
+            &.preview-col {
+                /* Add any preview-col specific styles here */
+            }
+        }
+    }
+}

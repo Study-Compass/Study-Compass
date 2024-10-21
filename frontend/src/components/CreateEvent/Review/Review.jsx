@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
+import '../CreateComponents.scss'
 
-function WhenWhere(){
+
+function Review(){
 
     return(
-        <div className="">
+        <div className="review create-component">
         </div>
     );
 }
 
-export default WhenWhere;
+export default Review;
 

@@ -5,9 +5,27 @@ import EventInfo from '../../assets/Icons/EventInfo.svg';
 import Calendar from '../../assets/Icons/Calendar.svg';
 import CheckBlack from '../../assets/Icons/CheckBlack.svg';
 
+import WhenWhere from '../../components/CreateEvent/WhenWhere/WhenWhere';
+import GenInfo from '../../components/CreateEvent/GenInfo/GenInfo';
+import Review from '../../components/CreateEvent/Review/Review';
+
 function CreateEvent(){
     const [step, setStep] = useState(0);
-    
+
+    const renderStep = () => {
+        switch(step){
+            case 0:
+                return <GenInfo/>
+            case 1:
+                return <WhenWhere/>
+            case 2:
+                return <Review/>
+            default:
+                return <GenInfo/>
+        }
+    }
+
+
     return(
         <div className="create-event page">
             <Header/>
@@ -33,7 +51,7 @@ function CreateEvent(){
                         </div>
                     </div>
                     <div className="create-workspace">
-                        
+                        {renderStep()}
                     </div>
                 </div>
             </div>
