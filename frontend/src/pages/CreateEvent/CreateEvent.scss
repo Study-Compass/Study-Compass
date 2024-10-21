@@ -1,0 +1,88 @@
+.create-event{
+    height:100vh;
+    .content-container{
+        display:flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        width:100%;
+        height:calc(100% - 115px);
+        max-height:calc(100% - 115px);
+        padding: 20px 20px 40px 20px;
+        box-sizing: border-box;
+        flex-grow:1;
+        .content{
+            display:flex;
+            max-width:1500px;
+            background-color: var(--background);
+            border-radius: 21px;
+            flex-direction: row;
+            width:calc(100% - 100px);
+            height:100%;
+            max-height: min(100%, 1000px);
+            overflow:hidden;
+            position: relative;
+            box-shadow: inset 0px 0px 0px 1px var(--lightborder),var(--shadow);
+            flex-grow: 1;
+            .create-steps{
+                height: calc(100% - 20px);
+                background-color: var(--lighter);
+                margin: 10px;
+                border-radius: 15px;
+                h1{
+                    font-size:23px;
+                }
+                .create-header{
+                    box-sizing: border-box;
+                    padding: 16px 16px;
+                }
+                .steps{
+                    display:flex;
+                    flex-direction: column;
+                    
+                    .step{
+                        cursor: pointer;
+                        display:flex;
+                        flex-direction: row;
+                        align-items: center;
+                        padding: 8px 32px 8px 16px;
+                        box-sizing: border-box;
+                        position: relative;
+                        gap:8px;
+                        overflow: hidden;
+                        img{
+                            height:22px;
+                            width:22px;
+                        }
+                        p{
+                            font-size:17px;
+                            margin: 0;
+                            font-family: 'Inter';
+                            font-weight: 600;
+                        }
+                        &::after{
+                            content: "";
+                            position: absolute;
+                            width: 5px;
+                            height: 60%;
+                            border-radius:0  3px 3px 0;
+                            left: -5px;
+                            transition: all 0.3s;;
+                        }
+                        &.selected{
+                            &::after{
+                                content: "";
+                                position: absolute;
+                                width: 5px;
+                                height: 60%;
+                                border-radius:0  3px 3px 0;
+                                background-color: var(--red);
+                                left: 0;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

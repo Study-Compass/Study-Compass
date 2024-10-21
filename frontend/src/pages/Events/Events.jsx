@@ -40,7 +40,7 @@ function Events(){
         <div className="events page">
             <Header/>
             <div className="content">
-                <div className={`banner ${tlLoadded && brLoaded && "active"}` }onClick={sendEvent}>
+                <div className={`banner ${tlLoadded && brLoaded && "active"}` }>
                     <img src={TopLeftEventsGrad} alt="" className="tl" onLoad={onBannerElementLoad} />
                     <img src={BottomRightEventsGrad} alt="" className="br" onLoad={onBannerElementLoad}/>
                     <h1>events at rpi</h1>

@@ -12,13 +12,11 @@ function EventsGrid({events}){
     
     //populate eventsArray
     useEffect(() => {
-        if(events.length > 0){
-            let newEventsArray = [[], [], []];
-            events.forEach((event, index) => {
-                newEventsArray[index % 3].push(event);
-            });
-            setEventsArray(newEventsArray);
-        }
+        let newEventsArray = [[], [], []];
+        events.forEach((event, index) => {
+            newEventsArray[index % 3].push(event);
+        });
+        setEventsArray(newEventsArray);
     }, [events]);
     
     //on mount

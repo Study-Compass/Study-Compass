@@ -2,7 +2,11 @@
     width:calc((100% - 20px) / 3);
     overflow:show;
     transform:translateY(100%);
-    transition:2s;
+    transition:1s;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:20px;
 }
 
 .events-column.active{

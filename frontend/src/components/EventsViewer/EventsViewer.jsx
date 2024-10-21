@@ -28,9 +28,11 @@ function EventsViewer(){
                 allEvents.sort((a, b) => {
                     return new Date(a.date) - new Date(b.date);
                 });
+                allEvents.reverse();
+                //add dummy first element
+                allEvents.unshift({type: "create event"});
                 setEvents(allEvents);
             } catch (error){
-                console.log(error);
                 addNotification({title: "Error", message: "Failed to fetch events"});
             }
 
@@ -42,11 +44,11 @@ function EventsViewer(){
         if(chosen === "all"){
             setDisplayEvents(events);
         } else {
-            console.log(events);
             //new event to trigger 
             const newEvents = events.filter(event => {
-                return event.type === chosen;
+                return chosen.includes(event.type);
             });
+            console.log(newEvents);
             setDisplayEvents(newEvents);
         }
     }, [chosen, events]);

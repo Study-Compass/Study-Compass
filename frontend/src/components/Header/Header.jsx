@@ -69,7 +69,7 @@ const Header = React.memo(()=>{
                             <Link className={`nav-link ${ pageClass === "events" ? "active" : ""}`} to="/events" ><h2>events</h2></Link>                            
                         </nav>  
                     </div>
-
+                    : ""
                     
                 }
                 {

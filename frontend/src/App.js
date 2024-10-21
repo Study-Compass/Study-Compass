@@ -25,6 +25,7 @@ import { ProfileCreationProvider } from './ProfileCreationContext';
 import { WebSocketProvider } from './WebSocketContext';
 import Layout from './pages/Layout/Layout';
 import axios from 'axios';
+import CreateEvent from './pages/CreateEvent/CreateEvent';
 
 function App() {
     useEffect(() => {
@@ -74,6 +75,7 @@ function App() {
                                             <Route path="/documentation" element={<Redirect/>}/>
                                             <Route path="/developer-onboarding" element={<DeveloperOnboard/>}/>
                                             <Route path="/admin" element={<Admin/>}/>
+                                            <Route path="/create-event" element={<CreateEvent/>}/>
                                         </Route>
                                         <Route path="/events" element={<Events/>}/>
                                     </Routes>
