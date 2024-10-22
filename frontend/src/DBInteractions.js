@@ -66,9 +66,9 @@ const save = async (roomId, userId, operation) => {
     }
 };
 
-const saveUser = async (name, username, email, password, recommendation, classroom) => {
+const saveUser = async (name, username, email, password, recommendation, classroom, darkModePreference) => {
     try{
-        const response = await axios.post('/update-user', {name, email, username, classroom, recommendation, onboarded :null}, {headers: {'Authorization': `Bearer ${localStorage.getItem('token')}`}});
+        const response = await axios.post('/update-user', {name, email, username, classroom, recommendation, onboarded :null, darkModePreference}, {headers: {'Authorization': `Bearer ${localStorage.getItem('token')}`}});
         const responseBody = response.body;
         console.log(response);
         if (response.data.success) {
@@ -80,7 +80,6 @@ const saveUser = async (name, username, email, password, recommendation, classro
         console.error("Error saving user");
         throw error;
     }
-
 }
 
 const checkUsername = async (username) => {

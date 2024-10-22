@@ -5,7 +5,10 @@ import Banner from '../../components/Banner/Banner'; // Import your Banner compo
 function Layout() {
   const [visible, setVisible] = useState(false);
 
+
   const [viewport, setViewport] = useState("100vh");
+
+
   useEffect(() => {
       let height = window.innerHeight;
       setViewport(height + 'px');

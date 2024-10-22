@@ -22,7 +22,7 @@ import { NotificationProvider } from './NotificationContext';
 import { ErrorProvider } from './ErrorContext';
 import { ProfileCreationProvider } from './ProfileCreationContext';
 import { WebSocketProvider } from './WebSocketContext';
-import { DarkModeProvider } from './DarkModeContext';
+import { DarkModeProvider, useDarkMode } from './DarkModeContext';
 import Layout from './pages/Layout/Layout';
 import axios from 'axios';
 

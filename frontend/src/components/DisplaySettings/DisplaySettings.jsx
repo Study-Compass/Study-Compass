@@ -3,9 +3,10 @@ import './DisplaySettings.css';
 import light from '../../assets/Icons/LightMode.svg';
 import dark from '../../assets/Icons/DarkMode.svg';
 import { useDarkMode } from '../../DarkModeContext';
+import { saveUser } from '../../DBInteractions';
 
 const DisplaySettings = ( {settingsRightSide, width, handleBackClick, rightarrow} ) => {
-    const {darkMode, toggleDarkMode} = useDarkMode();
+    const {darkMode, setSpecificMode} = useDarkMode();
     const [selectedMode, setSelectedMode] = useState(darkMode ? "dark" : "light");
 
     useEffect(() => {
@@ -35,8 +36,8 @@ const DisplaySettings = ( {settingsRightSide, width, handleBackClick, rightarrow
 
     const handleModeSelect = (mode) => {
         setSelectedMode(mode);
-        toggleDarkMode();
-      };
+        setSpecificMode(mode === 'dark'); 
+    };
     
 
     return( 

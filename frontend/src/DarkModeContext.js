@@ -13,11 +13,11 @@ export const DarkModeProvider = ({ children }) => {
 
   // check for auth
   const { isAuthenticating, isAuthenticated, user, getDeveloper } = useAuth();
-
-    const [darkMode, setDarkMode] = useState(() => {
-      const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      return systemPrefersDark;
-    });
+  
+  const [darkMode, setDarkMode] = useState(() => {
+    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    return systemPrefersDark;
+  });
 
     useEffect(() => {
       const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
@@ -25,9 +25,11 @@ export const DarkModeProvider = ({ children }) => {
       
       // Listen for changes in system preference
       mediaQuery.addEventListener('change', handleChange);
+      console.log("hello from dark mode");
       
       // Clean up event listener
       return () => mediaQuery.removeEventListener('change', handleChange);
+      
     }, []);
 
     useEffect(() => {
@@ -37,22 +39,30 @@ export const DarkModeProvider = ({ children }) => {
 
       if (isAuthenticated && user) {
         const userPreference = user.darkModePreference; 
-        
         if (userPreference !== undefined) {
-            setDarkMode(userPreference);
+            if(userPreference === true){
+              setDarkMode(true);
+              document.documentElement.classList.add('dark-mode');
+            } 
         }
+
       }
     }, [isAuthenticating, isAuthenticated, user])
     
     // check for user system preference
-        // use code from display settings
+      // use code from display settings
 
-    const toggleDarkMode = () => {
-      setDarkMode(prevMode => !prevMode);
+    // const toggleDarkMode = () => {
+    //   setDarkMode(prevMode => !prevMode);
+    // };
+
+    const setSpecificMode = (mode) => {
+      setDarkMode(mode);
     };
   
+  
   return (
-    <DarkModeContext.Provider value={{ darkMode, toggleDarkMode}}>
+    <DarkModeContext.Provider value={{ darkMode, setSpecificMode}}>
       {children}
 
     </DarkModeContext.Provider>

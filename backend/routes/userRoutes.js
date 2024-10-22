@@ -14,7 +14,7 @@ const { sendDiscordMessage } = require('../services/discordWebookService');
 const router = express.Router();
 
 router.post("/update-user", verifyToken, async (req, res) =>{
-    const { name, username, classroom, recommendation, onboarded } = req.body
+    const { name, username, classroom, recommendation, onboarded, darkModePreference } = req.body
     try{
         const user = await User.findById(req.user.userId);
         if (!user) {
@@ -26,6 +26,7 @@ router.post("/update-user", verifyToken, async (req, res) =>{
         user.classroomPreferences  = classroom ? classroom : user.classroomPreferences;
         user.recommendationPreferences = recommendation ? recommendation : user.recommendationPreferences;
         user.onboarded = onboarded ? onboarded : user.onboarded;
+        user.darkModePreference = darkModePreference ? darkModePreference : user.darkModePreference;
         
         await user.save();
         console.log(`POST: /update-user ${req.user.userId} successful`);
