@@ -140,10 +140,10 @@ function LoginForm() {
         <div className={`email-form ${email ? "disappear-show" : ""}`}>
             
             <div className="login-button">
-                <button className={`show-email button active ${email ? "disappear-show" : ""}`} onClick={()=>{setEmail(true)}}>
+                <button className={`show-email button active ${email ? "disappear-show" : ""}`} onClick={(e)=>{e.preventDefault();setEmail(true)}}>
                     Login with Email
                 </button>
-                <p className={`already ${email ? "disappear-show" : ""}`} onClick={()=>{setEmail(true)}}>Don’t have an account? <Link to="/register" >Register</Link></p>
+                <p className={`already ${email ? "disappear-show" : ""}`}>Don’t have an account? <Link to="/register" >Register</Link></p>
             </div>
 
             <div className="form-content" >

@@ -144,15 +144,13 @@ function RegisterForm() {
                 <hr />
             </div>
 
-           
-
             <div className={`email-form ${email ? "disappear-show" : ""}`}>
 
             <div className="login-button">
-                <button className={`show-email button active ${email ? "disappear-show" : ""}`} onClick={()=>{setEmail(true)}}>
+                <button className={`show-email button active ${email ? "disappear-show" : ""}`} onClick={(e)=>{e.preventDefault();setEmail(true)}}>
                     Register with Email
                 </button>
-                <p className={`already ${email ? "disappear-show" : ""}`} onClick={()=>{setEmail(true)}}>Already have an account? <Link to="/Login" >Login</Link></p>
+                <p className={`already ${email ? "disappear-show" : ""}`}>Already have an account? <Link to="/Login" >Login</Link></p>
             </div>
 
             <div className="form-content" >
