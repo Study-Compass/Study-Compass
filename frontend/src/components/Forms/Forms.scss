@@ -69,12 +69,14 @@
 
 .email p,
 .password p,
-.username p {
+.username p,
+.forgot-password p{
     font-family:Inter, sans-serif;
     font-size:13px;
     font-weight: 500;
     color: #414141;
     margin: 0 0 5px 7px;
+    
 }
 
 .email,
@@ -82,8 +84,24 @@
 .username{
     position: relative;
     width:100%;
+ 
 }
 
+.password-container{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    text-align: left;
+
+    .forgot-password{
+        display: flex;
+        display:inline-block;
+        position: relative;
+        width:100%;
+        text-align: right;
+    }
+
+}
 
 .already{
     font-size: 13px;
@@ -98,6 +116,8 @@
         pointer-events: none;
     }
 }
+
+
 
 .google{
     background-color: #1E1E1E;
