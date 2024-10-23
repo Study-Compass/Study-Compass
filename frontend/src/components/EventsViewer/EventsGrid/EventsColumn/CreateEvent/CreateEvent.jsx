@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import './CreateEvent.scss';
+import {Icon} from '@iconify-icon/react';  
+import GradientButtonCover from '../../../../../assets/GradientButtonCover.png';
 
 function CreateEvent(){
     const navigate = useNavigate();
@@ -9,9 +12,13 @@ function CreateEvent(){
     }
 
     return(
-        <div className="event-component" onClick={handleEventClick}>
+        <div className="event-component create" onClick={handleEventClick}>
             <div className="info">
-                <h1>Create Event</h1>
+                <Icon icon="ph:plus-bold" className="create-icon"/>
+                <h1>create event</h1>
+            </div>
+            <div className="gradient-cover">
+                <img src={GradientButtonCover} alt="" />
             </div>
         </div>
     );

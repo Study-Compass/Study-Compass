@@ -152,5 +152,8 @@
     "presets": [
       "react-app"
     ]
+  },
+  "devDependencies": {
+    "@iconify-icon/react": "^2.1.0"
   }
 }

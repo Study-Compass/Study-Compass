@@ -8,8 +8,6 @@
         max-width: 900px;
         height: 100%;
         padding: 0 20px;
-        overflow: auto;
-
         .banner{
             width: 100%;
             height: 200px;
