@@ -6,23 +6,18 @@
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    
-
 
     .login-container{
         display:flex;
         flex-direction: column;
-        flex-grow: 1;
         justify-content: center;
         align-items: center;
         align-content: flex-end;
         margin-bottom: 100px;
         // gap: 50px;
-       
-
+        padding: 0 60px;
     }
 
-    
     .block{
         display:flex;
         flex-direction: row;
