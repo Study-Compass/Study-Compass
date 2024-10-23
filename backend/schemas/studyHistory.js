@@ -10,7 +10,7 @@ const studyHistory = new Schema({
     user_id: {
         type: Schema.Types.ObjectId,
         required: true,
-        ref: 'User'
+        ref: 'User' 
     },
     start_time: {
         type: Date,
