@@ -4,6 +4,7 @@ import Room from './pages/Room/Room';
 import Room1 from './pages/Room/Room1';
 import Login from './pages/Login';
 import Register from './pages/Register/Register';
+import Password from './pages/Password/Password';
 import Redirect from './pages/Redirect/Redirect';
 import Error from './pages/Error/Error';
 import Onboard from './pages/OnBoarding/Onboard';
@@ -24,6 +25,7 @@ import { ProfileCreationProvider } from './ProfileCreationContext';
 import { WebSocketProvider } from './WebSocketContext';
 import Layout from './pages/Layout/Layout';
 import axios from 'axios';
+
 
 function App() {
     useEffect(() => {
@@ -63,6 +65,7 @@ function App() {
                                             <Route path="/room1/:roomid" element={<Room1 />}/>
                                             <Route path="/register" element={<Register />}/>
                                             <Route path="/login" element={<Login />}/>
+                                            <Route path="/password" element={<Password />}/>
                                             <Route path="*" element={<Error />}/>
                                             <Route path="/error/:errorCode" element={<Error />}/>
                                             <Route path="/onboard" element={<Onboard />}/>
