@@ -132,7 +132,7 @@ function RegisterForm() {
 
     return (
         <form onSubmit={handleSubmit} className='form'>
-            {/* <h1>Register</h1> */}
+            <h1>Register</h1>
             {errorText !== "" && 
                 <Flag text={errorText} img={circleWarning} color={"#FD5858"} primary={"rgba(250, 117, 109, 0.16)"} accent={"#FD5858"} /> 
             }
@@ -152,6 +152,7 @@ function RegisterForm() {
                 <button className={`show-email button active ${email ? "disappear-show" : ""}`} onClick={()=>{setEmail(true)}}>
                     Register with Email
                 </button>
+                <p className={`already ${email ? "disappear-show" : ""}`} onClick={()=>{setEmail(true)}}>Already have an account? <Link to="/Login" >Login</Link></p>
             </div>
 
             <div className="form-content" >
