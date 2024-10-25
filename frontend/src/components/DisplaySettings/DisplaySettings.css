@@ -38,8 +38,17 @@
         position: relative;
     }
 
-    .profile .button{
+    .profile button{
         display: flex;
+        background: darkgray;
+        font-family: "Inter";
+        font-weight: 500;
+        color: var(--text);
+        font-size: 13px;
+        padding: 5px 9px;
+        height: -moz-fit-content;
+        height: fit-content;
+        outline: none;
         border: none;
         border-radius: 6px;
     }
@@ -67,8 +76,8 @@
         border-radius: 10px; 
         border: 2px solid var(--red);
         position: absolute;
-        top:-3px;
-        right:-2px;
+        top:-2px;
+        right: -2px;
         width:calc(100%);
         height: calc(100%);
     }

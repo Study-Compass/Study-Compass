@@ -40,11 +40,9 @@ const DisplaySettings = ( {settingsRightSide, width, handleBackClick, rightarrow
     };
 
     // database takes pritority over system
-    const saveUsername = () => {
-        if (selectedMode === 'dark'){
-            saveUser(null, null, null, null, null, null, true);
-        }
-
+    const savePreference = () => {
+        const isDarkMode = selectedMode === 'dark';
+        saveUser(null, null, null, null, null, null, isDarkMode)
     }
     
 
@@ -80,7 +78,7 @@ const DisplaySettings = ( {settingsRightSide, width, handleBackClick, rightarrow
 
                 </div>
 
-                <button>save</button>
+                <button onClick={savePreference}>save</button>
 
              </div>
 
