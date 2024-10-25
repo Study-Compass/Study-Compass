@@ -101,8 +101,6 @@ const StudyPreferences = ({ settingsRightSide, width, handleBackClick, userInfo 
                         disabled={!active && (sliderValue == initialSliderValue)}
                     > save </button>
                 </div>
-
-
             </div>
             
         </div>

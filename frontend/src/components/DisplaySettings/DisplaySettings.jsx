@@ -38,6 +38,14 @@ const DisplaySettings = ( {settingsRightSide, width, handleBackClick, rightarrow
         setSelectedMode(mode);
         setSpecificMode(mode === 'dark'); 
     };
+
+    // database takes pritority over system
+    const saveUsername = () => {
+        if (selectedMode === 'dark'){
+            saveUser(null, null, null, null, null, null, true);
+        }
+
+    }
     
 
     return( 
@@ -71,6 +79,9 @@ const DisplaySettings = ( {settingsRightSide, width, handleBackClick, rightarrow
                     </div>
 
                 </div>
+
+                <button>save</button>
+
              </div>
 
         </div>

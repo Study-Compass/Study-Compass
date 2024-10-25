@@ -37,6 +37,12 @@
         align-items: center;
         position: relative;
     }
+
+    .profile .button{
+        display: flex;
+        border: none;
+        border-radius: 6px;
+    }
     
     img {
         border-radius: 0%;
@@ -70,5 +76,7 @@
     .profile .mode img.selected::before {
 
       }
+
+
 
 }

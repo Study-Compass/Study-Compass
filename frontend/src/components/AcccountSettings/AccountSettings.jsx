@@ -24,7 +24,7 @@ function AccountSettings({ settingsRightSide, width, handleBackClick, userInfo }
     // } );
 
     const handleNameChange = (e) => {
-            // setName(e.target.value);
+        // setName(e.target.value);
     };
 
     const handleUsernameChange = (e) => {
@@ -37,7 +37,7 @@ function AccountSettings({ settingsRightSide, width, handleBackClick, userInfo }
 
     const saveUsername = () => {
         if (editUsername){
-            saveUser(name, username, email, null, null, null);
+            saveUser(name, username, email, null, null, null, null);
         }
         setEditUsername(!editUsername);
 
