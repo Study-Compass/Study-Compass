@@ -21,6 +21,7 @@ function RegisterForm() {
     const [sent, setSent] = useState(false);
     const [loadContent, setLoadContent] = useState(false);
     const [errorText, setErrorText] = useState("");
+    const [email, setEmail] = useState(false);
 
     const googleLogo = generalIcons.google;
 
@@ -135,27 +136,41 @@ function RegisterForm() {
             {errorText !== "" && 
                 <Flag text={errorText} img={circleWarning} color={"#FD5858"} primary={"rgba(250, 117, 109, 0.16)"} accent={"#FD5858"} /> 
             }
-
-            <div className="username">
-                <p>Username</p>
-                <input type="text" name="username" value={formData.username} onChange={handleChange} placeholder="Username" required />
-            </div>
-            <div className="email">
-                <p>Email</p>
-                <input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="Email" required />
-            </div>
-            <div className="password">
-                <p>Password</p>
-                <input type="password" name="password" value={formData.password} onChange={handleChange} placeholder="Password" required />
-            </div>
-            <button type="submit" className={`button ${valid ? "active" : ""}`}>Register</button>
-            <p className="already">Already have an account? <Link to="/login">Login</Link></p>
+            <button className="button google" onClick={() => google()}>Continue with Google<img src={googleLogo} alt="google" /></button>
+            
             <div className="divider">
                 <hr />
                 <p>or</p>
                 <hr />
             </div>
-            <button className="button google" onClick={() => google()}>Continue with Google<img src={googleLogo} alt="google" /></button>
+
+            <div className={`email-form ${email ? "disappear-show" : ""}`}>
+
+            <div className="login-button">
+                <button className={`show-email button active ${email ? "disappear-show" : ""}`} onClick={(e)=>{e.preventDefault();setEmail(true)}}>
+                    Register with Email
+                </button>
+                <p className={`already ${email ? "disappear-show" : ""}`}>Already have an account? <Link to="/Login" >Login</Link></p>
+            </div>
+
+            <div className="form-content" >
+                <div className="username">
+                    <p>Username</p>
+                    <input type="text" name="username" value={formData.username} onChange={handleChange} placeholder="Username" required />
+                </div>
+                <div className="email">
+                    <p>Email</p>
+                    <input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="Email" required />
+                </div>
+                <div className="password">
+                    <p>Password</p>
+                    <input type="password" name="password" value={formData.password} onChange={handleChange} placeholder="Password" required />
+                </div>
+                <button type="submit" className={`button ${valid ? "active" : ""}`}>Register</button>
+                <p className="already">Already have an account? <Link to="/login">Login</Link></p>
+
+            </div>
+            </div>
         </form>
     );
 }

@@ -1,6 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800&display=swap');
 
-.form{
+.form, .form-content, .email-form{
     display:flex;
     flex-direction:column;
     justify-content:center;
@@ -9,6 +9,42 @@
     align-items: center;
     font-family: Inter, sans-serif;
     height:100%;
+}
+
+.email-form{
+    opacity: 1;
+    position: relative;
+
+    .login-button{
+        width:100%;
+        display:flex;
+        flex-direction: column;
+        align-items: center;
+        gap:10px;
+        position: absolute;
+        top:0;
+        left:0;
+    }
+    .form-content{
+        width:100%;
+        opacity:0;
+        transition: all 0.3s ease;
+        pointer-events: none;
+    }
+
+    &.disappear-show .form-content{
+        opacity:1;
+        pointer-events: all;
+    }
+}
+
+.show-email{
+    transition: all 0.3s ease;
+
+    &.disappear-show{
+        opacity:0;
+        pointer-events: none;
+    }
 }
 
 .form input{
@@ -56,6 +92,11 @@
     width:100%;
     text-align: left;
     margin: 0 0 0 7px;
+
+    &.disappear-show{
+        opacity:0;
+        pointer-events: none;
+    }
 }
 
 .google{
@@ -109,6 +150,7 @@
     display:flex;
     gap:10px;
     overflow: hidden;
+    // padding-bottom: 20px;
 }
 
 .error img{
