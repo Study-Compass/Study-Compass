@@ -3,6 +3,7 @@ const Classroom = require('../schemas/classroom.js');
 const Schedule = require('../schemas/schedule.js');
 const Rating = require('../schemas/rating.js');
 const User = require('../schemas/user.js');
+const History = require('../schemas/studyHistory.js');
 const Report = require('../schemas/report.js');
 const { verifyToken, verifyTokenOptional } = require('../middlewares/verifyToken');
 const { sortByAvailability } = require('../helpers.js');
@@ -260,6 +261,49 @@ router.get('/get-recommendation', verifyTokenOptional, async (req, res) => {
         return res.status(500).json({ success: false, message: 'Error finding user', error: error.message });
     }
 });
+
+router.get("/get-history", verifyToken, async (req,res) => {
+    const userId = req.user.userId;
+    try{
+        //takes in user id, returns all study history objects associated with user
+        const getHistory = await History.find({ user_id : userId });  
+   
+       if(getHistory){
+        console.log(`GET: /get-history`);
+        return res.status(200).json({success: true, message: 'History grabbed', data: getHistory});
+       } else {
+        return res.status(404).json({ success: false, message: 'Could not get history' });
+       }
+
+    } catch(error){
+        console.log(`GET: /get-history failed`, error);
+        return res.status(500).json({ success: false, message: 'Error finding user', error: error.message });
+    }
+});
+
+
+router.delete("/delete-history",verifyToken, async (req,res)=>{
+    // takes in study history id and deletes object
+    const histId = req.body.histId;
+    try{
+        const deleteHist = await History.deleteOne({ _id: histId});
+        //check if successful, if success, return success status, if not, return 404
+        //if deleted acount =0 then return 404
+     
+    if (deleteHist.deletedCount!==0){
+        console.log(`DELETE: /delete-history`);
+        return res.status(200).json({success: true, message: 'History sucessfully deleted', data: deleteHist});
+    } else {
+        return res.status(404).json({ success: false, message: 'Could not delete history' });
+    }
+    
+
+    }catch(error){
+        console.log(`DELETE: /delete-history failed`, error);
+        return res.status(500).json({ success: false, message: 'Error finding user', error: error.message });
+    }
+});
+
 
 
 module.exports = router;
