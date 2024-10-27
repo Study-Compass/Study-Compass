@@ -5,7 +5,6 @@ import './WhenWhere.scss'
 import Calendar from '../../CalendarComponents/Calendar/Calendar';
 import { useCache } from '../../../CacheContext';
 import { addQueryHelper, removeQueryHelper } from './WhenWhereHelpers';
-import { set } from 'mongoose';
 
 function WhenWhere(){
     const {getRoom, getRooms} = useCache();
@@ -19,10 +18,9 @@ function WhenWhere(){
     const addQuery = (key, value) => addQueryHelper(key, value, setQuery);
     const removeQuery = (key, value) => removeQueryHelper(key, value, setQuery);
 
-    const getData = async () => {
+    const getData = async (id) => {
         // fetch data
-        const data = await getRoom("none");
-        console.log(data);
+        const data = await getRoom(id);
         setData(data.data);
         const rooms = await getRooms();
         setRoomIds(rooms);
@@ -31,15 +29,21 @@ function WhenWhere(){
     }
 
     useEffect(() => {
-        getData();
+        getData("none");
     }, []);
+
+    const handleRoomSelect = (e) => {
+        const id = roomIds[e.target.value];
+        getData(id);
+    }
 
     return(
         <div className="when-where create-component">
             <h1>when & where</h1>
             <div className="time-select">
 
-            <select name="select" id="">
+            <select name="select" id="" onChange={handleRoomSelect}>
+                <option value="" disabled selected></option>
                 {rooms.map((room) => (
                     <option value={room}>{room}</option>
                 ))}
