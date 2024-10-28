@@ -1,0 +1,25 @@
+.dash{
+    height: 100%;
+    width:100%;
+    padding:20px;
+    box-sizing: border-box;
+    z-index: 1;
+    header.header{
+        height:110px;
+        position: relative;
+        border-radius: 13px;
+        overflow: hidden;
+        display:flex;
+        align-items: center;
+        h1{
+            z-index: 2;
+            padding-left:13%;
+        }
+        img{
+            position: absolute;
+            top:0;
+            left:0;
+            height:100%;
+        }
+    }
+}
