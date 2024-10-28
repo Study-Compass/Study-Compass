@@ -59,6 +59,7 @@ const Header = React.memo(()=>{
 
     return(
         <div className="Header">
+            <div className="header-content">
                 {page === "/login" || page === "/register"  || page === "/"  ? "" :
                     <div className="nav-container">
                         <nav>
@@ -81,7 +82,6 @@ const Header = React.memo(()=>{
                     </Link>
                 }
 
-
                 {page === "/login" || page === "/register" ? "" :
                     <div className="header-right">
                         {isAuthenticated ? <ProfilePicture/> : ""}
@@ -89,9 +89,8 @@ const Header = React.memo(()=>{
                     </div>    
                 }
             </div>
-
         </div>
     );
 });
 
-export default Header
+export default Header;

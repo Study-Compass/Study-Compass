@@ -15,7 +15,7 @@ import useAuth from '../../hooks/useAuth.js';
 import { createEvent } from '../../components/EventsViewer/EventHelpers.js';
 
 function Events(){
-    const [tlLoadded, setTlLoaded] = useState(false);
+    const [tlLoaded, setTlLoaded] = useState(false);
     const [brLoaded, setBrLoaded] = useState(false);
 
     const onBannerElementLoad = (e) => {
@@ -30,7 +30,7 @@ function Events(){
         try{
             //date object for 9/11/2024 at 5 pm
             const date = new Date(2024, 8, 11, 17, 0, 0, 0);
-            createEvent("CSCI 1100 Exam Review Session", "study event", null , "DCC 308", date, "description", "/ideation.png", null);
+            createEvent("RPI Service Day", "campus event", null , "DCC 308", date, "description", "/serviceDay.png", null);
         } catch (error){
 
         }
@@ -40,7 +40,7 @@ function Events(){
         <div className="events page">
             <Header/>
             <div className="content">
-                <div className={`banner ${tlLoadded && brLoaded && "active"}`  }onClick={sendEvent}>
+                <div className={`banner ${tlLoaded && brLoaded && "active"}`  }onClick={sendEvent}>
                     <img src={TopLeftEventsGrad} alt="" className="tl" onLoad={onBannerElementLoad} />
                     <img src={BottomRightEventsGrad} alt="" className="br" onLoad={onBannerElementLoad}/>
                     <h1>events at rpi</h1>

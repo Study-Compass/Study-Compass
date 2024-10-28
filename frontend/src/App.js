@@ -76,8 +76,8 @@ function App() {
                                             <Route path="/developer-onboarding" element={<DeveloperOnboard/>}/>
                                             <Route path="/admin" element={<Admin/>}/>
                                             <Route path="/create-event" element={<CreateEvent/>}/>
+                                            <Route path="/events" element={<Events/>}/>
                                         </Route>
-                                        <Route path="/events" element={<Events/>}/>
                                     </Routes>
                                     </ProfileCreationProvider>
                                 </Router>

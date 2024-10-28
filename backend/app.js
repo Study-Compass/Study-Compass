@@ -75,6 +75,7 @@ app.use(analyticsRoutes);app.use(eventRoutes);
 app.use(classroomChangeRoutes);
 app.use(ratingRoutes);
 app.use(searchRoutes);
+app.use(eventRoutes);
 
 //deprecated, should lowk invest in this
 // app.get('/update-database', (req, res) => {
