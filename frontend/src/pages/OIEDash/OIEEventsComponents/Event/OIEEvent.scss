@@ -1,14 +1,15 @@
-.event-component{
+.oie-event-component{
     display:flex;
-    width:100%;
+    flex-direction: column;
+    width:250px;
     gap:10px;
     padding:10px;
     box-sizing: border-box;
-    flex-direction: column;
     box-shadow:var(--shadow);
     background-color: var(--background);
     border-radius: 10px;
     border: 1px solid var(--lightborder);
+    justify-content: space-between;
 
     img{
         width:calc(100%);
@@ -17,18 +18,59 @@
 
     }
     .info{
+        display:flex;
+        flex-direction: column;
+        gap:5px;
         h1{
-            font-size: 18px;
+            font-size: 15px;
             font-weight: 600;
             margin: 0;
             color: var(--text);
         }
-        p{
-            font-size: 14px;
-            font-weight: 400;
-            margin: 0;
+        
+
+        .row{
+            display:flex;
+            gap:5px;
+            align-items: center;
+            font-size:18px;
             color: var(--text);
-            font-family: 'Inter';
+            .user-name{
+                font-weight: 700;
+                font-size:13px;
+            }
+            img{
+                width: 20px;
+                height: 20px;
+            }
+            p{
+                font-size: 12px;
+                font-weight: 500;
+                margin: 0;
+                color: var(--text);
+                font-family: 'Inter';
+            }
         }
     }
+    .button{
+        height:fit-content;
+        width:fit-content;
+        padding:5px 15px;
+        font-size: 18px;
+        color:var(--text);
+        background-color: var(--oie-background);
+        pointer-events: all;
+        iconify-icon{
+            transition: transform 0.2s;
+        }
+        p{
+            font-size:13px;
+            font-weight: 700;
+            margin-right:10px;
+        }
+        &:hover iconify-icon{
+            transform: scale(1.2);
+        }
+    }
+
 }
