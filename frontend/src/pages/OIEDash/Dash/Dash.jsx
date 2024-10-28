@@ -4,7 +4,7 @@ import OIEGradient from '../../../assets/OIE-Gradient.png';
 import { getAllEvents } from '../../../components/EventsViewer/EventHelpers';
 import OIEEvent from '../OIEEventsComponents/Event/OIEEvent';
 
-function Dash(){
+function Dash({expandedClass}){
 
     const [events, setEvents] = useState([]);
 
@@ -30,21 +30,24 @@ function Dash(){
 
 
     return (
-        <div className="dash">
+        <div className={`dash ${expandedClass}`}>
             <header className="header">
                 <img src={OIEGradient} alt="" />
                 <h1>OIE Dashboard</h1>
             </header>
             <div className="needs-approval">
-                {
-                    events.map((event, index) => {
-                        if(index < 3){
-                            return (
-                                <OIEEvent event={event} key={index}/>
-                            )
-                        }
-                    })
-                }
+                <h1>events pending approval</h1>
+                <div className="content">
+                    {
+                        events.map((event, index) => {
+                            if(index < 3){
+                                return (
+                                    <OIEEvent event={event} key={index}/>
+                                )
+                            }
+                        })
+                    }
+                </div>
             </div>
         </div>
     )

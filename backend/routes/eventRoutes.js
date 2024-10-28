@@ -56,7 +56,9 @@ router.get('/get-events', verifyToken, async (req, res) => {
 // Get all events
 router.get('/get-all-events', verifyTokenOptional, async (req, res) => {
     try {
-        const events = await Event.find({}).populate('classroom_id');
+        // const events = await Event.find({}).populate('classroom_id');
+        //get all events, attach user object to the event
+        const events = await Event.find({}).populate('classroom_id').populate('user_id');
         res.status(200).json({
             success: true,
             events
