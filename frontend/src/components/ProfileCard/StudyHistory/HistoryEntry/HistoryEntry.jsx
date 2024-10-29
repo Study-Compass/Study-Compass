@@ -2,17 +2,20 @@ import React from "react";
 import "./HistoryEntry.scss";
 import pfp from '../../../../assets/defaultAvatar.svg'
 
-const HistoryEntry = ({mockHistory})  => {
+const HistoryEntry = ({historyEntry})  => {
 
     
     return(
         <div className = "historyentry">
-                <h3>{mockHistory.roomName}
-                    <h6><img src={pfp} alt="" /></h6>
-                </h3>
-                <h4>{mockHistory.day}
-                <h5>{mockHistory.time}</h5>
-                </h4>
+            <div className="history-entry-left">
+                <h3>{historyEntry.roomName}</h3>
+                <img src={pfp} alt="" />
+            </div>
+            <div className="history-entry-right">
+                <h4>{historyEntry.day}</h4>
+                <h5>{historyEntry.time}</h5>
+            </div>
+
         </div>
     );
 }
