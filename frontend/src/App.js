@@ -12,6 +12,7 @@ import Settings from './pages/Settings/Settings';
 import Friends from './pages/Friends/Friends';
 import Profile from './pages/Profile/Profile';
 import Landing from './pages/Landing/Landing';
+import ForgottenEmail from './components/ForgottenEmail/ForgottenEmail';
 import DeveloperOnboard from './pages/DeveloperOnboarding/DeveloperOnboarding';
 import QR from './pages/QR/QR';
 import Admin  from './pages/Admin/Admin';

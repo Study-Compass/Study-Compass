@@ -1,0 +1,62 @@
+
+.forgotten-email{
+    height:100vh;
+    max-height:100%;
+    width:100%;
+    
+    .logo , .header{
+        height:100vh;
+        max-height:100%;
+        width:100%;
+    
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: center;
+    
+    }
+
+    .header-img{
+        display: flex;
+        .logo{
+            height: 50px;
+            padding-top: 20px;
+      
+        }
+    
+        .gradient{
+            height: 200px;
+            position: absolute;
+            &.tl{
+                top:0;
+                left:0;
+            }
+            &.tr{
+                top:0;
+                right:0;
+            }
+        }
+
+    }
+
+    .header{
+        padding-top: 60px;
+        position: absolute;
+    }
+
+    .email-content{
+        font-family: Inter, sans-serif;
+        font-size: 14px;
+        position: relative;
+        padding: 100px 200px;
+
+        .password-link{
+            color: var(--blue);
+        }
+
+    }
+
+    
+
+
+}
