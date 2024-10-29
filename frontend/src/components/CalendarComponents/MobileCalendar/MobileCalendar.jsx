@@ -53,6 +53,10 @@ function MobileCalendar({ className, data, isLoading, addQuery, removeQuery, que
         // },
     ];
 
+    useEffect(()=>{
+        console.log(data);
+    },[data]);
+
     // mobile drag logic
 
     const [{ y }, set] = useSpring(() => ({
@@ -103,7 +107,7 @@ function MobileCalendar({ className, data, isLoading, addQuery, removeQuery, que
             <div className="swiper-container">
                 {/* <button className="hide-mobile-calendar" onClick={()=>{setShow(false)}}>hide</button> */}
                 <div className="mobile-time">
-                    <DayColumn day={'S'}/>
+                    <DayColumn day={'G'}/>
                 </div>
                 <Swiper
                     modules={[Pagination]}
@@ -115,14 +119,13 @@ function MobileCalendar({ className, data, isLoading, addQuery, removeQuery, que
                     centeredSlides={true}
                 >   
                     {days.map((day) => (
-                        <SwiperSlide>
+                        <SwiperSlide key={`day${day}`}>
                             <div className="swiper-slide-content">
                                 <p className={`day-name ${currentDay === days.indexOf(day)+1 ? "current-day-mobile" : ""}`}>{dayNames[day]}</p>
                                 <DayColumn
-                                    key={day}
                                     day={day}
-                                    
                                     dayEvents={isLoading ? load : data ? data["weekly_schedule"][day] : load} eventColors={isLoading ? loadColors : data ? eventColors : loadColors}
+
                                     empty={empty}
                                     add={addQuery}
                                     remove={removeQuery}

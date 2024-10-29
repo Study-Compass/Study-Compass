@@ -7,7 +7,7 @@ import DayColumn from '../DayColumn/DayColumn';
  * */ 
 
 function Calendar({className, data, isLoading, addQuery, removeQuery, query}){
-    const days = ["S", "M", "T", "W", "R", "F"];
+    const days = ["G", "M", "T", "W", "R", "F"];
     const loadColors = useRef(new Map()).current;
     const eventColors = useRef(new Map()).current;
     const [empty, setEmpty] = useState(true);
@@ -46,7 +46,7 @@ function Calendar({className, data, isLoading, addQuery, removeQuery, query}){
                         <DayColumn 
                             key={day}
                             day={day} 
-                            dayEvents={isLoading ? load : data ? data["weekly_schedule"][day]: load} 
+                            dayEvents={isLoading ? load : data ? data["weekly_schedule"][day] ?data["weekly_schedule"][day] : load : load} 
                             eventColors={isLoading ? loadColors : data ? eventColors : loadColors }
                             empty = {empty} 
                             add = {addQuery}
@@ -61,4 +61,4 @@ function Calendar({className, data, isLoading, addQuery, removeQuery, query}){
 
 }
 
-export default Calendar
+export default Calendar;

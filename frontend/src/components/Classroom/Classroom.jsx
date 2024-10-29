@@ -105,7 +105,6 @@ function Classroom({ room, state, setState, schedule, roomName, width, setShowMo
         }
         getRatings(room._id)
             .then((response) => {
-                console.log(response.data.data);
                 setRatings(response.data.data);
             })
             .catch((error) => {
@@ -145,14 +144,9 @@ function Classroom({ room, state, setState, schedule, roomName, width, setShowMo
         }
         if (ratings.find(rating => rating.user_id === user._id)!== undefined) {
             setUserRating(ratings.find(rating => rating.user_id === user._id));
-            console.log("user has rated this room");
         }    
     }, [ratings, user]);
 
-    useEffect(() => {
-        console.log(userRating === null);
-
-    }, [userRating]);
 
     useEffect(() => {
 
@@ -189,7 +183,6 @@ function Classroom({ room, state, setState, schedule, roomName, width, setShowMo
     useEffect(() => {
         if (checkInRef.current) {
             setFillerHeight(checkInRef.current.clientHeight + 100);
-            console.log(checkInRef.current.clientHeight);
         }
     }, [checkInRef.current]);
 
@@ -256,7 +249,6 @@ function Classroom({ room, state, setState, schedule, roomName, width, setShowMo
     const handleCheckIn = async () => {
         try {
             const response = await checkIn(room._id);
-            console.log(response);
             await reload();
             getCheckedIn();
         } catch (error) {
@@ -274,10 +266,7 @@ function Classroom({ room, state, setState, schedule, roomName, width, setShowMo
             const response = await checkOut(room._id);
             if (!userRating) {
                 handleOpenRatingPopup();
-                console.log("user has not rated this room yet");
             }
-            console.log(userRated, "user has rated this room");
-            console.log(response);
             await reload();
 
 

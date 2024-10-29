@@ -1,0 +1,28 @@
+.full-event{
+    display:flex;
+    width:100%;
+    height:100%;
+    gap:20px;
+    .image{
+        max-width: 35%;
+        img{
+            width:100%;
+            border-radius: 10px;
+        }
+    }
+    .content{
+        flex-grow: 1;
+        padding-top:5px;
+        box-sizing: border-box;
+        h1{
+            font-size: 25px;
+        }
+    }
+    .gradient{
+        position: absolute;
+        bottom:0;
+        right:0;
+        height:110px;
+        width:110px;
+    }
+}
