@@ -49,6 +49,7 @@
         font-size: 14px;
         position: relative;
         padding: 100px 200px;
+        font-weight: 500;
 
         .password-link{
             color: var(--blue);
@@ -56,7 +57,44 @@
 
     }
 
-    
+}
 
+@media (max-width: 500px){
+  .forgotten-email{
+    
+    .header{
+        font-size: 20px;
+        padding-top: 20px;
+     }
+
+    .header-img{
+        .logo{
+            height: 50px;
+            // padding-top: 20px;
+      
+        }
+
+        .gradient{
+            height: 100px;
+            position: absolute;
+            &.tl{
+                top:0;
+                left:0;
+            }
+            &.tr{
+                top:0;
+                right:0;
+            }
+        }
+
+    }
+
+    .email-content{
+        font-size: 14px;
+        padding: 50px 50px;
+
+    }
+
+  }
 
 }
