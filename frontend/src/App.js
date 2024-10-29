@@ -11,6 +11,7 @@ import Settings from './pages/Settings/Settings';
 import Friends from './pages/Friends/Friends';
 import Profile from './pages/Profile/Profile';
 import Landing from './pages/Landing/Landing';
+import Club from './pages/Club/Club';
 import DeveloperOnboard from './pages/DeveloperOnboarding/DeveloperOnboarding';
 import QR from './pages/QR/QR';
 import Admin  from './pages/Admin/Admin';
@@ -71,6 +72,7 @@ function App() {
                                                 <Route path="/profile" element={<Profile/>}/>
                                                 <Route path="/friends" element={<Friends/>}/>
                                                 <Route path="/landing" element={<Landing/>}/>
+                                                <Route path="/club" element={<Club/>}/>
                                                 <Route path="/settings" element={<Settings/>}/>
                                                 <Route path="/documentation" element={<Redirect/>}/>
                                                 <Route path="/developer-onboarding" element={<DeveloperOnboard/>}/>

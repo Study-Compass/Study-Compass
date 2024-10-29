@@ -66,11 +66,6 @@
         border: none;
         
     }
-    .profile .mode .img::before{
-      
-
-    }
-
     .mode .selected::before{
         content:'';
         border-radius: 10px; 
@@ -81,11 +76,5 @@
         width:calc(100%);
         height: calc(100%);
     }
-
-    .profile .mode img.selected::before {
-
-      }
-
-
 
 }

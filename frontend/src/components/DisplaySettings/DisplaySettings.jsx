@@ -40,9 +40,11 @@ const DisplaySettings = ( {settingsRightSide, width, handleBackClick, rightarrow
     };
 
     // database takes pritority over system
-    const savePreference = () => {
+    const savePreference = async () => {
         const isDarkMode = selectedMode === 'dark';
-        saveUser(null, null, null, null, null, null, isDarkMode)
+        const response = await saveUser(null, null, null, null, null, null, isDarkMode);
+        console.log(response);
+        console.log(isDarkMode);
     }
     
 
@@ -78,7 +80,7 @@ const DisplaySettings = ( {settingsRightSide, width, handleBackClick, rightarrow
 
                 </div>
 
-                <button onClick={savePreference}>save</button>
+                <button onClick={savePreference}> save </button>
 
              </div>
 

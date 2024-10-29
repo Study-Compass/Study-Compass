@@ -26,7 +26,7 @@ router.post("/update-user", verifyToken, async (req, res) =>{
         user.classroomPreferences  = classroom ? classroom : user.classroomPreferences;
         user.recommendationPreferences = recommendation ? recommendation : user.recommendationPreferences;
         user.onboarded = onboarded ? onboarded : user.onboarded;
-        user.darkModePreference = darkModePreference ? darkModePreference : user.darkModePreference;
+        user.darkModePreference = darkModePreference !== null ? darkModePreference : user.darkModePreference;
         
         await user.save();
         console.log(`POST: /update-user ${req.user.userId} successful`);
