@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './OIEFullEvent.scss';
 import {Icon} from '@iconify-icon/react';  
-import StarGradient from '../../../../assets/StarGradient.png';
+import StarGradient from '../../../../assets/OIE-Gradient2.png';
 
 function OIEFullEvent({ event }){
     const navigate = useNavigate();
