@@ -78,6 +78,7 @@ function App() {
                                             <Route path="/developer-onboarding" element={<DeveloperOnboard/>}/>
                                             <Route path="/admin" element={<Admin/>}/>
                                             <Route path="/forgot-email" element={<ForgottenEmail/>}/>
+                                            
                                         </Route>
                                     </Routes>
                                     </ProfileCreationProvider>

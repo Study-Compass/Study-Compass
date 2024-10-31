@@ -5,7 +5,6 @@
     width:100%;
     
     .logo , .header{
-        height:100vh;
         max-height:100%;
         width:100%;
     
@@ -27,6 +26,7 @@
         .gradient{
             height: 200px;
             position: absolute;
+            z-index: -1;
             &.tl{
                 top:0;
                 left:0;
@@ -40,15 +40,14 @@
     }
 
     .header{
-        padding-top: 60px;
-        position: absolute;
+        padding-top: 50px;
     }
 
     .email-content{
         font-family: Inter, sans-serif;
         font-size: 14px;
         position: relative;
-        padding: 100px 200px;
+        padding: 0 100px;
         font-weight: 500;
 
         .password-link{
@@ -64,13 +63,13 @@
     
     .header{
         font-size: 20px;
-        padding-top: 20px;
+        padding-top: 30px;
      }
 
     .header-img{
         .logo{
-            height: 50px;
-            // padding-top: 20px;
+            height: 35px;
+            padding-top: 10px;
       
         }
 
@@ -91,7 +90,7 @@
 
     .email-content{
         font-size: 14px;
-        padding: 50px 50px;
+        padding: 0px 50px;
 
     }
 

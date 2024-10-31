@@ -7,6 +7,9 @@ import { useGoogleLogin } from '@react-oauth/google';
 import circleWarning from '../../../assets/circle-warning.svg';
 import { generalIcons } from '../../../Icons';
 import Flag from '../../Flag/Flag';
+import Juice from 'juice';
+import ForgottenEmail from '../../ForgottenEmail/ForgottenEmail';
+import ReactDOMServer from 'react-dom/server';
 
 
 function PasswordForm() {
@@ -80,34 +83,47 @@ function PasswordForm() {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     }
 
+    const generateEmailHTML = () => {
+        // Render the React component to a static HTML string
+        const html = ReactDOMServer.renderToStaticMarkup(<ForgottenEmail />);
+        // Inline the CSS for email compatibility
+        return Juice(html);
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
-        try{
-            const response = await axios.post('/verify-email', { email: formData.email });
-            if(response.data.data && response.data.data.result === "undeliverable"){
-                setErrorText("Invalid Email. Please try again");
-                return;
-            }
-        } catch (error){
-            console.error("Email verification failed:", error);
-            setErrorText("Invalid Username/Email or Password. Please try again");
-            return;
-        }
-        try {
-            setFormData({email : ""});
-            setSentForgot(true);
-            // Handle success (e.g., redirect to login page or auto-login)
-            await login(formData);
-            navigate('/onboard', { replace: true });
-        } catch (error) {
-            if(error.response.status === 400){
-                setErrorText("Username or Email already exists");
-            } else {
-                setErrorText(error.response.data.message);
-            }
-            // console.error('Registration failed:', error);
-            // Handle errors (e.g., display error message)
-        }
+        const emailHTML = generateEmailHTML();
+        //copy emailHTML to clipboard
+        navigator.clipboard.writeText(emailHTML);
+
+
+        // try{
+        //     const response = await axios.post('/verify-email', { email: formData.email });
+        //     if(response.data.data && response.data.data.result === "undeliverable"){
+        //         setErrorText("Invalid Email. Please try again");
+        //         return;
+        //     }
+        // } catch (error){
+        //     console.error("Email verification failed:", error);
+        //     setErrorText("Invalid Username/Email or Password. Please try again");
+        //     return;
+        // }
+        // try {
+        //     setFormData({email : ""});
+        //     setSentForgot(true);
+        //     // Handle success (e.g., redirect to login page or auto-login)
+        //     await login(formData);
+        //     navigate('/onboard', { replace: true });
+        // } catch (error) {
+        //     if(error.response.status === 400){
+        //         setErrorText("Username or Email already exists");
+        //     } else {
+        //         setErrorText(error.response.data.message);
+        //     }
+        //     // console.error('Registration failed:', error);
+        //     // Handle errors (e.g., display error message)
+        // }
+
     }
     // codeResponse => responseGoogle1(codeResponse)
     const google = useGoogleLogin({
