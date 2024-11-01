@@ -11,10 +11,12 @@ import Settings from './pages/Settings/Settings';
 import Friends from './pages/Friends/Friends';
 import Profile from './pages/Profile/Profile';
 import Landing from './pages/Landing/Landing';
+import Events from './pages/Events/Events';
 import Club from './pages/Club/Club';
 import DeveloperOnboard from './pages/DeveloperOnboarding/DeveloperOnboarding';
 import QR from './pages/QR/QR';
 import Admin  from './pages/Admin/Admin';
+import OIEDash from './pages/OIEDash/OIEDash';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './AuthContext';
 import { CacheProvider } from './CacheContext';
@@ -26,6 +28,7 @@ import { WebSocketProvider } from './WebSocketContext';
 import { DarkModeProvider, useDarkMode } from './DarkModeContext';
 import Layout from './pages/Layout/Layout';
 import axios from 'axios';
+import CreateEvent from './pages/CreateEvent/CreateEvent';
 
 function App() {
     useEffect(() => {

@@ -1,0 +1,19 @@
+.when-where{
+    .time-select{
+        display:flex;
+        flex-direction: column;
+        gap:20px;
+        align-items: center;
+
+        select{
+            width:60%;
+            padding:5px 10px;
+            font-size:18px;
+            margin:0;
+            font-family: 'Inter';
+            font-weight: 700;
+    
+    
+        }
+    }
+}

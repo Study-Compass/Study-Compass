@@ -1,0 +1,113 @@
+.gen-info {
+    gap: 20px;
+    .col-container {
+        display: flex;
+        gap: 30px;
+        width: 100%;
+        flex-grow: 1;
+
+        .col {
+            display: flex;
+            flex-direction: column;
+
+            &.input-col {
+                width: 30%;
+                min-width: 250px;
+                gap: 20px;
+
+                .input-field {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 3px;
+
+                    &.mandatory > p{
+                        &::after{
+                            content: "*";
+                            color: var(--red);
+                            margin-left:2px;
+                        }
+                    }
+
+                    p {
+                        font-family: 'Inter';
+                        font-size: 14px;
+                        font-weight: 500;
+                    }
+
+                    input,
+                    textarea,
+                    select {
+                        box-sizing: border-box;
+                        padding: 3px 10px;
+                        border-radius: 5px;
+                        border: 1px solid var(--lightborder);
+                        font-family: 'Inter';
+                        font-size: 14px;
+                        font-weight: 500;
+                        width: 100%;
+                        background-color: transparent;
+                        margin: 0;
+                        &:focus {
+                            outline: none;
+                        }
+                    }
+
+                    textarea {
+                        resize: none;
+                        height:50px;
+                    }
+
+                    select option {
+                        font-family: 'Inter';
+                        font-size: 14px;
+                        font-weight: 500;
+                    }
+
+                    .visibility{
+                        display:flex;
+                        gap:10px;
+                        .option{
+                            height:100%;
+                            width:50%;
+                            display:flex;
+                            align-items:center;
+                            justify-content:center;
+                            border-radius:5px;
+                            flex-direction: column;
+                            gap:3px;
+                            box-sizing: border-box;
+                            padding-right: 5%;
+                            padding-left:5%;
+                            transition: all 0.3s;
+                            img{
+                                width:25px;
+                                height:25px;
+                            }
+                            h3{
+                                font-size:14px;
+                                font-weight:700;
+                                margin:0;
+                                color: var(--text)
+                            }
+                            p{
+                                font-size:12px;
+                                font-weight:500;
+                                margin:0;
+                                color: var(--text);
+                                text-align: center;
+                            }
+                            &.selected{
+                                border: 1px solid var(--red);
+                                background-color: var(--lighter);
+                            }
+                        }
+                    }
+                }
+            }
+
+            &.preview-col {
+                /* Add any preview-col specific styles here */
+            }
+        }
+    }
+}

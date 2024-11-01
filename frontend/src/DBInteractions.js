@@ -70,7 +70,6 @@ const saveUser = async (name, username, email, password, recommendation, classro
     try{
         const response = await axios.post('/update-user', {name, email, username, classroom, recommendation, onboarded :null, darkModePreference}, {headers: {'Authorization': `Bearer ${localStorage.getItem('token')}`}});
         const responseBody = response.body;
-        console.log(response);
         if (response.data.success) {
             console.log("User saved successfully");
         } else {
@@ -90,7 +89,6 @@ const checkUsername = async (username) => {
                 'Content-Type': 'application/json'
             }
         });
-        console.log(response);
         const responseBody = response.data;
         if (!responseBody.success) {
             // Log the error if the response status is not OK
@@ -264,7 +262,6 @@ const getRecommendation = async () => {
                 'Authorization': `Bearer ${token}`,
             }
         });
-        console.log("successful");
         return response;
     } catch(error){
         throw error;
