@@ -16,6 +16,7 @@ import DeveloperOnboard from './pages/DeveloperOnboarding/DeveloperOnboarding';
 import QR from './pages/QR/QR';
 import Admin  from './pages/Admin/Admin';
 import OIEDash from './pages/OIEDash/OIEDash';
+import ClubDash from './pages/ClubDash/ClubDash';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './AuthContext';
 import { CacheProvider } from './CacheContext';
@@ -79,6 +80,8 @@ function App() {
                                             <Route path="/create-event" element={<CreateEvent/>}/>
                                             <Route path="/events" element={<Events/>}/>
                                             <Route path="/oie-dashboard" element={<OIEDash/>}/>
+                                            <Route path="/club-dashboard" element={<ClubDash/>}/>
+                                            
                                         </Route>
                                     </Routes>
                                     </ProfileCreationProvider>
