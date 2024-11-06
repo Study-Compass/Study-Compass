@@ -1,13 +1,19 @@
 const addQueryHelper = (key, newValue, setQuery) => {
     setQuery(prev => {
-        // Create a list that includes all existing timeslots plus the new one.
-        const allSlots = [...prev[key], newValue];
+        // Clear all other keys except for the current key.
+        const clearedQueries = Object.keys(prev).reduce((acc, currentKey) => {
+            acc[currentKey] = currentKey === key ? prev[currentKey] : [];
+            return acc;
+        }, {});
 
+        // Create a list that includes all existing timeslots for the current key plus the new one.
+        const allSlots = [...clearedQueries[key], newValue];
+        
         // Sort timeslots by start time.
         allSlots.sort((a, b) => a.start_time - b.start_time);
 
         // Merge overlapping or consecutive timeslots.
-        const mergedSlots = allSlots.reduce((acc, slot) => {
+        let mergedSlots = allSlots.reduce((acc, slot) => {
             if (acc.length === 0) {
                 acc.push(slot);
             } else {
@@ -23,10 +29,15 @@ const addQueryHelper = (key, newValue, setQuery) => {
             return acc;
         }, []);
 
-        // Return updated state.
-        return { ...prev, [key]: mergedSlots };
+        if(mergedSlots.length > 1){
+            mergedSlots = [newValue];
+        }
+
+        // Return updated state with only the current key containing merged slots.
+        return { ...clearedQueries, [key]: mergedSlots };
     });
 };
+
 
 const removeQueryHelper = (key, value, setQuery) => {
     // setNoQuery(true); //failsafe, useEffect checks before query anyways

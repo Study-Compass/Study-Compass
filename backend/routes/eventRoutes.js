@@ -10,10 +10,10 @@ router.post('/create-event', verifyToken, async (req, res) => {
     const user_id = req.user.userId;
 
     const event = new Event({
-        user_id,
         name,
         type,
-        hosting,
+        hosting : user_id,
+        hostingType : 'User',
         location,
         date,
         description,
@@ -58,7 +58,7 @@ router.get('/get-all-events', verifyTokenOptional, async (req, res) => {
     try {
         // const events = await Event.find({}).populate('classroom_id');
         //get all events, attach user object to the event
-        const events = await Event.find({}).populate('classroom_id').populate('user_id');
+        const events = await Event.find({}).populate('classroom_id').populate('hosting_id');
         res.status(200).json({
             success: true,
             events

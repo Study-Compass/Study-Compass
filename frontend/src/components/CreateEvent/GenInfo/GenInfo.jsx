@@ -3,7 +3,7 @@ import '../CreateComponents.scss'
 import './GenInfo.scss'
 import Global from '../../../assets/Icons/Global.svg';
 import Internal from '../../../assets/Icons/Internal.svg';
-import FileUpload from '../../FileUpload/FileUpload';
+import ImageUpload from '../../ImageUpload/ImageUpload';
 
 function GenInfo({next}){
     const [title, setTitle] = useState("");
@@ -49,13 +49,13 @@ function GenInfo({next}){
             <h1>general information</h1>
             <div className="col-container">
                 <div className="col input-col">
-                    <div className="input-field mandatory">
+                    <div className="input-field mandatory title">
                         <p className="label">Title</p>
-                        <input name="title" type="text" className="" value={title} onChange={handleChange}/>
+                        <input name="title" type="text" className="" value={title} onChange={handleChange} placeholder='event title'/>
                     </div>
                     <div className="input-field">
                         <p className="label">Description</p>
-                        <textarea name="description" type="text" className="" />
+                        <textarea name="description" type="text" className="" placeholder='event description' />
                     </div>
                     <div className="input-field mandatory">
                         <p className="label">Event Type</p>
@@ -80,13 +80,16 @@ function GenInfo({next}){
                             </div>
                         </div>
                     </div>
-                    <div className="input-field">
-                        <p>Flier</p>
-                        <FileUpload/>
-                    </div>
+
                     <button className={`next-button ${nextActive && "active"}`} onClick={next}>
                         next
                     </button>
+                </div>
+                <div className="col preview-col">
+                    <div className="input-field">
+                        <p>Flier</p>
+                        <ImageUpload uploadText="Upload Flier" />
+                    </div>
                 </div>
             </div>
         </div>

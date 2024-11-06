@@ -2,24 +2,25 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const eventSchema = new mongoose.Schema({
-    user_id: {
-        type: Schema.Types.ObjectId,
-        ref: 'User',
-        required: true,
-    },
     name: {
         type: String,
         required: true,
         trim: true, // trims whitespace
     },
     type:{
-        type:String, //study, campus event
+        type:String, 
         required:true,
     },
-    hosting:{
-        type:String, //only if campus event
-        required:false,
-    },
+    hostingId: {
+        type: Schema.Types.ObjectId,
+        required: true,
+        refPath: 'hostingType'
+      },
+      hostingType: {
+        type: String,
+        required: true,
+        enum: ['User', 'Club']
+      },
     going:{
         type:Array,
         default:[],
