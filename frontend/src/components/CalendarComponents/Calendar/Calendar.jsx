@@ -6,8 +6,8 @@ import DayColumn from '../DayColumn/DayColumn';
  * https://incongruous-reply-44a.notion.site/Frontend-Calendar-DayColumn-Components-0283818fd23a4bbfa5ab81d76a0ad876
  * */ 
 
-function Calendar({className, data, isLoading, addQuery, removeQuery, query}){
-    const days = ["G", "M", "T", "W", "R", "F"];
+function Calendar({className, data, isLoading, addQuery, removeQuery, query, weekend=false}){
+    const days = weekend ?  ["S", "M", "T", "W", "R", "F", "H"] : ["G", "M", "T", "W", "R", "F"];
     const loadColors = useRef(new Map()).current;
     const eventColors = useRef(new Map()).current;
     const [empty, setEmpty] = useState(true);
@@ -34,12 +34,14 @@ function Calendar({className, data, isLoading, addQuery, removeQuery, query}){
     return (
             <div className={`Calendar ${data ? "":"loading"}`}>
                 {isLoading ? <div>loading</div>: ""}
-                <div className="Calendar-header">
+                <div className={`Calendar-header ${weekend && "weekend"}`}>
+                    {weekend ? <p className={`${currentDay === 0 ? "currentDay" : ""}`}>sunday</p> : ""}
                     <p className={`${currentDay === 1 ? "currentDay" : ""}`}>monday</p>
                     <p className={`${currentDay === 2 ? "currentDay" : ""}`}>tuesday</p>
                     <p className={`${currentDay === 3 ? "currentDay" : ""}`}>wednesday</p>
                     <p className={`${currentDay === 4 ? "currentDay" : ""}`}>thursday</p>
                     <p className={`${currentDay === 5 ? "currentDay" : ""}`}>friday</p>
+                    {weekend ? <p className={`${currentDay === 6 ? "currentDay" : ""}`}>saturday</p> : ""}
                 </div>
                 <div className="Time-grid">
                     {days.map((day) => (
