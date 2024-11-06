@@ -64,6 +64,7 @@ const analyticsRoutes = require('./routes/analytics.js');
 const classroomChangeRoutes = require('./routes/classroomChangeRoutes.js');
 const ratingRoutes = require('./routes/ratingRoutes.js');
 const searchRoutes = require('./routes/searchRoutes.js');
+const clubRoutes = require('./routes/clubRoutes.js');
 
 app.use(authRoutes);
 app.use(dataRoutes);
@@ -73,7 +74,7 @@ app.use(analyticsRoutes);
 app.use(classroomChangeRoutes);
 app.use(ratingRoutes);
 app.use(searchRoutes);
-
+app.use(clubRoutes);
 //deprecated, should lowk invest in this
 // app.get('/update-database', (req, res) => {
 //     const pythonProcess = spawn('python3', ['courseScraper.py']);
