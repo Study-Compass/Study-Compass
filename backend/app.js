@@ -68,6 +68,7 @@ const ratingRoutes = require('./routes/ratingRoutes.js');
 const searchRoutes = require('./routes/searchRoutes.js');
 const eventRoutes = require('./routes/eventRoutes.js');
 const oieRoutes = require('./routes/oie-routes.js');
+const clubRoutes = require('./routes/clubRoutes.js');
 
 app.use(authRoutes);
 app.use(dataRoutes);
