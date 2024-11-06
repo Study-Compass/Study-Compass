@@ -7,10 +7,8 @@ const Club = require('../schemas/club.js');
 const Follower = require('../schemas/clubFollowers.js');
 const Member = require('../schemas/clubMember.js');
 const { cloudiot_v1 } = require('googleapis');
-const { clean } = require('../services/profanityFilterService');
+const { clean, isProfane } = require('../services/profanityFilterService');
 
-
-//CHECK IF IT WORKS- WALK
 
 //Route to get a specific club by name
 router.get("/get-club/:id", verifyToken, async(req,res)=>{
@@ -40,10 +38,9 @@ try{
 });
 
 
-
-
-router.post("/create-club", verifyToken, async(req,res)=>{
 // Create a new club and store it into database
+router.post("/create-club", verifyToken, async(req,res)=>{
+
     try {
         const{clubId, club_profile_image, club_description, positions, weekly_meeting } = req.body;
 
@@ -51,25 +48,27 @@ router.post("/create-club", verifyToken, async(req,res)=>{
         const userId = req.user.userId;
 
         //if club name exist fail to create
-        
         const clubExist = await Club.findOne({club_name: req.body.club_name });
-        
+
         //Check to verify if the club already exists
         if (clubExist){
             return res.status(400).json({ success: false, message: 'Club name already exists'});
         }
 
-        // Sanitize club name and description verify this right
-        const cleanClubName = clean(req.body.club_name);
-        if (!cleanClubName) {
+        //Check if Bad Words
+        if (isProfane(req.body.club_name)) {
             return res.status(400).json({ success: false, message: 'Club name contains inappropriate language' });
         }
 
-        const cleanClubDescription = clean(req.body.club_description);
+        // Sanitize club name and description verify this right
+        const cleanClubName = clean(req.body.club_name);
 
-        if (!cleanClubDescription) {
-            return res.status(400).json({ success: false, message: 'Contains inappropriate language' });
+        //Check if Bad Words
+        if (isProfane(req.body.club_description)) {
+            return res.status(400).json({ success: false, message: 'Description contains inappropriate language' });
         }
+
+        const cleanClubDescription = clean(req.body.club_description);
 
         const newClub = new Club({
 
@@ -110,6 +109,7 @@ router.post("/edit-club", verifyToken, async (req, res) => {
         const club = await Club.findById(clubId);
 
         // Check if the club exists
+        console.log
         if (!club) {
             return res.status(404).json({ success: false, message: "Club not found" });
         }
@@ -121,8 +121,10 @@ router.post("/edit-club", verifyToken, async (req, res) => {
 
         // If club_name is provided, clean it and check for inappropriate language
         if (club_name) {
+
             const cleanClubName = clean(club_name);
-            if (!cleanClubName) {
+            
+            if (isProfane(club_name)) {
                 return res.status(400).json({ success: false, message: "Club name contains inappropriate language" });
             }
 
@@ -139,7 +141,8 @@ router.post("/edit-club", verifyToken, async (req, res) => {
         // If club_description is provided, clean it
         if (club_description) {
             const cleanClubDescription = clean(club_description);
-            if (!cleanClubDescription) {
+
+            if (isProfane(club_description)) {
                 return res.status(400).json({ success: false, message: "Description contains inappropriate language" });
             }
             club.club_description = cleanClubDescription;
