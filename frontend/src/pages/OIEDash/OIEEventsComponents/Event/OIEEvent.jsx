@@ -31,8 +31,8 @@ function OIEEvent({event}){
                 {/* <p>{event.location }</p> */}
                 {/* display date in day of the week, month/day */}
                 <div className="row">
-                    <img src={event.user_id.image ? event.user_id.image : defaultAvatar} alt="" />
-                    <p className="user-name">{event.user_id.name}</p>
+                    <img src={event.hostingId.image ? event.hostingId.image : defaultAvatar} alt="" />
+                    <p className="user-name">{event.hostingId.name}</p>
                 </div>
                 <div className="row">
                     <Icon icon="heroicons:calendar-16-solid" />

@@ -6,28 +6,30 @@ const User = require('../schemas/user');
 const Classroom = require('../schemas/classroom');
 
 router.post('/create-event', verifyToken, async (req, res) => {
-    const { name, type, hosting, location, date, description, image, classroom_id } = req.body;
+    const { name, type, hosting, location, start_time, end_time, description, image, classroom_id } = req.body;
     const user_id = req.user.userId;
 
     const event = new Event({
         name,
         type,
-        hosting : user_id,
+        hostingId : user_id,
         hostingType : 'User',
         location,
-        date,
+        start_time,
+        end_time,
         description,
         image,
         classroom_id
     });
     try {
         await event.save();
+        console.log('POST: /create-event successful');
         res.status(201).json({
             success: true,
             message: 'Event created successfully.'
         });
     } catch (error) {
-        console.log(error);
+        console.log('POST: /create-event failed', error);
         res.status(500).json({
             success: false,
             message: error.message
@@ -41,11 +43,13 @@ router.get('/get-events', verifyToken, async (req, res) => {
 
     try {
         const events = await Event.find({ user_id }).populate('classroom_id');
+        console.log('GET: /get-events successful');
         res.status(200).json({
             success: true,
             events
         });
     } catch (error) {
+        console.log('GET: /get-events failed', error);
         res.status(500).json({
             success: false,
             message: error.message
@@ -58,12 +62,14 @@ router.get('/get-all-events', verifyTokenOptional, async (req, res) => {
     try {
         // const events = await Event.find({}).populate('classroom_id');
         //get all events, attach user object to the event
-        const events = await Event.find({}).populate('classroom_id').populate('hosting_id');
+        const events = await Event.find({}).populate('classroom_id').populate('hostingId');
+        console.log('GET: /get-all-events successful');
         res.status(200).json({
             success: true,
             events
         });
     } catch (error) {
+        console.log('GET: /get-all-events failed', error);
         res.status(500).json({
             success: false,
             message: error.message
