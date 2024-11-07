@@ -4,21 +4,23 @@ import './WhenWhere.scss'
 
 import Calendar from '../../CalendarComponents/Calendar/Calendar';
 import { useCache } from '../../../CacheContext';
-import { addQueryHelper, removeQueryHelper } from './WhenWhereHelpers';
+import { addQueryHelper, removeQueryHelper, getCurrentWeek, getNextWeek, getPreviousWeek } from './WhenWhereHelpers';
 import DayColumn from '../../CalendarComponents/DayColumn/DayColumn';
 import { useNotification } from '../../../NotificationContext';
+import { Icon } from '@iconify-icon/react/dist/iconify.mjs';
 
-function WhenWhere({next, visible}){
+function WhenWhere({next, visible, setInfo}){
     const {addNotification} = useNotification();
     const {getRoom, getRooms} = useCache();
     const [roomIds, setRoomIds] = useState({});
     const [empty, setEmpty] = useState(true);
     const [rooms, setRooms] = useState([]);
+    const [selectedRoom, setSelectedRoom] = useState("none");
     const [data, setData] = useState({});
     const [loading, setLoading] = useState(true);
     const [query, setQuery] = useState({'S': [],'M': [],'T': [],'W': [],'R': [],'F': [], "H": []});
     const [nextActive, setNextActive] = useState(false);    
-    const dateRange = ["9/11", "9/12", "9/13", "9/14", "9/15", "9/16", "9/17"];
+    const [dateRange, setDateRange] = useState(getCurrentWeek());
 
     const addQuery = (key, value) => addQueryHelper(key, value, setQuery);
     const removeQuery = (key, value) => removeQueryHelper(key, value, setQuery);
@@ -51,6 +53,14 @@ function WhenWhere({next, visible}){
                 setQuery({'S': [],'M': [],'T': [],'W': [],'R': [],'F': [], "H": []});
             } else {
                 setNextActive(true);
+                const singleQuery = Object.values(query).flat()[0];
+                const key = Object.keys(query).find(key => query[key].includes(singleQuery));
+                console.log(key); 
+                setInfo(prev => ({
+                    ...prev,
+                    start_time: singleQuery.start_time,
+                    end_time: singleQuery.end_time,
+                }));
             }
         } else {
             setNextActive(false);
@@ -59,6 +69,11 @@ function WhenWhere({next, visible}){
 
     const handleRoomSelect = (e) => {
         const id = roomIds[e.target.value];
+        setSelectedRoom(e.target.value);
+        setInfo(prev => ({
+            ...prev,
+            room: [e.target.value, id]
+        }));
         getData(id);
     }
 
@@ -101,6 +116,8 @@ function WhenWhere({next, visible}){
     // ================================================================================================================
     
 
+
+
     return(
         <div className={`when-where create-component ${visible && "visible"}`}>
             <h1>when & where</h1>
@@ -112,6 +129,7 @@ function WhenWhere({next, visible}){
                     ))}
                 </select>
                 <div className="row">
+                    <div className="left-arrow"><Icon icon="charm:chevron-left" onClick={()=>setDateRange(getPreviousWeek(dateRange))}/></div>
                     <DayColumn day={"G"}/>
                     <div className={`calendar-wrapper ${scrollClass}`}>
                         <div ref={containerRef}>
@@ -120,6 +138,7 @@ function WhenWhere({next, visible}){
                         <div className="scroll-border-r"></div>
                         <div className="scroll-border-l"></div>
                     </div>
+                    <div className="right-arrow" onClick={()=>setDateRange(getNextWeek(dateRange))}><Icon icon="charm:chevron-right" /></div>
                 </div>
             </div>
             <button className={`next-button ${nextActive && "active"}`} onClick={next}>

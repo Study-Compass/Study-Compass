@@ -1,6 +1,8 @@
 .when-where{
     padding: 25px 40px 60px 25px;
     overflow-y:auto;
+    position: relative;
+
     .time-select{
         display:flex;
         flex-direction: column;
@@ -24,6 +26,41 @@
             & > .DayColumn > .TimeLabelColumn{
                 margin-top:58px;
                 left:50px;
+            }
+
+            .left-arrow, .right-arrow{
+                position: absolute;
+                left:0;
+                top:50%;
+                transform: translateY(-50%);
+                cursor: pointer;
+                z-index: 1;
+                font-size:25px;
+                color:var(--text);
+                transition: all 0.3s;
+
+                &:hover{
+                    color:var(--red);
+                    transform: translateX(-5px) translateY(-50%);
+                }
+                &:active{
+                    transform: translateX(0) translateY(-50%);
+                }
+            }
+
+
+
+            .right-arrow{
+                right:20px;
+                left:auto;
+                &:hover{
+                    color:var(--red);
+                    transform: translateX(5px) translateY(-50%);
+                }
+                &:active{
+                    transform: translateX(0) translateY(-50%);
+                }
+
             }
         }
         .calendar-wrapper{

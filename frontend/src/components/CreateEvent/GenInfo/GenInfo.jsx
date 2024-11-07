@@ -19,7 +19,15 @@ function GenInfo({next, visible, setInfo}){
         if(title && eventType && visibility){
             setNextActive(true);
         }
-        setInfo({name: title, description, eventType, visibility, expectedAttendance, image});
+        setInfo(prev => ({
+            ...prev,
+            name: title, 
+            description, 
+            type: eventType, 
+            visibility, 
+            expectedAttendance, 
+            image
+        }));
     }
     ,[title, description, eventType, visibility, image]);
 
