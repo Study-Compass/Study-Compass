@@ -28,6 +28,15 @@
             color: var(--text);
         }
         
+        .level{
+            font-size:10px;
+            font-weight: 700;
+            color: var(--background);
+            background-color: var(--green);
+            padding:1px 5px;
+            border-radius: 5px;
+        }
+        
 
         .row{
             display:flex;

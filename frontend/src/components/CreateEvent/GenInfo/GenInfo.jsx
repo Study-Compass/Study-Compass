@@ -16,7 +16,7 @@ function GenInfo({next, visible, setInfo}){
     const [image, setImage] = useState(null);
 
     useEffect(()=>{
-        if(title && eventType && visibility && expectedAttendance){
+        if(title && eventType && description && visibility && expectedAttendance){
             setNextActive(true);
         }
         setInfo(prev => ({
@@ -67,9 +67,9 @@ function GenInfo({next, visible, setInfo}){
                         <p className="label">Title</p>
                         <input name="title" type="text" className="" value={title} onChange={handleChange} placeholder='event title'/>
                     </div>
-                    <div className="input-field">
+                    <div className="input-field mandatory">
                         <p className="label">Description</p>
-                        <textarea name="description" type="text" className="" placeholder='tell us a little about your event' />
+                        <textarea name="description" type="text" className="" placeholder='tell us a little about your event' value={description} onChange={handleChange} />
                     </div>
                     <div className="input-field mandatory">
                         <p className="label">Event Type</p>

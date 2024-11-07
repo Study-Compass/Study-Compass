@@ -75,7 +75,8 @@ function WhenWhere({next, visible, setInfo}){
         setSelectedRoom(e.target.value);
         setInfo(prev => ({
             ...prev,
-            room: [e.target.value, id]
+            location: e.target.value,
+            classroomId: id
         }));
         getData(id);
     }

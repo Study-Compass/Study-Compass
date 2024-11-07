@@ -63,8 +63,10 @@ function OIEDash(){
                             <p>Dashboard</p>
                         </li>
                         <li className=''>
-                            <img src={Dashboard} alt="" />
-                            <p>Dashboard</p>
+                            <div className="icon-container">
+                                <Icon icon="heroicons:calendar-16-solid" />
+                            </div>
+                            <p>Event Calendar</p>
                         </li>
                     </ul>
                 </nav>
