@@ -16,7 +16,7 @@ function Event({event}){
         setPopupOpen(false);
     }
 
-    const date = new Date(event.date);
+    const date = new Date(event.start_time);
     
 
     return(

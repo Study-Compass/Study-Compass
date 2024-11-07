@@ -4,7 +4,7 @@ import './WhenWhere.scss'
 
 import Calendar from '../../CalendarComponents/Calendar/Calendar';
 import { useCache } from '../../../CacheContext';
-import { addQueryHelper, removeQueryHelper, getCurrentWeek, getNextWeek, getPreviousWeek } from './WhenWhereHelpers';
+import { addQueryHelper, removeQueryHelper, getCurrentWeek, getNextWeek, getPreviousWeek, getDateTime } from './WhenWhereHelpers';
 import DayColumn from '../../CalendarComponents/DayColumn/DayColumn';
 import { useNotification } from '../../../NotificationContext';
 import { Icon } from '@iconify-icon/react/dist/iconify.mjs';
@@ -21,6 +21,8 @@ function WhenWhere({next, visible, setInfo}){
     const [query, setQuery] = useState({'S': [],'M': [],'T': [],'W': [],'R': [],'F': [], "H": []});
     const [nextActive, setNextActive] = useState(false);    
     const [dateRange, setDateRange] = useState(getCurrentWeek());
+    
+    const days = ["S", "M", "T", "W", "R", "F", "H"];
 
     const addQuery = (key, value) => addQueryHelper(key, value, setQuery);
     const removeQuery = (key, value) => removeQueryHelper(key, value, setQuery);
@@ -54,13 +56,14 @@ function WhenWhere({next, visible, setInfo}){
             } else {
                 setNextActive(true);
                 const singleQuery = Object.values(query).flat()[0];
-                const key = Object.keys(query).find(key => query[key].includes(singleQuery));
-                console.log(key); 
+                const index = days.indexOf(Object.keys(query).find(key => query[key].includes(singleQuery)));
+                console.log(getDateTime(dateRange[index][1], singleQuery.start_time));
                 setInfo(prev => ({
                     ...prev,
-                    start_time: singleQuery.start_time,
-                    end_time: singleQuery.end_time,
+                    start_time: getDateTime(dateRange[index][1], singleQuery.start_time),
+                    end_time: getDateTime(dateRange[index][1], singleQuery.end_time),
                 }));
+
             }
         } else {
             setNextActive(false);

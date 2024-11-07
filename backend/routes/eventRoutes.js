@@ -4,6 +4,7 @@ const { verifyToken, verifyTokenOptional } = require('../middlewares/verifyToken
 const Event = require('../schemas/event');
 const User = require('../schemas/user');
 const Classroom = require('../schemas/classroom');
+const OIEStatus = require('../schemas/OIE');
 
 router.post('/create-event', verifyToken, async (req, res) => {
     const user_id = req.user.userId;
@@ -12,9 +13,25 @@ router.post('/create-event', verifyToken, async (req, res) => {
         ...req.body,
         hostingId : user_id,
         hostingType : 'User',
+
     });
+    
+    let OIE = null;
+
+    if (event.expectedAttendance > 200 || event.OIEAcknowledgementItems && event.OIEAcknowledgementItems.length > 0) {
+        event.OIEStatus = "Pending";
+        OIE = new OIEStatus({
+            eventRef: event._id,
+            status: 'Pending',
+            checkListItems: event.OIEAcknowledgementItems
+        });
+    }
+
     try {
         await event.save();
+        if (OIE) {
+            await OIE.save();
+        }
         console.log('POST: /create-event successful');
         res.status(201).json({
             success: true,

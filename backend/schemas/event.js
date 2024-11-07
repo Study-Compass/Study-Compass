@@ -49,6 +49,28 @@ const eventSchema = new mongoose.Schema({
         type: Schema.Types.ObjectId,
         ref: 'Classroom'
     },
+    visibility:{
+        type:String,
+        required:true,
+    },
+    expectedAttendance:{
+        type:Number,
+        required:true,
+    },
+    OIEStatus:{
+        type:String,
+        required:true,
+        enum: ['Pending', 'Approved', 'Rejected', 'Not Applicable'],
+        default: 'Not Applicable'
+    },
+    OIEReference: {
+        type: Schema.Types.ObjectId,
+        ref: 'OIEStatus'
+    },
+    OIEAcknowledgementItems: {
+        type: Array,
+        default: []
+    }
 
 }, {
     timestamps: true // automatically adds 'createdAt' and 'updatedAt' fields

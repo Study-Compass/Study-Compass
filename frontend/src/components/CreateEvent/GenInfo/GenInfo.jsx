@@ -16,7 +16,7 @@ function GenInfo({next, visible, setInfo}){
     const [image, setImage] = useState(null);
 
     useEffect(()=>{
-        if(title && eventType && visibility){
+        if(title && eventType && visibility && expectedAttendance){
             setNextActive(true);
         }
         setInfo(prev => ({
@@ -29,7 +29,7 @@ function GenInfo({next, visible, setInfo}){
             image
         }));
     }
-    ,[title, description, eventType, visibility, image]);
+    ,[title, description, eventType, visibility, image, expectedAttendance]);
 
     const handleChange = (e) => {
         const {name, value} = e.target;
