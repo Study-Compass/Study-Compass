@@ -71,7 +71,8 @@ router.get('/get-all-events', verifyTokenOptional, async (req, res) => {
     try {
         // const events = await Event.find({}).populate('classroom_id');
         //get all events, attach user object to the event
-        const events = await Event.find({}).populate('classroom_id').populate('hostingId');
+        //mkae sure event doesn't have rejected or pending status
+        const events = await Event.find({ OIEStatus: { $nin: ['Rejected', 'Pending'] } }).populate('classroom_id');
         console.log('GET: /get-all-events successful');
         res.status(200).json({
             success: true,
@@ -150,6 +151,31 @@ router.delete('/delete-event/:event_id', verifyToken, async (req, res) => {
             message: 'Event deleted successfully.'
         });
     } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+});
+
+//get all oie-unapproved events
+router.get('/oie/get-pending-events', verifyToken, async (req, res) => {
+    try {
+        const user = await User.findById(req.user.userId);
+        if (!user || !user.admin) {
+            return res.status(403).json({
+                success: false,
+                message: 'You are not authorized to view this page.'
+            });
+        }
+        const events = await Event.find({ OIEStatus: 'Pending' }).populate('classroom_id').populate('hostingId');
+        console.log('GET: /oie/get-pending-events successful');
+        res.status(200).json({
+            success: true,
+            events
+        });
+    } catch (error) {
+        console.log('GET: /oie/get-pending-events failed', error);
         res.status(500).json({
             success: false,
             message: error.message

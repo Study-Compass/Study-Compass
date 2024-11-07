@@ -1,3 +1,5 @@
+import axios from 'axios';
+
 const createEvent = async (body) => {
     try{
         const response = await axios.post('/create-event', body , {

@@ -1,8 +1,6 @@
 :root{
     --oie-background: #EFEFEF
 }
-
-
 .oie-dash{
     overflow: hidden;
     height:100vh;
@@ -53,6 +51,7 @@
                 box-sizing: border-box;
                 padding: 0 8px;
                 li{
+                    cursor: pointer;
                     display:flex;
                     align-items: center;
                     justify-content: flex-start;
@@ -62,6 +61,18 @@
                         background-color: var(--background);
                         border-radius: 10px;
                         border: 1px solid var(--lightborder)
+                    }
+
+                    .icon-container{
+                        display:flex;
+                        align-items: center;
+                        justify-content: center;
+                        width:25px;
+                        height:25px;
+                        iconify-icon{
+                            color: var(--text);
+                            font-size: 20px;
+                        }
                     }
                     
                     img{
