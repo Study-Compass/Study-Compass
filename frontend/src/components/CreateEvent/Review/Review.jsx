@@ -10,7 +10,7 @@ function Review({info, visible}){
         <div className={`review create-component ${visible && "visible"}`}>
             <h1>review</h1>
             <div className="preview">
-                {info.name}
+                {info.name && info.start_time}
                 <Event event={info}/>
             </div>
         </div>

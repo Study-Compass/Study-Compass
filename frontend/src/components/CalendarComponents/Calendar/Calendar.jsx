@@ -46,13 +46,13 @@ function Calendar({className, data, isLoading, addQuery, removeQuery, query, wee
                 {
                     dateRange ?
                     <div className={`Calendar-header ${weekend && "weekend"}`}>
-                        <p>{dateRange[0]}</p>
-                        <p>{dateRange[1]}</p>
-                        <p>{dateRange[2]}</p>
-                        <p>{dateRange[3]}</p>
-                        <p>{dateRange[4]}</p>
-                        <p>{dateRange[5]}</p>
-                        <p>{dateRange[6]}</p>
+                        <p>{dateRange[0][0]}</p>
+                        <p>{dateRange[1][0]}</p>
+                        <p>{dateRange[2][0]}</p>
+                        <p>{dateRange[3][0]}</p>
+                        <p>{dateRange[4][0]}</p>
+                        <p>{dateRange[5][0]}</p>
+                        <p>{dateRange[6][0]}</p>
                     </div>
                     : ""
                 }

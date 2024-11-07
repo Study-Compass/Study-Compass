@@ -56,7 +56,7 @@ function CreateEvent(){
                     </div>
                     <div className="create-workspace">
                         <GenInfo next={nextStep} visible={step === 0} setInfo={setInfo}/>
-                        <WhenWhere next={nextStep} visible={step === 1}/>
+                        <WhenWhere next={nextStep} visible={step === 1} setInfo={setInfo}/>
                         <Review next={nextStep} visible={step === 2} info={info}/>
                     </div>
                 </div>

@@ -15,12 +15,12 @@ const eventSchema = new mongoose.Schema({
         type: Schema.Types.ObjectId,
         required: true,
         refPath: 'hostingType'
-      },
-      hostingType: {
+    },
+    hostingType: {
         type: String,
         required: true,
         enum: ['User', 'Club']
-      },
+    },
     going:{
         type:Array,
         default:[],
@@ -39,7 +39,7 @@ const eventSchema = new mongoose.Schema({
     },
     description:{
         type:String,
-        required:true,
+        required:false,
     },
     image:{
         type:String,

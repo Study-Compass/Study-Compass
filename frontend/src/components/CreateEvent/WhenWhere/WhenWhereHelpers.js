@@ -59,4 +59,42 @@ const removeQueryHelper = (key, value, setQuery) => {
     // Check if all keys in the query object have empty arrays and update `noQuery` accordingly.
 }
 
-export { addQueryHelper, removeQueryHelper };
+function getCurrentWeek() {
+    const today = new Date();
+    const startOfWeek = new Date(today);
+    startOfWeek.setDate(today.getDate() - today.getDay()); // Start on Sunday
+
+    const week = [];
+
+    for (let i = 0; i < 7; i++) {
+        const date = new Date(startOfWeek);
+        date.setDate(startOfWeek.getDate() + i);
+        
+        const monthDayString = `${date.getMonth() + 1}/${date.getDate()}`; // MM/DD format
+        week.push([monthDayString, date]);
+    }
+
+    return week;
+}
+
+function getNextWeek(currentWeek) {
+    return currentWeek.map(([monthDayString, date]) => {
+        const nextDate = new Date(date);
+        nextDate.setDate(date.getDate() + 7);
+        
+        const nextMonthDayString = `${nextDate.getMonth() + 1}/${nextDate.getDate()}`;
+        return [nextMonthDayString, nextDate];
+    });
+}
+
+function getPreviousWeek(currentWeek) {
+    return currentWeek.map(([monthDayString, date]) => {
+        const previousDate = new Date(date);
+        previousDate.setDate(date.getDate() - 7);
+        
+        const prevMonthDayString = `${previousDate.getMonth() + 1}/${previousDate.getDate()}`;
+        return [prevMonthDayString, previousDate];
+    });
+}
+
+export { addQueryHelper, removeQueryHelper, getNextWeek, getPreviousWeek, getCurrentWeek };

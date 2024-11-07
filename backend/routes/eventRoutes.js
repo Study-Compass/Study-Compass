@@ -6,20 +6,12 @@ const User = require('../schemas/user');
 const Classroom = require('../schemas/classroom');
 
 router.post('/create-event', verifyToken, async (req, res) => {
-    const { name, type, hosting, location, start_time, end_time, description, image, classroom_id } = req.body;
     const user_id = req.user.userId;
 
     const event = new Event({
-        name,
-        type,
+        ...req.body,
         hostingId : user_id,
         hostingType : 'User',
-        location,
-        start_time,
-        end_time,
-        description,
-        image,
-        classroom_id
     });
     try {
         await event.save();
