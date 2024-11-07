@@ -32,6 +32,8 @@
                         &:focus {
                             outline: none;
                         }
+                        color:var(--text);  
+                        
                     }
                 }
 
@@ -60,11 +62,17 @@
                     font-size: 14px;
                     font-weight: 500;
                     width: 100%;
+                    color:var(--text);
                     
                     background-color: transparent;
                     margin: 0;
                     &:focus {
                         outline: none;
+                    }
+
+                    &::placeholder {
+                        color: var(--darkborder);
+                        font-weight:400;
                     }
                 }
 

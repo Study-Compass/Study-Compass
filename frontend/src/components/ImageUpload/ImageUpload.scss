@@ -12,10 +12,20 @@
     padding-top:20px;
     position: relative;
 
+    &.active{
+        background-color: var(--translucent);
+    }
+
     iconify-icon{
         font-size: 40px;
         color: var(--lightborder);
         transition: all 0.3s;
+    }
+
+    img{
+        max-width:80%;
+        border-radius: 10px;
+        box-shadow: var(--shadow);
     }
 
     &.drag-over{

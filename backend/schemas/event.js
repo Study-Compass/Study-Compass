@@ -29,7 +29,11 @@ const eventSchema = new mongoose.Schema({
         type:String,
         required:true,
     },
-    date:{
+    start_time:{
+        type:Date,
+        required:true,
+    },
+    end_time:{
         type:Date,
         required:true,
     },

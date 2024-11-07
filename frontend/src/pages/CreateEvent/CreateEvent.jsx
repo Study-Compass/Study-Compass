@@ -10,6 +10,7 @@ import Review from '../../components/CreateEvent/Review/Review';
 
 function CreateEvent(){
     const [step, setStep] = useState(0);
+    const [info, setInfo] = useState({});
     
     const nextStep = () => {
         setStep(step+1);
@@ -54,7 +55,9 @@ function CreateEvent(){
                         </div>
                     </div>
                     <div className="create-workspace">
-                        {renderStep()}
+                        <GenInfo next={nextStep} visible={step === 0} setInfo={setInfo}/>
+                        <WhenWhere next={nextStep} visible={step === 1}/>
+                        <Review next={nextStep} visible={step === 2} info={info}/>
                     </div>
                 </div>
             </div>
