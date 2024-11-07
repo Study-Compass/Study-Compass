@@ -97,4 +97,19 @@ function getPreviousWeek(currentWeek) {
     });
 }
 
-export { addQueryHelper, removeQueryHelper, getNextWeek, getPreviousWeek, getCurrentWeek };
+function getDateTime(dayObject, minutesFromMidnight) {
+    // Clone the day object to avoid modifying the original date
+    const targetDate = new Date(dayObject);
+
+    // Calculate hours and minutes from minutesFromMidnight
+    const hours = Math.floor(minutesFromMidnight / 60);
+    const minutes = minutesFromMidnight % 60;
+
+    // Set the hours and minutes
+    targetDate.setHours(hours, minutes, 0, 0);
+
+    return targetDate;
+}
+
+
+export { addQueryHelper, removeQueryHelper, getNextWeek, getPreviousWeek, getCurrentWeek, getDateTime };
