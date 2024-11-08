@@ -4,6 +4,7 @@ import OIEGradient from '../../../assets/ClubGradient.png';
 import { getAllEvents } from '../../../components/EventsViewer/EventHelpers';
 import clubEvent from '../ClubEventsComponents/Event/ClubEvent';
 import people from '../../../assets/people.svg'
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 
 function Dash({expandedClass}){
 
@@ -51,7 +52,7 @@ function Dash({expandedClass}){
                 <div className="column">
                 <h1>meetings coming up</h1>
                 <div className="content meeting">
-                        <h2>Random Student Event <button>manage</button></h2>
+                        <h2>Random Student Event <button><Link to="/meeting" >details</Link></button> </h2>
                 </div>
 
                </div>

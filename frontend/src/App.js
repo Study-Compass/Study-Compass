@@ -17,6 +17,7 @@ import QR from './pages/QR/QR';
 import Admin  from './pages/Admin/Admin';
 import OIEDash from './pages/OIEDash/OIEDash';
 import ClubDash from './pages/ClubDash/ClubDash';
+import EventMeeting from './pages/ClubDash/ClubEventsComponents/EventMeeting/EventMeeting';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './AuthContext';
 import { CacheProvider } from './CacheContext';
@@ -81,6 +82,7 @@ function App() {
                                             <Route path="/events" element={<Events/>}/>
                                             <Route path="/oie-dashboard" element={<OIEDash/>}/>
                                             <Route path="/club-dashboard" element={<ClubDash/>}/>
+                                            <Route path="/meeting" element={<EventMeeting/>}/>
                                             
                                         </Route>
                                     </Routes>

@@ -1,0 +1,101 @@
+.eventmeeting{
+
+    .back{
+        padding-top: 10px;
+        padding-left: 10px;
+        button{
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            height: 25px;
+            border-radius: 7px;
+            background-color: var(--light);
+            width: fit-content;
+            border: 1px solid var(--lightborder);
+            gap: 8px;
+
+            img{
+                height: 15px;
+            }
+        }
+
+
+    }
+
+    .center{
+        display: flex;
+        flex-direction: left;
+        margin-top: 50px;
+        margin-left: 80px;
+        padding: 0px 50px;
+
+        .circle{
+            display:flex;
+            flex-direction: row;
+            height: 100px;
+            width:100px;
+            justify-content: left;
+            align-content: flex-start;
+            background-color: black; 
+            border-radius: 50%;
+        }
+
+        .info{
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            padding-left: 10px;
+            font-family: Inter, sans-serif;
+            // color: black;
+            position: relative;
+
+            &.title{
+                font-size: 25px;
+            }
+
+            &.time{ 
+                display: flex;
+                flex-direction: row;
+                font-size: 15px;
+                align-items: center;
+                gap: 5px;
+
+                img{
+                    height: 22px;
+                }
+
+                &.ongoing{
+                    display: flex;
+                    flex-direction: row;
+                    align-items: center;
+                    gap: 10px;
+                    font-size: 10px;
+                    color: green;
+
+                    .circle{
+                        
+                        height: 5px;
+                        width:5px;
+                        justify-content: left;
+                        align-content: flex-start;
+                        background-color: green; 
+                        border-radius: 50%;
+
+                    }
+                }
+            }
+        }
+
+       
+
+
+
+
+
+    }
+
+
+
+
+
+}
