@@ -41,7 +41,7 @@ function DayColumn({day, dayEvents, eventColors, empty, add, remove, queries}){
             return;
         }
         setIsSelecting(false);
-
+        
         let timeslot = {
             class_name: "search",
             start_time: stringifyTime((selectionStart-1)/4 + 7),
@@ -56,6 +56,14 @@ function DayColumn({day, dayEvents, eventColors, empty, add, remove, queries}){
             setSelectionEnd(temp);
             
         }
+
+        //check if this conflicts with any dayEvents
+        for(let i = 0; i < dayEvents.length; i++){
+            if(dayEvents[i].start_time < timeslot.end_time && dayEvents[i].end_time > timeslot.start_time){
+                return;
+            }
+        }
+        
 
         add(day, timeslot);
     };

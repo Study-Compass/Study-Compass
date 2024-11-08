@@ -96,7 +96,7 @@ function Classroom({ room, state, setState, schedule, roomName, width, setShowMo
     const handleCheckOutEvent = (data) => {
         if (data.classroomId === room._id) {
             reload();
-        }
+    }
     };
 
     useEffect(() => {

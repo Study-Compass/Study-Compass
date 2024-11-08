@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import './Event.css';
+import './Event.scss';
 import { useNavigate } from 'react-router-dom';
 import Popup from '../../../../Popup/Popup';
-import FullEvent from '../FullEvent/FullEvent'
+import FullEvent from '../FullEvent/FullEvent';
+import { Icon } from '@iconify-icon/react/dist/iconify.mjs';
 
 function Event({event}){
     const [popupOpen, setPopupOpen] = useState(false);
@@ -16,7 +17,7 @@ function Event({event}){
         setPopupOpen(false);
     }
 
-    const date = new Date(event.date);
+    const date = new Date(event.start_time);
     
 
     return(
@@ -27,11 +28,14 @@ function Event({event}){
             {event.image && <img src={event.image} alt="" />}
             <div className="info">
                 <h1>{event.name}</h1>
-                {/* <p>{event.location }</p> */}
-                {/* display date in day of the week, month/day */}
-                <p>{date.toLocaleString('default', {weekday: 'long'})}, {date.toLocaleString('default', {month: 'long'})} {date.getDate()}</p>
-                {/* time */}
-                <p>{date.toLocaleString('default', {hour: 'numeric', minute: 'numeric', hour12: true})}</p>
+                <div className="row">
+                    <Icon icon="heroicons:calendar-16-solid" />
+                    <p>{date.toLocaleString('default', {hour: 'numeric', minute: 'numeric', hour12: true})}   {date.toLocaleString('default', {weekday: 'long'})}, {date.toLocaleString('default', {month: 'long'})} {date.getDate()}</p>
+                </div>
+                <div className="row">
+                    <Icon icon="fluent:location-28-filled" />
+                    <p>{event.location}</p>
+                </div>
             </div>
         </div>
     );

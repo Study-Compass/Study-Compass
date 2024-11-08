@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import './OIEFullEvent.scss';
 import {Icon} from '@iconify-icon/react';  
 import StarGradient from '../../../../assets/OIE-Gradient2.png';
+import MockPoster from '../../../../assets/MockPoster.png';
+
 
 function OIEFullEvent({ event }){
     const navigate = useNavigate();
@@ -15,7 +17,7 @@ function OIEFullEvent({ event }){
     return(
         <div className="full-event">
             <div className="image">
-                <img src={event.image} alt="" />
+                <img src={event.image ? event.image : MockPoster} alt="" />
             </div>
             <div className="content">
             <h1>{event.name}</h1>

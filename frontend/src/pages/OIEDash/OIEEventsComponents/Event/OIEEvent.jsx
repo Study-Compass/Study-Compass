@@ -18,7 +18,7 @@ function OIEEvent({event}){
         setPopupOpen(false);
     }
 
-    const date = new Date(event.date);
+    const date = new Date(event.start_time);
     
 
     return(
@@ -31,17 +31,20 @@ function OIEEvent({event}){
                 {/* <p>{event.location }</p> */}
                 {/* display date in day of the week, month/day */}
                 <div className="row">
-                    <img src={event.user_id.image ? event.user_id.image : defaultAvatar} alt="" />
-                    <p className="user-name">{event.user_id.name}</p>
+                    <img src={event.hostingId.image ? event.hostingId.image : defaultAvatar} alt="" />
+                    <p className="user-name">{event.hostingId.name}</p>
+                    <div className="level">
+                        student
+                    </div>
                 </div>
                 <div className="row">
                     <Icon icon="heroicons:calendar-16-solid" />
                     <p>{date.toLocaleString('default', {weekday: 'long'})} {date.toLocaleString('default', {month: 'numeric'})}/{date.getDate()}</p>
+                </div>
+                <div className="row">
                     <Icon icon="fluent:location-28-filled" />
                     <p>{event.location}</p>
                 </div>
-                {/* time */}
-                {/* <p>{date.toLocaleString('default', {hour: 'numeric', minute: 'numeric', hour12: true})}</p> */}
             </div>
             <button className="button" onClick={() => handleEventClick(event)}>
                 <Icon icon="material-symbols:expand-content-rounded" />

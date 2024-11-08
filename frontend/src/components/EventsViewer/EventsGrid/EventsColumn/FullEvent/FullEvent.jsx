@@ -10,7 +10,8 @@ function FullEvent({ event }){
     const handleEventClick = () => {
         navigate(`/create-event`);
     }
-    const date = new Date(event.date);
+    const date = new Date(event.start_time);
+    const dateEnd = new Date(event.end_time);
 
     return(
         <div className="full-event">
@@ -18,13 +19,18 @@ function FullEvent({ event }){
                 <img src={event.image} alt="" />
             </div>
             <div className="content">
-            <h1>{event.name}</h1>
-                {/* <p>{event.location }</p> */}
-                {/* display date in day of the week, month/day */}
-                <p>{date.toLocaleString('default', {weekday: 'long'})}, {date.toLocaleString('default', {month: 'long'})} {date.getDate()}</p>
-                {/* time */}
-                <p>{date.toLocaleString('default', {hour: 'numeric', minute: 'numeric', hour12: true})}</p>
-
+                <h1>{event.name}</h1>
+                <div className="row">
+                    <Icon icon="heroicons:calendar-16-solid" />
+                    <div className="col">
+                        <p>{date.toLocaleString('default', {weekday: 'long'})}, {date.toLocaleString('default', {month: 'long'})} {date.getDate()}</p>
+                        <p>{date.toLocaleString('default', {hour: 'numeric', minute: 'numeric', hour12: true})} -  {dateEnd.toLocaleString('default', {hour: 'numeric', minute: 'numeric', hour12: true})}</p>
+                    </div>
+                </div>
+                <div className="row">
+                    <Icon icon="fluent:location-28-filled" />
+                    <p>{event.location[0]}</p>
+                </div>
             </div>
             <img src={StarGradient} alt="" className="gradient" />
         </div>

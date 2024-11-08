@@ -12,9 +12,9 @@ import Dash from './Dash/Dash';
 function OIEDash(){
     const [expanded, setExpanded] = useState(false);
     const [expandedClass, setExpandedClass] = useState("");
-    const{isAuthenticated, isAuthenticating, user} = useAuth();
+    const {isAuthenticated, isAuthenticating, user} = useAuth();
     const navigate  = useNavigate();
-    const [userInfo, setUserInfo] = useState(null);
+    const [userInfo, setUserInfo] = useState({});
 
     useEffect(()=>{
         if(isAuthenticating){
@@ -49,7 +49,6 @@ function OIEDash(){
         }
     }
 
-
     return (
         <div className="oie-dash">
             <div className={`dash-left ${expanded && "hidden"}`}>
@@ -64,8 +63,10 @@ function OIEDash(){
                             <p>Dashboard</p>
                         </li>
                         <li className=''>
-                            <img src={Dashboard} alt="" />
-                            <p>Dashboard</p>
+                            <div className="icon-container">
+                                <Icon icon="heroicons:calendar-16-solid" />
+                            </div>
+                            <p>Event Calendar</p>
                         </li>
                     </ul>
                 </nav>
@@ -79,6 +80,5 @@ function OIEDash(){
         </div>
     )
 }
-
 
 export default OIEDash;

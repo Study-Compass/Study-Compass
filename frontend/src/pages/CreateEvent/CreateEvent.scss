@@ -6,8 +6,8 @@
         justify-content: center;
         align-items: center;
         width:100%;
-        height:calc(100% - 115px);
-        max-height:calc(100% - 115px);
+        height:calc(100% - 80px);
+        max-height:calc(100% - 80px);
         padding: 20px 20px 40px 20px;
         box-sizing: border-box;
         flex-grow:1;
@@ -26,6 +26,8 @@
             flex-grow: 1;
             .create-steps{
                 height: calc(100% - 20px);
+                width:180px;
+                min-width: 180px;
                 background-color: var(--lighter);
                 margin: 10px;
                 border-radius: 15px;
