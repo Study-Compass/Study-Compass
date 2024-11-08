@@ -206,14 +206,12 @@ router.get('/getFriends', verifyToken, async (req, res) => {
 
         const friendIds = friends.map(friend => friend._id);
 
-        // Fetch friends objects
         const friendsObjects = await User.find({
-            _id: { $in: friendIds }
+            _id: { $in: friendIds.map(id => new mongoose.Types.ObjectId(id)) }
         });
 
-        // Fetch check-in information for all friends - need to double check this is correct checked-in syntax
         const checkedInFriends = await Classroom.find(
-            { checked_in: { $in: friendIds } },
+            { checked_in: { $in: friendIds.map(id => new mongoose.Types.ObjectId(id)) } },
             { checked_in: 1, _id: 1 }
         );
 
@@ -224,7 +222,6 @@ router.get('/getFriends', verifyToken, async (req, res) => {
             });
         });
 
-        // Attach check-in information to each friend - need to double check this is reformatted correctly.
         const friendsWithCheckInData = friendsObjects.map(friend => {
             const friendData = friend.toObject();
             const classroomId = checkedInMap.get(friend._id.toString());
