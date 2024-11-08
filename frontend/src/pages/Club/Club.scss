@@ -1,0 +1,76 @@
+.club-page {
+    padding: 20px;
+    color: black;
+    font-family: satoshi;
+}
+
+.top-header-box {
+    display: flex;
+    align-items: center;
+    max-width: 900px;
+    width: 100%;
+    padding: 20px;
+    background-color: #9d8484;
+    border-radius: 10px;
+    margin: 0 auto 20px;
+    color: #fff;
+
+}
+
+.club-logo {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 120px;
+    height: 120px;
+    background-color: #ccc;
+    border-radius: 50%;
+    margin-right: 20px;
+    
+}
+
+.club-header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+}
+
+.name {
+    font-size: 24px;
+    font-weight: bold;
+    margin: 0;
+}
+
+.status {
+    color: #ff5c5c;
+    font-weight: bold;
+    font-size: 12px;
+    padding-left: 10px;
+
+}
+
+.description {
+    margin: 10px 0;
+}
+
+.actions {
+    display: flex;
+    gap: 10px;
+    margin: 10px 0;
+
+    button{
+        padding: 6px 20px;
+        border: none;
+        border-radius: 5px;
+        font-weight: bold;
+        cursor: pointer;
+        background-color: var(--red);
+    }
+
+}
+.club-stats {
+    margin-top: 10px;
+    color: #666;
+}
+
