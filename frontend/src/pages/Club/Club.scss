@@ -17,6 +17,10 @@
 
 }
 
+.club-info{
+    padding-left: 170px;
+}
+
 .club-logo {
     display: flex;
     justify-content: center;
@@ -26,6 +30,13 @@
     background-color: #ccc;
     border-radius: 50%;
     margin-right: 20px;
+    transform: translate(80px) img;
+
+    img{
+        width: 120%;
+        // height: 100px;
+        padding-top: 170px;
+    }
     
 }
 

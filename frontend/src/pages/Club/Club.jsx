@@ -1,7 +1,7 @@
 import React from 'react';
 import './Club.scss';
 import Header from '../../components/Header/Header';
-// import rpiLogo from "./assets/Icon/rpiLogo.svg";
+import rpiLogo from "../../assets/Icons/rpiLogo.svg";
 
 
 const Club = () => {
@@ -10,13 +10,14 @@ const Club = () => {
             <Header />
             <div className="top-header-box">
                 <div className="club-logo">
-                    <img src="rpiLogo" alt=""/>
+                    <img src={rpiLogo} alt=""/>
                 </div>
+            </div>
                 <div className="club-info">
 
                     <div className="club-header">
                         <h2 className="name">Club Name</h2>
-                        <span className="status">Union Recognized</span>
+                        <div className="status">Union Recognized</div>
                     </div>
 
                     <p className="description">
@@ -27,10 +28,9 @@ const Club = () => {
                         <button>Follow</button>
                     </div>
                     <div className="stats">
-                        <span>250 followers • 50 members</span>
+                        <div>250 followers • 50 members</div>
                     </div>
                 </div>
-            </div>
 
             
         </div>
