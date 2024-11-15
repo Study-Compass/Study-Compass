@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState} from 'react';
 import './ClubDash.scss';
 import useAuth from '../../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
@@ -8,6 +8,8 @@ import { getAllEvents } from '../../components/EventsViewer/EventHelpers';
 
 import {Icon} from '@iconify-icon/react';  
 import Dash from './Dash/Dash';
+import Members from './Members/Members';
+import { set } from 'mongoose';
 
 function ClubDash(){
     const [expanded, setExpanded] = useState(false);
@@ -15,6 +17,25 @@ function ClubDash(){
     const{isAuthenticated, isAuthenticating, user} = useAuth();
     const navigate  = useNavigate();
     const [userInfo, setUserInfo] = useState(null);
+    const [members, setMembers] = useState(false);
+    const [dash, setDash] = useState(true);
+
+    
+    function toggleMembers(){
+        if (!members){
+            setMembers(true);
+            setDash(false);
+        }
+
+    }
+
+    function toggleDash(){
+        if (!dash){
+            setDash(true);
+            setMembers(false);
+        }
+    }
+
 
     useEffect(()=>{
         if(isAuthenticating){
@@ -56,19 +77,22 @@ function ClubDash(){
                 </div>
                 <nav className="nav">
                     <ul>
-                        <li className='selected'>
+                        <li className= {`${dash ? 'selected' : ''}`} onClick={toggleDash}>
                             <img src={Dashboard} alt="" />
                             <p>Dashboard</p>
                         </li>
-                        <li className=''>
+                        <li className={`${members ? 'selected' : ''}`}  onClick = {toggleMembers}>
                             <img src={Dashboard} alt="" />
-                            <p>Dashboard</p>
+                            <p>Members</p>
                         </li>
                     </ul>
                 </nav>
             </div>
             <div className={`dash-right ${expandedClass}`}>
-                <Dash expandedClass={expandedClass}/>
+                {
+                   
+                    members ? <Members expandedClass = {expandedClass}/> :  dash ? <Dash expandedClass={expandedClass}/> : ''
+                }
                 <div className={`expand`} onClick={onExpand}>
                     <Icon icon="material-symbols:expand-content-rounded" />
                 </div>
