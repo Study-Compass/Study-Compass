@@ -4,9 +4,12 @@ import './Popup.scss'; // Assuming this contains your animation and styling
 import useOutsideClick from '../../hooks/useClickOutside';
 import X from '../../assets/x.svg';
 
-const Popup = ({ children, isOpen, onClose, defaultStyling=true, customClassName="" }) => {
+const Popup = ({ children, isOpen, onClose, defaultStyling=true, customClassName="", popout=false }) => {
     const [render, setRender] = useState(isOpen);
     const [show, setShow] = useState(false);
+
+    const [topPosition, setTopPosition] = useState(null);
+    const [rightPosition, setRightPosition] = useState(null);
 
   const ref = useRef();
 
@@ -25,6 +28,18 @@ const Popup = ({ children, isOpen, onClose, defaultStyling=true, customClassName
         setShow(true);
     }, 100);
   },[render]);
+
+  useEffect(() => {
+    setTimeout(() => {
+        if(ref.current){
+            const rect = ref.current.getBoundingClientRect();
+            setTopPosition(rect.top);
+            setRightPosition(rect.right);
+        }
+    }, 300);
+
+  }, [show, ref.current]);
+
 
   const handleClose = () => {
     setShow(false);
@@ -47,8 +62,9 @@ const Popup = ({ children, isOpen, onClose, defaultStyling=true, customClassName
 
   return ReactDOM.createPortal(
     <div className={`popup-overlay ${show ? 'fade-in' : 'fade-out'}`}>
+        {popout && <img src={X} alt="" onClick={handleClose} className={`close-popup popout`} style={{left:rightPosition + 10, top:topPosition}} />}
       <div className={`popup-content ${show ? 'slide-in' : 'slide-out'} ${defaultStyling ? "" : "no-styling"} ${customClassName}`} ref={ref}>
-        <img src={X} alt="" onClick={handleClose} className="close-popup" />
+        {!popout && <img src={X} alt="" onClick={handleClose} className={`close-popup`} /> }
         {renderChildrenWithClose()} {/* Render children with handleClose prop */}
       </div>
     </div>,

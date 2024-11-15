@@ -45,7 +45,7 @@ function Dash({expandedClass}){
                 <div className="content">
                     {
                         pendingEvents.map((event, index) => {
-                            if(index < 3){
+                            if(index < 5){
                                 return (
                                     <OIEEvent event={event} key={index}/>
                                 )

@@ -12,6 +12,26 @@
     opacity: 0;
   }
 
+  .popup-content-overlay{
+    background-color: white;
+    padding: 20px;
+    border-radius: 20px;
+    position: absolute;
+    max-width:500px;
+    box-sizing: border-box;
+    display:flex;
+    flex-direction: column;
+    height:fit-content;
+    /* opacity: 0; */   
+    margin: 0 20px;
+    overflow:hidden;
+
+    &.wide-content{
+      max-width: 1000px;
+      width:95%;
+    }
+  }
+
   
   .popup-overlay .popup-content {
     background-color: white;
@@ -43,6 +63,16 @@
     height:15px;
     top:15px;
     right:15px;
+    z-index: 100;
+  }
+
+  .close-popup.popout{
+    width:15px;
+    height:15px;
+    background-color: var(--background);
+    padding:7px;
+    border-radius:50%;
+    position: absolute;
   }
   
   /* Entry and Exit Animations */

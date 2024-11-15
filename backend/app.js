@@ -77,7 +77,18 @@ app.use(classroomChangeRoutes);
 app.use(ratingRoutes);
 app.use(searchRoutes);
 app.use(eventRoutes);
-app.use(clubRoutes);
+
+
+// Serve static files from the React app in production
+if (process.env.NODE_ENV === 'production') {
+    app.use(express.static(path.join(__dirname, '../frontend/build')));
+
+    // The "catchall" handler: for any request that doesn't match one above, send back React's index.html file.
+    app.get('*', (req, res) => {
+        res.sendFile(path.join(__dirname, '../frontend/build/index.html'));
+    });
+}
+
 //deprecated, should lowk invest in this
 // app.get('/update-database', (req, res) => {
 //     const pythonProcess = spawn('python3', ['courseScraper.py']);
@@ -130,15 +141,6 @@ app.post('/upload-image/:classroomName', upload.single('image'), async (req, res
     }
 });
 
-// Serve static files from the React app in production
-if (process.env.NODE_ENV === 'production') {
-    app.use(express.static(path.join(__dirname, '../frontend/build')));
-
-    // The "catchall" handler: for any request that doesn't match one above, send back React's index.html file.
-    app.get('*', (req, res) => {
-        res.sendFile(path.join(__dirname, '../frontend/build/index.html'));
-    });
-}
 
 // Socket.io functionality
 io.on('connection', (socket) => {

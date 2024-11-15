@@ -78,7 +78,7 @@ function Review({info, visible, setInfo, onSubmit}){
                 {visible && 
                     <div className="publish" onClick={onSubmit}>
                         <div className="info">
-                            <h1>{pspeak || catering ? "request OIE approval" : "publish event"}</h1>
+                            <h1>{pspeak || catering || info.expectedAttendance > 199 ? "request OIE approval" : "publish event"}</h1>
                         </div>
                         <div className="gradient-cover">
                             <img src={GradientButtonCover} alt="" />
