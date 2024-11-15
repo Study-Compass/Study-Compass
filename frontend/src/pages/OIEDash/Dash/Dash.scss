@@ -35,16 +35,20 @@
     .needs-approval{
         display: flex;
         flex-direction: column;
-        gap:10px;
         h1{
             font-size: 20px;
             margin-left:10px;
             margin-bottom:5px;
         }
         .content{
+            padding: 10px 0 20px 0;
             display:flex;
             gap:10px;
-            
+            overflow-x: scroll;
+
+            &::-webkit-scrollbar {
+                height:6px;
+            }
         }
     }
 }

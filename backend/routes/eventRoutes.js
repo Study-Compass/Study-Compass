@@ -183,6 +183,47 @@ router.get('/oie/get-pending-events', verifyToken, async (req, res) => {
     }
 });
 
+router.post('/approve-event', verifyToken, async (req, res) => {
+    const user_id = req.user.userId;
+    const { event_id } = req.body;
+
+    try {
+        const user = await User.findById(user_id);
+        if(!user || !user.admin) {
+            return res.status(403).json({
+                success: false,
+                message: 'You are not authorized to approve events.'
+            });
+        }
+        const event = await Event.findById(event_id);
+        if (!event) {
+            return res.status(404).json({
+                success: false,
+                message: 'Event not found.'
+            });
+        }
+        if (event.OIEStatus !== 'Pending') {
+            return res.status(400).json({
+                success: false,
+                message: 'Event is not pending approval.'
+            });
+        }
+        event.OIEStatus = 'Approved';
+        await event.save();
+        console.log('POST: /approve-event successful');
+        res.status(200).json({
+            success: true,
+            message: 'Event approved successfully.'
+        });
+    } catch (error) {
+        console.log('POST: /approve-event failed', error);
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+});
+
 
 
 module.exports = router;
