@@ -4,6 +4,9 @@ const { isValid, formatISO, parseISO, setHours, startOfWeek, endOfWeek, setMinut
 const Visit = require('../schemas/visit'); 
 const User = require('../schemas/user');
 const QR = require('../schemas/qr');
+const RepeatedVisit = require('../schemas/repeatedVisit');
+const { verifyToken, verifyTokenOptional } = require('../middlewares/verifyToken');
+
 
 // Route to log a visit
 router.post('/log-visit', async (req, res) => {
@@ -12,6 +15,24 @@ router.post('/log-visit', async (req, res) => {
         await visit.save();
         res.status(200).json({ message: 'Visit logged' });
     } catch (error) {
+        res.status(500).json({ message: 'Failed to log visit' });
+    }
+});
+
+router.post('/log-repeated-visit', verifyTokenOptional, async (req, res) => {
+    const { hash } = req.body;
+    try {
+        console.log('Logging repeated visit');
+        let repeatedVisit = await RepeatedVisit.findOne({hash: hash});
+        if(!repeatedVisit){
+            repeatedVisit = new RepeatedVisit({ visits: [new Date()], hash: hash, user_id: req.user ? req.user._id : null });
+        }
+        repeatedVisit.visits.push(new Date());
+        await repeatedVisit.save();
+        console.log('Repeated visit logged');
+        res.status(200).json({ message: 'Visit logged' });
+    } catch (error) {
+        console.error(error);
         res.status(500).json({ message: 'Failed to log visit' });
     }
 });
