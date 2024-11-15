@@ -6,13 +6,16 @@ import rpiLogo from "../../assets/Icons/rpiLogo.svg";
 
 const Club = () => {
     return (
-        <div className="club-page">
+        <div className="club-page page">
             <Header />
-            <div className="top-header-box">
-                <div className="club-logo">
-                    <img src={rpiLogo} alt=""/>
+            <div className='club-content'>
+
+                <div className="top-header-box">
+                    <div className="club-logo">
+                        <img src={rpiLogo} alt=""/>
+                    </div>
                 </div>
-            </div>
+
                 <div className="club-info">
 
                     <div className="club-header">
@@ -23,16 +26,22 @@ const Club = () => {
                     <p className="description">
                         description of the club blah blah blah blah blah
                     </p>
+                    <p className="stats">
+                        250 followers • 50 members
+                    </p>
                     <div className="actions">
                         <button>Join</button>
                         <button>Follow</button>
                     </div>
-                    <div className="stats">
-                        <div>250 followers • 50 members</div>
-                    </div>
+
                 </div>
 
-            
+                <div className='event-info'>
+                    
+
+                </div>
+
+            </div>
         </div>
     );
 };
