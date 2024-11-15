@@ -24,7 +24,7 @@
     }
 
     &:hover{
-        border:1px solid transparent;
+
     }
 
     &:hover::after{
@@ -69,10 +69,16 @@
             transition: all 0.5s;
 
         }
+        iconify-icon{
+            transition: all 0.5s;
+        }
     }
 
     &:hover .info{
         color: var(--background);
+        iconify-icon{
+            color: var(--background);
+        }
         h1{
             color: var(--background);
         }

@@ -49,8 +49,6 @@ function CreateEvent(){
         console.log(location1);
         const formattedInfo = {
             ...info,
-            location : location1[0],
-            classroomId : location1[1],
             image:null
         }
         const response = await createEvent(formattedInfo);

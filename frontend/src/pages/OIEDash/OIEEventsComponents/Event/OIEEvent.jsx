@@ -23,7 +23,7 @@ function OIEEvent({event}){
 
     return(
         <div className="oie-event-component" >
-            <Popup isOpen={popupOpen} onClose={onPopupClose} customClassName={"wide-content"}>
+            <Popup isOpen={popupOpen} onClose={onPopupClose} customClassName={"wide-content"} >
                 <OIEFullEvent event={event}/>
             </Popup>
             <div className="info">
