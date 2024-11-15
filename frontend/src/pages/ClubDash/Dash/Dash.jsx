@@ -6,9 +6,7 @@ import clubEvent from '../ClubEventsComponents/Event/ClubEvent';
 import people from '../../../assets/people.svg'
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 
-
-
-function Dash({expandedClass}){
+function Dash({expandedClass, openMeeting}){
 
     const [events, setEvents] = useState([]);
 
@@ -54,8 +52,8 @@ function Dash({expandedClass}){
                 </div>
                 <div className="column">
                 <h1>meetings coming up</h1>
-                <div className="content meeting">
-                        <h2>Random Student Event <button><Link to="/meeting" >details</Link></button> </h2>
+                <div className="content meeting" onClick={openMeeting} >
+                        <h2>Random Student Event <button>details</button> </h2>
                 </div>
 
                </div>

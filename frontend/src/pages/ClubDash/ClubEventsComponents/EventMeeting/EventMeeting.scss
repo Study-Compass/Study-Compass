@@ -1,6 +1,8 @@
 .eventmeeting{
     display: flex;
     flex-direction: column;
+    z-index: 1;
+    width: 100%;
 
     .back{
         padding-top: 10px;

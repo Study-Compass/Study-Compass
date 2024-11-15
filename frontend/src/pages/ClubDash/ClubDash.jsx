@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import Dashboard from '../../assets/Icons/Dashboard.svg';
 import logo from '../../assets/red_logo.svg';
 import { getAllEvents } from '../../components/EventsViewer/EventHelpers';
-
+import EventMeeting from './ClubEventsComponents/EventMeeting/EventMeeting';
 import {Icon} from '@iconify-icon/react';  
 import Dash from './Dash/Dash';
 import Members from './Members/Members';
@@ -52,6 +52,21 @@ function ClubDash(){
         }
     }
 
+    const openMeeting = () => {
+        onExpand();
+        setCurrentPage(null);
+        setTimeout(() => {
+            
+            setCurrentPage("meeting");
+        }, 700);
+    }
+
+    const openDash = () => {
+        onExpand();
+        setCurrentPage("dash");
+    }
+
+
 
     return (
         <div className="club-dash">
@@ -76,12 +91,17 @@ function ClubDash(){
             <div className={`dash-right ${expandedClass}`}>
                 {
                     currentPage === "dash" &&
-                    <Dash expandedClass={expandedClass}/> 
+                    <Dash expandedClass={expandedClass} openMeeting={openMeeting}/> 
                 }
                 {
                     currentPage === 'members' && 
                     <Members expandedClass = {expandedClass}/>
                 }
+                 {
+                    currentPage === 'meeting' && 
+                    <EventMeeting expandedClass = {expandedClass} openDash={openDash}/>
+                }
+
                 <div className={`expand`} onClick={onExpand}>
                     <Icon icon="material-symbols:expand-content-rounded" />
                 </div>

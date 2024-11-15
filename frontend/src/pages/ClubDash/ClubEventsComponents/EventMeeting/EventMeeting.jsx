@@ -4,15 +4,16 @@ import { useNavigate, useLocation, Link } from 'react-router-dom';
 import calendar from '../../../../assets/calendar.svg';
 import left from '../../../../assets/arrow-small-left.svg';
 
-function EventMeeting(){
+function EventMeeting({openDash}){
 
     return(
     
         <header className="eventmeeting">
-            <div className="back">
+            <div className="back" onClick={openDash}>
                 <button>
                     <img src={left} alt="" />
                     back to dashboard
+                    <Link to="/club-dashboard" ></Link>
                 </button>          
             </div>
 
