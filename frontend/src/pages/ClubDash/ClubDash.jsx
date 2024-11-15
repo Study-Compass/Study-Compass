@@ -19,7 +19,6 @@ function ClubDash(){
     const [userInfo, setUserInfo] = useState(null);
     const [members, setMembers] = useState(false);
     const [dash, setDash] = useState(true);
-
     
     function toggleMembers(){
         if (!members){
@@ -89,8 +88,7 @@ function ClubDash(){
                 </nav>
             </div>
             <div className={`dash-right ${expandedClass}`}>
-                {
-                   
+                {    
                     members ? <Members expandedClass = {expandedClass}/> :  dash ? <Dash expandedClass={expandedClass}/> : ''
                 }
                 <div className={`expand`} onClick={onExpand}>

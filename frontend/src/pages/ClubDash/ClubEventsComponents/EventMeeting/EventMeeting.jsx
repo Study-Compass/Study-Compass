@@ -13,35 +13,41 @@ function EventMeeting(){
                 <button>
                     <img src={left} alt="" />
                     back to dashboard
-                </button>
-                
+                </button>          
             </div>
 
             <div className="center">
-                <div className="circle">
-                </div>
-
-                <div className="info">
-                    <div className="info title">YDSA Weekly GBM</div>
-                    <div className="info time">
-                        <img src={calendar} alt="" />
-                        Sunday 11/7, 5:00 - 6:00 PM 
-
+                <div className="header">
+                    <div className="circle">
                     </div>
 
-                    <div className="info time ongoing" >
-                        <div className="circle">
+                    <div className="info">
+                        <div className="info title">YDSA Weekly GBM</div>
+                        <div className="info time">
+                            <img src={calendar} alt="" />
+                            Sunday 11/7, 5:00 - 6:00 PM 
                         </div>
-                        ongoing
+
+                        <div className="info time ongoing" >
+                            <div className="circle">
+                            </div>
+                            ongoing
+                        </div>
                     </div>
-
-                   
-
                 </div>
 
-               
+
 
             </div>
+            
+                <div className="agenda">
+                    {/* <div className="agenda body"> */}
+                        <h1>
+                            agenda
+                        </h1> 
+                    {/* </div> */}
+
+                </div>
 
         </header>
     )

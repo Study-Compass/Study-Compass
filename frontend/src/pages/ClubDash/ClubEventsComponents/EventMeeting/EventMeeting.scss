@@ -1,4 +1,6 @@
 .eventmeeting{
+    display: flex;
+    flex-direction: column;
 
     .back{
         padding-top: 10px;
@@ -24,10 +26,16 @@
 
     .center{
         display: flex;
-        flex-direction: left;
+        flex-direction: row;
         margin-top: 50px;
         margin-left: 80px;
-        padding: 0px 50px;
+        // padding: 0px 50px;
+
+        .header{
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+        }
 
         .circle{
             display:flex;
@@ -51,6 +59,7 @@
 
             &.title{
                 font-size: 25px;
+                font-weight: bold;
             }
 
             &.time{ 
@@ -86,7 +95,8 @@
             }
         }
 
-       
+        
+
 
 
 
@@ -94,8 +104,99 @@
 
     }
 
+    .agenda{
+        display: flex;
+        flex-direction: column;
+        // margin-top: 60px;
+        margin: 50px 70px 30px 70px;
+
+        box-sizing: border-box;
+        border-radius: 10px;
+        max-width: 1400px;
+        height: 500px;
+        border: 1px solid var(--lightborder);
+        
+        h1{
+            display: flex;
+            flex-direction: row;
+            font-family: Inter, sans-serif;
+            font-size: 15px;
+            padding-top: 10px;
+            padding-left: 10px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid var(--lightborder);;
+                           
+        }
+
+    
+
+    }
 
 
 
 
+
+}
+
+
+@media (max-width: 500px){
+    .eventmeeting{
+        .back{
+            padding-top: 5px;
+            padding-left: 5px;
+            
+            button{
+                font-size: 10px;
+                height: 20px;
+                gap: 5px;
+
+                img{
+                    height: 10px;
+                }
+                
+            }
+            
+        }
+
+        .center{
+            margin-top: 10px;
+            margin-left: 10px;
+            
+            .circle{
+                height: 80px;
+                width:80px;
+            }
+
+            .info{
+                &.title{
+                    font-size: 20px;
+
+                }
+
+                &.time{
+                    font-size: 12px;
+
+                    img{
+                        height: 18px;
+                    }
+
+                    &.ongoing{
+                        font-size: 8px;
+                    }
+
+                }
+
+
+            }
+        }  
+        
+        .agenda{
+            margin: 20px 20px 3px 20px;
+
+            h1{
+                font-size: 12px;
+            }
+        }
+       
+    }
 }
