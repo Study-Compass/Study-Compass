@@ -20,23 +20,8 @@ function ClubDash(){
     const [members, setMembers] = useState(false);
     const [dash, setDash] = useState(true);
 
+    const [currentPage, setCurrentPage] = useState('dash');
     
-    function toggleMembers(){
-        if (!members){
-            setMembers(true);
-            setDash(false);
-        }
-
-    }
-
-    function toggleDash(){
-        if (!dash){
-            setDash(true);
-            setMembers(false);
-        }
-    }
-
-
     useEffect(()=>{
         if(isAuthenticating){
             return;
@@ -77,11 +62,11 @@ function ClubDash(){
                 </div>
                 <nav className="nav">
                     <ul>
-                        <li className= {`${dash ? 'selected' : ''}`} onClick={toggleDash}>
+                        <li className= {`${currentPage === 'dash' ? 'selected' : ''}`} onClick={()=>setCurrentPage("dash")}>
                             <img src={Dashboard} alt="" />
                             <p>Dashboard</p>
                         </li>
-                        <li className={`${members ? 'selected' : ''}`}  onClick = {toggleMembers}>
+                        <li className={`${currentPage === "members" ? 'selected' : ''}`}  onClick = {()=>setCurrentPage('members')}>
                             <img src={Dashboard} alt="" />
                             <p>Members</p>
                         </li>
@@ -90,8 +75,12 @@ function ClubDash(){
             </div>
             <div className={`dash-right ${expandedClass}`}>
                 {
-                   
-                    members ? <Members expandedClass = {expandedClass}/> :  dash ? <Dash expandedClass={expandedClass}/> : ''
+                    currentPage === "dash" &&
+                    <Dash expandedClass={expandedClass}/> 
+                }
+                {
+                    currentPage === 'members' && 
+                    <Members expandedClass = {expandedClass}/>
                 }
                 <div className={`expand`} onClick={onExpand}>
                     <Icon icon="material-symbols:expand-content-rounded" />
