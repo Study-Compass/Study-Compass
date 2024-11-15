@@ -95,12 +95,13 @@ router.post("/create-club", verifyToken, async(req,res)=>{
 });
 
 
-
+//Adjust Scalabilty 
 router.post("/edit-club", verifyToken, async (req, res) => {
-    try {
-        const { clubId, club_profile_image, club_description, positions, weekly_meeting, club_name } = req.body;
+        const allowedFields=['club_profile_image', 'club_description', 'positions', 'weekly_meeting', 'club_name'];
         const userId = req.user?.userId;
-
+        
+    try {
+        const {clubId, ...updateData}=req.body;
         // Validate that the essential fields are present
         if (!clubId) {
             return res.status(400).json({ success: false, message: "Club ID is required" });
@@ -109,7 +110,6 @@ router.post("/edit-club", verifyToken, async (req, res) => {
         const club = await Club.findById(clubId);
 
         // Check if the club exists
-        console.log
         if (!club) {
             return res.status(404).json({ success: false, message: "Club not found" });
         }
@@ -119,45 +119,33 @@ router.post("/edit-club", verifyToken, async (req, res) => {
             return res.status(400).json({ success: false, message: "You are not authorized to edit this club" });
         }
 
-        // If club_name is provided, clean it and check for inappropriate language
-        if (club_name) {
+      // Loop through the allowed fields list to clean and update them as needed
+      for (const field of allowedFields) {
+        if (updateData[field] !== undefined) {
+            let value = updateData[field];
 
-            const cleanClubName = clean(club_name);
-            
-            if (isProfane(club_name)) {
-                return res.status(400).json({ success: false, message: "Club name contains inappropriate language" });
+            // Check for inappropriate language in each field
+            if (['club_name', 'club_description'].includes(field)) {
+                if (isProfane(value)) {
+                    value = clean(value);
+                    return res.status(400).json({ success: false, message: `${field.replace('_', ' ')} contains inappropriate language` });
+                }
+                value = clean(value);
             }
 
-            // Check if a club with the cleaned name already exists, excluding the current club
-            const clubExist = await Club.findOne({ club_name: cleanClubName });
-            if (clubExist && clubExist._id.toString() !== clubId) {
-                return res.status(400).json({ success: false, message: "Club name already taken" });
+            // For unique fields, perform a duplicate check
+            if (field === 'club_name') {
+                const cleanClubName = value;
+                const clubExist = await Club.findOne({ club_name: cleanClubName });
+                if (clubExist && clubExist._id.toString() !== clubId) {
+                    return res.status(400).json({ success: false, message: "Club name already taken" });
+                }
+                club[field] = cleanClubName;
+            } else {
+                club[field] = value;
             }
-
-            // Update the club name with the clean version
-            club.club_name = cleanClubName;
         }
-
-        // If club_description is provided, clean it
-        if (club_description) {
-            const cleanClubDescription = clean(club_description);
-
-            if (isProfane(club_description)) {
-                return res.status(400).json({ success: false, message: "Description contains inappropriate language" });
-            }
-            club.club_description = cleanClubDescription;
-        }
-
-        // Update other fields only if they are provided
-        if (club_profile_image) {
-            club.club_profile_image = club_profile_image;
-        }
-        if (positions) {
-            club.positions = positions;
-        }
-        if (weekly_meeting) {
-            club.weekly_meeting = weekly_meeting;
-        }
+    }
 
         // Save the updated club
         await club.save();
