@@ -17,8 +17,6 @@ function ClubDash(){
     const{isAuthenticated, isAuthenticating, user} = useAuth();
     const navigate  = useNavigate();
     const [userInfo, setUserInfo] = useState(null);
-    const [members, setMembers] = useState(false);
-    const [dash, setDash] = useState(true);
 
     const [currentPage, setCurrentPage] = useState('dash');
     
@@ -52,6 +50,11 @@ function ClubDash(){
         }
     }
 
+    const openMembers = () =>{
+        setCurrentPage('members');
+    }
+
+
 
     return (
         <div className="club-dash">
@@ -76,7 +79,7 @@ function ClubDash(){
             <div className={`dash-right ${expandedClass}`}>
                 {
                     currentPage === "dash" &&
-                    <Dash expandedClass={expandedClass}/> 
+                    <Dash expandedClass={expandedClass} openMembers={openMembers}/> 
                 }
                 {
                     currentPage === 'members' && 

@@ -6,8 +6,7 @@ import clubEvent from '../ClubEventsComponents/Event/ClubEvent';
 import people from '../../../assets/people.svg'
 
 
-
-function Dash({expandedClass}){
+function Dash({expandedClass, openMembers}){
 
     const [events, setEvents] = useState([]);
 
@@ -44,7 +43,7 @@ function Dash({expandedClass}){
                 <h1>manage membership</h1>
 
                 <div className="content">
-                        <h2><img src={people} alt="" />200 members <button>manage</button></h2>
+                        <h2><img src={people} alt="" />200 members <button onClick={openMembers}>manage</button></h2>
                         <h2> <img src={people} alt="" />8 officers <button>manage</button></h2>
                 </div>
 
