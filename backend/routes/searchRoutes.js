@@ -11,6 +11,7 @@ const path = require('path');
 const s3 = require('../aws-config');
 const mongoose = require('mongoose');
 const { clean } = require('../services/profanityFilterService');
+const search = require('../schemas/search.js');
 
 const router = express.Router();
 
@@ -242,6 +243,19 @@ router.get('/all-purpose-search', verifyTokenOptional, async (req, res) => {
 
         // Extract only the names from the result set
         const names = sortedClassrooms.map(classroom => classroom.name);
+
+        //analytics
+        const search = new Search({
+            query: {
+                query: query,
+                attributes: attributes,
+                timePeriod: timePeriod
+            },
+            user_id: userId ? userId : null,        
+        });
+
+        search.save();
+        
 
         res.json({ success: true, message: "Rooms found", data: names });
 
