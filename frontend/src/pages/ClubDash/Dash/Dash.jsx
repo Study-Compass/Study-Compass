@@ -5,9 +5,12 @@ import { getAllEvents } from '../../../components/EventsViewer/EventHelpers';
 import clubEvent from '../ClubEventsComponents/Event/ClubEvent';
 import people from '../../../assets/people.svg'
 
+
+
 function Dash({expandedClass}){
 
     const [events, setEvents] = useState([]);
+
 
     useEffect(() => {
         const fetchEvents = async () => {
@@ -57,7 +60,12 @@ function Dash({expandedClass}){
                </div>
                 
             </div>
+
         </div>
+
+                    
+
+        
     )
 }
 
