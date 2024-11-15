@@ -6,6 +6,8 @@ import clubEvent from '../ClubEventsComponents/Event/ClubEvent';
 import people from '../../../assets/people.svg'
 
 
+
+
 function Dash({expandedClass, openMembers}){
 
     const [events, setEvents] = useState([]);
