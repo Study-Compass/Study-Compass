@@ -26,10 +26,13 @@ router.post('/log-repeated-visit', verifyTokenOptional, async (req, res) => {
         console.log('Logging repeated visit');
         let repeatedVisit = await RepeatedVisit.findOne({hash: hash});
         if(!repeatedVisit){
-            repeatedVisit = new RepeatedVisit({ visits: [new Date()], hash: hash, user_id: req.user ? req.user._id : null });
+            repeatedVisit = new RepeatedVisit({ visits: [new Date()], hash: hash, user_id: req.user ? req.user.userId : null });
         }
         repeatedVisit.user_id = req.user ? req.user.userId : null;
         repeatedVisit.visits.push(new Date());
+        if(req.user && req.user.userId){
+            repeatedVisit.user_id = req.user.userId;
+        }
         await repeatedVisit.save();
         console.log('Repeated visit logged');
         res.status(200).json({ message: 'Visit logged' });
