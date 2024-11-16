@@ -46,7 +46,41 @@ function App() {
                 .catch(error => {
                     console.error('Error logging visit', error);
                 });
+        } else {
+            // console.log('User has already visited');
+            // generate 10 char hash
+            // store in local storage
+            // send to backend
+            console.log('User has already visited');
+            let hash = localStorage.getItem('hash');
+            let timestamp = localStorage.getItem('timestamp');
+            if (!hash) {
+                // generate hash
+                hash = Math.random().toString(36).substring(2, 12);
+                // store hash
+                localStorage.setItem('hash', hash);
+            }
+            if (!timestamp) {
+                timestamp = new Date().toISOString();
+                localStorage.setItem('timestamp', timestamp);
+            }
+            //if 20 minutes from last timestamp
+            if (new Date().getTime() - new Date(timestamp).getTime() > 20 * 60 * 1000) {
+                //send to backend
+                localStorage.setItem('timestamp', new Date().toISOString());
+                axios.post('/log-repeated-visit', {
+                    hash: hash
+                })
+                    .then(response => {
+                        localStorage.setItem('timestamp', new Date().toISOString());
+                    })
+                    .catch(error => {
+                        console.error('Error logging visit', error);
+                    });
+            }
         }
+
+        
     }, []);
     // document.documentElement.classList.add('dark-mode');
     return (
