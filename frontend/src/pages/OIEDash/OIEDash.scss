@@ -94,8 +94,8 @@
             animation: hide 1s forwards;
         }
     }
+
     .dash-right{
-        overflow: hidden;
         position: relative;
         flex-grow: 1;
         display:flex;
@@ -104,6 +104,17 @@
         border-radius: 15px;
         border: 1px solid var(--lightborder);
         box-shadow: var(--shadow);
+        width:calc(100% - 200px);
+
+        &.maximized{
+            width:100%;
+        }
+
+        .dash-content{
+            position: relative;
+            max-width:100%;
+            width:100%;
+        }
         
         .expand{
             position: absolute;
@@ -126,7 +137,7 @@
             
         }
 
-        &::after{
+        &::before{
             content: '';
             position: absolute;
             width:100%;
@@ -138,10 +149,10 @@
             border-radius: 20px;
             transition: all 1s;
         }
-        &.minimized::after{
+        &.minimized::before{
             transform:scale(1);
         }
-        &.maximized::after{
+        &.maximized::before{
             transform:scale(1.2);
         }
     }

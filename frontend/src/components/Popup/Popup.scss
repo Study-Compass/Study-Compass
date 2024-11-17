@@ -57,6 +57,11 @@
     background-color: transparent;
     padding: 0;
   }
+
+  
+  .popup-overlay .popup-content.no-padding {
+    padding: 0;
+  }
   .popup-content .close-popup{
     position: absolute;
     width:15px;

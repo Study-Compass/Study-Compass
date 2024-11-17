@@ -72,9 +72,11 @@ function OIEDash(){
                 </nav>
             </div>
             <div className={`dash-right ${expandedClass}`}>
-                <Dash expandedClass={expandedClass}/>
-                <div className={`expand`} onClick={onExpand}>
-                    <Icon icon="material-symbols:expand-content-rounded" />
+                <div className="dash-content">
+                    <Dash expandedClass={expandedClass}/>
+                    <div className={`expand`} onClick={onExpand}>
+                        <Icon icon="material-symbols:expand-content-rounded" />
+                    </div>
                 </div>
             </div>
         </div>
