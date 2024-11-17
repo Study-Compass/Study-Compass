@@ -1,8 +1,15 @@
 .full-event{
     display:flex;
-    width:100%;
+    width:calc(100% - 50px);
     height:100%;
     gap:20px;
+    position: relative;
+    margin-right:50px;
+    background-color: var(--background);
+    border-radius: 20px;
+    overflow:hidden;
+    padding:20px;
+    box-sizing: border-box;
     
     iconify-icon{
         font-size: 20px;

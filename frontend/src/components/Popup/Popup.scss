@@ -29,6 +29,7 @@
     &.wide-content{
       max-width: 1000px;
       width:95%;
+
     }
   }
 
@@ -50,6 +51,29 @@
     &.wide-content{
       max-width: 1000px;
       width:95%;
+      .close-popup{
+        background-color: var(--background);
+        padding:7px;
+        top:5px;
+        right:10px;
+        border-radius:50%;
+        animation: popout 0.3s forwards cubic-bezier(0.075, 0.82, 0.165, 1);
+        animation-delay:0.1s;
+        transform:translateX(-50px);
+        opacity:0;
+      }
+      @keyframes popout {
+        from {
+          transform:translateX(-50px);
+          opacity: 0;
+        }
+        to {
+            transform:translateX(0);
+            opacity: 1;
+        }
+        
+      }
+
     }
   }
 
@@ -69,6 +93,7 @@
     top:15px;
     right:15px;
     z-index: 100;
+    cursor: pointer;
   }
 
   .close-popup.popout{
