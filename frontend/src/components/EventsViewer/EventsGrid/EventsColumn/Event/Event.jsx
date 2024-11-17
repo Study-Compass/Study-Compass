@@ -22,7 +22,7 @@ function Event({event}){
 
     return(
         <div className="event-component" onClick={() => handleEventClick(event)}>
-            <Popup isOpen={popupOpen} onClose={onPopupClose} customClassName={"wide-content"}>
+            <Popup isOpen={popupOpen} onClose={onPopupClose} customClassName={"wide-content no-styling no-padding"}>
                 <FullEvent event={event}/>
             </Popup>
             {event.image && <img src={event.image} alt="" />}

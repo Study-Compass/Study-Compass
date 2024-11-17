@@ -1,11 +1,16 @@
 .full-event.oie{
     display:flex;
     flex-direction: column;
-    width:100%;
+    width:calc(100% - 50px);
+    position: relative;
+    border-radius: 20px;
+    overflow: hidden;
     height:100%;
     box-sizing: border-box;
     gap:0;
     background-color: var(--oie-background);
+    margin-right:50px;
+    padding:0;
 
     iconify-icon{
         font-size: 20px;
@@ -69,6 +74,7 @@
         width:100%;
         padding: 0 7px;
         align-items: center;
+        box-sizing: border-box;
         .tab{
             padding: 10px 10px;
             box-sizing: border-box;
