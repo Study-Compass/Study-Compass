@@ -67,11 +67,11 @@ function OIEDash(){
                 </div>
                 <nav className="nav">
                     <ul>
-                        <li className='selected' onClick={()=>setCurrentDisplay(0)}>
+                        <li className={` ${currentDisplay === 0 && "selected"}`} onClick={()=>setCurrentDisplay(0)}>
                             <img src={Dashboard} alt="" />
                             <p>Dashboard</p>
                         </li>
-                        <li className='' onClick={()=>setCurrentDisplay(1)}>
+                        <li className={` ${currentDisplay === 1 && "selected"}`}  onClick={()=>setCurrentDisplay(1)}>
                             <div className="icon-container">
                                 <Icon icon="heroicons:calendar-16-solid" />
                             </div>
