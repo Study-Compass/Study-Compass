@@ -183,6 +183,55 @@ router.get('/oie/get-pending-events', verifyToken, async (req, res) => {
     }
 });
 
+router.get('/get-event/:event_id', verifyTokenOptional, async (req, res) => {
+    const { event_id } = req.params;
+    const user_id = req.user ? req.user.userId : null;
+
+    try {
+        const user = user_id ? await User.findById(user_id) : null;
+        const event = await Event.findById(event_id).populate('classroom_id').populate('hostingId');
+        if (!event) {
+            return res.status(404).json({
+                success: false,
+                message: 'Event not found.'
+            });
+        }
+        if (event.OIEStatus === 'Pending') {
+            if (!user || !user.admin){
+                return res.status(403).json({
+                    success: false,
+                    message: 'You are not authorized to view this page.'
+                });
+            } else {
+                const OIE = await OIEStatus.findOne({ eventRef: event_id });
+                if (OIE) {
+                    //attach to event object
+                    OIE.oieObject = OIE;
+                    return res.status(202).json({
+                        success: true,
+                        event
+                    });
+                }
+                return res.status(200).json({
+                    success: true,
+                    event
+                });
+            }
+        }
+        console.log('GET: /get-event successful');
+        res.status(200).json({
+            success: true,
+            event
+        });
+    } catch (error) {
+        console.log('GET: /get-event failed', error);
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+});
+
 router.post('/approve-event', verifyToken, async (req, res) => {
     const user_id = req.user.userId;
     const { event_id } = req.body;
