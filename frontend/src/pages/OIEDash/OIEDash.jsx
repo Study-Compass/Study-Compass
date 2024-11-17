@@ -8,6 +8,7 @@ import { getAllEvents } from '../../components/EventsViewer/EventHelpers';
 
 import {Icon} from '@iconify-icon/react';  
 import Dash from './Dash/Dash';
+import { set } from 'mongoose';
 
 function OIEDash(){
     const [expanded, setExpanded] = useState(false);
@@ -15,6 +16,9 @@ function OIEDash(){
     const {isAuthenticated, isAuthenticating, user} = useAuth();
     const navigate  = useNavigate();
     const [userInfo, setUserInfo] = useState({});
+
+    const [currentPage, setCurrentPage] = useState(0);
+    const [currentDisplay, setCurrentDisplay] = useState(0);
 
     useEffect(()=>{
         if(isAuthenticating){
@@ -49,6 +53,11 @@ function OIEDash(){
         }
     }
 
+    useEffect(() => {
+            setCurrentPage(currentPage);
+
+    }, [currentDisplay]);
+
     return (
         <div className="oie-dash">
             <div className={`dash-left ${expanded && "hidden"}`}>
@@ -58,11 +67,11 @@ function OIEDash(){
                 </div>
                 <nav className="nav">
                     <ul>
-                        <li className='selected'>
+                        <li className='selected' onClick={()=>setCurrentDisplay(0)}>
                             <img src={Dashboard} alt="" />
                             <p>Dashboard</p>
                         </li>
-                        <li className=''>
+                        <li className='' onClick={()=>setCurrentDisplay(1)}>
                             <div className="icon-container">
                                 <Icon icon="heroicons:calendar-16-solid" />
                             </div>
@@ -72,11 +81,18 @@ function OIEDash(){
                 </nav>
             </div>
             <div className={`dash-right ${expandedClass}`}>
-                <div className="dash-content">
-                    <Dash expandedClass={expandedClass}/>
-                    <div className={`expand`} onClick={onExpand}>
-                        <Icon icon="material-symbols:expand-content-rounded" />
-                    </div>
+                    {
+                        (currentPage === 0 || currentDisplay === 0) &&
+                        <div className={`${currentDisplay === 0 && "visible"} dash-content`}>
+                            <Dash expandedClass={expandedClass}/>
+                        </div>
+                    }
+                    {
+                        (currentPage === 1 || currentDisplay === 1) &&
+                        <div className={`${currentDisplay === 1 && "visible"} dash-content`}>Page 1</div>
+                    }
+                <div className={`expand`} onClick={onExpand}>
+                    <Icon icon="material-symbols:expand-content-rounded" />
                 </div>
             </div>
         </div>
