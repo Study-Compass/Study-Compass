@@ -1,11 +1,12 @@
 .full-event.oie{
     display:flex;
+    flex-direction: column;
     width:100%;
     height:100%;
-    gap:20px;
     box-sizing: border-box;
-    padding-top:30px;
-    
+    gap:0;
+    background-color: var(--oie-background);
+
     iconify-icon{
         font-size: 20px;
         color: var(--text);
@@ -19,16 +20,39 @@
             box-shadow: var(--shadow);
         }
     }
-    .content{
-        flex-grow: 1;
-        padding-top:5px;
-        box-sizing: border-box;
-        gap:10px;
-        display:flex;
-        flex-direction: column;
-        h1{
-            font-size: 25px;
-            margin-bottom:0;
+
+    .event-info{
+        border-radius: 20px;
+        background-color: var(--background);
+
+        & > div{
+            display:flex;
+            gap:20px;  
+            padding:20px; 
+    
+            opacity: 0;
+            transition: all 0.5s;
+
+            &.visible{
+                opacity: 1;
+            }
+        }
+        
+        .content{
+            flex-grow: 1;
+            padding-top:5px;
+            box-sizing: border-box;
+            gap:10px;
+            display:flex;
+            flex-direction: column;
+            h1{
+                font-size: 25px;
+                margin-bottom:0;
+            }
+        }
+
+        &.visible{
+            opacity: 1;
         }
     }
     .gradient{
@@ -40,37 +64,84 @@
     }
 
     .tabs{
-        background-color: var(--background);
-        position:absolute;
-        border-bottom: 1px solid var(--lighterborder);
+        background-color: var(--oie-background);
         display:flex;
-        top:-0px;
-        left:0px;
-        height:40px;
         width:100%;
+        padding: 0 7px;
         align-items: center;
         .tab{
-            display:flex;
-            transform:none;
-            margin:0;
-            align-items: center;
-            background-color: var(--background);
-            border:1px soldi var(--lightborder);
-            height:80%;
-            padding:5px 10px;
+            padding: 10px 10px;
             box-sizing: border-box;
-            border-radius: 10px 10px 0 0;
-            gap:10px;
-            iconify-icon{
-                color: var(--text);
-                font-size: 17px;
+            height:100%;
+            display: flex;
+            align-items: center;
+            margin:0;
+            .tab-content{
+                display:flex;
+                transform:none;
+                cursor:pointer;
+                margin:0;
+                align-items: center;
+                border:1px soldi var(--lightborder);
+                height:80%;
+                padding:5px 10px;
+                box-sizing: border-box;
+                border-radius: 10px;
+                gap:10px;
+                transition: all 0.3s;
+                iconify-icon{
+                    color: var(--text);
+                    font-size: 17px;
+                    transition: inherit;
+                }
+                p{
+                    font-size: 15px;
+                    font-family: 'Inter';
+                    font-weight: 600;
+                    color: var(--text);
+                    transition: inherit;
+
+                }
+
+                &:hover{
+                    background-color: var(--background);
+                }
             }
-            p{
-                font-size: 15px;
-                font-family: 'Inter';
-                font-weight: 600;
-                color: var(--text);
+
+            &::after{
+                content: '';
+                position: absolute;
+                bottom:0;
+                left:50%;
+                width:0%;
+                height:3px;
+                background-color: transparent;
+                transition: all 0.3s;
+                border-radius: 3px 3px 0 0;
             }
+            
+            &.selected{
+                &::after{
+                    content: '';
+                    position: absolute;
+                    bottom:0;
+                    left:10%;
+                    width:80%;
+                    height:3px;
+                    background-color: var(--red);
+
+                }
+                .tab-content{
+                    p{
+                        color: var(--red);
+                    }
+                    iconify-icon{
+                        color: var(--red);
+                    }
+                }
+            }
+            
+
         }
     }
 }
