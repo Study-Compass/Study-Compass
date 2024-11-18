@@ -7,7 +7,6 @@ export const useFetch = (url, options = { method: "GET", data: null }) => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    console.log(options);
     let isMounted = true; //track whether component is mounted
     const fetchData = async () => {
       setLoading(true);
@@ -19,6 +18,7 @@ export const useFetch = (url, options = { method: "GET", data: null }) => {
           data: options.data || null,
           headers: options.headers || {"Authorization": `Bearer ${localStorage.getItem("token")}`},
         });
+        console.log(response);
         if (isMounted) setData(response.data);
       } catch (err) {
         if (isMounted) setError(err.message);

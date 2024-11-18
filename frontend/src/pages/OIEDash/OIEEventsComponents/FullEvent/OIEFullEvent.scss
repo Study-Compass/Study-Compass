@@ -40,15 +40,132 @@
             transition: all 0.5s;
 
             &.check{
+            
                 position: absolute;
                 height:100%;
                 width: 100%;
                 top:0;
                 left:0;
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+                box-sizing: border-box;
+                pointer-events: none;
+                h1{
+                    font-size:24px;
+                }
+                .checklist{
+                    display: flex;
+                    flex-direction: column;
+                    gap: 10px;
+                    .check-item{
+                        cursor: pointer;
+                        display: flex;
+                        flex-direction: column;
+                        padding: 5px 10px;
+                        border:1px solid var(--lightborder);
+                        border-radius: 10px;
+                        transition: all 0.3s;
+                        iconify-icon{
+                            font-size:20px;
+                            transition: all 0.3s;
+                            height:20px;
+                            width:20px;
+                            border-radius: 50%;
+                        }
+                        h2{
+                            font-size:16px;
+                            font-weight:600;
+                            margin: 0;
+                            -webkit-user-select: none;
+                            user-select: none;
+                        }
+                        p{
+                            -webkit-user-select: none;
+                            user-select: none;
+                        }
+
+                        h2{
+                            position:relative;
+                            width:fit-content;
+                            &::after{
+                                content: '';
+                                position: absolute;
+                                width:0;
+                                background-color: var(--green);
+                                left:-20px;
+                                height:2px;
+                                top: 50%;
+                                transition: all 0.1s ease-out;
+                                border-radius: 2px;
+                            }
+                            
+                        }
+
+                        .row{
+                            gap:10px;
+                        }
+
+                        .row > :first-child{
+                            margin-top:2px;
+                        }
+
+                        .col{
+                            gap:2px;
+                        }
+
+                        &.checked{
+                            background-color: var(--translucent);
+                            
+                            iconify-icon{
+                                color: var(--green);
+                                animation: radiate 0.5s forwards;
+                            }
+                            h2{
+                                color: var(--darkborder);
+                                animation: bounce 0.5s forwards ease-in-out;
+                                &::after{
+                                    content: '';
+                                    width:105%;
+                                    background-color: var(--darkborder);
+                                    left:-2%;
+                                    
+                                }
+                            }
+                            p{
+                                color: var(--darkborder);
+                            }
+                            
+                            @keyframes bounce {
+                                0% {
+                                    transform: translateX(0);
+                                }
+                                50% {
+                                    transform: translateX(5px);
+                                }
+                                100% {
+                                    transform: translateX(0);
+                                }
+                            }
+                            @keyframes radiate {
+                                // green glow
+                                0% {
+                                    box-shadow: 0 0 0 0 var(--green);
+                                }
+                                100% {
+                                    box-shadow: 0 0 0 10px rgba(0, 255, 0, 0);
+                                }
+
+                                
+                            }
+                        }
+                    }
+                }
             }
 
             &.visible{
                 opacity: 1;
+                pointer-events:all;
             }
         }
         
@@ -76,6 +193,9 @@
         height:110px;
         height:30%;
     }
+
+
+
 
     .tabs{
         background-color: var(--oie-background);
