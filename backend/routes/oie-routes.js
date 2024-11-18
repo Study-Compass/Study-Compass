@@ -33,3 +33,4 @@ router.post('/config', verifyToken, async (req, res) => {
     }
 });
 
+module.exports = router;
