@@ -77,6 +77,12 @@ function OIEDash(){
                             </div>
                             <p>Event Calendar</p>
                         </li>
+                        <li className={` ${currentDisplay === 2 && "selected"}`}  onClick={()=>setCurrentDisplay(1)}>
+                            <div className="icon-container">
+                                <Icon icon="flowbite:adjustments-horizontal-solid" />
+                            </div>
+                            <p>Configuration</p>
+                        </li>
                     </ul>
                 </nav>
             </div>
