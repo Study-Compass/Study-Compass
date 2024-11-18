@@ -4,9 +4,11 @@ import './OIEFullEvent.scss';
 import {Icon} from '@iconify-icon/react';  
 import StarGradient from '../../../../assets/OIE-Gradient2.png';
 import MockPoster from '../../../../assets/MockPoster.png';
+import { useFetch } from '../../../../hooks/useFetch';
 
 
 function OIEFullEvent({ event }){
+    const { data, loading, error } = useFetch('/config');
     const navigate = useNavigate();
 
     const handleEventClick = () => {
@@ -54,6 +56,17 @@ function OIEFullEvent({ event }){
                         </div>
                     </div>
                     <img src={StarGradient} alt="" className="gradient" />
+                </div>
+                <div className={`check ${tab === "check" && "visible"}`}>
+                    <h1>Checklist</h1>
+                    <div className="checklist">
+                        {!loading && data.config.checklist.map((item, index) => (
+                            <div className="check-item" key={index}>
+                                <h2>{item.title}</h2>
+                                <p>{item.description}</p>
+                            </div>
+                        ))}
+                    </div>
                 </div>
             </div>
         </div>
