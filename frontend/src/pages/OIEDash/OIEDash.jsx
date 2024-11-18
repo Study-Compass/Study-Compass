@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import Dashboard from '../../assets/Icons/Dashboard.svg';
 import logo from '../../assets/red_logo.svg';
 import { getAllEvents } from '../../components/EventsViewer/EventHelpers';
+import Configuration from './Configuration/Configuration';
 
 import {Icon} from '@iconify-icon/react';  
 import Dash from './Dash/Dash';
@@ -77,7 +78,7 @@ function OIEDash(){
                             </div>
                             <p>Event Calendar</p>
                         </li>
-                        <li className={` ${currentDisplay === 2 && "selected"}`}  onClick={()=>setCurrentDisplay(1)}>
+                        <li className={` ${currentDisplay === 2 && "selected"}`}  onClick={()=>setCurrentDisplay(2)}>
                             <div className="icon-container">
                                 <Icon icon="flowbite:adjustments-horizontal-solid" />
                             </div>
@@ -96,6 +97,12 @@ function OIEDash(){
                     {
                         (currentPage === 1 || currentDisplay === 1) &&
                         <div className={`${currentDisplay === 1 && "visible"} dash-content`}>Page 1</div>
+                    }
+                    {
+                        (currentPage === 2 || currentDisplay === 2) &&
+                        <div className={`${currentDisplay === 2 && "visible"} dash-content`}>
+                            <Configuration />
+                        </div>
                     }
                 <div className={`expand`} onClick={onExpand}>
                     <Icon icon="material-symbols:expand-content-rounded" />
