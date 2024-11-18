@@ -4,7 +4,7 @@ import './Popup.scss'; // Assuming this contains your animation and styling
 import useOutsideClick from '../../hooks/useClickOutside';
 import X from '../../assets/x.svg';
 
-const Popup = ({ children, isOpen, onClose, defaultStyling=true, customClassName="", popout=false }) => {
+const Popup = ({ children, isOpen, onClose, defaultStyling=true, customClassName="", popout=false, waitForLoad=false}) => {
     const [render, setRender] = useState(isOpen);
     const [show, setShow] = useState(false);
 
