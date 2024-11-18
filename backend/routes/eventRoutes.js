@@ -13,7 +13,6 @@ router.post('/create-event', verifyToken, async (req, res) => {
         ...req.body,
         hostingId : user_id,
         hostingType : 'User',
-
     });
     
     let OIE = null;
@@ -23,7 +22,7 @@ router.post('/create-event', verifyToken, async (req, res) => {
         OIE = new OIEStatus({
             eventRef: event._id,
             status: 'Pending',
-            checkListItems: event.OIEAcknowledgementItems
+            checkListItems: [],
         });
     }
 
@@ -202,14 +201,15 @@ router.get('/get-event/:event_id', verifyTokenOptional, async (req, res) => {
                     success: false,
                     message: 'You are not authorized to view this page.'
                 });
-            } else {
+            } else {    
                 const OIE = await OIEStatus.findOne({ eventRef: event_id });
                 if (OIE) {
                     //attach to event object
-                    OIE.oieObject = OIE;
+                    let newEvent = event.toObject();
+                    newEvent["OIE"] = OIE;
                     return res.status(202).json({
                         success: true,
-                        event
+                        event: newEvent
                     });
                 }
                 return res.status(200).json({
