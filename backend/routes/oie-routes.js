@@ -29,6 +29,7 @@ router.post('/config', verifyToken, async (req, res) => {
         await newConfig.save();
         res.json(newConfig);
     } catch (error) {
+        console.log(error);
         res.status(500).json({ message: error.message });
     }
 });
