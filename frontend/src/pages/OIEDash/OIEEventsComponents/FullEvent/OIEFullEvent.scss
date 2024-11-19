@@ -53,6 +53,90 @@
                 pointer-events: none;
                 h1{
                     font-size:24px;
+                    margin-bottom:0;
+                }
+                .status{
+                    display: flex;
+                    gap:10px;
+                    flex-direction: column;
+                    width:100%;
+                    border:1px solid var(--lighterborder);
+                    box-shadow: var(--shadow);
+                    padding: 10px 15px;
+                    box-sizing: border-box;
+                    border-radius: 10px;
+                    .row{
+                        align-items: center;
+                        gap:10px;
+
+                        .accept,.reject{
+                            display:flex;
+                            align-items: center;
+                            gap:5px;
+
+                            background-color: var(--green);
+                            color: white;
+                            border-radius: 5px;
+                            cursor: pointer;
+                            font-family: 'Inter';
+                            font-weight: 400;
+                            iconify-icon{
+                                font-size: 14px;
+                                color: white;
+                            }
+                        }
+                        .reject{
+                            background-color: var(--red);
+                        }
+                        h2{
+                            margin: 0;
+                            font-size: 18px;
+                            font-weight: 600;
+                            font-family: 'Inter';
+                        }
+
+
+                        .status-dot{
+                            width: 13px;
+                            height: 13px;
+                            border-radius: 50%;
+                            &.pending{
+                                background-color: var(--yellow);
+                            }
+                            &.approved{
+                                background-color: var(--green);
+                            }
+                            &.rejected{
+                                background-color: var(--red);
+                            }   
+                        }
+                    }
+                    
+                    .requirements{
+                        background-color: var(--oie-background);
+                        padding:2px;
+                        border-radius: 5px;
+                        width:fit-content;
+                        min-width:200px;
+                        .requirement-header{
+                            padding:2px 8px;
+                            p{
+                                font-size: 15px;
+                                font-weight: 600;
+                                font-family: 'Inter';
+                            }
+                        }
+                        .requirement{
+                            border-radius: 3px;
+                            padding: 2px 5px;
+                            background-color: var(--background);
+                        }
+                    }
+                    p{
+                        font-size: 15px;
+                        font-weight: 400;
+                        font-family: "Inter";
+                    }
                 }
                 .checklist{
                     display: flex;
@@ -96,7 +180,7 @@
                                 left:-20px;
                                 height:2px;
                                 top: 50%;
-                                transition: all 0.1s ease-out;
+                                transition: all 0.1s ease-out, background-color 0.3s;
                                 border-radius: 2px;
                             }
                             

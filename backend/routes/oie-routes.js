@@ -3,6 +3,7 @@ const router = express.Router();
 const { verifyToken, verifyTokenOptional } = require('../middlewares/verifyToken');
 const OIEConfig = require('../schemas/OIEConfig');
 const OIEStatus = require('../schemas/OIE');
+const Event = require('../schemas/event');
 
 router.get('/config', verifyToken, async (req, res) => {
     try {
@@ -45,10 +46,18 @@ router.post('/oie-status', verifyToken, async (req, res) => {
             oieStatus.status = status;
             oieStatus.checkListItems = checkListItems;
             await oieStatus.save();
+            const event = await Event.findById(eventRef);
+            event.OIEStatus = status;
+            await event.save();
+            console.log('POST: /oie-status successful');
             return res.json(oieStatus);
         }
         const newOIEStatus = new OIEStatus(req.body);
         await newOIEStatus.save();
+        const event = await Event.findById(eventRef);
+        event.OIEStatus = status;
+        await event.save();
+        console.log(event);
         console.log('POST: /oie-status successful');
         res.json(newOIEStatus);
     } catch (error) {

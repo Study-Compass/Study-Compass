@@ -17,14 +17,20 @@
         display:flex;
         flex-direction: column;
         flex-grow:1;
+        overflow-x:hidden;
         .col-header{
             width:100%;
             justify-content: space-between;
             display:flex;
-            
+            align-items: center;
+            padding-right:15px;
+            iconify-icon{
+                font-size:18px;
+                color: var(--text);
+            }
         }
         h2{
-            margin:7px 10px 10px 10px;
+            margin:7px 10px 10px 15px;
             padding:0;
             font-size:16px;
             font-weight:800;
@@ -42,9 +48,35 @@
             background-color: var(--background);
             opacity: 0;
             transform:translateX(-100%);
+            justify-content: center;
             animation: fromLeft 0.3s forwards cubic-bezier(0.075, 0.82, 0.165, 1), fadeIn 0.3s forwards;
             .row{
                 justify-content: space-between;
+                .col{
+                    gap:2px;
+                    button{
+                        background-color: var(--red);
+                        color: white;
+                        border:none;
+                        padding: 5px;
+                        width:100%;
+                        font-family: 'Inter';
+                        font-weight:500;
+                        height:fit-content;
+                        margin-top:10px;
+                    }
+                }
+                .edit-container{
+                    display:flex;
+                    flex-direction: column;
+                    gap: 10px;
+                    .trash{
+                        iconify-icon{
+
+                            color:var(--red);
+                        }
+                    }
+                }
             }
 
             input{
@@ -68,6 +100,19 @@
                 font-size:16px;
                 font-weight:600;
                 font-family: 'Inter';
+            }
+            button{
+                background-color: transparent;
+                height:16px;
+                width:16px;
+                iconify-icon{
+                    color: var(--darkborder);
+                    font-size: 18px;
+                }
+
+            }
+            &.edit{
+                border: 1px dashed var(--darkborder);
             }
         }
     }
