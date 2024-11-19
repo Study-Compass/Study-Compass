@@ -13,12 +13,11 @@ import { set } from 'mongoose';
 
 function ClubDash(){
     const [expanded, setExpanded] = useState(false);
-    const [expandedClass, setExpandedClass] = useState("");
+    const [expands, setExpands] = useState(false);
+    const [expandedClass, setExpandedClass] = useState("minimized");
     const{isAuthenticated, isAuthenticating, user} = useAuth();
     const navigate  = useNavigate();
     const [userInfo, setUserInfo] = useState(null);
-    const [members, setMembers] = useState(false);
-    const [dash, setDash] = useState(true);
 
     const [currentPage, setCurrentPage] = useState('dash');
     
@@ -37,13 +36,13 @@ function ClubDash(){
         
     },[isAuthenticating, isAuthenticated, user]);
 
-    const onExpand = () => {
-        if(expanded){
+    const onExpand = (expand) => {
+        if(expand){
             setExpandedClass("minimized");
             setTimeout(() => {
                 setExpanded(false);
             }, 200);
-        } else {
+        } else{
             setExpanded(true);
             setTimeout(() => {
                 setExpandedClass("maximized");
@@ -53,17 +52,35 @@ function ClubDash(){
     }
 
     const openMeeting = () => {
-        onExpand();
+        // onExpand();
+        onExpand(false);
         setCurrentPage(null);
-        setTimeout(() => {
-            
+        setTimeout(() => {    
             setCurrentPage("meeting");
         }, 700);
     }
 
     const openDash = () => {
-        onExpand();
-        setCurrentPage("dash");
+        onExpand(true);
+        setTimeout(() => {    
+            setCurrentPage("dash");
+            // onExpand();
+        }, 200);
+    }
+
+    const Expand = () => {
+        if(expanded){
+            setExpandedClass("minimized");
+            setTimeout(() => {
+                setExpanded(false);
+            }, 200);
+        } else{
+            setExpanded(true);
+            setTimeout(() => {
+                setExpandedClass("maximized");
+            }, 200);
+
+        }
     }
 
 
@@ -97,12 +114,12 @@ function ClubDash(){
                     currentPage === 'members' && 
                     <Members expandedClass = {expandedClass}/>
                 }
-                 {
+                {
                     currentPage === 'meeting' && 
                     <EventMeeting expandedClass = {expandedClass} openDash={openDash}/>
                 }
 
-                <div className={`expand`} onClick={onExpand}>
+                <div className={`expand` }  onClick={Expand}>
                     <Icon icon="material-symbols:expand-content-rounded" />
                 </div>
             </div>
