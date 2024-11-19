@@ -95,8 +95,8 @@ router.post("/create-club", verifyToken, async(req,res)=>{
 });
 
 
-//Adjust Scalabilty 
 router.post("/edit-club", verifyToken, async (req, res) => {
+        //If field is added to schema, add here
         const allowedFields=['club_profile_image', 'club_description', 'positions', 'weekly_meeting', 'club_name'];
         const userId = req.user?.userId;
         
