@@ -342,3 +342,11 @@ button.active{
     flex-direction:column;
     gap:5px;
   }
+
+
+button{
+    outline:none;
+    border:none;
+    border-radius:5px;
+    
+}
