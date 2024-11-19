@@ -27,6 +27,7 @@ function OIEFullEvent({ event, eventId = null }){
         setChecked(newChecked);
         let newOIE = {...fullEvent.data.event.OIE};
         const checkedItems = [];
+        console.log(data.config);
         for(const key in newChecked){
             if(newChecked[key]){
                 checkedItems.push(data.config.checklist[key].title);
@@ -36,10 +37,11 @@ function OIEFullEvent({ event, eventId = null }){
         changeOIE(newOIE);
     }
 
-    const handleApproved = async () => {
+    const handleApproved = async (status) => {
         const newOIE = {...fullEvent.data.event.OIE};
-        newOIE.status = "Approved";
+        newOIE.status = status ? "Approved" : "Rejected";
         changeOIE(newOIE);
+        fullEvent.refetch();
     }
 
     const changeOIE = async (newOIE) => {
@@ -48,6 +50,7 @@ function OIEFullEvent({ event, eventId = null }){
             const auth = {headers: {"Authorization": `Bearer ${localStorage.getItem("token")}`}};
             const response = await axios.post(`/oie-status`, newOIE, auth);
             console.log(response);
+            return response.data;
         } catch(err){
             console.log(err);
             addNotification({title: "Internal Error", content: "Failed to update checklist", type: "error"});
@@ -60,6 +63,9 @@ function OIEFullEvent({ event, eventId = null }){
             fullEvent.data.event.OIE.checkListItems.forEach((item)=>{
                 //find index of item in config, then set checked to true
                 const index = data.config.checklist.findIndex((configItem) => configItem.title.toLowerCase() === item.toLowerCase());
+                if(index === -1){
+                    return;
+                }
                 check[index] = true;
 
             });
@@ -109,7 +115,30 @@ function OIEFullEvent({ event, eventId = null }){
                     <img src={StarGradient} alt="" className="gradient" />
                 </div>
                 <div className={`check ${tab === "check" && "visible"}`}>
-                    <h1>Status</h1>
+                    <h1>Approval Status</h1>
+                    <div className="status"> 
+                        {!fullEvent.loading && 
+                            <>
+                                <div className="row">
+                                    <div className={`status-dot ${fullEvent.data.event.OIE.status.toLowerCase()}`}></div>
+                                    <h2>{fullEvent.data.event.OIE.status}</h2>
+                                    <button className="accept" onClick={()=>handleApproved(true)}><Icon icon="icon-park-solid:check-one" /> accept</button>
+                                    <button className="reject" onClick={()=>handleApproved(false)}><Icon icon="icon-park-solid:close-one" /> reject</button>
+                                </div>
+                                <div className="col requirements">
+                                    <div className="requirement-header">
+                                        <p>OIE requirements met</p>
+                                    </div>
+                                    {event.OIEAcknowledgementItems.map((item, index) => (
+                                        <div className="requirement" key={index}>
+                                            <p>{item}</p>
+                                        </div>
+                                    ))}
+                                </div>
+                                <p>Approval requested {new Date(fullEvent.data.event.createdAt).toLocaleString('default', {weekday: 'long'})}, {new Date(fullEvent.data.event.createdAt).toLocaleString('default', {month: 'long'})} {new Date(fullEvent.data.event.createdAt).getDate()}</p>
+                            </>
+                        }
+                    </div>
                     <h1>Checklist</h1>
                     <div className="checklist">
                         {!loading && data.config.checklist.map((item, index) => (
