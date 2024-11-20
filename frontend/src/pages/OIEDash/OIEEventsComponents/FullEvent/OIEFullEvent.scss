@@ -40,7 +40,6 @@
             transition: all 0.5s;
 
             &.check{
-            
                 position: absolute;
                 height:100%;
                 width: 100%;
@@ -51,6 +50,7 @@
                 gap: 10px;
                 box-sizing: border-box;
                 pointer-events: none;
+                overflow-y:auto;
                 h1{
                     font-size:24px;
                     margin-bottom:0;

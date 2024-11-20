@@ -70,25 +70,32 @@ function CheckItem({ item, index, handleCheck, editOnLoad=false, editing, setEdi
         }
     }, []);
 
+    const onSubmit = (e) => {
+        e.preventDefault();
+
+    }
+
     return (
-        <div className={`check-item ${edit && "edit"}`} style={{ animationDelay: `${index * 0.1}s` }}>
+        <div className={`check-item ${edit && "edit"}`} style={{ animationDelay: editOnLoad ? "0s" : `${index * 0.1}s` }}>
             <div className="row">
                 <div className="col">
-                    { edit ? 
-                        (
-                            <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} ref={editRef} />
-                        ) : 
-                        <h2>{item.title}</h2> 
-                    }
-                    {       
-                        edit ? 
-                        (
-                            <input type="text" value={description} onChange={(e) => setDescription(e.target.value)} />
-                        ) : 
-                        item.description && 
-                        <p>{item.description}</p>
-                    }
-                    {edit && <button onClick={toggleEdit}>save</button>}
+                    <form onSubmit={onSubmit}>
+                        { edit ? 
+                            (
+                                <input type="text" placeholder="checklist title" value={title} onChange={(e) => setTitle(e.target.value)} ref={editRef} />
+                            ) : 
+                            <h2>{item.title}</h2> 
+                        }
+                        {       
+                            edit ? 
+                            (
+                                <input type="text" placeholder="checklist description"value={description} onChange={(e) => setDescription(e.target.value)} />
+                            ) : 
+                            item.description && 
+                            <p>{item.description}</p>
+                        }
+                        {edit && <button type='submit' onClick={toggleEdit}>save</button>}
+                    </form>
                 </div>
                 <div className="edit-container">
                     <button className={`${edit && "edit"}`}onClick={edit ? cancelEdit : toggleEdit}><Icon icon={edit ? "mingcute:close-circle-fill":"fluent:edit-48-filled"} /></button>
@@ -163,21 +170,23 @@ function Configuration() {
             <h1>Configuration</h1>
             <div className="content">
                 <div className="col-header">
-                    <h2>checklist items</h2>
+                    <h2>Checklist Items</h2>
                     <div onClick={onAdd}>
                         <Icon icon="icon-park-solid:add-one" />
                     </div>
                 </div>
-                {
-                    !loading && clientData && clientData.config.checklist.map((config, index) => {
-                        return (
-                            <CheckItem key={index} item={config} index={index} handleCheck={setClientData} editOnLoad={editOnLoad} editing={editing} setEditing={setEditing}/>
-                        );
-                    })
-                }
-                {
-                    loading && <Loader />
-                }
+                <div className="check-items">
+                    {
+                        !loading && clientData && clientData.config.checklist.map((config, index) => {
+                            return (
+                                <CheckItem key={index} item={config} index={index} handleCheck={setClientData} editOnLoad={editOnLoad} editing={editing} setEditing={setEditing}/>
+                            );
+                        })
+                    }
+                    {
+                        loading && <Loader />
+                    }
+                </div>
             </div>
             <button onClick={handleSave}>save</button>
         </div>
