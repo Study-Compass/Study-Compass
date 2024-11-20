@@ -3,36 +3,41 @@ import './Dash.scss';
 import OIEGradient from '../../../assets/OIE-Gradient.png';
 import { getAllEvents, getOIEEvents } from '../../../components/EventsViewer/EventHelpers';
 import OIEEvent from '../OIEEventsComponents/Event/OIEEvent';
+import { useFetch } from '../../../hooks/useFetch';
 
 function Dash({expandedClass}){
 
     const [events, setEvents] = useState([]);
     const [pendingEvents, setPendingEvents] = useState([]);
 
+    const fetchEvents = useFetch('/get-all-events');
+    const fetchPendingEvents = useFetch('/oie/get-pending-events');
+
     useEffect(() => {
-        const fetchEvents = async (pending) => {
-            try{
-                const allEvents = pending ? await getOIEEvents() : await getAllEvents();
-                //sort by dates
-                allEvents.sort((a, b) => {
-                    return new Date(a.date) - new Date(b.date);
-                });
-                allEvents.reverse();
-                if(pending){
-                    setPendingEvents(allEvents);
-                } else {
-                    setEvents(allEvents);
-                }
-                console.log(allEvents);
-            } catch (error){
-                console.log("Failed to fetch events", error);
-            }
-
+        if(fetchEvents.data){
+            const allEvents = fetchEvents.data.events;
+            //sort by dates
+            allEvents.sort((a, b) => {
+                return new Date(a.date) - new Date(b.date);
+            });
+            allEvents.reverse();
+            setEvents(allEvents);
         }
-        fetchEvents(true);
-        fetchEvents(false);
-    }, []);
+        if(fetchPendingEvents.data){
+            const allEvents = fetchPendingEvents.data.events;
+            //sort by dates
+            allEvents.sort((a, b) => {
+                return new Date(a.date) - new Date(b.date);
+            });
+            allEvents.reverse();
+            setPendingEvents(allEvents);
+        }
+    }, [fetchEvents.data, fetchPendingEvents.data]);
 
+    const refetch = () => {
+        fetchEvents.refetch();
+        fetchPendingEvents.refetch();
+    }
 
     return (
         <div className={`dash ${expandedClass}`}>
@@ -47,7 +52,7 @@ function Dash({expandedClass}){
                         pendingEvents.map((event, index) => {
                             if(index < 5){
                                 return (
-                                    <OIEEvent event={event} key={index}/>
+                                    <OIEEvent event={event} key={index} refetch={refetch}/>
                                 )
                             }
                         })
@@ -59,9 +64,9 @@ function Dash({expandedClass}){
                 <div className="content">
                     {
                         events.map((event, index) => {
-                            if(index < 3){
+                            if(index < 5){
                                 return (
-                                    <OIEEvent event={event} key={index}/>
+                                    <OIEEvent event={event} key={index} showStatus={true} refetch={refetch}/>
                                 )
                             }
                         })

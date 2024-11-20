@@ -8,7 +8,7 @@ import { useFetch } from '../../../../hooks/useFetch';
 import { useNotification } from '../../../../NotificationContext';
 import axios from 'axios';
 
-function OIEFullEvent({ event, eventId = null }){
+function OIEFullEvent({ event, eventId = null, setEdited }){
     const { addNotification } = useNotification();
 
     const { data, loading, error } = useFetch('/config');
@@ -46,10 +46,10 @@ function OIEFullEvent({ event, eventId = null }){
 
     const changeOIE = async (newOIE) => {
         try{
-            console.log(newOIE);
             const auth = {headers: {"Authorization": `Bearer ${localStorage.getItem("token")}`}};
             const response = await axios.post(`/oie-status`, newOIE, auth);
             console.log(response);
+            setEdited(true);
             return response.data;
         } catch(err){
             console.log(err);

@@ -4,10 +4,13 @@ import { useNavigate } from 'react-router-dom';
 import Popup from '../../../../components/Popup/Popup';
 import OIEFullEvent from '../FullEvent/OIEFullEvent';
 import { Icon } from '@iconify-icon/react/dist/iconify.mjs';
+import FullEvent from '../../../../components/EventsViewer/EventsGrid/EventsColumn/FullEvent/FullEvent';
+
 import defaultAvatar from '../../../../assets/defaultAvatar.svg';
 
-function OIEEvent({event}){
+function OIEEvent({event, showStatus=false, refetch}){
     const [popupOpen, setPopupOpen] = useState(false);
+    const [edited, setEdited] = useState(false);
     const navigate = useNavigate();
 
     const handleEventClick = (event) => {
@@ -16,17 +19,32 @@ function OIEEvent({event}){
 
     const onPopupClose = () => {
         setPopupOpen(false);
+        if(edited){
+            refetch();
+            setEdited(false);
+        }
     }
 
     const date = new Date(event.start_time);
-    
+
+    const statusMessages = {
+        'Not Applicable' : ["Doesnt meet approval criteria","not-applicable"],
+        "Approved" : ["OIE Approved", "approved"]
+    }
 
     return(
         <div className="oie-event-component" >
             <Popup isOpen={popupOpen} onClose={onPopupClose} customClassName={"wide-content no-padding no-styling oie"} waitForLoad={true} >
-                <OIEFullEvent event={event}/>
+                {event.OIEStatus === "Pending" ?
+                 <OIEFullEvent event={event} refetch={refetch} setEdited={setEdited}/>
+                :
+                <FullEvent event={event}/>
+                }
             </Popup>
             <div className="info">
+                {
+                    showStatus && <div className={`oie-status ${statusMessages[event.OIEStatus][1]}`}><p>{statusMessages[event.OIEStatus][0]}</p></div>
+                }
                 <h1>{event.name}</h1>
                 {/* <p>{event.location }</p> */}
                 {/* display date in day of the week, month/day */}

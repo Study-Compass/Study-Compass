@@ -22,6 +22,26 @@
         display:flex;
         flex-direction: column;
         gap:5px;
+        .oie-status{
+            padding:1px 12px;
+            border-radius: 5px;
+            width:fit-content;
+            background-color: var(--green);
+            &.approved{
+                background-color: var(--green);
+            }
+            &.not-applicable{
+                background-color: var(--dark-blue);
+            }
+            p{
+                font-size:11px;
+                color:var(--background);
+                margin:0;
+                font-family: 'Inter';
+                font-weight:500;
+            }
+        }
+
         h1{
             font-size: 15px;
             font-weight: 600;
