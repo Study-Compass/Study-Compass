@@ -106,6 +106,9 @@
         border: 1px solid var(--lightborder);
         box-shadow: var(--shadow);
         width:calc(100% - 200px);
+        height: calc(100vh - 20px);
+        max-height: calc(100vh - 20px);
+        overflow: hidden;
 
         &.maximized{
             width:100%;
