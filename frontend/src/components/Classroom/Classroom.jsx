@@ -357,11 +357,11 @@ function Classroom({ room, state, setState, schedule, roomName, width, setShowMo
                                 </div>
                             );
                         })}
-                        {user && user.admin ? <div className="attribute" onClick={() => { setEdit(!edit) }}><img src={Edit} alt="" /></div> : ""}
+                        {user && user.roles.includes("admin") ? <div className="attribute" onClick={() => { setEdit(!edit) }}><img src={Edit} alt="" /></div> : ""}
                     </div>
                     {userRating && <UserRating rating={userRating} />}
                     {
-                        defaultImage && (!isAuthenticating) && isAuthenticated && user.admin ? <FileUpload classroomName={room.name} /> : ""
+                        defaultImage && (!isAuthenticating) && isAuthenticated && user.roles.includes('admin') ? <FileUpload classroomName={room.name} /> : ""
                     }
                     <div>
                         <Flag functions={setIsUp} primary={"rgba(176, 175, 175, .13)"} img={circleWarning} accent={"#D9D9D9"} color={"#737373"} text={"As Study Compass is still in beta, certain information may be incorrect. Reporting incorrect information is an important part of our troubleshooting process, so please help us out!"} />
@@ -390,7 +390,7 @@ function Classroom({ room, state, setState, schedule, roomName, width, setShowMo
 
                     </div>
                 </div>
-                {user && user.admin ? room ? edit ? <EditAttributes room={room} attributes={room.attributes} setEdit={setEdit} /> : "" : "" : ""}
+                {user && user.roles.includes('admin') ? room ? edit ? <EditAttributes room={room} attributes={room.attributes} setEdit={setEdit} /> : "" : "" : ""}
                 <div className="check-in" ref={checkInRef}>
                     <div className={`${success ? 'free-until' : 'class-until'}`}>
                         <div className="dot">

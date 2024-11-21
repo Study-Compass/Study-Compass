@@ -1,11 +1,11 @@
 const express = require('express');
 const router = express.Router();
-const { verifyToken, verifyTokenOptional } = require('../middlewares/verifyToken');
+const { verifyToken, authorizeRoles } = require('../middlewares/verifyToken');
 const OIEConfig = require('../schemas/OIEConfig');
 const OIEStatus = require('../schemas/OIE');
 const Event = require('../schemas/event');
 
-router.get('/config', verifyToken, async (req, res) => {
+router.get('/config', verifyToken, authorizeRoles('oie'), async (req, res) => {
     try {
         const config = await OIEConfig.findOne({});
         if (!config) {
@@ -19,7 +19,7 @@ router.get('/config', verifyToken, async (req, res) => {
     }
 });
 
-router.post('/config', verifyToken, async (req, res) => {
+router.post('/config', verifyToken, authorizeRoles('oie'), async (req, res) => {
     try {
         const config = await OIEConfig.findOne({});
         if (config) {
@@ -38,7 +38,7 @@ router.post('/config', verifyToken, async (req, res) => {
     }
 });
 
-router.post('/oie-status', verifyToken, async (req, res) => {
+router.post('/oie-status', verifyToken, authorizeRoles('oie'), async (req, res) => {
     try {
         const { eventRef, status, checkListItems } = req.body;
         const oieStatus = await OIEStatus.findOne({ eventRef });

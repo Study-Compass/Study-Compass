@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { verifyToken, verifyTokenOptional } = require('../middlewares/verifyToken');
+const { verifyToken, verifyTokenOptional, authorizeRoles } = require('../middlewares/verifyToken');
 const Event = require('../schemas/event');
 const User = require('../schemas/user');
 const Classroom = require('../schemas/classroom');
@@ -158,10 +158,10 @@ router.delete('/delete-event/:event_id', verifyToken, async (req, res) => {
 });
 
 //get all oie-unapproved events
-router.get('/oie/get-pending-events', verifyToken, async (req, res) => {
+router.get('/oie/get-pending-events', verifyToken, authorizeRoles('oie'), async (req, res) => {
     try {
         const user = await User.findById(req.user.userId);
-        if (!user || !user.admin) {
+        if (!user) {
             return res.status(403).json({
                 success: false,
                 message: 'You are not authorized to view this page.'
@@ -183,10 +183,10 @@ router.get('/oie/get-pending-events', verifyToken, async (req, res) => {
 });
 
 //get all oie-unapproved events
-router.get('/oie/get-accepted-events', verifyToken, async (req, res) => {
+router.get('/oie/get-accepted-events', verifyToken, authorizeRoles('oie'), async (req, res) => {
     try {
         const user = await User.findById(req.user.userId);
-        if (!user || !user.admin) {
+        if (!user ) {
             return res.status(403).json({
                 success: false,
                 message: 'You are not authorized to view this page.'
@@ -208,10 +208,10 @@ router.get('/oie/get-accepted-events', verifyToken, async (req, res) => {
 });
 
 //get all oie-unapproved events
-router.get('/oie/get-rejected-events', verifyToken, async (req, res) => {
+router.get('/oie/get-rejected-events', verifyToken, authorizeRoles('oie'), async (req, res) => {
     try {
         const user = await User.findById(req.user.userId);
-        if (!user || !user.admin) {
+        if (!user) {
             return res.status(403).json({
                 success: false,
                 message: 'You are not authorized to view this page.'
@@ -246,7 +246,7 @@ router.get('/get-event/:event_id', verifyTokenOptional, async (req, res) => {
             });
         }
         if (event.OIEStatus === 'Pending') {
-            if (!user || !user.admin){
+            if (!user){
                 return res.status(403).json({
                     success: false,
                     message: 'You are not authorized to view this page.'
@@ -288,7 +288,7 @@ router.post('/approve-event', verifyToken, async (req, res) => {
 
     try {
         const user = await User.findById(user_id);
-        if(!user || !user.admin) {
+        if(!user) {
             return res.status(403).json({
                 success: false,
                 message: 'You are not authorized to approve events.'
