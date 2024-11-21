@@ -182,6 +182,56 @@ router.get('/oie/get-pending-events', verifyToken, async (req, res) => {
     }
 });
 
+//get all oie-unapproved events
+router.get('/oie/get-accepted-events', verifyToken, async (req, res) => {
+    try {
+        const user = await User.findById(req.user.userId);
+        if (!user || !user.admin) {
+            return res.status(403).json({
+                success: false,
+                message: 'You are not authorized to view this page.'
+            });
+        }
+        const events = await Event.find({ OIEStatus: 'approved' }).populate('classroom_id').populate('hostingId');
+        console.log('GET: /oie/get-pending-events successful');
+        res.status(200).json({
+            success: true,
+            events
+        });
+    } catch (error) {
+        console.log('GET: /oie/get-pending-events failed', error);
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+});
+
+//get all oie-unapproved events
+router.get('/oie/get-rejected-events', verifyToken, async (req, res) => {
+    try {
+        const user = await User.findById(req.user.userId);
+        if (!user || !user.admin) {
+            return res.status(403).json({
+                success: false,
+                message: 'You are not authorized to view this page.'
+            });
+        }
+        const events = await Event.find({ OIEStatus: 'Rejected' }).populate('classroom_id').populate('hostingId');
+        console.log('GET: /oie/get-pending-events successful');
+        res.status(200).json({
+            success: true,
+            events
+        });
+    } catch (error) {
+        console.log('GET: /oie/get-pending-events failed', error);
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+});
+
 router.get('/get-event/:event_id', verifyTokenOptional, async (req, res) => {
     const { event_id } = req.params;
     const user_id = req.user ? req.user.userId : null;

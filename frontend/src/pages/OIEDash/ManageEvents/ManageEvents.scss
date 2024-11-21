@@ -1,0 +1,31 @@
+.manage-events{
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    padding: 20px;
+    box-sizing: border-box;
+    width: 100%;
+    gap:10px;
+    .events-col{
+        display: flex;
+        flex-direction:column;
+        align-items: center;
+        background-color: var(--offwhite);
+        padding:5px;
+        box-sizing: border-box;
+        max-height: calc(100vh - 50px);
+        border-radius: 10px;
+        border: 1px solid var(--lightborder);
+
+        .header{
+            h1{
+                font-size:20px;
+            }
+
+        }
+        .content{
+            overflow-y: auto;
+            max-height:100%;
+        }
+    }
+}
