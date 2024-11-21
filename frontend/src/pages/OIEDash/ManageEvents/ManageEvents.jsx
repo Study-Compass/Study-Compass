@@ -9,6 +9,8 @@ function ManageEvents({expandedClass}){
 
     const [events, setEvents] = useState([]);
     const [pendingEvents, setPendingEvents] = useState([]);
+    const [approvedEvents, setApprovedEvents] = useState([]);
+    const [rejectedEvents, setRejectedEvents] = useState([]);
 
     const fetchEvents = useFetch('/get-all-events');
     const fetchPendingEvents = useFetch('/oie/get-pending-events');
@@ -36,6 +38,30 @@ function ManageEvents({expandedClass}){
         }
     }, [fetchEvents.data, fetchPendingEvents.data]);
 
+    useEffect(() => {
+        if(fetchRejectedEvents.data){
+            const allEvents = fetchRejectedEvents.data.events;
+            console.log(allEvents);
+            //sort by dates
+            allEvents.sort((a, b) => {
+                return new Date(a.date) - new Date(b.date);
+            }
+            );
+            allEvents.reverse();
+            setRejectedEvents(allEvents);
+        }
+        if(fetchApprovedEvents.data){
+            const allEvents = fetchApprovedEvents.data.events;
+            //sort by dates
+            allEvents.sort((a, b) => {
+                return new Date(a.date) - new Date(b.date);
+            }
+            );
+            allEvents.reverse();
+            setApprovedEvents(allEvents);
+        }
+    }, [fetchRejectedEvents.data, fetchApprovedEvents.data]);
+
     const refetch = () => {
         fetchEvents.refetch();
         fetchPendingEvents.refetch();
@@ -52,7 +78,7 @@ function ManageEvents({expandedClass}){
                         pendingEvents.map((event, index) => {
                             if(index < 5){
                                 return (
-                                    <OIEEvent event={event} key={index} refetch={refetch}/>
+                                    <OIEEvent event={event} key={index} refetch={refetch} showOIE={true}/>
                                 )
                             }
                         })
@@ -65,18 +91,29 @@ function ManageEvents({expandedClass}){
                 </div>
                 <div className="content">
                     {
-                        events.map((event, index) => {
-                            if(index < 5){
-                                return (
-                                    <OIEEvent event={event} key={index} showStatus={true} refetch={refetch}/>
-                                )
-                            }
+                        approvedEvents.map((event, index) => {
+                            return (
+                                <OIEEvent event={event} key={index} refetch={refetch} showOIE={true}/>
+                            )
                         })
                     }
                 </div>
             </div>
             <div className="events-col">
-
+                <div className="header">
+                    <h1>rejected events</h1>
+                </div>
+                <div className="content">
+                    {
+                        rejectedEvents.map((event, index) => {
+                            if(index < 5){
+                                return (
+                                    <OIEEvent event={event} key={index} refetch={refetch} showOIE={true}/>
+                                )
+                            }
+                        })
+                    }
+                </div>
             </div>
         </div>
     )
