@@ -9,6 +9,7 @@ import Configuration from './Configuration/Configuration';
 
 import {Icon} from '@iconify-icon/react';  
 import Dash from './Dash/Dash';
+import ManageEvents from './ManageEvents/ManageEvents';
 import { set } from 'mongoose';
 
 function OIEDash(){
@@ -82,6 +83,12 @@ function OIEDash(){
                             <div className="icon-container">
                                 <Icon icon="flowbite:adjustments-horizontal-solid" />
                             </div>
+                            <p>Events</p>
+                        </li>
+                        <li className={` ${currentDisplay === 3 && "selected"}`}  onClick={()=>setCurrentDisplay(3)}>
+                            <div className="icon-container">
+                                <Icon icon="flowbite:adjustments-horizontal-solid" />
+                            </div>
                             <p>Configuration</p>
                         </li>
                     </ul>
@@ -96,11 +103,17 @@ function OIEDash(){
                     }
                     {
                         (currentPage === 1 || currentDisplay === 1) &&
-                        <div className={`${currentDisplay === 1 && "visible"} dash-content`}>Page 1</div>
+                        <div className={`${currentDisplay === 1 && "visible"} dash-content`}></div>
                     }
                     {
                         (currentPage === 2 || currentDisplay === 2) &&
                         <div className={`${currentDisplay === 2 && "visible"} dash-content`}>
+                            <ManageEvents expandedClass={expandedClass}/>
+                        </div>
+                    }
+                    {
+                        (currentPage === 3 || currentDisplay === 3) &&
+                        <div className={`${currentDisplay === 3 && "visible"} dash-content`}>
                             <Configuration />
                         </div>
                     }
