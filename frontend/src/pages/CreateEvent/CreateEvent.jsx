@@ -9,11 +9,30 @@ import GenInfo from '../../components/CreateEvent/GenInfo/GenInfo';
 import Review from '../../components/CreateEvent/Review/Review';
 import { useNotification } from '../../NotificationContext';
 import { createEvent } from './CreateEventHelpers';
+import { useNavigate } from 'react-router-dom';
+import useAuth from '../../hooks/useAuth';
 
 function CreateEvent(){
     const [step, setStep] = useState(0);
     const [info, setInfo] = useState({});
     const [finishedStep, setFinishedStep] = useState(0);
+    const {isAuthenticated, isAuthenticating, user} = useAuth();
+    const { navigate } = useNavigate();
+
+    useEffect(()=>{
+        if(isAuthenticating){
+            return;
+        }
+        if(!isAuthenticated){
+            navigate('/');
+        }
+        if(!user){
+            return;
+        }
+        if(!(user.roles.includes('oie') || user.roles.includes('admin') || user.roles.includes('developer'))){
+            navigate('/');
+        }
+    }, [isAuthenticating, isAuthenticated, user]);
 
     const {addNotification} = useNotification();
     

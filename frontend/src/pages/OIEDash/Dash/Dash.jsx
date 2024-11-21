@@ -52,7 +52,7 @@ function Dash({expandedClass}){
                         pendingEvents.map((event, index) => {
                             if(index < 5){
                                 return (
-                                    <OIEEvent event={event} key={index} refetch={refetch}/>
+                                    <OIEEvent event={event} key={index} refetch={refetch} showOIE={true}/>
                                 )
                             }
                         })
@@ -66,7 +66,7 @@ function Dash({expandedClass}){
                         events.map((event, index) => {
                             if(index < 5){
                                 return (
-                                    <OIEEvent event={event} key={index} showStatus={true} refetch={refetch}/>
+                                    <OIEEvent event={event} key={index} showStatus={true} refetch={refetch} showOIE={true}/>
                                 )
                             }
                         })

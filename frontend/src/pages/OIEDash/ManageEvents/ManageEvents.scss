@@ -16,6 +16,7 @@
         max-height: calc(100vh - 50px);
         border-radius: 10px;
         border: 1px solid var(--lightborder);
+        min-width:260px;
 
         .header{
             h1{

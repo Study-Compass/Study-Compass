@@ -18,6 +18,24 @@ function Events(){
     const [tlLoaded, setTlLoaded] = useState(false);
     const [brLoaded, setBrLoaded] = useState(false);
 
+    const { isAuthenticated, isAuthenticating, user } = useAuth();
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        if(isAuthenticating){
+            return;
+        }
+        if(!isAuthenticated){
+            navigate('/');
+        }
+        if(!user){
+            return;
+        }
+        if(!(user.roles.includes('oie') || user.roles.includes('admin') || user.roles.includes('developer'))){
+            navigate('/');
+        }
+    }, [isAuthenticating, isAuthenticated, user]);
+
     const onBannerElementLoad = (e) => {
         if(e.target.className === "tl"){
             setTlLoaded(true);
