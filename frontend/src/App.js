@@ -64,6 +64,11 @@ function App() {
                 timestamp = new Date().toISOString();
                 localStorage.setItem('timestamp', timestamp);
             }
+
+            //log how many minutes it has been since last visit
+            console.log("minutes since last visit: ", (new Date().getTime() - new Date(timestamp).getTime()) / 1000 / 60);
+
+
             //if 20 minutes from last timestamp
             if (new Date().getTime() - new Date(timestamp).getTime() > 20 * 60 * 1000) {
                 //send to backend

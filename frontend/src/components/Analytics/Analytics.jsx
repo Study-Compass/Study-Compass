@@ -26,6 +26,8 @@ function Analytics() {
             </div>
             <AnalyticsChart endpoint={"visits"} heading={"Unique Visits"} color={"#45A1FC"}/>
             <AnalyticsChart endpoint={"users"} heading={"New Users"} color={"#8052FB"}/>
+            <AnalyticsChart endpoint={"searches"} heading={"Searches"} color={"#FA756D"}/>
+
         </div>
     );
 }
