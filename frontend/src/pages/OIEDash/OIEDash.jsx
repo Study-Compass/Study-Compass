@@ -32,7 +32,7 @@ function OIEDash(){
         if(!user){
             return;
         } else {
-            if(!user.admin){
+            if(!user.roles.includes('oie')){
                 navigate('/');
             }
             setUserInfo(user);

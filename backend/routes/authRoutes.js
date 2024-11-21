@@ -148,7 +148,6 @@ router.get('/validate-token', verifyToken, async (req, res) => {
                 //     email: user.email,
                 //     name: user.name,
                 //     picture : user.picture,
-                //     admin : user.admin,
                 //     saved: user.saved,
                 //     visited: user.visited,
                 //     partners: user.partners,
