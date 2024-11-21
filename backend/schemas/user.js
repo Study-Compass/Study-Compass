@@ -90,7 +90,7 @@ const userSchema = new mongoose.Schema({
     roles: {
         type: [String],
         default: ['user'],
-        enum: ['user', 'admin', 'moderator', 'developer'], // Adjust roles as needed
+        enum: ['user', 'admin', 'moderator', 'developer', 'oie'], // Adjust roles as needed
     },
     
     // you can add more fields here if needed, like 'createdAt', 'updatedAt', etc.

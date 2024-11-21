@@ -83,7 +83,7 @@ function EditAttributes({room, attributes, setEdit}){
                             {attribute in attributeIcons ? <img src={attributeIcons[attribute]} alt={attribute} />: ""}
                             {attribute}
                         </div>
-                        {user && user.admin && <img src={Delete} alt="delete" onClick={() => {
+                        {user && user.roles.includes('admin') && <img src={Delete} alt="delete" onClick={() => {
                             const newAttributes = attributesAdmin.filter((item) => item !== attribute);
                             console.log(newAttributes);
                             setAttributes(newAttributes);
