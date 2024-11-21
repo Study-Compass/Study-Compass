@@ -183,7 +183,7 @@ router.get('/oie/get-pending-events', verifyToken, authorizeRoles('oie'), async 
 });
 
 //get all oie-unapproved events
-router.get('/oie/get-accepted-events', verifyToken, authorizeRoles('oie'), async (req, res) => {
+router.get('/oie/get-approved-events', verifyToken, authorizeRoles('oie'), async (req, res) => {
     try {
         const user = await User.findById(req.user.userId);
         if (!user ) {
@@ -192,14 +192,14 @@ router.get('/oie/get-accepted-events', verifyToken, authorizeRoles('oie'), async
                 message: 'You are not authorized to view this page.'
             });
         }
-        const events = await Event.find({ OIEStatus: 'approved' }).populate('classroom_id').populate('hostingId');
-        console.log('GET: /oie/get-pending-events successful');
+        const events = await Event.find({ OIEStatus: 'Approved' }).populate('classroom_id').populate('hostingId');
+        console.log('GET: /oie/get-approved-events successful');
         res.status(200).json({
             success: true,
             events
         });
     } catch (error) {
-        console.log('GET: /oie/get-pending-events failed', error);
+        console.log('GET: /oie/get-approved-events failed', error);
         res.status(500).json({
             success: false,
             message: error.message
@@ -218,13 +218,13 @@ router.get('/oie/get-rejected-events', verifyToken, authorizeRoles('oie'), async
             });
         }
         const events = await Event.find({ OIEStatus: 'Rejected' }).populate('classroom_id').populate('hostingId');
-        console.log('GET: /oie/get-pending-events successful');
+        console.log('GET: /oie/get-rejected-events successful');
         res.status(200).json({
             success: true,
             events
         });
     } catch (error) {
-        console.log('GET: /oie/get-pending-events failed', error);
+        console.log('GET: /oie/get-rejected-events failed', error);
         res.status(500).json({
             success: false,
             message: error.message
@@ -245,7 +245,7 @@ router.get('/get-event/:event_id', verifyTokenOptional, async (req, res) => {
                 message: 'Event not found.'
             });
         }
-        if (event.OIEStatus === 'Pending') {
+        if (event.OIEStatus !== 'Not Applicable') {
             if (!user){
                 return res.status(403).json({
                     success: false,

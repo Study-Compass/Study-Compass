@@ -65,7 +65,7 @@ const Header = React.memo(()=>{
                         <nav>
                             {isAuthenticated && <Link className={`nav-link ${ pageClass === "room" ? "active" : ""}`} to="/room/none" ><h2>search</h2></Link>}
                             {isAuthenticated && <Link className={`nav-link ${ pageClass === "friends" ? "active" : ""}`} to="/friends" ><h2>friends</h2></Link>}
-                            <Link className={`nav-link ${ pageClass === "events" ? "active" : ""}`} to="/events" ><h2>events</h2></Link>                            
+                            {isAuthenticated && user && (user.roles.includes('admin') || user.roles.includes('oie')) && <Link className={`nav-link ${ pageClass === "events" ? "active" : ""}`} to="/events" ><h2>events</h2></Link>}                         
                         </nav>  
                     </div>
                     

@@ -46,7 +46,6 @@
         flex-grow:1;
         overflow-x:hidden;
         overflow-y: auto;
-        
 
         .check-item{
             width:100%;
@@ -58,10 +57,9 @@
             border-radius: 10px;
             flex-direction: column;
             background-color: var(--background);
-            opacity: 0;
-            transform:translateX(-100%);
             justify-content: center;
-            animation: fromLeft 0.3s forwards cubic-bezier(0.075, 0.82, 0.165, 1), fadeIn 0.3s forwards;
+            opacity: 0;
+            animation: fadeIn 0.5s forwards;
             .row{
                 justify-content: space-between;
                 .col{
