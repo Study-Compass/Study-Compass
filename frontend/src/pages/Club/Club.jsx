@@ -2,8 +2,9 @@ import React from 'react';
 import './Club.scss';
 import Header from '../../components/Header/Header';
 import rpiLogo from "../../assets/Icons/rpiLogo.svg";
-import person from "../../assets/Icons/Person.svg"
-
+import person from "../../assets/Icons/Person.svg";
+import calendar from "../../assets/Icons/Calendar.svg";
+import locate from "../../assets/Icons/Locate.svg";
 
 const Club = () => {
     return (
@@ -54,21 +55,23 @@ const Club = () => {
 
                 </div> */}
 
-                {/* Meeting Schedule Section */}
                 <div className="meeting-schedule">
                     <h3>Meetings Schedule</h3>
                     <div className="meeting-card">
-                        <h4>YDSA Weekly GBM</h4>
+                        <div className='title'>
+                            <img src={rpiLogo} alt=""/>
+                            <h4>YDSA Weekly GBM</h4>
+                        </div>
                         <div className='info'>
+                            <img src={calendar} alt="" />
                             <p>Weekly on Thursday at 5:00</p>
+                            <img src={locate} alt="" />
                             <p>Phalanx</p>
                             {/* <p>Next Meeting: Thursday 10/24</p> */}
 
                         </div>
                     </div>
                 </div>
-
-
             </div>
         </div>
     );
