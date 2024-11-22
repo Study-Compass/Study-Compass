@@ -143,7 +143,7 @@ a:hover{
 .shimmer {
 	animation: shimmering 2s linear infinite;
 	background: var(--dark);
-	background: linear-gradient(90deg, var(--dark) 9%, var(--light) 18%, var(--dark) 31%);
+	background: linear-gradient(90deg, var(--lightborder) 9%, var(--light) 18%, var(--lightborder) 31%);
 	background-size: 1300px 100%;
     opacity: 0.8;
 }

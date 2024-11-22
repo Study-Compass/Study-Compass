@@ -65,10 +65,15 @@ function ManageEvents({expandedClass}){
     const refetch = () => {
         fetchEvents.refetch();
         fetchPendingEvents.refetch();
+        fetchRejectedEvents.refetch();
+        fetchApprovedEvents.refetch();
     }
 
     return (
         <div className={`manage-events ${expandedClass}`}>
+            <div className="panel">
+                <h1>Event Board</h1>
+            </div>
             <div className="events-col">
                 <div className="header">
                     <h1>events pending approval</h1>
@@ -78,10 +83,14 @@ function ManageEvents({expandedClass}){
                         pendingEvents.map((event, index) => {
                             if(index < 5){
                                 return (
-                                    <OIEEvent event={event} key={index} refetch={refetch} showOIE={true}/>
+                                    <OIEEvent event={event} key={index} refetch={refetch} showOIE={true} index={index}/>
                                 )
                             }
                         })
+                    }
+                    {
+                        pendingEvents.length === 0 && <div className="no-events shimmer">
+                        </div>
                     }
                 </div>
             </div>
@@ -93,9 +102,13 @@ function ManageEvents({expandedClass}){
                     {
                         approvedEvents.map((event, index) => {
                             return (
-                                <OIEEvent event={event} key={index} refetch={refetch} showOIE={true}/>
+                                <OIEEvent event={event} key={index} refetch={refetch} showOIE={true} index={index}/>
                             )
                         })
+                    }
+                    {
+                        approvedEvents.length === 0 && <div className="no-events shimmer">
+                        </div>
                     }
                 </div>
             </div>
@@ -103,15 +116,17 @@ function ManageEvents({expandedClass}){
                 <div className="header">
                     <h1>rejected events</h1>
                 </div>
-                <div className="content">
+            <div className="content">
                     {
                         rejectedEvents.map((event, index) => {
-                            if(index < 5){
-                                return (
-                                    <OIEEvent event={event} key={index} refetch={refetch} showOIE={true}/>
-                                )
-                            }
+                            return (
+                                <OIEEvent event={event} key={index} refetch={refetch} showOIE={true} index={index}/>
+                            )
                         })
+                    }
+                    {
+                        rejectedEvents.length === 0 && <div className="no-events shimmer">
+                        </div>
                     }
                 </div>
             </div>
