@@ -11,6 +11,8 @@
     border-radius: 10px;
     border: 1px solid var(--lightborder);
     justify-content: space-between;
+    animation: fadeIn 0.5s forwards;
+    opacity: 0;
 
     img{
         width:calc(100%);

@@ -8,7 +8,7 @@ import FullEvent from '../../../../components/EventsViewer/EventsGrid/EventsColu
 
 import defaultAvatar from '../../../../assets/defaultAvatar.svg';
 
-function OIEEvent({event, showStatus=false, refetch, showOIE=false}){
+function OIEEvent({event, showStatus=false, refetch, showOIE=false, index}){
     const [popupOpen, setPopupOpen] = useState(false);
     const [edited, setEdited] = useState(false);
     const navigate = useNavigate();
@@ -33,7 +33,7 @@ function OIEEvent({event, showStatus=false, refetch, showOIE=false}){
     }
 
     return(
-        <div className="oie-event-component" >
+        <div className="oie-event-component" style={index ? {animationDelay: `${index * 0.1}s`}:{}}>
             <Popup isOpen={popupOpen} onClose={onPopupClose} customClassName={"wide-content no-padding no-styling oie"} waitForLoad={true} >
                 {showOIE && !(event.OIEStatus === "Not Applicable") ?
                  <OIEFullEvent event={event} refetch={refetch} setEdited={setEdited}/>
