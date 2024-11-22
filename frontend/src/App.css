@@ -18,6 +18,7 @@
     --lighterborder:#E4E5E6;
     /* --green: #4DAA57; */
     --green: #64AB6C;
+    --dark-blue: #6D8EFA;
     --shadow: 0px 7px 29px 0px rgba(100, 100, 111, 0.1);
     --lighter: #F5F5F5;
     --offwhite: #F6F6F6;
@@ -27,7 +28,7 @@
     --rating-yellow : #FFC700;
     --yellow: #FBBC05;
     --offwhite: #F6F6F6;
-    --offwhite: #F6F6F6;
+    
 
     --developerBlue: #45A1FC;
     --developerPurple: #8052FB;
@@ -128,10 +129,21 @@ a:hover{
 	}
 }
 
+.page{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100%;
+    background-color: var(--background);
+    width: 100%;
+    height:100%;
+    
+}
+
 .shimmer {
 	animation: shimmering 2s linear infinite;
 	background: var(--dark);
-	background: linear-gradient(90deg, var(--dark) 9%, var(--light) 18%, var(--dark) 31%);
+	background: linear-gradient(90deg, var(--lightborder) 9%, var(--light) 18%, var(--lightborder) 31%);
 	background-size: 1300px 100%;
     opacity: 0.8;
 }
@@ -310,3 +322,32 @@ button.active{
       opacity: 1;
     }
   }
+
+@keyframes fromLeft{
+    from{
+        transform: translateX(-100%);
+    }
+    to{
+        transform: translateX(0);
+    }
+}
+
+  .row{
+    display:flex;
+    flex-direction:row;
+    gap:5px;
+  }
+
+  .col{
+    display:flex;
+    flex-direction:column;
+    gap:5px;
+  }
+
+
+button{
+    outline:none;
+    border:none;
+    border-radius:5px;
+
+}

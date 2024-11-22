@@ -164,7 +164,6 @@ function Room() {
             setNumLoaded(0);
             setLoadedResults([]);
         }
-        console.log(contentState);
     },[contentState]);
 
         
@@ -179,7 +178,6 @@ function Room() {
         if(!isAuthenticated && !isAuthenticating){
             height -= 20;
             setViewport(height + 'px');
-            console.log(height);
         }
         
         setViewport(height + 'px');
@@ -214,12 +212,10 @@ function Room() {
             if(!ready){
                 return;
             }
-            console.log("hi there");
-            console.log(searchQueryParams);
+            console.log("hello");
             setSearchAttributes(attributes);
             setSearchSort(sort); 
             setSearchQuery(searchQueryParams);   
-            console.log("searching");
             setContentState("nameSearch");
             fetchData("none");
 
@@ -240,7 +236,6 @@ function Room() {
                 clearQuery();
             }
         }
-        console.log(roomid);
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isAuthenticated, isAuthenticating, roomIds]);
 
@@ -265,14 +260,14 @@ function Room() {
         // if(searchQuery === ""){
         //     return;
         // }
-        console.log(noquery);
         if(noquery && searchQuery === "" && searchAttributes.length === 0 && contentState !== "classroom"){
             setContentState("empty");
             return;
         }
-
         allPurposeSearch();
     }, [searchQuery, searchAttributes, searchSort, query]);
+
+    useEffect(()=>{console.log(data)},[data])
 
     
     useEffect(() => { 
@@ -290,7 +285,6 @@ function Room() {
             
             try{
                 const recommendation = await getRecommendation();
-                console.log(recommendation.data.data);
                 setRecommendedRoom(recommendation.data.data);
             } catch (error){
                 console.log(error);
@@ -450,6 +444,7 @@ function Room() {
                         <div className={`calendar-content-container ${showMobileCalendar ? "active" : ""}`}>
                             <MobileCalendar className={"s"} data={data} isloading={loading} addQuery={addQuery} removeQuery={removeQuery} query={query} show={showMobileCalendar} setShow={setShowMobileCalendar} />
                         </div>
+                        
                     ) : (
                         <div className="right">
                             <div className={`calendar-instruction ${(contentState === "empty" && calendarEmpty) ? "visible": ""}`}>select a timeslot</div>

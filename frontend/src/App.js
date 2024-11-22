@@ -11,9 +11,11 @@ import Settings from './pages/Settings/Settings';
 import Friends from './pages/Friends/Friends';
 import Profile from './pages/Profile/Profile';
 import Landing from './pages/Landing/Landing';
+import Events from './pages/Events/Events';
 import DeveloperOnboard from './pages/DeveloperOnboarding/DeveloperOnboarding';
 import QR from './pages/QR/QR';
 import Admin  from './pages/Admin/Admin';
+import OIEDash from './pages/OIEDash/OIEDash';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './AuthContext';
 import { CacheProvider } from './CacheContext';
@@ -24,6 +26,7 @@ import { ProfileCreationProvider } from './ProfileCreationContext';
 import { WebSocketProvider } from './WebSocketContext';
 import Layout from './pages/Layout/Layout';
 import axios from 'axios';
+import CreateEvent from './pages/CreateEvent/CreateEvent';
 
 function App() {
     useEffect(() => {
@@ -112,6 +115,9 @@ function App() {
                                             <Route path="/documentation" element={<Redirect/>}/>
                                             <Route path="/developer-onboarding" element={<DeveloperOnboard/>}/>
                                             <Route path="/admin" element={<Admin/>}/>
+                                            <Route path="/create-event" element={<CreateEvent/>}/>
+                                            <Route path="/events" element={<Events/>}/>
+                                            <Route path="/oie-dashboard" element={<OIEDash/>}/>
                                         </Route>
                                     </Routes>
                                     </ProfileCreationProvider>

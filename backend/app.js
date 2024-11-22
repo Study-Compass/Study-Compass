@@ -64,15 +64,32 @@ const analyticsRoutes = require('./routes/analytics.js');
 const classroomChangeRoutes = require('./routes/classroomChangeRoutes.js');
 const ratingRoutes = require('./routes/ratingRoutes.js');
 const searchRoutes = require('./routes/searchRoutes.js');
+const eventRoutes = require('./routes/eventRoutes.js');
+const oieRoutes = require('./routes/oie-routes.js');
 
 app.use(authRoutes);
 app.use(dataRoutes);
 app.use(friendRoutes);
 app.use(userRoutes);
 app.use(analyticsRoutes);
+app.use(eventRoutes);
+
 app.use(classroomChangeRoutes);
 app.use(ratingRoutes);
 app.use(searchRoutes);
+app.use(eventRoutes);
+app.use(oieRoutes);
+
+
+// Serve static files from the React app in production
+if (process.env.NODE_ENV === 'production') {
+    app.use(express.static(path.join(__dirname, '../frontend/build')));
+
+    // The "catchall" handler: for any request that doesn't match one above, send back React's index.html file.
+    app.get('*', (req, res) => {
+        res.sendFile(path.join(__dirname, '../frontend/build/index.html'));
+    });
+}
 
 //deprecated, should lowk invest in this
 // app.get('/update-database', (req, res) => {
@@ -126,15 +143,6 @@ app.post('/upload-image/:classroomName', upload.single('image'), async (req, res
     }
 });
 
-// Serve static files from the React app in production
-if (process.env.NODE_ENV === 'production') {
-    app.use(express.static(path.join(__dirname, '../frontend/build')));
-
-    // The "catchall" handler: for any request that doesn't match one above, send back React's index.html file.
-    app.get('*', (req, res) => {
-        res.sendFile(path.join(__dirname, '../frontend/build/index.html'));
-    });
-}
 
 // Socket.io functionality
 io.on('connection', (socket) => {
