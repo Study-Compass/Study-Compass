@@ -14,6 +14,8 @@ import Stats from '../../assets/Icons/Stats.svg';
 import useOutsideClick from '../../hooks/useClickOutside';
 
 import { useNotification } from '../../NotificationContext';
+import {Icon} from '@iconify-icon/react';  
+import RPI from '../../assets/Icons/RPI.svg';
 
 import {Link} from 'react-router-dom'
 
@@ -73,14 +75,26 @@ function ProfilePicture(){
                     </div>
                 </Link>
                 {
-                    user && user.admin && 
+                    user && user.roles.includes('admin') && 
                     <>
                         <hr />
 
                         <Link to="/admin">
                             <div className="menu-item">
-                                <img className="icon" src={Stats} alt="guide" />
+                                <Icon icon="bx:stats" />
                                 <p>Admin</p>
+                            </div>
+                        </Link>
+                    </>
+                }
+                {
+                    user && user.roles.includes('oie') && 
+                    <>
+                        <hr />
+                        <Link to="/oie-dashboard">
+                            <div className="menu-item">
+                                <img className="icon" src={RPI} alt="log out" />
+                                <p>OIE Admin</p>
                             </div>
                         </Link>
                     </>

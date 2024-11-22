@@ -78,7 +78,7 @@ router.post('/register', async (req, res) => {
         await user.save();
 
         // Generate a token for the new user
-        const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+        const token = jwt.sign({ userId: user._id, roles: user.roles }, process.env.JWT_SECRET, { expiresIn: '1h' });
         console.log(`POST: /register new user ${username}`);
         sendDiscordMessage(`New user registered`, `user ${username} registered`, "newUser");
         // Send the token to the client
@@ -148,7 +148,6 @@ router.get('/validate-token', verifyToken, async (req, res) => {
                 //     email: user.email,
                 //     name: user.name,
                 //     picture : user.picture,
-                //     admin : user.admin,
                 //     saved: user.saved,
                 //     visited: user.visited,
                 //     partners: user.partners,

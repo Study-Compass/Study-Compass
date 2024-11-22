@@ -6,8 +6,8 @@ import DayColumn from '../DayColumn/DayColumn';
  * https://incongruous-reply-44a.notion.site/Frontend-Calendar-DayColumn-Components-0283818fd23a4bbfa5ab81d76a0ad876
  * */ 
 
-function Calendar({className, data, isLoading, addQuery, removeQuery, query}){
-    const days = ["S", "M", "T", "W", "R", "F"];
+function Calendar({className, data, isLoading, addQuery, removeQuery, query, weekend=false, dateRange = null}){
+    const days = weekend ?  ["S", "M", "T", "W", "R", "F", "H"] : ["G", "M", "T", "W", "R", "F"];
     const loadColors = useRef(new Map()).current;
     const eventColors = useRef(new Map()).current;
     const [empty, setEmpty] = useState(true);
@@ -34,19 +34,34 @@ function Calendar({className, data, isLoading, addQuery, removeQuery, query}){
     return (
             <div className={`Calendar ${data ? "":"loading"}`}>
                 {isLoading ? <div>loading</div>: ""}
-                <div className="Calendar-header">
+                <div className={`Calendar-header ${weekend && "weekend"} ${dateRange ? "date" : "   "}`}>
+                    {weekend ? <p className={`${currentDay === 0 ? "currentDay" : ""}`}>sunday</p> : ""}
                     <p className={`${currentDay === 1 ? "currentDay" : ""}`}>monday</p>
                     <p className={`${currentDay === 2 ? "currentDay" : ""}`}>tuesday</p>
                     <p className={`${currentDay === 3 ? "currentDay" : ""}`}>wednesday</p>
                     <p className={`${currentDay === 4 ? "currentDay" : ""}`}>thursday</p>
                     <p className={`${currentDay === 5 ? "currentDay" : ""}`}>friday</p>
+                    {weekend ? <p className={`${currentDay === 6 ? "currentDay" : ""}`}>saturday</p> : ""}
                 </div>
+                {
+                    dateRange ?
+                    <div className={`Calendar-header ${weekend && "weekend"}`}>
+                        <p>{dateRange[0][0]}</p>
+                        <p>{dateRange[1][0]}</p>
+                        <p>{dateRange[2][0]}</p>
+                        <p>{dateRange[3][0]}</p>
+                        <p>{dateRange[4][0]}</p>
+                        <p>{dateRange[5][0]}</p>
+                        <p>{dateRange[6][0]}</p>
+                    </div>
+                    : ""
+                }
                 <div className="Time-grid">
                     {days.map((day) => (
                         <DayColumn 
                             key={day}
                             day={day} 
-                            dayEvents={isLoading ? load : data ? data["weekly_schedule"][day]: load} 
+                            dayEvents={isLoading ? load : data ? data["weekly_schedule"][day] ?data["weekly_schedule"][day] : load : load} 
                             eventColors={isLoading ? loadColors : data ? eventColors : loadColors }
                             empty = {empty} 
                             add = {addQuery}
@@ -61,4 +76,4 @@ function Calendar({className, data, isLoading, addQuery, removeQuery, query}){
 
 }
 
-export default Calendar
+export default Calendar;

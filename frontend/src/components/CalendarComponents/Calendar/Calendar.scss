@@ -19,14 +19,26 @@
     margin-bottom:10px;
 }
 
+.Calendar-header.weekend{
+    width:850px;
+}
+
+.Calendar-header.date{
+    margin-bottom:0;
+}
+
 
 .Calendar-header p{
-    width: 20%;
+    min-width: 20%;
     color: #B0AFAF;
     font-family: 'Satoshi';
     font-size: 14px;
     font-weight: normal;
     text-align: center;
+}
+
+.Calendar-header.weekend p{
+    min-width: 14.28%;
 }
 
 .currentDay{
@@ -35,6 +47,12 @@
     border-radius: 10px;
     padding: 5px 5px;
     box-sizing:border-box;
+}
+
+.weekend .currentDay{
+    background-color: var(--background-color);
+    color:#B0AFAF !important;
+
 }
 /* .loading{
     width:825px;
@@ -46,6 +64,11 @@
 @media screen and (max-width: 1150px){
     .Calendar-header{
         width:500px;
+    }
+
+    .Calendar-header.weekend{
+        width:700px;
+
     }
 }
 

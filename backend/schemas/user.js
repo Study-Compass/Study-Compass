@@ -87,6 +87,11 @@ const userSchema = new mongoose.Schema({
         type: Boolean,
         default: false,
     },
+    roles: {
+        type: [String],
+        default: ['user'],
+        enum: ['user', 'admin', 'moderator', 'developer', 'oie'], // Adjust roles as needed
+    },
     
     // you can add more fields here if needed, like 'createdAt', 'updatedAt', etc.
 }, {
