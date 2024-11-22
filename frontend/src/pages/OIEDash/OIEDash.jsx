@@ -57,7 +57,6 @@ function OIEDash(){
 
     useEffect(() => {
             setCurrentPage(currentPage);
-
     }, [currentDisplay]);
 
     return (
@@ -81,9 +80,9 @@ function OIEDash(){
                         </li>
                         <li className={` ${currentDisplay === 2 && "selected"}`}  onClick={()=>setCurrentDisplay(2)}>
                             <div className="icon-container">
-                                <Icon icon="flowbite:adjustments-horizontal-solid" />
+                                <Icon icon="heroicons-solid:view-boards" />
                             </div>
-                            <p>Events</p>
+                            <p>Events Board</p>
                         </li>
                         <li className={` ${currentDisplay === 3 && "selected"}`}  onClick={()=>setCurrentDisplay(3)}>
                             <div className="icon-container">
