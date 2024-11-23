@@ -14,13 +14,11 @@ const clubSchema= new Schema({
         type: String,
         required: true
     },
-    
     positions: {
         type: Array, // [regular, treasurer, secretary]
         required: true,
-        default:['regular','officer']
+        default:['chair', 'officer', 'regular'] //add more complex roles, include permissions
     },
-
     weekly_meeting:{
         type: Object, //Times,Data, Room Location
         required: false
