@@ -221,4 +221,18 @@ router.post('/google-login', async (req, res) => {
     }
 });
 
+
+router.post('/forgot-password', async (req, res) => {
+    // assume passed userID is stored in body
+    const { userId } = req.body;
+    try {
+        // ussuming m for min, since h is hr
+        const token = jwt.sign({ userId: userId}, process.env.JWT_SECRET, { expiresIn: '30m' });
+        res.status(200).json(token);
+    } catch (error) {
+        // 404 for no user found?
+        res.status(404).json({error: "User not found"});
+    }
+});
+
 module.exports = router;
