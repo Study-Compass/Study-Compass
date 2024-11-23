@@ -54,7 +54,7 @@ Our project has dependencies for both the frontend and backend. You need to inst
 We use Concurrently to run our frontend and backend servers at the same time. You can start both with a single command:
 
 ```bash
-npm start
+npm run dev
 ```
 
 This command is configured in the root **`package.json`** file and will launch both servers simultaneously. By default, the React application runs on **`localhost:3000`** and the Express server on **`localhost:5001`**.
