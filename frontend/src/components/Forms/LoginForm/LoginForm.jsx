@@ -151,13 +151,17 @@ function LoginForm() {
                     <p>Username/Email</p>
                     <input type="text" name="email" value={formData.email} onChange={handleChange} placeholder="Valid username/email..." required />
                 </div>
+
                 <div className="password">
-                    <p>Password</p>
+                    <div className="password-container"> 
+                    <p>Password </p>
+                    <p className="forgot-password"> <Link to="/password">Forgot Password?</Link></p>
+                    </div>
                     <input type="password" name="password" value={formData.password} onChange={handleChange} placeholder="Enter your password..." required />
                 </div>
                 <button type="submit" className={`button ${valid ? "active":""}`}>Log In</button>
                 <p className="already">Don’t have an account? <Link to="/register" >Register</Link></p>
-            </div>
+            </div>          
         </div>
 
       </form>

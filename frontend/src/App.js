@@ -4,6 +4,7 @@ import Room from './pages/Room/Room';
 import Room1 from './pages/Room/Room1';
 import Login from './pages/Login';
 import Register from './pages/Register/Register';
+import Password from './pages/Password/Password';
 import Redirect from './pages/Redirect/Redirect';
 import Error from './pages/Error/Error';
 import Onboard from './pages/OnBoarding/Onboard';
@@ -11,6 +12,7 @@ import Settings from './pages/Settings/Settings';
 import Friends from './pages/Friends/Friends';
 import Profile from './pages/Profile/Profile';
 import Landing from './pages/Landing/Landing';
+import ForgottenEmail from './components/ForgottenEmail/ForgottenEmail';
 import Events from './pages/Events/Events';
 import DeveloperOnboard from './pages/DeveloperOnboarding/DeveloperOnboarding';
 import QR from './pages/QR/QR';
@@ -26,6 +28,7 @@ import { ProfileCreationProvider } from './ProfileCreationContext';
 import { WebSocketProvider } from './WebSocketContext';
 import Layout from './pages/Layout/Layout';
 import axios from 'axios';
+
 import CreateEvent from './pages/CreateEvent/CreateEvent';
 
 function App() {
@@ -105,6 +108,7 @@ function App() {
                                             <Route path="/room1/:roomid" element={<Room1 />}/>
                                             <Route path="/register" element={<Register />}/>
                                             <Route path="/login" element={<Login />}/>
+                                            <Route path="/password" element={<Password />}/>
                                             <Route path="*" element={<Error />}/>
                                             <Route path="/error/:errorCode" element={<Error />}/>
                                             <Route path="/onboard" element={<Onboard />}/>
@@ -115,6 +119,8 @@ function App() {
                                             <Route path="/documentation" element={<Redirect/>}/>
                                             <Route path="/developer-onboarding" element={<DeveloperOnboard/>}/>
                                             <Route path="/admin" element={<Admin/>}/>
+                                            <Route path="/forgot-email" element={<ForgottenEmail/>}/>
+                                            
                                             <Route path="/create-event" element={<CreateEvent/>}/>
                                             <Route path="/events" element={<Events/>}/>
                                             <Route path="/oie-dashboard" element={<OIEDash/>}/>
