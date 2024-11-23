@@ -87,6 +87,10 @@ const userSchema = new mongoose.Schema({
         type: Boolean,
         default: false,
     },
+    clubAssociations: {
+        type: Array,
+        default: [],
+    },
     roles: {
         type: [String],
         default: ['user'],

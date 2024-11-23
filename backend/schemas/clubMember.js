@@ -13,7 +13,7 @@ const memberSchema = new Schema({
         ref: 'User'
     },
     status: {
-        //Ranking in club
+        //role index, see club schema for roles
         type: Number, 
         required:true,
     }
