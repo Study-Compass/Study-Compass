@@ -283,6 +283,143 @@ router.get("/get-followed-clubs", verifyToken, async(req,res)=>{
     }
 });
 
+router.get("/get-club-members/:clubId", verifyToken, async(req,res)=>{
+    try {
+        const { clubId } = req.params;
+        const userId = req.user.userId;
+    
+        const club = await Club.findById(clubId);
 
+        //Check if the club exists
+        if (!club) {
+            return res.status(404).json({ success: false, message: "Club not found" });
+        }
+
+        // Check if the user is a member of the club
+        const member = await Member.findOne({ club_id: clubId, user_id: userId });
+        if (!member) {
+            return res.status(400).json({ success: false, message: "You are not a member of this club" });
+        }
+
+        const members = await Member.find({ club_id: clubId }).populate('user_id');
+        console.log(`GET: /get-club-members`);
+        res.json({ success: true, message: "Club members retrieved successfully", members });
+
+    } catch (error) {
+        console.log(`GET: /get-club-members failed`, error);
+        return res.status(500).json({ success: false, message: "Error retrieving club members", error: error.message });
+    }
+});
+
+router.post("/add-club-member/:clubId", verifyToken, async(req,res)=>{
+    try {
+        const { clubId } = req.params;
+        const userId = req.user.userId;
+        const { user_id, role } = req.body;
+    
+        const club = await Club.findById(clubId);
+
+        //Check if the club exists
+        if (!club) {
+            return res.status(404).json({ success: false, message: "Club not found" });
+        }
+
+        // Check if the user is the owner of the club
+        if (club.owner.toString() !== userId) {
+            return res.status(400).json({ success: false, message: "You are not authorized to add members to this club" });
+        }
+
+        // Check if the user to be added is already a member
+        const member = await Member.findOne({ club_id: clubId, user_id: user_id });
+        if (member) {
+            return res.status(400).json({ success: false, message: "User is already a member of this club" });
+        }
+
+        const newMember = new Member({
+            club_id: clubId,
+            user_id,
+            role
+        });
+        await newMember.save();
+
+        console.log(`POST: /add-club-member`);
+        res.json({ success: true, message: "Member added successfully" });
+
+    } catch (error) {
+        console.log(`POST: /add-club-member failed`, error);
+        return res.status(500).json({ success: false, message: "Error adding member", error: error.message });
+    }
+});
+
+router.delete("/remove-club-member/:clubId", verifyToken, async(req,res)=>{ 
+    try {
+        const { clubId } = req.params;
+        const userId = req.user.userId;
+        const { user_id } = req.body;
+    
+        const club = await Club.findById(clubId);
+
+        //Check if the club exists
+        if (!club) {
+            return res.status(404).json({ success: false, message: "Club not found" });
+        }
+
+        // Check if the user is the owner of the club
+        if (club.owner.toString() !== userId) {
+            return res.status(400).json({ success: false, message: "You are not authorized to remove members from this club" });
+        }
+
+        // Check if the user to be removed is a member
+        const member = await Member.findOne({ club_id: clubId, user_id });
+        if (!member) {
+            return res.status(400).json({ success: false, message: "User is not a member of this club" });
+        }
+
+        await Member.findByIdAndDelete(member._id);
+
+        console.log(`DELETE: /remove-club-member`);
+        res.json({ success: true, message: "Member removed successfully" });
+
+    } catch (error) {
+        console.log(`DELETE: /remove-club-member failed`, error);
+        return res.status(500).json({ success: false, message: "Error removing member", error: error.message });
+    }
+});
+
+router.post("/update-club-member/:clubId", verifyToken, async(req,res)=>{
+    try {
+        const { clubId } = req.params;
+        const userId = req.user.userId;
+        const { user_id, role } = req.body;
+    
+        const club = await Club.findById(clubId);
+
+        //Check if the club exists
+        if (!club) {
+            return res.status(404).json({ success: false, message: "Club not found" });
+        }
+
+        // Check if the user is the owner of the club
+        if (club.owner.toString() !== userId) {
+            return res.status(400).json({ success: false, message: "You are not authorized to update members of this club" });
+        }
+
+        // Check if the user to be updated is a member
+        const member = await Member.findOne({ club_id: clubId, user_id });
+        if (!member) {
+            return res.status(400).json({ success: false, message: "User is not a member of this club" });
+        }
+
+        member.role = role;
+        await member.save();
+
+        console.log(`POST: /update-club-member`);
+        res.json({ success: true, message: "Member updated successfully" });
+
+    } catch (error) {
+        console.log(`POST: /update-club-member failed`, error);
+        return res.status(500).json({ success: false, message: "Error updating member", error: error.message });
+    }
+});
 
 module.exports = router;
