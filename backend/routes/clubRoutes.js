@@ -47,25 +47,22 @@ router.post("/create-club", verifyToken, async(req,res)=>{
         
         //Verify user and have their clubs saved under them
         const userId = req.user.userId;
-
-        //if club name exist fail to create
-        const clubExist = await Club.findOne({club_name: club_name });
-
+        const user = await User.find({_id: userId});
+        if(!user){
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
+    
+        const clubExist = await Club.findOne({club_name: club_name }); 
         //Check to verify if the club already exists
         if (clubExist){
             return res.status(400).json({ success: false, message: 'Club name already exists'});
         }
-
-        //Check if Bad Words
-        if (isProfane(req.body.club_name)) {
+        if (isProfane(req.body.club_name)) { //Check if Bad Words
             return res.status(400).json({ success: false, message: 'Club name contains inappropriate language' });
         }
 
-        // Sanitize club name and description verify this right
-        const cleanClubName = clean(club_name);
-
-        //Check if Bad Words
-        if (isProfane(club_description)) {
+        const cleanClubName = clean(club_name); // Sanitize club name and description verify this right
+        if (isProfane(club_description)) { //Check if Bad Words
             return res.status(400).json({ success: false, message: 'Description contains inappropriate language' });
         }
 
@@ -80,16 +77,19 @@ router.post("/create-club", verifyToken, async(req,res)=>{
             //Owner is the user
             owner: userId
         });
-        //add new member to the club
-        const newMember = new Member({
+        
+        const newMember = new Member({ //add new member to the club
             club_id: newClub._id,
             user_id: userId,
             role: positions[0] || 'chair',
         });
 
-        const saveMember = await newMember.save(); 
-        //Save the club
-        const saveClub = await newClub.save();
+        await newMember.save(); 
+
+        user.clubsAssociations.push(newClub._id);
+        await user.save();
+        
+        const saveClub = await newClub.save(); //Save the club
         console.log(`POST: /create-club`);
         return res.status(200).json({ success: true, message: "Club created successfully", club: saveClub });
 
@@ -208,6 +208,81 @@ try {
     return res.status(500).json({ success: false, message: "Error deleting club", error: error.message });
 }
 });
+
+router.post("/follow-club/:clubId", verifyToken, async(req,res)=>{
+    try {
+        const { clubId } = req.params;
+        const userId = req.user.userId;
+    
+        const club = await Club.findById(clubId);
+        
+        //Check if the club exists
+        if (!club) {
+            return res.status(404).json({ success: false, message: "Club not found" });
+        }
+       
+        const alreadyFollowing = await Follower.findOne({ user_id: userId, club_id: clubId }); //Check if the user is already following the club
+        if (alreadyFollowing) {
+            return res.status(400).json({ success: false, message: "You are already following this club" });
+        }
+
+        const newFollower = new Follower({
+            user_id: userId,
+            club_id: clubId
+        });
+        await newFollower.save();
+
+        console.log(`POST: /follow-club`);
+        res.json({ success: true, message: "Club followed successfully" });
+        
+    } catch (error) {
+        console.log(`POST: /follow-club failed`, error);
+        return res.status(500).json({ success: false, message: "Error following club", error: error.message });
+    }
+});
+
+router.post("/unfollow-club/:clubId", verifyToken, async(req,res)=>{
+    try {
+        const { clubId } = req.params;
+        const userId = req.user.userId;
+    
+        const club = await Club.findById(clubId);
+        
+        //Check if the club exists
+        if (!club) {
+            return res.status(404).json({ success: false, message: "Club not found" });
+        }
+
+        const follower = await Follower.findOne({ user_id: userId, club_id: clubId }); //Check if the user is already following the club
+        if (!follower) {
+            return res.status(400).json({ success: false, message: "You are not following this club" });
+        }
+
+        await Follower.findByIdAndDelete(follower._id);
+
+        console.log(`POST: /unfollow-club`);
+        res.json({ success: true, message: "Club unfollowed successfully" });
+
+    } catch (error) {
+        console.log(`POST: /unfollow-club failed`, error);
+        return res.status(500).json({ success: false, message: "Error unfollowing club", error: error.message });
+    }
+});
+
+router.get("/get-followed-clubs", verifyToken, async(req,res)=>{
+    try {
+        const userId = req.user.userId;
+    
+        const followedClubs = await Follower.find({ user_id: userId }).populate('club_id');
+        console.log(`GET: /get-followed-clubs`);
+        res.json({ success: true, message: "Followed clubs retrieved successfully", clubs: followedClubs });
+
+    } catch (error) {
+        console.log(`GET: /get-followed-clubs failed`, error);
+        return res.status(500).json({ success: false, message: "Error retrieving followed clubs", error: error.message });
+    }
+});
+
 
 
 module.exports = router;
