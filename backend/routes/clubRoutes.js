@@ -41,14 +41,15 @@ try{
 // Create a new club and store it into database
 router.post("/create-club", verifyToken, async(req,res)=>{
 
-    try {
-        const{clubId, club_profile_image, club_description, positions, weekly_meeting } = req.body;
+    const{ club_name, club_profile_image, club_description, positions, weekly_meeting } = req.body;
 
+    try {
+        
         //Verify user and have their clubs saved under them
         const userId = req.user.userId;
 
         //if club name exist fail to create
-        const clubExist = await Club.findOne({club_name: req.body.club_name });
+        const clubExist = await Club.findOne({club_name: club_name });
 
         //Check to verify if the club already exists
         if (clubExist){
@@ -61,29 +62,34 @@ router.post("/create-club", verifyToken, async(req,res)=>{
         }
 
         // Sanitize club name and description verify this right
-        const cleanClubName = clean(req.body.club_name);
+        const cleanClubName = clean(club_name);
 
         //Check if Bad Words
-        if (isProfane(req.body.club_description)) {
+        if (isProfane(club_description)) {
             return res.status(400).json({ success: false, message: 'Description contains inappropriate language' });
         }
 
-        const cleanClubDescription = clean(req.body.club_description);
+        const cleanClubDescription = clean(club_description);
 
         const newClub = new Club({
-
-        club_name: cleanClubName,
-        club_profile_image: req.body.club_profile_image,
-        club_description: cleanClubDescription,
-        positions: req.body.positions || ['regular', 'officer'],
-        weekly_meeting: req.body.weekly_meeting || null,
-        //Owner is the user
-        owner: userId
-
+            club_name: cleanClubName,
+            club_profile_image: club_profile_image,
+            club_description: cleanClubDescription,
+            positions: positions || ['chair', 'officer', 'regular'],
+            weekly_meeting: weekly_meeting || null,
+            //Owner is the user
+            owner: userId
+        });
+        //add new member to the club
+        const newMember = new Member({
+            club_id: newClub._id,
+            user_id: userId,
+            role: positions[0] || 'chair',
         });
 
+        const saveMember = await newMember.save(); 
         //Save the club
-        const saveClub= await newClub.save();
+        const saveClub = await newClub.save();
         console.log(`POST: /create-club`);
         return res.status(200).json({ success: true, message: "Club created successfully", club: saveClub });
 
@@ -93,7 +99,6 @@ router.post("/create-club", verifyToken, async(req,res)=>{
         return res.status(500).json({ success: false, message: 'Error creating club', error: error.message });
     }
 });
-
 
 
 router.post("/edit-club", verifyToken, async (req, res) => {
