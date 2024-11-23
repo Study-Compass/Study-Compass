@@ -4,7 +4,7 @@ const Schedule = require('../schemas/schedule.js');
 const Rating = require('../schemas/rating.js');
 const User = require('../schemas/user.js');
 const Report = require('../schemas/report.js');
-const { verifyToken, verifyTokenOptional } = require('../middlewares/verifyToken');
+const { verifyToken, authorizeRoles } = require('../middlewares/verifyToken');
 const { sortByAvailability } = require('../helpers.js');
 const multer = require('multer');
 const path = require('path');
@@ -122,7 +122,7 @@ router.post('/upload-image/:classroomName', upload.single('image'), async (req, 
   }
 });
 
-router.post('/main-search-change', verifyToken, async (req, res) => {
+router.post('/main-search-change', verifyToken, authorizeRoles('admin'), async (req, res) => {
     const userId = req.user.userId;
     const classroomId = req.body.classroomId;
     try{
@@ -131,7 +131,7 @@ router.post('/main-search-change', verifyToken, async (req, res) => {
             console.log(`POST: /main-search-change/${userId} failed`);
             return res.status(404).json({ success: false, message: "User not found" });
         }
-        if(!user.admin){
+        if(!user.roles.includes('admin')) {
             console.log(`POST: /main-search-change/${userId} failed`);
             return res.status(403).json({ success: false, message: "User not authorized" });
         }

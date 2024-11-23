@@ -96,7 +96,7 @@ function Classroom({ room, state, setState, schedule, roomName, width, setShowMo
     const handleCheckOutEvent = (data) => {
         if (data.classroomId === room._id) {
             reload();
-        }
+    }
     };
 
     useEffect(() => {
@@ -105,7 +105,6 @@ function Classroom({ room, state, setState, schedule, roomName, width, setShowMo
         }
         getRatings(room._id)
             .then((response) => {
-                console.log(response.data.data);
                 setRatings(response.data.data);
             })
             .catch((error) => {
@@ -145,14 +144,9 @@ function Classroom({ room, state, setState, schedule, roomName, width, setShowMo
         }
         if (ratings.find(rating => rating.user_id === user._id)!== undefined) {
             setUserRating(ratings.find(rating => rating.user_id === user._id));
-            console.log("user has rated this room");
         }    
     }, [ratings, user]);
 
-    useEffect(() => {
-        console.log(userRating === null);
-
-    }, [userRating]);
 
     useEffect(() => {
 
@@ -189,7 +183,6 @@ function Classroom({ room, state, setState, schedule, roomName, width, setShowMo
     useEffect(() => {
         if (checkInRef.current) {
             setFillerHeight(checkInRef.current.clientHeight + 100);
-            console.log(checkInRef.current.clientHeight);
         }
     }, [checkInRef.current]);
 
@@ -256,7 +249,6 @@ function Classroom({ room, state, setState, schedule, roomName, width, setShowMo
     const handleCheckIn = async () => {
         try {
             const response = await checkIn(room._id);
-            console.log(response);
             await reload();
             getCheckedIn();
         } catch (error) {
@@ -274,10 +266,7 @@ function Classroom({ room, state, setState, schedule, roomName, width, setShowMo
             const response = await checkOut(room._id);
             if (!userRating) {
                 handleOpenRatingPopup();
-                console.log("user has not rated this room yet");
             }
-            console.log(userRated, "user has rated this room");
-            console.log(response);
             await reload();
 
 
@@ -368,11 +357,11 @@ function Classroom({ room, state, setState, schedule, roomName, width, setShowMo
                                 </div>
                             );
                         })}
-                        {user && user.admin ? <div className="attribute" onClick={() => { setEdit(!edit) }}><img src={Edit} alt="" /></div> : ""}
+                        {user && user.roles.includes("admin") ? <div className="attribute" onClick={() => { setEdit(!edit) }}><img src={Edit} alt="" /></div> : ""}
                     </div>
                     {userRating && <UserRating rating={userRating} />}
                     {
-                        defaultImage && (!isAuthenticating) && isAuthenticated && user.admin ? <FileUpload classroomName={room.name} /> : ""
+                        defaultImage && (!isAuthenticating) && isAuthenticated && user.roles.includes('admin') ? <FileUpload classroomName={room.name} /> : ""
                     }
                     <div>
                         <Flag functions={setIsUp} primary={"rgba(176, 175, 175, .13)"} img={circleWarning} accent={"#D9D9D9"} color={"#737373"} text={"As Study Compass is still in beta, certain information may be incorrect. Reporting incorrect information is an important part of our troubleshooting process, so please help us out!"} />
@@ -401,7 +390,7 @@ function Classroom({ room, state, setState, schedule, roomName, width, setShowMo
 
                     </div>
                 </div>
-                {user && user.admin ? room ? edit ? <EditAttributes room={room} attributes={room.attributes} setEdit={setEdit} /> : "" : "" : ""}
+                {user && user.roles.includes('admin') ? room ? edit ? <EditAttributes room={room} attributes={room.attributes} setEdit={setEdit} /> : "" : "" : ""}
                 <div className="check-in" ref={checkInRef}>
                     <div className={`${success ? 'free-until' : 'class-until'}`}>
                         <div className="dot">

@@ -41,6 +41,10 @@ const Header = React.memo(()=>{
             setTimeout(() => {
                 setPageClass("friends");
             }, 100);
+        } else if(page.includes("/events")){
+            setTimeout(() => {
+                setPageClass("events");
+            }, 100);
         }
     },[page]);
 
@@ -56,16 +60,15 @@ const Header = React.memo(()=>{
     return(
         <div className="Header">
             <div className="header-content">
-                {page === "/login" || page === "/register" ? "" :
-                    isAuthenticated ? 
+                {page === "/login" || page === "/register"  || page === "/"  ? "" :
                     <div className="nav-container">
                         <nav>
-                            <Link className={`nav-link ${ pageClass === "room" ? "active" : ""}`} to="/room/none" ><h2>search</h2></Link>
-                            <Link className={`nav-link ${ pageClass === "friends" ? "active" : ""}`} to="/friends" ><h2>friends</h2></Link>
+                            {isAuthenticated && <Link className={`nav-link ${ pageClass === "room" ? "active" : ""}`} to="/room/none" ><h2>search</h2></Link>}
+                            {isAuthenticated && <Link className={`nav-link ${ pageClass === "friends" ? "active" : ""}`} to="/friends" ><h2>friends</h2></Link>}
+                            {isAuthenticated && user && (user.roles.includes('admin') || user.roles.includes('oie')) && <Link className={`nav-link ${ pageClass === "events" ? "active" : ""}`} to="/events" ><h2>events</h2></Link>}                         
                         </nav>  
                     </div>
-
-                    : "" 
+                    
                 }
                 {
                     isAuthenticated ? 
@@ -79,7 +82,6 @@ const Header = React.memo(()=>{
                     </Link>
                 }
 
-
                 {page === "/login" || page === "/register" ? "" :
                     <div className="header-right">
                         {isAuthenticated ? <ProfilePicture/> : ""}
@@ -87,9 +89,8 @@ const Header = React.memo(()=>{
                     </div>    
                 }
             </div>
-
         </div>
     );
 });
 
-export default Header
+export default Header;

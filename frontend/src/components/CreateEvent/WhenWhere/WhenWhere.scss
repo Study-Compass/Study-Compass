@@ -1,0 +1,112 @@
+.when-where{
+    padding: 25px 40px 60px 25px;
+    overflow-y:auto;
+    position: relative;
+
+    .time-select{
+        display:flex;
+        flex-direction: column;
+        gap:20px;
+        align-items: center;
+
+        select{
+            width:60%;
+            padding:5px 10px;
+            font-size:18px;
+            margin:0;
+            font-family: 'Inter';
+            font-weight: 700;
+            option.disabled{
+                color: var(--border);
+            }
+        }
+        .row{
+            display: flex;
+            max-width: 100%;
+            & > .DayColumn > .TimeLabelColumn{
+                margin-top:58px;
+                left:50px;
+            }
+
+            .left-arrow, .right-arrow{
+                position: absolute;
+                left:0;
+                top:50%;
+                transform: translateY(-50%);
+                cursor: pointer;
+                z-index: 1;
+                font-size:25px;
+                color:var(--text);
+                transition: all 0.3s;
+
+                &:hover{
+                    color:var(--red);
+                    transform: translateX(-5px) translateY(-50%);
+                }
+                &:active{
+                    transform: translateX(0) translateY(-50%);
+                }
+            }
+
+            .right-arrow{
+                right:20px;
+                left:auto;
+                &:hover{
+                    color:var(--red);
+                    transform: translateX(5px) translateY(-50%);
+                }
+                &:active{
+                    transform: translateX(0) translateY(-50%);
+                }
+
+            }
+        }
+        .calendar-wrapper{
+            max-width: calc(100% - 80px);
+            height: -moz-fit-content;
+            height: fit-content;
+            display: flex;
+            justify-content: flex-start;
+            position: relative;
+            box-sizing: border-box;
+            margin:0 30px 0 50px;
+            align-items: center;
+
+            & > div{
+                max-width: 100%;
+                width:100%;  
+                overflow-y: auto;
+                overflow-x: auto;
+                display:flex;
+
+                &::-webkit-scrollbar {
+                    width: 10px;
+                    height: 10px;
+                }
+            }
+
+            .scroll-border-l, .scroll-border-r{
+                content: '';
+                position: absolute;
+                width: 10px;
+                height: 85%;
+                transform: translateY(-50%);
+                top: 50%;
+                opacity: 0;
+                transition: opacity 0.3s;
+            }
+            
+            &.right-scroll .scroll-border-r{
+                right:0;               
+                opacity: 1;
+                background: linear-gradient(to right, rgba(255, 255, 255, 0), var(--border));
+            }
+
+            &.left-scroll .scroll-border-l{
+                opacity: 1;
+                left:0;
+                background: linear-gradient(to left, rgba(255, 255, 255, 0), var(--border));
+            }
+        }
+    }
+}

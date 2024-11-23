@@ -11,9 +11,11 @@ import Settings from './pages/Settings/Settings';
 import Friends from './pages/Friends/Friends';
 import Profile from './pages/Profile/Profile';
 import Landing from './pages/Landing/Landing';
+import Events from './pages/Events/Events';
 import DeveloperOnboard from './pages/DeveloperOnboarding/DeveloperOnboarding';
 import QR from './pages/QR/QR';
 import Admin  from './pages/Admin/Admin';
+import OIEDash from './pages/OIEDash/OIEDash';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './AuthContext';
 import { CacheProvider } from './CacheContext';
@@ -24,6 +26,7 @@ import { ProfileCreationProvider } from './ProfileCreationContext';
 import { WebSocketProvider } from './WebSocketContext';
 import Layout from './pages/Layout/Layout';
 import axios from 'axios';
+import CreateEvent from './pages/CreateEvent/CreateEvent';
 
 function App() {
     useEffect(() => {
@@ -43,7 +46,46 @@ function App() {
                 .catch(error => {
                     console.error('Error logging visit', error);
                 });
+        } else {
+            // console.log('User has already visited');
+            // generate 10 char hash
+            // store in local storage
+            // send to backend
+            console.log('User has already visited');
+            let hash = localStorage.getItem('hash');
+            let timestamp = localStorage.getItem('timestamp');
+            if (!hash) {
+                // generate hash
+                hash = Math.random().toString(36).substring(2, 12);
+                // store hash
+                localStorage.setItem('hash', hash);
+            }
+            if (!timestamp) {
+                timestamp = new Date().toISOString();
+                localStorage.setItem('timestamp', timestamp);
+            }
+
+            //log how many minutes it has been since last visit
+            console.log("minutes since last visit: ", (new Date().getTime() - new Date(timestamp).getTime()) / 1000 / 60);
+
+
+            //if 20 minutes from last timestamp
+            if (new Date().getTime() - new Date(timestamp).getTime() > 20 * 60 * 1000) {
+                //send to backend
+                localStorage.setItem('timestamp', new Date().toISOString());
+                axios.post('/log-repeated-visit', {
+                    hash: hash
+                })
+                    .then(response => {
+                        localStorage.setItem('timestamp', new Date().toISOString());
+                    })
+                    .catch(error => {
+                        console.error('Error logging visit', error);
+                    });
+            }
         }
+
+        
     }, []);
     // document.documentElement.classList.add('dark-mode');
     return (
@@ -73,6 +115,9 @@ function App() {
                                             <Route path="/documentation" element={<Redirect/>}/>
                                             <Route path="/developer-onboarding" element={<DeveloperOnboard/>}/>
                                             <Route path="/admin" element={<Admin/>}/>
+                                            <Route path="/create-event" element={<CreateEvent/>}/>
+                                            <Route path="/events" element={<Events/>}/>
+                                            <Route path="/oie-dashboard" element={<OIEDash/>}/>
                                         </Route>
                                     </Routes>
                                     </ProfileCreationProvider>
