@@ -235,4 +235,43 @@ router.post('/forgot-password', async (req, res) => {
     }
 });
 
+// POST: /reset-password [given hash and password or user credentials and password (verifyTokenOptional middleware)]: first check 
+// for existence of user credentials (this will be a user changing their password through settings and therefore will not require 
+//     as many checks and balances, if no user, verify validity of hash (json web token), decode and extract inputs, make sure the
+//      current time has not passed the encoded time. On successful checks, change user password (don’t hash, hashing is taken care 
+//         of in the pre-save hook, see schemas/user.js, and succeed with status 200
+
+router.post('reset-password', async (req, res) => {
+    // I'm not sure how to diferentiate between the 2 cases so I'll make a fake condiational that we can replace with the real approach when i figure it out
+    // is it fr just this?
+    const { hash, password, userCredentials } = req.body;
+    try {
+      // definitly not the real function or how to call it, idk what it is called and I'd rather not search through 10 billion files rn
+        if(isValidUser(userCredentials)){
+            // no chance this is the correct way to change it.
+            res.status(200)._write(password, newPassword);
+        }
+    } catch (error) {
+      try {
+        // does this need to be a level up so it hits both try catch cases?
+        const decodedToken = jwt.verify(hash, process.env.JWT_SECRET);
+        // I hate this syntax but this is how you seem to do almost all your nested condiationals so I guess I'll copy it, is probably correct order.
+        // should I be doing some other exit case instead of false so it goes to the catch?
+        const validate = decodedToken.exp
+          ? false
+          : decodedToken.User === userCredentials._id
+          ? false
+          : true;
+
+          if(validate) {
+            // no chance this is the correct way to change it.
+            res.status(200)._write(password, newPassword);
+          }
+        // second case
+      } catch (error) {
+        res.status(500).json({error: "Error reseting password"});
+      }
+    }
+    res.status(500).json({error: "Error reseting password"});
+});
 module.exports = router;
