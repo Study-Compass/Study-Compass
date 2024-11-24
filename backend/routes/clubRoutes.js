@@ -47,7 +47,8 @@ router.post("/create-club", verifyToken, async(req,res)=>{
         
         //Verify user and have their clubs saved under them
         const userId = req.user.userId;
-        const user = await User.find({_id: userId});
+        const user = await User.findById({_id: userId});
+        console.log(user);
         if(!user){
             return res.status(404).json({ success: false, message: 'User not found' });
         }
@@ -81,12 +82,12 @@ router.post("/create-club", verifyToken, async(req,res)=>{
         const newMember = new Member({ //add new member to the club
             club_id: newClub._id,
             user_id: userId,
-            role: positions[0] || 'chair',
+            status: 0,
         });
 
         await newMember.save(); 
 
-        user.clubsAssociations.push(newClub._id);
+        user.clubAssociations.push(newClub._id);
         await user.save();
         
         const saveClub = await newClub.save(); //Save the club
