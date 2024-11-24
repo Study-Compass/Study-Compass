@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import './App.css';
+import './assets/fonts.css';
 import Room from './pages/Room/Room';
 import Room1 from './pages/Room/Room1';
 import Login from './pages/Login';
@@ -18,6 +19,7 @@ import QR from './pages/QR/QR';
 import Admin  from './pages/Admin/Admin';
 import OIEDash from './pages/OIEDash/OIEDash';
 import NewBadge from './pages/NewBadge/NewBadge';
+import CreateClub from './pages/CreateClub/CreateClub';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './AuthContext';
 import { CacheProvider } from './CacheContext';
@@ -121,6 +123,7 @@ function App() {
                                                 <Route path="/developer-onboarding" element={<DeveloperOnboard/>}/>
                                                 <Route path="/admin" element={<Admin/>}/>
                                                 <Route path="/new-badge/:hash" element={<NewBadge/>}/>
+                                            <Route path='/create-club' element={<CreateClub/>}/>
                                         </Route>
                                         </Routes>
                                         </ProfileCreationProvider>
