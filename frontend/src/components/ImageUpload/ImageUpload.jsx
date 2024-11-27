@@ -44,7 +44,7 @@ const ImageUpload = ({ classroomName, onUpload, uploadText}) => {
             const reader = new FileReader();
             reader.onload = () => {
                 setImage(reader.result);
-                onUpload(reader.result);
+                // onUpload(reader.result);
             };
             reader.readAsDataURL(file);
             
@@ -76,7 +76,7 @@ const ImageUpload = ({ classroomName, onUpload, uploadText}) => {
         >   
             {image ? <img src={image} alt="preview" className="preview" /> : <Icon className="upload-icon" icon={isDragging? "line-md:uploading-loop" : "line-md:uploading"} />}
 
-            <h3>{selectedFile ? fileName : "Upload Classroom Image"}</h3>
+            <h3>{selectedFile ? fileName : uploadText ? uploadText: "Upload Classroom Image"}</h3>
             <input
                 type="file"
                 ref={fileInputRef}

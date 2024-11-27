@@ -4,6 +4,8 @@ import rightarrow from '../../assets/Icons/RightArrow.svg';
 import pfp from '../../assets/defaultAvatar.svg';
 import { saveUser } from '../../DBInteractions';
 import { useNotification } from '../../NotificationContext';
+import { Icon } from '@iconify-icon/react/dist/iconify.mjs';
+import ImageUpload from '../ImageUpload/ImageUpload';
 
 function AccountSettings({ settingsRightSide, width, handleBackClick, userInfo }) {
 
@@ -13,7 +15,7 @@ function AccountSettings({ settingsRightSide, width, handleBackClick, userInfo }
     const [name, setName] = useState(userInfo.name);
     const [username, setUsername] = useState(userInfo.username);
     const [editUsername, setEditUsername] = useState(false);
-
+    const [uploadPfp, setUploadPfp] = useState(false);
     
     const [editEmail, setEditEmail] = useState(false);
     const [email, setEmail] = useState(userInfo.email);
@@ -40,10 +42,11 @@ function AccountSettings({ settingsRightSide, width, handleBackClick, userInfo }
             saveUser(name, username, email, null, null, null);
         }
         setEditUsername(!editUsername);
-
-        // setEditUsername(false);
-        // setEditEmail(false);
     };
+
+    const uploadPfpToggle = () => {
+        setUploadPfp(!uploadPfp);
+    }
 
     return (
         <div className={`settings-right ${settingsRightSide ? "active" : "not-active"}`}>
@@ -62,12 +65,21 @@ function AccountSettings({ settingsRightSide, width, handleBackClick, userInfo }
                 <hr />
 
                 <div className='name-settings'>
-                    <img src={userInfo.picture ? userInfo.picture : pfp} alt="" />
+                    <div className="picture-container">
+                        <img className="pfp" src={userInfo.picture ? userInfo.picture : pfp} alt="" />
+                        <div className="add-picture" onClick={uploadPfpToggle}>
+                            <Icon icon="mdi:image-add"/>
+                        </div>
+                    </div>
+
                     <div className='input-name'>
                         <h3>name:</h3>
                         <input type="text" value={name} onChange={handleNameChange}/>
                     </div>
 
+                </div>
+                <div className={`pfp-upload ${uploadPfp && "active"}`}>
+                    <ImageUpload uploadText="upload new profile picture" onUpload={console.log}/>
                 </div>
 
                 <h2>security settings</h2>

@@ -8,6 +8,7 @@ require('dotenv').config();
 const { createServer } = require('http');
 const { Server } = require('socket.io');
 const enforce = require('express-sslify');
+const s3 = require('./aws-config');
 
 const app = express();
 const port = process.env.PORT || 5001;

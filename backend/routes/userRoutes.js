@@ -10,6 +10,16 @@ const { isProfane } = require('../services/profanityFilterService');
 const StudyHistory = require('../schemas/studyHistory.js'); 
 const { findNext } = require('../helpers.js');
 const { sendDiscordMessage } = require('../services/discordWebookService');
+const { uploadImageToS3, deleteAndUploadImageToS3 } = require('../services/imageUploadService');
+const multer = require('multer');
+
+const upload = multer({
+    storage: multer.memoryStorage(),
+    limits: {
+        fileSize: 5 * 1024 * 1024, // 5 MB
+    },
+});
+
 
 const router = express.Router();
 
@@ -232,6 +242,30 @@ router.get("/get-users", async (req, res) =>{
         return res.status(200).json({ success: true, message: 'Users retrieved', users });
     } catch(error){
         console.log(`GET: /get-users ${req.query.userId} failed`)
+        return res.status(500).json({ success: false, message: 'Internal server error', error });
+    }
+});
+
+router.post("/upload-user-image", verifyToken, upload.single('image'), async (req, res) =>{
+    const file = req.file;
+    if(!file){
+        console.log(`POST: /upload-user-image ${req.user.userId} no file uploaded`)
+        return res.status(400).json({ success: false, message: 'No file uploaded' });
+    }
+    try{
+        const user = await User.findById(req.user.userId);
+        if(!user.picture){
+            const imageUrl = await uploadImageToS3(file, "users");
+            user.image = imageUrl;
+        } else {
+            const imageUrl = await deleteAndUploadImageToS3(file, "users", user.image);
+            user.image = imageUrl;
+        }
+        await user.save();
+        console.log(`POST: /upload-user-image ${req.user.userId} successful`);
+        return res.status(200).json({ success: true, message: 'Image uploaded successfully', imageUrl });
+    } catch(error){
+        console.log(`POST: /upload-user-image ${req.user.userId} failed`)
         return res.status(500).json({ success: false, message: 'Internal server error', error });
     }
 });
