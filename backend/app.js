@@ -81,7 +81,7 @@ app.use(searchRoutes);
 app.use(clubRoutes);
 app.use(eventRoutes);
 app.use(oieRoutes);
-
+app.use(clubRoutes);
 
 // Serve static files from the React app in production
 if (process.env.NODE_ENV === 'production') {
