@@ -17,7 +17,7 @@ function CreateEvent(){
     const [info, setInfo] = useState({});
     const [finishedStep, setFinishedStep] = useState(0);
     const {isAuthenticated, isAuthenticating, user} = useAuth();
-    const { navigate } = useNavigate();
+    const navigate = useNavigate();
 
     useEffect(()=>{
         if(isAuthenticating){
