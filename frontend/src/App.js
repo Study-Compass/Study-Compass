@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import './App.css';
+import './assets/fonts.css';
 import Room from './pages/Room/Room';
 import Room1 from './pages/Room/Room1';
 import Login from './pages/Login';
@@ -16,6 +17,7 @@ import DeveloperOnboard from './pages/DeveloperOnboarding/DeveloperOnboarding';
 import QR from './pages/QR/QR';
 import Admin  from './pages/Admin/Admin';
 import OIEDash from './pages/OIEDash/OIEDash';
+import CreateClub from './pages/CreateClub/CreateClub';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './AuthContext';
 import { CacheProvider } from './CacheContext';
@@ -118,6 +120,7 @@ function App() {
                                             <Route path="/create-event" element={<CreateEvent/>}/>
                                             <Route path="/events" element={<Events/>}/>
                                             <Route path="/oie-dashboard" element={<OIEDash/>}/>
+                                            <Route path='/create-club' element={<CreateClub/>}/>
                                         </Route>
                                     </Routes>
                                     </ProfileCreationProvider>
