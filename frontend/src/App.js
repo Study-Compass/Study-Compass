@@ -119,7 +119,7 @@ function App() {
                                             <Route path="/create-event" element={<CreateEvent/>}/>
                                             <Route path="/events" element={<Events/>}/>
                                             <Route path="/oie-dashboard" element={<OIEDash/>}/>
-                                            <Route path="/new-badge" element={<NewBadge/>}/>
+                                            <Route path="/new-badge/:hash" element={<NewBadge/>}/>
                                         </Route>
                                     </Routes>
                                     </ProfileCreationProvider>
