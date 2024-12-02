@@ -19,6 +19,7 @@ import Admin  from './pages/Admin/Admin';
 import OIEDash from './pages/OIEDash/OIEDash';
 import NewBadge from './pages/NewBadge/NewBadge';
 import CreateClub from './pages/CreateClub/CreateClub';
+import NewBadge from './pages/NewBadge/NewBadge';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './AuthContext';
 import { CacheProvider } from './CacheContext';
@@ -123,6 +124,7 @@ function App() {
                                             <Route path="/oie-dashboard" element={<OIEDash/>}/>
                                             <Route path="/new-badge/:hash" element={<NewBadge/>}/>
                                             <Route path='/create-club' element={<CreateClub/>}/>
+                                            <Route path="/new-badge" element={<NewBadge/>}/>
                                         </Route>
                                     </Routes>
                                     </ProfileCreationProvider>
