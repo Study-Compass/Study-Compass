@@ -1,0 +1,39 @@
+.new-badge{
+    position: relative;
+    overflow:hidden;
+    height:100vh;
+    width:100vw;
+    display:flex;
+    align-items: center;
+    justify-content: center ;
+    flex-direction: column;
+    opacity: 0;
+    transition: all 0.5s ease-in-out;
+}
+
+.new-badge.visible{
+    opacity:1;
+}
+
+.new-badge .content h2{
+    font-family: 'Satoshi';
+    color: var(--text);
+    text-align: center;
+    margin:0;
+}
+
+.new-badge .yellow-red{
+    position: absolute;
+    top:0;
+    right:0;
+    pointer-events: none;
+    z-index: -1;
+}
+
+.new-badge .purple{
+    position:absolute;
+    bottom:0;
+    left:0;
+    pointer-events: none;
+    z-index: -1;
+}

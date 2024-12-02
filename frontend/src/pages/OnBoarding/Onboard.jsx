@@ -18,7 +18,6 @@ import waiting from '../../assets/Icons/Waiting.svg';
 import error from '../../assets/circle-warning.svg';
 import unavailable from '../../assets/Icons/Circle-X.svg';
 import CardHeader from '../../components/ProfileCard/CardHeader/CardHeader.jsx';
-import { set } from 'mongoose';
 
 function Onboard(){
     const [start, setStart] = useState(false);
@@ -42,7 +41,6 @@ function Onboard(){
     const { newError } = useError();
 
     const [buttonActive, setButtonActive] = useState(true);
-    
 
     const containerRef = useRef(null);
     const contentRefs = useRef([]);
