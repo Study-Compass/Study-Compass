@@ -27,7 +27,7 @@ const postRequest = async (url, body, options = {}) => {
     console.error('POST request error:', error.message);
 
     if (error.response) {
-      return { error: error.response.data.message || 'An error occurred' };
+      return { error: error.response.data.error };
     } else if (error.request) {
       return { error: 'No response received from server' };
     } else {
