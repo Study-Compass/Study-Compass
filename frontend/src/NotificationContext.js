@@ -31,7 +31,7 @@ export const NotificationProvider = ({ children }) => {
     const savedNotification = localStorage.getItem('notifications');
     if (savedNotification) {
       addNotification(JSON.parse(savedNotification));
-      setTimeout(() => localStorage.removeItem('notifications'), 3000);
+      setTimeout(() => localStorage.removeItem('notifications'), 100);
 
     }
   }, []);

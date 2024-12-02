@@ -17,6 +17,7 @@ import DeveloperOnboard from './pages/DeveloperOnboarding/DeveloperOnboarding';
 import QR from './pages/QR/QR';
 import Admin  from './pages/Admin/Admin';
 import OIEDash from './pages/OIEDash/OIEDash';
+import NewBadge from './pages/NewBadge/NewBadge';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './AuthContext';
 import { CacheProvider } from './CacheContext';
@@ -119,7 +120,8 @@ function App() {
                                                 <Route path="/documentation" element={<Redirect/>}/>
                                                 <Route path="/developer-onboarding" element={<DeveloperOnboard/>}/>
                                                 <Route path="/admin" element={<Admin/>}/>
-                                            </Route>
+                                                <Route path="/new-badge" element={<NewBadge/>}/>
+                                        </Route>
                                         </Routes>
                                         </ProfileCreationProvider>
                                     </Router>
