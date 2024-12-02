@@ -126,6 +126,7 @@ function App() {
                                                 <Route path="/new-badge/:hash" element={<NewBadge/>}/>
                                             <Route path='/create-club' element={<CreateClub/>}/>
                                             <Route path="/new-badge" element={<NewBadge/>}/>
+                                            <Route path="/new-badge/:hash" element={<NewBadge/>}/>
                                         </Route>
                                         </Routes>
                                         </ProfileCreationProvider>
