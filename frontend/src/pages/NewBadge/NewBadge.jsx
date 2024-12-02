@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { Navigate, useLocation, useParams } from 'react-router-dom';
+import { Navigate, useLocation, useParams, useNavigate } from 'react-router-dom';
 import useAuth from '../../hooks/useAuth';
 import './NewBadge.scss';
 import { useNotification } from '../../NotificationContext';
 import PurpleGradient from '../../assets/PurpleGrad.svg';
 import YellowRedGradient from '../../assets/YellowRedGrad.svg';
 import postRequest from '../../utils/postRequest';
+import CardHeader from '../../components/ProfileCard/CardHeader/CardHeader';
 
 const NewBadge = () => {
     const { hash } = useParams();
-    const { user, isAuthenticating, isAuthenticated } = useAuth();
+    const { user, isAuthenticating, isAuthenticated, validateToken } = useAuth();
     const location = useLocation();
     const navigate = useNavigate();
     const {reloadNotification} = useNotification();
@@ -17,6 +18,9 @@ const NewBadge = () => {
     const [yellowLoaded, setYellowLoaded] = useState(false);
     const [show, setShow] = useState(false);
     const [start, setStart] = useState(false);
+    const [error, setError] = useState(null);
+    const [badge, setBadge] = useState(null);
+    const [claimed, setClaimed] = useState(false);
 
     useEffect(() => {
         setTimeout(() => {
@@ -30,13 +34,20 @@ const NewBadge = () => {
     }, [redLoaded, yellowLoaded]);
 
     useEffect(() => {
-        if(isAuthenticated){
-            const response = postRequest('/verify-new-badge', {hash: hash});
+
+        const grantBadge = async () => {
+            const response = await postRequest('/grant-badge', {hash: hash});
             if(response.error){
                 console.log(response.error);
+                setError(response.error);    
             } else {
                 console.log(response);
+                setBadge(response.badge);
             }
+        }
+
+        if(isAuthenticated){
+            grantBadge();
         } else {
             return;
         }
