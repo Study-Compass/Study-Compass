@@ -23,6 +23,7 @@ import NewBadge from './pages/NewBadge/NewBadge';
 import ClubDash from './pages/ClubDash/ClubDash';
 import NewBadge from './pages/NewBadge/NewBadge';
 import CreateClub from './pages/CreateClub/CreateClub';
+import NewBadge from './pages/NewBadge/NewBadge';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './AuthContext';
 import { CacheProvider } from './CacheContext';
@@ -133,6 +134,7 @@ function App() {
                                             
                                             <Route path="/new-badge/:hash" element={<NewBadge/>}/>
                                             <Route path='/create-club' element={<CreateClub/>}/>
+                                            <Route path="/new-badge" element={<NewBadge/>}/>
                                         </Route>
                                     </Routes>
                                     </ProfileCreationProvider>
