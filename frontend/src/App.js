@@ -130,7 +130,7 @@ function App() {
                                             <Route path="/new-badge/:hash" element={<NewBadge/>}/>
                                             <Route path="/club-dashboard" element={<ClubDash/>}/>
                                             
-                                            <Route path="/new-badge" element={<NewBadge/>}/>
+                                            <Route path="/new-badge/:hash" element={<NewBadge/>}/>
                                         </Route>
                                     </Routes>
                                     </ProfileCreationProvider>
