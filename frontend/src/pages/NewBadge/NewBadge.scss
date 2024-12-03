@@ -47,6 +47,11 @@
 
     .content{
         max-width:400px;
+        margin:0 50px;
+
+        h1,h2,p{
+            transition: opacity 0.5s ease-in-out;
+        }
 
         & > div{
             display:flex;
@@ -91,7 +96,15 @@
             border-radius: 20px;
             font-weight:800;
             margin-bottom:20px;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
             @include shimmer-effect(130deg,2s );
+            //box shadow red
+            // box-shadow: 4px 4px 4px #D51F2B;
+
+            &.visible{
+                opacity: 1;
+            }
         }
         .card-header{
             margin-top:20px
@@ -102,7 +115,9 @@
     }
 }
 
-
+.invis{
+    opacity:0;
+}
 
 .new-badge .yellow-red{
     position: absolute;
@@ -121,5 +136,17 @@
 }
 
 
+@media (max-width: 1000px) {
+    .yellow-red,
+    .purple{
+        height:400px;
+    }
+}
 
-  
+@media (max-width: 500px){
+    .yellow-red,
+    .purple{
+        height:300px;
+    }
+}
+

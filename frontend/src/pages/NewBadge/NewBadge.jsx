@@ -22,7 +22,16 @@ const NewBadge = () => {
     const [badge, setBadge] = useState(null);
     const [claimed, setClaimed] = useState(false);
 
+    const [badgeVisible, setBadgeVisible] = useState(false);
+    const [contentVisible, setContentVisible] = useState(false);
+
     useEffect(() => {
+        setTimeout(() => {
+            setBadgeVisible(true);
+        }, 100);
+        setTimeout(() => {
+            setContentVisible(true);
+        }, 1000);
         setTimeout(() => {
             setStart(true);
         }, 500);
@@ -96,13 +105,13 @@ const NewBadge = () => {
                             :
                             <div className="success">
                                 {badge && 
-                                    <div className="mock-badge" style={{backgroundColor: badge.badgeColor}}>
+                                    <div className={`mock-badge ${badgeVisible && "visible"}`}style={{backgroundColor: badge.badgeColor}}>
                                         {badge.badgeContent}
                                     </div>
                                 }
-                                <h1>claim your new badge!</h1>
-                                <p>Thank you for attending the RCOS expo 🎉. To express our thanks, we’d like to gift you a limited RCOS badge, wear it proudly on your profile! </p>
-                                <button onClick={onClaim}>claim</button>
+                                <h1 className={`${!contentVisible && "invis"}`}>claim your new badge!</h1>
+                                <p className={`${!contentVisible && "invis"}`}>Thank you for attending the RCOS expo 🎉. To express our thanks, we’d like to gift you a limited RCOS badge, wear it proudly on your profile! </p>
+                                <button onClick={onClaim} className={`${!contentVisible && "invis"}`}>claim</button>
 
                             </div>
                         }
