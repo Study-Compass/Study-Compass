@@ -60,8 +60,13 @@ function RegisterForm() {
 
     useEffect(() => {
         if (isAuthenticated && isAuthenticated !== null) {
-            console.log("logged in already");
-            navigate('/room/none', { replace: true })
+            // console.log("logged in already");
+            // const redirectto = localStorage.getItem('redirectto');
+            // if(redirectto){
+                // navigate(redirectto, { replace: true });
+            // } else {
+                navigate('/room/none', { replace: true });
+            // }
         }
     }, [isAuthenticated, navigate]);
 
@@ -114,7 +119,8 @@ function RegisterForm() {
         flow: 'auth-code',
         ux_mode: 'redirect',
         onFailure: () => { console.log("failed") },
-    })
+    });
+
 
     function failed(message){
         navigate('/login');
