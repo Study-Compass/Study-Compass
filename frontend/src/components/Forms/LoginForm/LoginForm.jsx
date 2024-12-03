@@ -144,7 +144,7 @@ function LoginForm() {
                 <button className={`show-email button active ${email ? "disappear-show" : ""}`} onClick={(e)=>{e.preventDefault();setEmail(true)}}>
                     Login with Email
                 </button>
-                <p className={`already ${email ? "disappear-show" : ""}`}>Don’t have an account? <Link to="/register" state={{from:location.state.from}} replace>Register</Link></p>
+                <p className={`already ${email ? "disappear-show" : ""}`}>Don’t have an account? <Link to="/register" state={{from:location.state?.from || "/room/none"}} replace>Register</Link></p>
             </div>
 
             <div className="form-content" >
@@ -157,7 +157,7 @@ function LoginForm() {
                     <input type="password" name="password" value={formData.password} onChange={handleChange} placeholder="Enter your password..." required />
                 </div>
                 <button type="submit" className={`button ${valid ? "active":""}`}>Log In</button>
-                <p className="already">Don’t have an account? <Link to="/register" state={{from:location.state.from}}>Register</Link></p>
+                <p className="already">Don’t have an account? <Link to="/register" state={{from:location.state?.from || "/room/none"}}>Register</Link></p>
             </div>
         </div>
 
