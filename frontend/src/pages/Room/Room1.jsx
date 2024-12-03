@@ -292,6 +292,9 @@ function Room() {
         }
 
         getRecommendationData();
+
+        const newBadgeRedirect = localStorage.getItem('badge');
+
     },[]);
 
 

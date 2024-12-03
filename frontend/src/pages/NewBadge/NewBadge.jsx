@@ -52,6 +52,7 @@ const NewBadge = () => {
             } else {
                 console.log(response);
                 setBadge(response.badge);
+                localStorage.removeItem('badge');
             }
         }
 
@@ -72,6 +73,7 @@ const NewBadge = () => {
         setTimeout(() => {
             window.location.reload();
         }, 100);
+        localStorage.setItem('badge', location.pathname);
         return <Navigate to="/login" state={{ from: location }} replace/>;
     } 
 
