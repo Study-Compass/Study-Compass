@@ -292,6 +292,13 @@ function Room() {
         }
 
         getRecommendationData();
+
+        const newBadgeRedirect = localStorage.getItem('badge');
+        if(newBadgeRedirect){
+            navigate(newBadgeRedirect);
+            localStorage.removeItem('badge');
+        }
+
     },[]);
 
 
