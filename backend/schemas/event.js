@@ -73,7 +73,7 @@ const eventSchema = new mongoose.Schema({
     },
     contact:{
         type:String,
-        required:true,
+        required:false,
     },
 }, {
     timestamps: true // automatically adds 'createdAt' and 'updatedAt' fields
