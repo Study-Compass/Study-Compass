@@ -323,6 +323,44 @@ router.post('/approve-event', verifyToken, async (req, res) => {
     }
 });
 
+router.get('/get-events-by-month', verifyToken, authorizeRoles('oie'), async (req, res) => {
+    const { month, year } = req.query;
+
+    if (!month || !year) {
+        return res.status(400).json({
+            success: false,
+            message: 'Month and year are required parameters.',
+        });
+    }
+
+    try {
+        // Parse month and year into integers
+        const parsedMonth = parseInt(month, 10) - 1; // JavaScript months are 0-indexed
+        const parsedYear = parseInt(year, 10);
+
+        // Construct the start and end of the month
+        const startOfMonth = new Date(parsedYear, parsedMonth, 1); // First day of the month
+        const endOfMonth = new Date(parsedYear, parsedMonth + 1, 0, 23, 59, 59, 999); // Last day of the month
+
+        // Query events with dates within the range
+        const events = await Event.find({
+            start_time: { $gte: startOfMonth, $lte: endOfMonth }
+        }).populate('classroom_id');
+
+        console.log('GET: /get-events-by-month successful');
+        res.status(200).json({
+            success: true,
+            events
+        });
+    } catch (error) {
+        console.log('GET: /get-events-by-month failed', error);
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+});
+
 
 
 module.exports = router;
