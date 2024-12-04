@@ -43,10 +43,21 @@
         height:calc(100% - 40px);
         max-height:calc(100% - 40px);
         display:grid;
-        grid-template-columns: repeat(7, 1fr);
         box-sizing: border-box;
         // border-top: 1px solid var(--lightborder);
         border-left: 1px solid var(--lighterborder);
+        grid-template-rows: repeat(5, 1fr); 
+
+        &__row{
+            display:grid;
+            grid-template-columns: repeat(7, 1fr);
+            cursor: pointer;
+            &:hover{
+                .calendar__day{
+                    background-color: var(--lighter);
+                }
+                }
+        }
 
         &__day{
             display:flex;
@@ -75,7 +86,11 @@
                 flex-direction: column;
                 gap:3px;
                 .event{
+                    padding: 3px 10px;
                     margin:0;
+                    p{
+                        font-weight: 400;
+                    }
                 }
             }
             &.is-disabled{
@@ -83,9 +98,14 @@
             }
         }
 
-        &__day:last-child{
-            border-radius: 0 0 10px 0;
+        &__row:last-child{
+            .calendar__day:first-child{
+                border-radius: 0 0 0  10px;
+            }
+            .calendar__day:last-child{
+                border-radius: 0 0 10px 0;
+            }
+    
         }
-
     }
 }
