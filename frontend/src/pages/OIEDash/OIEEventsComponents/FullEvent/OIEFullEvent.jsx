@@ -136,10 +136,12 @@ function OIEFullEvent({ event, eventId = null, setEdited }){
                                     ))}
                                 </div>
                                 <p>Approval requested {new Date(fullEvent.data.event.createdAt).toLocaleString('default', {weekday: 'long'})}, {new Date(fullEvent.data.event.createdAt).toLocaleString('default', {month: 'long'})} {new Date(fullEvent.data.event.createdAt).getDate()}</p>
+                                <p className="contact">contact: jbliu88@gmail.com</p>
+
                             </>
                         }
                     </div>
-                    <h1>Checklist</h1>
+                    {/* <h1>Checklist</h1>
                     <div className="checklist">
                         {!loading && data.config.checklist.map((item, index) => (
                             <div className={`check-item ${checked[index] && "checked"}`} key={index} onClick={()=>handleCheck(index)} >
@@ -152,7 +154,7 @@ function OIEFullEvent({ event, eventId = null, setEdited }){
                                 </div>
                             </div>
                         ))}
-                    </div>
+                    </div> */}
                 </div>
             </div>
         </div>

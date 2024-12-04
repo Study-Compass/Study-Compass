@@ -57,6 +57,7 @@
                 label{
                     font-family: 'Inter';
                     font-weight:500;
+                    -webkit-user-select: none;
                     user-select: none;
                     cursor: pointer;
                 }
@@ -146,7 +147,6 @@
                 transition: all 0.5s;
                 margin:0;
                 font-size:18px;
-
             }
         }
     

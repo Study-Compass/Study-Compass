@@ -5,7 +5,7 @@ import { getAllEvents, getOIEEvents } from '../../../components/EventsViewer/Eve
 import OIEEvent from '../OIEEventsComponents/Event/OIEEvent';
 import { useFetch } from '../../../hooks/useFetch';
 
-function Dash({expandedClass}){
+function Dash({expandedClass, change}){
 
     const [events, setEvents] = useState([]);
     const [pendingEvents, setPendingEvents] = useState([]);
@@ -46,7 +46,10 @@ function Dash({expandedClass}){
                 <h1>OIE Dashboard</h1>
             </header>
             <div className="needs-approval">
-                <h1>events pending approval</h1>
+                <div className="approval-header">
+                    <h1>events pending approval</h1>
+                    <button onClick={()=>change(2)}><p>see all</p></button>
+                </div>
                 <div className="content">
                     {
                         pendingEvents.map((event, index) => {
@@ -60,7 +63,10 @@ function Dash({expandedClass}){
                 </div>
             </div>
             <div className="needs-approval">
-                <h1>events coming up</h1>
+                <div className="approval-header">
+                    <h1>events coming up</h1>
+                    <button onClick={()=>change(2)}><p>see all</p></button>
+                </div>
                 <div className="content">
                     {
                         events.map((event, index) => {

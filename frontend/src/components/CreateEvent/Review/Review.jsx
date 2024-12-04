@@ -12,6 +12,7 @@ function Review({info, visible, setInfo, onSubmit}){
 
     const [pspeak, setPspeak]  = useState(false);
     const [catering, setCatering] = useState(false);
+    const [alumni, setAlumni] = useState(false);
 
     const handleChange = (e) => {
         const {name} = e.target;
@@ -21,6 +22,9 @@ function Review({info, visible, setInfo, onSubmit}){
                 break;
             case "pspeak":
                 setPspeak(!pspeak);
+                break;
+            case "alumni":
+                setAlumni(!alumni);
                 break;
             default:
                 break;
@@ -70,6 +74,15 @@ function Review({info, visible, setInfo, onSubmit}){
                             </label>
                             <label htmlFor="catering">This even requires catering</label>
                         </div>
+                        <div className="acknowledgement">
+                            <label className="check">
+                                <input type="checkbox" id="alumni" name="alumni" value={alumni} onChange={handleChange}/>
+                                <span className="checkmark">
+                                    <Icon icon="icon-park-solid:check-one" />
+                                </span>
+                            </label>
+                            <label htmlFor="alumni">This event includes alumni speakers</label>
+                        </div>
                     </div>
                 </div>
                 
@@ -78,7 +91,7 @@ function Review({info, visible, setInfo, onSubmit}){
                 {visible && 
                     <div className="publish" onClick={onSubmit}>
                         <div className="info">
-                            <h1>{pspeak || catering || info.expectedAttendance > 199 ? "request OIE approval" : "publish event"}</h1>
+                            <h1>{pspeak || catering || info.expectedAttendance > 99 || alumni ? "request OIE approval" : "publish event"}</h1>
                         </div>
                         <div className="gradient-cover">
                             <img src={GradientButtonCover} alt="" />

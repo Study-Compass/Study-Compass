@@ -107,7 +107,7 @@ function OIEDash(){
                     {
                         (currentPage === 0 || currentDisplay === 0) &&
                         <div className={`${currentDisplay === 0 && "visible"} dash-content`}>
-                            <Dash expandedClass={expandedClass}/>
+                            <Dash expandedClass={expandedClass} change={setCurrentDisplay}/>
                         </div>
                     }
                     {
