@@ -6,10 +6,10 @@ const getDaysInMonth = (month, year) => {
 };
   
 const getFirstDayOfWeek = (month, year) => {
-    return new Date(year, month, 1).getDay(); // 0 (Sun) to 6 (Sat)
+    return new Date(year, month - 1, 1).getDay(); // Subtract 1 from the month
 };
 
-function Month({height, month=11, year=2024}){
+function Month({ height, month=11, year=2024 }){
     const daysInMonth = getDaysInMonth(month, year); // Total days in the given month
     const firstDayOfWeek = getFirstDayOfWeek(month, year); // Starting weekday
 
@@ -19,20 +19,30 @@ function Month({height, month=11, year=2024}){
     
     const dayCells = Array.from({ length: daysInMonth }, (_, i) => (
         <div key={`day-${i}`} className="calendar__day">
-            {i + 1}
+            <div className="day-header">
+                <p>{i + 1}</p>
+            </div>
+            <div className="events">
+                
+            </div>
         </div>
     ));
 
     return(
         <div className="month" style={{height: `${height}px`}}>
             {/* Headers */}
-      {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
-        <div key={day} className="calendar__header">
-          {day}
-        </div>
-      ))}
-      {/* Days */}
-      {emptyCells.concat(dayCells)}
+            <div className="calendar-header">
+                {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
+                    <div key={day} className="day">
+                        <p>{day}</p>
+                    </div>
+                ))}
+            </div>
+            <div className="calendar">
+
+                {/* Days */}
+                {emptyCells.concat(dayCells)}
+            </div>
         </div>
     )
 }
