@@ -15,16 +15,21 @@ function EventsCalendar({expandedClass}){
         }
     },[contentRef.current]);
 
+    const changeToWeek = (week) => {
+        console.log(week);
+        setView(1);
+    }
+
     return (
         <div className={`events-calendar ${expandedClass}`}>
             <div className="header">
                 <h1>December 2024</h1>
-                <Switch options={["month", "week", "day", "list"]} onChange={setView} />
+                <Switch options={["month", "week", "day", "list"]} onChange={setView} selectedPass={view} setSelectedPass={setView}/>
 
             </div>
             <div className="content" ref={contentRef}>
                 {
-                    view === 0 && <Month height={contentHeight}/>
+                    view === 0 && <Month height={contentHeight} changeToWeek={changeToWeek}/>
                 }
             </div>
         </div>
