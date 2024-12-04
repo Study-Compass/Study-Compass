@@ -18,7 +18,7 @@ function EventsCalendar({expandedClass}){
     return (
         <div className={`events-calendar ${expandedClass}`}>
             <div className="header">
-                <h1>Events Calendar</h1>
+                <h1>December 2024</h1>
                 <Switch options={["month", "week", "day", "list"]} onChange={setView} />
 
             </div>
