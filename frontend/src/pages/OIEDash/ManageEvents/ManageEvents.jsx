@@ -76,7 +76,7 @@ function ManageEvents({expandedClass}){
             </div>
             <div className="events-col">
                 <div className="header">
-                    <h1>events pending approval</h1>
+                    <h1>pending events</h1>
                 </div>
                 <div className="content">
                     {
@@ -89,7 +89,7 @@ function ManageEvents({expandedClass}){
                         })
                     }
                     {
-                        pendingEvents.length === 0 && <div className="no-events shimmer">
+                        fetchPendingEvents.loading && <div className="no-events shimmer">
                         </div>
                     }
                 </div>
@@ -107,7 +107,11 @@ function ManageEvents({expandedClass}){
                         })
                     }
                     {
-                        approvedEvents.length === 0 && <div className="no-events shimmer">
+                        fetchApprovedEvents.loading && <div className="no-events shimmer">
+                        </div>
+                    }
+                    {
+                        approvedEvents.length === 0 && !fetchApprovedEvents.loading && <div className="no-events">
                         </div>
                     }
                 </div>
@@ -125,9 +129,37 @@ function ManageEvents({expandedClass}){
                         })
                     }
                     {
-                        rejectedEvents.length === 0 && <div className="no-events shimmer">
+                        fetchRejectedEvents.loading && <div className="no-events shimmer">
                         </div>
                     }
+                    {
+                        rejectedEvents.length === 0 && !fetchRejectedEvents.loading && <div className="no-events">
+                        </div>
+                    }
+                    
+                </div>
+            </div>
+            <div className="events-col">
+                <div className="header">
+                    <h1>other events</h1>
+                </div>
+            <div className="content">
+                    {
+                        events.map((event, index) => {
+                            return (
+                                <OIEEvent event={event} key={index} refetch={refetch} showOIE={true} index={index}/>
+                            )
+                        })
+                    }
+                    {
+                        fetchEvents.loading && <div className="no-events shimmer">
+                        </div>
+                    }
+                    {
+                        events.length === 0 && !fetchRejectedEvents.loading && <div className="no-events">
+                        </div>
+                    }
+                    
                 </div>
             </div>
         </div>
