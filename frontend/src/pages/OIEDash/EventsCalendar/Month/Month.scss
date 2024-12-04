@@ -5,7 +5,7 @@
         display:grid;
         grid-template-columns: repeat(7, 1fr);
         width:100%;
-        height:30px; 
+        height:40px; 
         box-sizing: border-box;
         border-right: 1px solid var(--lighterborder);
         border-bottom: 1px solid var(--lighterborder);
@@ -19,7 +19,6 @@
             border-radius: 0 10px 0 0 ;
 
         }
-        
 
         .day{
             box-sizing: border-box;
@@ -28,6 +27,7 @@
             justify-content: center;
             border-top: 1px solid var(--lighterborder);
             border-left: 1px solid var(--lighterborder);
+            
         }
 
         p{
@@ -40,8 +40,8 @@
         }
     }
     .calendar{
-        height:calc(100% - 30px);
-        max-height:calc(100% - 30px);
+        height:calc(100% - 40px);
+        max-height:calc(100% - 40px);
         display:grid;
         grid-template-columns: repeat(7, 1fr);
         box-sizing: border-box;
@@ -55,6 +55,8 @@
             border-bottom: 1px solid var(--lighterborder);
             border-right: 1px solid var(--lighterborder);
             background-color: var(--lightest);
+            flex-direction: column;
+            gap:5px;
 
             .day-header{
                 width:100%;
@@ -65,6 +67,15 @@
                     font-weight:400;
                     font-size: 15px;
                     color: var(--text); 
+                }
+            }
+
+            .events{
+                display: flex;
+                flex-direction: column;
+                gap:3px;
+                .event{
+                    margin:0;
                 }
             }
             &.is-disabled{
