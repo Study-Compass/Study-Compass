@@ -52,7 +52,7 @@ async function registerUser({ username, email, password }) {
     });
     await user.save();
 
-    const token = jwt.sign({ userId: user._id, roles:user.roles }, process.env.JWT_SECRET, { expiresIn: '12h' });
+    const token = jwt.sign({ userId: user._id, roles:user.roles }, process.env.JWT_SECRET, { expiresIn: '5d' });
     return { user, token };
 }
 
@@ -77,7 +77,7 @@ async function loginUser({ email, password }) {
         throw new Error('Invalid credentials');
     }
     delete user.password;
-    const token = jwt.sign({ userId: user._id, roles: user.roles }, process.env.JWT_SECRET, { expiresIn: '12h' });
+    const token = jwt.sign({ userId: user._id, roles: user.roles }, process.env.JWT_SECRET, { expiresIn: '5d' });
     return { user, token };
 }
 
@@ -124,7 +124,7 @@ async function authenticateWithGoogle(code, isRegister = false, url) {
         sendDiscordMessage(`New user registered`, `user ${user.username} registered`, "newUser");
     }
 
-    const jwtToken = jwt.sign({ userId: user._id, roles: user.roles }, process.env.JWT_SECRET, { expiresIn: '12h' });
+    const jwtToken = jwt.sign({ userId: user._id, roles: user.roles }, process.env.JWT_SECRET, { expiresIn: '5d' });
 
     return { user, token: jwtToken };
 }

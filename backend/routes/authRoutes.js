@@ -78,7 +78,7 @@ router.post('/register', async (req, res) => {
         await user.save();
 
         // Generate a token for the new user
-        const token = jwt.sign({ userId: user._id, roles: user.roles }, process.env.JWT_SECRET, { expiresIn: '1h' });
+        const token = jwt.sign({ userId: user._id, roles: user.roles }, process.env.JWT_SECRET, { expiresIn: '5d' });
         console.log(`POST: /register new user ${username}`);
         sendDiscordMessage(`New user registered`, `user ${username} registered`, "newUser");
         // Send the token to the client
