@@ -8,13 +8,13 @@ const verifyToken = (req, res, next) => {
 
     jwt.verify(token, process.env.JWT_SECRET, (err, decodedToken) => {
       if (err) return res.sendStatus(403); // if the token is not valid
-      if (decodedToken && decodedToken.exp) {
-        const currentTime = Math.floor(Date.now() / 1000); // Current time in seconds
-        const timeLeft = decodedToken.exp - currentTime; // Time left in seconds
-        const hoursLeft = (timeLeft / 3600).toFixed(2); // Convert to hours and format to 2 decimal places
+    //   if (decodedToken && decodedToken.exp) {
+    //     const currentTime = Math.floor(Date.now() / 1000); // Current time in seconds
+    //     const timeLeft = decodedToken.exp - currentTime; // Time left in seconds
+    //     const hoursLeft = (timeLeft / 3600).toFixed(2); // Convert to hours and format to 2 decimal places
 
-        console.debug(`Token has ${hoursLeft} hours left until expiration.`);
-      }
+    //     console.debug(`Token has ${hoursLeft} hours left until expiration.`);
+    //   }
       req.user = decodedToken;
       next();
     });
