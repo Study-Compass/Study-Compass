@@ -160,7 +160,7 @@ const AnalyticsChart = ({endpoint, heading, color}) => {
                   <img src={Stats} alt="Stats" />
                   <h2>{heading}</h2>
               </div>
-              <Switch options={["week", "day", "all"]} onChange={handleViewModeChange} />
+              <Switch options={["week", "day", "all"]} onChange={handleViewModeChange} selectedPass={0} setSelectedPass={console.log}/>
           </div>
           <div className="row">
               <h3>{chartData.datasets ? chartData.datasets[0].data.reduce((a, b) => a + b, 0) : 0} {endpoint}</h3>
