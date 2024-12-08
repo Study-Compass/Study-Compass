@@ -8,7 +8,7 @@ import FullEvent from '../../../../components/EventsViewer/EventsGrid/EventsColu
 
 import defaultAvatar from '../../../../assets/defaultAvatar.svg';
 
-function OIEEvent({event, showStatus=false, refetch, showOIE=false, index}){
+function OIEEvent({event, showStatus=false, refetch, showOIE=false, index, showExpand=true}){
     const [popupOpen, setPopupOpen] = useState(false);
     const [edited, setEdited] = useState(false);
     const navigate = useNavigate();
@@ -64,10 +64,13 @@ function OIEEvent({event, showStatus=false, refetch, showOIE=false, index}){
                     <p>{event.location}</p>
                 </div>
             </div>
-            <button className="button" onClick={() => handleEventClick(event)}>
-                <Icon icon="material-symbols:expand-content-rounded" />
-                <p>details</p>
-            </button>
+            {
+                showExpand && 
+                <button className="button" onClick={() => handleEventClick(event)}>
+                    <Icon icon="material-symbols:expand-content-rounded" />
+                    <p>details</p>
+                </button>
+            }
         </div>
     );
 

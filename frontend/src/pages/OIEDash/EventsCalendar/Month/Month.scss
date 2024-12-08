@@ -52,11 +52,14 @@
             display:grid;
             grid-template-columns: repeat(7, 1fr);
             cursor: pointer;
+            position: relative;
+            overflow:visible;
+            z-index: 1;
             &:hover{
                 .calendar__day{
-                    background-color: var(--lighter);
+                    filter: brightness(0.98);
                 }
-                }
+            }
         }
 
         &__day{
@@ -65,7 +68,7 @@
             padding:5px;
             border-bottom: 1px solid var(--lighterborder);
             border-right: 1px solid var(--lighterborder);
-            background-color: var(--lightest);
+            background-color: white;
             flex-direction: column;
             gap:5px;
 
@@ -94,8 +97,17 @@
                 }
             }
             &.is-disabled{
-                background-color: var(--light);
+                background-color: var(--lighter);
             }
+            &:first-child:not(.is-disabled),
+            &:last-child:not(.is-disabled){
+                background-color: var(--lightest);
+            }
+            &:first-child.is-disabled,
+            &:last-child.is-disabled{
+                background-color: var(--lighter);
+            }
+            
         }
 
         &__row:last-child{
