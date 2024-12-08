@@ -96,6 +96,12 @@ const userSchema = new mongoose.Schema({
         default: ['user'],
         enum: ['user', 'admin', 'moderator', 'developer', 'oie'], // Adjust roles as needed
     },
+    clubAssociations:[
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Club'
+        }
+    ]
     
     // you can add more fields here if needed, like 'createdAt', 'updatedAt', etc.
 }, {

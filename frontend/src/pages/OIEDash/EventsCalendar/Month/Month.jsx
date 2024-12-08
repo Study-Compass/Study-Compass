@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import './Month.scss';
 import { useFetch } from '../../../../hooks/useFetch';
+import MonthEvent from './MonthEvent/MonthEvent';
 
 const getDaysInMonth = (month, year) => {
     return new Date(year, month, 0).getDate();
@@ -35,9 +36,7 @@ function Month({ height, month = 12, year = 2024, changeToWeek }) {
             </div>
             <div className="events">
                 {getEventByDay(i + 1).map((event) => (
-                    <div key={event._id} className="event">
-                        <p>{event.name}</p>
-                    </div>
+                    <MonthEvent key={event.id} event={event} show={i===10} />
                 ))}
             </div>
         </div>

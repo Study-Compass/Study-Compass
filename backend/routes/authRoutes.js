@@ -132,9 +132,10 @@ router.get('/validate-token', verifyToken, async (req, res) => {
     try {
         const user = await User.findById(req.user.userId)
             .select('-password') // Add fields you want to exclude
-            .lean(); // Assuming Mongoose for DB operations
+            .lean()
+            .populate('clubAssociations'); // Assuming Mongoose for DB operations
         if (!user) {
-            console.log(`GET: /validate-token token is invalid`)
+            console.log(`GET: /validate-token token is invalid`);
             return res.status(404).json({ success: false, message: 'User not found' });
         }
         console.log(`GET: /validate-token token is valid for user ${user.username}`)
@@ -164,7 +165,7 @@ router.get('/validate-token', verifyToken, async (req, res) => {
             }
         });
     } catch (error) {
-        console.log(`GET: /validate-token token is invalid`)
+        console.log(`GET: /validate-token token is invalid`, error)
         res.status(500).json({
             success: false,
             message: 'Error fetching user details',
