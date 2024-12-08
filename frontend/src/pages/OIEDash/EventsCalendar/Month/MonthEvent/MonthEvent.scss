@@ -1,0 +1,37 @@
+.month-event {
+    border-radius: 3px;
+    padding: 2px 5px;
+    border: 1px solid var(--lighterborder);
+    background-color: var(--lightest);
+
+    .event-info p {
+        font-size: 10px;
+        font-weight: 500;
+        font-family: 'Inter';
+    }
+
+    .hover-event {
+        position: fixed;
+        left: 0;
+        white-space: nowrap;
+        opacity:0;
+        border-radius: 10px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        pointer-events: none;
+        z-index: 99999;
+
+        &.show{
+            opacity:1;
+        }
+
+        &.above {
+            bottom: 100%;
+            margin-bottom: 5px;
+        }
+
+        &.below {
+            top: 100%;
+            margin-top: 5px;
+        }
+    }
+}
