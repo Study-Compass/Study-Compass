@@ -361,6 +361,38 @@ router.get('/get-events-by-month', verifyToken, authorizeRoles('oie'), async (re
     }
 });
 
+router.get('/get-events-by-range', verifyToken, authorizeRoles('oie'), async (req, res) => {
+    const { start, end } = req.query;
+
+    if (!start || !end) {
+        return res.status(400).json({
+            success: false,
+            message: 'Start and end dates are required parameters.',
+        });
+    }
+
+    try {
+        const startOfRange = new Date(start);
+        const endOfRange = new Date(end);
+
+        const events = await Event.find({
+            start_time: { $gte: startOfRange, $lte: endOfRange }
+        }).populate('classroom_id');
+
+        console.log('GET: /get-events-by-week successful');
+        res.status(200).json({
+            success: true,
+            events
+        });
+    } catch (error) {
+        console.log('GET: /get-events-by-week failed', error);
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+});
+
 
 
 module.exports = router;

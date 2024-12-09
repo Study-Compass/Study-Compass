@@ -11,6 +11,39 @@
         width:100%;
         align-items: center;
         justify-content: space-between;
+        align-items: center;
+        height:40px;
+        margin-bottom:10px;
+        .time-period{
+            display: flex;
+            gap: 10px;
+            h1{
+                margin:0;
+                -webkit-user-select: 0;
+                user-select: none;
+                b{
+                    color: var(--red);  
+                }
+            }
+            .arrows{
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                iconify-icon{
+                    cursor: pointer;
+                    color: var(--text);
+                    transition: all 0.3s;
+                    &:hover{
+                        color: var(--green);
+                    }
+                    &:active{
+                        color: var(--red);
+                        transform: scale(0.8);
+                    }
+                    font-size:22px;
+                }
+            }
+        }
         .view-select{
             display:flex;
             gap:10px;
