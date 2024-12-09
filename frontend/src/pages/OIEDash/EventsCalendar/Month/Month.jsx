@@ -51,7 +51,7 @@ function Month({ height, changeToWeek }) {
             </div>
             <div className="events">
                 {getEventByDay(i + 1).map((event) => (
-                    <MonthEvent key={event.id} event={event} show={i===10} />
+                    <MonthEvent key={event._id} event={event} show={i===10} />
                 ))}
             </div>
         </div>
@@ -61,7 +61,7 @@ function Month({ height, changeToWeek }) {
     const totalCells = emptyCells.length + dayCells.length;
     const remainingCells = Math.ceil(totalCells / 7) * 7 - totalCells; // Ensure a complete grid
     const remainingEmptyCells = Array.from({ length: remainingCells }, (_, i) => (
-        <div key={`empty-${i}`} className="calendar__day is-disabled"></div>
+        <div key={`empty-last-${i}`} className="calendar__day is-disabled"></div>
     ));
 
     // Group cells into rows
