@@ -1,16 +1,13 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import '../OnBoarding/Onboard.scss';
 import './CreateClub.scss';
-import PurpleGradient from '../../assets/BlueGrad2.png';
-import YellowRedGradient from '../../assets/BlueGrad1.png';
+import PurpleGradient from '../../assets/RedBottomRight.png';
+import YellowRedGradient from '../../assets/RedTopRight.png';
 import Loader from '../../components/Loader/Loader.jsx';
 import useAuth from '../../hooks/useAuth.js';
 import { useNavigate } from 'react-router-dom';
 import { useError } from '../../ErrorContext.js'; 
 import { useNotification } from '../../NotificationContext.js';
-import { checkUsername } from '../../DBInteractions.js';
-import { useCache } from '../../CacheContext.js';
-import { debounce} from '../../Query.js';
 import CardHeader from '../../components/ProfileCard/CardHeader/CardHeader.jsx';
 import ImageUpload from '../../components/ImageUpload/ImageUpload';
 import axios from 'axios';

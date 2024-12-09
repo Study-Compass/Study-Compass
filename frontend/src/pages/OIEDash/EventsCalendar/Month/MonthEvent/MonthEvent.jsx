@@ -15,8 +15,6 @@ function MonthEvent({ event }) {
     // Portal content
 
     function PortalContent({yPos, xPos, below, right}) {
-        console.log("below", below);
-        console.log('right', right);
         const screenHeight = window.innerHeight;
         const screenWidth = window.innerWidth;
 
@@ -38,7 +36,6 @@ function MonthEvent({ event }) {
       }
 
     const handleMouseEnter = () => {
-        console.log("ghello");
         if (!eventRef.current) return;
         const rect = eventRef.current.getBoundingClientRect();
         const screenWidth = window.innerWidth;

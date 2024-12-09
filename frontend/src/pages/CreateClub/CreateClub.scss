@@ -1,4 +1,17 @@
 .create-club{
+    .yellow-red{
+        height:50%;
+    }
+    .purple{
+        height:50%;
+    }
+    h2{
+        b{
+            background: -webkit-linear-gradient(135deg, #F8A185 , #F34237);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+    }
     .content{
         textarea.text-input{
             width:100%;
