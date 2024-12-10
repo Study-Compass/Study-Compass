@@ -7,6 +7,7 @@ const multer = require('multer');
 require('dotenv').config();
 const { createServer } = require('http');
 const { Server } = require('socket.io');
+const enforce = require('express-sslify');
 
 const app = express();
 const port = process.env.PORT || 5001;
@@ -25,6 +26,7 @@ const io = new Server(server, {
 });
 
 if (process.env.NODE_ENV === 'production') {
+    app.use(enforce.HTTPS({ trustProtoHeader: true }));
     const corsOptions = {
         origin: ['https://www.study-compass.com', 'https://studycompass.com'],
         optionsSuccessStatus: 200 // for legacy browser support
