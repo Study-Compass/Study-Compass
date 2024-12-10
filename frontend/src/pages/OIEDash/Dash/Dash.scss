@@ -6,7 +6,7 @@
     z-index: 1;
     display: flex;
     flex-direction: column;
-    gap:30px;
+    gap:10px;
     transition: padding 1s ease-in-out;
 
     &.maximized{
@@ -40,8 +40,23 @@
             margin-left:10px;
             margin-bottom:5px;
         }
+        .approval-header{
+            display: flex;
+            gap: 15px;
+            button{
+                font-family: 'Inter';
+                font-size: 14px;
+                outline:none;
+                border-radius: 8px;
+                border:none;
+                font-weight: 600;
+                padding: 5px 25px;
+                cursor: pointer;
+                height:fit-content;
+            }
+        }
         .content{
-            padding: 10px 0 20px 0;
+            padding: 10px 0 10px 0;
             display:flex;
             gap:10px;
             overflow-x: scroll;

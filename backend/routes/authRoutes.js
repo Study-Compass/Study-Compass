@@ -78,7 +78,7 @@ router.post('/register', async (req, res) => {
         await user.save();
 
         // Generate a token for the new user
-        const token = jwt.sign({ userId: user._id, roles: user.roles }, process.env.JWT_SECRET, { expiresIn: '1h' });
+        const token = jwt.sign({ userId: user._id, roles: user.roles }, process.env.JWT_SECRET, { expiresIn: '5d' });
         console.log(`POST: /register new user ${username}`);
         sendDiscordMessage(`New user registered`, `user ${username} registered`, "newUser");
         // Send the token to the client
@@ -132,7 +132,7 @@ router.get('/validate-token', verifyToken, async (req, res) => {
     try {
         const user = await User.findById(req.user.userId)
             .select('-password') // Add fields you want to exclude
-            .lean(); // Assuming Mongoose for DB operations
+            .lean()
         if (!user) {
             console.log(`GET: /validate-token token is invalid`)
             return res.status(404).json({ success: false, message: 'User not found' });
@@ -142,29 +142,11 @@ router.get('/validate-token', verifyToken, async (req, res) => {
             success: true,
             message: 'Token is valid',
             data: {
-                // user: {
-                //     _id: user._id,
-                //     username: user.username,
-                //     email: user.email,
-                //     name: user.name,
-                //     picture : user.picture,
-                //     saved: user.saved,
-                //     visited: user.visited,
-                //     partners: user.partners,
-                //     sessions: user.sessions,
-                //     hours: user.hours,
-                //     contributions: user.contributions,
-                //     onboarded: user.onboarded,
-                //     classroomPreferences: user.classroomPreferences,
-                //     recommendationPreferences: user.recommendationPreferences,
-                //     google: user.googleId ? true : false,
-                //     tags: user.tags                    
-                // }
                 user : user
             }
         });
     } catch (error) {
-        console.log(`GET: /validate-token token is invalid`)
+        console.log(`GET: /validate-token token is invalid`, error)
         res.status(500).json({
             success: false,
             message: 'Error fetching user details',

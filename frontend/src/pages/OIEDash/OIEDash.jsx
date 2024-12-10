@@ -1,18 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import './OIEDash.scss';
 import useAuth from '../../hooks/useAuth';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams, useHistory  } from 'react-router-dom';
 import Dashboard from '../../assets/Icons/Dashboard.svg';
 import logo from '../../assets/red_logo.svg';
 import { getAllEvents } from '../../components/EventsViewer/EventHelpers';
 import Configuration from './Configuration/Configuration';
+import EventsCalendar from './EventsCalendar/EventsCalendar';
 
 import {Icon} from '@iconify-icon/react';  
 import Dash from './Dash/Dash';
 import ManageEvents from './ManageEvents/ManageEvents';
-import { set } from 'mongoose';
+
 
 function OIEDash(){
+    const [searchParams, setSearchParams] = useSearchParams();
     const [expanded, setExpanded] = useState(false);
     const [expandedClass, setExpandedClass] = useState("");
     const {isAuthenticated, isAuthenticating, user} = useAuth();
@@ -21,6 +23,13 @@ function OIEDash(){
 
     const [currentPage, setCurrentPage] = useState(0);
     const [currentDisplay, setCurrentDisplay] = useState(0);
+
+    useEffect(()=>{
+        const pageFromUrl = searchParams.get("page");
+        if(pageFromUrl){
+            setCurrentDisplay(parseInt(pageFromUrl));
+        }
+    },[]);
 
     useEffect(()=>{
         if(isAuthenticating){
@@ -57,6 +66,7 @@ function OIEDash(){
 
     useEffect(() => {
             setCurrentPage(currentPage);
+            setSearchParams({page: currentDisplay});
     }, [currentDisplay]);
 
     return (
@@ -97,12 +107,14 @@ function OIEDash(){
                     {
                         (currentPage === 0 || currentDisplay === 0) &&
                         <div className={`${currentDisplay === 0 && "visible"} dash-content`}>
-                            <Dash expandedClass={expandedClass}/>
+                            <Dash expandedClass={expandedClass} change={setCurrentDisplay}/>
                         </div>
                     }
                     {
                         (currentPage === 1 || currentDisplay === 1) &&
-                        <div className={`${currentDisplay === 1 && "visible"} dash-content`}></div>
+                        <div className={`${currentDisplay === 1 && "visible"} dash-content`}>
+                            <EventsCalendar expandedClass={expandedClass}/>
+                        </div>
                     }
                     {
                         (currentPage === 2 || currentDisplay === 2) &&

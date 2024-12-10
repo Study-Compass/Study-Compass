@@ -70,8 +70,11 @@ const eventSchema = new mongoose.Schema({
     OIEAcknowledgementItems: {
         type: Array,
         default: []
-    }
-
+    },
+    contact:{
+        type:String,
+        required:false,
+    },
 }, {
     timestamps: true // automatically adds 'createdAt' and 'updatedAt' fields
 });

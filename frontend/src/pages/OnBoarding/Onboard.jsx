@@ -6,7 +6,7 @@ import Loader from '../../components/Loader/Loader.jsx';
 import DragList from './DragList/DragList.jsx';
 import useAuth from '../../hooks/useAuth.js';
 import Recommendation from './Recommendation/Recommendation.jsx';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { onboardUser } from './OnboardHelpers.js';
 import { useError } from '../../ErrorContext.js'; 
 import { useNotification } from '../../NotificationContext.js';
@@ -18,7 +18,6 @@ import waiting from '../../assets/Icons/Waiting.svg';
 import error from '../../assets/circle-warning.svg';
 import unavailable from '../../assets/Icons/Circle-X.svg';
 import CardHeader from '../../components/ProfileCard/CardHeader/CardHeader.jsx';
-import { set } from 'mongoose';
 
 function Onboard(){
     const [start, setStart] = useState(false);
@@ -42,10 +41,13 @@ function Onboard(){
     const { newError } = useError();
 
     const [buttonActive, setButtonActive] = useState(true);
-    
 
     const containerRef = useRef(null);
     const contentRefs = useRef([]);
+
+    const location = useLocation();
+    const from = location.state?.from?.pathname || '/room/none';
+
 
     const [items, setItems] = useState(["outlets", "classroom type", "printer", "table type", "windows"]);
     const details = {
@@ -99,7 +101,7 @@ function Onboard(){
         } else {
             if(user){
                 if(user.onboarded && (!onboarded)){
-                    navigate('/room/none');
+                    navigate(from, {replace: true});
                 }
                 setUserInfo(user);
                 setIsGoogle(user.googleId);
@@ -167,7 +169,7 @@ function Onboard(){
         }
 
         if(current === 4){
-            navigate('/room/none');
+            navigate(from, {replace: true});
         }
 
         setButtonActive(false);
