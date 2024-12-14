@@ -260,11 +260,7 @@ function CreateOrg(){
                     }
                     { current === 5 &&
                         <div className={`content ${current === 6 ? "going": ""} ${5 === currentTransition ? org!== null ? "": "beforeOnboard" : "beforeOnboard"}`} ref={el => contentRefs.current[5] = el}>
-                            <h2>congratulations, {userInfo && userInfo.name} <b className="holo-text">{name}</b> is now a study compass organization! </h2>
-                            <p>Here's your study compass id, make sure to hold onto it!</p>
-                            <div className="card-container">
-                                <CardHeader userInfo={userInfo} settings={false}/>
-                            </div>
+                            <h2>congratulations, <b>{name}</b> is now a study compass organization! </h2>
                         </div>
                     }
                 </div>  

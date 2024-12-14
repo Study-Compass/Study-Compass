@@ -37,7 +37,6 @@ try{
    }
 });
 
-// Create a new org and store it into database
 router.post("/create-org", verifyToken, async(req,res)=>{
 
     const{ org_name, org_profile_image, org_description, positions, weekly_meeting } = req.body;
