@@ -20,7 +20,8 @@ const getMonthName = (month) => {
         "September", "October", "November", "December"
     ];
     return months[month - 1];
-}
+};
+
 
 function Month({ height, changeToWeek }) {
     const [month, setMonth] = useState(12);
@@ -85,6 +86,13 @@ function Month({ height, changeToWeek }) {
         setYear(month === 1 ? year - 1 : year);
     }
 
+    const getFirstDayOfWeekFromRow = (rowIndex) => {
+        const firstDayOfMonth = new Date(year, month - 1, 1);
+        const firstDayOfWeek = firstDayOfMonth.getDay();
+        const firstDayOfRow = new Date(year, month - 1, 1 + (rowIndex * 7) - firstDayOfWeek);
+        return firstDayOfRow;
+    };
+
     return (
         <>
             <div className="header">
@@ -106,7 +114,7 @@ function Month({ height, changeToWeek }) {
                 </div>
                 <div className="calendar">
                     {rows.map((row, rowIndex) => (
-                        <div key={`row-${rowIndex}`} className="calendar__row" onClick={()=>changeToWeek(rowIndex)}>
+                        <div key={`row-${rowIndex}`} className="calendar__row" onClick={()=>changeToWeek(getFirstDayOfWeekFromRow(rowIndex))}>
                             {row}
                         </div>
                     ))}

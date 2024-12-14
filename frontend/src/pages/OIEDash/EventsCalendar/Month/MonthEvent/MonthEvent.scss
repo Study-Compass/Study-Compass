@@ -1,8 +1,14 @@
 .month-event {
+    
     border-radius: 3px;
     padding: 2px 5px;
     border: 1px solid var(--lighterborder);
     background-color: var(--lightest);
+    transition: transform 0.3s ease-in-out;
+
+    &:hover{
+        transform:scale(1.05);
+    }
 
     .event-info p {
         font-size: 10px;
