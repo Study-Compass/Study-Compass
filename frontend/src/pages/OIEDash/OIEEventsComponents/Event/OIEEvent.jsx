@@ -45,7 +45,7 @@ function OIEEvent({event, showStatus=false, refetch, showOIE=false, index, showE
                 {
                     showStatus && <div className={`oie-status ${statusMessages[event.OIEStatus][1]}`}><p>{statusMessages[event.OIEStatus][0]}</p></div>
                 }
-                <h1>{event.name}</h1>
+                <h2>{event.name}</h2>
                 {/* <p>{event.location }</p> */}
                 {/* display date in day of the week, month/day */}
                 <div className="row">

@@ -2,10 +2,10 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const memberSchema = new Schema({
-    club_id: {
+    org_id: {
         type: Schema.Types.ObjectId,
         required: true,
-        ref: 'Club'
+        ref: 'Org'
     },
     user_id: {
         type: Schema.Types.ObjectId,
@@ -13,13 +13,13 @@ const memberSchema = new Schema({
         ref: 'User'
     },
     status: {
-        //role index, see club schema for roles
+        //role index, see org schema for roles
         type: Number, 
         required:true,
     }
 });
 
 
-const ClubMember = mongoose.model('ClubMember', memberSchema, 'members');
+const OrgMember = mongoose.model('OrgMember', memberSchema, 'members');
 
-module.exports = ClubMember;
+module.exports = OrgMember;
