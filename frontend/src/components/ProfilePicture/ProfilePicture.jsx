@@ -67,22 +67,20 @@ function ProfilePicture(){
                         <p>Settings</p>
                     </div>
                 </Link>
-                <hr />
-                <Link to="/">
-                    <div className="menu-item">
-                        <img className="icon" src={Guide} alt="guide" />
-                        <p>Guide</p>
-                    </div>
-                </Link>
+                {user && (user.roles.includes('admin')||user.roles.includes('oie')) && 
+                    <>
+                        <hr />
+                        <p className="section">ADMINISTRATION</p>
+                    </>
+                }
+                
                 {
                     user && user.roles.includes('admin') && 
                     <>
-                        <hr />
-
                         <Link to="/admin">
                             <div className="menu-item">
                                 <Icon icon="bx:stats" />
-                                <p>Admin</p>
+                                <p>Analytics</p>
                             </div>
                         </Link>
                     </>
@@ -90,7 +88,6 @@ function ProfilePicture(){
                 {
                     user && user.roles.includes('oie') && 
                     <>
-                        <hr />
                         <Link to="/oie-dashboard">
                             <div className="menu-item">
                                 <img className="icon" src={RPI} alt="log out" />
