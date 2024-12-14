@@ -1,16 +1,16 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const clubSchema= new Schema({
-    club_name:{
+const OrgSchema= new Schema({
+    org_name:{
         type:String,
         required: true
     },
-    club_profile_image:{
+    org_profile_image:{
         type: String,
         required: true
     },
-    club_description:{
+    org_description:{
         type: String,
         required: true
     },
@@ -32,6 +32,6 @@ const clubSchema= new Schema({
 });
 
 
-const Club =mongoose.model('Club',clubSchema,'clubs');
+const Org = mongoose.model('Org', OrgSchema,'orgs');
 
-module.exports=Club;
+module.exports=Org;

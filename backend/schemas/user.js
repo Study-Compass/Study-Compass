@@ -99,7 +99,7 @@ const userSchema = new mongoose.Schema({
     clubAssociations:[
         {
             type: mongoose.Schema.Types.ObjectId,
-            ref: 'Club'
+            ref: 'Org'
         }
     ]
     
