@@ -18,7 +18,7 @@ import QR from './pages/QR/QR';
 import Admin  from './pages/Admin/Admin';
 import OIEDash from './pages/OIEDash/OIEDash';
 import NewBadge from './pages/NewBadge/NewBadge';
-import CreateClub from './pages/CreateClub/CreateClub';
+import CreateOrg from './pages/CreateOrg/CreateOrg';
 import ClubDash from './pages/ClubDash/ClubDash';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './AuthContext';
@@ -123,13 +123,12 @@ function App() {
                                             <Route path="/events" element={<Events/>}/>
                                             <Route path="/oie-dashboard" element={<OIEDash/>}/>
                                             <Route path="/new-badge/:hash" element={<NewBadge/>}/>
-                                            <Route path='/create-club' element={<CreateClub/>}/>
                                             <Route path="/new-badge" element={<NewBadge/>}/>
                                             <Route path="/new-badge/:hash" element={<NewBadge/>}/>
                                             <Route path="/club-dashboard" element={<ClubDash/>}/>
                                             
                                             <Route path="/new-badge/:hash" element={<NewBadge/>}/>
-                                            <Route path='/create-club' element={<CreateClub/>}/>
+                                            <Route path='/create-org' element={<CreateOrg/>}/>
                                             <Route path="/new-badge" element={<NewBadge/>}/>
                                         </Route>
                                     </Routes>

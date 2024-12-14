@@ -4,13 +4,22 @@ import { useFetch } from '../../../../hooks/useFetch';
 import './Week.scss';
 import WeekComponent from '../../../../components/NewCalendar/WeekComponent/WeekComponent';
 
-function Week({height, changeToDay, start='"2024-12-08"', end='2024-12-14"'}){
+function Week({height, changeToDay, start='2024-12-01'}){
+    console.log(start);
+    //get end date
+    const end = new Date(start);
+    end.setDate(end.getDate() + 6);
     const url = `/get-events-by-range?start=${encodeURIComponent(start)}&end=${encodeURIComponent(end)}`;
     const events = useFetch(url);
 
     useEffect(() => {
         console.log(events);
     }, [events]);
+
+    const formattedDate = (date) => {
+        const d = new Date(date);
+        return `${d.toDateString().split(" ")[1]} ${d.toDateString().split(" ")[2]}`;
+    }
 
     return(
         <>
@@ -20,7 +29,8 @@ function Week({height, changeToDay, start='"2024-12-08"', end='2024-12-14"'}){
                         <Icon icon="charm:chevron-left" />
                         <Icon icon="charm:chevron-right" />
                     </div>
-                    <h1>dec</h1>
+                    {/* date formatted <Month Name> <Day Number> */}
+                    <h1>{formattedDate(start)} to {formattedDate(end)}</h1>
                 </div>
             </div>
             <div className="week">

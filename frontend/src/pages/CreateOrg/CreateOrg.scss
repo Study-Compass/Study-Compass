@@ -1,4 +1,4 @@
-.create-club{
+.create-org{
     .yellow-red{
         height:50%;
     }
@@ -20,6 +20,12 @@
         }
         .file-upload{
             width:100%;
+        }
+        .status{
+            bottom:-30px;
+        }
+        .username-input{
+            margin-bottom:30px;
         }
     }
 

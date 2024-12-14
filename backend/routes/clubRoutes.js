@@ -37,7 +37,6 @@ try{
    }
 });
 
-
 // Create a new club and store it into database
 router.post("/create-club", verifyToken, async(req,res)=>{
 
@@ -420,6 +419,28 @@ router.post("/update-club-member/:clubId", verifyToken, async(req,res)=>{
     } catch (error) {
         console.log(`POST: /update-club-member failed`, error);
         return res.status(500).json({ success: false, message: "Error updating member", error: error.message });
+    }
+});
+
+router.post('/check-club-name', verifyToken, async (req, res) => {
+    const { clubName } = req.body;
+    try{
+        if(clubName.length === 0) {
+            return res.status(400).json({ success: false, message: 'Club name is required' });
+        }
+        if (isProfane(clubName)) {
+            return res.status(400).json({ success: false, message: 'Club name contains inappropriate language' });
+        }
+        const cleanClubName = clean(clubName);
+        const clubExist = await Club.findOne({ club_name: cleanClubName });
+        if (clubExist) {
+            return res.status(402).json({ success: false, message: 'Club name already exists' });
+        }
+        console.log(`POST: /club-name-check`);
+        return res.json({ success: true, message: 'Club name is available' });
+    } catch (error){
+        console.log('POST: /club-name-check failed', error);
+        return res.status(500).json({ success: false, message: 'Error checking club name', error: error.message });
     }
 });
 

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import '../OnBoarding/Onboard.scss';
-import './CreateClub.scss';
+import './CreateOrg.scss';
 import PurpleGradient from '../../assets/RedBottomRight.png';
 import YellowRedGradient from '../../assets/RedTopRight.png';
 import Loader from '../../components/Loader/Loader.jsx';
@@ -9,10 +9,15 @@ import { useNavigate } from 'react-router-dom';
 import { useError } from '../../ErrorContext.js'; 
 import { useNotification } from '../../NotificationContext.js';
 import CardHeader from '../../components/ProfileCard/CardHeader/CardHeader.jsx';
-import ImageUpload from '../../components/ImageUpload/ImageUpload';
+import ImageUpload from '../../components/ImageUpload/ImageUpload.jsx';
 import axios from 'axios';
+import { debounce } from '../../Query.js';
+import check from '../../assets/Icons/Check.svg';
+import waiting from '../../assets/Icons/Waiting.svg';
+import error from '../../assets/circle-warning.svg';
+import unavailable from '../../assets/Icons/Circle-X.svg';
 
-function CreateClub(){
+function CreateOrg(){
     const [start, setStart] = useState(false);
     const [current, setCurrent] = useState(0);
     const [show, setShow] = useState(0);
@@ -23,7 +28,7 @@ function CreateClub(){
     const [name, setName] = useState("");
     const [timeCommitment, setTimeCommitment] = useState(null);
     const [description, setDescription] = useState(""); 
-    const [club, setClub] = useState(null);
+    const [org, setOrg] = useState(null);
 
     const navigate = useNavigate();
     const {addNotification} = useNotification();
@@ -31,7 +36,7 @@ function CreateClub(){
 
     const [buttonActive, setButtonActive] = useState(true);
     const [validNext, setValidNext] = useState(true);
-    
+    const [nameValid, setNameValid] = useState(null);
 
     const containerRef = useRef(null);
     const contentRefs = useRef([]);
@@ -82,10 +87,10 @@ function CreateClub(){
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [current]);
 
-    async function handleClubCreation(name, description){
+    async function handleOrgCreation(name, description){
         try {
-            const response = await axios.post('/create-club', {club_name: name, club_profile_image: '/Logo.svg', club_description: description}, {headers: {"Authorization": `Bearer ${localStorage.getItem("token")}`}});
-            setClub(response.data.club);
+            const response = await axios.post('/create-org', {org_name: name, org_profile_image: '/Logo.svg', org_description: description}, {headers: {"Authorization": `Bearer ${localStorage.getItem("token")}`}});
+            setOrg(response.data.org);
         } catch (error) {
             addNotification({ title: 'Error', message: error.message, type: 'error' });
             navigate('/');
@@ -94,14 +99,6 @@ function CreateClub(){
 
     useEffect(()=>{
         if(current === 0 || current===3 || current === 4){
-            return;
-        }
-        if(current === 1){
-            if(name === ""){
-                setValidNext(false);
-            } else {
-                setValidNext(true);
-            }
             return;
         }
         if(current === 2){
@@ -140,7 +137,7 @@ function CreateClub(){
 
         if(current === 4){
             try{
-                handleClubCreation(name, description);
+                handleOrgCreation(name, description);
             } catch (error){
                 newError(error, navigate);
             }
@@ -160,6 +157,35 @@ function CreateClub(){
         setViewport((window.innerHeight) + 'px');
     },[]);
 
+    const validOrgName = async (name) => {
+        try {
+            const response = await axios.post('/check-org-name', {orgName: name}, {headers: {"Authorization": `Bearer ${localStorage.getItem("token")}`}});
+            console.log(response);
+            setNameValid(1);
+            setValidNext(true);
+            return response.data.valid;
+        } catch (error) {
+            setNameValid(3);
+            setValidNext(false);
+            // addNotification({ title: 'Error', message: error.message, type: 'error' });
+        }
+    }
+
+    const debounced = useCallback(debounce(validOrgName, 500),[]);
+
+    useEffect(()=>{
+        if(name === ""){
+            setNameValid(3);
+            if(current === 1){
+                debounced(name);
+                setValidNext(false);
+            }
+            return;
+        }
+        setNameValid(0);
+        debounced(name);
+    }, [name]);
+
     if(isAuthenticating || !userInfo){
         return(
             <div className="onboard"></div>
@@ -171,11 +197,15 @@ function CreateClub(){
     }
 
     const handleDescChange = (e) => {
+        // limit to 500 chars
+        if(e.target.value.length > 500){
+            return;
+        }
         setDescription(e.target.value);
     }
 
     return (
-        <div className={`onboard ${start ? "visible" : ""} create-club`} style={{height: viewport}}>
+        <div className={`onboard ${start ? "visible" : ""} create-org`} style={{height: viewport}}>
             <img src={YellowRedGradient} alt="" className="yellow-red" />
             <img src={PurpleGradient} alt="" className="purple" />
 
@@ -193,7 +223,15 @@ function CreateClub(){
                             <Loader/>
                             <h2>what should we call your organization?</h2>
                             <p>This name will be publicly visible to users, and should be unique as well</p>
-                            <input type="text" value={name} onChange={handleNameChange} className="text-input"/>
+                            <div className="username-input">
+                                <input type="text" value={name} onChange={handleNameChange} className="text-input"/>
+                                <div className="status">
+                                    { nameValid === 0 && <div className="checking"><img src={waiting} alt="" /><p>checking name...</p></div>}
+                                    { nameValid === 1 && <div className="available"><img src={check} alt="" /><p>name is available</p></div>}
+                                    { nameValid === 2 && <div className="taken"><img src={unavailable} alt="" /><p>name is taken</p></div>}
+                                    { nameValid === 3 && <div className="invalid"><img src={error} alt="" /><p>invalid name</p></div>}   
+                                </div>
+                            </div>
                         </div>
                     }
                     { current === 2  &&
@@ -221,7 +259,7 @@ function CreateClub(){
                         </div>
                     }
                     { current === 5 &&
-                        <div className={`content ${current === 6 ? "going": ""} ${5 === currentTransition ? club!== null ? "": "beforeOnboard" : "beforeOnboard"}`} ref={el => contentRefs.current[5] = el}>
+                        <div className={`content ${current === 6 ? "going": ""} ${5 === currentTransition ? org!== null ? "": "beforeOnboard" : "beforeOnboard"}`} ref={el => contentRefs.current[5] = el}>
                             <h2>congratulations, {userInfo && userInfo.name} <b className="holo-text">{name}</b> is now a study compass organization! </h2>
                             <p>Here's your study compass id, make sure to hold onto it!</p>
                             <div className="card-container">
@@ -240,4 +278,4 @@ function CreateClub(){
     )
 }
 
-export default CreateClub;
+export default CreateOrg;
