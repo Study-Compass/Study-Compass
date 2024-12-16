@@ -5,7 +5,7 @@ import Upload from '../../assets/Icons/Upload.svg';
 import { Icon } from '@iconify-icon/react/dist/iconify.mjs';
 import CircleX from '../../assets/Icons/Circle-X.svg';
 
-const ImageUpload = ({ classroomName, onUpload, uploadText}) => {
+const ImageUpload = ({ classroomName, onUpload, uploadText="Upload Classroom Image"}) => {
     const [selectedFile, setSelectedFile] = useState(null);
     const [message, setMessage] = useState('');
     const [fileName, setFileName] = useState('');
@@ -76,7 +76,7 @@ const ImageUpload = ({ classroomName, onUpload, uploadText}) => {
         >   
             {image ? <img src={image} alt="preview" className="preview" /> : <Icon className="upload-icon" icon={isDragging? "line-md:uploading-loop" : "line-md:uploading"} />}
 
-            <h3>{selectedFile ? fileName : "Upload Classroom Image"}</h3>
+            <h3>{selectedFile ? fileName : uploadText}</h3>
             <input
                 type="file"
                 ref={fileInputRef}
