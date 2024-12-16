@@ -5,28 +5,47 @@ const Event = require('../schemas/event');
 const User = require('../schemas/user');
 const Classroom = require('../schemas/classroom');
 const OIEStatus = require('../schemas/OIE');
+const Org = require('../schemas/org')
 
 router.post('/create-event', verifyToken, async (req, res) => {
     const user_id = req.user.userId;
-
-    const event = new Event({
-        ...req.body,
-        hostingId : user_id,
-        hostingType : 'User',
-    });
+    const orgId = req.body.orgId;
     
-    let OIE = null;
-
-    if (event.expectedAttendance > 200 || event.OIEAcknowledgementItems && event.OIEAcknowledgementItems.length > 0) {
-        event.OIEStatus = "Pending";
-        OIE = new OIEStatus({
-            eventRef: event._id,
-            status: 'Pending',
-            checkListItems: [],
-        });
-    }
-
     try {
+        let event;
+
+        if(orgId){
+            const user = await User.findById(user_id);
+            if(!user.clubAssociations.includes(orgId)){
+                return res.status(403).json({
+                    "message": 'you are not authorized to create an event as this organization'
+                })
+            }
+            event = new Event({
+                ...req.body,
+                hostingId : user_id,
+                hostingType : 'User',
+            });
+        } else {
+            event = new Event({
+                ...req.body,
+                hostingId : orgId,
+                hostingType : 'Org',
+            });
+        }
+    
+        let OIE;
+    
+        if (event.expectedAttendance > 100 || event.OIEAcknowledgementItems && event.OIEAcknowledgementItems.length > 0) {
+            event.OIEStatus = "Pending";
+            OIE = new OIEStatus({
+                eventRef: event._id,
+                status: 'Pending',
+                checkListItems: [],
+            });
+        }
+
+
         await event.save();
         if (OIE) {
             await OIE.save();
