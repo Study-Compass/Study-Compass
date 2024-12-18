@@ -7,7 +7,7 @@ const { sendDiscordMessage } = require('../services/discordWebookService');
 const { isProfane } = require('../services/profanityFilterService');
 
 const router = express.Router();
-const { verifyToken } = require('../middlewares/verifyToken.js');
+const { verifyToken, verifyTokenOptional } = require('../middlewares/verifyToken.js');
 
 const { authenticateWithGoogle, loginUser, registerUser } = require('../services/userServices.js');
 
@@ -222,56 +222,53 @@ router.post('/google-login', async (req, res) => {
 });
 
 
-router.post('/forgot-password', async (req, res) => {
+router.post('/forgot-password', verifyToken, async (req, res) => {
     // assume passed userID is stored in body
-    const { userId } = req.body;
+    const { userId } = req.user.userId;
     try {
-        // ussuming m for min, since h is hr
         const token = jwt.sign({ userId: userId}, process.env.JWT_SECRET, { expiresIn: '30m' });
-        res.status(200).json(token);
+        res.status(200).json({
+            message: "Token created",
+            token: token
+        });
     } catch (error) {
-        // 404 for no user found?
-        res.status(404).json({error: "User not found"});
+        res.status(500).json({message: "Internal error", error: error});
     }
 });
 
-// POST: /reset-password [given hash and password or user credentials and password (verifyTokenOptional middleware)]: first check 
-// for existence of user credentials (this will be a user changing their password through settings and therefore will not require 
-//     as many checks and balances, if no user, verify validity of hash (json web token), decode and extract inputs, make sure the
-//      current time has not passed the encoded time. On successful checks, change user password (don’t hash, hashing is taken care 
-//         of in the pre-save hook, see schemas/user.js, and succeed with status 200
+router.post('reset-password', verifyTokenOptional, async (req, res) => {
+    const { hash, password } = req.body;
+    const userId = req.user.userId;
 
-router.post('reset-password', async (req, res) => {
-    // I'm not sure how to diferentiate between the 2 cases so I'll make a fake condiational that we can replace with the real approach when i figure it out
-    // is it fr just this?
-    const { hash, password, userCredentials } = req.body;
     try {
-      // definitly not the real function or how to call it, idk what it is called and I'd rather not search through 10 billion files rn
-        if(isValidUser(userCredentials)){
-            // no chance this is the correct way to change it.
-            res.status(200)._write(password, newPassword);
+        //checking for user credentials
+        if(userId){
+            const user = await User.findById(userId);
+            if(user){
+                user.password = password;
+                await user.save();
+                return res.status(200).json({message: "Password reset"});
+            } else {
+                return res.status(404).json({message: "User not found"});
+            }
         }
-    } catch (error) {
-      try {
         // does this need to be a level up so it hits both try catch cases?
-        const decodedToken = jwt.verify(hash, process.env.JWT_SECRET);
-        // I hate this syntax but this is how you seem to do almost all your nested condiationals so I guess I'll copy it, is probably correct order.
-        // should I be doing some other exit case instead of false so it goes to the catch?
-        const validate = decodedToken.exp
-          ? false
-          : decodedToken.User === userCredentials._id
-          ? false
-          : true;
-
-          if(validate) {
-            // no chance this is the correct way to change it.
-            res.status(200)._write(password, newPassword);
-          }
-        // second case
-      } catch (error) {
+        jwt.verify(hash, process.env.JWT_SECRET, async (err, decodedToken) => {
+                if(err){
+                    return res.status(400).json({message: "Invalid token"});
+                }
+                const decodedUserId = decodedToken.userId;
+                const user = await User.findById(decodedUserId);
+                if(!user){
+                    return res.status(404).json({message: "User not found"});
+                }
+                user.password = password;
+                await user.save();
+                return res.status(200).json({message: "Password reset"});
+            }
+        );
+    } catch (error) {
         res.status(500).json({error: "Error reseting password"});
-      }
     }
-    res.status(500).json({error: "Error reseting password"});
 });
 module.exports = router;
