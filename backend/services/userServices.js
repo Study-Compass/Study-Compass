@@ -62,11 +62,13 @@ async function loginUser({ email, password }) {
     if (!email.includes('@')) {
         user = await User.findOne({ username: email })
             .select('-googleId') // Add fields to exclude
-            .lean();
+            .lean()
+            .populate('clubAssociations'); 
     } else {
         user = await User.findOne({ email })
             .select('-googleId') // Add fields to exclude
-            .lean();
+            .lean()
+            .populate('clubAssociations'); 
     }
     if (!user) {
         throw new Error('User not found');

@@ -10,6 +10,7 @@
     border-radius: 21px;
     background-color: var(--background);
     position: relative;
+    overflow:hidden;
 }
 
 .card-header .grad{
@@ -17,7 +18,7 @@
     z-index:1;
     top:0;
     left:0;
-    width:70%;
+    width:60%;
 }
 
 .card-header .logo{
@@ -29,7 +30,7 @@
 }
 
 .card-header:hover{
-    box-shadow: 0px 7px 29px 0px var(--red);
+    // box-shadow: 0px 7px 29px 0px var(--red);
 }
 
 .card-header h2.watermark{
@@ -129,6 +130,7 @@
     box-sizing: border-box;
     padding: 12px;
     gap: 5px;
+    z-index: 2;
 }
 
 .card-header .stats p{

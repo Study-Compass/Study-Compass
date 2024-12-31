@@ -127,8 +127,7 @@ function App() {
                                             <Route path='/create-club' element={<CreateClub/>}/>
                                             <Route path="/new-badge" element={<NewBadge/>}/>
                                             <Route path="/new-badge/:hash" element={<NewBadge/>}/>
-                                            <Route path="/club-dashboard" element={<ClubDash/>}/>
-                                            
+                                            <Route path="/club-dashboard/:id" element={<ClubDash/>}/>
                                             <Route path="/new-badge/:hash" element={<NewBadge/>}/>
                                             <Route path='/create-org' element={<CreateOrg/>}/>
                                             <Route path="/new-badge" element={<NewBadge/>}/>

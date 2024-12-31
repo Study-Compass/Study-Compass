@@ -5,14 +5,9 @@ import { getAllEvents } from '../../../components/EventsViewer/EventHelpers';
 import clubEvent from '../ClubEventsComponents/Event/ClubEvent';
 import people from '../../../assets/people.svg'
 
-
-
-
-function Dash({expandedClass, openMembers}){
+function Dash({expandedClass, openMembers, clubName}){
 
     const [events, setEvents] = useState([]);
-
-
     useEffect(() => {
         const fetchEvents = async () => {
             try{
@@ -28,7 +23,6 @@ function Dash({expandedClass, openMembers}){
             } catch (error){
                 console.log("Failed to fetch events", error);
             }
-
         }
         fetchEvents();
     }, []);
@@ -38,28 +32,31 @@ function Dash({expandedClass, openMembers}){
         <div className={`dash ${expandedClass}`}>
             <header className="header">
                 <img src={OIEGradient} alt="" />
-                <h1>Club Dashboard</h1>
+                <h1>Org Dashboard</h1>
             </header>
-            <div className="membership">
+            <div className="row">
                 <div className="column">
                 <h1>manage membership</h1>
-
-                <div className="content">
+                <div className="content membership">
                         <h2><img src={people} alt="" />200 members <button onClick={openMembers}>manage</button></h2>
                         <h2> <img src={people} alt="" />8 officers <button>manage</button></h2>
                 </div>
-
-
-                <h1>quick actions</h1>
                 </div>
                 <div className="column">
                 <h1>meetings coming up</h1>
                 <div className="content meeting">
-                        <h2>Random Student Event <button>manage</button></h2>
+                    <h2>Random Student Event <button>manage</button></h2>
                 </div>
 
                </div>
                 
+            </div>
+            <div className="row">
+                <div className="column">
+                    <h1>quick actions</h1>
+                    <div className="content">
+                    </div>
+                </div>
             </div>
 
         </div>

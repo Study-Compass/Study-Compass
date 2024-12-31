@@ -17,7 +17,7 @@ const OrgSchema= new Schema({
     positions: {
         type: Array, // [regular, treasurer, secretary]
         required: true,
-        default:['chair', 'officer', 'regular'] //add more complex roles, include permissions
+        default:['chair', 'officer', 'member'] //add more complex roles, include permissions
     },
     weekly_meeting:{
         type: Object, //Times,Data, Room Location
