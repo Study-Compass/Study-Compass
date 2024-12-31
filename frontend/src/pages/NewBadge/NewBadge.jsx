@@ -22,7 +22,16 @@ const NewBadge = () => {
     const [badge, setBadge] = useState(null);
     const [claimed, setClaimed] = useState(false);
 
+    const [badgeVisible, setBadgeVisible] = useState(false);
+    const [contentVisible, setContentVisible] = useState(false);
+
     useEffect(() => {
+        setTimeout(() => {
+            setBadgeVisible(true);
+        }, 100);
+        setTimeout(() => {
+            setContentVisible(true);
+        }, 1000);
         setTimeout(() => {
             setStart(true);
         }, 500);
@@ -43,6 +52,7 @@ const NewBadge = () => {
             } else {
                 console.log(response);
                 setBadge(response.badge);
+                localStorage.removeItem('badge');
             }
         }
 

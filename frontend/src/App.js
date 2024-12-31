@@ -124,7 +124,6 @@ function App() {
                                                 <Route path="/developer-onboarding" element={<DeveloperOnboard/>}/>
                                                 <Route path="/admin" element={<Admin/>}/>
                                                 <Route path="/new-badge/:hash" element={<NewBadge/>}/>
-                                            <Route path='/create-club' element={<CreateClub/>}/>
                                             <Route path="/new-badge" element={<NewBadge/>}/>
                                             <Route path="/new-badge/:hash" element={<NewBadge/>}/>
                                             <Route path="/club-dashboard/:id" element={<ClubDash/>}/>
