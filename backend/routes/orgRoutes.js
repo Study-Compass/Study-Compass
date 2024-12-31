@@ -6,7 +6,6 @@ const User = require('../schemas/user.js');
 const Org = require('../schemas/org.js');
 const Follower = require('../schemas/orgFollower.js');
 const Member = require('../schemas/orgMember.js');
-const { cloudiot_v1 } = require('googleapis');
 const { clean, isProfane } = require('../services/profanityFilterService.js');
 
 
@@ -36,6 +35,35 @@ try{
         return res.status(500).json({ success: false, message: 'Error retrieving org data', error: error.message });
    }
 });
+
+router.get("/get-org-by-name/:name", verifyToken, async(req,res)=>{
+    try{
+        const orgName= req.params.name;
+        
+        const org= await Org.findOne({org_name: orgName});
+
+        if(!org){
+            return res.status(404).json({ success: false, message: 'Org not found' });
+        }
+        
+        const orgMembers = await Member.find({org_id: org._id}).populate('user_id');
+
+        // If the org exists, return it
+        console.log(`GET: /get-org-by-name/${orgName}`);
+        res.json({ success: true, message: "Org found", org: {
+            overview: org,
+            members: orgMembers
+        }});
+    
+
+    
+       } catch(error){
+        // Handle any errors that occur during the process
+            console.log(`GET: /get-org-by-name failed`, error);
+            return res.status(500).json({ success: false, message: 'Error retrieving org data', error: error.message });
+       }
+    }
+);
 
 router.post("/create-org", verifyToken, async(req,res)=>{
 

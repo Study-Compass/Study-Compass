@@ -1,79 +1,120 @@
 .members{
+    display: flex;
+    flex-direction: column;
+    height:100%;
     .content{
-        border-radius: 10px;
-        box-sizing: border-box;
-        border: 1px solid var(--lightborder);
-        height: 800px;
-        width: 300px;
-
-        .topbox{
-            display: flex;
-            gap: 15px;
-            justify-content: flex-start;
-            align-items: center;
-            padding: 5px;
-            .selected{
-                display: flex;
-                justify-content: center;
-                border-radius: 8px;
-                box-sizing: border-box;
-                border: 1px solid var(--lightborder);
-                background-color: var(--red);
-                height: fit-content;
-                width: fit-content;
-                padding: 5px 20px 5px 20px;
-                h2{
-                    color: white;
-                }
-                
-            }
-
-            h2{
-                font-size: 15px;
-                //color: white;
-                font-family: Inter, sans-serif;
-                display: flex;
-                align-items: center;
-                margin: 0;
-
-            }
-
-
-
-        }
-        .list{
+        flex-grow:1;
+        display: flex;
+        gap: 20px;
+        .member-col{
+            border-radius: 10px;
             box-sizing: border-box;
             border: 1px solid var(--lightborder);
-            width: 100%;
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            padding: 15px;
-            gap: 10px;
-
-            .box{
+            width: 300px;
+            height:100%;
+            .topbox{
                 display: flex;
-                flex-direction: column;
-                h3{
-                    margin: 0px;
+                gap: 15px;
+                justify-content: flex-start;
+                align-items: center;
+                padding: 8px 10px;
+                border-bottom: 1px solid var(--lighterborder);
+                height:45px;
+                box-sizing: border-box;
+                
+                h2{
+                    cursor: pointer;
                     font-size: 15px;
+                    //color: white;
+                    font-family: Inter, sans-serif;
+                    background-color: var(--background);
+                    display: flex;
+                    align-items: center;
+                    margin: 0;
+                    padding: 5px 20px;
+                    border-radius: 8px;
+                    transition:all 0.3s;
+                    &:hover{
+                        filter: brightness(0.9);
+                    }
+                    &.selected{
+                        background-color: var(--red);
+                        color: white;   
+                    }
                 }
-                h4{
-                    color: var(--darkborder);
-                    margin: 0px;
-                    font-size: 12px;
+            }
+            .members-list{
+                display: flex;
+                height:calc(100% - 45px);
+                box-sizing: border-box;
+                overflow-x: hidden;
+                width:300px;
+                .members,
+                .officers{
+                    flex-direction: column;
+                    overflow-y:auto;
+                    min-width:300px;
+                    // transform:translateX(-100%);
+                    margin:0;
+                    transition: all 0.5s;
+                    &.show{
+                        transform:translateX(-100%);
+                    }
                 }
+                .list{
+                    box-sizing: border-box;
+                    border-bottom: 1px solid var(--lighterborder);
+                    width: 100%;
+                    display: flex;
+                    flex-direction: row;
+                    align-items: center;
+                    padding: 15px;
+                    gap: 10px;
+                    padding-left:20px;
+                    position: relative;
+                    cursor:pointer;
+        
+                    .box{
+                        display: flex;
+                        flex-direction: column;
+                        h3{
+                            margin: 0px;
+                            font-size: 15px;
+                        }
+                        h4{
+                            color: var(--darkborder);
+                            margin: 0px;
+                            font-size: 12px;
+                        }
+            
+        
+                    }
+                    img{
+                        height: 30px;
+                    }
+                    &::after{
+                        content:'';
+                        position: absolute;
+                        width:4px;
+                        height: 80%;
+                        background-color: var(--white);
+                        left:0;
+                        top:10%;
+                        border-radius: 0 3px 3px 0;
+                        transition: all 0.3s
+                    }
+                    &.selected{
+                        &::after{
+                            background-color: var(--red);
+                        }
+                    }
+                }
+            }
     
-
-            }
-            img{
-                height: 30px;
-            }
-
         }
-
-
-
-
+    .col{
+        height:fit-content;
+        width:350px;
+    }
     }
 }

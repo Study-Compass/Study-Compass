@@ -32,7 +32,7 @@
             height:100%;
         }
     }
-    .membership{
+    .row{
         display: flex;
         flex-direction: row;
         gap:10px;
@@ -49,16 +49,13 @@
             display:flex;
             border-radius: 10px;
             box-sizing: border-box;
-            border: 1px solid var(--lightborder);
-            width: 350px;
-            height: 120px;
-            justify-content: space-around;
+            border: 1px solid var(--lighterborder);
+            box-shadow: var(--shadow);
             align-items: center;
-
+            align-items: center;
+            justify-content: center;
+            height:100%;
             &.meeting{
-                padding-left: 20px;
-                width: 250px;
-                height: 120px;
             }
             h2{
                 display: flex;
@@ -73,12 +70,18 @@
                     border-radius: 7px;
                     background-color: var(--light);
                     width: 100px;
-                    border: 1px solid var(--lightborder);
-
+                    font-weight:600;
+                    font-family: 'Inter';
+                    padding: 3px 13px;
+                    color: var(--text);
+                    cursor: pointer;
                 }
             }
 
-            
+            &.membership{
+                padding: 10px 30px;
+                gap: 40px;
+            }
         }
     }
 }
