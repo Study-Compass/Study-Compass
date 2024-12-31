@@ -1,81 +1,38 @@
-import React from 'react';
-import './Club.scss';
-import Header from '../../components/Header/Header';
-import rpiLogo from "../../assets/Icons/rpiLogo.svg";
-import person from "../../assets/Icons/Person.svg";
-import calendar from "../../assets/Icons/Calendar.svg";
-import locate from "../../assets/Icons/Locate.svg";
+import React, {useEffect, useState} from 'react';
+import ClubDisplay from './ClubDisplay/ClubDisplay';
+import { useParams } from 'react-router-dom';
+import { useFetch } from '../../hooks/useFetch';
 
 const Club = () => {
+    const orgName = useParams().name;
+    const orgData = useFetch(`/get-org-by-name/${orgName}`);
+
+    const org = {
+        "_id": {
+          "$oid": "675ce4871958af1a0199505e"
+        },
+        "org_name": "Study Compass Devs",
+        "org_profile_image": "/Logo.svg",
+        "org_description": "asdasd",
+        "positions": [
+          "chair",
+          "officer",
+          "member"
+        ],
+        "weekly_meeting": null,
+        "owner": {
+          "$oid": "65f474445dca7aca4fb5acaf"
+        },
+        "__v": 0
+      }
+
+
     return (
-        <div className="club-page page">
-            <Header />
-            <div className='club-content'>
-
-                <div className="top-header-box">
-                    <div className="club-logo">
-                        <img src={rpiLogo} alt=""/>
-                    </div>
-                </div>
-
-                <div className="club-info">
-
-                    <div className="club-header">
-                        <h2 className="name">Club Name</h2>
-                        <div className="status">Union Recognized</div>
-                    </div>
-
-                    <p className="description">
-                        description of the club blah blah blah blah blah
-                    </p>
-                    <p className="stats">
-                        <img src = {person} alt =""/>
-                        250 followers • 50 members
-                    </p>
-                    <div className="actions">
-                        <button>Join</button>
-                        <button>Follow</button>
-                    </div>
-
-                </div>
-
-                <div className='event-info'>
-                    <div className='upcoming'> 
-
-                    </div>
-                    
-                </div>
-
-                {/* <div className='meeting-schedule'>
-                    <h1>meetings schedule</h1>
-                    <div className='meetings'>
-                        <p>YDSA Weekly GBM</p>
-
-                    </div>
-
-                </div> */}
-
-                <div className="meeting-schedule">
-                    <h3>Meetings Schedule</h3>
-                    <div className="meeting-card">
-                        <div className='title'>
-                            <img src={rpiLogo} alt="" className='logo'/>
-                            <h4>YDSA Weekly GBM</h4>
-                        </div>
-                        <div className='info'>
-                            <div className='item'> 
-                                <img src={calendar} alt="" />
-                                <p>Weekly on Thursday at 5:00</p>
-                                <img src={locate} alt="" />
-                                <p>Phalanx</p>
-                            </div>
-                            {/* <p>Next Meeting: Thursday 10/24</p> */}
-
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <>
+            {
+                !orgData.loading && <ClubDisplay org={orgData.data.org}/>
+            }
+        </>
     );
 };
 

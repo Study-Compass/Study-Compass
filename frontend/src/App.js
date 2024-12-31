@@ -118,7 +118,7 @@ function App() {
                                                 <Route path="/profile" element={<Profile/>}/>
                                                 <Route path="/friends" element={<Friends/>}/>
                                                 <Route path="/landing" element={<Landing/>}/>
-                                                <Route path="/club" element={<Club/>}/>
+                                                <Route path="/club/:name" element={<Club/>}/>
                                                 <Route path="/settings" element={<Settings/>}/>
                                                 <Route path="/documentation" element={<Redirect/>}/>
                                                 <Route path="/developer-onboarding" element={<DeveloperOnboard/>}/>
