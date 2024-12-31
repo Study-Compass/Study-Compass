@@ -59,14 +59,16 @@ const Club = () => {
                     <h3>Meetings Schedule</h3>
                     <div className="meeting-card">
                         <div className='title'>
-                            <img src={rpiLogo} alt=""/>
+                            <img src={rpiLogo} alt="" className='logo'/>
                             <h4>YDSA Weekly GBM</h4>
                         </div>
                         <div className='info'>
-                            <img src={calendar} alt="" />
-                            <p>Weekly on Thursday at 5:00</p>
-                            <img src={locate} alt="" />
-                            <p>Phalanx</p>
+                            <div className='item'> 
+                                <img src={calendar} alt="" />
+                                <p>Weekly on Thursday at 5:00</p>
+                                <img src={locate} alt="" />
+                                <p>Phalanx</p>
+                            </div>
                             {/* <p>Next Meeting: Thursday 10/24</p> */}
 
                         </div>
