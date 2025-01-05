@@ -31,34 +31,92 @@ async def get_course_ids(term):
 
 
 
-# function that, given a term and a course ID (exmaple: ADMN), searches for all the courses in the term with in that subject
-async def get_all_courses(term, id):
-    pass
+def getMeetingDays(meetings):
+    days=""
+    if meetings['meetsSaturday']:
+        days+="Sa"
+    if meetings['meetsMonday']:
+        days+="Mo"
+    if meetings['meetsTuesday']:
+        days+="Tu"
+    if meetings['meetsWednesday']:
+        days+="We"
+    if meetings['meetsThursday']:
+        days+="Th"
+    if meetings['meetsFriday']:
+        days+="Fr"
+    if meetings['meetsSunday']:
+        days+="Su"
+    return days
 
-
-# function that, given a course link, extracts relevant info from meeting times table
-async def parse_course_info(url, classroom_info):
-    pass
+def checkMultipleMeetings(meetings):
+    meeting = None
+    for meeting in meetings:
+        newMeeting = getMeetingDays(meeting)
+        if meeting == None:
+            meeting = newMeeting
+        elif meeting != newMeeting:
+            return False
+    return True
+        
+    
 
 # view-source:https://classes.berkeley.edu/search/class/?f%5B0%5D=im_field_term_name:3153
-async def parse_results(dic):
-    pages=10
-    url = "https://classes.berkeley.edu/search/class/?f%5B0%5D=im_field_term_name:3153"
-    
+async def parse_results(dic, pages=341):
+    entries = 0
+    backoff_factor = 1.0  # Initial backoff factor
+    max_retries = 5  # Maximum number of retries for each request
+
     async with httpx.AsyncClient(timeout=TIMEOUT) as client:
-        # scraping using bs4
-        response = await client.get(url) 
-        soup = BeautifulSoup(response.content, 'html.parser') 
-        
-        results = soup.find_all('div', class_="handlebarData")
-        for result in results:
-            data_node = result.get('data-node')
-            data_json = json.loads(result.get('data-json'))
-            data_node_json =  json.loads(data_node)
-            name = data_node_json['nodeURL']
-            dic[name] = data_json['meetings']
+        for i in range(pages):
+            for attempt in range(max_retries):
+                try:
+                    url = f"https://classes.berkeley.edu/search/class?page={i}&f%5B0%5D=im_field_term_name:3153"
+                    response = await client.get(url)
+                    if response.status_code == 429:  # Too many requests
+                        raise httpx.HTTPStatusError(message="Rate limit exceeded", request=response.request, response=response)
+                    soup = BeautifulSoup(response.content, 'html.parser')
+                    print('page number: ', i)
 
+                    results = soup.find_all('div', class_="handlebarData")
+                    for result in results:
+                        entries += 1
+                        data_node = result.get('data-node')
+                        data_json = json.loads(result.get('data-json'))
+                        data_node_json = json.loads(data_node)
+                        name = data_node_json['nodeURL']
+                        if not data_json.get('meetings'):
+                            print('no meetings found :(')
+                            continue
+                        if data_json['instructionMode']['code'] == 'P':  # Only in-person classes
+                            classroom_info = {
+                                "name": data_json['displayName'],
+                                "location": data_json['meetings'][0]["location"],
+                                "time": [
+                                    data_json['meetings'][0]["startTime"],
+                                    data_json['meetings'][0]["endTime"],
+                                ],
+                                "days": getMeetingDays(data_json['meetings'][0]),
+                            }
+                            dic[name] = classroom_info
 
+                        if len(data_json['meetings']) > 1:
+                            if not checkMultipleMeetings(data_json['meetings']):
+                                print('multiple meetings not matching :(')
+                                for meeting in data_json['meetings']:
+                                    print(getMeetingDays(meeting))
+                    break  # If successful, break out of the retry loop
+                except (httpx.ReadTimeout, httpx.HTTPStatusError) as e:
+                    wait = (2 ** attempt) * backoff_factor + random.uniform(0, 1)  # Exponential backoff + jitter
+                    print(f"Request failed: {e}. Retrying in {wait:.2f} seconds...")
+                    await asyncio.sleep(wait)
+                except Exception as e:
+                    print(f"An unexpected error occurred: {e}")
+                    print('full error: ', e)
+                    break  # Break the loop on unknown errors
+
+        # Print the number of entries found
+        print(entries, "classes found")
 # function to connect and update connected mongo database, in progress until real-
 # cluster organization and database management determined
 def upload_to_mongo(dic, term):

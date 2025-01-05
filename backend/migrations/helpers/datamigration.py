@@ -73,7 +73,7 @@ def findNoPics():
 
 def migrateClassrooms():
     load_dotenv() # loading .env file
-    uri = os.environ.get('MONGO_URL') # fetching URI string
+    uri = os.environ.get('MONGO_URL_LOCAL') # fetching URI string
     client = MongoClient(uri, server_api=ServerApi('1')) 
     try: # send a ping to confirm a successful connection
         client.admin.command('ping')
@@ -319,3 +319,4 @@ def renameField(uri, collection, previousName, newName):
 # migrateClassrooms()
 # forceUpdate('users', {'visited': [], 'partners': [], 'sessions': [], 'hours': 0, 'contributions': 0})
 # updateImages()
+migrateClassrooms()
