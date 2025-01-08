@@ -68,6 +68,7 @@ const ratingRoutes = require('./routes/ratingRoutes.js');
 const searchRoutes = require('./routes/searchRoutes.js');
 const eventRoutes = require('./routes/eventRoutes.js');
 const oieRoutes = require('./routes/oie-routes.js');
+const orgRoutes = require('./routes/orgRoutes.js');
 
 app.use(authRoutes);
 app.use(dataRoutes);
@@ -81,7 +82,7 @@ app.use(ratingRoutes);
 app.use(searchRoutes);
 app.use(eventRoutes);
 app.use(oieRoutes);
-
+app.use(orgRoutes);
 
 // Serve static files from the React app in production
 if (process.env.NODE_ENV === 'production') {

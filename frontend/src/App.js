@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import './App.css';
+import './assets/fonts.css';
 import Room from './pages/Room/Room';
 import Room1 from './pages/Room/Room1';
 import Login from './pages/Login';
@@ -17,6 +18,8 @@ import QR from './pages/QR/QR';
 import Admin  from './pages/Admin/Admin';
 import OIEDash from './pages/OIEDash/OIEDash';
 import NewBadge from './pages/NewBadge/NewBadge';
+import CreateOrg from './pages/CreateOrg/CreateOrg';
+import ClubDash from './pages/ClubDash/ClubDash';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './AuthContext';
 import { CacheProvider } from './CacheContext';
@@ -120,6 +123,12 @@ function App() {
                                             <Route path="/events" element={<Events/>}/>
                                             <Route path="/oie-dashboard" element={<OIEDash/>}/>
                                             <Route path="/new-badge/:hash" element={<NewBadge/>}/>
+                                            <Route path="/new-badge" element={<NewBadge/>}/>
+                                            <Route path="/new-badge/:hash" element={<NewBadge/>}/>
+                                            <Route path="/club-dashboard/:id" element={<ClubDash/>}/>
+                                            <Route path="/new-badge/:hash" element={<NewBadge/>}/>
+                                            <Route path='/create-org' element={<CreateOrg/>}/>
+                                            <Route path="/new-badge" element={<NewBadge/>}/>
                                         </Route>
                                     </Routes>
                                     </ProfileCreationProvider>
