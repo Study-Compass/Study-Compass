@@ -143,24 +143,6 @@ router.get('/validate-token', verifyToken, async (req, res) => {
             success: true,
             message: 'Token is valid',
             data: {
-                // user: {
-                //     _id: user._id,
-                //     username: user.username,
-                //     email: user.email,
-                //     name: user.name,
-                //     picture : user.picture,
-                //     saved: user.saved,
-                //     visited: user.visited,
-                //     partners: user.partners,
-                //     sessions: user.sessions,
-                //     hours: user.hours,
-                //     contributions: user.contributions,
-                //     onboarded: user.onboarded,
-                //     classroomPreferences: user.classroomPreferences,
-                //     recommendationPreferences: user.recommendationPreferences,
-                //     google: user.googleId ? true : false,
-                //     tags: user.tags                    
-                // }
                 user : user
             }
         });
