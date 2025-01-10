@@ -47,15 +47,15 @@ router.get("/get-org-by-name/:name", verifyToken, async(req,res)=>{
         }
         
         const orgMembers = await Member.find({org_id: org._id}).populate('user_id');
+        const orgFollowers = await Follower.find({org_id: org._id}).populate('user_id');
 
         // If the org exists, return it
         console.log(`GET: /get-org-by-name/${orgName}`);
         res.json({ success: true, message: "Org found", org: {
             overview: org,
-            members: orgMembers
+            members: orgMembers,
+            followers: orgFollowers
         }});
-    
-
     
        } catch(error){
         // Handle any errors that occur during the process
