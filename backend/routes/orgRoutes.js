@@ -10,7 +10,7 @@ const { clean, isProfane } = require('../services/profanityFilterService.js');
 const { Resend } = require('resend');
 const { render } = require('@react-email/render')
 const React = require('react');
-const MyEmail = require('../emails/MyEmail').default;
+const ForgotEmail = require('../emails/ForgotEmail').default;
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -478,9 +478,8 @@ router.post('/check-org-name', verifyToken, async (req, res) => {
 
 router.post('/send-email', async (req,res) => {
     try{
-        // const MyEmail = require(path.resolve(__dirname, '../emails/MyEmail')).default;
         
-        const emailHTML = await render(React.createElement(MyEmail, { name: "James" }));
+        const emailHTML = await render(React.createElement(ForgotEmail, { name: "James" }));
 
         const { data, error } = await resend.emails.send({
             from: "Study Compass <whereAreYouStudying@study-compass.com>",
