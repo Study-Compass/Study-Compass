@@ -7,7 +7,12 @@ const Org = require('../schemas/org.js');
 const Follower = require('../schemas/orgFollower.js');
 const Member = require('../schemas/orgMember.js');
 const { clean, isProfane } = require('../services/profanityFilterService.js');
+const { Resend } = require('resend');
+const { render } = require('@react-email/render')
+const React = require('react');
+const MyEmail = require('../emails/MyEmail').default;
 
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 //Route to get a specific org by name
 router.get("/get-org/:id", verifyToken, async(req,res)=>{
@@ -470,5 +475,29 @@ router.post('/check-org-name', verifyToken, async (req, res) => {
         return res.status(500).json({ success: false, message: 'Error checking org name', error: error.message });
     }
 });
+
+router.post('/send-email', async (req,res) => {
+    try{
+        // const MyEmail = require(path.resolve(__dirname, '../emails/MyEmail')).default;
+        
+        const emailHTML = await render(React.createElement(MyEmail, { name: "James" }));
+
+        const { data, error } = await resend.emails.send({
+            from: "Study Compass <whereAreYouStudying@study-compass.com>",
+            to: ["jbliu88@gmail.com"],
+            subject: "hello world",
+            html: emailHTML,
+          });
+        if(error){
+            console.log('POST: email sending error', error);
+            return res.status(500).json({ success: false, message: 'Error sending email', error: error.message });
+        }
+        res.status(200).json({ success: true, message: 'Email sent successfully', data });
+    } catch (error){
+        console.log('POST: email sending error');
+        res.status(500).json({ success: false, message: 'Error sending email', error: error.message });
+    }
+});
+
 
 module.exports = router;
