@@ -66,8 +66,8 @@ function OIEDash(){
 
     useEffect(() => {
             setCurrentPage(currentPage);
-            setSearchParams({page: currentDisplay});
-    }, [currentDisplay]);
+            setSearchParams({ page: currentDisplay }, { replace: true });
+        }, [currentDisplay]);
 
     return (
         <div className="oie-dash">

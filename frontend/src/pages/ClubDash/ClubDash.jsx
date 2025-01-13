@@ -10,7 +10,6 @@ import {Icon} from '@iconify-icon/react';
 import Dash from './Dash/Dash';
 import Members from './Members/Members';
 import {useFetch} from '../../hooks/useFetch';
-import { use } from 'react';
 
 function ClubDash(){
     const clubId = useParams().id;
@@ -22,6 +21,7 @@ function ClubDash(){
 
     const [currentPage, setCurrentPage] = useState('dash');
     const { addNotification } = useNotification();
+    const [showDrop, setShowDrop] = useState(false);
 
     const orgData = useFetch(`/get-org-by-name/${clubId}`);
 
@@ -94,13 +94,14 @@ function ClubDash(){
         <div className="club-dash">
             <div className={`dash-left ${expanded && "hidden"}`}>
                 <div className="logo">
-                    <img src={logo} alt="" />
-                    <div className="club-badge"><p>club admin</p></div>
+                    <img src={orgData.data.org.overview.org_profile_image} alt="" />
+                    <h1>{orgData.data.org.overview.org_name}</h1>
+                    <Icon icon={`${showDrop ? "ic:round-keyboard-arrow-up" : "ic:round-keyboard-arrow-down"}`} width="24" height="24"  />
                 </div>
                 <nav className="nav">
                     <ul>
                         <li className= {`${currentPage === 'dash' ? 'selected' : ''}`} onClick={()=>setCurrentPage("dash")}>
-                            <img src={Dashboard} alt="" />
+                            <Icon icon="ic:round-dashboard" />
                             <p>Dashboard</p>
                         </li>
                         <li className={`${currentPage === "members" ? 'selected' : ''}`}  onClick = {()=>setCurrentPage('members')}>
