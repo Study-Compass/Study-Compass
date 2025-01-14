@@ -87,6 +87,14 @@
         height: 15px;
         padding-right: 10px;
     }
+
+    .mutuals{
+        display:grid;
+        grid-template-columns: repeat(12, 1fr);
+        position: relative;
+        padding-left: 20px;
+        padding-right: 0px;
+    }
 }
 
 .actions {
@@ -171,8 +179,12 @@
                 border-radius: 50%;
 
             }
+            height: 25px;
         h4{
+            display: flex;
             margin: 0px;
+            height: 25px;
+
         }
 
         }
@@ -186,9 +198,11 @@
                 flex-direction: center;
                 gap: 5px;
             }
-            h4{
-                font-size: 12px;
-            }
+            // h4{
+            //     display: flex;
+            //     font-size: 12px;
+            //     height: 0px;
+            // }
             p{
                 color: #666;
                 font-size: 10px;
