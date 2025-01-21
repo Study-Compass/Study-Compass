@@ -66,12 +66,9 @@ const analyticsRoutes = require('./routes/analytics.js');
 const classroomChangeRoutes = require('./routes/classroomChangeRoutes.js');
 const ratingRoutes = require('./routes/ratingRoutes.js');
 const searchRoutes = require('./routes/searchRoutes.js');
-<<<<<<< HEAD
 const clubRoutes = require('./routes/clubRoutes.js');
-=======
 const eventRoutes = require('./routes/eventRoutes.js');
 const oieRoutes = require('./routes/oie-routes.js');
->>>>>>> 1c297de7e3f664954ded9815a98a269f53686810
 
 app.use(authRoutes);
 app.use(dataRoutes);
@@ -83,9 +80,7 @@ app.use(eventRoutes);
 app.use(classroomChangeRoutes);
 app.use(ratingRoutes);
 app.use(searchRoutes);
-<<<<<<< HEAD
 app.use(clubRoutes);
-=======
 app.use(eventRoutes);
 app.use(oieRoutes);
 
@@ -100,7 +95,6 @@ if (process.env.NODE_ENV === 'production') {
     });
 }
 
->>>>>>> 1c297de7e3f664954ded9815a98a269f53686810
 //deprecated, should lowk invest in this
 // app.get('/update-database', (req, res) => {
 //     const pythonProcess = spawn('python3', ['courseScraper.py']);
