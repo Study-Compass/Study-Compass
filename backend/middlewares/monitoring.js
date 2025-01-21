@@ -1,5 +1,5 @@
 //Monitor and Logger
-const API = require('../models/api.js');
+const API = require('./schemas/api.js');
 const morgan = require('morgan');
 
 //Logging HTTP Requests
@@ -27,11 +27,11 @@ const monitorUsage = async (req, res, next)=>{
 
         next();
     } catch(error){
-        //Change this error
+        //Change this error  messsage
         console.error ('Error verifying or updating API key usage:', error);
         //Continue 
         return next();
     }
 };
-
+//Maybe could improve with new code
 module.exports = {logRequests, monitorUsage};

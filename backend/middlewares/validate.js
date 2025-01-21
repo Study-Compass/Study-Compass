@@ -1,7 +1,8 @@
 //Input Validator
 const Joi = require('joi');
 
-//SCHEMA - MAY NEED TO ADD OR ADJUST THIS
+//SCHEMA - MAY NEED TO ADD OR ADJUST THIS, 
+//Convert to a rest api format so that my comman lines are easier to run
 
 const validateRequest = (schema, property = "body") => {
     return (req, res, next) => {
@@ -17,6 +18,7 @@ const validateRequest = (schema, property = "body") => {
     };
   };
   
+  //Might remove this since mongoDB
   //Catches Malformed or missing data early
   const createApiKeySchema =Joi.object({
     author_key: Joi.string().trim().required(),
