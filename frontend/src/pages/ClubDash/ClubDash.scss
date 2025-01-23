@@ -227,10 +227,10 @@
             min-width:220px;
             opacity: 1 !important;
             .logo{
-                opacity: 0;
                 &>*{
                     opacity: 0;
                 }
+                background-color: var(--lightborder);
             }
         }
     }

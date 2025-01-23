@@ -23,14 +23,14 @@ router.post('/create-event', verifyToken, async (req, res) => {
             }
             event = new Event({
                 ...req.body,
-                hostingId : user_id,
-                hostingType : 'User',
+                hostingId : orgId,
+                hostingType : 'Org',
             });
         } else {
             event = new Event({
                 ...req.body,
-                hostingId : orgId,
-                hostingType : 'Org',
+                hostingId : user_id,
+                hostingType : 'User',
             });
         }
     
