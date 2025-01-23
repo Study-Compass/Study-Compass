@@ -28,8 +28,8 @@ const Org = ({ org }) => {
                 <div className="org-info">
 
                     <div className="org-header">
-                        {/* <h2 className="name">{org.overview.org_name}</h2> */}
-                        <h2 className="name"> Name </h2>
+                        <h2 className="name">{org.overview.org_name}</h2>
+                        {/* <h2 className="name"> Name </h2> */}
                         <div className="status">Union Recognized</div>
                     </div>
 

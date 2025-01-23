@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import Org from './Org/Org';
+import Org from './Org.jsx';
 import { useParams } from 'react-router-dom';
 import { useFetch } from '../../hooks/useFetch';
 
@@ -29,8 +29,12 @@ const OrgDisplay = () => {
 
     return (
         <>
-            {
+            {/* {
                 !orgData.loading && <Org org={orgData.data.org}/>
+            }  */}
+
+            {
+                !orgData.loading && orgData.data && <Org org={orgData.data}/>
             }
         </>
     );
