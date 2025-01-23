@@ -1,11 +1,20 @@
 import React, {useEffect, useState} from 'react';
-import Org from './Org/Org';
+import Org from './Org/Org.jsx';
 import { useParams } from 'react-router-dom';
 import { useFetch } from '../../hooks/useFetch';
 
 const OrgDisplay = () => {
     const orgName = useParams().name;
     const orgData = useFetch(`/get-org-by-name/${orgName}`);
+
+    useEffect(()=>{
+      if(orgData.error){
+        console.log(orgData.error)
+      }
+      if(orgData.data){
+        console.log(orgData.data);
+      }
+    },[orgData.data]);
 
     const org = {
         "_id": {
@@ -26,11 +35,14 @@ const OrgDisplay = () => {
         "__v": 0
       }
 
-
     return (
         <>
-            {
+            {/* {
                 !orgData.loading && <Org org={orgData.data.org}/>
+            } */}
+
+            {
+                !orgData.loading && orgData.data && <Org org={orgData.data}/>
             }
         </>
     );

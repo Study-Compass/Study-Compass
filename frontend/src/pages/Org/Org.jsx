@@ -7,13 +7,14 @@ import profile from "../../assets/Icons/Profile2.svg";
 
 import Header from '../../components/Header/Header';
 
+// import Org from './Org/OrgDisplay';
 
 import './Org.scss';
 
 const Org = ({ org }) => {
-    // const { overview, members, followers } = org;
     
     console.log(org);
+    
     return (
         <div className="org-page page">
             <Header />
