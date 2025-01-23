@@ -21,6 +21,7 @@ import OIEDash from './pages/OIEDash/OIEDash';
 import NewBadge from './pages/NewBadge/NewBadge';
 import CreateOrg from './pages/CreateOrg/CreateOrg';
 import ClubDash from './pages/ClubDash/ClubDash';
+import OrgDisplay from './pages/Org/OrgDisplay';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './AuthContext';
 import { CacheProvider } from './CacheContext';
@@ -117,7 +118,7 @@ function App() {
                                             <Route path="/friends" element={<Friends/>}/>
                                             <Route path="/landing" element={<Landing/>}/>
                                             <Route path="/settings" element={<Settings/>}/>
-                                            <Route path="/org" element={<Org/>}/>
+                                            <Route path="/org/:name" element={<OrgDisplay/>}/>
                                             <Route path="/documentation" element={<Redirect/>}/>
                                             <Route path="/developer-onboarding" element={<DeveloperOnboard/>}/>
                                             <Route path="/admin" element={<Admin/>}/>
