@@ -32,20 +32,20 @@ function OIEDash(){
     },[]);
 
     useEffect(()=>{
-        if(isAuthenticating){
-            return;
-        }
-        if(!isAuthenticated){
-            navigate('/');
-        }
-        if(!user){
-            return;
-        } else {
-            if(!user.roles.includes('oie')){
-                navigate('/');
-            }
-            setUserInfo(user);
-        }
+        // if(isAuthenticating){
+        //     return;
+        // }
+        // if(!isAuthenticated){
+        //     navigate('/');
+        // }
+        // if(!user){
+        //     return;
+        // } else {
+        //     if(!user.roles.includes('oie')){
+        //         navigate('/');
+        //     }
+        //     setUserInfo(user);
+        // }
         
     },[isAuthenticating, isAuthenticated, user]);
 

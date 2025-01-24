@@ -34,7 +34,7 @@ const OrgDisplay = () => {
             }  */}
 
             {
-                !orgData.loading && orgData.data && <Org org={orgData.data}/>
+                !orgData.loading && orgData.data && <Org org={orgData.data.org}/>
             }
         </>
     );
