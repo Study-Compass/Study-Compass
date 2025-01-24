@@ -1,0 +1,42 @@
+.day-component{
+    --calendar-line: #F2F3F7;
+    --calendar-background-2: #FDFDFE;
+
+    box-sizing: border-box;
+    border-right: 1px solid var(--calendar-line);
+    border-bottom: 1px solid var(--calendar-line);
+
+    .header{
+        border-bottom: 1px solid var(--lighterborder);
+        border-top: 1px solid var(--lighterborder);
+        border-right: 1px solid var(--lighterborder);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height:40px;
+        margin-bottom:0;
+    }
+    .events{
+    }
+
+    .grid-container{
+        height:calc(100% - 40px);
+        max-height:calc(100% - 40px);
+        display:flex;
+        padding:0;
+        .time-grid{
+            .time-period{
+                height:50px;
+                border-bottom: 1px solid var(--calendar-line)
+            }
+        }
+    }
+
+    &.time-col{
+        .header{
+            border-left: 1px solid var(--lighterborder);
+            transform:translateX(-1px);
+        }
+    }
+}

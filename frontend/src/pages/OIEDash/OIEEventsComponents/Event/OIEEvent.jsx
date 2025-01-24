@@ -8,7 +8,7 @@ import FullEvent from '../../../../components/EventsViewer/EventsGrid/EventsColu
 
 import defaultAvatar from '../../../../assets/defaultAvatar.svg';
 
-function OIEEvent({event, showStatus=false, refetch, showOIE=false, index}){
+function OIEEvent({event, showStatus=false, refetch, showOIE=false, index, showExpand=true}){
     const [popupOpen, setPopupOpen] = useState(false);
     const [edited, setEdited] = useState(false);
     const navigate = useNavigate();
@@ -45,7 +45,7 @@ function OIEEvent({event, showStatus=false, refetch, showOIE=false, index}){
                 {
                     showStatus && <div className={`oie-status ${statusMessages[event.OIEStatus][1]}`}><p>{statusMessages[event.OIEStatus][0]}</p></div>
                 }
-                <h1>{event.name}</h1>
+                <h2>{event.name}</h2>
                 {/* <p>{event.location }</p> */}
                 {/* display date in day of the week, month/day */}
                 <div className="row">
@@ -64,10 +64,13 @@ function OIEEvent({event, showStatus=false, refetch, showOIE=false, index}){
                     <p>{event.location}</p>
                 </div>
             </div>
-            <button className="button" onClick={() => handleEventClick(event)}>
-                <Icon icon="material-symbols:expand-content-rounded" />
-                <p>details</p>
-            </button>
+            {
+                showExpand && 
+                <button className="button" onClick={() => handleEventClick(event)}>
+                    <Icon icon="material-symbols:expand-content-rounded" />
+                    <p>details</p>
+                </button>
+            }
         </div>
     );
 

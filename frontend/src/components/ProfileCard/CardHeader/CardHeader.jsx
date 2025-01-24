@@ -5,15 +5,19 @@ import defaultAvatar from "../../../assets/defaultAvatar.svg"
 import Badges from '../../Badges/Badges';
 import '../../ProfilePicture/ProfilePicture.scss';
 import GrainTexture from '../../../assets/Grain-Texture.png';
+import StudentCardGrad from '../../../assets/Gradients/StudentCardGrad.png';
+import logo from '../../../assets/Logo.svg'
 
 function CardHeader({userInfo, settings}){
     console.log(userInfo);
     return (
         <div className="card-header">
-            <div className="bar" style={{backgroundImage: `url(${GrainTexture}), -webkit-linear-gradient(135deg, #F9E298, #F2374C)`,}}>
+            {/* <div className="bar" style={{backgroundImage: `url(${GrainTexture}), -webkit-linear-gradient(135deg, #F9E298, #F2374C)`,}}>
                 {settings ? <img src={WhiteSettings} alt="settings-icon" /> : <h2 className="watermark">study compass</h2> }
                 
-            </div>
+            </div> */}
+            <img src={StudentCardGrad} alt="" className="grad" />
+            <img src={logo} alt="" className="logo"/>
             <div className="personal">
                 <div className="pfp">
                     <img src={userInfo.picture ? userInfo.picture : defaultAvatar} alt="profile-icon" />

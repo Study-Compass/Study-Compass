@@ -5,28 +5,47 @@ const Event = require('../schemas/event');
 const User = require('../schemas/user');
 const Classroom = require('../schemas/classroom');
 const OIEStatus = require('../schemas/OIE');
+const Org = require('../schemas/org')
 
 router.post('/create-event', verifyToken, async (req, res) => {
     const user_id = req.user.userId;
-
-    const event = new Event({
-        ...req.body,
-        hostingId : user_id,
-        hostingType : 'User',
-    });
+    const orgId = req.body.orgId;
     
-    let OIE = null;
-
-    if (event.expectedAttendance > 200 || event.OIEAcknowledgementItems && event.OIEAcknowledgementItems.length > 0) {
-        event.OIEStatus = "Pending";
-        OIE = new OIEStatus({
-            eventRef: event._id,
-            status: 'Pending',
-            checkListItems: [],
-        });
-    }
-
     try {
+        let event;
+
+        if(orgId){
+            const user = await User.findById(user_id);
+            if(!user.clubAssociations.includes(orgId)){
+                return res.status(403).json({
+                    "message": 'you are not authorized to create an event as this organization'
+                })
+            }
+            event = new Event({
+                ...req.body,
+                hostingId : orgId,
+                hostingType : 'Org',
+            });
+        } else {
+            event = new Event({
+                ...req.body,
+                hostingId : user_id,
+                hostingType : 'User',
+            });
+        }
+    
+        let OIE;
+    
+        if (event.expectedAttendance > 100 || event.OIEAcknowledgementItems && event.OIEAcknowledgementItems.length > 0) {
+            event.OIEStatus = "Pending";
+            OIE = new OIEStatus({
+                eventRef: event._id,
+                status: 'Pending',
+                checkListItems: [],
+            });
+        }
+
+
         await event.save();
         if (OIE) {
             await OIE.save();
@@ -354,6 +373,38 @@ router.get('/get-events-by-month', verifyToken, authorizeRoles('oie'), async (re
         });
     } catch (error) {
         console.log('GET: /get-events-by-month failed', error);
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+});
+
+router.get('/get-events-by-range', verifyToken, authorizeRoles('oie'), async (req, res) => {
+    const { start, end } = req.query;
+
+    if (!start || !end) {
+        return res.status(400).json({
+            success: false,
+            message: 'Start and end dates are required parameters.',
+        });
+    }
+
+    try {
+        const startOfRange = new Date(start);
+        const endOfRange = new Date(end);
+
+        const events = await Event.find({
+            start_time: { $gte: startOfRange, $lte: endOfRange }
+        }).populate('classroom_id');
+
+        console.log('GET: /get-events-by-week successful');
+        res.status(200).json({
+            success: true,
+            events
+        });
+    } catch (error) {
+        console.log('GET: /get-events-by-week failed', error);
         res.status(500).json({
             success: false,
             message: error.message

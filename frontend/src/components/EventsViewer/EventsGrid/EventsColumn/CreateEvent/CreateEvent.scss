@@ -7,7 +7,7 @@
     overflow: show;
     z-index: 1;
     animation: glint 3s infinite linear;
-    
+    transition: border 0.3s ease;
     
     &::after{
         transition: all 0.5s;
@@ -24,7 +24,7 @@
     }
 
     &:hover{
-
+        border: 1px solid transparent;
     }
 
     &:hover::after{
