@@ -69,6 +69,7 @@ const searchRoutes = require('./routes/searchRoutes.js');
 const clubRoutes = require('./routes/clubRoutes.js');
 const eventRoutes = require('./routes/eventRoutes.js');
 const oieRoutes = require('./routes/oie-routes.js');
+const apiRoutes = require('./routes/apiRoutes.js');
 
 app.use(authRoutes);
 app.use(dataRoutes);
@@ -83,7 +84,7 @@ app.use(searchRoutes);
 app.use(clubRoutes);
 app.use(eventRoutes);
 app.use(oieRoutes);
-
+app.use(apiRoutes);//ADDED PK
 
 // Serve static files from the React app in production
 if (process.env.NODE_ENV === 'production') {
