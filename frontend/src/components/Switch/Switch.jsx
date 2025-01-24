@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import './Switch.css';
 
-function Switch({ options, onChange }) {
+function Switch({ options, onChange, selectedPass, setSelectedPass}) {
     const [selected, setSelected] = useState(0);
     const optionRefs = useRef([]);
     const containerRef = useRef(null);
@@ -22,15 +22,21 @@ function Switch({ options, onChange }) {
         }
     }, [selected]);
 
+    useEffect(() => {
+        setSelected(selectedPass);
+    }, [selectedPass]);
+
     const handleClick = (index) => {
         if(options.length === 2){
             if(index === selected){
                 setSelected(selected === 0 ? 1 : 0);
                 onChange(selected === 0 ? 1 : 0);
+                setSelectedPass(selected === 0 ? 1 : 0);
                 return;
             }
         }
         setSelected(index);
+        setSelectedPass(index);
         onChange(index);
         if (optionRefs.current[index] && containerRef.current) {
             const containerRect = containerRef.current.getBoundingClientRect();

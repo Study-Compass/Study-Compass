@@ -1,8 +1,6 @@
 :root{
     --oie-background: #EFEFEF
 }
-
-
 .oie-dash{
     overflow: hidden;
     height:100vh;
@@ -53,15 +51,29 @@
                 box-sizing: border-box;
                 padding: 0 8px;
                 li{
+                    cursor: pointer;
                     display:flex;
                     align-items: center;
                     justify-content: flex-start;
                     gap:10px;
                     padding:5px 10px;
+                    border:1px solid var(--oie-background);
                     &.selected{
                         background-color: var(--background);
                         border-radius: 10px;
                         border: 1px solid var(--lightborder)
+                    }
+
+                    .icon-container{
+                        display:flex;
+                        align-items: center;
+                        justify-content: center;
+                        width:25px;
+                        height:25px;
+                        iconify-icon{
+                            color: var(--text);
+                            font-size: 20px;
+                        }
                     }
                     
                     img{
@@ -83,6 +95,7 @@
             animation: hide 1s forwards;
         }
     }
+
     .dash-right{
         position: relative;
         flex-grow: 1;
@@ -92,6 +105,35 @@
         border-radius: 15px;
         border: 1px solid var(--lightborder);
         box-shadow: var(--shadow);
+        width:calc(100% - 200px);
+        height: calc(100vh - 20px);
+        max-height: calc(100vh - 20px);
+        overflow: hidden;
+
+        &.maximized{
+            width:100%;
+        }
+
+        .dash-content{
+            position: absolute;
+            top:0;
+            left:0;
+            max-width:100%;
+            width:100%;
+            opacity: 0;
+            pointer-events:none;
+            transition: all 0.5s;
+            display:flex;
+            flex-direction: column;
+            min-height:100%;
+                &.visible{
+                    opacity: 1;
+                    pointer-events:all;
+                }
+            
+
+        }
+
         
         .expand{
             position: absolute;
@@ -114,7 +156,7 @@
             
         }
 
-        &::after{
+        &::before{
             content: '';
             position: absolute;
             width:100%;
@@ -126,10 +168,10 @@
             border-radius: 20px;
             transition: all 1s;
         }
-        &.minimized::after{
+        &.minimized::before{
             transform:scale(1);
         }
-        &.maximized::after{
+        &.maximized::before{
             transform:scale(1.2);
         }
     }

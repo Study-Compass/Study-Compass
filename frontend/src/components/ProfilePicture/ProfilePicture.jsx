@@ -14,6 +14,8 @@ import Stats from '../../assets/Icons/Stats.svg';
 import useOutsideClick from '../../hooks/useClickOutside';
 
 import { useNotification } from '../../NotificationContext';
+import {Icon} from '@iconify-icon/react';  
+import RPI from '../../assets/Icons/RPI.svg';
 
 import {Link} from 'react-router-dom'
 
@@ -53,6 +55,7 @@ function ProfilePicture(){
                     </div>
                 </div>
                 <hr />
+                <p className="section">GENERAL</p>
                 <Link to="/profile">
                     <div className="menu-item">
                         <img className="icon" src={ProfileIcon} alt="profile" />
@@ -65,24 +68,60 @@ function ProfilePicture(){
                         <p>Settings</p>
                     </div>
                 </Link>
-                <hr />
-                <Link to="/">
-                    <div className="menu-item">
-                        <img className="icon" src={Guide} alt="guide" />
-                        <p>Guide</p>
+                <Link  to="/create-org">
+                    <div className="menu-item" >
+                        <img className="icon" src={Settings} alt="settings" />
+                        <p>Create an Org</p>
                     </div>
                 </Link>
-                {
-                    user && user.admin && 
+                {user && (user.roles.includes('admin')||user.roles.includes('oie')) && 
                     <>
                         <hr />
-
+                        <p className="section">ADMINISTRATION</p>
+                    </>
+                }
+                
+                {
+                    user && user.roles.includes('admin') && 
+                    <>
                         <Link to="/admin">
                             <div className="menu-item">
-                                <img className="icon" src={Stats} alt="guide" />
-                                <p>Admin</p>
+                                <Icon icon="bx:stats" />
+                                <p>Analytics</p>
                             </div>
                         </Link>
+                    </>
+                }
+                {
+                    user && user.roles.includes('oie') && 
+                    <>
+                        <Link to="/oie-dashboard">
+                            <div className="menu-item">
+                                <img className="icon" src={RPI} alt="log out" />
+                                <p>OIE Admin</p>
+                            </div>
+                        </Link>
+                    </>
+                }
+                {
+                    user && user.clubAssociations.length > 0 && 
+                    <>
+                        <hr/>
+                        <p className="section">ORGS</p>
+                        {user.clubAssociations.map(
+                            (org)=>{
+                                const url = `/club-dashboard/${org.org_name}`
+                                return(
+                                    <Link to={`${url}`}>
+                                        <div className="menu-item">
+                                            <img className="icon" src={org.org_profile_image} alt="" />
+                                            <p>{org.org_name}</p>
+                                        </div>
+                                    </Link>
+                                )
+                            }
+                        )}
+
                     </>
                 }
                 <hr />

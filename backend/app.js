@@ -7,6 +7,7 @@ const multer = require('multer');
 require('dotenv').config();
 const { createServer } = require('http');
 const { Server } = require('socket.io');
+const enforce = require('express-sslify');
 
 const app = express();
 const port = process.env.PORT || 5001;
@@ -25,6 +26,7 @@ const io = new Server(server, {
 });
 
 if (process.env.NODE_ENV === 'production') {
+    app.use(enforce.HTTPS({ trustProtoHeader: true }));
     const corsOptions = {
         origin: ['https://www.study-compass.com', 'https://studycompass.com'],
         optionsSuccessStatus: 200 // for legacy browser support
@@ -65,17 +67,32 @@ const classroomChangeRoutes = require('./routes/classroomChangeRoutes.js');
 const ratingRoutes = require('./routes/ratingRoutes.js');
 const searchRoutes = require('./routes/searchRoutes.js');
 const eventRoutes = require('./routes/eventRoutes.js');
+const oieRoutes = require('./routes/oie-routes.js');
+const orgRoutes = require('./routes/orgRoutes.js');
 
 app.use(authRoutes);
 app.use(dataRoutes);
 app.use(friendRoutes);
 app.use(userRoutes);
-app.use(analyticsRoutes);app.use(eventRoutes);
+app.use(analyticsRoutes);
+app.use(eventRoutes);
 
 app.use(classroomChangeRoutes);
 app.use(ratingRoutes);
 app.use(searchRoutes);
 app.use(eventRoutes);
+app.use(oieRoutes);
+app.use(orgRoutes);
+
+// Serve static files from the React app in production
+if (process.env.NODE_ENV === 'production') {
+    app.use(express.static(path.join(__dirname, '../frontend/build')));
+
+    // The "catchall" handler: for any request that doesn't match one above, send back React's index.html file.
+    app.get('*', (req, res) => {
+        res.sendFile(path.join(__dirname, '../frontend/build/index.html'));
+    });
+}
 
 //deprecated, should lowk invest in this
 // app.get('/update-database', (req, res) => {
@@ -129,15 +146,6 @@ app.post('/upload-image/:classroomName', upload.single('image'), async (req, res
     }
 });
 
-// Serve static files from the React app in production
-if (process.env.NODE_ENV === 'production') {
-    app.use(express.static(path.join(__dirname, '../frontend/build')));
-
-    // The "catchall" handler: for any request that doesn't match one above, send back React's index.html file.
-    app.get('*', (req, res) => {
-        res.sendFile(path.join(__dirname, '../frontend/build/index.html'));
-    });
-}
 
 // Socket.io functionality
 io.on('connection', (socket) => {

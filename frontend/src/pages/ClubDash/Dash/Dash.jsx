@@ -4,13 +4,14 @@ import OIEGradient from '../../../assets/ClubGradient.png';
 import { getAllEvents } from '../../../components/EventsViewer/EventHelpers';
 import clubEvent from '../ClubEventsComponents/Event/ClubEvent';
 import people from '../../../assets/people.svg'
+import RedGrad from '../../../assets/Gradients/ClubAdminGrad.png';
 
 
-function Dash({expandedClass, openMembers}){
-
+function Dash({expandedClass, openMembers, clubName}){
+    //define welcometext to be either good morning, good afternoon, or good evening, in one line
+    const welcomeText = `Good ${new Date().getHours() < 12 ? "Morning" : new Date().getHours() < 18 ? "Afternoon" : "Evening"}`;
+    
     const [events, setEvents] = useState([]);
-
-
     useEffect(() => {
         const fetchEvents = async () => {
             try{
@@ -26,38 +27,42 @@ function Dash({expandedClass, openMembers}){
             } catch (error){
                 console.log("Failed to fetch events", error);
             }
-
         }
         fetchEvents();
     }, []);
 
 
+
     return (
         <div className={`dash ${expandedClass}`}>
+            <img src={RedGrad} alt="" className="red-grad"/>
             <header className="header">
-                <img src={OIEGradient} alt="" />
-                <h1>Club Dashboard</h1>
+                <h1>{welcomeText}, {clubName}</h1>
+                <h3>welcome back to your organization portal</h3>
             </header>
-            <div className="needs-approval">
+            <div className="row">
                 <div className="column">
                 <h1>manage membership</h1>
-
-                <div className="content">
+                <div className="content membership">
                         <h2><img src={people} alt="" />200 members <button onClick={openMembers}>manage</button></h2>
                         <h2> <img src={people} alt="" />8 officers <button>manage</button></h2>
                 </div>
-
-
-                <h1>quick actions</h1>
                 </div>
                 <div className="column">
                 <h1>meetings coming up</h1>
                 <div className="content meeting">
-                        <h2>Random Student Event <button>manage</button></h2>
+                    <h2>Random Student Event <button>manage</button></h2>
                 </div>
 
                </div>
                 
+            </div>
+            <div className="row">
+                <div className="column">
+                    <h1>quick actions</h1>
+                    <div className="content">
+                    </div>
+                </div>
             </div>
 
         </div>

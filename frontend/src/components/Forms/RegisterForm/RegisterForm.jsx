@@ -8,8 +8,6 @@ import circleWarning from '../../../assets/circle-warning.svg';
 import { generalIcons } from '../../../Icons';
 import Flag from '../../Flag/Flag';
 
-
-
 function RegisterForm() {
     const { isAuthenticated, googleLogin, login } = useAuth();
     const [valid, setValid] = useState(false);
@@ -28,6 +26,7 @@ function RegisterForm() {
     let navigate = useNavigate();
 
     const location = useLocation();
+    const from = location.state?.from?.pathname || '/room/none';
 
     useEffect(() => {
         async function google(code) {
@@ -61,8 +60,13 @@ function RegisterForm() {
 
     useEffect(() => {
         if (isAuthenticated && isAuthenticated !== null) {
-            console.log("logged in already");
-            navigate('/room/none', { replace: true })
+            // console.log("logged in already");
+            // const redirectto = localStorage.getItem('redirectto');
+            // if(redirectto){
+                // navigate(redirectto, { replace: true });
+            // } else {
+                navigate('/room/none', { replace: true });
+            // }
         }
     }, [isAuthenticated, navigate]);
 
@@ -98,7 +102,7 @@ function RegisterForm() {
             console.log(response.data);
             // Handle success (e.g., redirect to login page or auto-login)
             await login(formData);
-            navigate('/onboard', { replace: true });
+            navigate('/onboard', { state: {from:location.state?.from} });
         } catch (error) {
             if(error.response.status === 400){
                 setErrorText("Username or Email already exists");
@@ -115,7 +119,8 @@ function RegisterForm() {
         flow: 'auth-code',
         ux_mode: 'redirect',
         onFailure: () => { console.log("failed") },
-    })
+    });
+
 
     function failed(message){
         navigate('/login');
@@ -136,7 +141,7 @@ function RegisterForm() {
             {errorText !== "" && 
                 <Flag text={errorText} img={circleWarning} color={"#FD5858"} primary={"rgba(250, 117, 109, 0.16)"} accent={"#FD5858"} /> 
             }
-            <button className="button google" onClick={() => google()}>Continue with Google<img src={googleLogo} alt="google" /></button>
+            <button type="button" className="button google" onClick={() => google()}>Continue with Google<img src={googleLogo} alt="google" /></button>
             
             <div className="divider">
                 <hr />

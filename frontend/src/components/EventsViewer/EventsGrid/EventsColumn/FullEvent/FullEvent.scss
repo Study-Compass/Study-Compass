@@ -1,28 +1,52 @@
 .full-event{
     display:flex;
-    width:100%;
+    width:calc(100% - 50px);
     height:100%;
     gap:20px;
+    position: relative;
+    margin-right:50px;
+    background-color: var(--background);
+    border-radius: 20px;
+    overflow:hidden;
+    padding:20px;
+    box-sizing: border-box;
+    
+    iconify-icon{
+        font-size: 20px;
+        color: var(--text);
+    }
+
     .image{
         max-width: 35%;
         img{
             width:100%;
             border-radius: 10px;
+            box-shadow: var(--shadow);
         }
     }
     .content{
         flex-grow: 1;
         padding-top:5px;
         box-sizing: border-box;
+        gap:10px;
+        display:flex;
+        flex-direction: column;
         h1{
             font-size: 25px;
+            margin-bottom:0;
         }
+        p{
+            font-size: 15px;
+            font-weight: 500;
+            font-family: 'Inter';
+        }
+
     }
     .gradient{
         position: absolute;
         bottom:0;
         right:0;
         height:110px;
-        width:110px;
+        height:30%;
     }
 }

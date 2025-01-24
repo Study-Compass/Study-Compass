@@ -27,6 +27,19 @@ const getAllEvents = async () => {
     }
 }
 
+const getOIEEvents = async () => {
+    try{
+        const response = await axios.get('/oie/get-pending-events', {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`,
+            },
+        });
+        return response.data.events;
+    } catch(error){
+        throw error;
+    }
+}
+
 const createEvent = async (name, type, hosting, location, date, description, image, classroom_id) => {
     try{
         const response = await axios.post('/create-event', {
@@ -44,4 +57,4 @@ const createEvent = async (name, type, hosting, location, date, description, ima
 }
 
 
-export { getAllEvents, createEvent };
+export { getAllEvents, createEvent, getOIEEvents };
