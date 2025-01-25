@@ -278,6 +278,7 @@ function Room() {
         //     setContentState("calendarSearch");  
         // }
      // eslint-disable-next-line react-hooks/exhaustive-deps
+     console.log(query);
     }, [query])
 
     useEffect(() => {
@@ -391,7 +392,7 @@ function Room() {
                                 givenRoom={recommendedRoom}
                             />
                         }
-                        <SearchBar data={rooms} onEnter={changeURL2} room={contentState === "classroom" || contentState === "calendarSearchResult" ? roomName : searchQuery } onX={onX} onSearch={onSearch} query={searchQuery} onBlur={setSearchFocus} />
+                        <SearchBar data={rooms} addQuery={addQuery} onEnter={changeURL2} room={contentState === "classroom" || contentState === "calendarSearchResult" ? roomName : searchQuery } onX={onX} onSearch={onSearch} query={searchQuery} onBlur={setSearchFocus} />
                         {contentState === "classroom" || contentState === "calendarSearchResult"  ? 
                             <Classroom  
                                 room={room} 
