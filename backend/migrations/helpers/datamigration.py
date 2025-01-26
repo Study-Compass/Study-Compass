@@ -2,6 +2,7 @@ from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
 import os
 from dotenv import load_dotenv
+import json
 
 def updateClassroom():
     load_dotenv() # loading .env file
@@ -71,9 +72,9 @@ def findNoPics():
 
     print(f'Number of classrooms with no image: {count}')
 
-def migrateClassrooms():
+def migrateClassrooms(uri, db):
     load_dotenv() # loading .env file
-    uri = os.environ.get('MONGO_URL') # fetching URI string
+    # uri = os.environ.get('MONGO_URL') # fetching URI string
     client = MongoClient(uri, server_api=ServerApi('1')) 
     try: # send a ping to confirm a successful connection
         client.admin.command('ping')
@@ -82,7 +83,7 @@ def migrateClassrooms():
         print(e)
 
     # getting relevant collection, clearing data before scanning new
-    db = client['studycompass']
+    db = client[db]
     collection = db['classrooms']
     collection1 = db['classrooms1']  
     schedules = db['schedules']
@@ -96,8 +97,12 @@ def migrateClassrooms():
             # Insert the classroom into collection1 if it doesn't exist
             classroom1 = {
                 'name': classroom['name'],
-                'image' : '/classrooms/downsizedPlaceholder.jpeg',
+                'image' : 'https://studycompass.s3.amazonaws.com/downsizedPlaceholder.jpeg',
                 'attributes': [],
+                'number_of_ratings': 0,
+                'average_rating': 0,
+                'checked_in':[],
+                'mainSearch': True,
             }
             collection1.insert_one(classroom1)
             print(f"Classroom '{classroom['name']}' and its schedule were migrated.")
@@ -299,6 +304,33 @@ def renameField(uri, collection, previousName, newName):
     print("Field renaming completed, " + str(count) + " documents updated")
 
 
+def load_json_to_mongo(json_file, uri):
+    client = MongoClient(uri, server_api=ServerApi('1')) 
+    db = client['ucb']
+    collection = db['classrooms']
+
+    with open(json_file, 'r') as file:
+        data = json.load(file)
+
+        for room_name, room_data in data.items():
+            # Prepare the document to insert
+            document = {
+                "name": room_data["name"],
+                "weekly_schedule": room_data["weekly_schedule"]
+            }
+            
+            # Check if the room already exists and update it, or insert a new one
+            result = collection.update_one(
+                {"room_name": room_name},
+                {"$set": document},
+                upsert=True
+            )
+            
+            # Log the result
+            if result.upserted_id:
+                print(f"Inserted new document for room: {room_name}")
+            else:
+                print(f"Updated existing document for room: {room_name}")
 
 
 
@@ -316,6 +348,8 @@ def renameField(uri, collection, previousName, newName):
 # addNewField('users',{'sessions': 0})
 # addNewField('users',{'hours': 0})
 # addNewField('users',{'contributions': 0})
-# migrateClassrooms()
 # forceUpdate('users', {'visited': [], 'partners': [], 'sessions': [], 'hours': 0, 'contributions': 0})
 # updateImages()
+
+load_json_to_mongo("classes.json", "mongodb://127.0.0.1:27017/ucb" )
+migrateClassrooms('mongodb://127.0.0.1:27017/ucb', 'ucb')
