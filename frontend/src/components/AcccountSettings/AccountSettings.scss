@@ -8,3 +8,52 @@
     color: var(--text);
     font-weight: 600;
 }
+
+.settings-right .status{
+}
+
+.settings-right .status p{
+    font-size:14px;
+    font-weight: 500;
+    margin-bottom:2px;
+}
+
+.settings-right .status div{
+    display:flex;
+    gap:8px;
+    align-items: center;
+}
+
+.settings-right .status img{
+    width:15px;
+    height:15px;
+    margin: 0;
+}
+
+.settings-right .checking p{
+    color: var(--yellow) !important;
+}
+
+.settings-right .available p{
+    color: var(--green) !important;
+}
+
+.settings-right .taken p{
+    color: var(--red) !important;
+
+}
+
+.settings-right .invalid p{
+    color: var(--red) !important;
+}
+
+.settings-right .user-container button:disabled{
+    background-color: var(--lighter);
+    color: var(--darkborder);
+    cursor: not-allowed;
+}
+
+.settings-right .save-name{
+    background-color: var(--red);
+    color: white;
+}

@@ -47,8 +47,8 @@ router.post("/check-username", verifyToken, async (req, res) => {
             console.log(`POST: /check-username ${username} is profane`)
             return res.status(200).json({ success: false, message: 'Username does not abide by community standards' });
         }
-        const reqUser = await User.findById(userId);
-        const user = await User.findOne({ username: { $regex: new RegExp(username, "i") } });
+        console.log(`Checking username: ${username}, User ID: ${userId}`);
+        const user = await User.findOne({ username: { $regex: new RegExp(`^${username}$`, "i") } });        console.log(`User found: ${user ? user.username : null}, User ID: ${user ? user._id : null}`);
         if (user && user._id.toString() !== userId) {
             console.log(`POST: /check-username ${username} is taken`)
             return res.status(200).json({ success: false, message: 'Username is taken' });

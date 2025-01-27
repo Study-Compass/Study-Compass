@@ -89,7 +89,7 @@
     flex-direction: column;
     font-family: 'Satoshi';
     font-size: 14px;
-    color: var(--border);
+    color: var(--darkborder);
     margin: 0 0 0px 0;
 }
 
@@ -163,6 +163,7 @@
     /* gap: 200px; */
     width: 200px;
     height: 31px;
+    gap: 5px;
 }
 
 .settings-right .user-container{
@@ -226,24 +227,28 @@
     /* height: 42px; */
 }
 
-.settings-right .user-container .delete{
+.settings-right .delete{
     display: flex;
     flex-direction: column;
-    font-family: 'Satoshi';
     width: 100%;
     /* height: 55px; */
+    padding: 10px 15px;
+    box-sizing: border-box;
+    border-radius: 10px;
+    background-color: rgba(255, 117, 109, 0.16);
+    cursor:pointer;
 }
 
 
-.settings-right .user-container .delete p{
+.settings-right .delete p{
     display: flex;
     flex-direction: row;
     margin: 0px;
-    color: var(--border);
-    font-size: 12px;
+    color: var(--darkborder);
+    font-size: 13px;
 }
 
-.settings-right .user-container .delete button {
+.settings-right .delete button {
     display: flex;
     flex-direction: column;
     font-family: 'Satoshi';
@@ -258,7 +263,7 @@
     transition: background-color 0.3s ease;
 }
 
-.settings-right .user-container .delete h3{
+.settings-right .delete h3{
     color: red;
 }
 
@@ -279,14 +284,14 @@
     color: var(--text);
     font-weight: 600;
     margin: 0px;
-    margin-bottom: 7px;
+    margin-bottom: 5px;
 }
 
 .settings-right p{
     display: flex;
     flex-direction: row;
     margin: 0px;
-    color: var(--border);
+    color: var(--darkborder);
     font-size: 15px;
 }
 
