@@ -8,6 +8,7 @@ const rateLimit = require('./rateLimit.js');
 
 // Middleware for validating API keys
 const apiKeyMiddleware = async (req, res, next) => {
+    console.log("THIS SHIT HIT")
     const { authorization_key, api_key } = req.headers;
 
     if (!authorization_key || !api_key) {
@@ -22,8 +23,10 @@ const apiKeyMiddleware = async (req, res, next) => {
         next();
 
     } catch (error) {
-        console.error('Error verifying API key:', error);
+        console.log('Error verifying API key:', error);
         return res.status(500).json({ error: 'Internal server error.' });
     }
 };
 
+
+module.exports = { apiKeyMiddleware };

@@ -1,5 +1,5 @@
 //Monitor and Logger
-const API = require('./schemas/api.js');
+const API = require('../schemas/api.js');
 const morgan = require('morgan');
 
 //Logging HTTP Requests

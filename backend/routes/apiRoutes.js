@@ -1,30 +1,29 @@
 const express = require('express');
 const router = express.Router();
-const Api = require('../models/api.js');
-const User = require('../models/user.js');
-const limiter = require('../middleware/rateLimit.js'); // Rate limiting middleware
-const apiKeyMiddleware = require('../middleware/apiKeyMiddleware.js'); // API key validation
-const validateInput = require('../middleware/validate.js'); // Input validation middleware
+const Api = require('../schemas/api.js');
+const User = require('../schemas/user.js');
+const limiter = require('../middlewares/rateLimit.js'); // Rate limiting middleware
+const {apiKeyMiddleware} = require('../middlewares/apiKeyMiddleware.js'); // API key validation
+const {validateInput} = require('../middlewares/validate.js'); // Input validation middleware
 const crypto = require('crypto'); // For generating API keys
 const mongoose = require('mongoose');
+const {verifyToken}= require('../middlewares/verifyToken');
 
-// Generate a new API key   validateInput,
-router.post('/create_api', validateInput, async (req, res) => {
-    // DEBUG: Check if `req.user` exists and contains `userId`
-    if (!req.user || !req.user.userId) {
-        console.error('User ID is missing in the request.');
-        return res.status(400).json({ error: 'User ID is required to generate an API key.' });
-    }
 
-    const userId = req.user.userId;
+//Need to make the Api Usable and give access
+//CURRENT ERRRORS
+/**
+ * validate Input needs to be called like a middle ware {   } go back through validate and change sutff up 
+ * need my rate limited
+ * api Key Middle ware needs to be added  with protected routes
+ */
 
+// Generate a new API key 
+router.post('/create_api', verifyToken, async (req, res) => { // Validate input needs to go in here  
     try {
-        // DEBUG: Verify if the user exists in the database
-        const user = await User.findById(userId);
-        if (!user) {
-            console.error(`User with ID ${userId} not found.`);
-            return res.status(404).json({ error: 'User not found.' });
-        }
+       const userId = req.user.userId;  
+
+       const user = await User.findById(userId);
 
         // Generate API key and authorization key
         const apiKey = crypto.randomBytes(32).toString('hex');
@@ -39,19 +38,21 @@ router.post('/create_api', validateInput, async (req, res) => {
 
         await newApi.save();
 
-        console.log('POST: /generate_api successful. API key generated:', newApi);
+        console.log('POST: /create_api successful. API key generated:', newApi);
         res.status(201).json({ message: 'API key generated successfully.', apiKey: newApi });
     } catch (error) {
-        console.error('POST: /generate_api failed. Error:', error);
+        console.error('POST: /create_api failed. Error:', error);
         res.status(500).json({ error: 'Internal server error.' });
     }
 });
-/*
+
 // Validate API key middleware
 router.use('/protected', apiKeyMiddleware);
 
 // Get API key details
-router.get('/details', apiKeyMiddleware, async (req, res) => {
+
+//Get details LOOK at MIDDLEWARE Debugging guide
+router.get('/protected/details', apiKeyMiddleware, async (req, res) => {
     const { authorization_key, api_key } = req.headers;
 
     try {
@@ -69,6 +70,8 @@ router.get('/details', apiKeyMiddleware, async (req, res) => {
     }
 });
 
+
+/*
 // Delete an API key
 router.delete('/delete', apiKeyMiddleware, async (req, res) => {
     const { authorization_key, api_key } = req.headers;
