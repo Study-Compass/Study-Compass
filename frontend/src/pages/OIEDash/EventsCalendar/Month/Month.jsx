@@ -106,7 +106,7 @@ function Month({ height, changeToWeek }) {
             </div>
             <div className="month" style={{ height: `${height}px` }}>
                 <div className="calendar-header">
-                    {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
+                    {["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"].map((day) => (
                         <div key={day} className="day">
                             <p>{day}</p>
                         </div>

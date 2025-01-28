@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import Org from './Org/Org.jsx';
+import Org from './Org.jsx';
 import { useParams } from 'react-router-dom';
 import { useFetch } from '../../hooks/useFetch';
 

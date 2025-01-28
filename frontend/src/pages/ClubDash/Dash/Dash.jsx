@@ -4,9 +4,13 @@ import OIEGradient from '../../../assets/ClubGradient.png';
 import { getAllEvents } from '../../../components/EventsViewer/EventHelpers';
 import clubEvent from '../ClubEventsComponents/Event/ClubEvent';
 import people from '../../../assets/people.svg'
+import RedGrad from '../../../assets/Gradients/ClubAdminGrad.png';
+
 
 function Dash({expandedClass, openMembers, clubName}){
-
+    //define welcometext to be either good morning, good afternoon, or good evening, in one line
+    const welcomeText = `Good ${new Date().getHours() < 12 ? "Morning" : new Date().getHours() < 18 ? "Afternoon" : "Evening"}`;
+    
     const [events, setEvents] = useState([]);
     useEffect(() => {
         const fetchEvents = async () => {
@@ -28,11 +32,13 @@ function Dash({expandedClass, openMembers, clubName}){
     }, []);
 
 
+
     return (
         <div className={`dash ${expandedClass}`}>
+            <img src={RedGrad} alt="" className="red-grad"/>
             <header className="header">
-                <img src={OIEGradient} alt="" />
-                <h1>Org Dashboard</h1>
+                <h1>{welcomeText}, {clubName}</h1>
+                <h3>welcome back to your organization portal</h3>
             </header>
             <div className="row">
                 <div className="column">
