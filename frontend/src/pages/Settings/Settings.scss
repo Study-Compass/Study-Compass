@@ -85,12 +85,13 @@
 }
 
 .settings-left .header p{
-    display: flex;
-    flex-direction: column;
     font-family: 'Satoshi';
     font-size: 14px;
     color: var(--darkborder);
     margin: 0 0 0px 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .settings-left .header img{

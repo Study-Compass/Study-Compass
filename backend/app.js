@@ -8,6 +8,8 @@ require('dotenv').config();
 const { createServer } = require('http');
 const { Server } = require('socket.io');
 const enforce = require('express-sslify');
+const s3 = require('./aws-config.js')
+const Classroom = require('./schemas/classroom');
 
 const app = express();
 const port = process.env.PORT || 5001;
@@ -110,7 +112,7 @@ if (process.env.NODE_ENV === 'production') {
 //         console.log(`child process exited with code ${code}`);
 //     });
 // });
-
+  
 app.post('/upload-image/:classroomName', upload.single('image'), async (req, res) => {
     const classroomName = req.params.classroomName;
     const file = req.file;

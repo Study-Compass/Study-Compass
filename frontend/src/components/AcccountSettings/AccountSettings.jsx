@@ -172,7 +172,7 @@ function AccountSettings({ settingsRightSide, width, handleBackClick, userInfo }
                     </div>
                     <div className='user-container'>
                         <div className='email'>
-                        {editEmail ? (
+                        {false ? (
                                 <input
                                     type="text" value={email} onChange={handleEmailChange}
                                     onBlur={saveUsername}
@@ -186,7 +186,7 @@ function AccountSettings({ settingsRightSide, width, handleBackClick, userInfo }
                                 )  
                         }
                         </div>
-                        <button onClick={() => setEditEmail(true)}>change email</button>
+                        {/* <button onClick={() => setEditEmail(true)}>change email</button> */}
 
                     </div>
                     <div className='user-container'>
@@ -194,7 +194,7 @@ function AccountSettings({ settingsRightSide, width, handleBackClick, userInfo }
                             <h3>password</h3>
                             <p>enabled</p>
                         </div>
-                        <button>change password</button>
+                        {/* <button>change password</button> */}
 
                     </div>
                 </div>
