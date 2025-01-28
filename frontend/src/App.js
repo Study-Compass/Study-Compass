@@ -10,6 +10,7 @@ import Error from './pages/Error/Error';
 import Onboard from './pages/OnBoarding/Onboard';
 import Settings from './pages/Settings/Settings';
 import Friends from './pages/Friends/Friends';
+import Org from './pages/Org/Org';
 import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute';
 import Profile from './pages/Profile/Profile';
 import Landing from './pages/Landing/Landing';

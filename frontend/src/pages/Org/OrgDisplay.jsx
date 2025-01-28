@@ -7,15 +7,6 @@ const OrgDisplay = () => {
     const orgName = useParams().name;
     const orgData = useFetch(`/get-org-by-name/${orgName}`);
 
-    useEffect(()=>{
-      if(orgData.error){
-        console.log(orgData.error)
-      }
-      if(orgData.data){
-        console.log(orgData.data);
-      }
-    },[orgData.data]);
-
     const org = {
         "_id": {
           "$oid": "675ce4871958af1a0199505e"
@@ -39,10 +30,10 @@ const OrgDisplay = () => {
         <>
             {/* {
                 !orgData.loading && <Org org={orgData.data.org}/>
-            } */}
+            }  */}
 
             {
-                !orgData.loading && orgData.data && <Org org={orgData.data}/>
+                !orgData.loading && orgData.data && <Org org={orgData.data.org}/>
             }
         </>
     );
