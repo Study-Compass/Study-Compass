@@ -1,0 +1,92 @@
+.oie-weekly-calendar-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow-y: auto;
+  
+    .calendar-header {
+      display: flex;
+      background-color: #f0f0f0;
+      padding: 10px 0;
+      border-bottom: 1px solid #ccc;
+      position: sticky;
+      top: 0;
+      z-index: 2;
+    }
+    
+    .time-header {
+      width: 60px;
+      flex-shrink: 0;
+    }
+    
+    .day-header {
+      flex: 1;
+      text-align: center;
+      min-width: 120px;
+    }
+    
+    .calendar-body {
+      display: flex;
+      position: relative;
+      min-height: 1440px; /* 24 hours * 60 minutes */
+    }
+    
+    .time-column {
+      width: 60px;
+      flex-shrink: 0;
+      position: relative;
+    }
+    
+    .time-label {
+      position: absolute;
+      right: 5px;
+      font-size: 0.8em;
+      color: #666;
+      transform: translateY(-50%);
+      background: white;
+      padding-right: 5px;
+    }
+    
+    .days-container {
+      display: flex;
+      flex: 1;
+      margin-left: 60px;
+    }
+    
+    .day-column {
+      flex: 1;
+      border-right: 1px solid #eee;
+      position: relative;
+    }
+    
+    .event {
+      position: absolute;
+      background-color: #e3f2fd;
+      border-left: 4px solid #2196f3;
+      padding: 8px;
+      margin: 2px;
+      border-radius: 4px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+    }
+    
+    .event-name {
+      font-weight: bold;
+      font-size: 0.9em;
+      margin-bottom: 4px;
+    }
+    
+    .event-details {
+      display: flex;
+      gap: 8px;
+      font-size: 0.8em;
+      color: #555;
+      margin-bottom: 4px;
+    }
+    
+    .event-time {
+      font-size: 0.75em;
+      color: #666;
+    }
+}
+  
