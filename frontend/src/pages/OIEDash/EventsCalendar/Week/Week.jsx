@@ -3,10 +3,12 @@ import { Icon } from '@iconify-icon/react/dist/iconify.mjs';
 import { useFetch } from '../../../../hooks/useFetch';
 import './Week.scss';
 import WeekComponent from '../../../../components/NewCalendar/WeekComponent/WeekComponent';
+import WeeklyCalendar from './WeeklyCalendar/WeeklyCalendar';
 
-function Week({height, changeToDay, start='2024-12-01'}){
+function Week({height, changeToDay, start='2024-12-02'}){
     console.log(start);
     //get end date
+    const startDate = new Date(start);
     const end = new Date(start);
     end.setDate(end.getDate() + 6);
     const url = `/get-events-by-range?start=${encodeURIComponent(start)}&end=${encodeURIComponent(end)}`;
@@ -19,6 +21,10 @@ function Week({height, changeToDay, start='2024-12-01'}){
     const formattedDate = (date) => {
         const d = new Date(date);
         return `${d.toDateString().split(" ")[1]} ${d.toDateString().split(" ")[2]}`;
+    }
+
+    if(events.loading || !events.data){
+        return <div>Loading...</div>
     }
 
     return(
@@ -34,7 +40,7 @@ function Week({height, changeToDay, start='2024-12-01'}){
                 </div>
             </div>
             <div className="week">
-                <WeekComponent height={height} start={start} events={events} changeToDay={changeToDay}/>
+                <WeeklyCalendar events={events.data.events} startOfWeek={startDate} height={height} changeToDay={changeToDay}/>
             </div>
         </>
     )

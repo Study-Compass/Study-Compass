@@ -91,9 +91,15 @@ function CreateEvent(){
     const onSubmit = async () => {
         const location1 = info.location;
         console.log(location1);
-        const formattedInfo = {
+        let formattedInfo = {
             ...info,
             image:null
+        }
+        if (alias){
+            formattedInfo = {
+                ...formattedInfo,
+                orgId: alias.id,
+            }
         }
         const response = await createEvent(formattedInfo);
         if(response){

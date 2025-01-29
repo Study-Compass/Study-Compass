@@ -29,7 +29,8 @@ function OIEEvent({event, showStatus=false, refetch, showOIE=false, index, showE
 
     const statusMessages = {
         'Not Applicable' : ["Doesnt meet approval criteria","not-applicable"],
-        "Approved" : ["OIE Approved", "approved"]
+        "Approved" : ["OIE Approved", "approved"],
+        "Pending" : ["Pending OIE Approval", "pending"],
     }
 
     return(
@@ -49,10 +50,10 @@ function OIEEvent({event, showStatus=false, refetch, showOIE=false, index, showE
                 {/* <p>{event.location }</p> */}
                 {/* display date in day of the week, month/day */}
                 <div className="row">
-                    <img src={event.hostingId.image ? event.hostingId.image : defaultAvatar} alt="" />
+                    <img src={event.hostingType === "User" ? event.hostingId.image ? event.hostingId.image : defaultAvatar : event.hostingId.org_profile_image} alt="" />
                     <p className="user-name">{event.hostingId.name}</p>
                     <div className="level">
-                        student
+                        {event.hostingType === "User" ? "Student" : "Organization"}
                     </div>
                 </div>
                 <div className="row">
