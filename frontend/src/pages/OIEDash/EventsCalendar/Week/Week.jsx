@@ -2,48 +2,66 @@ import React, { useEffect, useState } from 'react';
 import { Icon } from '@iconify-icon/react/dist/iconify.mjs';
 import { useFetch } from '../../../../hooks/useFetch';
 import './Week.scss';
-import WeekComponent from '../../../../components/NewCalendar/WeekComponent/WeekComponent';
 import WeeklyCalendar from './WeeklyCalendar/WeeklyCalendar';
 
-function Week({height, changeToDay, start='2024-12-02'}){
-    console.log(start);
-    //get end date
-    const startDate = new Date(start);
-    const end = new Date(start);
-    end.setDate(end.getDate() + 6);
-    const url = `/get-events-by-range?start=${encodeURIComponent(start)}&end=${encodeURIComponent(end)}`;
+function Week({ height, changeToDay, start = '2024-12-09' }) {
+    const initialStartDate = new Date(start);
+    const initialEndDate = new Date(initialStartDate);
+    initialEndDate.setDate(initialEndDate.getDate() + 6);
+
+    const [startOfWeek, setStartOfWeek] = useState(initialStartDate);
+    const [endOfWeek, setEndOfWeek] = useState(initialEndDate);
+
+    const formattedDate = (date) => {
+        return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    };
+
+    const updateWeek = (days) => {
+        setStartOfWeek((prev) => {
+            const newStart = new Date(prev);
+            newStart.setDate(newStart.getDate() + days);
+            return newStart;
+        });
+
+        setEndOfWeek((prev) => {
+            const newEnd = new Date(prev);
+            newEnd.setDate(newEnd.getDate() + days);
+            return newEnd;
+        });
+    };
+
+    const url = `/get-events-by-range?start=${encodeURIComponent(startOfWeek.toISOString())}&end=${encodeURIComponent(endOfWeek.toISOString())}`;
     const events = useFetch(url);
 
     useEffect(() => {
         console.log(events);
     }, [events]);
 
-    const formattedDate = (date) => {
-        const d = new Date(date);
-        return `${d.toDateString().split(" ")[1]} ${d.toDateString().split(" ")[2]}`;
-    }
+    // if (events.loading || !events.data) {
+    //     return <div>Loading...</div>;
+    // }
 
-    if(events.loading || !events.data){
-        return <div>Loading...</div>
-    }
-
-    return(
+    return (
         <>
             <div className="header">
                 <div className="time-period">
                     <div className="arrows">
-                        <Icon icon="charm:chevron-left" />
-                        <Icon icon="charm:chevron-right" />
+                        <Icon icon="charm:chevron-left" onClick={() => updateWeek(-7)} />
+                        <Icon icon="charm:chevron-right" onClick={() => updateWeek(7)} />
                     </div>
-                    {/* date formatted <Month Name> <Day Number> */}
-                    <h1>{formattedDate(start)} to {formattedDate(end)}</h1>
+                    <h1>{formattedDate(startOfWeek)} to {formattedDate(endOfWeek)}</h1>
                 </div>
             </div>
             <div className="week">
-                <WeeklyCalendar events={events.data.events} startOfWeek={startDate} height={height} changeToDay={changeToDay}/>
+                <WeeklyCalendar 
+                    events={events.data ? events.data.events : []} 
+                    startOfWeek={startOfWeek} 
+                    height={height} 
+                    changeToDay={changeToDay} 
+                />
             </div>
         </>
-    )
+    );
 }
 
 export default Week;

@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './WeeklyCalendar.scss';
 
-const WeeklyCalendar = ({ startOfWeek, events }) => {
+const WeeklyCalendar = ({ startOfWeek, events, height }) => {
   const [days, setDays] = useState([]);
   const hours = Array.from({ length: 24 }, (_, i) => i);
   const MINUTE_HEIGHT = 1; // 1px per minute
@@ -19,6 +19,38 @@ const WeeklyCalendar = ({ startOfWeek, events }) => {
 
     generateWeek();
   }, [startOfWeek]);
+
+  const ref = useRef(null);
+
+    useEffect(() => {
+        if (ref.current) {
+            // scroll to current time
+            //find earliest event by time not date
+            const earliestEvent = events.reduce((earliest, event) => {
+                const eventTime = new Date(event.start_time);
+                const eventHours = eventTime.getHours();
+                const eventMinutes = eventTime.getMinutes();
+            
+                const earliestTime = new Date(earliest);
+                const earliestHours = earliestTime.getHours();
+                const earliestMinutes = earliestTime.getMinutes();
+            
+                // Compare purely by hours and minutes
+                return (eventHours < earliestHours || (eventHours === earliestHours && eventMinutes < earliestMinutes))
+                    ? eventTime
+                    : earliest;
+            }, new Date(events[0]?.start_time || '1970-01-01T00:00:00Z')); // Default to the first event or midnight
+            
+            const earliestHour = earliestEvent.getHours();
+
+            ref.current.scrollTo({
+                top: (earliestHour * 60 * MINUTE_HEIGHT) - 20,
+                behavior: 'smooth'
+            });
+        }
+
+    }, [ref, events]);
+
 
   const formatTime = (date) => {
     return new Date(date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -73,7 +105,7 @@ const WeeklyCalendar = ({ startOfWeek, events }) => {
             top: `${top}px`,
             height: `${height}px`,
             left: `${left}%`,
-            width: `${width}%`
+            width: `calc(${width}% - 4px)`
           }}
         >
           <div className="event-name">{event.name}</div>
@@ -89,8 +121,23 @@ const WeeklyCalendar = ({ startOfWeek, events }) => {
     });
   };
 
+  const renderTimeGrid = () => {
+    const times = Array.from({ length: 48 }, (_, i) => i * 30); // 30-minute intervals
+
+    return times.map((minutes, index) => {
+      const isHour = minutes % 60 === 0;
+      return (
+        <div
+          key={index}
+          className={`time-grid-line ${isHour ? 'hour-line' : 'half-hour-line'}`}
+          style={{ top: `${minutes * MINUTE_HEIGHT}px` }}
+        />
+      );
+    });
+  };
+
   return (
-    <div className="oie-weekly-calendar-container">
+    <div className="oie-weekly-calendar-container" style={{ height: `${height}px` }} ref={ref}>
       <div className="calendar-header">
         <div className="time-header"></div>
         {days.map((day, index) => (
@@ -113,6 +160,7 @@ const WeeklyCalendar = ({ startOfWeek, events }) => {
         <div className="days-container">
           {days.map((day, index) => (
             <div key={index} className="day-column">
+                {renderTimeGrid()}
               {renderEvents(day)}
             </div>
           ))}

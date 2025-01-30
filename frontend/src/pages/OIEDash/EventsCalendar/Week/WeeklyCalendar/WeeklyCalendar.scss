@@ -1,92 +1,170 @@
 .oie-weekly-calendar-container {
+    --border-color: var(--lighterborder);
+    --bounding-color: #FBFBFB;
+    --hour-border: #E7E7E7;
+    --half-hour-border: #F0F0F0;
+
     display: flex;
     flex-direction: column;
     height: 100vh;
     overflow-y: auto;
-  
+    border-radius: 10px;
+    position: relative;
+    
+
     .calendar-header {
-      display: flex;
-      background-color: #f0f0f0;
-      padding: 10px 0;
-      border-bottom: 1px solid #ccc;
-      position: sticky;
-      top: 0;
-      z-index: 2;
+        display: flex;
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        border:none;
+        background-color: var(--background);
     }
-    
+
     .time-header {
-      width: 60px;
-      flex-shrink: 0;
+        width: 60px;
+        flex-shrink: 0;
+        border: 1px solid var(--border-color);
+        border-radius: 10px 0 0 0;
+        
     }
-    
-    .day-header {
-      flex: 1;
-      text-align: center;
-      min-width: 120px;
-    }
-    
-    .calendar-body {
-      display: flex;
-      position: relative;
-      min-height: 1440px; /* 24 hours * 60 minutes */
-    }
-    
-    .time-column {
-      width: 60px;
-      flex-shrink: 0;
-      position: relative;
-    }
-    
-    .time-label {
-      position: absolute;
-      right: 5px;
-      font-size: 0.8em;
-      color: #666;
-      transform: translateY(-50%);
-      background: white;
-      padding-right: 5px;
-    }
-    
-    .days-container {
-      display: flex;
-      flex: 1;
-      margin-left: 60px;
-    }
-    
-    .day-column {
-      flex: 1;
-      border-right: 1px solid #eee;
-      position: relative;
-    }
-    
-    .event {
-      position: absolute;
-      background-color: #e3f2fd;
-      border-left: 4px solid #2196f3;
-      padding: 8px;
-      margin: 2px;
-      border-radius: 4px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-      overflow: hidden;
-    }
-    
-    .event-name {
-      font-weight: bold;
-      font-size: 0.9em;
-      margin-bottom: 4px;
-    }
-    
-    .event-details {
-      display: flex;
-      gap: 8px;
-      font-size: 0.8em;
-      color: #555;
-      margin-bottom: 4px;
-    }
-    
-    .event-time {
-      font-size: 0.75em;
-      color: #666;
-    }
-}
+
+
+.time-grid-line {
+    position: absolute;
+    left: 0;
+    right: 0;
+    // border-top: 1px solid #eee;
+    z-index: 0;
+  }
   
+  .hour-line {
+    border-top: 1px solid var(--hour-border);
+  }
+  
+  .half-hour-line {
+    // border-top: 1px solid #f0f0f0;
+  }
+
+    .day-header {
+        flex: 1;
+        text-align: center;
+        //   uppercase
+        text-transform: uppercase;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        background-color: var(--background);
+        gap: 5px;
+        border: 1px solid var(--border-color);
+        padding: 4px 6px;
+        box-sizing: border-box;
+        border-left:none;
+
+        .day-name {
+            margin: 0;
+        }
+
+        .day-name, .day-date {
+            color: black;
+            font-family: "Inter";
+            font-weight: 500;
+            font-size: 13px;
+            text-align: center;
+        }
+
+        &:last-child {
+            border-radius: 0 10px 0 0;
+        }
+    }
+
+    .calendar-body {
+        display: flex;
+        position: relative;
+        min-height: 1440px;
+        /* 24 hours * 60 minutes */
+    }
+
+    .time-column {
+        width: 60px;
+        flex-shrink: 0;
+        position: relative;
+        border-left: 1px solid var(--border-color);
+        border-right: 1px solid var(--border-color);
+    }
+
+    .time-label {
+        position: absolute;
+        right: 5px;
+        font-size: 0.8em;
+        color: #666;
+        transform: translateY(-50%);
+        background: white;
+        padding-right: 5px;
+    }
+
+    .days-container {
+        display: flex;
+        flex: 1;
+    }
+
+    .day-column {
+        flex: 1;
+        border-right: 1px solid #eee;
+        position: relative;
+        background-color: var(--bounding-color);
+    }
+
+    .event {
+        position: absolute;
+        background-color: #e3f2fd;
+        border-left: 4px solid #2196f3;
+        padding: 8px;
+        margin: 2px;
+        border-radius: 4px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+    }
+
+    .event-name {
+        font-weight: bold;
+        font-size: 0.9em;
+        margin-bottom: 4px;
+    }
+
+    .event-details {
+        display: flex;
+        gap: 8px;
+        font-size: 0.8em;
+        color: #555;
+        margin-bottom: 4px;
+    }
+
+    .event-time {
+        font-size: 0.75em;
+        color: #666;
+    }
+
+    //scrollbar
+    &::-webkit-scrollbar {
+        width: 12px;
+    }
+
+
+    &::-webkit-scrollbar-thumb {
+        background: var(--dark);
+        width:5px;
+        border: 4px solid var(--background);
+    }
+
+    &::after{
+        content: "";
+        position: fixed;
+        bottom:1px;
+        width:100%;
+        height: 1px;
+        background-color: var(--border-color);
+    }
+
+}
+
