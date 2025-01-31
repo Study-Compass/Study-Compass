@@ -8,6 +8,7 @@
     z-index: 1;
     animation: glint 3s infinite linear;
     transition: border 0.3s ease;
+    min-width:250px;
     
     &::after{
         transition: all 0.5s;
@@ -67,6 +68,7 @@
         h1{
             color:var(--text);
             transition: all 0.5s;
+            margin: 0;
 
         }
         iconify-icon{
