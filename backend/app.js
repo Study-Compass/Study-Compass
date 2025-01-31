@@ -28,7 +28,11 @@ const io = new Server(server, {
 if (process.env.NODE_ENV === 'production') {
     app.use(enforce.HTTPS({ trustProtoHeader: true }));
     const corsOptions = {
-        origin: ['https://www.study-compass.com', 'https://studycompass.com'],
+        origin: [
+            'https://www.study-compass.com', 
+            'https://studycompass.com',
+            `http://${process.env.EDUREKA_IP}:${process.env.EDUREKA_PORT}`
+        ],
         optionsSuccessStatus: 200 // for legacy browser support
     };
     app.use(cors(corsOptions));
@@ -69,7 +73,11 @@ const searchRoutes = require('./routes/searchRoutes.js');
 const clubRoutes = require('./routes/clubRoutes.js');
 const eventRoutes = require('./routes/eventRoutes.js');
 const oieRoutes = require('./routes/oie-routes.js');
+<<<<<<< HEAD
 const apiRoutes = require('./routes/apiRoutes.js'); //Added Pk ERROR
+=======
+const orgRoutes = require('./routes/orgRoutes.js');
+>>>>>>> 87bf008301b3ca50aa0490f02cbf21aad6ca06c1
 
 app.use(authRoutes);
 app.use(dataRoutes);
@@ -84,7 +92,11 @@ app.use(searchRoutes);
 app.use(clubRoutes);
 app.use(eventRoutes);
 app.use(oieRoutes);
+<<<<<<< HEAD
 app.use(apiRoutes);//ADDED PK
+=======
+app.use(orgRoutes);
+>>>>>>> 87bf008301b3ca50aa0490f02cbf21aad6ca06c1
 
 // Serve static files from the React app in production
 if (process.env.NODE_ENV === 'production') {
@@ -147,6 +159,13 @@ app.post('/upload-image/:classroomName', upload.single('image'), async (req, res
         res.status(500).send('An error occurred while uploading the image or updating the classroom.');
     }
 });
+
+//greet route
+app.get('/api/greet', (req, res) => {
+    res.send('Hello from the backend!');
+});
+//how to call the above route
+// fetch('/api/greet').then(response => response.text()).then(data => console.log(data));
 
 
 // Socket.io functionality

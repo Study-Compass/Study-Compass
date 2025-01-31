@@ -16,12 +16,15 @@ const {verifyToken}= require('../middlewares/verifyToken');
  * validate Input needs to be called like a middle ware {   } go back through validate and change sutff up 
  * need my rate limited
  * api Key Middle ware needs to be added  with protected routes
+ * If i already created an api key under my username DO NOT RECRATE ANOTHER ONE until Rate limit checks it is valid
+ * Then use that api key to retrieve details
+ * Read the reminders i wrote down
  */
 
 // Generate a new API key 
-router.post('/create_api', verifyToken, async (req, res) => { // Validate input needs to go in here  
+router.post('/create_api', verifyToken, async (req, res) => { // I DONT NEED VALIDATE SINCE I HAV VERIFY TOKEN
     try {
-       const userId = req.user.userId;  
+       const userId = req.user.userId;
 
        const user = await User.findById(userId);
 
@@ -45,8 +48,9 @@ router.post('/create_api', verifyToken, async (req, res) => { // Validate input 
         res.status(500).json({ error: 'Internal server error.' });
     }
 });
-
+//WORKING RIGHT HERE
 // Validate API key middleware
+//Should check and make sure middleware is present and linked to the account
 router.use('/protected', apiKeyMiddleware);
 
 // Get API key details
@@ -72,7 +76,7 @@ router.get('/protected/details', apiKeyMiddleware, async (req, res) => {
 
 
 /*
-// Delete an API key
+// Delete an API key, userId could also be assumed// addeded
 router.delete('/delete', apiKeyMiddleware, async (req, res) => {
     const { authorization_key, api_key } = req.headers;
 
