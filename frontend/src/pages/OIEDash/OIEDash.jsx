@@ -83,21 +83,15 @@ function OIEDash(){
                             <p>Dashboard</p>
                         </li>
                         <li className={` ${currentDisplay === 1 && "selected"}`}  onClick={()=>setCurrentDisplay(1)}>
-                            <div className="icon-container">
-                                <Icon icon="heroicons:calendar-16-solid" />
-                            </div>
+                            <Icon icon="heroicons:calendar-16-solid" />
                             <p>Event Calendar</p>
                         </li>
                         <li className={` ${currentDisplay === 2 && "selected"}`}  onClick={()=>setCurrentDisplay(2)}>
-                            <div className="icon-container">
-                                <Icon icon="heroicons-solid:view-boards" />
-                            </div>
+                            <Icon icon="heroicons-solid:view-boards" />
                             <p>Events Board</p>
                         </li>
                         <li className={` ${currentDisplay === 3 && "selected"}`}  onClick={()=>setCurrentDisplay(3)}>
-                            <div className="icon-container">
-                                <Icon icon="flowbite:adjustments-horizontal-solid" />
-                            </div>
+                            <Icon icon="flowbite:adjustments-horizontal-solid" />
                             <p>Configuration</p>
                         </li>
                     </ul>
