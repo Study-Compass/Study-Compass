@@ -90,7 +90,9 @@ router.get('/get-all-events', verifyTokenOptional, async (req, res) => {
         // const events = await Event.find({}).populate('classroom_id');
         //get all events, attach user object to the event
         //mkae sure event doesn't have rejected or pending status
-        const events = await Event.find({ OIEStatus: { $nin: ['Rejected', 'Pending'] } }).populate('classroom_id');
+        const events = await Event.find({ OIEStatus: { $nin: ['Rejected', 'Pending'] } })
+            .populate('classroom_id')
+            .populate('hostingId');
         console.log('GET: /get-all-events successful');
         res.status(200).json({
             success: true,

@@ -4,7 +4,7 @@ import { useFetch } from '../../../../hooks/useFetch';
 import './Week.scss';
 import WeeklyCalendar from './WeeklyCalendar/WeeklyCalendar';
 
-function Week({ height, changeToDay, start = '2024-12-09' }) {
+function Week({ height, changeToDay, start = '2024-12-09', startingText = "" }) {
     const initialStartDate = new Date(start);
     const initialEndDate = new Date(initialStartDate);
     initialEndDate.setDate(initialEndDate.getDate() + 6);
@@ -49,7 +49,7 @@ function Week({ height, changeToDay, start = '2024-12-09' }) {
                         <Icon icon="charm:chevron-left" onClick={() => updateWeek(-7)} />
                         <Icon icon="charm:chevron-right" onClick={() => updateWeek(7)} />
                     </div>
-                    <h1>{formattedDate(startOfWeek)} to {formattedDate(endOfWeek)}</h1>
+                    <h1>{startingText}{formattedDate(startOfWeek)} to {formattedDate(endOfWeek)}</h1>
                 </div>
             </div>
             <div className="week">
