@@ -44,6 +44,8 @@
             display: flex;
             gap: 15px;
             align-items: center;
+            box-sizing: border-box;
+            padding:0 10px;
             button{
                 font-family: 'Inter';
                 font-size: 13px;
@@ -76,6 +78,9 @@
         // overflow-y:hidden;
         .header .time-period{
             display: flex;
+            justify-content: space-between;
+            box-sizing: border-box;
+            padding: 0 10px;
             align-items: center;
             h1{
                 margin: 0;

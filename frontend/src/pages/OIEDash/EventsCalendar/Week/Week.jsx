@@ -4,7 +4,7 @@ import { useFetch } from '../../../../hooks/useFetch';
 import './Week.scss';
 import WeeklyCalendar from './WeeklyCalendar/WeeklyCalendar';
 
-function Week({ height, changeToDay, start = '2024-12-09', startingText = "" }) {
+function Week({ height, changeToDay, start = '2025-1-26', startingText = "", nav=true }) {
     const initialStartDate = new Date(start);
     const initialEndDate = new Date(initialStartDate);
     initialEndDate.setDate(initialEndDate.getDate() + 6);
@@ -45,11 +45,13 @@ function Week({ height, changeToDay, start = '2024-12-09', startingText = "" }) 
         <>
             <div className="header">
                 <div className="time-period">
-                    <div className="arrows">
-                        <Icon icon="charm:chevron-left" onClick={() => updateWeek(-7)} />
-                        <Icon icon="charm:chevron-right" onClick={() => updateWeek(7)} />
-                    </div>
-                    <h1>{startingText}{formattedDate(startOfWeek)} to {formattedDate(endOfWeek)}</h1>
+                    {nav &&
+                        <div className="arrows">
+                            <Icon icon="charm:chevron-left" onClick={() => updateWeek(-7)} />
+                            <Icon icon="charm:chevron-right" onClick={() => updateWeek(7)} />
+                        </div>
+                    }
+                    <h1>{startingText}{nav && `${formattedDate(startOfWeek)} to ${formattedDate(endOfWeek)}`}</h1>
                 </div>
             </div>
             <div className="week">

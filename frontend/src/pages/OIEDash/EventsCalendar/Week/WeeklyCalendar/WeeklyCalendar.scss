@@ -1,8 +1,12 @@
 .oie-weekly-calendar-container {
     --border-color: var(--lighterborder);
-    --bounding-color: #FBFBFB;
-    --hour-border: #E7E7E7;
-    --half-hour-border: #F0F0F0;
+    --bounding-color: #fbfbfb;
+    --hour-border: #e7e7e7;
+    --half-hour-border: #f0f0f0;
+
+    --header-selected: #fef0ef;
+    --body-selected: #fbeceb;
+    --selected-overlay: rgba(250, 117, 109, 0.07);
 
     display: flex;
     flex-direction: column;
@@ -10,15 +14,15 @@
     overflow-y: auto;
     border-radius: 10px;
     position: relative;
-    
 
     .calendar-header {
         display: flex;
         position: sticky;
         top: 0;
         z-index: 2;
-        border:none;
+        border: none;
         background-color: var(--background);
+        z-index: 5;
     }
 
     .time-header {
@@ -26,25 +30,41 @@
         flex-shrink: 0;
         border: 1px solid var(--border-color);
         border-radius: 10px 0 0 0;
-        
     }
 
+    .current-time-line {
+        position: absolute;
+        top: 0;
+        left: 61px;
+        right: 0;
+        width: calc(100% - 61px);
+        z-index: 1;
+        //dotted
+        border-radius: 1px;
+        border-bottom: 2px dashed var(--lightborder);
 
-.time-grid-line {
-    position: absolute;
-    left: 0;
-    right: 0;
-    // border-top: 1px solid #eee;
-    z-index: 0;
-  }
-  
-  .hour-line {
-    border-top: 1px solid var(--hour-border);
-  }
-  
-  .half-hour-line {
-    // border-top: 1px solid #f0f0f0;
-  }
+    }
+
+    .time-grid-line {
+        position: absolute;
+        left: 0;
+        right: 0;
+        // border-top: 1px solid #eee;
+        z-index: 0;
+    }
+
+    .hour-line {
+        border-top: 1px solid var(--hour-border);
+        z-index: 3;
+
+        &:first-child {
+            border-top: none;
+        }
+    }
+
+    .half-hour-line {
+        // border-top: 1px solid #f0f0f0;
+    }
 
     .day-header {
         flex: 1;
@@ -59,13 +79,16 @@
         border: 1px solid var(--border-color);
         padding: 4px 6px;
         box-sizing: border-box;
-        border-left:none;
+        border-left: none;
+        position: relative;
+        z-index: 5;
 
         .day-name {
             margin: 0;
         }
 
-        .day-name, .day-date {
+        .day-name,
+        .day-date {
             color: black;
             font-family: "Inter";
             font-weight: 500;
@@ -75,6 +98,25 @@
 
         &:last-child {
             border-radius: 0 10px 0 0;
+        }
+
+        &.current-day {
+            border-bottom: 1px solid var(--red);
+            z-index: 5;
+
+            .day-date {
+                color: var(--red);
+            }
+
+            &::after {
+                content: "";
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: var(--selected-overlay);
+            }
         }
     }
 
@@ -113,6 +155,38 @@
         border-right: 1px solid #eee;
         position: relative;
         background-color: var(--bounding-color);
+
+        .current-day-time-line{
+            position: absolute;
+            width:100%;
+            border-bottom:2px solid var(--red);
+            z-index: 5;
+            &::before{
+                content: "";
+                position:absolute;
+                height:7px;
+                width:7px;
+                left:0;
+                top:-3px;
+                border-radius: 50%;
+                background-color: var(--red);
+            }
+        }
+
+
+        &.current-day {
+            z-index: 4;
+
+            &::after {
+                content: "";
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: var(--selected-overlay);
+            }
+        }
     }
 
     .event {
@@ -145,13 +219,13 @@
         color: #666;
     }
 
-    .fixed-bottom{
+    .fixed-bottom {
         position: fixed;
         bottom: 0;
         width: 100%;
-        border-bottom:1px solid var(--border-color);
+        border-bottom: 1px solid var(--border-color);
         z-index: 2;
-        height:10px;
+        height: 10px;
         border-radius: 10px;
         background-color: transparent;
     }
@@ -161,21 +235,18 @@
         width: 12px;
     }
 
-
     &::-webkit-scrollbar-thumb {
         background: var(--dark);
-        width:5px;
+        width: 5px;
         border: 4px solid var(--background);
     }
 
-    &::after{
+    &::after {
         content: "";
         position: fixed;
-        bottom:1px;
-        width:100%;
+        bottom: 1px;
+        width: 100%;
         height: 1px;
         background-color: var(--border-color);
     }
-
 }
-
