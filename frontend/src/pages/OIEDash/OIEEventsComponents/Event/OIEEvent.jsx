@@ -33,6 +33,10 @@ function OIEEvent({event, showStatus=false, refetch, showOIE=false, index, showE
         "Pending" : ["Pending OIE Approval", "pending"],
     }
 
+    const renderHostingStatus = () => {
+        
+    }
+
     return(
         <div className="oie-event-component" style={index ? {animationDelay: `${index * 0.1}s`}:{}}>
             <Popup isOpen={popupOpen} onClose={onPopupClose} customClassName={"wide-content no-padding no-styling oie"} waitForLoad={true} >
@@ -51,7 +55,7 @@ function OIEEvent({event, showStatus=false, refetch, showOIE=false, index, showE
                 {/* display date in day of the week, month/day */}
                 <div className="row">
                     <img src={event.hostingType === "User" ? event.hostingId.image ? event.hostingId.image : defaultAvatar : event.hostingId.org_profile_image} alt="" />
-                    <p className="user-name">{event.hostingId.name}</p>
+                    <p className="user-name">{event.hostingType === "User" ? event.hostingId.name : event.hostingId.org_name}</p>
                     <div className="level">
                         {event.hostingType === "User" ? "Student" : "Organization"}
                     </div>

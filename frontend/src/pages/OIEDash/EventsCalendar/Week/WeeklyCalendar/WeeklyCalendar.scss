@@ -145,6 +145,17 @@
         color: #666;
     }
 
+    .fixed-bottom{
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        border-bottom:1px solid var(--border-color);
+        z-index: 2;
+        height:10px;
+        border-radius: 10px;
+        background-color: transparent;
+    }
+
     //scrollbar
     &::-webkit-scrollbar {
         width: 12px;

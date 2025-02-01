@@ -6,6 +6,9 @@ const WeeklyCalendar = ({ startOfWeek, events, height }) => {
   const hours = Array.from({ length: 24 }, (_, i) => i);
   const MINUTE_HEIGHT = 1; // 1px per minute
 
+  const [width, setWidth] = useState(0);
+  const [bottom, setBottom] = useState(0);
+
   useEffect(() => {
     const generateWeek = () => {
       const daysArray = [];
@@ -47,6 +50,10 @@ const WeeklyCalendar = ({ startOfWeek, events, height }) => {
                 top: (earliestHour * 60 * MINUTE_HEIGHT) - 20,
                 behavior: 'smooth'
             });
+
+            // Set width and bottom for fixed-bottom
+            setWidth(ref.current.clientWidth);
+            setBottom(ref.current.getBoundingClientRect().bottom);
         }
 
     }, [ref, events]);
@@ -165,6 +172,9 @@ const WeeklyCalendar = ({ startOfWeek, events, height }) => {
             </div>
           ))}
         </div>
+      </div>
+      <div className="fixed-bottom" style={{ width: `${width}px`, top: `${bottom-10}px` }}>
+
       </div>
     </div>
   );
