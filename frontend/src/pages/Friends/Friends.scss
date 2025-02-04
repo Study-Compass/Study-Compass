@@ -155,6 +155,11 @@
     display:block;
 }
 
+// .friends .add-friend .friends-results.active .AddButton{
+//     background: var(--lightergreen);
+//     color: white;
+// }
+
 .friends .add-friend button{
     width:50px;
     height:40px;
@@ -218,9 +223,9 @@
     display:flex;
     border-bottom: 1px solid var(--lightborder);
     gap:10px;
-    justify-content: space-between;
     transform: 0.5s ease;
     height:50px;
+
 }
 
 
@@ -265,13 +270,15 @@
     font-family: 'Satoshi';
     margin: 0;
     color: var(--text);
+    padding-right: 8px;
+    border-right: 1px solid var(--lightborder);
 }
 
 .friends .friends-list-header .pending{
     font-weight:500;
     transform:translateY(1px);
-    background-color: var(--light);
-    padding:2px 10px;
+    // background-color: var(--light);
+    // padding:2px 10px;
     border-radius: 6px;
     cursor:pointer;
     display:flex;

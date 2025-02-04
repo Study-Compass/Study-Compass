@@ -146,7 +146,7 @@ function Friends() {
     return (
         
         <div className="friends component" style={{height: viewport}}>
-            <div className={`dark-overlay ${showSearch ? "active" : ""}`}></div>
+            <div className={`dark-overlay ${showSearch ? "active" : ""}`}></div> {/* Put add friend here I think */ }
             <Header />
             { user && isAuthenticated &&
                 <div className="friends-container">
@@ -172,7 +172,7 @@ function Friends() {
                                 {
                                     results.map(user => {
                                         return <div onClick={()=>{handleFriendRequest(user.username)}}>
-                                            <Friend friend={user} key={user._id} isFriendRequest={true} reload={reload} setReload={setReload}/>
+                                            <Friend friend={user} key={user._id} isFriendRequest={true} reload={reload} setReload={setReload} />{/*Handlefriend in here*/}
                                         </div>
 
                                     })

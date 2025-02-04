@@ -3,6 +3,7 @@ import './Friend.scss';
 import pfp from '../../../assets/defaultAvatar.svg';
 import { unFriend } from '../FriendsHelpers';
 import { useNotification } from '../../../NotificationContext';
+import Badges from '../../../components/Badges/Badges';
 
 function Friend({ friend, isFriendRequest, reload, setReload }) {
     const [isHovering, setIsHovering] = useState(false);
@@ -35,8 +36,10 @@ function Friend({ friend, isFriendRequest, reload, setReload }) {
                 <div className="user-content">
                     <h1>{friend.name}</h1>
                     <p>@{friend.username}</p>
+                    <Badges badges = {friend.tags ? friend.tags : []}/>
                 </div>
             </div>
+            {isFriendRequest && <div className='AddButton'>add</div>}
             {
                 !isFriendRequest && isHovering &&
                 <button className="action" onClick={handleUnFriend}>

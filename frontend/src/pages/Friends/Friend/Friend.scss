@@ -45,6 +45,13 @@
     color:var(--border);
     font-size:13px;  
 }
+.friend .AddButton {
+    padding: 3px 15px;
+    background: var(--lightergreen);
+    color: white;
+    border-radius: 15px;
+
+}
 
 .friend button{
     font-family: 'Satoshi';
