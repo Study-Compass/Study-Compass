@@ -9,7 +9,7 @@ const limiter=rateLimit({
     // Limit each IP to 100 requests per windowMs
     max: 100, 
     message: 'Too many requests, please try again later.',
-
 });
+
 
 module.exports = limiter;

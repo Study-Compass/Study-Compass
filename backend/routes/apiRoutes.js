@@ -4,72 +4,59 @@ const Api = require('../schemas/api.js');
 const User = require('../schemas/user.js');
 const limiter = require('../middlewares/rateLimit.js'); // Rate limiting middleware
 const {apiKeyMiddleware} = require('../middlewares/apiKeyMiddleware.js'); // API key validation
-const {validateInput} = require('../middlewares/validate.js'); // Input validation middleware
 const crypto = require('crypto'); // For generating API keys
 const mongoose = require('mongoose');
 const {verifyToken}= require('../middlewares/verifyToken');
 
 
-//Need to make the Api Usable and give access
-//CURRENT ERRRORS
-/**
- * validate Input needs to be called like a middle ware {   } go back through validate and change sutff up 
- * need my rate limited
- * api Key Middle ware needs to be added  with protected routes
- * If i already created an api key under my username DO NOT RECRATE ANOTHER ONE until Rate limit checks it is valid
- * Then use that api key to retrieve details
- * Read the reminders i wrote down
- */
-
 // Generate a new API key 
-router.post('/create_api', verifyToken, async (req, res) => { // I DONT NEED VALIDATE SINCE I HAV VERIFY TOKEN
+router.post('/create_api', verifyToken, limiter, async (req, res) => {  // Limit to how many keys can be created by 
     try {
        const userId = req.user.userId;
-
        const user = await User.findById(userId);
 
         // Generate API key and authorization key
         const apiKey = crypto.randomBytes(32).toString('hex');
-        const authorizationKey = crypto.randomBytes(16).toString('hex');
+        const authorizationKey = crypto.randomBytes(16).toString('hex');// Replace with userID
 
         // Create and save the new API key entry
         const newApi = new Api({
             authorization_key: authorizationKey,
             api_key: apiKey,
-            owner: userId
+            owner: userId,
         });
 
         await newApi.save();
 
         console.log('POST: /create_api successful. API key generated:', newApi);
-        res.status(201).json({ message: 'API key generated successfully.', apiKey: newApi });
+        res.status(201).json({success: true, message: 'API key generated successfully.', apiKey: newApi });
     } catch (error) {
         console.error('POST: /create_api failed. Error:', error);
-        res.status(500).json({ error: 'Internal server error.' });
+        res.status(500).json({ sucess: false, message: 'Unable to generate api' }); 
     }
 });
+
 //WORKING RIGHT HERE
-// Validate API key middleware
-//Should check and make sure middleware is present and linked to the account
-router.use('/protected', apiKeyMiddleware);
+// Validate API key middleware- Make sure API exists, safe and clean,
+//Should check and make sure middleware is present and linked to the account is what apiKeyMiddleware does
+router.use('/protected', apiKeyMiddleware); // Make sure is nor redudndant
 
-// Get API key details
-
-//Get details LOOK at MIDDLEWARE Debugging guide
-router.get('/protected/details', apiKeyMiddleware, async (req, res) => {
-    const { authorization_key, api_key } = req.headers;
-
+router.get('/protected/details', apiKeyMiddleware, limiter, async (req, res) => {
+    //Should allow access to any route,(will this be specified?)
+    const { authorization_key, api_key } = req.body;  // ALL I need is thhe api_key  userId
     try {
-        const apiEntry = await Api.findOne({ authorization_key, api_key });
+        const apiEntry = await Api.findOneAndUpdate({ authorization_key, api_key }, { $inc: { usageCount: 1 } }, { new: true });
+
         if (!apiEntry) {
-            console.error('API key not found:', { authorization_key, api_key });
+            console.log('API key not found', error);
             return res.status(404).json({ error: 'API key not found.' });
         }
-
         console.log('GET: /details successful. API key details:', apiEntry);
         res.status(200).json(apiEntry);
     } catch (error) {
-        console.error('GET: /details failed. Error:', error);
+
+
+        console.log('GET: /details failed. Error', error);
         res.status(500).json({ error: 'Internal server error.' });
     }
 });

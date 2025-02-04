@@ -70,14 +70,10 @@ const analyticsRoutes = require('./routes/analytics.js');
 const classroomChangeRoutes = require('./routes/classroomChangeRoutes.js');
 const ratingRoutes = require('./routes/ratingRoutes.js');
 const searchRoutes = require('./routes/searchRoutes.js');
-const clubRoutes = require('./routes/clubRoutes.js');
 const eventRoutes = require('./routes/eventRoutes.js');
 const oieRoutes = require('./routes/oie-routes.js');
-<<<<<<< HEAD
 const apiRoutes = require('./routes/apiRoutes.js'); //Added Pk ERROR
-=======
 const orgRoutes = require('./routes/orgRoutes.js');
->>>>>>> 87bf008301b3ca50aa0490f02cbf21aad6ca06c1
 
 app.use(authRoutes);
 app.use(dataRoutes);
@@ -89,14 +85,10 @@ app.use(eventRoutes);
 app.use(classroomChangeRoutes);
 app.use(ratingRoutes);
 app.use(searchRoutes);
-app.use(clubRoutes);
 app.use(eventRoutes);
 app.use(oieRoutes);
-<<<<<<< HEAD
 app.use(apiRoutes);//ADDED PK
-=======
 app.use(orgRoutes);
->>>>>>> 87bf008301b3ca50aa0490f02cbf21aad6ca06c1
 
 // Serve static files from the React app in production
 if (process.env.NODE_ENV === 'production') {
