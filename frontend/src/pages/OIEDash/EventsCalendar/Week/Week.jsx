@@ -4,7 +4,7 @@ import { useFetch } from '../../../../hooks/useFetch';
 import './Week.scss';
 import WeeklyCalendar from './WeeklyCalendar/WeeklyCalendar';
 
-function Week({ height, changeToDay, start = '2025-1-26', startingText = "", nav=true }) {
+function Week({ height, changeToDay, start = '2025-1-26', startingText = "", nav=true , filter}) {
     const initialStartDate = typeof start === 'string' ? new Date(start) : start;
     const initialEndDate = new Date(initialStartDate);
     initialEndDate.setDate(initialEndDate.getDate() + 6);
@@ -32,7 +32,10 @@ function Week({ height, changeToDay, start = '2025-1-26', startingText = "", nav
         });
     };
 
-    const url = `/get-events-by-range?start=${encodeURIComponent(startOfWeek.toISOString())}&end=${encodeURIComponent(endOfWeek.toISOString())}`;
+    const filterParam = encodeURIComponent(JSON.stringify(filter));
+
+
+    const url = `/get-events-by-range?start=${encodeURIComponent(startOfWeek.toISOString())}&end=${encodeURIComponent(endOfWeek.toISOString())}&filter=${filterParam}`;
     const events = useFetch(url);
 
 

@@ -31,7 +31,7 @@ function CalendarEvent({event}){
             <div className="event-content">
                 <div className="event-name">{event.name}</div>
                 <div className="event-details">
-                    <span className="event-type">{event.type}</span>
+                    <span className={`event-type ${event.type}`}>{event.type}</span>
                     <span className="event-location">{event.location}</span>
                 </div>
             </div>

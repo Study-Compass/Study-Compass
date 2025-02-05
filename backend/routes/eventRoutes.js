@@ -384,7 +384,7 @@ router.get('/get-events-by-month', verifyToken, authorizeRoles('oie'), async (re
 });
 
 router.get('/get-events-by-range', verifyToken, authorizeRoles('oie'), async (req, res) => {
-    const { start, end } = req.query;
+    const { start, end, filter } = req.query;
 
     if (!start || !end) {
         return res.status(400).json({
@@ -399,12 +399,18 @@ router.get('/get-events-by-range', verifyToken, authorizeRoles('oie'), async (re
         //log dates
         //make into eastern time
         //print formatted time
-        console.log(startOfRange.toISOString());
-        console.log(endOfRange.toISOString());
+        const filterObj = filter ? JSON.parse(decodeURIComponent(filter)) : null;
 
-        const events = await Event.find({
-            start_time: { $gte: startOfRange, $lte: endOfRange }
-        }).populate('classroom_id');
+        const query = filterObj && filterObj.type !== "all" ?{
+            start_time: { $gte: startOfRange, $lte: endOfRange },
+            ...filterObj
+        } :
+        {
+            start_time: { $gte: startOfRange, $lte: endOfRange },
+        };
+
+
+        const events = await Event.find(query).populate('classroom_id');
 
         console.log('GET: /get-events-by-week successful');
         res.status(200).json({
