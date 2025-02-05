@@ -35,9 +35,6 @@ function Week({ height, changeToDay, start = '2025-1-26', startingText = "", nav
     const url = `/get-events-by-range?start=${encodeURIComponent(startOfWeek.toISOString())}&end=${encodeURIComponent(endOfWeek.toISOString())}`;
     const events = useFetch(url);
 
-    useEffect(() => {
-        console.log(events);
-    }, [events]);
 
     // if (events.loading || !events.data) {
     //     return <div>Loading...</div>;
@@ -63,7 +60,7 @@ function Week({ height, changeToDay, start = '2025-1-26', startingText = "", nav
                     events={events.data ? events.data.events : []} 
                     startOfWeek={startOfWeek} 
                     height={height} 
-                    changeToDay={changeToDay} 
+                    dayClick={changeToDay} 
                 />
             </div>
         </>

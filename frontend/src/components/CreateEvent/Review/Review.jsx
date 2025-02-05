@@ -13,6 +13,8 @@ function Review({info, visible, setInfo, onSubmit}){
     const [pspeak, setPspeak]  = useState(false);
     const [catering, setCatering] = useState(false);
     const [alumni, setAlumni] = useState(false);
+    
+    const [contact, setContact] = useState("");
 
     const handleChange = (e) => {
         const {name} = e.target;
@@ -34,9 +36,10 @@ function Review({info, visible, setInfo, onSubmit}){
     useEffect(()=>{
         setInfo(prev => ({
             ...prev,
-            OIEAcknowledgementItems: pspeak ? catering ? ["pspeak", "catering"] : ["pspeak"] : catering ? ["catering"] : []
+            OIEAcknowledgementItems: pspeak ? catering ? ["pspeak", "catering"] : ["pspeak"] : catering ? ["catering"] : [],
+            contact: contact
         }));
-    },[pspeak, catering]);
+    },[pspeak, catering, contact]);
 
     return(
         <div className={`create-component review ${visible && "visible"}`}>
