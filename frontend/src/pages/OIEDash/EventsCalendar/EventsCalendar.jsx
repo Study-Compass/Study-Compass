@@ -3,41 +3,15 @@ import Switch from '../../../components/Switch/Switch';
 import './EventsCalendar.scss';
 import Month from './Month/Month';
 import Week from './Week/Week';
+import Day from './Day/Day';
 import { Icon } from '@iconify-icon/react/dist/iconify.mjs';
 
-const events = [
-    {
-      "_id": { "$oid": "674b6d55b299e3918e461236" },
-      "name": "Example Event",
-      "type": "campus",
-      "location": "Carnegie Building 106",
-      "start_time": { "$date": "2024-11-24T18:00:00.000Z" },
-      "end_time": { "$date": "2024-11-24T23:30:00.000Z" }
-    },
-    {
-        "_id": { "$oid": "674b6d55b299e3918e461236" },
-        "name": "Example Event",
-        "type": "campus",
-        "location": "Carnegie Building 106",
-        "start_time": { "$date": "2024-11-24T21:00:00.000Z" },
-        "end_time": { "$date": "2024-11-24T23:30:00.000Z" }
-    },
-    {
-        "_id": { "$oid": "674b6d55b299e3918e461236" },
-        "name": "Example Event",
-        "type": "campus",
-        "location": "Carnegie Building 106",
-        "start_time": { "$date": "2024-11-24T15:00:00.000Z" },
-        "end_time": { "$date": "2024-11-24T21:30:00.000Z" }
-    },
-      
-    // Add more events here
-  ];
+
 
 function EventsCalendar({expandedClass}){
     const [view, setView] = useState(0); //0: month, 1: week:, 2: day, 3: list
     const [contentHeight, setContentHeight] = useState(100);
-    const [start, setStart] = useState("2024-12-01");
+    const [start, setStart] = useState(null);
     const contentRef = useRef(null);
 
     useEffect(() => {
@@ -62,7 +36,6 @@ function EventsCalendar({expandedClass}){
         setView(2);
     } 
 
-    const startOfWeek = new Date('2024-11-24'); // Start of the week
 
     return (
         <div className={`events-calendar ${expandedClass}`}>
@@ -73,8 +46,12 @@ function EventsCalendar({expandedClass}){
                     view === 0 && <Month height={contentHeight} changeToWeek={changeToWeek} view={view} setView={setView}/>
                 }
                 {
-                    view === 1 && <Week height={contentHeight} changeToDay={changeToDay} />
+                    view === 1 && <Week height={contentHeight} changeToDay={changeToDay} start={start}/>
                 }
+                {
+                    view === 2 && <Day height={contentHeight} start="2025-1-29"/>
+                }
+
             </div>
         </div>
     )

@@ -25,6 +25,13 @@ function Dash({expandedClass, change}){
         }
     }, [weeklyRef]);
 
+    const getSunday = () => {
+        const today = new Date();
+        const day = today.getDay();
+        const diff = today.getDate() - day;
+        return new Date(today.setDate(diff));
+    }
+
     useEffect(() => {
         if(fetchEvents.data){
             const allEvents = fetchEvents.data.events;
@@ -77,7 +84,7 @@ function Dash({expandedClass, change}){
             <div className="week-container" ref={weeklyRef}>    
                 {
                     height !== 0 &&
-                    <Week changeToDay={console.log} startingText='this week at a glance' nav={false} height={height-50}/>
+                    <Week changeToDay={console.log} startingText='this week at a glance' nav={false} height={height-50} start={getSunday()}/>
                 }
             </div>
         </div>

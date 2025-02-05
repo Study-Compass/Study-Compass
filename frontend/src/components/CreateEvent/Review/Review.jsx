@@ -4,7 +4,7 @@ import './Review.scss';
 import Event from '../../EventsViewer/EventsGrid/EventsColumn/Event/Event';
 import {Icon} from '@iconify-icon/react';
 import GradientButtonCover from '../../../assets/GradientButtonCover.png';
-
+import FullEvent from '../../EventsViewer/EventsGrid/EventsColumn/FullEvent/FullEvent';
 
 function Review({info, visible, setInfo, onSubmit}){
 
@@ -45,7 +45,7 @@ function Review({info, visible, setInfo, onSubmit}){
                 <div className="preview">
                     {info.name && info.start_time && info.description ?
                         <div className="event-preview">
-                            <Event event={info}/>
+                            <FullEvent event={info}/>
                         </div>
                         :
                         <div className="no-preview">

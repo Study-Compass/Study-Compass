@@ -18,7 +18,7 @@ function FullEvent({ event }){
             <div className="image">
                 <img src={event.image} alt="" />
             </div>
-            <div className="content">
+            <div className="event-content">
                 <h1>{event.name}</h1>
                 <div className="row">
                     <Icon icon="heroicons:calendar-16-solid" />

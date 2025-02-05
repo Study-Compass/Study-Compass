@@ -63,7 +63,10 @@ const WeeklyCalendar = ({ startOfWeek, events, height }) => {
                     : earliest;
             }, new Date(events[0]?.start_time || '1970-01-01T00:00:00Z')); // Default to the first event or midnight
 
-            const earliestHour = earliestEvent.getHours();
+            let earliestHour = earliestEvent.getHours();
+            if (earliestHour === 16){
+                earliestHour = 8;
+            }
 
             ref.current.scrollTo({
                 top: (earliestHour * 60 * MINUTE_HEIGHT) - 20,
