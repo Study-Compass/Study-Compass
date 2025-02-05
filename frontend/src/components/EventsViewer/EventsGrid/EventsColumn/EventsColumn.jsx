@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './EventsColumn.css';
 import Event from './Event/Event.jsx';
-import CreateEvent from './CreateEvent/CreateEvent.jsx';
+import CreateEvent from './CreateEventButton/CreateEvent.jsx';
 
 function EventsColumn({events, triggerAnimation}){
     return(

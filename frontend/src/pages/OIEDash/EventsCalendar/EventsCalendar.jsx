@@ -3,46 +3,17 @@ import Switch from '../../../components/Switch/Switch';
 import './EventsCalendar.scss';
 import Month from './Month/Month';
 import Week from './Week/Week';
-import { Icon } from '@iconify-icon/react/dist/iconify.mjs';
+import Day from './Day/Day';
+import Filter from '../../../components/Filter/Filter';
 
-const events = [
-    {
-      "_id": { "$oid": "674b6d55b299e3918e461236" },
-      "name": "Example Event",
-      "type": "campus",
-      "location": "Carnegie Building 106",
-      "start_time": { "$date": "2024-11-24T18:00:00.000Z" },
-      "end_time": { "$date": "2024-11-24T23:30:00.000Z" }
-    },
-    {
-        "_id": { "$oid": "674b6d55b299e3918e461236" },
-        "name": "Example Event",
-        "type": "campus",
-        "location": "Carnegie Building 106",
-        "start_time": { "$date": "2024-11-24T21:00:00.000Z" },
-        "end_time": { "$date": "2024-11-24T23:30:00.000Z" }
-    },
-    {
-        "_id": { "$oid": "674b6d55b299e3918e461236" },
-        "name": "Example Event",
-        "type": "campus",
-        "location": "Carnegie Building 106",
-        "start_time": { "$date": "2024-11-24T15:00:00.000Z" },
-        "end_time": { "$date": "2024-11-24T21:30:00.000Z" }
-    },
-      
-    // Add more events here
-  ];
 
 function EventsCalendar({expandedClass}){
     const [view, setView] = useState(0); //0: month, 1: week:, 2: day, 3: list
     const [contentHeight, setContentHeight] = useState(100);
-    const [start, setStart] = useState("2024-12-01");
+    const [start, setStart] = useState("2025-2-2");
+    const [selected, setSelected] = useState("2025-2-5");
     const contentRef = useRef(null);
-
-    useEffect(() => {
-        console.log(start);
-    }, [start]);
+    const [filter, setFilter] = useState({type: "all"});
 
     useEffect(() => {
         if(contentRef.current){
@@ -59,22 +30,29 @@ function EventsCalendar({expandedClass}){
 
     const changeToDay = (day) => {
         console.log(day);
+        setSelected(day);
         setView(2);
     } 
 
-    const startOfWeek = new Date('2024-11-24'); // Start of the week
 
     return (
         <div className={`events-calendar ${expandedClass}`}>
-            <Switch options={["month", "week", "day", "list"]} onChange={setView} selectedPass={view} setSelectedPass={setView}/>
+            <div className="top-bar">
+                <Switch options={["month", "week", "day", "list"]} onChange={setView} selectedPass={view} setSelectedPass={setView}/>
+                <Filter options={["all", "study", "campus", "social", "club", "meeting", "sports"]} selected={filter.type} setSelected={(type)=>setFilter({...filter, type})} label={"type"}/>
+            </div>
 
             <div className="content" ref={contentRef}>
                 {
-                    view === 0 && <Month height={contentHeight} changeToWeek={changeToWeek} view={view} setView={setView}/>
+                    view === 0 && <Month height={contentHeight} changeToWeek={changeToWeek} view={view} setView={setView} filter={filter}/>
                 }
                 {
-                    view === 1 && <Week height={contentHeight} changeToDay={changeToDay} />
+                    view === 1 && <Week height={contentHeight} changeToDay={changeToDay} start={start} filter={filter}/>
                 }
+                {
+                    view === 2 && <Day height={contentHeight} start={selected} filter={filter}/>
+                }
+
             </div>
         </div>
     )

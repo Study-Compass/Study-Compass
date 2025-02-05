@@ -3,13 +3,17 @@
         display:flex;
         gap:20px;
         height:fit-content;
+        flex-direction: column;
         .col{
             justify-content: space-between;
         }
         .preview{
             display:flex;
-            max-width:300px;
-            width:3 00px;
+            .full-event{
+
+                border: 1px solid var(--lighterborder);
+                box-shadow: var(--shadow);
+            }
         }
         .oie-acknowledgement{
             color:var(--text);

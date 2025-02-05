@@ -122,8 +122,8 @@ function OIEFullEvent({ event, eventId = null, setEdited }){
                                 <div className="row">
                                     <div className={`status-dot ${fullEvent.data.event.OIE.status.toLowerCase()}`}></div>
                                     <h2>{fullEvent.data.event.OIE.status}</h2>
-                                    <button className="accept" onClick={()=>handleApproved(true)}><Icon icon="icon-park-solid:check-one" /> accept</button>
-                                    <button className="reject" onClick={()=>handleApproved(false)}><Icon icon="icon-park-solid:close-one" /> reject</button>
+                                    <button className="accept" onClick={()=>handleApproved(true)}><Icon icon="icon-park-solid:check-one" />approve</button>
+                                    <button className="reject" onClick={()=>handleApproved(false)}><Icon icon="icon-park-solid:close-one" />reject</button>
                                 </div>
                                 <div className="col requirements">
                                     <div className="requirement-header">

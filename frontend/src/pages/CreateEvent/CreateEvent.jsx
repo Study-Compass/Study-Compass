@@ -9,12 +9,14 @@ import GenInfo from '../../components/CreateEvent/GenInfo/GenInfo';
 import Review from '../../components/CreateEvent/Review/Review';
 import { useNotification } from '../../NotificationContext';
 import { createEvent } from './CreateEventHelpers';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import useAuth from '../../hooks/useAuth';
 import { Icon } from '@iconify-icon/react/dist/iconify.mjs';
 import defaultAvatar from '../../assets/defaultAvatar.svg'
 
 function CreateEvent(){
+    const location = useLocation();
+    const origin = location.state ? location.state.origin : "";
     const [step, setStep] = useState(0);
     const [info, setInfo] = useState({});
     const [finishedStep, setFinishedStep] = useState(0);
@@ -36,12 +38,26 @@ function CreateEvent(){
         if(!(user.roles.includes('oie') || user.roles.includes('admin') || user.roles.includes('developer'))){
             navigate('/');
         }
-        setAlias({
-            img: user.pfp ? user.pfp : defaultAvatar,
-            text: user.username,
-            id: user._id,
-            type: 'user'
-        })
+        if(origin && origin !== ""){
+            const club = user.clubAssociations.find((org)=>org.org_name === origin);
+            if(club){
+                setAlias({
+                    img: club.org_profile_image,
+                    text: club.org_name,
+                    id: club._id,
+                    type: 'club'
+                });
+            } else {
+                navigate('/');
+            }
+        } else {
+            setAlias({
+                img: user.pfp ? user.pfp : defaultAvatar,
+                text: user.username,
+                id: user._id,
+                type: 'user'
+            });
+        }
     }, [isAuthenticating, isAuthenticated, user]);
 
     const {addNotification} = useNotification();
@@ -79,7 +95,7 @@ function CreateEvent(){
             ...info,
             image:null
         }
-        if (alias){
+        if (alias.text !== user.username){
             formattedInfo = {
                 ...formattedInfo,
                 orgId: alias.id,
