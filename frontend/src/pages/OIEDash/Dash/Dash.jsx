@@ -88,7 +88,7 @@ function Dash({expandedClass, change}){
             <div className="week-container" ref={weeklyRef}>    
                 {
                     height !== 0 &&
-                    <Week changeToDay={changeToDay} startingText='this week at a glance' nav={false} height={height-50} start={getSunday()} />
+                    <Week changeToDay={changeToDay} startingText='this week at a glance' nav={false} height={height-50} start={getSunday()} filter={{}}/>
                 }
             </div>
         </div>
