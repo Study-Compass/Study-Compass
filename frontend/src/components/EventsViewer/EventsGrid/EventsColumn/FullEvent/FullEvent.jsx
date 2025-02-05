@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import './FullEvent.scss';
 import {Icon} from '@iconify-icon/react';  
 import StarGradient from '../../../../../assets/StarGradient.png'
+import MockPoster from '../../../../../assets/MockPoster.png'
 
 function FullEvent({ event }){
     const navigate = useNavigate();
@@ -16,7 +17,7 @@ function FullEvent({ event }){
     return(
         <div className="full-event">
             <div className="image">
-                <img src={event.image} alt="" />
+                <img src={MockPoster} alt="" />
             </div>
             <div className="event-content">
                 <h1>{event.name}</h1>

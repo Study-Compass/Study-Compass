@@ -88,6 +88,28 @@
                     font-size: 15px;
                     color: var(--text); 
                 }
+                &.is-today{
+                    p{
+                        box-sizing: border-box;
+                        color:var(--red);
+                        border-radius: 50%;
+                        position: relative;
+                        z-index: 2;
+                        &::before{
+                            content: '';
+                            display: block;
+                            width: 7px;
+                            height: 7px;
+                            background-color: var(--red);
+                            border-radius: 50%;
+                            position: absolute;
+                            top: 150%;
+                            left: 50%;
+                            transform: translate(-50%, -50%);
+                            z-index:1;
+                        }
+                    }
+                }
             }
 
             .events{

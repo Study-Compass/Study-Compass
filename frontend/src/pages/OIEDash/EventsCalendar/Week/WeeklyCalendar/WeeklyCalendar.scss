@@ -206,33 +206,10 @@
 
     .event {
         position: absolute;
-        background-color: #e3f2fd;
-        border-left: 4px solid #2196f3;
-        padding: 8px;
         margin: 2px;
-        border-radius: 4px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        overflow: hidden;
         z-index: 4;
-    }
-
-    .event-name {
-        font-weight: bold;
-        font-size: 0.9em;
-        margin-bottom: 4px;
-    }
-
-    .event-details {
-        display: flex;
-        gap: 8px;
-        font-size: 0.8em;
-        color: #555;
-        margin-bottom: 4px;
-    }
-
-    .event-time {
-        font-size: 0.75em;
-        color: #666;
+        padding: 0;
+        background-color: transparent;
     }
 
     .fixed-bottom {
