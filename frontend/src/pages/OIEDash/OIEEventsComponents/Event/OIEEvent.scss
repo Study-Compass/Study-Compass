@@ -94,6 +94,7 @@
         color:var(--text);
         background-color: var(--oie-background);
         pointer-events: all;
+        margin: 0;
         iconify-icon{
             transition: transform 0.2s;
         }

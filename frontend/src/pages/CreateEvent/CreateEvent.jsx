@@ -95,7 +95,7 @@ function CreateEvent(){
             ...info,
             image:null
         }
-        if (alias){
+        if (alias.text !== user.username){
             formattedInfo = {
                 ...formattedInfo,
                 orgId: alias.id,

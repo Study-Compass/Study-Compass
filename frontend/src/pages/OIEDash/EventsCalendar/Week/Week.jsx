@@ -5,9 +5,10 @@ import './Week.scss';
 import WeeklyCalendar from './WeeklyCalendar/WeeklyCalendar';
 
 function Week({ height, changeToDay, start = '2025-1-26', startingText = "", nav=true }) {
-    const initialStartDate = new Date(start);
+    const initialStartDate = typeof start === 'string' ? new Date(start) : start;
     const initialEndDate = new Date(initialStartDate);
     initialEndDate.setDate(initialEndDate.getDate() + 6);
+    initialEndDate.setHours(23, 59, 59, 999);
 
     const [startOfWeek, setStartOfWeek] = useState(initialStartDate);
     const [endOfWeek, setEndOfWeek] = useState(initialEndDate);
@@ -26,6 +27,7 @@ function Week({ height, changeToDay, start = '2025-1-26', startingText = "", nav
         setEndOfWeek((prev) => {
             const newEnd = new Date(prev);
             newEnd.setDate(newEnd.getDate() + days);
+            newEnd.setHours(23, 59, 59, 999);
             return newEnd;
         });
     };
@@ -40,6 +42,8 @@ function Week({ height, changeToDay, start = '2025-1-26', startingText = "", nav
     // if (events.loading || !events.data) {
     //     return <div>Loading...</div>;
     // }
+
+    
 
     return (
         <>

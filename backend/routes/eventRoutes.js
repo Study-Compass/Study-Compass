@@ -15,6 +15,7 @@ router.post('/create-event', verifyToken, async (req, res) => {
         let event;
 
         if(orgId){
+            console.log(orgId);
             const user = await User.findById(user_id);
             if(!user.clubAssociations.includes(orgId)){
                 return res.status(403).json({
@@ -395,6 +396,11 @@ router.get('/get-events-by-range', verifyToken, authorizeRoles('oie'), async (re
     try {
         const startOfRange = new Date(start);
         const endOfRange = new Date(end);
+        //log dates
+        //make into eastern time
+        //print formatted time
+        console.log(startOfRange.toISOString());
+        console.log(endOfRange.toISOString());
 
         const events = await Event.find({
             start_time: { $gte: startOfRange, $lte: endOfRange }
