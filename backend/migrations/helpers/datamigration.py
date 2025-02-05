@@ -351,5 +351,5 @@ def load_json_to_mongo(json_file, uri):
 # forceUpdate('users', {'visited': [], 'partners': [], 'sessions': [], 'hours': 0, 'contributions': 0})
 # updateImages()
 
-load_json_to_mongo("classes.json", "mongodb://127.0.0.1:27017/ucb" )
-migrateClassrooms('mongodb://127.0.0.1:27017/ucb', 'ucb')
+# load_json_to_mongo("classes.json", "mongodb://127.0.0.1:27017/ucb" )
+# migrateClassrooms('mongodb://127.0.0.1:27017/ucb', 'ucb')

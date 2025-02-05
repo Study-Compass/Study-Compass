@@ -89,11 +89,13 @@
 
         .day-name,
         .day-date {
-            color: black;
+            color: var(--text);
             font-family: "Inter";
             font-weight: 500;
             font-size: 13px;
             text-align: center;
+            -webkit-user-select: none;
+            user-select: none;
         }
 
         &:last-child {
@@ -118,6 +120,12 @@
                 background-color: var(--selected-overlay);
             }
         }
+    }
+
+    &.day-only .day-header{
+        border-radius: 10px 10px 0 0;
+        border:1px solid var(--border-color);
+        border-left: 1px solid var(--border-color);
     }
 
     .calendar-body {
@@ -148,6 +156,7 @@
     .days-container {
         display: flex;
         flex: 1;
+
     }
 
     .day-column {
@@ -188,6 +197,12 @@
             }
         }
     }
+
+    .days-container .day-column:hover {
+        filter:brightness(0.98);
+    }
+
+
 
     .event {
         position: absolute;

@@ -5,7 +5,7 @@ import { set } from 'mongoose';
 
 
 
-const WeeklyCalendar = ({ startOfWeek, events, height }) => {
+const WeeklyCalendar = ({ startOfWeek, events, height, dayClick }) => {
     const [days, setDays] = useState([]);
     const hours = Array.from({ length: 24 }, (_, i) => i);
     const MINUTE_HEIGHT = 1; // 1px per minute
@@ -68,10 +68,21 @@ const WeeklyCalendar = ({ startOfWeek, events, height }) => {
                 earliestHour = 8;
             }
 
-            ref.current.scrollTo({
-                top: (earliestHour * 60 * MINUTE_HEIGHT) - 20,
-                behavior: 'smooth'
-            });
+            if(currentDay !== -1){
+                ref.current.scrollTo({
+                    top: (currentMinutes * MINUTE_HEIGHT) - 20,
+                    behavior: 'smooth'
+                });
+                console.log('got here', currentMinutes)
+            } else {
+
+                ref.current.scrollTo({
+                    top: (earliestHour * 60 * MINUTE_HEIGHT) - 20,
+                    behavior: 'smooth'
+                });
+                console.log('got here', earliestHour)
+            }
+
 
             // Set width and bottom for fixed-bottom
             setWidth(ref.current.clientWidth);
@@ -195,7 +206,7 @@ const WeeklyCalendar = ({ startOfWeek, events, height }) => {
 
                 <div className="days-container">
                     {days.map((day, index) => (
-                        <div key={index} className={`day-column ${currentDay === index ? 'current-day' : ''}`}>
+                        <div key={index} className={`day-column ${currentDay === index ? 'current-day' : ''}`} onClick={()=>dayClick(day.toISOString())}>
                             {currentDay === index && <div className="current-day-time-line" style={{ top: `${currentMinutes * MINUTE_HEIGHT}px` }} />}
                             {renderTimeGrid()}
                             {renderEvents(day)}

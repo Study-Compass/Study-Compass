@@ -11,7 +11,7 @@ import { Icon } from '@iconify-icon/react/dist/iconify.mjs';
 function EventsCalendar({expandedClass}){
     const [view, setView] = useState(0); //0: month, 1: week:, 2: day, 3: list
     const [contentHeight, setContentHeight] = useState(100);
-    const [start, setStart] = useState(null);
+    const [start, setStart] = useState("2025-1-26");
     const contentRef = useRef(null);
 
     useEffect(() => {
@@ -33,6 +33,7 @@ function EventsCalendar({expandedClass}){
 
     const changeToDay = (day) => {
         console.log(day);
+        setStart(day);
         setView(2);
     } 
 
@@ -49,7 +50,7 @@ function EventsCalendar({expandedClass}){
                     view === 1 && <Week height={contentHeight} changeToDay={changeToDay} start={start}/>
                 }
                 {
-                    view === 2 && <Day height={contentHeight} start="2025-1-29"/>
+                    view === 2 && <Day height={contentHeight} start={start}/>
                 }
 
             </div>

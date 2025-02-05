@@ -30,10 +30,6 @@ function Day({ height, start = new Date(new Date().setHours(0, 0, 0, 0)) , start
 
     const url = `/get-events-by-range?start=${encodeURIComponent(day.toISOString())}&end=${encodeURIComponent(getEndOfDay(day).toISOString())}`;
     const events = useFetch(url);
-
-    useEffect(() => {
-        console.log(events);
-    }, [events]);
     
 
     return (

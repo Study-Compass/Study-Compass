@@ -58,6 +58,10 @@ function Dash({expandedClass, change}){
         fetchPendingEvents.refetch();
     }
 
+    const changeToDay = (day) => {
+        change(1);
+    }
+
     return (
         <div className={`dash ${expandedClass}`}>
             <header className="header">
@@ -84,7 +88,7 @@ function Dash({expandedClass, change}){
             <div className="week-container" ref={weeklyRef}>    
                 {
                     height !== 0 &&
-                    <Week changeToDay={console.log} startingText='this week at a glance' nav={false} height={height-50} start={getSunday()}/>
+                    <Week changeToDay={changeToDay} startingText='this week at a glance' nav={false} height={height-50} start={getSunday()} />
                 }
             </div>
         </div>

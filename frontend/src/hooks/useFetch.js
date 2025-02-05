@@ -16,7 +16,6 @@ export const useFetch = (url, options = { method: "GET", data: null }) => {
         data: options.data || null,
         headers: options.headers || { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
-      console.log(response.data);
       setData(response.data);
     } catch (err) {
       setError(err.message);
