@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import '../../Week/WeeklyCalendar/WeeklyCalendar.scss';
 import { DateTime } from "luxon";
+import CalendarEvent from '../../CalendarEvent/CalendarEvent';
 
 const DailyCalendar = ({ selectedDay, events, height }) => {
     const hours = Array.from({ length: 24 }, (_, i) => i);
@@ -128,8 +129,7 @@ const DailyCalendar = ({ selectedDay, events, height }) => {
                         width: `calc(${100 / event.columnsInCluster}% - 4px)`,
                     }}
                 >
-                    <div className="event-name">{event.name}</div>
-                    <div className="event-time">{formatTime(event.start_time)} - {formatTime(event.end_time)}</div>
+                    <CalendarEvent event={event}/>
                 </div>
             );
         });

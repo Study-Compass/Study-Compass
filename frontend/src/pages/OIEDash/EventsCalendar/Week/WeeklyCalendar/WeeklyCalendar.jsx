@@ -1,9 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './WeeklyCalendar.scss';
 import { DateTime } from "luxon";
-import { set } from 'mongoose';
-
-
+import CalendarEvent from '../../CalendarEvent/CalendarEvent';
 
 const WeeklyCalendar = ({ startOfWeek, events, height, dayClick }) => {
     const [days, setDays] = useState([]);
@@ -150,14 +148,15 @@ const WeeklyCalendar = ({ startOfWeek, events, height, dayClick }) => {
                         width: `calc(${width}% - 4px)`
                     }}
                 >
-                    <div className="event-name">{event.name}</div>
+                    {/* <div className="event-name">{event.name}</div>
                     <div className="event-details">
                         <span className="event-type">{event.type}</span>
                         <span className="event-location">{event.location}</span>
                     </div>
                     <div className="event-time">
                         {formatTime(event.start_time)} - {formatTime(event.end_time)}
-                    </div>
+                    </div> */}
+                    <CalendarEvent event={event}/>
                 </div>
             );
         });
