@@ -11,6 +11,7 @@ import Onboard from './pages/OnBoarding/Onboard';
 import Settings from './pages/Settings/Settings';
 import Friends from './pages/Friends/Friends';
 import Org from './pages/Org/Org';
+import OrgDislay from './pages/Org/OrgDisplay';
 import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute';
 import Profile from './pages/Profile/Profile';
 import Landing from './pages/Landing/Landing';
@@ -117,7 +118,8 @@ function App() {
                                             <Route path="/error/:errorCode" element={<Error />}/>
                                             <Route path="/landing" element={<Landing/>}/>
                                             <Route path="/settings" element={<Settings/>}/>
-                                            <Route path="/org" element={<Org/>}/>
+                                            <Route path="/org/:name" element={<OrgDisplay/>}/>
+                                            {/* <Route path="org/" element={<Org/>} /> */}
                                             <Route path="/documentation" element={<Redirect/>}/>
                                             <Route path="/new-badge/:hash" element={<NewBadge/>}/>
                                             <Route path="/new-badge" element={<NewBadge/>}/>

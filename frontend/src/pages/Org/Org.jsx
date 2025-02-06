@@ -21,24 +21,26 @@ const Org = ({ org }) => {
 
                 <div className="top-header-box">
                     <div className="org-logo">
-                        <img src={rpiLogo} alt=""/>
+                        <img src={org.overview.org_profile_image} alt =""/>
+                        {/* <img src={rpiLogo} alt=""/> */}
                     </div>
                 </div>
 
                 <div className="org-info">
 
                     <div className="org-header">
-                        {/* <h2 className="name">{org.overview.org_name}</h2> */}
+                        <h2 className="name">{org.overview.org_name}</h2>
                         {/* <h2 className="name"> Name </h2> */}
                         <div className="status">Union Recognized</div>
                     </div>
 
                     <p className="description">
-                        {/* {org.overview.org_description} */}
+                        {org.overview.org_description}
                     </p>
                     <p className="stats">
                         <img src = {person} alt =""/>
-                        250 followers • 50 members
+                        {org.followers.length} followers • {org.members.length} members
+                        {/* 250 followers • 50 members */}
                         
                         <img src = {profile} className='mutuals' alt =""/>
                         <img src = {profile} alt =""/>

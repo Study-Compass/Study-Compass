@@ -40,7 +40,7 @@ router.get("/get-org-by-name/:name", verifyToken, async(req,res)=>{
     try{
         const orgName= req.params.name;
         
-        const org= await Org.findOne({org_name: orgName});
+        const org= await Org.findOne({org_name: new RegExp(`^${orgName}$`, 'i')});
 
         if(!org){
             return res.status(404).json({ success: false, message: 'Org not found' });
