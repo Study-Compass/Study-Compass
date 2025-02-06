@@ -6,6 +6,7 @@ import logo from '../../assets/Brand Image/EventsLogo.svg';
 import { getAllEvents } from '../../components/EventsViewer/EventHelpers';
 import Configuration from './Configuration/Configuration';
 import EventsCalendar from './EventsCalendar/EventsCalendar';
+import defaultAvatar from '../../assets/defaultAvatar.svg';
 
 import {Icon} from '@iconify-icon/react';  
 import Dash from './Dash/Dash';
@@ -30,24 +31,6 @@ function OIEDash(){
         }
     },[]);
 
-    useEffect(()=>{
-        // if(isAuthenticating){
-        //     return;
-        // }
-        // if(!isAuthenticated){
-        //     navigate('/');
-        // }
-        // if(!user){
-        //     return;
-        // } else {
-        //     if(!user.roles.includes('oie')){
-        //         navigate('/');
-        //     }
-        //     setUserInfo(user);
-        // }
-        
-    },[isAuthenticating, isAuthenticated, user]);
-
     const onExpand = () => {
         if(expanded){
             setExpandedClass("minimized");
@@ -71,29 +54,46 @@ function OIEDash(){
     return (
         <div className="oie-dash">
             <div className={`dash-left ${expanded && "hidden"}`}>
-                <div className="logo">
-                    <img src={logo} alt="" />
+                <div className="top">
+                    <div className="logo">
+                        <img src={logo} alt="" />
+                    </div>
+                    <nav className="nav">
+                        <ul>
+                            <li className={` ${currentDisplay === 0 && "selected"}`} onClick={()=>setCurrentDisplay(0)}>
+                                <Icon icon="ic:round-dashboard" />
+                                <p>Dashboard</p>
+                            </li>
+                            <li className={` ${currentDisplay === 1 && "selected"}`}  onClick={()=>setCurrentDisplay(1)}>
+                                <Icon icon="heroicons:calendar-16-solid" />
+                                <p>Event Calendar</p>
+                            </li>
+                            <li className={` ${currentDisplay === 2 && "selected"}`}  onClick={()=>setCurrentDisplay(2)}>
+                                <Icon icon="heroicons-solid:view-boards" />
+                                <p>Events Board</p>
+                            </li>
+                            <li className={` ${currentDisplay === 3 && "selected"}`}  onClick={()=>setCurrentDisplay(3)}>
+                                <Icon icon="flowbite:adjustments-horizontal-solid" />
+                                <p>Configuration</p>
+                            </li>
+                        </ul>
+                    </nav>
                 </div>
-                <nav className="nav">
-                    <ul>
-                        <li className={` ${currentDisplay === 0 && "selected"}`} onClick={()=>setCurrentDisplay(0)}>
-                            <Icon icon="ic:round-dashboard" />
-                            <p>Dashboard</p>
-                        </li>
-                        <li className={` ${currentDisplay === 1 && "selected"}`}  onClick={()=>setCurrentDisplay(1)}>
-                            <Icon icon="heroicons:calendar-16-solid" />
-                            <p>Event Calendar</p>
-                        </li>
-                        <li className={` ${currentDisplay === 2 && "selected"}`}  onClick={()=>setCurrentDisplay(2)}>
-                            <Icon icon="heroicons-solid:view-boards" />
-                            <p>Events Board</p>
-                        </li>
-                        <li className={` ${currentDisplay === 3 && "selected"}`}  onClick={()=>setCurrentDisplay(3)}>
-                            <Icon icon="flowbite:adjustments-horizontal-solid" />
-                            <p>Configuration</p>
-                        </li>
-                    </ul>
-                </nav>
+                <div className="bottom">
+                    <div className="user">
+                        <div className="avatar">
+                            <img src={user.image ? user.image : defaultAvatar} alt="" />
+                        </div>
+                        <div className="user-info">
+                            <p className="username">{user.name}</p>
+                            <p className="email">{user.email}</p>
+                        </div>
+                    </div>
+                    <div className="back">
+                        <Icon icon="ep:back"/>
+                        <p>back to study compass</p>
+                    </div>
+                </div>
             </div>
             <div className={`dash-right ${expandedClass}`}>
                     {

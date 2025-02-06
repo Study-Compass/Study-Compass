@@ -2,7 +2,10 @@ const express = require('express');
 const Classroom = require('../schemas/classroom.js');
 const Schedule = require('../schemas/schedule.js');
 const Rating = require('../schemas/rating.js');
-const User = require('../schemas/user.js');
+const userSchema = require('../schemas/user.js');
+const classroomSchema = require('../schemas/classroom.js');
+const scheduleSchema = require('../schemas/schedule.js');
+
 const History = require('../schemas/studyHistory.js');
 const Report = require('../schemas/report.js');
 const { verifyToken, verifyTokenOptional } = require('../middlewares/verifyToken');
@@ -19,6 +22,8 @@ const router = express.Router();
 // Route to get a specific classroom by name
 router.get('/getroom/:id', async (req, res) => {
     try {
+        const Classroom = req.db.model('Classroom', classroomSchema, 'classrooms1');
+        const Schedule = req.db.model('Schedule', scheduleSchema, 'schedules');
         const roomId = req.params.id;
         
         // Handle special case where "none" is passed as a room name
@@ -50,6 +55,7 @@ router.get('/getroom/:id', async (req, res) => {
 router.get('/getrooms', async (req, res) => {
     try {
         // Fetch all classrooms and only select their names
+        const Classroom = req.db.model('Classroom', classroomSchema, 'classrooms1');
         const allRooms = await Classroom.find({}).select('name _id');
         const roomDict = allRooms.reduce((acc, room) => {
             acc[room.name] = room._id.toString(); // Convert ObjectId to string if necessary
@@ -187,6 +193,9 @@ router.post('/getbatch', async (req, res) => {
 router.get('/get-recommendation', verifyTokenOptional, async (req, res) => {
     const userId = req.user ? req.user.userId : null;
     try {
+        const User = req.db.model('User', userSchema, 'users');
+        const Classroom = req.db.model('Classroom', classroomSchema, 'classrooms1');
+        const Schedule = req.db.model('Schedule', scheduleSchema, 'schedules');
         let user;
         let randomClassroom;
         const currentTime = new Date();

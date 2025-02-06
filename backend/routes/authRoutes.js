@@ -12,6 +12,7 @@ const { verifyToken } = require('../middlewares/verifyToken.js');
 const { authenticateWithGoogle, loginUser, registerUser } = require('../services/userServices.js');
 
 const User = require('../schemas/user.js');
+const userSchema = require('../schemas/user.js');
 
 function validateUsername(username) { //keeping logic external, for easier testing
     // Define the regex pattern
@@ -130,6 +131,7 @@ router.post('/login', async (req, res) => {
 
 router.get('/validate-token', verifyToken, async (req, res) => {
     try {
+        const User = req.db.model('User', userSchema, 'users');
         const user = await User.findById(req.user.userId)
             .select('-password') // Add fields you want to exclude
             .lean()
