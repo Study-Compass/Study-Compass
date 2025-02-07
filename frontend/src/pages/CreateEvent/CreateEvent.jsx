@@ -9,15 +9,21 @@ import GenInfo from '../../components/CreateEvent/GenInfo/GenInfo';
 import Review from '../../components/CreateEvent/Review/Review';
 import { useNotification } from '../../NotificationContext';
 import { createEvent } from './CreateEventHelpers';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import useAuth from '../../hooks/useAuth';
+import { Icon } from '@iconify-icon/react/dist/iconify.mjs';
+import defaultAvatar from '../../assets/defaultAvatar.svg'
 
 function CreateEvent(){
+    const location = useLocation();
+    const origin = location.state ? location.state.origin : "";
     const [step, setStep] = useState(0);
     const [info, setInfo] = useState({});
     const [finishedStep, setFinishedStep] = useState(0);
     const {isAuthenticated, isAuthenticating, user} = useAuth();
-    const { navigate } = useNavigate();
+    const [alias, setAlias] = useState(null);
+    const navigate = useNavigate();
+    const [showDrop, setShowDrop] = useState(false);
 
     useEffect(()=>{
         if(isAuthenticating){
@@ -31,6 +37,26 @@ function CreateEvent(){
         }
         if(!(user.roles.includes('oie') || user.roles.includes('admin') || user.roles.includes('developer'))){
             navigate('/');
+        }
+        if(origin && origin !== ""){
+            const club = user.clubAssociations.find((org)=>org.org_name === origin);
+            if(club){
+                setAlias({
+                    img: club.org_profile_image,
+                    text: club.org_name,
+                    id: club._id,
+                    type: 'club'
+                });
+            } else {
+                navigate('/');
+            }
+        } else {
+            setAlias({
+                img: user.pfp ? user.pfp : defaultAvatar,
+                text: user.username,
+                id: user._id,
+                type: 'user'
+            });
         }
     }, [isAuthenticating, isAuthenticated, user]);
 
@@ -63,20 +89,30 @@ function CreateEvent(){
     }
 
     const onSubmit = async () => {
-        console.log(info);
         const location1 = info.location;
         console.log(location1);
-        const formattedInfo = {
+        let formattedInfo = {
             ...info,
             image:null
         }
+        if (alias.text !== user.username){
+            formattedInfo = {
+                ...formattedInfo,
+                orgId: alias.id,
+            }
+        }
         const response = await createEvent(formattedInfo);
         if(response){
-            addNotification({title: "Event created", message: "Your event has been created", type: "success"});
+            // addNotification({title: "Event created", message: "Your event has been created", type: "success"});
+
         } else {
             addNotification({title: "Failed to create event", message: "An error occurred while creating your event", type: "error"});
         }
+    }
 
+    const onSelectAlias = (alias) => {
+        setAlias(alias);
+        setShowDrop(false);
     }
 
     return(
@@ -87,6 +123,42 @@ function CreateEvent(){
                     <div className="create-steps">
                         <div className="create-header">
                             <h1>create event</h1>
+                            <div className="alias">
+                                <p>as</p>
+                                <div className="choice-container">
+                                    <div className="choose" onClick={()=>setShowDrop(!showDrop)}>
+                                        {
+                                            alias && 
+                                            <div className="choice">
+                                                <img src={alias.img} alt="" />
+                                                <p>{alias.text}</p>
+                                            </div>
+                                        }
+                                        <Icon icon={`${showDrop ? "ic:round-keyboard-arrow-up" : "ic:round-keyboard-arrow-down"}`} width="24" height="24"  />
+                                    </div>
+                                    {
+                                        showDrop && 
+                                        <div className={`dropdown`} >
+                                            {user && 
+                                                <div className="drop-option" onClick={()=>onSelectAlias({img: user.pfp ? user.pfp : defaultAvatar, text: user.username, id: user._id, type: 'user'})}>
+                                                    <img src={user.pfp ? user.pfp : defaultAvatar} alt="" />
+                                                    <p>{user.username}</p>
+                                                </div>
+                                            }
+                                            {
+                                                user && user.clubAssociations && user.clubAssociations.map((org)=>{
+                                                    return(
+                                                        <div className="drop-option" key={org._id} onClick={()=>onSelectAlias({img: org.org_profile_image, text: org.org_name, id: org._id, type: "club"})}>
+                                                            <img src={org.org_profile_image} alt="" />
+                                                            <p>{org.org_name}</p>
+                                                        </div>
+                                                    )
+                                                })
+                                            }
+                                        </div>
+                                    }
+                                </div>
+                            </div>
                         </div>
                         <div className="steps">
                             <div className={`step ${step === 0 && "selected"}`} onClick={()=>{handleSwitch(0)}}>

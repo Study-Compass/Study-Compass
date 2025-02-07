@@ -133,8 +133,9 @@ router.get('/validate-token', verifyToken, async (req, res) => {
         const user = await User.findById(req.user.userId)
             .select('-password') // Add fields you want to exclude
             .lean()
+            .populate('clubAssociations'); 
         if (!user) {
-            console.log(`GET: /validate-token token is invalid`)
+            console.log(`GET: /validate-token token is invalid`);
             return res.status(404).json({ success: false, message: 'User not found' });
         }
         console.log(`GET: /validate-token token is valid for user ${user.username}`)

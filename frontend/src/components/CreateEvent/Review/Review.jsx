@@ -4,7 +4,7 @@ import './Review.scss';
 import Event from '../../EventsViewer/EventsGrid/EventsColumn/Event/Event';
 import {Icon} from '@iconify-icon/react';
 import GradientButtonCover from '../../../assets/GradientButtonCover.png';
-
+import FullEvent from '../../EventsViewer/EventsGrid/EventsColumn/FullEvent/FullEvent';
 
 function Review({info, visible, setInfo, onSubmit}){
 
@@ -13,6 +13,8 @@ function Review({info, visible, setInfo, onSubmit}){
     const [pspeak, setPspeak]  = useState(false);
     const [catering, setCatering] = useState(false);
     const [alumni, setAlumni] = useState(false);
+    
+    const [contact, setContact] = useState("");
 
     const handleChange = (e) => {
         const {name} = e.target;
@@ -34,9 +36,10 @@ function Review({info, visible, setInfo, onSubmit}){
     useEffect(()=>{
         setInfo(prev => ({
             ...prev,
-            OIEAcknowledgementItems: pspeak ? catering ? ["pspeak", "catering"] : ["pspeak"] : catering ? ["catering"] : []
+            OIEAcknowledgementItems: pspeak ? catering ? ["pspeak", "catering"] : ["pspeak"] : catering ? ["catering"] : [],
+            contact: contact
         }));
-    },[pspeak, catering]);
+    },[pspeak, catering, contact]);
 
     return(
         <div className={`create-component review ${visible && "visible"}`}>
@@ -45,7 +48,7 @@ function Review({info, visible, setInfo, onSubmit}){
                 <div className="preview">
                     {info.name && info.start_time && info.description ?
                         <div className="event-preview">
-                            <Event event={info}/>
+                            <FullEvent event={info}/>
                         </div>
                         :
                         <div className="no-preview">

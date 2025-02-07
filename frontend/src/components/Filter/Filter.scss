@@ -1,0 +1,66 @@
+.filter {
+    position: relative;
+    display: inline-block; // so the dropdown aligns well with the label
+  
+    .filter-label {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      padding: 5px 10px;
+      border-radius: 7px;
+      background-color: #fff;
+      border: 4px solid var(--light);
+      box-sizing: border-box;
+      font-size: 15px;
+      font-weight:500;
+      gap: 10px;
+        color: var(--text);
+
+    
+      
+      // The label text
+      span {
+        margin-right: 0.5rem;
+        font-weight: 600;
+      }
+  
+      // The icon
+      iconify-icon {
+        font-size: 18px;
+        transition: transform 0.3s ease;
+      }
+
+    }
+  
+    .filter-options {
+      position: absolute;
+      top: calc(100% + 0.25rem); // positions the dropdown slightly below the label
+      left: 0;
+      background-color: #fff;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      width: 100%;
+      display: none; // hidden by default
+      flex-direction: column;
+      z-index: 10; // ensure it appears above other elements
+  
+      &.open {
+        display: flex; // show the dropdown
+      }
+  
+      .filter-option {
+        padding: 0.5rem 1rem;
+        cursor: pointer;
+        transition: background 0.3s ease;
+  
+        &:hover {
+          background-color: #f0f0f0; // hover effect
+        }
+  
+        &.selected {
+          background-color: #e8e8e8; // highlight the selected option
+        }
+      }
+    }
+  }
+  

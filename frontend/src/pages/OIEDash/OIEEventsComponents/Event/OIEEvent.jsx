@@ -8,7 +8,7 @@ import FullEvent from '../../../../components/EventsViewer/EventsGrid/EventsColu
 
 import defaultAvatar from '../../../../assets/defaultAvatar.svg';
 
-function OIEEvent({event, showStatus=false, refetch, showOIE=false, index}){
+function OIEEvent({event, showStatus=false, refetch, showOIE=false, index, showExpand=true}){
     const [popupOpen, setPopupOpen] = useState(false);
     const [edited, setEdited] = useState(false);
     const navigate = useNavigate();
@@ -29,7 +29,12 @@ function OIEEvent({event, showStatus=false, refetch, showOIE=false, index}){
 
     const statusMessages = {
         'Not Applicable' : ["Doesnt meet approval criteria","not-applicable"],
-        "Approved" : ["OIE Approved", "approved"]
+        "Approved" : ["OIE Approved", "approved"],
+        "Pending" : ["Pending OIE Approval", "pending"],
+    }
+
+    const renderHostingStatus = () => {
+        
     }
 
     return(
@@ -45,14 +50,14 @@ function OIEEvent({event, showStatus=false, refetch, showOIE=false, index}){
                 {
                     showStatus && <div className={`oie-status ${statusMessages[event.OIEStatus][1]}`}><p>{statusMessages[event.OIEStatus][0]}</p></div>
                 }
-                <h1>{event.name}</h1>
+                <h2>{event.name}</h2>
                 {/* <p>{event.location }</p> */}
                 {/* display date in day of the week, month/day */}
                 <div className="row">
-                    <img src={event.hostingId.image ? event.hostingId.image : defaultAvatar} alt="" />
-                    <p className="user-name">{event.hostingId.name}</p>
+                    <img src={event.hostingType === "User" ? event.hostingId.image ? event.hostingId.image : defaultAvatar : event.hostingId.org_profile_image} alt="" />
+                    <p className="user-name">{event.hostingType === "User" ? event.hostingId.name : event.hostingId.org_name}</p>
                     <div className="level">
-                        student
+                        {event.hostingType === "User" ? "Student" : "Organization"}
                     </div>
                 </div>
                 <div className="row">
@@ -64,10 +69,13 @@ function OIEEvent({event, showStatus=false, refetch, showOIE=false, index}){
                     <p>{event.location}</p>
                 </div>
             </div>
-            <button className="button" onClick={() => handleEventClick(event)}>
-                <Icon icon="material-symbols:expand-content-rounded" />
-                <p>details</p>
-            </button>
+            {
+                showExpand && 
+                <button className="button" onClick={() => handleEventClick(event)}>
+                    <Icon icon="material-symbols:expand-content-rounded" />
+                    <p>details</p>
+                </button>
+            }
         </div>
     );
 

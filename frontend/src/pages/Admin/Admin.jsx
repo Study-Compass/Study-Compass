@@ -10,36 +10,9 @@ import Analytics from '../../components/Analytics/Analytics';
 import './Admin.scss';
 
 function Admin(){
-    const [userInfo, setUserInfo] = useState(null);
-    const [isAdmin, setIsAdmin] = useState(false);
-    const { isAuthenticating, isAuthenticated, user } = useAuth();
-    const navigate = useNavigate();
+    const { user } = useAuth();
 
     const [showPage, setShowPage] = useState("analytics");
-    useEffect(() => {
-        if (isAuthenticating) {
-            return;
-        }
-        if (!isAuthenticated) {
-            navigate("/login");
-        }
-        if (!user) {
-            return;
-        } else {
-            setUserInfo(user);
-            console.log(user);
-        }
-    }, [isAuthenticating, isAuthenticated, user]);
-
-    useEffect(() => {
-        if (userInfo) {
-            if (!userInfo.admin) {
-                navigate('/');
-            }
-            if (userInfo.admin) {
-            }
-        }
-    }, [userInfo]);
 
     const toggleAnalytics = (page) => {
         if(showPage === page){
@@ -49,8 +22,7 @@ function Admin(){
         setShowPage(page);
     }
 
-
-    if(!userInfo){
+    if(!user){
         return(
             <div className="admin">
                 <Header />

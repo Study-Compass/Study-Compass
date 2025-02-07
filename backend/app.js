@@ -28,7 +28,11 @@ const io = new Server(server, {
 if (process.env.NODE_ENV === 'production') {
     app.use(enforce.HTTPS({ trustProtoHeader: true }));
     const corsOptions = {
-        origin: ['https://www.study-compass.com', 'https://studycompass.com'],
+        origin: [
+            'https://www.study-compass.com', 
+            'https://studycompass.com',
+            `http://${process.env.EDUREKA_IP}:${process.env.EDUREKA_PORT}`
+        ],
         optionsSuccessStatus: 200 // for legacy browser support
     };
     app.use(cors(corsOptions));
@@ -68,6 +72,7 @@ const ratingRoutes = require('./routes/ratingRoutes.js');
 const searchRoutes = require('./routes/searchRoutes.js');
 const eventRoutes = require('./routes/eventRoutes.js');
 const oieRoutes = require('./routes/oie-routes.js');
+const orgRoutes = require('./routes/orgRoutes.js');
 
 app.use(authRoutes);
 app.use(dataRoutes);
@@ -81,7 +86,7 @@ app.use(ratingRoutes);
 app.use(searchRoutes);
 app.use(eventRoutes);
 app.use(oieRoutes);
-
+app.use(orgRoutes);
 
 // Serve static files from the React app in production
 if (process.env.NODE_ENV === 'production') {
@@ -144,6 +149,13 @@ app.post('/upload-image/:classroomName', upload.single('image'), async (req, res
         res.status(500).send('An error occurred while uploading the image or updating the classroom.');
     }
 });
+
+//greet route
+app.get('/api/greet', (req, res) => {
+    res.send('Hello from the backend!');
+});
+//how to call the above route
+// fetch('/api/greet').then(response => response.text()).then(data => console.log(data));
 
 
 // Socket.io functionality

@@ -44,11 +44,13 @@
             }
         }
 
-        h1{
+        h2{
             font-size: 15px;
             font-weight: 600;
             margin: 0;
             color: var(--text);
+            font-weight: 700;
+            font-family: 'Satoshi';
         }
         
         .level{
@@ -88,10 +90,11 @@
         height:fit-content;
         width:fit-content;
         padding:5px 15px;
-        font-size: 18px;
+        font-size: 14px;
         color:var(--text);
         background-color: var(--oie-background);
         pointer-events: all;
+        margin: 0;
         iconify-icon{
             transition: transform 0.2s;
         }

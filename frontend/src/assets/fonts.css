@@ -9,3 +9,11 @@
     font-weight: normal;
     src: url(Satoshi-Bold.otf);
 }
+
+@font-face{
+    font-family:'Inter';
+    src:url(Inter-VariableFont_opsz\,wght.ttf);
+    font-weight:100 900;
+    font-style:normal;
+}
+

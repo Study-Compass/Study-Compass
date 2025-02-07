@@ -19,7 +19,7 @@ const eventSchema = new mongoose.Schema({
     hostingType: {
         type: String,
         required: true,
-        enum: ['User', 'Club']
+        enum: ['User', 'Org']
     },
     going:{
         type:Array,
@@ -39,7 +39,7 @@ const eventSchema = new mongoose.Schema({
     },
     description:{
         type:String,
-        required:false,
+        required:false, 
     },
     image:{
         type:String,

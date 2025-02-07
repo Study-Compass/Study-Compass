@@ -1,0 +1,106 @@
+.club-dash .dash{
+    height: 100%;
+    width:100%;
+    padding:40px 48px;
+    overflow:hidden;
+    box-sizing: border-box;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    gap:30px;
+    transition: padding 1s ease-in-out;
+
+    &.maximized{
+        padding:5px;
+    }
+
+    header.header{
+        position: relative;
+        overflow: hidden;
+        display:flex;
+        flex-direction: column;
+        gap: 10px;
+        h1{
+            z-index: 2;
+            font-size: 20px;
+            font-family: 'Inter';
+            font-weight: 700;
+            margin: 0;
+        }
+        h3{
+            font-size: 15px;
+            font-family: 'Inter';
+            font-weight: 500;
+            color: var(--light-text);
+            margin: 0;
+            
+        }
+
+
+    }
+    .row{
+        display: flex;
+        flex-direction: row;
+        gap:10px;
+        .column{
+            display: flex;
+            flex-direction: column;
+        }
+        h1{
+            z-index: 2;
+            font-size:16px;
+            font-family: 'Inter';
+            font-weight: 700;
+            margin: 0;
+            margin-left:10px;
+            margin-bottom:5px;
+        }
+        .content{
+            display:flex;
+            border-radius: 10px;
+            box-sizing: border-box;
+            border: 1px solid var(--lighterborder);
+            box-shadow: var(--shadow);
+            align-items: center;
+            align-items: center;
+            justify-content: center;
+            height:100%;
+            &.meeting{
+            }
+            h2{
+                display: flex;
+                flex-direction: column;
+                font-size: 14px;
+                align-items: center;
+                gap: 5px;
+                img{
+                    height: 22px;
+                }
+                button{
+                    border-radius: 7px;
+                    background-color: var(--light);
+                    width: 100px;
+                    font-weight:600;
+                    font-family: 'Inter';
+                    padding: 3px 13px;
+                    color: var(--text);
+                    cursor: pointer;
+                }
+            }
+
+            &.membership{
+                padding: 10px 30px;
+                gap: 40px;
+            }
+        }
+    }
+    .red-grad{
+        position: absolute;
+        z-index: -1;
+        transition: all 0.5s;
+        top:10px;
+        left:10px;
+        width:150px;
+        border-radius: 15px 0 0 0 ;
+    }
+}

@@ -87,11 +87,21 @@ const userSchema = new mongoose.Schema({
         type: Boolean,
         default: false,
     },
+    clubAssociations: { //clubs that this user has management role in
+        type: Array,
+        default: [],
+    },
     roles: {
         type: [String],
         default: ['user'],
         enum: ['user', 'admin', 'moderator', 'developer', 'oie'], // Adjust roles as needed
     },
+    clubAssociations:[
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Org'
+        }
+    ]
     
     // you can add more fields here if needed, like 'createdAt', 'updatedAt', etc.
 }, {

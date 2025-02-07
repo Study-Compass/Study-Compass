@@ -2,8 +2,7 @@ import React, { useEffect, useState } from 'react';
 import './OIEDash.scss';
 import useAuth from '../../hooks/useAuth';
 import { useNavigate, useSearchParams, useHistory  } from 'react-router-dom';
-import Dashboard from '../../assets/Icons/Dashboard.svg';
-import logo from '../../assets/red_logo.svg';
+import logo from '../../assets/Brand Image/EventsLogo.svg';
 import { getAllEvents } from '../../components/EventsViewer/EventHelpers';
 import Configuration from './Configuration/Configuration';
 import EventsCalendar from './EventsCalendar/EventsCalendar';
@@ -32,20 +31,20 @@ function OIEDash(){
     },[]);
 
     useEffect(()=>{
-        if(isAuthenticating){
-            return;
-        }
-        if(!isAuthenticated){
-            navigate('/');
-        }
-        if(!user){
-            return;
-        } else {
-            if(!user.roles.includes('oie')){
-                navigate('/');
-            }
-            setUserInfo(user);
-        }
+        // if(isAuthenticating){
+        //     return;
+        // }
+        // if(!isAuthenticated){
+        //     navigate('/');
+        // }
+        // if(!user){
+        //     return;
+        // } else {
+        //     if(!user.roles.includes('oie')){
+        //         navigate('/');
+        //     }
+        //     setUserInfo(user);
+        // }
         
     },[isAuthenticating, isAuthenticated, user]);
 
@@ -66,38 +65,31 @@ function OIEDash(){
 
     useEffect(() => {
             setCurrentPage(currentPage);
-            setSearchParams({page: currentDisplay});
-    }, [currentDisplay]);
+            setSearchParams({ page: currentDisplay }, { replace: true });
+        }, [currentDisplay]);
 
     return (
         <div className="oie-dash">
             <div className={`dash-left ${expanded && "hidden"}`}>
                 <div className="logo">
                     <img src={logo} alt="" />
-                    <div className="oie-badge"><p>OIE admin</p></div>
                 </div>
                 <nav className="nav">
                     <ul>
                         <li className={` ${currentDisplay === 0 && "selected"}`} onClick={()=>setCurrentDisplay(0)}>
-                            <img src={Dashboard} alt="" />
+                            <Icon icon="ic:round-dashboard" />
                             <p>Dashboard</p>
                         </li>
                         <li className={` ${currentDisplay === 1 && "selected"}`}  onClick={()=>setCurrentDisplay(1)}>
-                            <div className="icon-container">
-                                <Icon icon="heroicons:calendar-16-solid" />
-                            </div>
+                            <Icon icon="heroicons:calendar-16-solid" />
                             <p>Event Calendar</p>
                         </li>
                         <li className={` ${currentDisplay === 2 && "selected"}`}  onClick={()=>setCurrentDisplay(2)}>
-                            <div className="icon-container">
-                                <Icon icon="heroicons-solid:view-boards" />
-                            </div>
+                            <Icon icon="heroicons-solid:view-boards" />
                             <p>Events Board</p>
                         </li>
                         <li className={` ${currentDisplay === 3 && "selected"}`}  onClick={()=>setCurrentDisplay(3)}>
-                            <div className="icon-container">
-                                <Icon icon="flowbite:adjustments-horizontal-solid" />
-                            </div>
+                            <Icon icon="flowbite:adjustments-horizontal-solid" />
                             <p>Configuration</p>
                         </li>
                     </ul>
