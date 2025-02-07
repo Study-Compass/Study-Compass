@@ -1,11 +1,32 @@
 import React,{ useEffect, useState, useRef } from 'react'
 import { useNavigate,useLocation, Link } from 'react-router-dom';
-import logo from '../../assets/Brand Image/UcbLogo.svg';
+import logo from '../../assets/Brand Image/Logo.svg';
 import './Header.scss';
 import ProfilePicture from '../ProfilePicture/ProfilePicture';
 import useAuth from '../../hooks/useAuth';
 import MobileLogo from '../../assets/MobileLogo.svg';
 import { useWebSocket } from '../../WebSocketContext';
+import RpiLogo from '../../assets/Brand Image/RpiLogo.svg';
+import BerkeleyLogo from '../../assets/Brand Image/BerkeleyLogo.svg';
+
+function getLogo() {
+    const hostname = window.location.hostname;
+    const parts = hostname.split('.');
+
+    if (parts.length > 2) {
+        let subdomain = parts[0];
+        if (subdomain.toLowerCase() === 'www') {
+            subdomain = parts[1]; 
+        }
+        if (subdomain.toLowerCase() === 'rpi') {
+            return RpiLogo;
+        } else if (subdomain.toLowerCase() === 'berkeley') {
+            return BerkeleyLogo;
+        }
+    }
+    return logo; 
+}
+
 
 const Header = React.memo(()=>{
     const { isAuthenticating, isAuthenticated, logout, user, checkedIn } = useAuth();
@@ -74,11 +95,11 @@ const Header = React.memo(()=>{
                     isAuthenticated ? 
 
                     <Link to='/room/none'>
-                        <img className="logo" src={ isAuthenticated || isAuthenticating ? width < 800 ? MobileLogo : logo : logo} alt="logo"/>
+                        <img className="logo" src={ isAuthenticated || isAuthenticating ? width < 800 ? MobileLogo : getLogo() : getLogo()} alt="logo"/>
                     </Link>
                     :
                     <Link to='/'>
-                    <img className="logo" src={ isAuthenticated || isAuthenticating ? width < 800 ? MobileLogo : logo : logo} alt="logo"/>
+                    <img className="logo" src={ isAuthenticated || isAuthenticating ? width < 800 ? MobileLogo : getLogo() : getLogo()} alt="logo"/>
                     </Link>
                 }
 

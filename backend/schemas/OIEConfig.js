@@ -10,6 +10,4 @@ const OIESchema = new mongoose.Schema({
     timestamps: true
 });
 
-const OIEConfig = mongoose.model('OIEConfig', OIESchema , 'OIEConfig');
-
-module.exports = OIEConfig;
+module.exports = OIESchema;

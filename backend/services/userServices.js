@@ -1,9 +1,9 @@
 const google = require('googleapis').google;
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const User = require('../schemas/user.js');
 const crypto = require('crypto');
 const { sendDiscordMessage } = require('./discordWebookService');
+const getModels = require('./getModelService');
 
 const login = new google.auth.OAuth2(
     process.env.GOOGLE_CLIENT_ID,
@@ -33,7 +33,8 @@ const registerwww = new google.auth.OAuth2(
 
 
 
-async function registerUser({ username, email, password }) {
+async function registerUser({ username, email, password, req }) {
+    const { User } = getModels(req, 'User');
     const existingUsername = await User.findOne({ username });
     const existingEmail = await User.findOne({ email });
 
@@ -56,7 +57,8 @@ async function registerUser({ username, email, password }) {
     return { user, token };
 }
 
-async function loginUser({ email, password }) {
+async function loginUser({ email, password, req }) {
+    const { User } = getModels(req, 'User');
     //check if it is an email or username
     let user;
     if (!email.includes('@')) {
@@ -83,7 +85,8 @@ async function loginUser({ email, password }) {
     return { user, token };
 }
 
-async function authenticateWithGoogle(code, isRegister = false, url) {
+async function authenticateWithGoogle(code, isRegister = false, url, req) {
+    const { User } = getModels(req, 'User');
     let www = false;
     if (url.startsWith('http://www.') || url.startsWith('https://www.')) {
         www = true;
@@ -131,7 +134,8 @@ async function authenticateWithGoogle(code, isRegister = false, url) {
     return { user, token: jwtToken };
 }
 
-async function generateUniqueUsername(email) {
+async function generateUniqueUsername(email, req) {
+    const { User } = getModels(req, 'User');
     let username =  email.split('@')[0].replace(/[^a-zA-Z0-9]/g, '');
     let isUnique = false;
 

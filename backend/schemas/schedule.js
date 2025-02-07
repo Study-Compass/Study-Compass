@@ -36,6 +36,4 @@ const scheduleSchema = new Schema({
     }
 });
 
-
-
 module.exports = scheduleSchema;

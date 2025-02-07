@@ -31,6 +31,4 @@ const classroomSchema = new Schema({
     },
 });
 
-
-
 module.exports = classroomSchema;
