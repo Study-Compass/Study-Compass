@@ -10,7 +10,7 @@ const router = express.Router();
 const { verifyToken } = require('../middlewares/verifyToken.js');
 
 const { authenticateWithGoogle, loginUser, registerUser } = require('../services/userServices.js');
-const { getModels } = require('../services/getModelService.js');
+const getModels = require('../services/getModelService.js');
 
 function validateUsername(username) { //keeping logic external, for easier testing
     // Define the regex pattern
