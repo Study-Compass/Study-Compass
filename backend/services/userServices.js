@@ -93,7 +93,7 @@ function getRedirectUri(url) {
     // Determine the base path for redirect (either login or register)
     const basePath = path.includes('register') ? '/register' : '/login';
     const development = process.env.NODE_ENV === 'development';
-    const uri = development ? `http://${hostname}:3000${basePath}` : `http://${hostname}${basePath}`;
+    const uri = development ? `http://${hostname}:3000${basePath}` : `https://${hostname}${basePath}`;
 
     const allowedOrigins = [
         'http://localhost:3000/login',
