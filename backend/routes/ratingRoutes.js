@@ -6,7 +6,7 @@ const path = require('path');
 const s3 = require('../aws-config');
 const mongoose = require('mongoose');
 const { clean } = require('../services/profanityFilterService');
-const { getModels } = require('../services/getModelService');
+const getModels = require('../services/getModelService');
 
 const router = express.Router();
 
@@ -187,6 +187,7 @@ router.post('/delete-rating', verifyToken, async (req, res) => {
 
 router.post('/send-report', verifyToken, async (req, res) => {
     const { Report, User } = getModels(req, 'Report', 'User');
+
     const userId = req.user.userId;
     const report = req.body.report;
     const type = req.body.type;
