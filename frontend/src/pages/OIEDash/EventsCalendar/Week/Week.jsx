@@ -4,10 +4,11 @@ import { useFetch } from '../../../../hooks/useFetch';
 import './Week.scss';
 import WeeklyCalendar from './WeeklyCalendar/WeeklyCalendar';
 
-function Week({ height, changeToDay, start = '2024-12-09' }) {
-    const initialStartDate = new Date(start);
+function Week({ height, changeToDay, start = '2025-1-26', startingText = "", nav=true , filter}) {
+    const initialStartDate = typeof start === 'string' ? new Date(start) : start;
     const initialEndDate = new Date(initialStartDate);
     initialEndDate.setDate(initialEndDate.getDate() + 6);
+    initialEndDate.setHours(23, 59, 59, 999);
 
     const [startOfWeek, setStartOfWeek] = useState(initialStartDate);
     const [endOfWeek, setEndOfWeek] = useState(initialEndDate);
@@ -26,30 +27,35 @@ function Week({ height, changeToDay, start = '2024-12-09' }) {
         setEndOfWeek((prev) => {
             const newEnd = new Date(prev);
             newEnd.setDate(newEnd.getDate() + days);
+            newEnd.setHours(23, 59, 59, 999);
             return newEnd;
         });
     };
 
-    const url = `/get-events-by-range?start=${encodeURIComponent(startOfWeek.toISOString())}&end=${encodeURIComponent(endOfWeek.toISOString())}`;
+    const filterParam = encodeURIComponent(JSON.stringify(filter));
+
+
+    const url = `/get-events-by-range?start=${encodeURIComponent(startOfWeek.toISOString())}&end=${encodeURIComponent(endOfWeek.toISOString())}&filter=${filterParam}`;
     const events = useFetch(url);
 
-    useEffect(() => {
-        console.log(events);
-    }, [events]);
 
     // if (events.loading || !events.data) {
     //     return <div>Loading...</div>;
     // }
 
+    
+
     return (
         <>
             <div className="header">
                 <div className="time-period">
-                    <div className="arrows">
-                        <Icon icon="charm:chevron-left" onClick={() => updateWeek(-7)} />
-                        <Icon icon="charm:chevron-right" onClick={() => updateWeek(7)} />
-                    </div>
-                    <h1>{formattedDate(startOfWeek)} to {formattedDate(endOfWeek)}</h1>
+                    {nav &&
+                        <div className="arrows">
+                            <Icon icon="charm:chevron-left" onClick={() => updateWeek(-7)} />
+                            <Icon icon="charm:chevron-right" onClick={() => updateWeek(7)} />
+                        </div>
+                    }
+                    <h1>{startingText}{nav && `${formattedDate(startOfWeek)} to ${formattedDate(endOfWeek)}`}</h1>
                 </div>
             </div>
             <div className="week">
@@ -57,7 +63,7 @@ function Week({ height, changeToDay, start = '2024-12-09' }) {
                     events={events.data ? events.data.events : []} 
                     startOfWeek={startOfWeek} 
                     height={height} 
-                    changeToDay={changeToDay} 
+                    dayClick={changeToDay} 
                 />
             </div>
         </>

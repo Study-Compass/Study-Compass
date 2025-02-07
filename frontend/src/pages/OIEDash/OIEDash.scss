@@ -18,25 +18,11 @@
         animation: show 1s forwards;
         .logo{
             position: relative;
-            width:85%;
+            width:80%;
             img{
                 width:100%;
             }
-            .oie-badge{
-                font-size:12px;
-                background-color: var(--red);
-                width:fit-content;
-                padding:0px 8px;
-                border-radius: 7px;
-                position: absolute;
-                left:25%;
-                bottom:0;
-                p{
-                    color: var(--background);
-                    font-family: 'Inter';
-                    font-weight:500;
-                }
-            }
+
         }
         .nav{
             width:100%;

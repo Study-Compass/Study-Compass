@@ -5,7 +5,8 @@ import { getAllEvents } from '../../../components/EventsViewer/EventHelpers';
 import clubEvent from '../ClubEventsComponents/Event/ClubEvent';
 import people from '../../../assets/people.svg'
 import RedGrad from '../../../assets/Gradients/ClubAdminGrad.png';
-
+import { Icon } from '@iconify-icon/react';
+import CreateEvent from '../../../components/EventsViewer/EventsGrid/EventsColumn/CreateEventButton/CreateEvent';
 
 function Dash({expandedClass, openMembers, clubName}){
     //define welcometext to be either good morning, good afternoon, or good evening, in one line
@@ -30,6 +31,10 @@ function Dash({expandedClass, openMembers, clubName}){
         }
         fetchEvents();
     }, []);
+
+    const handleEventClick = () => {
+        console.log("create event");
+    }
 
 
 
@@ -60,8 +65,7 @@ function Dash({expandedClass, openMembers, clubName}){
             <div className="row">
                 <div className="column">
                     <h1>quick actions</h1>
-                    <div className="content">
-                    </div>
+                    <CreateEvent origin={clubName}/>
                 </div>
             </div>
 
