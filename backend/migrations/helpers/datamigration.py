@@ -74,7 +74,7 @@ def findNoPics():
 
 def migrateClassrooms(uri, db):
     load_dotenv() # loading .env file
-    # uri = os.environ.get('MONGO_URL') # fetching URI string
+    uri = os.environ.get('MONGO_URL_LOCAL') # fetching URI string
     client = MongoClient(uri, server_api=ServerApi('1')) 
     try: # send a ping to confirm a successful connection
         client.admin.command('ping')
