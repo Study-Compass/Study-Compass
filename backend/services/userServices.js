@@ -151,7 +151,7 @@ async function authenticateWithGoogle(code, isRegister = false, url, req) {
             throw new Error('Email already exists');
         }
 
-        const randomUsername = await generateUniqueUsername(userInfo.data.email);
+        const randomUsername = await generateUniqueUsername(userInfo.data.email, req);
 
         user = new User({
             googleId: userInfo.data.id,
