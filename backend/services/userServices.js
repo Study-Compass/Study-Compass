@@ -109,7 +109,7 @@ function getRedirectUri(url) {
     ];
 
     if(!allowedOrigins.includes(uri)) {
-        throw new Error('Invalid redirect URI');
+        throw new Error(`Invalid redirect URI ${uri}`);
     }
 
     // Return the redirect URI dynamically constructed
