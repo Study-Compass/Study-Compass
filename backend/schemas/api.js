@@ -5,7 +5,7 @@ const apiSchema = new Schema({
     api_key:{
         type: String,
         required: true,
-        unique: true, // Ensure each API key is unique
+        unique: true,
         trim: true,
     },
     owner: {
@@ -15,7 +15,7 @@ const apiSchema = new Schema({
       },
     createdAt: {
         type: Date,
-        default: Date.now, // Automatically record when the key was created
+        default: Date.now,
     },
     usageCount: {
         type: Number,

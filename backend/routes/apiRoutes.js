@@ -43,7 +43,7 @@ router.post('/create_api', verifyToken, async (req, res) => {
 //If we want to grant access to a route, we want to grant access using the apiKeyMiddleware
 //apiKeyMiddleware will guarantee and verify the existence of the key and then continue to grab items
 
-router.get('/details', verifyToken, apiKeyMiddleware, async (req, res) => { 
+router.get('/details', verifyToken, apiKeyMiddleware, async (req, res) => { //name to be changed
     //Should allow access to any route,(will this be specified?)
     try {
         const apiEntry = req.apiKeyData;

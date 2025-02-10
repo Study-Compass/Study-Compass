@@ -15,9 +15,10 @@ const apiKeyMiddleware = async (req, res, next) => {
             return res.status(401).json({ error: 'API key does not exist for user' });
         }
 
+        //Add a status for rate limit here, better status more usages 
+
         // Apply the rate limiter
         apiKeyRateLimiter(req, res, async (error) => {
-            // Stop execution if rate limit is exceeded
             if (error) return; 
 
             // Increment API key usage count
