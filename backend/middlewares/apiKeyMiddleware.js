@@ -3,20 +3,32 @@
 const API = require('../schemas/api.js');
 const monitoring = require('./monitoring.js');
 
+//For routes http://localhost:5000/api/get-org-by-name/{club name} using the api key
+
 // Middleware for validating API keys to make sure it exist, also validate that authorization is accepted
 const apiKeyMiddleware = async (req, res, next) => {
-    const { owner, api_key } = req.body;
+    //const { owner, api_key } = req.body;
+    const userId = req.user.userId
 
-    if (!owner || !api_key) {
-       return res.status(401).json({ error: 'Missing authorization or API key.' });
-    }
+    //With these changes i made you shouldnt need owner box or api key it should just find the owner based on verify token, make sure i dont need this
+
+    //if (!owner || !api_key) { 
+    //   return res.status(401).json({ error: 'Missing API key.' });
+    //}
 
     try {
-        const apiEntry = await API.findOne({ owner, api_key });
-        if (!apiEntry) {
-            console.log("Cant verify authorization or API");
-            return res.status(401).json({ error: 'Invalid authorization or API key.' });
+        const apiKeyData = await Api.findOne({ owner: userId });
+        if (!apiKeyData) {
+            console.log("API key does not exist for user");
+            return res.status(401).json({ error: 'API key does not exist for user' });
         }
+
+        // Increment the usage count
+        apiKeyData.usageCount = (apiKeyData.usageCount || 0) + 1;
+        await apiKeyData.save();
+        console.log(`API Key Used. New usage count: ${apiKeyData.usageCount}`);
+
+        req.apiKeyData = apiKeyData // Saves the apiKey into the middleware, to be used cross
         next();
 
     } catch (error) {

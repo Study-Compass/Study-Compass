@@ -75,9 +75,10 @@ router.get('/details', verifyToken, apiKeyMiddleware, async (req, res) => { //Se
     }
 });
 
-/*
+/*  START WORKING ON THE DELETE TOOL TUESDAY AND THEN GO BACK FOR MANUVERABILITY
+I can already see there is a few things that can be taken out
 // Delete an API key, Verify user is the owner
-router.delete('/delete', apiKeyMiddleware, async (req, res) => {
+router.delete('/delete', verifyToken, apiKeyMiddleware, async (req, res) => {
     const { authorization_key, api_key } = req.headers;
 
     try {
