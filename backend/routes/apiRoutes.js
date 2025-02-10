@@ -8,7 +8,6 @@ const crypto = require('crypto'); // For generating API keys
 const mongoose = require('mongoose');
 const {verifyToken}= require('../middlewares/verifyToken');
 
-
 // Generate a new API key 
 router.post('/create_api', verifyToken, async (req, res) => { 
     try {
@@ -38,52 +37,39 @@ router.post('/create_api', verifyToken, async (req, res) => {
     }
 });
 
-//WORKING RIGHT HERE
-// Validate API key middleware- Make sure API exists, safe and clean,
-//Should check and make sure middleware is present and linked to the account is what apiKeyMiddleware does
-
-
-
 //router.use('/protected', apiKeyMiddleware); // ANY LINE THAT CONTAINS THE /protected will apply apiKeyMiddleware too
-//I should also store apiKeyin th
 
 //Simplistic then detailed dont stress about key things
-//One type of api key that has access to all routes that we can access
 //If we want to grant access to a route, we want to grant access using the apiKeyMiddleware
 //apiKeyMiddleware will guarantee and verify the existence of the key and then continue to grab items
- 
-router.get('/details', verifyToken, apiKeyMiddleware, async (req, res) => { //See middleware debugging guid
+
+router.get('/details', verifyToken, apiKeyMiddleware, async (req, res) => { 
     //Should allow access to any route,(will this be specified?)
-    //const {owner, api_key } = req.body; 
     try {
-        //const apiEntry = await Api.findOneAndUpdate({api_key, owner }, { $inc: { usageCount: 1 } }, { new: true });
-        //TEST THE NEW CODE AS OF 2/10/25 changes were made int apiKeyMiddleware for effectivness
         const apiEntry = req.apiKeyData;
 
         if (!apiEntry) {
             console.log('API key not found', error);
             return res.status(404).json({ error: 'API key not found.' });
         }
+
         console.log('GET: /details successful. API key details:', apiEntry);
         res.status(200).json(apiEntry);
     } catch (error) {
 
 
         console.log('GET: /details failed. Error', error);
-        res.status(500).json({ error: 'Internal server error.' });
+        res.status(500).json({ success: false, message: 'Unable to retrieve details.' });
     }
 });
 
-/*  START WORKING ON THE DELETE TOOL TUESDAY AND THEN GO BACK FOR MANUVERABILITY
-I can already see there is a few things that can be taken out
 // Delete an API key, Verify user is the owner
-router.delete('/delete', verifyToken, apiKeyMiddleware, async (req, res) => {
-    const { authorization_key, api_key } = req.headers;
-
+router.delete('/delete-api', verifyToken, apiKeyMiddleware, async (req, res) => {
+    const userId = req.user.userId;
     try {
-        const deletedApi = await Api.findOneAndDelete({ authorization_key, api_key });
+        const deletedApi = await Api.findOneAndDelete({ owner: userId }); 
         if (!deletedApi) {
-            console.error('API key not found for deletion:', { authorization_key, api_key });
+            console.error('API key not found for deletion');
             return res.status(404).json({ error: 'API key not found.' });
         }
 
@@ -91,11 +77,10 @@ router.delete('/delete', verifyToken, apiKeyMiddleware, async (req, res) => {
         res.status(200).json({ message: 'API key deleted successfully.' });
     } catch (error) {
         console.error('DELETE: /delete failed. Error:', error);
-        res.status(500).json({ error: 'Internal server error.' });
+        res.status(500).json({success:false, message : 'Error deleting API.' });
     }
 });
 
-*/
 
 
 module.exports = router;

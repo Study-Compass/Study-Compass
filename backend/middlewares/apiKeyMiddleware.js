@@ -1,38 +1,38 @@
-//Stores API handling of where can be accessed 
-//Will need to store the apiKey in this function to then check in any route for this key and if route exist then user can access
 const API = require('../schemas/api.js');
-
+const apiKeyRateLimiter = require('../middlewares/rateLimit.js'); 
 //For routes http://localhost:5000/api/get-org-by-name/{club name} using the api key example route
-
 // Middleware for validating API keys to make sure it exist, also validate that authorization is accepted
+
 const apiKeyMiddleware = async (req, res, next) => {
-    //const { owner, api_key } = req.body;
-    const userId = req.user.userId
-
-    //With these changes i made you shouldnt need owner box or api key it should just find the owner based on verify token, make sure i dont need this
-
-    //if (!owner || !api_key) { 
-    //   return res.status(401).json({ error: 'Missing API key.' });
-    //}
-
+    
+    const userId = req.user.userId;
     try {
-        const apiKeyData = await Api.findOne({ owner: userId });
+        
+        const apiKeyData = await API.findOne({ owner: userId });
+        console.log(apiKeyData);
         if (!apiKeyData) {
             console.log("API key does not exist for user");
             return res.status(401).json({ error: 'API key does not exist for user' });
         }
 
-        // Increment the usage count
-        apiKeyData.usageCount = (apiKeyData.usageCount || 0) + 1;
-        await apiKeyData.save();
-        console.log(`API Key Used. New usage count: ${apiKeyData.usageCount}`);
+        // Apply the rate limiter
+        apiKeyRateLimiter(req, res, async (error) => {
+            // Stop execution if rate limit is exceeded
+            if (error) return; 
 
-        req.apiKeyData = apiKeyData // Saves the apiKey into the middleware, to be used across platforms
-        next();
+            // Increment API key usage count
+            apiKeyData.usageCount = (apiKeyData.usageCount || 0) + 1;
+            await apiKeyData.save();
+            console.log(`API Key Used. New usage count: ${apiKeyData.usageCount}`);
+
+            // Store the API key data in the request object
+            req.apiKeyData = apiKeyData;
+            next();
+        });
 
     } catch (error) {
         console.log('Error verifying API key:', error);
-        return res.status(500).json({ error: 'Internal server error.' });
+        return res.status(500).json({ error: 'Could not verify API key' });
     }
 };
 
