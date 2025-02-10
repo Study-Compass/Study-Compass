@@ -119,7 +119,6 @@ function App() {
                                             <Route path="/landing" element={<Landing/>}/>
                                             <Route path="/settings" element={<Settings/>}/>
                                             <Route path="/org/:name" element={<OrgDisplay/>}/>
-                                            {/* <Route path="org/" element={<Org/>} /> */}
                                             <Route path="/documentation" element={<Redirect/>}/>
                                             <Route path="/new-badge/:hash" element={<NewBadge/>}/>
                                             <Route path="/new-badge" element={<NewBadge/>}/>
