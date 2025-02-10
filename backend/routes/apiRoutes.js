@@ -10,18 +10,21 @@ const {verifyToken}= require('../middlewares/verifyToken');
 
 
 // Generate a new API key 
-router.post('/create_api', verifyToken, limiter, async (req, res) => {  // Limit to how many keys can be created by 
+router.post('/create_api', verifyToken, async (req, res) => { 
     try {
        const userId = req.user.userId;
        const user = await User.findById(userId);
 
-        // Generate API key and authorization key
+        // Generate API key and verify user does not have any pre-existing one
+        const existingApi = await Api.findOne({ owner: userId });
+        if (existingApi) {
+            console.log ('POST: /create_api failed. User already has an API key')
+            return res.status(400).json({ success: false, message: 'User already has an API key.' });
+        }
         const apiKey = crypto.randomBytes(32).toString('hex');
-        const authorizationKey = crypto.randomBytes(16).toString('hex');// Replace with userID
 
         // Create and save the new API key entry
         const newApi = new Api({
-            authorization_key: authorizationKey,
             api_key: apiKey,
             owner: userId,
         });
@@ -39,13 +42,24 @@ router.post('/create_api', verifyToken, limiter, async (req, res) => {  // Limit
 //WORKING RIGHT HERE
 // Validate API key middleware- Make sure API exists, safe and clean,
 //Should check and make sure middleware is present and linked to the account is what apiKeyMiddleware does
-router.use('/protected', apiKeyMiddleware); // Make sure is nor redudndant
 
-router.get('/protected/details', apiKeyMiddleware, limiter, async (req, res) => {
+
+
+//router.use('/protected', apiKeyMiddleware); // ANY LINE THAT CONTAINS THE /protected will apply apiKeyMiddleware too
+//I should also store apiKeyin th
+
+//Simplistic then detailed dont stress about key things
+//One type of api key that has access to all routes that we can access
+//If we want to grant access to a route, we want to grant access using the apiKeyMiddleware
+//apiKeyMiddleware will guarantee and verify the existence of the key and then continue to grab items
+ 
+router.get('/details', verifyToken, apiKeyMiddleware, async (req, res) => { //See middleware debugging guid
     //Should allow access to any route,(will this be specified?)
-    const { authorization_key, api_key } = req.body;  // ALL I need is thhe api_key  userId
+    //const {owner, api_key } = req.body; 
     try {
-        const apiEntry = await Api.findOneAndUpdate({ authorization_key, api_key }, { $inc: { usageCount: 1 } }, { new: true });
+        //const apiEntry = await Api.findOneAndUpdate({api_key, owner }, { $inc: { usageCount: 1 } }, { new: true });
+        //TEST THE NEW CODE AS OF 2/10/25 changes were made int apiKeyMiddleware for effectivness
+        const apiEntry = req.apiKeyData;
 
         if (!apiEntry) {
             console.log('API key not found', error);
@@ -61,9 +75,8 @@ router.get('/protected/details', apiKeyMiddleware, limiter, async (req, res) => 
     }
 });
 
-
 /*
-// Delete an API key, userId could also be assumed// addeded
+// Delete an API key, Verify user is the owner
 router.delete('/delete', apiKeyMiddleware, async (req, res) => {
     const { authorization_key, api_key } = req.headers;
 
@@ -82,8 +95,6 @@ router.delete('/delete', apiKeyMiddleware, async (req, res) => {
     }
 });
 
-// Apply rate limiter
-router.use(limiter);
 */
 
 

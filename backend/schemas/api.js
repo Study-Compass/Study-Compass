@@ -2,12 +2,6 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const apiSchema = new Schema({
-    authorization_key:{
-        type: String,
-        required: true,
-        unique: true, // Ensure each authorization key is unique
-        trim: true,   // Removes unnecessary whitespace
-    },
     api_key:{
         type: String,
         required: true,

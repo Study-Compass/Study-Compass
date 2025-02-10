@@ -1,17 +1,18 @@
 //Stores API handling of where can be accessed 
+//Will need to store the apiKey in this function to then check in any route for this key and if route exist then user can access
 const API = require('../schemas/api.js');
 const monitoring = require('./monitoring.js');
 
 // Middleware for validating API keys to make sure it exist, also validate that authorization is accepted
 const apiKeyMiddleware = async (req, res, next) => {
-    const { authorization_key, api_key } = req.body;
+    const { owner, api_key } = req.body;
 
-    if (!authorization_key || !api_key) {
+    if (!owner || !api_key) {
        return res.status(401).json({ error: 'Missing authorization or API key.' });
     }
 
     try {
-        const apiEntry = await API.findOne({ authorization_key, api_key });
+        const apiEntry = await API.findOne({ owner, api_key });
         if (!apiEntry) {
             console.log("Cant verify authorization or API");
             return res.status(401).json({ error: 'Invalid authorization or API key.' });
