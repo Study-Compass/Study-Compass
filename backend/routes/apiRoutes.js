@@ -13,7 +13,6 @@ const {verifyToken}= require('../middlewares/verifyToken');
 router.post('/create_api', verifyToken, async (req, res) => { 
     try {
        const userId = req.user.userId;
-       const user = await User.findById(userId);
 
         // Generate API key and verify user does not have any pre-existing one
         const existingApi = await Api.findOne({ owner: userId });

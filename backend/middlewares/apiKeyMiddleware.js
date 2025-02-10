@@ -1,9 +1,8 @@
 //Stores API handling of where can be accessed 
 //Will need to store the apiKey in this function to then check in any route for this key and if route exist then user can access
 const API = require('../schemas/api.js');
-const monitoring = require('./monitoring.js');
 
-//For routes http://localhost:5000/api/get-org-by-name/{club name} using the api key
+//For routes http://localhost:5000/api/get-org-by-name/{club name} using the api key example route
 
 // Middleware for validating API keys to make sure it exist, also validate that authorization is accepted
 const apiKeyMiddleware = async (req, res, next) => {
@@ -28,7 +27,7 @@ const apiKeyMiddleware = async (req, res, next) => {
         await apiKeyData.save();
         console.log(`API Key Used. New usage count: ${apiKeyData.usageCount}`);
 
-        req.apiKeyData = apiKeyData // Saves the apiKey into the middleware, to be used cross
+        req.apiKeyData = apiKeyData // Saves the apiKey into the middleware, to be used across platforms
         next();
 
     } catch (error) {
