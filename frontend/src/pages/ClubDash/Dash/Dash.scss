@@ -55,6 +55,10 @@
             margin-left:10px;
             margin-bottom:5px;
         }
+        .meeting{
+            display: flex;
+            gap: 10px;
+        }
         .content{
             display:flex;
             border-radius: 10px;
@@ -65,8 +69,6 @@
             align-items: center;
             justify-content: center;
             height:100%;
-            &.meeting{
-            }
             h2{
                 display: flex;
                 flex-direction: column;

@@ -130,13 +130,13 @@ function Room() {
     },[roomid]);
 
     function changeURL(option) {
-        navigate(`/room/${option}`);
+        navigate(`/room/${encodeURI(option)}`);
         fetchData(roomIds[option]);
         setContentState("calendarSearchResult");
     }
 
     function changeURL2(option) {
-        navigate(`/room/${option}`);
+        navigate(`/room/${encodeURI(option)}`);
         fetchData(roomIds[option]);
         setContentState("classroom");
     }

@@ -1,9 +1,5 @@
 const express = require('express');
-const User = require('../schemas/user.js');
-const Developer = require('../schemas/developer.js');
 const { verifyToken, verifyTokenOptional, authorizeRoles } = require('../middlewares/verifyToken');
-const Classroom = require('../schemas/classroom.js');
-const Schedule = require('../schemas/schedule.js');
 const cron = require('node-cron');
 const axios = require('axios');
 const { isProfane } = require('../services/profanityFilterService');
@@ -11,10 +7,12 @@ const StudyHistory = require('../schemas/studyHistory.js');
 const { findNext } = require('../helpers.js');
 const { sendDiscordMessage } = require('../services/discordWebookService');
 const BadgeGrant = require('../schemas/badgeGrant');
+const getModels = require('../services/getModelService');
 
 const router = express.Router();
 
 router.post("/update-user", verifyToken, async (req, res) => {
+    const { User } = getModels(req, 'User');
     const { name, username, classroom, recommendation, onboarded } = req.body
     try {
         const user = await User.findById(req.user.userId);
@@ -39,6 +37,7 @@ router.post("/update-user", verifyToken, async (req, res) => {
 
 // check if username is available
 router.post("/check-username", verifyToken, async (req, res) => {
+    const { User } = getModels(req, 'User');
     const { username } = req.body;
     const userId = req.user.userId;
     try {
@@ -62,6 +61,7 @@ router.post("/check-username", verifyToken, async (req, res) => {
 });
 
 router.post("/check-in", verifyToken, async (req, res) => {
+    const { Classroom, Schedule } = getModels(req, 'Classroom', 'Schedule');
     const { classroomId } = req.body;
     try {
         //check if user is checked in elsewhere in the checked_in array
@@ -105,6 +105,7 @@ router.post("/check-in", verifyToken, async (req, res) => {
 });
 
 router.get("/checked-in", verifyToken, async (req, res) => {
+    const { Classroom } = getModels(req, 'Classroom');
     try {
         const classrooms = await Classroom.find({ checked_in: { $in: [req.user.userId] } });
         console.log(`GET: /checked-in ${req.user.userId} successful`)
@@ -116,6 +117,7 @@ router.get("/checked-in", verifyToken, async (req, res) => {
 });
 
 router.post("/check-out", verifyToken, async (req, res) => {
+    const { Classroom, Schedule, User } = getModels(req, 'Classroom', 'Schedule', 'User');
     const { classroomId } = req.body;
     try {
         const classroom = await Classroom.findOne({ _id: classroomId });
@@ -161,6 +163,7 @@ router.post("/check-out", verifyToken, async (req, res) => {
 });
 
 router.get("/get-developer", verifyToken, async (req, res) => {
+    const { Developer } = getModels(req, 'Developer');
     try {
         const developer = await Developer.findOne({ user_id: req.user.userId });
         console.log(`GET: /get-developer ${req.user.userId} successful`);
@@ -176,6 +179,7 @@ router.get("/get-developer", verifyToken, async (req, res) => {
 });
 
 router.post("/update-developer", verifyToken, async (req, res) => {
+    const { Developer, User } = getModels(req, 'Developer', 'User');
     const { type, commitment, goals, skills } = req.body;
     try {
         const developer = await Developer.findOne({ userId: req.user.userId });
@@ -213,6 +217,7 @@ router.post("/update-developer", verifyToken, async (req, res) => {
 });
 
 router.get("/get-user", async (req, res) => {
+    const { User } = getModels(req, 'User');
     const userId = req.query.userId;
     try {
         const user = await User.findById(userId);
@@ -226,6 +231,7 @@ router.get("/get-user", async (req, res) => {
 
 //route to get mulitple users, specified in array
 router.get("/get-users", async (req, res) => {
+    const { User } = getModels(req, 'User');
     const userIds = req.query.userIds;
     try {
         const users = await User.find({ _id: { $in: userIds } });
@@ -238,6 +244,7 @@ router.get("/get-users", async (req, res) => {
 });
 
 router.post('/create-badge-grant', verifyToken, authorizeRoles('admin'), async (req, res) => {
+    const { BadgeGrant } = getModels(req, 'BadgeGrant');
     try {
         const { badgeContent, badgeColor, daysValid } = req.body;
 
@@ -272,6 +279,7 @@ router.post('/create-badge-grant', verifyToken, authorizeRoles('admin'), async (
 });
 
 router.post('/grant-badge', verifyToken, async (req, res) => {
+    const { BadgeGrant, User } = getModels(req, 'BadgeGrant', 'User');
     try {
         const { hash } = req.body;
         const userId = req.user.userId;

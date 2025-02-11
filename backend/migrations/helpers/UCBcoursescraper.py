@@ -93,7 +93,7 @@ async def parse_results(dic, pages=1):
         for i in range(pages):
             for attempt in range(max_retries):
                 try:
-                    url = f"https://classes.berkeley.edu/search/class?page={i+157}&f%5B0%5D=im_field_term_name:3153"
+                    url = f"https://classes.berkeley.edu/search/class?page={i}&f%5B0%5D=im_field_term_name:3153"
                     response = await client.get(url)
                     if response.status_code == 429:  # Too many requests
                         raise httpx.HTTPStatusError(message="Rate limit exceeded", request=response.request, response=response)
@@ -202,7 +202,7 @@ async def main():
     term = "202405"
     dic= {}
 
-    await parse_results(dic)
+    await parse_results(dic, 355)
 
     # upload data
     dump_to_json(dic)

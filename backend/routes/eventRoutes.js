@@ -1,13 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const { verifyToken, verifyTokenOptional, authorizeRoles } = require('../middlewares/verifyToken');
-const Event = require('../schemas/event');
-const User = require('../schemas/user');
-const Classroom = require('../schemas/classroom');
-const OIEStatus = require('../schemas/OIE');
-const Org = require('../schemas/org')
+const getModels = require('../services/getModelService');
 
 router.post('/create-event', verifyToken, async (req, res) => {
+    const { Event, OIEStatus, User } = getModels(req, 'Event', 'OIEStatus', 'User');
     const user_id = req.user.userId;
     const orgId = req.body.orgId;
     
@@ -67,6 +64,7 @@ router.post('/create-event', verifyToken, async (req, res) => {
 
 // Get all events created by the user
 router.get('/get-events', verifyToken, async (req, res) => {
+    const { Event, User } = getModels(req, 'Event', 'User');
     const user_id = req.user.userId;
 
     try {
@@ -87,6 +85,7 @@ router.get('/get-events', verifyToken, async (req, res) => {
 
 // Get all events
 router.get('/get-all-events', verifyTokenOptional, async (req, res) => {
+    const { Event, User } = getModels(req, 'Event', 'User');
     try {
         // const events = await Event.find({}).populate('classroom_id');
         //get all events, attach user object to the event
@@ -110,6 +109,7 @@ router.get('/get-all-events', verifyTokenOptional, async (req, res) => {
 
 // Get all events in a classroom
 router.get('/get-classroom-events/:classroom_id', verifyTokenOptional, async (req, res) => {
+    const { Event } = getModels(req, 'Event');
     const { classroom_id } = req.params;
 
     try {
@@ -128,6 +128,7 @@ router.get('/get-classroom-events/:classroom_id', verifyTokenOptional, async (re
 
 // Get all events user is going to
 router.get('/get-going-events', verifyToken, async (req, res) => {
+    const { Event, User } = getModels(req, 'Event', 'User');
     const user_id = req.user.userId;
 
     try {
@@ -147,6 +148,7 @@ router.get('/get-going-events', verifyToken, async (req, res) => {
 
 // delete event
 router.delete('/delete-event/:event_id', verifyToken, async (req, res) => {
+    const { Event } = getModels(req, 'Event');
     const { event_id } = req.params;
     const user_id = req.user.userId;
 
@@ -181,6 +183,7 @@ router.delete('/delete-event/:event_id', verifyToken, async (req, res) => {
 
 //get all oie-unapproved events
 router.get('/oie/get-pending-events', verifyToken, authorizeRoles('oie'), async (req, res) => {
+    const { Event, User } = getModels(req, 'Event', 'User');
     try {
         const user = await User.findById(req.user.userId);
         if (!user) {
@@ -206,6 +209,7 @@ router.get('/oie/get-pending-events', verifyToken, authorizeRoles('oie'), async 
 
 //get all oie-unapproved events
 router.get('/oie/get-approved-events', verifyToken, authorizeRoles('oie'), async (req, res) => {
+    const { Event, User } = getModels(req, 'Event', 'User');
     try {
         const user = await User.findById(req.user.userId);
         if (!user ) {
@@ -231,6 +235,7 @@ router.get('/oie/get-approved-events', verifyToken, authorizeRoles('oie'), async
 
 //get all oie-unapproved events
 router.get('/oie/get-rejected-events', verifyToken, authorizeRoles('oie'), async (req, res) => {
+    const { Event, User } = getModels(req, 'Event', 'User');
     try {
         const user = await User.findById(req.user.userId);
         if (!user) {
@@ -255,6 +260,7 @@ router.get('/oie/get-rejected-events', verifyToken, authorizeRoles('oie'), async
 });
 
 router.get('/get-event/:event_id', verifyTokenOptional, async (req, res) => {
+    const { Event, User, OIEStatus } = getModels(req, 'Event', 'User', 'OIEStatus');
     const { event_id } = req.params;
     const user_id = req.user ? req.user.userId : null;
 
@@ -305,6 +311,7 @@ router.get('/get-event/:event_id', verifyTokenOptional, async (req, res) => {
 });
 
 router.post('/approve-event', verifyToken, async (req, res) => {
+    const { Event, User } = getModels(req, 'Event', 'User');
     const user_id = req.user.userId;
     const { event_id } = req.body;
 
@@ -346,6 +353,7 @@ router.post('/approve-event', verifyToken, async (req, res) => {
 });
 
 router.get('/get-events-by-month', verifyToken, authorizeRoles('oie'), async (req, res) => {
+    const { Event } = getModels(req, 'Event');
     const { month, year } = req.query;
 
     if (!month || !year) {
@@ -384,6 +392,7 @@ router.get('/get-events-by-month', verifyToken, authorizeRoles('oie'), async (re
 });
 
 router.get('/get-events-by-range', verifyToken, authorizeRoles('oie'), async (req, res) => {
+    const { Event } = getModels(req, 'Event');
     const { start, end, filter } = req.query;
 
     if (!start || !end) {
@@ -429,4 +438,3 @@ router.get('/get-events-by-range', verifyToken, authorizeRoles('oie'), async (re
 
 
 module.exports = router;
-

@@ -125,7 +125,7 @@ function LoginForm() {
     
     
     return (
-      <form onSubmit={handleSubmit} className='form'>
+      <div className='form'>
           <h1>Welcome Back!</h1>
         {errorText !== "" && 
             <Flag text={errorText} img={circleWarning} color={"#FD5858"} primary={"rgba(250, 117, 109, 0.16)"} accent={"#FD5858"} /> 
@@ -141,13 +141,13 @@ function LoginForm() {
         <div className={`email-form ${email ? "disappear-show" : ""}`}>
             
             <div className="login-button">
-                <button className={`show-email button active ${email ? "disappear-show" : ""}`} onClick={(e)=>{e.preventDefault();setEmail(true)}}>
+                <button type="button" className={`show-email button active ${email ? "disappear-show" : ""}`} onClick={(e)=>{e.preventDefault();setEmail(true)}}>
                     Login with Email
                 </button>
                 <p className={`already ${email ? "disappear-show" : ""}`}>Don’t have an account? <Link to="/register" state={{from:location.state?.from || "/room/none"}} replace>Register</Link></p>
             </div>
 
-            <div className="form-content" >
+            <form  onSubmit={handleSubmit}  className="form-content" >
                 <div className="email">
                     <p>Username/Email</p>
                     <input type="text" name="email" value={formData.email} onChange={handleChange} placeholder="Valid username/email..." required />
@@ -158,10 +158,10 @@ function LoginForm() {
                 </div>
                 <button type="submit" className={`button ${valid ? "active":""}`}>Log In</button>
                 <p className="already">Don’t have an account? <Link to="/register" state={{from:location.state?.from || "/room/none"}}>Register</Link></p>
-            </div>
+            </form>
         </div>
 
-      </form>
+      </div>
     );
   }
   

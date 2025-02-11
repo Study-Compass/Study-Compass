@@ -20,6 +20,4 @@ const OIESchema = new mongoose.Schema({
     timestamps: true
 });
 
-const OIEStatus = mongoose.model('OIEStatus', OIESchema , 'OIEStatuses');
-
-module.exports = OIEStatus;
+module.exports = OIESchema;

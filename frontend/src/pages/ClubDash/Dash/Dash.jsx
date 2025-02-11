@@ -7,8 +7,9 @@ import people from '../../../assets/people.svg'
 import RedGrad from '../../../assets/Gradients/ClubAdminGrad.png';
 import { Icon } from '@iconify-icon/react';
 import CreateEvent from '../../../components/EventsViewer/EventsGrid/EventsColumn/CreateEventButton/CreateEvent';
+import ClubEvent from '../ClubEventsComponents/Event/ClubEvent';
 
-function Dash({expandedClass, openMembers, clubName}){
+function Dash({expandedClass, openMembers, clubName, meetings}){
     //define welcometext to be either good morning, good afternoon, or good evening, in one line
     const welcomeText = `Good ${new Date().getHours() < 12 ? "Morning" : new Date().getHours() < 18 ? "Afternoon" : "Evening"}`;
     
@@ -54,18 +55,25 @@ function Dash({expandedClass, openMembers, clubName}){
                 </div>
                 </div>
                 <div className="column">
-                <h1>meetings coming up</h1>
-                <div className="content meeting">
-                    <h2>Random Student Event <button>manage</button></h2>
-                </div>
+                <h1>quick actions</h1>
+                <CreateEvent origin={clubName}/>
 
                </div>
                 
             </div>
             <div className="row">
                 <div className="column">
-                    <h1>quick actions</h1>
-                    <CreateEvent origin={clubName}/>
+                    <h1>upcoming events</h1>
+                    <div className="meeting">
+                        {
+                            meetings && meetings.events && meetings.events.length > 0 ? meetings.events.map((meeting, index) => {
+                                //check if meeting is upcoming or past
+                                if(new Date(meeting.start_time) > new Date()){
+                                    return <ClubEvent key={index} event={meeting} />
+                                }
+                            }) : <h2>no meetings scheduled</h2>
+                        }
+                    </div>
                 </div>
             </div>
 

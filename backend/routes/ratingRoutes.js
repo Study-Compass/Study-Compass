@@ -1,9 +1,4 @@
 const express = require('express');
-const Classroom = require('../schemas/classroom.js');
-const Schedule = require('../schemas/schedule.js');
-const Rating = require('../schemas/rating.js');
-const User = require('../schemas/user.js');
-const Report = require('../schemas/report.js');
 const { verifyToken, verifyTokenOptional } = require('../middlewares/verifyToken');
 const { sortByAvailability } = require('../helpers.js');
 const multer = require('multer');
@@ -11,12 +6,14 @@ const path = require('path');
 const s3 = require('../aws-config');
 const mongoose = require('mongoose');
 const { clean } = require('../services/profanityFilterService');
+const getModels = require('../services/getModelService');
 
 const router = express.Router();
 
 
 // Route to get all number of ratings and average for Classroom 
 router.post('/average_rating', verifyToken, async (req, res) => {
+    const { Rating, Classroom, User } = getModels(req, 'Rating', 'Classroom', 'User');
     const classroomId = req.body.classroomId;
     const userId = req.body.userId;
 
@@ -40,6 +37,7 @@ router.post('/average_rating', verifyToken, async (req, res) => {
 
 // Route to update rating to Classroom Schema
 router.post('/update_rating', verifyToken, async (req, res) => {
+    const { Rating, Classroom, User } = getModels(req, 'Rating', 'Classroom', 'User');
     const { classroomId, userId, comment, score, upvotes, downvotes } = req.body;
 
     try {
@@ -91,6 +89,7 @@ router.post('/update_rating', verifyToken, async (req, res) => {
 });
 
 router.get('/get-user-ratings', verifyToken, async (req, res) => {
+    const { Rating } = getModels(req, 'Rating');
     const userId = req.user.userId;
     try{
         const ratings = await Rating.find({ user_id: userId });
@@ -103,6 +102,7 @@ router.get('/get-user-ratings', verifyToken, async (req, res) => {
 });
 
 router.get('/user-rated', verifyToken, async (req, res) => {
+    const { Rating } = getModels(req, 'Rating');
     const userId = req.user.userId;
     const classroomId = req.query.classroomId;
     try{
@@ -121,6 +121,7 @@ router.get('/user-rated', verifyToken, async (req, res) => {
 });
 
 router.get('/get-ratings', async (req, res) => {
+    const { Rating } = getModels(req, 'Rating');
     let classroomId = req.query.classroomId;
     try{
         classroomId = new mongoose.Types.ObjectId(classroomId);
@@ -146,6 +147,7 @@ router.get('/get-ratings', async (req, res) => {
 });
 
 router.post('/delete-rating', verifyToken, async (req, res) => {
+    const { Rating } = getModels(req, 'Rating');
     const userId = req.user.userId;
     const classroomId = req.body.classroomId;
     try{
@@ -184,6 +186,8 @@ router.post('/delete-rating', verifyToken, async (req, res) => {
 // }); 
 
 router.post('/send-report', verifyToken, async (req, res) => {
+    const { Report, User } = getModels(req, 'Report', 'User');
+
     const userId = req.user.userId;
     const report = req.body.report;
     const type = req.body.type;

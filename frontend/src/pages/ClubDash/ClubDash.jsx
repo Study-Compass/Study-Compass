@@ -10,6 +10,7 @@ import {Icon} from '@iconify-icon/react';
 import Dash from './Dash/Dash';
 import Members from './Members/Members';
 import {useFetch} from '../../hooks/useFetch';
+import { use } from 'react';
 
 function ClubDash(){
     const [clubId, setClubId] = useState(useParams().id);
@@ -25,6 +26,7 @@ function ClubDash(){
 
     const [loadingIn, setLoadingIn] = useState(true);
     const orgData = useFetch(`/get-org-by-name/${clubId}`);
+    const meetings = useFetch(`/get-meetings/${clubId}`);
 
     useEffect(()=>{
         if(orgData){
@@ -60,6 +62,18 @@ function ClubDash(){
         }
     }
     ,[orgData]);
+
+    useEffect(()=>{ 
+        if(meetings){
+            if(meetings.error){
+                addNotification({title: "Error", message: meetings.error, type: "error"});
+            }
+            if(meetings.data){
+                console.log(meetings.data);
+            }
+        }
+    },[meetings]);
+
 
     useEffect(()=>{
         if(!userInfo){
@@ -171,7 +185,7 @@ function ClubDash(){
             <div className={`dash-right ${expandedClass}`}>
                 {
                     currentPage === "dash" &&
-                    <Dash expandedClass={expandedClass} openMembers={openMembers} clubName={clubId}/> 
+                    <Dash expandedClass={expandedClass} openMembers={openMembers} clubName={clubId} meetings={meetings.data}/> 
                 }
                 {
                     currentPage === 'members' && 

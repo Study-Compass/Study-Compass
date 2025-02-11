@@ -19,7 +19,4 @@ const memberSchema = new Schema({
     }
 });
 
-
-const OrgMember = mongoose.model('OrgMember', memberSchema, 'members');
-
-module.exports = OrgMember;
+module.exports = memberSchema;

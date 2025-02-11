@@ -8,4 +8,4 @@ const SearchSchema = new mongoose.Schema({
     user_id: { type: Schema.Types.ObjectId, required: false, ref: 'User' }
 });
 
-module.exports = mongoose.model('Search', SearchSchema);
+module.exports = SearchSchema;

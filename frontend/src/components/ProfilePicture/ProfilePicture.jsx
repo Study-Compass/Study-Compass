@@ -68,12 +68,14 @@ function ProfilePicture(){
                         <p>Settings</p>
                     </div>
                 </Link>
-                <Link  to="/create-org">
-                    <div className="menu-item" >
-                        <img className="icon" src={Settings} alt="settings" />
-                        <p>Create an Org</p>
-                    </div>
-                </Link>
+                {user && (user.roles.includes('admin')) && 
+                    <Link  to="/create-org">
+                        <div className="menu-item" >
+                            <img className="icon" src={Settings} alt="settings" />
+                            <p>Create an Org</p>
+                        </div>
+                    </Link>
+                }
                 {user && (user.roles.includes('admin')||user.roles.includes('oie')) && 
                     <>
                         <hr />
