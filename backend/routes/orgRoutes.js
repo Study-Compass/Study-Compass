@@ -83,7 +83,7 @@ router.get("/get-org-by-name/:name", verifyToken, async (req, res) => {
 });
 
 router.post("/create-org", verifyToken, async (req, res) => {
-    const { Org, Member, User } = getModels(req, "Org", "Member", "User");
+    const { Org, OrgMember, User } = getModels(req, "Org", "OrgMember", "User");
     const {
         org_name,
         org_profile_image,
@@ -143,7 +143,7 @@ router.post("/create-org", verifyToken, async (req, res) => {
             owner: userId,
         });
 
-        const newMember = new Member({
+        const newMember = new OrgMember({
             //add new member to the org
             org_id: newOrg._id,
             user_id: userId,
@@ -286,7 +286,7 @@ router.post("/edit-org", verifyToken, async (req, res) => {
 });
 
 router.delete("/delete-org/:orgId", verifyToken, async (req, res) => {
-    const { Org, Follower, Member } = getModels(req, "Org", "Follower", "Member");
+    const { Org, Follower, OrgMember } = getModels(req, "Org", "Follower", "OrgMember");
     try {
         const { orgId } = req.params;
         const userId = req.user.userId;
@@ -434,7 +434,7 @@ router.get("/get-followed-orgs", verifyToken, async (req, res) => {
 });
 
 router.get("/get-org-members/:orgId", verifyToken, async (req, res) => {
-    const { Org, Member } = getModels(req, "Org", "Member");
+    const { Org, OrgMember } = getModels(req, "Org", "OrgMember");
     try {
         const { orgId } = req.params;
         const userId = req.user.userId;
@@ -447,14 +447,14 @@ router.get("/get-org-members/:orgId", verifyToken, async (req, res) => {
         }
 
         // Check if the user is a member of the org
-        const member = await Member.findOne({ org_id: orgId, user_id: userId });
+        const member = await OrgMember.findOne({ org_id: orgId, user_id: userId });
         if (!member) {
             return res
                 .status(400)
                 .json({ success: false, message: "You are not a member of this org" });
         }
 
-        const members = await Member.find({ org_id: orgId }).populate("user_id");
+        const members = await OrgMember.find({ org_id: orgId }).populate("user_id");
         console.log(`GET: /get-org-members`);
         res.json({
             success: true,
@@ -474,7 +474,7 @@ router.get("/get-org-members/:orgId", verifyToken, async (req, res) => {
 });
 
 router.post("/add-org-member/:orgId", verifyToken, async (req, res) => {
-    const { Org, Member } = getModels(req, "Org", "Member");
+    const { Org, OrgMember } = getModels(req, "Org", "OrgMember");
     try {
         const { orgId } = req.params;
         const userId = req.user.userId;
@@ -498,7 +498,7 @@ router.post("/add-org-member/:orgId", verifyToken, async (req, res) => {
         }
 
         // Check if the user to be added is already a member
-        const member = await Member.findOne({ org_id: orgId, user_id: user_id });
+        const member = await OrgMember.findOne({ org_id: orgId, user_id: user_id });
         if (member) {
             return res
                 .status(400)
@@ -508,7 +508,7 @@ router.post("/add-org-member/:orgId", verifyToken, async (req, res) => {
                 });
         }
 
-        const newMember = new Member({
+        const newMember = new OrgMember({
             org_id: orgId,
             user_id,
             role,
@@ -530,7 +530,7 @@ router.post("/add-org-member/:orgId", verifyToken, async (req, res) => {
 });
 
 router.delete("/remove-org-member/:orgId", verifyToken, async (req, res) => {
-    const { Org, Member } = getModels(req, "Org", "Member");
+    const { Org, OrgMember } = getModels(req, "Org", "OrgMember");
     try {
         const { orgId } = req.params;
         const userId = req.user.userId;
@@ -554,14 +554,14 @@ router.delete("/remove-org-member/:orgId", verifyToken, async (req, res) => {
         }
 
         // Check if the user to be removed is a member
-        const member = await Member.findOne({ org_id: orgId, user_id });
+        const member = await OrgMember.findOne({ org_id: orgId, user_id });
         if (!member) {
             return res
                 .status(400)
                 .json({ success: false, message: "User is not a member of this org" });
         }
 
-        await Member.findByIdAndDelete(member._id);
+        await OrgMember.findByIdAndDelete(member._id);
 
         console.log(`DELETE: /remove-org-member`);
         res.json({ success: true, message: "Member removed successfully" });
@@ -578,7 +578,7 @@ router.delete("/remove-org-member/:orgId", verifyToken, async (req, res) => {
 });
 
 router.post("/update-org-member/:orgId", verifyToken, async (req, res) => {
-    const { Org, Member } = getModels(req, "Org", "Member");
+    const { Org, OrgMember } = getModels(req, "Org", "Member");
     try {
         const { orgId } = req.params;
         const userId = req.user.userId;
@@ -602,7 +602,7 @@ router.post("/update-org-member/:orgId", verifyToken, async (req, res) => {
         }
 
         // Check if the user to be updated is a member
-        const member = await Member.findOne({ org_id: orgId, user_id });
+        const member = await OrgMember.findOne({ org_id: orgId, user_id });
         if (!member) {
             return res
                 .status(400)
