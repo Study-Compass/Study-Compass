@@ -41,7 +41,7 @@ router.get("/get-org/:id", verifyToken, async (req, res) => {
 });
 
 router.get("/get-org-by-name/:name", verifyToken, async (req, res) => {
-    const { Org, Member, Follower, User } = getModels(req, "Org", "Member", "Follower", "User");
+    const { Org, OrgMember, OrgFollower, User } = getModels(req, "Org", "OrgMember", "OrgFollower", "User");
     try {
         const orgName = req.params.name;
 
@@ -51,10 +51,10 @@ router.get("/get-org-by-name/:name", verifyToken, async (req, res) => {
             return res.status(404).json({ success: false, message: "Org not found" });
         }
 
-        const orgMembers = await Member.find({ org_id: org._id }).populate(
+        const orgMembers = await OrgMember.find({ org_id: org._id }).populate(
             "user_id"
         );
-        const orgFollowers = await Follower.find({ org_id: org._id }).populate(
+        const orgFollowers = await OrgFollower.find({ org_id: org._id }).populate(
             "user_id"
         );
 
@@ -659,6 +659,30 @@ router.post("/check-org-name", verifyToken, async (req, res) => {
             .json({
                 success: false,
                 message: "Error checking org name",
+                error: error.message,
+            });
+    }
+});
+
+router.get('/get-meetings/:name', verifyToken, async(req,res)=>{
+    const { Org, Event } = getModels(req, "Org", "Event");
+    const name = req.params.name;
+    try {
+        const org = await Org.find({name:name});
+        const events = await Event.find({hosting: org._id, type: "meeting"});
+        console.log(`GET: /get-meetings`);
+        res.json({
+            success: true,
+            message: "Meetings retrieved successfully",
+            events,
+        });
+    } catch (error) {
+        console.log(`GET: /get-meetings failed`, error);
+        return res
+            .status(500)
+            .json({
+                success: false,
+                message: "Error retrieving meetings",
                 error: error.message,
             });
     }
