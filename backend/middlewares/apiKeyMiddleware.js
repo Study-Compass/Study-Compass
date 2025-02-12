@@ -9,13 +9,14 @@ const apiKeyMiddleware = async (req, res, next) => {
     try {
         
         const apiKeyData = await API.findOne({ owner: userId });
+
         console.log(apiKeyData);
         if (!apiKeyData) {
             console.log("API key does not exist for user");
             return res.status(401).json({ error: 'API key does not exist for user' });
         }
 
-        //Add a status for rate limit here, better status more usages 
+        //Add a status for rate limit here, better status more usages , see how wants 
 
         // Apply the rate limiter
         apiKeyRateLimiter(req, res, async (error) => {
@@ -39,3 +40,6 @@ const apiKeyMiddleware = async (req, res, next) => {
 
 
 module.exports = { apiKeyMiddleware };
+
+
+//New task to do is to now apply apiKeyMiddleware into different branches to see if will return me a status 

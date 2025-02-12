@@ -68,6 +68,7 @@ router.delete('/delete-api', verifyToken, apiKeyMiddleware, async (req, res) => 
     const userId = req.user.userId;
     try {
         const deletedApi = await Api.findOneAndDelete({ owner: userId }); 
+        
         if (!deletedApi) {
             console.error('API key not found for deletion');
             return res.status(404).json({ error: 'API key not found.' });
