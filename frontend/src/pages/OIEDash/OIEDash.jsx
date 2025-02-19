@@ -76,6 +76,10 @@ function OIEDash(){
                                 <Icon icon="flowbite:adjustments-horizontal-solid" />
                                 <p>Configuration</p>
                             </li>
+                            <li onClick={()=>navigate('/create-event')}>
+                                <Icon icon="ph:plus-bold" className="create-icon"/>
+                                <p>Create Event</p>
+                            </li>
                         </ul>
                     </nav>
                 </div>
