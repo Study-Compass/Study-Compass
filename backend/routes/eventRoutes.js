@@ -44,10 +44,12 @@ router.post('/create-event', verifyToken, async (req, res) => {
         }
 
 
-        await event.save();
         if (OIE) {
             await OIE.save();
         }
+        // attach oie reference 
+        event.OIEReference = OIE ? OIE._id : null;
+        await event.save();
         console.log('POST: /create-event successful');
         res.status(201).json({
             success: true,
@@ -354,7 +356,7 @@ router.post('/approve-event', verifyToken, async (req, res) => {
 
 router.get('/get-events-by-month', verifyToken, authorizeRoles('oie'), async (req, res) => {
     const { Event } = getModels(req, 'Event');
-    const { month, year } = req.query;
+    const { month, year, filter } = req.query;
 
     if (!month || !year) {
         return res.status(400).json({
@@ -368,14 +370,24 @@ router.get('/get-events-by-month', verifyToken, authorizeRoles('oie'), async (re
         const parsedMonth = parseInt(month, 10) - 1; // JavaScript months are 0-indexed
         const parsedYear = parseInt(year, 10);
 
+        const filterObj = filter ? JSON.parse(decodeURIComponent(filter)) : null;
+
         // Construct the start and end of the month
         const startOfMonth = new Date(parsedYear, parsedMonth, 1); // First day of the month
         const endOfMonth = new Date(parsedYear, parsedMonth + 1, 0, 23, 59, 59, 999); // Last day of the month
+        
+        const query = filterObj && filterObj.type !== "all" ?{
+            start_time: { $gte: startOfMonth, $lte: endOfMonth },
+            ...filterObj
+        } :
+        {
+            start_time: { $gte: startOfMonth, $lte: endOfMonth },
+        };
 
         // Query events with dates within the range
-        const events = await Event.find({
-            start_time: { $gte: startOfMonth, $lte: endOfMonth }
-        }).populate('classroom_id');
+        const events = await Event.find(query)
+            .populate('classroom_id')
+            .populate('hostingId');
 
         console.log('GET: /get-events-by-month successful');
         res.status(200).json({
@@ -392,7 +404,7 @@ router.get('/get-events-by-month', verifyToken, authorizeRoles('oie'), async (re
 });
 
 router.get('/get-events-by-range', verifyToken, authorizeRoles('oie'), async (req, res) => {
-    const { Event } = getModels(req, 'Event');
+    const { Event, OIEStatus } = getModels(req, 'Event', 'OIEStatus');
     const { start, end, filter } = req.query;
 
     if (!start || !end) {
@@ -408,7 +420,29 @@ router.get('/get-events-by-range', verifyToken, authorizeRoles('oie'), async (re
         //log dates
         //make into eastern time
         //print formatted time
-        const filterObj = filter ? JSON.parse(decodeURIComponent(filter)) : null;
+        let filterObj;
+
+        const safeOperators = ['$gte', '$lte', '$eq', '$ne', '$in']; // Allow only these
+        if (filter) {
+            try {
+                const decodedFilter = JSON.parse(decodeURIComponent(filter));
+                Object.keys(decodedFilter).forEach(key => {
+                    if (typeof decodedFilter[key] === 'object') {
+                        Object.keys(decodedFilter[key]).forEach(op => {
+                            if (!safeOperators.includes(op)) {
+                                throw new Error('Invalid query operator');
+                            }
+                        });
+                    }
+                });
+                filterObj = decodedFilter;
+            } catch (error) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Invalid filter format.',
+                });
+            }
+        }
 
         const query = filterObj && filterObj.type !== "all" ?{
             start_time: { $gte: startOfRange, $lte: endOfRange },
@@ -419,7 +453,10 @@ router.get('/get-events-by-range', verifyToken, authorizeRoles('oie'), async (re
         };
 
 
-        const events = await Event.find(query).populate('classroom_id');
+        const events = await Event.find(query)
+            .populate('classroom_id')
+            .populate('hostingId')
+            .populate('OIEReference');
 
         console.log('GET: /get-events-by-week successful');
         res.status(200).json({

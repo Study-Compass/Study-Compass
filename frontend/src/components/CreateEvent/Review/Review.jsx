@@ -13,33 +13,67 @@ function Review({info, visible, setInfo, onSubmit}){
     const [pspeak, setPspeak]  = useState(false);
     const [catering, setCatering] = useState(false);
     const [alumni, setAlumni] = useState(false);
+    const [none, setNone] = useState(false);
     
+    //criteria to be able to create event
+    const [selected, setSelected] = useState(false);
     const [contact, setContact] = useState("");
+
+    const [complete, setComplete] = useState(false);
 
     const handleChange = (e) => {
         const {name} = e.target;
+        console.log(name);
         switch(name){
             case "catering":
                 setCatering(!catering);
+                if(none){
+                    setNone(false);
+                }
                 break;
             case "pspeak":
                 setPspeak(!pspeak);
+                if(none){
+                    setNone(false);
+                }
                 break;
             case "alumni":
                 setAlumni(!alumni);
+                if(none){
+                    setNone(false);
+                }
                 break;
+            case "none":
+                setCatering(false);
+                setPspeak(false);
+                setAlumni(false);
+                setNone(!none);
             default:
                 break;
         }
     }
 
     useEffect(()=>{
+        if(pspeak || catering || alumni || none){
+            setSelected(true);
+        } else {
+            setSelected(false);
+        }
         setInfo(prev => ({
             ...prev,
             OIEAcknowledgementItems: pspeak ? catering ? ["pspeak", "catering"] : ["pspeak"] : catering ? ["catering"] : [],
             contact: contact
         }));
-    },[pspeak, catering, contact]);
+    },[pspeak, catering, contact, alumni, none, contact]);
+
+    useEffect(()=>{
+        if(selected && contact !== ""){
+            setComplete(true);
+        } else {
+            setComplete(false);
+        }
+        console.log(contact);
+    },[selected, contact]);
 
     return(
         <div className={`create-component review ${visible && "visible"}`}>
@@ -57,11 +91,15 @@ function Review({info, visible, setInfo, onSubmit}){
                     }
                 </div>
                 <div className="col">
+                    <div className="contact">
+                        <h4>email address for contact:</h4>
+                        <input type="email" value={contact} onChange={(e)=>setContact(e.target.value)}/>
+                    </div>
                     <div className="oie-acknowledgement">
-                        <h4>Before you submit, select all that apply below:</h4>
+                        <h4>before you submit, select at least one below:</h4>
                         <div className="acknowledgement">
                             <label className="check">
-                                <input type="checkbox" id="pspeak" name="pspeak" value={pspeak} onChange={handleChange}/>
+                                <input type="checkbox" id="pspeak" name="pspeak" checked={pspeak} onChange={handleChange}/>
                                 <span className="checkmark">
                                     <Icon icon="icon-park-solid:check-one" />
                                 </span>
@@ -70,7 +108,7 @@ function Review({info, visible, setInfo, onSubmit}){
                         </div>
                         <div className="acknowledgement">
                             <label className="check">
-                                <input type="checkbox" id="catering" name="catering" value={catering} onChange={handleChange}/>
+                                <input type="checkbox" id="catering" name="catering" checked={catering} onChange={handleChange}/>
                                 <span className="checkmark">
                                     <Icon icon="icon-park-solid:check-one" />
                                 </span>
@@ -79,20 +117,29 @@ function Review({info, visible, setInfo, onSubmit}){
                         </div>
                         <div className="acknowledgement">
                             <label className="check">
-                                <input type="checkbox" id="alumni" name="alumni" value={alumni} onChange={handleChange}/>
+                                <input type="checkbox" id="alumni" name="alumni" checked={alumni} onChange={handleChange}/>
                                 <span className="checkmark">
                                     <Icon icon="icon-park-solid:check-one" />
                                 </span>
                             </label>
                             <label htmlFor="alumni">This event includes alumni speakers</label>
                         </div>
+                        <div className="acknowledgement">
+                            <label className="check">
+                                <input type="checkbox" id="none" name="none" checked={none} onChange={handleChange}/>
+                                <span className="checkmark">
+                                    <Icon icon="icon-park-solid:check-one" />
+                                </span>
+                            </label>
+                            <label htmlFor="none">None of the above</label>
+                        </div>
                     </div>
                 </div>
-                
+
             </div>
             <div className="publish-container">
                 {visible && 
-                    <div className="publish" onClick={onSubmit}>
+                    <div className={`publish ${complete && 'active'}`} onClick={complete ? onSubmit : ()=>{}}>
                         <div className="info">
                             <h1>{pspeak || catering || info.expectedAttendance > 99 || alumni ? "request OIE approval" : "publish event"}</h1>
                         </div>

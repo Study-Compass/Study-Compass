@@ -67,6 +67,10 @@ function CreateEvent(){
         setFinishedStep(step+1);
     }
 
+    useEffect(()=>{
+        console.log(info);
+    }, [info])
+
     const renderStep = () => {
         switch(step){
             case 0:
@@ -103,7 +107,7 @@ function CreateEvent(){
         }
         const response = await createEvent(formattedInfo);
         if(response){
-            // addNotification({title: "Event created", message: "Your event has been created", type: "success"});
+            addNotification({title: "Event created", message: "Your event has been created", type: "success"});
 
         } else {
             addNotification({title: "Failed to create event", message: "An error occurred while creating your event", type: "error"});

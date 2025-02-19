@@ -22,7 +22,10 @@ function CalendarEvent({event}){
     return (
         <div className={`calendar-event`} onClick={handleEventClick}>
             <Popup isOpen={popupOpen} onClose={onPopupClose} customClassName={"wide-content no-padding no-styling oie"} waitForLoad={true} >
-                 <FullEvent event={event}/>
+                {event.OIEReference  ? 
+                <OIEFullEvent event={event} refetch={console.log} setEdited={console.log}/> :
+                <FullEvent event={event}/>
+}
             </Popup>
 
             <div className="event-time">

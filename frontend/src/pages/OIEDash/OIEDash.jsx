@@ -89,7 +89,7 @@ function OIEDash(){
                             <p className="email">{user.email}</p>
                         </div>
                     </div>
-                    <div className="back">
+                    <div className="back" onClick={()=>navigate('/room/none')}>
                         <Icon icon="ep:back"/>
                         <p>back to study compass</p>
                     </div>

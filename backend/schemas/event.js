@@ -65,7 +65,7 @@ const eventSchema = new mongoose.Schema({
     },
     OIEReference: {
         type: Schema.Types.ObjectId,
-        ref: 'OIEStatus'
+        ref: 'OIE'
     },
     OIEAcknowledgementItems: {
         type: Array,

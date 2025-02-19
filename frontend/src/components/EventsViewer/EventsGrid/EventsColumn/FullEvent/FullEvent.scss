@@ -48,4 +48,38 @@
         height:110px;
         height:30%;
     }
+    .row.hosting{
+        display: flex;
+        align-items: center;
+        img{
+            width:25px;
+            height:25px;
+            border-radius: 50%;
+            margin-right:5px;
+        }
+        .user-name{
+            font-weight: 700;
+            font-size:16px;
+            white-space: nowrap;  
+            overflow: hidden;    
+            text-overflow: ellipsis;
+        }
+        .level{
+            font-size:10px;
+            font-weight: 700;
+            color: var(--background);
+            background-color: var(--green);
+            padding:1px 5px;
+            border-radius: 5px;
+            &.faculty{
+                background-color: var(--blue);
+            }
+            &.organization{
+                background-color: var(--red);
+            }
+            &.developer{
+                background-color: var(--developerBlue);
+            }
+        }
+    }
 }

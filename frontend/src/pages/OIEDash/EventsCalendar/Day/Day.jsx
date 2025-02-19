@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { Icon } from '@iconify-icon/react/dist/iconify.mjs';
 import { useFetch } from '../../../../hooks/useFetch';
 import DailyCalendar from './DailyCalendar/DailyCalendar';
-import { use } from 'react';
 
 function Day({ height, start = new Date(new Date().setHours(0, 0, 0, 0)) , startingText = "", nav=true }) {
     const initialStartDate = typeof start === 'string' ? new Date(start) : start;
