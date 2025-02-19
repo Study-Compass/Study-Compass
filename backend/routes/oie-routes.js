@@ -1,67 +1,59 @@
 const express = require('express');
 const router = express.Router();
 const { verifyToken, authorizeRoles } = require('../middlewares/verifyToken');
-const OIEConfig = require('../schemas/OIEConfig');
-const OIEStatus = require('../schemas/OIE');
-const Event = require('../schemas/event');
+const oieConfigSchema = require('../schemas/OIEConfig');
+const oieStatusSchema = require('../schemas/OIE');
+const eventSchema = require('../schemas/event');
+const getModels = require('../services/getModelService');
 
 router.get('/config', verifyToken, authorizeRoles('oie'), async (req, res) => {
+    const { OIEConfig } = getModels(req, 'OIEConfig');
     try {
         const config = await OIEConfig.findOne({});
-        if (!config) {
-            return res.status(404).json({ message: 'Config not found' });
-        }
-        console.log('GET: /config successful');
+        if (!config) return res.status(404).json({ message: 'Config not found' });
         res.json(config);
     } catch (error) {
-        console.log('GET: /config failed', error);
         res.status(500).json({ message: error.message });
     }
 });
 
 router.post('/config', verifyToken, authorizeRoles('oie'), async (req, res) => {
+    const { OIEConfig } = getModels(req, 'OIEConfig');
     try {
-        const config = await OIEConfig.findOne({});
+        let config = await OIEConfig.findOne({});
         if (config) {
-            // Update existing config
             config.config = req.body.config;
             await config.save();
-            return res.json(config);
+        } else {
+            config = new OIEConfig(req.body);
+            await config.save();
         }
-        const newConfig = new OIEConfig(req.body);
-        await newConfig.save();
-        console.log('POST: /config successful');
-        res.json(newConfig);
+        res.json(config);
     } catch (error) {
-        console.log("POST: /config failed", error);
         res.status(500).json({ message: error.message });
     }
 });
 
 router.post('/oie-status', verifyToken, authorizeRoles('oie'), async (req, res) => {
+    const { OIEStatus, Event } = getModels(req, 'OIEStatus', 'Event');
     try {
         const { eventRef, status, checkListItems } = req.body;
-        const oieStatus = await OIEStatus.findOne({ eventRef });
+        let oieStatus = await OIEStatus.findOne({ eventRef });
         if (oieStatus) {
             oieStatus.status = status;
             oieStatus.checkListItems = checkListItems;
             await oieStatus.save();
-            const event = await Event.findById(eventRef);
+        } else {
+            oieStatus = new OIEStatus(req.body);
+            await oieStatus.save();
+        }
+        const event = await Event.findById(eventRef);
+        if (event) {
             event.OIEStatus = status;
             await event.save();
-            console.log('POST: /oie-status successful');
-            return res.json(oieStatus);
         }
-        const newOIEStatus = new OIEStatus(req.body);
-        await newOIEStatus.save();
-        const event = await Event.findById(eventRef);
-        event.OIEStatus = status;
-        await event.save();
-        console.log(event);
-        console.log('POST: /oie-status successful');
-        res.json(newOIEStatus);
+        res.json(oieStatus);
     } catch (error) {
-        console.log('POST: /oie-status failed', error);
         res.status(500).json({ message: error.message });
     }
 });

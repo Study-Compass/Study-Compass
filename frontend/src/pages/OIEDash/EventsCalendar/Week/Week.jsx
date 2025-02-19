@@ -34,16 +34,10 @@ function Week({ height, changeToDay, start = '2025-1-26', startingText = "", nav
 
     const filterParam = encodeURIComponent(JSON.stringify(filter));
 
-
     const url = `/get-events-by-range?start=${encodeURIComponent(startOfWeek.toISOString())}&end=${encodeURIComponent(endOfWeek.toISOString())}&filter=${filterParam}`;
     const events = useFetch(url);
 
 
-    // if (events.loading || !events.data) {
-    //     return <div>Loading...</div>;
-    // }
-
-    
 
     return (
         <>

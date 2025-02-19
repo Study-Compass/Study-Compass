@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import './Landing.scss';
 import logo from '../../assets/red_logo.svg';
 import landing from '../../assets/Landing.png';
@@ -17,6 +17,7 @@ function Landing() {
 
     const [heroLoaded, setHeroLoaded] = useState(false);
     const [gradientLoaded, setGradientLoaded] = useState(false);
+    const location = useLocation();
 
     useEffect(() => {
         setViewport((window.innerHeight) + 'px');
@@ -57,8 +58,6 @@ function Landing() {
                 <h1>where are <b>you</b> studying?</h1>
                 <button className={`try-button ${buttonActive ? "active" : ""} `} onClick={()=>{navigate('/room/none')}}>
                     <Typing entries={typingEntries} showCaret={true}/>
-                    {/* <img src={rightarrow} alt="" /> */}
-
                 </button>
             </div>
         </div>

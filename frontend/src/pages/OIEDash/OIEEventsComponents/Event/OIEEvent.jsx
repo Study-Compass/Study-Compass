@@ -34,14 +34,43 @@ function OIEEvent({event, showStatus=false, refetch, showOIE=false, index, showE
     }
 
     const renderHostingStatus = () => {
-        
+        let hostingImage = '';
+        let hostingName = '';
+        let level = '';
+        if(!event.hostingType){
+            return;
+        }
+        if(event.hostingType === "User"){
+            hostingImage = event.hostingId.image ? event.hostingId.image : defaultAvatar;
+            hostingName = event.hostingId.name;
+            if(event.hostingId.roles.includes("developer")){
+                level = "Developer";
+            } else if(event.hostingId.roles.includes("oie")){
+                level = "Faculty";
+            } else {
+                level = "Student";
+            }
+        } else {
+            hostingImage = event.hostingId.org_profile_image;
+            hostingName = event.hostingId.org_name;
+            level = "Organization";
+        }
+        return (
+            <div className={`row ${level.toLowerCase()}`}>
+                <img src={hostingImage} alt="" />
+                <p className="user-name">{hostingName}</p>
+                <div className={`level ${level.toLowerCase()}`}>
+                    {level}
+                </div>
+            </div>
+        );
     }
 
     return(
         <div className="oie-event-component" style={index ? {animationDelay: `${index * 0.1}s`}:{}}>
             <Popup isOpen={popupOpen} onClose={onPopupClose} customClassName={"wide-content no-padding no-styling oie"} waitForLoad={true} >
                 {showOIE && !(event.OIEStatus === "Not Applicable") ?
-                 <OIEFullEvent event={event} refetch={refetch} setEdited={setEdited}/>
+                    <OIEFullEvent event={event} refetch={refetch} setEdited={setEdited}/>
                 :
                     <FullEvent event={event}/>
                 }
@@ -53,13 +82,7 @@ function OIEEvent({event, showStatus=false, refetch, showOIE=false, index, showE
                 <h2>{event.name}</h2>
                 {/* <p>{event.location }</p> */}
                 {/* display date in day of the week, month/day */}
-                <div className="row">
-                    <img src={event.hostingType === "User" ? event.hostingId.image ? event.hostingId.image : defaultAvatar : event.hostingId.org_profile_image} alt="" />
-                    <p className="user-name">{event.hostingType === "User" ? event.hostingId.name : event.hostingId.org_name}</p>
-                    <div className="level">
-                        {event.hostingType === "User" ? "Student" : "Organization"}
-                    </div>
-                </div>
+                {renderHostingStatus()}
                 <div className="row">
                     <Icon icon="heroicons:calendar-16-solid" />
                     <p>{date.toLocaleString('default', {weekday: 'long'})} {date.toLocaleString('default', {month: 'numeric'})}/{date.getDate()}</p>

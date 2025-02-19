@@ -9,6 +9,4 @@ const BadgeGrantSchema = new mongoose.Schema({
   hash: { type: String, required: true, unique: true, default: uuidv4 },
 });
 
-const BadgeGrant = mongoose.model('BadgeGrant', BadgeGrantSchema);
-
-module.exports = BadgeGrant;
+module.exports = BadgeGrantSchema;

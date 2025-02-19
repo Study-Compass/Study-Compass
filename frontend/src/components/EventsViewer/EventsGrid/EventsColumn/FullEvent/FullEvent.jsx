@@ -4,6 +4,7 @@ import './FullEvent.scss';
 import {Icon} from '@iconify-icon/react';  
 import StarGradient from '../../../../../assets/StarGradient.png'
 import MockPoster from '../../../../../assets/MockPoster.png'
+import defaultAvatar from '../../../../../assets/defaultAvatar.svg'
 
 function FullEvent({ event }){
     const navigate = useNavigate();
@@ -13,6 +14,39 @@ function FullEvent({ event }){
     }
     const date = new Date(event.start_time);
     const dateEnd = new Date(event.end_time);
+    
+    const renderHostingStatus = () => {
+        let hostingImage = '';
+        let hostingName = '';
+        let level = '';
+        if(!event.hostingType){
+            return;
+        }
+        if(event.hostingType === "User"){
+            hostingImage = event.hostingId.image ? event.hostingId.image : defaultAvatar;
+            hostingName = event.hostingId.name;
+            if(event.hostingId.roles.includes("developer")){
+                level = "Developer";
+            } else if(event.hostingId.roles.includes("oie")){
+                level = "Faculty";
+            } else {
+                level = "Student";
+            }
+        } else {
+            hostingImage = event.hostingId.org_profile_image;
+            hostingName = event.hostingId.org_name;
+            level = "Organization";
+        }
+        return (
+            <div className={`row hosting ${level.toLowerCase()}`}>
+                <img src={hostingImage} alt="" />
+                <p className="user-name">{hostingName}</p>
+                <div className={`level ${level.toLowerCase()}`}>
+                    {level}
+                </div>
+            </div>
+        );
+    }
 
     return(
         <div className="full-event">
@@ -21,6 +55,7 @@ function FullEvent({ event }){
             </div>
             <div className="event-content">
                 <h1>{event.name}</h1>
+                {renderHostingStatus()}
                 <div className="row">
                     <Icon icon="heroicons:calendar-16-solid" />
                     <div className="col">
@@ -30,7 +65,7 @@ function FullEvent({ event }){
                 </div>
                 <div className="row">
                     <Icon icon="fluent:location-28-filled" />
-                    <p>{event.location[0]}</p>
+                    <p>{event.location}</p>
                 </div>
             </div>
             <img src={StarGradient} alt="" className="gradient" />

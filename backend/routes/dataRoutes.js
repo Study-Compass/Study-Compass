@@ -1,10 +1,10 @@
 const express = require('express');
-const Classroom = require('../schemas/classroom.js');
-const Schedule = require('../schemas/schedule.js');
-const Rating = require('../schemas/rating.js');
-const User = require('../schemas/user.js');
-const History = require('../schemas/studyHistory.js');
-const Report = require('../schemas/report.js');
+const ratingSchema = require('../schemas/rating.js');
+const userSchema = require('../schemas/user.js');
+const classroomSchema = require('../schemas/classroom.js');
+const scheduleSchema = require('../schemas/schedule.js');
+
+const historySchema = require('../schemas/studyHistory.js');
 const { verifyToken, verifyTokenOptional } = require('../middlewares/verifyToken');
 const { sortByAvailability } = require('../helpers.js');
 const multer = require('multer');
@@ -12,12 +12,17 @@ const path = require('path');
 const s3 = require('../aws-config');
 const mongoose = require('mongoose');
 const { clean } = require('../services/profanityFilterService');
+const getModels = require('../services/getModelService');
 
 
 const router = express.Router();
 
 // Route to get a specific classroom by name
 router.get('/getroom/:id', async (req, res) => {
+    const { Classroom, Schedule } = getModels(req, 'Classroom', 'Schedule');
+    // const Classroom = req.db.model('Classroom', classroomSchema, "classrooms1");
+    // const Schedule = req.db.model('Schedule', scheduleSchema, "schedules");
+
     try {
         const roomId = req.params.id;
         
@@ -48,6 +53,8 @@ router.get('/getroom/:id', async (req, res) => {
 
 // Route to get all classroom names
 router.get('/getrooms', async (req, res) => {
+    const { Classroom } = getModels(req, 'Classroom');
+
     try {
         // Fetch all classrooms and only select their names
         const allRooms = await Classroom.find({}).select('name _id');
@@ -91,7 +98,10 @@ router.post('/free', async (req, res) => {
         return conditions;
     };
 
+    const { Schedule, Classroom } = getModels(req, 'Schedule', 'Classroom');
+
     try {
+
         const queryConditions = createTimePeriodQuery(freePeriods);
         const mongoQuery = { "$and": queryConditions };
 
@@ -117,7 +127,10 @@ router.post('/getbatch', async (req, res) => {
 
     console.log(`POST: /getbatch`, JSON.stringify(req.body.queries));
 
+    const { Schedule } = getModels(req, 'Schedule');
+
     try {
+        
         // Map the queries to their indices to preserve order later
         const indexedQueries = queries.map((query, index) => ({ query, index }));
 
@@ -183,9 +196,74 @@ router.post('/getbatch', async (req, res) => {
     }
 });
 
+router.post('/getbatch-new', async (req, res) => {
+    const queries = req.body.queries;
+    const exhaustive = req.body.exhaustive;
+
+    console.log(`POST: /getbatch`, JSON.stringify(req.body.queries));
+
+    const { Schedule } = getModels(req, 'Schedule');
+
+    try {
+
+        // Map queries to indices to preserve order
+        const indexedQueries = queries.map((query, index) => ({ query, index }));
+
+        // Filter out 'none' queries and convert IDs to ObjectId
+        const validQueries = indexedQueries.filter(item => item.query !== "none");
+        const queryIds = validQueries.map(item => new mongoose.Types.ObjectId(item.query));
+
+        // Fetch schedules and populate the referenced classrooms
+        let schedules = await Schedule.find({ classroom_id: { $in: queryIds } })
+            .populate(exhaustive ? { path: 'classroom_id', model: 'Classroom' } : '')
+            .lean();
+
+        // Create a mapping from classroom_id to schedule data
+        const dataMap = {};
+        schedules.forEach(item => {
+            dataMap[item.classroom_id._id.toString()] = item;
+        });
+
+        // Build the final results array
+        const results = indexedQueries.map(({ query, index }) => {
+            if (query === "none") {
+                return { index, result: { data: new Schedule() } };
+            }
+
+            const data = dataMap[query];
+            if (!data) {
+                return null;
+            }
+
+            const result = { data };
+            if (exhaustive) {
+                result.room = data.classroom_id ? data.classroom_id : "not found";
+            }
+            return { index, result };
+        }).filter(item => item !== null);
+
+        // Sort the results to maintain original order
+        results.sort((a, b) => a.index - b.index);
+
+        // Extract the result objects
+        const finalResults = results.map(item => item.result);
+
+        // Send the response
+        res.json({ success: true, message: "Rooms found", data: finalResults });
+    } catch (error) {
+        return res.status(500).json({ success: false, message: 'Error retrieving data', error: error.message });
+    }
+});
+
+
 
 router.get('/get-recommendation', verifyTokenOptional, async (req, res) => {
     const userId = req.user ? req.user.userId : null;
+    // const { User, Schedule, Classroom } = getModels(req, 'User', 'Schedule', 'Classroom');
+    const User = req.db.model('User', userSchema, "users");
+    const Schedule = req.db.model('Schedule', scheduleSchema, "schedules");
+    const Classroom = req.db.model('Classroom', classroomSchema, "classrooms1");
+
     try {
         let user;
         let randomClassroom;
@@ -262,6 +340,7 @@ router.get('/get-recommendation', verifyTokenOptional, async (req, res) => {
 });
 
 router.get("/get-history", verifyToken, async (req,res) => {
+    const { History } = getModels(req, 'History');
     const userId = req.user.userId;
     try{
         //takes in user id, returns all study history objects associated with user
@@ -282,6 +361,7 @@ router.get("/get-history", verifyToken, async (req,res) => {
 
 
 router.delete("/delete-history",verifyToken, async (req,res)=>{
+    const { History } = getModels(req, 'History');
     // takes in study history id and deletes object
     const histId = req.body.histId;
     try{
@@ -289,12 +369,12 @@ router.delete("/delete-history",verifyToken, async (req,res)=>{
         //check if successful, if success, return success status, if not, return 404
         //if deleted acount =0 then return 404
      
-    if (deleteHist.deletedCount!==0){
-        console.log(`DELETE: /delete-history`);
-        return res.status(200).json({success: true, message: 'History sucessfully deleted', data: deleteHist});
-    } else {
-        return res.status(404).json({ success: false, message: 'Could not delete history' });
-    }
+        if (deleteHist.deletedCount!==0){
+            console.log(`DELETE: /delete-history`);
+            return res.status(200).json({success: true, message: 'History sucessfully deleted', data: deleteHist});
+        } else {
+            return res.status(404).json({ success: false, message: 'Could not delete history' });
+        }
     
 
     }catch(error){

@@ -32,14 +32,13 @@ function EventsCalendar({expandedClass}){
         console.log(day);
         setSelected(day);
         setView(2);
-    } 
-
+    }
 
     return (
         <div className={`events-calendar ${expandedClass}`}>
             <div className="top-bar">
                 <Switch options={["month", "week", "day", "list"]} onChange={setView} selectedPass={view} setSelectedPass={setView}/>
-                <Filter options={["all", "study", "campus", "social", "club", "meeting", "sports"]} selected={filter.type} setSelected={(type)=>setFilter({...filter, type})} label={"type"}/>
+                <Filter options={["all", "study", "campus", "social", "club", "meeting", "sports"]} selected={filter.type} setSelected={(type)=>setFilter({...filter, type})} label={"filter"}/>
             </div>
 
             <div className="content" ref={contentRef}>
