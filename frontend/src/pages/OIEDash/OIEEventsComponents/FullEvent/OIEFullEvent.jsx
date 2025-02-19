@@ -13,6 +13,7 @@ const acknowledgements = {
     'pspeak' : 'This event is asking the President to speak',
     'people' : 'This event has over 100 people expected to attend',
     'alumni' : 'This event is planning to have an alumni speaker',
+    'catering' : 'This event requires catering',
 
 }
 
@@ -118,6 +119,8 @@ function OIEFullEvent({ event, eventId = null, setEdited }){
         return "";
     }
 
+    console.log(event.OIEAcknowledgementItems)
+
     return(
         <div className="full-event oie">
             <div className="tabs">
@@ -175,7 +178,7 @@ function OIEFullEvent({ event, eventId = null, setEdited }){
                                     </div>
                                     {event.OIEAcknowledgementItems.map((item, index) => (
                                         <div className="requirement" key={index}>
-                                            <p>{acknowledgements.item}</p>
+                                            <p>{acknowledgements[item]}</p>
                                         </div>
                                     ))}
                                     {
