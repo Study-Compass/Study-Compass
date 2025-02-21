@@ -22,11 +22,11 @@ const getMonthName = (month) => {
     return months[month - 1];
 };
 
-
-function Month({ height, changeToWeek }) {
+function Month({ height, changeToWeek, filter}) {
     const [month, setMonth] = useState(2);
     const [year, setYear] = useState(2025);
-    const url = `/get-events-by-month?month=${month}&year=${year}`;
+    const filterParam = encodeURIComponent(JSON.stringify(filter));
+    const url = `/get-events-by-month?month=${month}&year=${year}&filter=${filterParam}`;
     const events = useFetch(url);
     const daysInMonth = getDaysInMonth(month, year); // Total days in the given month
     const firstDayOfWeek = getFirstDayOfWeek(month, year); // Starting weekday

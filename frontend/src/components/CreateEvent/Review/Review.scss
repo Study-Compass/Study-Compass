@@ -6,6 +6,9 @@
         flex-direction: column;
         .col{
             justify-content: space-between;
+            padding: 20px;
+            box-sizing: border-box;
+            gap: 20px;
         }
         .preview{
             display:flex;
@@ -15,16 +18,15 @@
                 box-shadow: var(--shadow);
             }
         }
+        h4{
+            margin:0;
+        }
         .oie-acknowledgement{
-            color:var(--text);
-            padding:20px;
             border-radius: 10px;
             display:flex;
             flex-direction: column;
             gap:10px;
-            h4{
-                margin:0;
-            }
+            color:var(--text);
             .acknowledgement{
                 display:flex;
                 gap:10px;
@@ -67,6 +69,12 @@
                 }
             }
         }
+        .contact{
+            color: var(--text);
+            input{
+                margin-top:10px;
+            }
+        }
     }
 
     .publish-container{
@@ -74,11 +82,12 @@
         align-items: center;
         justify-content: center;
         width:100%;
-        margin-top:50px;
         box-sizing: border-box;
+        padding: 20px 0;
     }
 
     .publish{
+        cursor:not-allowed;
         display:flex;
         align-items: center;
         justify-content: center;
@@ -88,9 +97,9 @@
         overflow: show;
         z-index: 1;
         animation: glint 3s infinite linear;
-        border:1px solid var(--lightborder);
+        border:1px solid var(--lighterborder);
         border-radius: 10px;
-        background-color: var(--background);
+        background-color: var(--lighter);
         
         &::after{
             transition: all 0.5s;
@@ -105,14 +114,7 @@
             top: 0;
             opacity: 0;
         }
-    
-        &:hover{
-            border:1px solid transparent;
-        }
-    
-        &:hover::after{
-            opacity:1;
-        }
+
     
         .gradient-cover{
             width:100%;
@@ -131,12 +133,6 @@
             }
         }
     
-        &:hover .gradient-cover img{
-            top:0;
-            width:130%;
-            left:0;
-            opacity: 1;
-        }
     
         .info{
             display:flex;
@@ -147,18 +143,36 @@
             z-index: 2;
             transition: all 0.5s;
             h1{
-                color:var(--text);
+                color: var(--darkborder);
                 transition: all 0.5s;
                 margin:0;
                 font-size:18px;
             }
         }
-    
-        &:hover .info{
-            color: var(--background);
-            h1{
-                color: var(--background);
+        &.active{
+            cursor:pointer;
+            background-color: var(--background);
+            .info{
+                h1{
+                    color: var(--background);
+                }
             }
+
+            .gradient-cover img{
+                top:0;
+                width:130%;
+                left:0;
+                opacity: 1;
+            }
+
+            &:hover{
+                border:1px solid transparent;
+            }
+        
+            &:hover::after{
+                opacity:1;
+            }
+
         }
     }
     

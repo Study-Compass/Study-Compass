@@ -7,6 +7,15 @@ import MockPoster from '../../../../assets/MockPoster.png';
 import { useFetch } from '../../../../hooks/useFetch';
 import { useNotification } from '../../../../NotificationContext';
 import axios from 'axios';
+import defaultAvatar from '../../../../assets/defaultAvatar.svg';
+
+const acknowledgements = {
+    'pspeak' : 'This event is asking the President to speak',
+    'people' : 'This event has over 100 people expected to attend',
+    'alumni' : 'This event is planning to have an alumni speaker',
+    'catering' : 'This event requires catering',
+
+}
 
 function OIEFullEvent({ event, eventId = null, setEdited }){
     const { addNotification } = useNotification();
@@ -44,6 +53,39 @@ function OIEFullEvent({ event, eventId = null, setEdited }){
         fullEvent.refetch();
     }
 
+    const renderHostingStatus = () => {
+        let hostingImage = '';
+        let hostingName = '';
+        let level = '';
+        if(!event.hostingType){
+            return;
+        }
+        if(event.hostingType === "User"){
+            hostingImage = event.hostingId.image ? event.hostingId.image : defaultAvatar;
+            hostingName = event.hostingId.name;
+            if(event.hostingId.roles.includes("developer")){
+                level = "Developer";
+            } else if(event.hostingId.roles.includes("oie")){
+                level = "Faculty";
+            } else {
+                level = "Student";
+            }
+        } else {
+            hostingImage = event.hostingId.org_profile_image;
+            hostingName = event.hostingId.org_name;
+            level = "Organization";
+        }
+        return (
+            <div className={`row hosting ${level.toLowerCase()}`}>
+                <img src={hostingImage} alt="" />
+                <p className="user-name">{hostingName}</p>
+                <div className={`level ${level.toLowerCase()}`}>
+                    {level}
+                </div>
+            </div>
+        );
+    }
+
     const changeOIE = async (newOIE) => {
         try{
             const auth = {headers: {"Authorization": `Bearer ${localStorage.getItem("token")}`}};
@@ -77,6 +119,8 @@ function OIEFullEvent({ event, eventId = null, setEdited }){
         return "";
     }
 
+    console.log(event.OIEAcknowledgementItems)
+
     return(
         <div className="full-event oie">
             <div className="tabs">
@@ -100,6 +144,9 @@ function OIEFullEvent({ event, eventId = null, setEdited }){
                     </div>
                     <div className="content">
                         <h1>{event.name}</h1>
+                        <div className="row">
+                            {renderHostingStatus()}
+                        </div>
                         <div className="row">
                             <Icon icon="heroicons:calendar-16-solid" />
                             <div className="col">
@@ -131,12 +178,18 @@ function OIEFullEvent({ event, eventId = null, setEdited }){
                                     </div>
                                     {event.OIEAcknowledgementItems.map((item, index) => (
                                         <div className="requirement" key={index}>
-                                            <p>{item}</p>
+                                            <p>{acknowledgements[item]}</p>
                                         </div>
                                     ))}
+                                    {
+                                        event.expectedAttendance > 100 &&
+                                            <div className="requirement">
+                                                <p>{acknowledgements.people}</p>
+                                            </div>
+                                    }
                                 </div>
                                 <p>Approval requested {new Date(fullEvent.data.event.createdAt).toLocaleString('default', {weekday: 'long'})}, {new Date(fullEvent.data.event.createdAt).toLocaleString('default', {month: 'long'})} {new Date(fullEvent.data.event.createdAt).getDate()}</p>
-                                <p className="contact">contact: jbliu88@gmail.com</p>
+                                <p className="contact">contact: {event.contact}</p>
 
                             </>
                         }

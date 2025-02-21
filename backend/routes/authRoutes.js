@@ -10,8 +10,7 @@ const router = express.Router();
 const { verifyToken } = require('../middlewares/verifyToken.js');
 
 const { authenticateWithGoogle, loginUser, registerUser } = require('../services/userServices.js');
-
-const User = require('../schemas/user.js');
+const getModels = require('../services/getModelService.js');
 
 function validateUsername(username) { //keeping logic external, for easier testing
     // Define the regex pattern
@@ -44,6 +43,8 @@ router.post('/register', async (req, res) => {
     const { username, email, password } = req.body;
 
     try {
+        const {User} = getModels(req, 'User');
+
         if (!validateUsername(username)) {
             console.log(`POST: /register registration of ${username} failed`);
             return res.status(405).json({
@@ -109,7 +110,7 @@ router.post('/login', async (req, res) => {
 
     try {
         //check if it is an email or username
-        const { user, token } = await loginUser({ email, password });
+        const { user, token } = await loginUser({ email, password, req });
         console.log(`POST: /login user ${user.username} logged in`)
         res.status(200).json({
             success: true,
@@ -130,6 +131,8 @@ router.post('/login', async (req, res) => {
 
 router.get('/validate-token', verifyToken, async (req, res) => {
     try {
+        const {User} = getModels(req, 'User');
+
         const user = await User.findById(req.user.userId)
             .select('-password') // Add fields you want to exclude
             .lean()
@@ -179,7 +182,7 @@ router.post('/google-login', async (req, res) => {
     }
 
     try {
-        const { user, token } = await authenticateWithGoogle(code, isRegister, url);
+        const { user, token } = await authenticateWithGoogle(code, isRegister, url, req);
         res.status(200).json({
             success: true,
             message: 'Google login successful',

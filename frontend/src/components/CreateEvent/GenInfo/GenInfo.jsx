@@ -73,12 +73,12 @@ function GenInfo({next, visible, setInfo}){
                         <select className="" name="eventType" onChange={handleChange} value={eventType}>
                             <option value="" disabled selected></option>
                             <option value="study">study event</option>
+                            <option value="workshop">workshop</option>
                             <option value="campus">campus event</option>
                             <option value="social">social event</option>
                             <option value="club">club event</option>
                             <option value="meeting">club meeting</option>
                             <option value="sports">sports event</option>
-
                         </select>
                     </div>
                     <div className="input-field mandatory">

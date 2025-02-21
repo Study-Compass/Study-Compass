@@ -60,6 +60,15 @@
             background-color: var(--green);
             padding:1px 5px;
             border-radius: 5px;
+            &.faculty{
+                background-color: var(--blue);
+            }
+            &.organization{
+                background-color: var(--red);
+            }
+            &.developer{
+                background-color: var(--developerBlue);
+            }
         }
         
 
@@ -72,6 +81,9 @@
             .user-name{
                 font-weight: 700;
                 font-size:13px;
+                white-space: nowrap;  
+                overflow: hidden;    
+                text-overflow: ellipsis;
             }
             img{
                 width: 20px;

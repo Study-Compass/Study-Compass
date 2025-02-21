@@ -8,6 +8,7 @@ require('dotenv').config();
 const { createServer } = require('http');
 const { Server } = require('socket.io');
 const enforce = require('express-sslify');
+const { connectToDatabase } = require('./connectionsManager');
 
 const app = express();
 const port = process.env.PORT || 5001;
@@ -42,16 +43,28 @@ if (process.env.NODE_ENV === 'production') {
 app.use(express.json());
 app.use(cookieParser());
 
-if (process.env.NODE_ENV === 'production') {
-    mongoose.connect(process.env.MONGO_URL);
-} else {
-    mongoose.connect(process.env.MONGO_URL_LOCAL);
-}
-mongoose.connection.on('connected', () => {
-    console.log('Mongoose connected to DB.');
-});
-mongoose.connection.on('error', (err) => {
-    console.log('Mongoose connection error:', err);
+// if (process.env.NODE_ENV === 'production') {
+//     mongoose.connect(process.env.MONGO_URL);
+// } else {
+//     mongoose.connect(process.env.MONGO_URL_LOCAL);
+// }
+// mongoose.connection.on('connected', () => {
+//     console.log('Mongoose connected to DB.');
+// });
+// mongoose.connection.on('error', (err) => {
+//     console.log('Mongoose connection error:', err);
+// });
+
+app.use(async (req, res, next) => {
+    try {
+        const subdomain = req.headers.host.split('.')[0]; // Extract subdomain (e.g., 'ucb')
+        console.log(req.headers.host);
+        req.db = await connectToDatabase(subdomain);
+        next();
+    } catch (error) {
+        console.error('Error establishing database connection:', error);
+        res.status(500).send('Database connection error');
+    }
 });
 
 const upload = multer({
