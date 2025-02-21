@@ -21,7 +21,7 @@ const apiSchema = new Schema({
         type: Number,
         default: 0, 
     },
-    apiAuthorization: {
+    Authorization: {
         type: String,
         required: true,
         default:['Unauthorized', 'Authorized'],

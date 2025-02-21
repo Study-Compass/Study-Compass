@@ -5,10 +5,11 @@ const apiKeyRateLimiter = require('../middlewares/rateLimit.js');
 
 const apiKeyMiddleware = async (req, res, next) => {
     
-    const userId = req.user.userId; // Verify apiId
+    //User attached Api Key
+    const apiKey = req.headers['x-api-key']; // Verify apiId CHANGED 
     try {
-        
-        const apiKeyData = await API.findOne({ owner: userId }); //change owner to find apiKey
+        //Verifies the Existence
+        const apiKeyData = await API.findOne({apiKey}); //Check if works
 
         console.log(apiKeyData);
         if (!apiKeyData) {
@@ -16,9 +17,30 @@ const apiKeyMiddleware = async (req, res, next) => {
             return res.status(401).json({ error: 'API key does not exist for user' });
         }
 
-        //Add a status for rate limit here, better status more usages , see how wants 
+        //Add a status for rate limit here, better status more usages
+        const clearance = apiKeyData.Authorization ||"default"; //NEED TO ATTACH A TAG WITH KEY, test both cases, front end will handle who gets the tag
+        let maxRequests;
+
+        //Basic Framework if we want to change the different types
+        switch (clearance){
+            case "Unauthorized":
+                maxRequests = 100;
+                console.log(apiKeyData, "Unauthorized User Key: Limited ", maxRequests, " requests.\nCurrent Usage: ", apiKeyData.usageCount);
+                break;
+            case "Authorized":
+                maxRequests = 500;
+                console.log(apiKeyData, "Authorized User Key: Limited ", maxRequests, " requests.\nCurrent Usage: ", apiKeyData.usageCount);
+                break;
+
+            default: //Default with no tag is still unauthorized
+                maxRequests = 100;
+                console.log(apiKeyData, "Unauthorized User Key: Limited ", maxRequests, " requests.\nCurrent Usage: ", apiKeyData.usageCount);
+                break;
+            }
+        
 
         // Apply the rate limiter
+        const apiKeyRateLimiter = limiter(maxRequests);
         apiKeyRateLimiter(req, res, async (error) => {
             if (error) return; 
 
