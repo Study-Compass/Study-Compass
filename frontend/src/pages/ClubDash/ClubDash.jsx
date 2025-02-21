@@ -9,8 +9,10 @@ import { useNotification } from '../../NotificationContext';
 import {Icon} from '@iconify-icon/react';  
 import Dash from './Dash/Dash';
 import Members from './Members/Members';
+import MeetingsManagement from "./MeetingManagement/MeetingManagement";
 import {useFetch} from '../../hooks/useFetch';
 import { use } from 'react';
+import MeetingManagement from './MeetingManagement/MeetingManagement';
 
 function ClubDash(){
     const [clubId, setClubId] = useState(useParams().id);
@@ -134,6 +136,10 @@ function ClubDash(){
                                 <img src={Dashboard} alt="" />
                                 <p>Members</p>
                             </li>
+                            <li className={`${currentPage === "meetings" ? 'selected' : ''}`}  onClick = {()=>setCurrentPage('meetings')}>
+                                <img src={Dashboard} alt="" />
+                                <p>Meetings</p>
+                            </li>
                         </ul>
                     </nav>
                 </div>
@@ -179,10 +185,15 @@ function ClubDash(){
                             <img src={Dashboard} alt="" />
                             <p>Members</p>
                         </li>
+                        <li className={`${currentPage === "meetings" ? 'selected' : ''}`}  onClick = {()=>setCurrentPage('meetings')}>
+                                <img src={Dashboard} alt="" />
+                                <p>Meetings</p>
+                        </li>
                     </ul>
                 </nav>
             </div>
             <div className={`dash-right ${expandedClass}`}>
+    
                 {
                     currentPage === "dash" &&
                     <Dash expandedClass={expandedClass} openMembers={openMembers} clubName={clubId} meetings={meetings.data}/> 
@@ -190,6 +201,10 @@ function ClubDash(){
                 {
                     currentPage === 'members' && 
                     <Members expandedClass = {expandedClass} people={orgData.data.org.members} positions={orgData.data.org.overview.positions}/>
+                }
+                {
+                    currentPage =="meetings" &&
+                    <MeetingManagement expandedClass = {expandedClass}  meetings={meetings.data}/>
                 }
                 <div className={`expand`} onClick={onExpand}>
                     <Icon icon="material-symbols:expand-content-rounded" />
