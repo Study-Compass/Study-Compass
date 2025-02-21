@@ -43,7 +43,39 @@ router.post('/create_api', verifyToken, async (req, res) => {
 //If we want to grant access to a route, we want to grant access using the apiKeyMiddleware
 //apiKeyMiddleware will guarantee and verify the existence of the key and then continue to grab items
 
-router.get('/details', verifyToken, apiKeyMiddleware, async (req, res) => { //name to be changed
+//Api key adds other servers to use our routes,  functionallity isnt to have to make a verify token
+//Instead of checking user we should be checking the api key, trust any request with a valid api key, take out verifyToken, 
+
+
+//Verify the api key, have a special header for api keys, when header is present should check validity of the api key, then pass them through rate limiters
+//this is the only one that takes outside servers that not our front, prolly only given to none verify token routes, change user validity to api valdity
+
+//associating a header : with an api key
+/*
+Tasks to do: 
+change user id to strictly api idea
+find a way to test the request coming from a different server (new api with a new routing system
+): create a new repositiory, a light weight server to use fetch or axios to call routes from a different server  (dont know the logistics) 
+Set up one route/action 
+
+calling a different api to another server 
+
+have the new header that signifys an api request,  if the api request to see if valid, if so let them through the next process
+maybe add more validity
+Unauthorized organization vs authorized prompt for rate (header in the schema), hard code how much rate each gets
+
+Look through middleware debugger for anything 
+
+- change validity from user, to strictly api key validation- make sure exists and cant be looped around
+- rate limiting authority verification | associate the api in the create function with a tag based on their user id, would need to be assigned that tag from front end, but have it in schema 
+//so thunder clients say "Authorization:" unauthorized_org , "apikey"
+-api caller program
+
+*/
+
+
+
+router.get('/details', verifyToken, apiKeyMiddleware, async (req, res) => { //This is a place holder
     //Should allow access to any route,(will this be specified?)
     try {
         const apiEntry = req.apiKeyData;

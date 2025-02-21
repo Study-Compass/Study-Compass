@@ -20,6 +20,12 @@ const apiSchema = new Schema({
     usageCount: {
         type: Number,
         default: 0, 
+    },
+    apiAuthorization: {
+        type: String,
+        required: true,
+        default:['Unauthorized', 'Authorized'],
+
     }
 });
 const API = mongoose.model("api", apiSchema);

@@ -5,10 +5,10 @@ const apiKeyRateLimiter = require('../middlewares/rateLimit.js');
 
 const apiKeyMiddleware = async (req, res, next) => {
     
-    const userId = req.user.userId;
+    const userId = req.user.userId; // Verify apiId
     try {
         
-        const apiKeyData = await API.findOne({ owner: userId });
+        const apiKeyData = await API.findOne({ owner: userId }); //change owner to find apiKey
 
         console.log(apiKeyData);
         if (!apiKeyData) {
