@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import rpiLogo from "../../assets/Icons/rpiLogo.svg";
 import person from "../../assets/Icons/Profile.svg";
 import calendar from "../../assets/Icons/Calendar.svg";
@@ -14,6 +14,10 @@ const Org = ({ org }) => {
     // const { overview, members, followers } = org;
     
     console.log(org);
+
+    const[isMember, setIsMember] = useState(false);
+    const[isFollowing, setIsFollowing] = useState(false);
+
     return (
         <div className="org-page page">
             <Header />
@@ -48,8 +52,8 @@ const Org = ({ org }) => {
                     </p>
                     
                     <div className="actions">
-                        <button>Join</button>
-                        <button>Follow</button>
+                        <button onClick={() => setIsMember(!isMember)}>{isMember ? "Joined" : "Join"}</button>
+                        <button onClick={() => setIsFollowing(!isFollowing)}>{isFollowing ? "Following" : "Follow"}</button>
                     </div>
 
                 </div>
@@ -60,15 +64,6 @@ const Org = ({ org }) => {
                     </div>
                     
                 </div>
-
-                {/* <div className='meeting-schedule'>
-                    <h1>meetings schedule</h1>
-                    <div className='meetings'>
-                        <p>YDSA Weekly GBM</p>
-
-                    </div>
-
-                </div> */}
 
                 <div className="meeting-schedule">
                     <h3>meetings schedule</h3>
@@ -84,7 +79,6 @@ const Org = ({ org }) => {
                                 <img src={locate} alt="" />
                                 <p>Phalanx</p>
                             </div>
-                            {/* <p>Next Meeting: Thursday 10/24</p> */}
 
                         </div>
                     </div>
