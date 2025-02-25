@@ -28,7 +28,6 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            padding-bottom:5px;
             .user{
                 display: flex;
                 align-items: center;
@@ -60,13 +59,19 @@
                 width:fit-content;
                 width:100%;
                 justify-content: center;
-                padding-top:5px;
+                padding: 5px 0;
                 box-sizing: border-box;
+                cursor: pointer;
+                transition: all 0.3s;
+                background-color: var(--oie-background);
                 p{
                     font-family: 'Inter';
                     font-weight: 600;
                     color:var(--text);
                     font-size: 12px;
+                }
+                &:hover{
+                    filter:brightness(0.92);
                 }
             }
         }   

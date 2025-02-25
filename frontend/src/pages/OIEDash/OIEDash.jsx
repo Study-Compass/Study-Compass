@@ -76,6 +76,10 @@ function OIEDash(){
                                 <Icon icon="flowbite:adjustments-horizontal-solid" />
                                 <p>Configuration</p>
                             </li>
+                            <li onClick={()=>navigate('/create-event')}>
+                                <Icon icon="ph:plus-bold" className="create-icon"/>
+                                <p>Create Event</p>
+                            </li>
                         </ul>
                     </nav>
                 </div>
@@ -89,7 +93,7 @@ function OIEDash(){
                             <p className="email">{user.email}</p>
                         </div>
                     </div>
-                    <div className="back">
+                    <div className="back" onClick={()=>navigate('/room/none')}>
                         <Icon icon="ep:back"/>
                         <p>back to study compass</p>
                     </div>

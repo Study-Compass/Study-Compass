@@ -41,6 +41,11 @@ router.post('/oie-status', verifyToken, authorizeRoles('oie'), async (req, res) 
         let oieStatus = await OIEStatus.findOne({ eventRef });
         if (oieStatus) {
             oieStatus.status = status;
+            if(oieStatus === "Approved") {
+                oieStatus.reviewedBy = req.user.userId;
+            } else if(oieStatus === "Rejected") {
+                oieStatus.reviewedBy = req.user.userId;
+            }
             oieStatus.checkListItems = checkListItems;
             await oieStatus.save();
         } else {

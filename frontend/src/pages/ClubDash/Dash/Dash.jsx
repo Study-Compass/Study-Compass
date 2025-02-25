@@ -73,6 +73,7 @@ function Dash({expandedClass, openMembers, clubName, meetings}){
                                 }
                             }) : <h2>no meetings scheduled</h2>
                         }
+                        
                     </div>
                 </div>
             </div>
