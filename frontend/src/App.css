@@ -42,7 +42,12 @@
 
     --background:white;
     --rs-btn-link-text: var(--red) !important;   
-    --rs-btn-primary-bg: var(--red) !important; 
+    --rs-btn-primary-bg: var(--red) !important;
+    
+    
+    /* statuses */
+    --green-main: #6EB25F;
+    --green-bg: rgba(147,235,127, 0.32);
 
 }
 

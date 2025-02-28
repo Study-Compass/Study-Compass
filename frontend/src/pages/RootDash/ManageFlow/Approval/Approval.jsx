@@ -9,7 +9,9 @@ function Approval({approval}){
             <div className="row">
                 <div className="col">
                     <h3>{approval.role}</h3>
-                    <p>0 pending approvals</p>
+                    <div className="approval-status low">
+                        <p className="low">0 pending approvals</p>
+                    </div>
                 </div>
             </div>
             <div className="row info">
@@ -22,10 +24,15 @@ function Approval({approval}){
                     </div>
                 </div>
                 <div className="col actions">
-                    <button> 
-                        <Icon icon="material-symbols:arrow-outward-rounded" width="24" height="24" />
-                        <p>asdf</p>
+                    <button className="button"> 
+                        <Icon icon="material-symbols:arrow-outward-rounded"/>
+                        <p>dashboard</p>
                     </button>
+                    <button className="button"> 
+                        <Icon icon="material-symbols:expand-content-rounded" />
+                        <p>details</p>
+                    </button>
+
                 </div>
             </div>
         </div>
