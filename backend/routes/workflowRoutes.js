@@ -8,7 +8,7 @@ const { verifyToken, verifyTokenOptional, authorizeRoles } = require('../middlew
 const router = express.Router();
 
 router.get('/get-approval-flow', verifyToken, authorizeRoles('admin', 'root'), async (req, res) => {
-    const ApprovalFlow = getModels('approvalFlow');
+    const ApprovalFlow = getModels(req, 'ApprovalFlow');
     try{
         //there should only be one approval flow
         const approvalFlow = await ApprovalFlow.findOne();
@@ -31,7 +31,7 @@ router.get('/get-approval-flow', verifyToken, authorizeRoles('admin', 'root'), a
 });
 
 router.post('/create-approval-flow', async (req, res) => {
-    const ApprovalFlow = getModels('approvalFlow');
+    const { ApprovalFlow } = getModels(req, 'ApprovalFlow');
     const { Flow } = req.body;
     try{
         const approvalFlow = new ApprovalFlow(Flow);
@@ -49,7 +49,7 @@ router.post('/create-approval-flow', async (req, res) => {
 });
 
 router.post('/add-approval', verifyToken, authorizeRoles('admin', 'root'), async (req, res) => {
-    const ApprovalFlow = getModels('approvalFlow');
+    const ApprovalFlow = getModels(req,'ApprovalFlow');
     const { Approval } = req.body
     try{
         const approvalFlow = ApprovalFlow.findOne();
