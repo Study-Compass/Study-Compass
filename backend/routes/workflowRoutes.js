@@ -8,17 +8,17 @@ const { verifyToken, verifyTokenOptional, authorizeRoles } = require('../middlew
 const router = express.Router();
 
 router.get('/get-approval-flow', verifyToken, authorizeRoles('admin', 'root'), async (req, res) => {
-    const ApprovalFlow = getModels(req, 'ApprovalFlow');
+    const {ApprovalFlow} = getModels(req, 'ApprovalFlow');
     try{
         //there should only be one approval flow
         const approvalFlow = await ApprovalFlow.findOne();
         if(approvalFlow){
-            res.status(200).json({
+            return res.status(200).json({
                 success: true,
                 data: approvalFlow
             });
         }
-        res.status(404).json({
+        return res.status(404).json({
             success: false,
             message: 'Approval Flow not found'
         })

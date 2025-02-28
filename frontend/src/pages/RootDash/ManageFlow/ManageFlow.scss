@@ -1,4 +1,44 @@
 .manage-flow{
     width:100%;
     z-index: 0;
+    .content{
+        box-sizing: border-box;
+        padding: 20px 40px;
+        .approvals{
+            display: flex;
+            flex-direction: column;
+            border: 1px solid var(--lighterborder);
+            border-radius: 15px;
+            // background-color: var(--lightest);
+            overflow:hidden;
+            height:300px;
+            .container-header{
+                display: flex;
+                align-items: center;
+                padding: 8px 15px;
+                gap: 8px;
+                background-color: var(--background);
+                // border-bottom: 1px solid var(--lighterborder);
+                h2{
+                    font-size: 16px;
+                    margin: 0;
+                    font-family: 'Satoshi';
+                    font-weight:400;
+                    color: var(--lighter-text);
+                }
+                iconify-icon{
+                    font-size:16px;
+                    color: var(--lighter-text);
+                }
+                
+            }
+            .container{
+                padding: 10px;
+                box-sizing: border-box;
+                display: flex;
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+        }
+    }
 }
