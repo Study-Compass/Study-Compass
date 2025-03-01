@@ -27,8 +27,14 @@ function ManageFlow(){
             <div className="content">
                 <div className="approvals">
                     <div className="container-header">
-                        <Icon icon="icon-park-solid:check-one"/>
-                        <h2>approvals</h2>
+                        <div className="approval-left">
+                            <Icon icon="icon-park-solid:check-one"/>
+                            <h2>approvals</h2>
+                        </div>
+                        <button onClick={console.log}>
+                            <Icon icon="fluent:flow-16-filled"/>
+                            <p>edit workflow</p>
+                        </button>
                     </div>
                     <div className="container">
                         {

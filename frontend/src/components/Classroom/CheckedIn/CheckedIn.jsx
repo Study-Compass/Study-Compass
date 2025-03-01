@@ -8,7 +8,6 @@ function CheckedIn({users}){
     useEffect(() => {
         //populate error array with all false for every user
         setError(new Array(users.length).fill(false));
-
     }, [users]);
 
     const onError = (index) => {

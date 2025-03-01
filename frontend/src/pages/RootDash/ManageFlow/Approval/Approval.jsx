@@ -4,6 +4,10 @@ import './Approval.scss';
 import { Icon } from '@iconify-icon/react/dist/iconify.mjs';
 
 function Approval({approval}){
+    const icons = {
+        'location' : 'fluent:location-28-filled',
+        'attendance' : 'fluent:location-28-filled'
+    }
     return(
         <div className="approval col">
             <div className="row">
@@ -20,7 +24,16 @@ function Approval({approval}){
                         <p>Approval Criteria</p>
                     </div>
                     <div className="content">
-            
+                        {
+                            Object.keys(approval.criteria).map((criteria)=>{
+                                return (
+                                    <div className="criteria-item">
+                                        <Icon icon={icons[criteria]} />
+                                        <p>{approval.criteria[criteria]}</p>
+                                    </div>
+                                )
+                            })
+                        }
                     </div>
                 </div>
                 <div className="col actions">

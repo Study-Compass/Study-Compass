@@ -61,7 +61,7 @@ router.post("/check-username", verifyToken, async (req, res) => {
 });
 
 router.post("/check-in", verifyToken, async (req, res) => {
-    const { Classroom, Schedule } = getModels(req, 'Classroom', 'Schedule');
+    const { Classroom, Schedule, StudyHistory } = getModels(req, 'Classroom', 'Schedule', 'StudyHistory');
     const { classroomId } = req.body;
     try {
         //check if user is checked in elsewhere in the checked_in array
@@ -117,7 +117,7 @@ router.get("/checked-in", verifyToken, async (req, res) => {
 });
 
 router.post("/check-out", verifyToken, async (req, res) => {
-    const { Classroom, Schedule, User } = getModels(req, 'Classroom', 'Schedule', 'User');
+    const { Classroom, Schedule, User, StudyHistory } = getModels(req, 'Classroom', 'Schedule', 'User', 'StudyHistory');
     const { classroomId } = req.body;
     try {
         const classroom = await Classroom.findOne({ _id: classroomId });
