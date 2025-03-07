@@ -126,6 +126,26 @@ function ProfilePicture(){
 
                     </>
                 }
+                {
+                    user && user.approvalRoles.length > 0 && 
+                    <>
+                        <hr/>
+                        <p className="section">APPROVALS</p>
+                        {user.approvalRoles.map(
+                            (role)=>{
+                                const url = role === 'root' ? '/root-dashboard' : `/approval-dashboard/${role}` 
+                                return(
+                                    <Link to={`${url}`}>
+                                        <div className="menu-item">
+                                            <img className="icon" src={Stats} alt="" />
+                                            <p>{role}</p>
+                                        </div>
+                                    </Link>
+                                )
+                            }
+                        )}
+                    </>
+                }
                 <hr />
                 <Link to="">
                     <div className="menu-item" onClick={logout}>

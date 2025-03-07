@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams, useParams } from 'react-router-dom';
 import Configuration from './Configuration/Configuration';
 import EventsCalendar from './EventsCalendar/EventsCalendar';
 import Dashboard from '../../components/Dashboard/Dashboard';
@@ -9,6 +9,7 @@ import ManageEvents from './ManageEvents/ManageEvents';
 
 
 function OIEDash(){
+    const [approvalId, setApprovalId] = useState(useParams().id);
 
     const menuItems = [
         { label: 'Dashboard', icon: 'ic:round-dashboard' },
@@ -19,7 +20,7 @@ function OIEDash(){
 
     return (
         <Dashboard menuItems={menuItems} additionalClass='oie-dash'>
-            <Dash />
+        <Dash name={approvalId} />
             <EventsCalendar />
             <ManageEvents />
             <Configuration />

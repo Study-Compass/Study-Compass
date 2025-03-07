@@ -57,5 +57,14 @@
                 gap: 10px;
             }
         }
+        .create-approval{
+            button{
+                display: flex;
+                font-family: 'Satoshi';
+                padding: 5px 15px;
+                align-items: center;
+                cursor:pointer;
+            }
+        }
     }
 }

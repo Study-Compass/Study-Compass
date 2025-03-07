@@ -141,6 +141,7 @@ function App() {
                                                 <Route path="/club-dashboard/:id" element={<ClubDash/>}/>
                                                 <Route path='/create-org' element={<CreateOrg/>}/>
                                                 <Route path="/root-dashboard" element={<RootDash/>}/>
+                                                <Route path="/approval-dashboard/:id" element={<OIEDash/>}/>
                                             </Route>
 
                                             {/* oie routes */}

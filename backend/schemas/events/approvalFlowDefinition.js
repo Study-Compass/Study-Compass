@@ -12,16 +12,19 @@ const stepSchema = new mongoose.Schema({
     //store dynamic conditions here
     //example: { location: "AlumniHouse", minAttendees: 100 }
     type: Map,
-    of: mongoose.Schema.Types.Mixed
+    of: mongoose.Schema.Types.Mixed,
+    default: {}
   },
   checkItems:[
     {
       type: String,
-      required: false
+      required: false,
+      default: {}
     }
   ],
   formDefinition: {
     fields: [fieldSchema],
+    default: {}
   },
   // Possibly an `order` field or we rely on the array index for ordering
 });

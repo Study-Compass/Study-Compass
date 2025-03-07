@@ -4,12 +4,13 @@
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(0, 0, 0, 0.2);
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 1000;
     opacity: 0;
+
   }
 
   .popup-content-overlay{
@@ -38,7 +39,7 @@
   .popup-overlay .popup-content {
     background-color: white;
     padding: 20px;
-    border-radius: 20px;
+    border-radius: 15px;
     position: relative;
     max-width:500px;
     box-sizing: border-box;
@@ -85,6 +86,7 @@
   .popup-overlay .popup-content.no-styling {
     background-color: transparent;
     padding: 0;
+    border-radius: 0;
   }
 
   
@@ -94,8 +96,9 @@
   .popup-content .close-popup{
     position: absolute;
     width:15px;
-    height:15px;
     top:15px;
+    font-size:18px;
+    color:var(--lighter-text);
     right:15px;
     z-index: 100;
     cursor: pointer;

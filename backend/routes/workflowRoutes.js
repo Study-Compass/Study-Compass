@@ -49,23 +49,36 @@ router.post('/create-approval-flow', async (req, res) => {
 });
 
 router.post('/add-approval', verifyToken, authorizeRoles('admin', 'root'), async (req, res) => {
-    const ApprovalFlow = getModels(req,'ApprovalFlow');
-    const { Approval } = req.body
+    const { ApprovalFlow, User, } = getModels(req,'ApprovalFlow', 'User');
+    const { role, usernames } = req.body
     try{
-        const approvalFlow = ApprovalFlow.findOne();
+        const approvalFlow = await ApprovalFlow.findOne();
         if(approvalFlow){
-            approvalFlow.steps.push(Approval);
+            if(approvalFlow.steps.find(step => step.role === role)){
+                return res.status(400).json({
+                    success: false,
+                    message: 'Role already exists in approval flow'
+                });
+            }
+            approvalFlow.steps.push({role:role});
             await approvalFlow.save();
-            res.status(200).json({
+            const users = await User.find({username: {$in: usernames}});
+            users.forEach(user => {
+                user.approvalRoles.push(role);
+                user.save();
+            });
+            //add role to users
+            return res.status(200).json({
                 success: true,
                 data: approvalFlow
             });
         }
-        res.status(404).json({
+        return res.status(404).json({
             success: false,
             message: 'Approval Flow not found'
         })
     } catch(error){
+        console.log(error)
         res.status(500).json({
             success: false,
             message: error.message
