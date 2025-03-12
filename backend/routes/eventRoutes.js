@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { verifyToken, verifyTokenOptional, authorizeRoles } = require('../middlewares/verifyToken');
 const getModels = require('../services/getModelService');
+const { createApprovalInstance } = require('../utilities/workflowUtilities');
 
 router.post('/create-event', verifyToken, async (req, res) => {
     const { Event, OIEStatus, User } = getModels(req, 'Event', 'OIEStatus', 'User');
@@ -32,23 +33,29 @@ router.post('/create-event', verifyToken, async (req, res) => {
             });
         }
     
-        let OIE;
+        // let OIE;
     
-        if (event.expectedAttendance > 100 || event.OIEAcknowledgementItems && event.OIEAcknowledgementItems.length > 0) {
-            event.OIEStatus = "Pending";
-            OIE = new OIEStatus({
-                eventRef: event._id,
-                status: 'Pending',
-                checkListItems: [],
-            });
-        }
+        // if (event.expectedAttendance > 100 || event.OIEAcknowledgementItems && event.OIEAcknowledgementItems.length > 0) {
+        //     event.OIEStatus = "Pending";
+        //     OIE = new OIEStatus({
+        //         eventRef: event._id,
+        //         status: 'Pending',
+        //         checkListItems: [],
+        //     });
+        // }
 
 
-        if (OIE) {
-            await OIE.save();
+        // if (OIE) {
+        //     await OIE.save();
+        // }
+        // // attach oie reference 
+        // event.OIEReference = OIE ? OIE._id : null;
+        // // get required approvals
+        const approvalInstance = await createApprovalInstance(req, event._id, event);
+        if (approvalInstance) {
+            event.approvalInstance = approvalInstance._id;
         }
-        // attach oie reference 
-        event.OIEReference = OIE ? OIE._id : null;
+
         await event.save();
         console.log('POST: /create-event successful');
         res.status(201).json({

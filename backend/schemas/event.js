@@ -57,19 +57,9 @@ const eventSchema = new mongoose.Schema({
         type:Number,
         required:true,
     },
-    OIEStatus:{
-        type:String,
-        required:true,
-        enum: ['Pending', 'Approved', 'Rejected', 'Not Applicable'],
-        default: 'Not Applicable'
-    },
-    OIEReference: {
+    approvalReference:{
         type: Schema.Types.ObjectId,
-        ref: 'OIE'
-    },
-    OIEAcknowledgementItems: {
-        type: Array,
-        default: []
+        ref: 'ApprovalInstance'
     },
     contact:{
         type:String,
