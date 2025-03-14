@@ -22,6 +22,7 @@ import NewBadge from './pages/NewBadge/NewBadge';
 import CreateOrg from './pages/CreateOrg/CreateOrg';
 import ClubDash from './pages/ClubDash/ClubDash';
 import OrgDisplay from './pages/Org/OrgDisplay';
+import RootDash from './pages/RootDash/RootDash';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './AuthContext';
 import { CacheProvider } from './CacheContext';
@@ -139,7 +140,9 @@ function App() {
                                                 <Route path="/events" element={<Events/>}/>
                                                 <Route path="/club-dashboard/:id" element={<ClubDash/>}/>
                                                 <Route path='/create-org' element={<CreateOrg/>}/>
-\                                            </Route>
+                                                <Route path="/root-dashboard" element={<RootDash/>}/>
+                                                <Route path="/approval-dashboard/:id" element={<OIEDash/>}/>
+                                            </Route>
 
                                             {/* oie routes */}
                                             <Route element={ <ProtectedRoute authorizedRoles={['admin', 'developer', 'oie']}/> }>

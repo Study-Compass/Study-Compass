@@ -6,6 +6,8 @@
     width: 100%;
     overflow-x: hidden;
     flex-grow: 1;
+    position: relative;
+    z-index: 10;
 
     &::-webkit-scrollbar {
         height: 10px;

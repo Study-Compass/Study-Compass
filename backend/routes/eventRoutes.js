@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { verifyToken, verifyTokenOptional, authorizeRoles } = require('../middlewares/verifyToken');
 const getModels = require('../services/getModelService');
+const { createApprovalInstance, getEventsWithAuthorization } = require('../utilities/workflowUtilities');
 
 router.post('/create-event', verifyToken, async (req, res) => {
     const { Event, OIEStatus, User } = getModels(req, 'Event', 'OIEStatus', 'User');
@@ -32,23 +33,34 @@ router.post('/create-event', verifyToken, async (req, res) => {
             });
         }
     
-        let OIE;
+        // let OIE;
     
-        if (event.expectedAttendance > 100 || event.OIEAcknowledgementItems && event.OIEAcknowledgementItems.length > 0) {
-            event.OIEStatus = "Pending";
-            OIE = new OIEStatus({
-                eventRef: event._id,
-                status: 'Pending',
-                checkListItems: [],
-            });
-        }
+        // if (event.expectedAttendance > 100 || event.OIEAcknowledgementItems && event.OIEAcknowledgementItems.length > 0) {
+        //     event.OIEStatus = "Pending";
+        //     OIE = new OIEStatus({
+        //         eventRef: event._id,
+        //         status: 'Pending',
+        //         checkListItems: [],
+        //     });
+        // }
 
 
-        if (OIE) {
-            await OIE.save();
+        // if (OIE) {
+        //     await OIE.save();
+        // }
+        // // attach oie reference 
+        // event.OIEReference = OIE ? OIE._id : null;
+        // // get required approvals
+        const approvalInstance = await createApprovalInstance(req, event._id, event);
+        if (approvalInstance) {
+            event.approvalReference = approvalInstance._id;
+            console.log('Approval instance created');
+            console.log(event.approvalInstance);
+            event.status = 'pending';
+        } else{
+            event.status = 'not-applicable';
         }
-        // attach oie reference 
-        event.OIEReference = OIE ? OIE._id : null;
+
         await event.save();
         console.log('POST: /create-event successful');
         res.status(201).json({
@@ -262,7 +274,7 @@ router.get('/oie/get-rejected-events', verifyToken, authorizeRoles('oie'), async
 });
 
 router.get('/get-event/:event_id', verifyTokenOptional, async (req, res) => {
-    const { Event, User, OIEStatus } = getModels(req, 'Event', 'User', 'OIEStatus');
+    const { Event, User, OIEStatus, ApprovalInstance } = getModels(req, 'Event', 'User', 'OIEStatus', 'ApprovalInstance');
     const { event_id } = req.params;
     const user_id = req.user ? req.user.userId : null;
 
@@ -275,31 +287,26 @@ router.get('/get-event/:event_id', verifyTokenOptional, async (req, res) => {
                 message: 'Event not found.'
             });
         }
-        if (event.OIEStatus !== 'Not Applicable') {
+        const approvalInstance = await ApprovalInstance.findOne({ eventId: event_id });
+        if (approvalInstance) {
             if (!user){
                 return res.status(403).json({
                     success: false,
                     message: 'You are not authorized to view this page.'
                 });
             } else {    
-                const OIE = await OIEStatus.findOne({ eventRef: event_id });
-                if (OIE) {
-                    //attach to event object
+                //check that user has approval role
+                if(user.approvalRoles.length > 0){
                     let newEvent = event.toObject();
-                    newEvent["OIE"] = OIE;
+                    newEvent["approvalInstance"] = approvalInstance;
                     return res.status(202).json({
                         success: true,
                         event: newEvent
                     });
                 }
-                return res.status(200).json({
-                    success: true,
-                    event
-                });
             }
         }
-        console.log('GET: /get-event successful');
-        res.status(200).json({
+        return res.status(200).json({
             success: true,
             event
         });
@@ -313,7 +320,7 @@ router.get('/get-event/:event_id', verifyTokenOptional, async (req, res) => {
 });
 
 router.post('/approve-event', verifyToken, async (req, res) => {
-    const { Event, User } = getModels(req, 'Event', 'User');
+    const { Event, User, ApprovalInstance } = getModels(req, 'Event', 'User', 'ApprovalInstance');
     const user_id = req.user.userId;
     const { event_id } = req.body;
 
@@ -332,13 +339,32 @@ router.post('/approve-event', verifyToken, async (req, res) => {
                 message: 'Event not found.'
             });
         }
-        if (event.OIEStatus !== 'Pending') {
-            return res.status(400).json({
+        // if (event.OIEStatus !== 'Pending') {
+        //     return res.status(400).json({
+        //         success: false,
+        //         message: 'Event is not pending approval.'
+        //     });
+        // }
+        // event.OIEStatus = 'Approved';
+        const approvalInstance = await ApprovalInstance.findOne({ eventId: event_id });
+        if (!approvalInstance) {
+            return res.status(404).json({
                 success: false,
-                message: 'Event is not pending approval.'
+                message: 'Approval instance not found.'
             });
         }
-        event.OIEStatus = 'Approved';
+        const roleNeeded = approvalInstance.approvals[approvalInstance.currentStepIndex].role;
+        if (!user.approvalRoles.includes(roleNeeded)) {
+            return res.status(403).json({
+                success: false,
+                message: 'You are not authorized to approve this event.'
+            });
+        }
+        approvalInstance.approvals[approvalInstance.currentStepIndex].status = 'approved';
+        approvalInstance.approvals[approvalInstance.currentStepIndex].approvedByUserId = user_id;
+        approvalInstance.approvals[approvalInstance.currentStepIndex].approvedAt = new Date();
+        approvalInstance.currentStepIndex++;
+            
         await event.save();
         console.log('POST: /approve-event successful');
         res.status(200).json({
@@ -405,7 +431,7 @@ router.get('/get-events-by-month', verifyToken, authorizeRoles('oie'), async (re
 
 router.get('/get-events-by-range', verifyToken, authorizeRoles('oie'), async (req, res) => {
     const { Event, OIEStatus } = getModels(req, 'Event', 'OIEStatus');
-    const { start, end, filter } = req.query;
+    const { start, end, filter, roles } = req.query;
 
     if (!start || !end) {
         return res.status(400).json({
@@ -444,7 +470,7 @@ router.get('/get-events-by-range', verifyToken, authorizeRoles('oie'), async (re
             }
         }
 
-        const query = filterObj && filterObj.type !== "all" ?{
+        let query = filterObj && filterObj.type !== "all" ?{
             start_time: { $gte: startOfRange, $lte: endOfRange },
             ...filterObj
         } :
@@ -453,10 +479,13 @@ router.get('/get-events-by-range', verifyToken, authorizeRoles('oie'), async (re
         };
 
 
-        const events = await Event.find(query)
-            .populate('classroom_id')
-            .populate('hostingId')
-            .populate('OIEReference');
+        const events = await getEventsWithAuthorization(req, filterObj, [], startOfRange, endOfRange, ['classroom_id', 'hostingId']);
+        console.log(events);
+
+        // const events = await Event.find(query)
+        //     .populate('classroom_id')
+        //     .populate('hostingId')
+        //     // .populate('OIEReference');
 
         console.log('GET: /get-events-by-week successful');
         res.status(200).json({
