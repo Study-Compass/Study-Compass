@@ -61,6 +61,12 @@ const eventSchema = new mongoose.Schema({
         type: Schema.Types.ObjectId,
         ref: 'ApprovalInstance'
     },
+    status:{
+        type:String,
+        required:true,
+        enum: ['approved', 'pending', 'rejected', 'not-applicable'],
+        default: 'not-applicable'
+    },
     contact:{
         type:String,
         required:false,

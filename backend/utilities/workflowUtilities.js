@@ -53,8 +53,89 @@ const createApprovalInstance = async (req, eventId, event) => {
         return null;
     }
 }
+async function getEventsWithAuthorization(req, filterObj = {}, roleNames = [], startOfRange, endOfRange, populateFields = []) {
+    try {
+        const { Event } = getModels(req, 'Event');
+        let matchStage = {
+            start_time: { $gte: startOfRange, $lte: endOfRange },
+            ...(filterObj?.type !== "all" ? filterObj : {}), 
+        };
+
+        //if no roles, only return "approved" or "not applicable" events
+        if (!roleNames || roleNames.length === 0) {
+            // matchStage["status"] = { $in: ["approved", "not applicable"] };
+            let query = Event.find(matchStage);
+            if (populateFields.length > 0) {
+                populateFields.forEach(field => query.populate(field));
+            }
+            return await query.lean();
+        }
+
+        //if roles are provided, allow all statuses, but check role-based approval level
+        let pipeline = [
+            { $match: matchStage },
+
+            {
+                $lookup: {
+                    from: "approvalinstances",
+                    localField: "approvalReference",
+                    foreignField: "_id",
+                    as: "approvalData"
+                }
+            },
+            { $unwind: { path: "$approvalData", preserveNullAndEmptyArrays: true } },
+
+            {
+                $addFields: {
+                    currentApprovalStep: {
+                        $arrayElemAt: ["$approvalData.approvals", "$approvalData.currentStepIndex"]
+                    }
+                }
+            },
+
+            {
+                $match: {
+                    $or: [
+                        { "approvalData.status": { $in: ["approved", "not applicable"] } },
+
+                        {
+                            "approvalData.status": { $in: ["pending", "rejected"] },
+                            "currentApprovalStep.role": { $in: roleNames }
+                        }
+                    ]
+                }
+            }
+        ];
+
+        populateFields.forEach(field => {
+            pipeline.push({
+                $lookup: {
+                    from: field === "hostingId" ? (filterObj.hostingType === "User" ? "users" : "orgs") : field.toLowerCase() + "s",
+                    localField: field,
+                    foreignField: "_id",
+                    as: field
+                }
+            });
+            pipeline.push({ $unwind: { path: `$${field}`, preserveNullAndEmptyArrays: true } });
+        });
+
+        pipeline.push({
+            $project: {
+                approvalData: 0,
+                currentApprovalStep: 0
+            }
+        });
+
+        return await Event.aggregate(pipeline);
+    } catch (error) {
+        console.error("Error fetching events with authorization:", error);
+        return [];
+    }
+}
+
 
 module.exports = {
     getRequiredApprovals,
-    createApprovalInstance
+    createApprovalInstance,
+    getEventsWithAuthorization
 } 

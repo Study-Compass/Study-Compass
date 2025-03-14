@@ -59,7 +59,7 @@ function Dash({expandedClass, change, name}){
     }
 
     const changeToDay = (day) => {
-        change(1);
+        
     }
 
     return (
