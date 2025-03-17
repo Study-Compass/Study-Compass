@@ -12,6 +12,6 @@ const approvalInstanceSchema = new mongoose.Schema({
     eventId: { type: mongoose.Schema.Types.ObjectId, ref: 'Event', required: true },
     currentStepIndex: { type: Number, default: 0 },
     approvals: [approvalSchema],
-});
+}, { timestamps: true });
 
 module.exports = approvalInstanceSchema

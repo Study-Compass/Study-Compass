@@ -53,6 +53,7 @@ const createApprovalInstance = async (req, eventId, event) => {
         return null;
     }
 }
+
 async function getEventsWithAuthorization(req, filterObj = {}, roleNames = [], startOfRange, endOfRange, populateFields = []) {
     try {
         const { Event } = getModels(req, 'Event');
@@ -63,7 +64,7 @@ async function getEventsWithAuthorization(req, filterObj = {}, roleNames = [], s
 
         //if no roles, only return "approved" or "not applicable" events
         if (!roleNames || roleNames.length === 0) {
-            // matchStage["status"] = { $in: ["approved", "not applicable"] };
+            matchStage["status"] = { $in: ["approved", "not-applicable"] };
             let query = Event.find(matchStage);
             if (populateFields.length > 0) {
                 populateFields.forEach(field => query.populate(field));
@@ -77,7 +78,7 @@ async function getEventsWithAuthorization(req, filterObj = {}, roleNames = [], s
 
             {
                 $lookup: {
-                    from: "approvalinstances",
+                    from: "approvalInstances",
                     localField: "approvalReference",
                     foreignField: "_id",
                     as: "approvalData"
@@ -96,10 +97,10 @@ async function getEventsWithAuthorization(req, filterObj = {}, roleNames = [], s
             {
                 $match: {
                     $or: [
-                        { "approvalData.status": { $in: ["approved", "not applicable"] } },
+                        { "status": { $in: ["approved", "not-applicable"] } },
 
                         {
-                            "approvalData.status": { $in: ["pending", "rejected"] },
+                            "status": { $in: ["pending", "rejected"] },
                             "currentApprovalStep.role": { $in: roleNames }
                         }
                     ]
@@ -108,15 +109,49 @@ async function getEventsWithAuthorization(req, filterObj = {}, roleNames = [], s
         ];
 
         populateFields.forEach(field => {
-            pipeline.push({
-                $lookup: {
-                    from: field === "hostingId" ? (filterObj.hostingType === "User" ? "users" : "orgs") : field.toLowerCase() + "s",
-                    localField: field,
-                    foreignField: "_id",
-                    as: field
-                }
-            });
-            pipeline.push({ $unwind: { path: `$${field}`, preserveNullAndEmptyArrays: true } });
+            if (field === "hostingId") {
+                pipeline.push(
+                    //dyanmically lookup the correct collection based on hostingType
+                    {
+                        $lookup: {
+                            from: "users",
+                            localField: "hostingId",
+                            foreignField: "_id",
+                            as: "userHost"
+                        }
+                    },
+                    {
+                        $lookup: {
+                            from: "orgs",
+                            localField: "hostingId",
+                            foreignField: "_id",
+                            as: "orgHost"
+                        }
+                    },
+                    //overwrite hostingId with the correct document
+                    {
+                        $addFields: {
+                            hostingId: {
+                                $cond: {
+                                    if: { $eq: ["$hostingType", "User"] },
+                                    then: { $arrayElemAt: ["$userHost", 0] },
+                                    else: { $arrayElemAt: ["$orgHost", 0] }
+                                }
+                            }
+                        }
+                    },
+                    { $project: { userHost: 0, orgHost: 0 } }
+                );
+            } else {
+                pipeline.push({
+                    $lookup: {
+                        from: field.toLowerCase() + "s", // Convert to plural collection name
+                        localField: field,
+                        foreignField: "_id",
+                        as: field
+                    }
+                });
+            }
         });
 
         pipeline.push({

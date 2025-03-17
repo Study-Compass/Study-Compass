@@ -20,7 +20,7 @@ function OIEDash(){
 
     return (
         <Dashboard menuItems={menuItems} additionalClass='oie-dash'>
-        <Dash name={approvalId} />
+            <Dash name={approvalId} />
             <EventsCalendar />
             <ManageEvents />
             <Configuration />

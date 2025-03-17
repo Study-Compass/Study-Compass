@@ -47,9 +47,9 @@ function OIEFullEvent({ event, eventId = null, setEdited }){
     }
 
     const handleApproved = async (status) => {
-        const newOIE = {...fullEvent.data.event.OIE};
-        newOIE.status = status ? "Approved" : "Rejected";
-        changeOIE(newOIE);
+        const newApproval = {...fullEvent.data.event.approvalInstance};
+        newApproval.status = status ? "Approved" : "Rejected";
+        changeOIE(newApproval);
         fullEvent.refetch();
     }
 
