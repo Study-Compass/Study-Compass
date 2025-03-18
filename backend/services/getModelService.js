@@ -20,6 +20,10 @@ const userSchema = require('../schemas/user');
 const visitSchema = require('../schemas/visit');
 const apiSchema = require('../schemas/api');
 
+//events
+const approvalFlowDefinition = require('../schemas/events/approvalFlowDefinition');
+const approvalFlowInstance = require('../schemas/events/approvalInstance');
+
 const getModels = (req, ...names) => {
     const models = {
         BadgeGrant: req.db.model('BadgeGrant', badgeGrantSchema, 'badgeGrants'),
@@ -42,7 +46,9 @@ const getModels = (req, ...names) => {
         StudyHistory: req.db.model('StudyHistory', studyHistorySchema, 'studyHistories'),
         User: req.db.model('User', userSchema, 'users'),
         Visit: req.db.model('Visit', visitSchema, 'visits'),
-        Api: req.db.model('Api', apiSchema, 'api')
+        Api: req.db.model('Api', apiSchema, 'api'),
+        ApprovalFlow: req.db.model('ApprovalFlow', approvalFlowDefinition, 'approvalFlows'),
+        ApprovalInstance: req.db.model('ApprovalInstance', approvalFlowInstance, 'approvalInstances')
     };
 
     return names.reduce((acc, name) => {
