@@ -6,6 +6,8 @@
     height:100%;
     flex-grow:1;
     gap:20px;
+    position: relative;
+    z-index: 10;
     .top-bar{
         display: flex;
         justify-content: space-between;

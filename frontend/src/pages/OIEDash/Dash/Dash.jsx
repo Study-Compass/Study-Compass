@@ -6,7 +6,7 @@ import OIEEvent from '../OIEEventsComponents/Event/OIEEvent';
 import { useFetch } from '../../../hooks/useFetch';
 import Week from '../EventsCalendar/Week/Week';
 
-function Dash({expandedClass, change}){
+function Dash({expandedClass, change, name}){
 
     const [events, setEvents] = useState([]);
     const [pendingEvents, setPendingEvents] = useState([]);
@@ -59,14 +59,14 @@ function Dash({expandedClass, change}){
     }
 
     const changeToDay = (day) => {
-        change(1);
+        
     }
 
     return (
         <div className={`dash ${expandedClass}`}>
             <header className="header">
                 <img src={OIEGradient} alt="" />
-                <h1>OIE Dashboard</h1>
+                <h1>{name} Dashboard</h1>
             </header>
             <div className="needs-approval">
                 <div className="approval-header">
