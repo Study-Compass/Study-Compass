@@ -24,7 +24,7 @@ const apiSchema = new Schema({
     Authorization: {
          type: String, 
          enum: ["Unauthorized", "Authorized"], 
-         default: "default" 
+         
         }
 
 });

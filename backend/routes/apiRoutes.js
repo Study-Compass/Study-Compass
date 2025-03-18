@@ -87,24 +87,20 @@ small change or medium change
 
 
 
-router.get('/details', apiKeyMiddleware, async (req, res) => { //This is a place holder
-    //Should allow access to any route,(will this be specified?)
-    const apiKey = req.headers['x-api-key'];// see if this call works
-    try {
-        const apiEntry = req.apiKey;
+router.get('/details', apiKeyMiddleware, async (req, res, next) => {
+    const apiKey = req.headers['x-api-key'];
 
-        if (!apiEntry) {
-            console.log('API key not found', error);
-            return res.status(404).json({ error: 'API key not found.' });
+    try {
+        const apiKeyData = req.apiKeyData; // Assuming you set this in apiKeyMiddleware
+        if (!apiKeyData) {
+            return res.status(404).json({ error: 'API key not found' });
         }
 
-        console.log('GET: /details successful. API key details:', apiEntry);
-        res.status(200).json(apiEntry);
+        console.log('GET: /details successful. API key details:', apiKeyData);
+        return res.status(200).json(apiKeyData);
     } catch (error) {
-
-
-        console.log('GET: /details failed. Error', error);
-        res.status(500).json({ success: false, message: 'Unable to retrieve details.' });
+        console.error('GET: /details failed. Error:', error);  // Correctly reference 'error'
+        return next(error);  // Pass the error to the next middleware or global error handler
     }
 });
 

@@ -1,15 +1,17 @@
 const API = require('../schemas/api.js');
-const apiKeyRateLimiter = require('../middlewares/rateLimit.js'); 
+const limiter = require('../middlewares/rateLimit.js'); 
+const getModels = require('../services/getModelService.js');
 //For routes http://localhost:5000/api/get-org-by-name/{club name} using the api key example route
 // Middleware for validating API keys to make sure it exist, also validate that authorization is accepted
 
 const apiKeyMiddleware = async (req, res, next) => {
     
     //User attached Api Key
+    const { Api } = getModels(req, 'Api')
     const apiKey = req.headers['x-api-key']; // Verify apiId CHANGED see if it works  HAVE TO CHANGE
     try {
         //Verifies the Existence
-        const apiKeyData = await API.findOne({apiKey}); //Check if works
+        const apiKeyData = await Api.findOne({apiKey}); //Check if works
         
 
         console.log(apiKeyData);
