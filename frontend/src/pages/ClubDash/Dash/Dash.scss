@@ -1,7 +1,8 @@
-.dash{
+.club-dash .dash{
     height: 100%;
     width:100%;
-    padding:20px;
+    padding:40px 48px;
+    overflow:hidden;
     box-sizing: border-box;
     z-index: 1;
     display: flex;
@@ -9,30 +10,31 @@
     gap:30px;
     transition: padding 1s ease-in-out;
 
-    &.maximized{
-        padding:5px;
-    }
-
     header.header{
-        height:110px;
         position: relative;
-        border-radius: 13px;
         overflow: hidden;
         display:flex;
-        align-items: center;
+        flex-direction: column;
+        gap: 10px;
         h1{
             z-index: 2;
-            padding-left:13%;
-            font-size: 30px;
+            font-size: 20px;
+            font-family: 'Inter';
+            font-weight: 700;
+            margin: 0;
         }
-        img{
-            position: absolute;
-            top:0;
-            left:0;
-            height:100%;
+        h3{
+            font-size: 15px;
+            font-family: 'Inter';
+            font-weight: 500;
+            color: var(--light-text);
+            margin: 0;
+            
         }
+
+
     }
-    .needs-approval{
+    .row{
         display: flex;
         flex-direction: row;
         gap:10px;
@@ -41,25 +43,28 @@
             flex-direction: column;
         }
         h1{
-            font-size: 20px;
+            z-index: 2;
+            font-size:16px;
+            font-family: 'Inter';
+            font-weight: 700;
+            margin: 0;
             margin-left:10px;
             margin-bottom:5px;
+        }
+        .meeting{
+            display: flex;
+            gap: 10px;
         }
         .content{
             display:flex;
             border-radius: 10px;
             box-sizing: border-box;
-            border: 1px solid var(--lightborder);
-            width: 350px;
-            height: 120px;
-            justify-content: space-around;
+            border: 1px solid var(--lighterborder);
+            box-shadow: var(--shadow);
             align-items: center;
-
-            &.meeting{
-                padding-left: 20px;
-                width: 250px;
-                height: 120px;
-            }
+            align-items: center;
+            justify-content: center;
+            height:100%;
             h2{
                 display: flex;
                 flex-direction: column;
@@ -73,12 +78,43 @@
                     border-radius: 7px;
                     background-color: var(--light);
                     width: 100px;
-                    border: 1px solid var(--lightborder);
-
+                    font-weight:600;
+                    font-family: 'Inter';
+                    padding: 3px 13px;
+                    color: var(--text);
+                    cursor: pointer;
                 }
             }
 
-            
+            &.membership{
+                padding: 10px 30px;
+                gap: 40px;
+            }
         }
     }
+    .red-grad{
+        position: absolute;
+        z-index: -1;
+        transition: all 0.3s;
+        top:10px;
+        left:10px;
+        width:150px;
+        border-radius: 15px 0 0 0 ;
+    }
+
+    &.maximized{
+        padding:20px;
+        .red-grad{
+            border-radius: 0;
+            top:0;
+            left:0;
+        }
+    }
+}
+
+@keyframes hide-show {
+    0%{
+        
+    }
+    
 }

@@ -1,0 +1,70 @@
+.manage-flow{
+    width:100%;
+    z-index: 0;
+    .content{
+        box-sizing: border-box;
+        padding: 20px 40px;
+        .approvals{
+            display: flex;
+            flex-direction: column;
+            border: 1px solid var(--lighterborder);
+            border-radius: 15px;
+            background-color: var(--lightest);
+            overflow:hidden;
+            height:fit-content;
+            .container-header{
+                display: flex;
+                align-items: center;
+                padding: 8px 15px;
+                gap: 8px;
+                justify-content: space-between;
+                background-color: var(--background);
+                border-bottom: 1px solid var(--lighterborder);
+                .approval-left{
+                    border:none;
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    
+                    h2{
+                        font-size: 16px;
+                        margin: 0;
+                        font-family: 'Satoshi';
+                        font-weight:400;
+                        color: var(--lighter-text);
+                    }
+                    iconify-icon{
+                        font-size:16px;
+                        color: var(--lighter-text);
+                    }
+                }
+                button{
+                    display: flex;
+                    align-items: center;
+                    gap: 5px;   
+                    cursor: pointer;
+                    p{
+                        font-family: 'Satoshi';
+                        font-weight: 500    ;
+                    }
+                }
+            }
+            .container{
+                padding: 10px;
+                box-sizing: border-box;
+                display: flex;
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+        }
+        .create-approval{
+            button{
+                display: flex;
+                font-family: 'Satoshi';
+                padding: 5px 15px;
+                align-items: center;
+                cursor:pointer;
+            }
+        }
+    }
+}

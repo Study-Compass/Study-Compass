@@ -12,4 +12,4 @@ const FriendshipSchema = new Schema({
     createdAt: { type: Date, default: Date.now }
 });
 
-module.exports = mongoose.model('Friendship', FriendshipSchema, 'friendships');
+module.exports = FriendshipSchema;

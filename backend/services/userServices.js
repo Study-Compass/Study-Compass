@@ -1,9 +1,10 @@
 const google = require('googleapis').google;
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const User = require('../schemas/user.js');
 const crypto = require('crypto');
 const { sendDiscordMessage } = require('./discordWebookService');
+const getModels = require('./getModelService');
+const { get } = require('../schemas/badgeGrant');
 
 const login = new google.auth.OAuth2(
     process.env.GOOGLE_CLIENT_ID,
@@ -33,7 +34,8 @@ const registerwww = new google.auth.OAuth2(
 
 
 
-async function registerUser({ username, email, password }) {
+async function registerUser({ username, email, password, req }) {
+    const { User } = getModels(req, 'User');
     const existingUsername = await User.findOne({ username });
     const existingEmail = await User.findOne({ email });
 
@@ -52,21 +54,24 @@ async function registerUser({ username, email, password }) {
     });
     await user.save();
 
-    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    const token = jwt.sign({ userId: user._id, roles:user.roles }, process.env.JWT_SECRET, { expiresIn: '5d' });
     return { user, token };
 }
 
-async function loginUser({ email, password }) {
+async function loginUser({ email, password, req }) {
+    const { User } = getModels(req, 'User');
     //check if it is an email or username
     let user;
     if (!email.includes('@')) {
         user = await User.findOne({ username: email })
             .select('-googleId') // Add fields to exclude
-            .lean();
+            .lean()
+            .populate('clubAssociations'); 
     } else {
         user = await User.findOne({ email })
             .select('-googleId') // Add fields to exclude
-            .lean();
+            .lean()
+            .populate('clubAssociations'); 
     }
     if (!user) {
         throw new Error('User not found');
@@ -77,17 +82,52 @@ async function loginUser({ email, password }) {
         throw new Error('Invalid credentials');
     }
     delete user.password;
-    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '12h' });
+    const token = jwt.sign({ userId: user._id, roles: user.roles }, process.env.JWT_SECRET, { expiresIn: '5d' });
     return { user, token };
 }
+function getRedirectUri(url) {
+    const urlObj = new URL(url);
+    const hostname = urlObj.hostname;
+    const path = urlObj.pathname;
 
-async function authenticateWithGoogle(code, isRegister = false, url) {
-    let www = false;
+    // Determine the base path for redirect (either login or register)
+    const basePath = path.includes('register') ? '/register' : '/login';
+    const development = process.env.NODE_ENV === 'development';
+    const uri = development ? `http://${hostname}:3000${basePath}` : `https://${hostname}${basePath}`;
+
+    const allowedOrigins = [
+        'http://localhost:3000/login',
+        'http://localhost:3000/register',
+        'https://study-compass.com/login',
+        'https://study-compass.com/register',
+        'https://www.study-compass.com/login',
+        'https://www.study-compass.com/register',
+        'https://rpi.study-compass.com/login',
+        'https://rpi.study-compass.com/register',
+        'https://berkeley.study-compass.com/login',
+        'https://berkeley.study-compass.com/register'
+    ];
+
+    if(!allowedOrigins.includes(uri)) {
+        throw new Error(`Invalid redirect URI ${uri}`);
+    }
+
+    // Return the redirect URI dynamically constructed
+    return uri;
+}
+
+async function authenticateWithGoogle(code, isRegister = false, url, req) {
+    const { User } = getModels(req, 'User');
+
     if (url.startsWith('http://www.') || url.startsWith('https://www.')) {
         www = true;
     }
 
-    const client = www ? isRegister ? registerwww : loginwww : isRegister ? register : login;
+    const client = new google.auth.OAuth2(
+        process.env.GOOGLE_CLIENT_ID,
+        process.env.GOOGLE_CLIENT_SECRET,
+        getRedirectUri(url)
+    );
 
     const { tokens } = await client.getToken(code);
     client.setCredentials(tokens);
@@ -111,7 +151,7 @@ async function authenticateWithGoogle(code, isRegister = false, url) {
             throw new Error('Email already exists');
         }
 
-        const randomUsername = await generateUniqueUsername(userInfo.data.email);
+        const randomUsername = await generateUniqueUsername(userInfo.data.email, req);
 
         user = new User({
             googleId: userInfo.data.id,
@@ -124,12 +164,13 @@ async function authenticateWithGoogle(code, isRegister = false, url) {
         sendDiscordMessage(`New user registered`, `user ${user.username} registered`, "newUser");
     }
 
-    const jwtToken = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '12h' });
+    const jwtToken = jwt.sign({ userId: user._id, roles: user.roles }, process.env.JWT_SECRET, { expiresIn: '5d' });
 
     return { user, token: jwtToken };
 }
 
-async function generateUniqueUsername(email) {
+async function generateUniqueUsername(email, req) {
+    const { User } = getModels(req, 'User');
     let username =  email.split('@')[0].replace(/[^a-zA-Z0-9]/g, '');
     let isUnique = false;
 

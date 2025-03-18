@@ -130,13 +130,13 @@ function Room() {
     },[roomid]);
 
     function changeURL(option) {
-        navigate(`/room/${option}`);
+        navigate(`/room/${encodeURI(option)}`);
         fetchData(roomIds[option]);
         setContentState("calendarSearchResult");
     }
 
     function changeURL2(option) {
-        navigate(`/room/${option}`);
+        navigate(`/room/${encodeURI(option)}`);
         fetchData(roomIds[option]);
         setContentState("classroom");
     }
@@ -278,6 +278,7 @@ function Room() {
         //     setContentState("calendarSearch");  
         // }
      // eslint-disable-next-line react-hooks/exhaustive-deps
+     console.log(query);
     }, [query])
 
     useEffect(() => {
@@ -292,6 +293,13 @@ function Room() {
         }
 
         getRecommendationData();
+
+        const newBadgeRedirect = localStorage.getItem('badge');
+        if(newBadgeRedirect){
+            navigate(newBadgeRedirect);
+            localStorage.removeItem('badge');
+        }
+
     },[]);
 
 
@@ -384,7 +392,7 @@ function Room() {
                                 givenRoom={recommendedRoom}
                             />
                         }
-                        <SearchBar data={rooms} onEnter={changeURL2} room={contentState === "classroom" || contentState === "calendarSearchResult" ? roomName : searchQuery } onX={onX} onSearch={onSearch} query={searchQuery} onBlur={setSearchFocus} />
+                        <SearchBar data={rooms} addQuery={addQuery} onEnter={changeURL2} room={contentState === "classroom" || contentState === "calendarSearchResult" ? roomName : searchQuery } onX={onX} onSearch={onSearch} query={searchQuery} onBlur={setSearchFocus} />
                         {contentState === "classroom" || contentState === "calendarSearchResult"  ? 
                             <Classroom  
                                 room={room} 

@@ -1,9 +1,4 @@
 const express = require('express');
-const Classroom = require('../schemas/classroom.js');
-const Schedule = require('../schemas/schedule.js');
-const Rating = require('../schemas/rating.js');
-const User = require('../schemas/user.js');
-const Report = require('../schemas/report.js');
 const { verifyToken, verifyTokenOptional } = require('../middlewares/verifyToken');
 const { sortByAvailability } = require('../helpers.js');
 const multer = require('multer');
@@ -11,10 +6,11 @@ const path = require('path');
 const s3 = require('../aws-config');
 const mongoose = require('mongoose');
 const { clean } = require('../services/profanityFilterService');
-
+const getModels = require('../services/getModelService');
 const router = express.Router();
 
 router.get('/search', verifyTokenOptional, async (req, res) => {
+    const { Classroom, User, Schedule } = getModels(req, 'Classroom', 'User', 'Schedule');
     const query = req.query.query;
     const attributes = req.query.attributes ? req.query.attributes : []; // Ensure attributes is an array
     const sort = req.query.sort;
@@ -117,6 +113,7 @@ router.get('/search', verifyTokenOptional, async (req, res) => {
 });
 
 router.get('/all-purpose-search', verifyTokenOptional, async (req, res) => {
+    const { Classroom, User, Schedule, Search } = getModels(req, 'Classroom', 'User', 'Schedule', 'Search');
     const query = req.query.query;
     const attributes = req.query.attributes ? req.query.attributes : []; // Ensure attributes is an array
     const timePeriod = req.query.timePeriod; // might be null
@@ -243,6 +240,17 @@ router.get('/all-purpose-search', verifyTokenOptional, async (req, res) => {
         // Extract only the names from the result set
         const names = sortedClassrooms.map(classroom => classroom.name);
 
+        //analytics
+        const search = new Search({
+            query: {
+                query: query,
+                attributes: attributes,
+                timePeriod: timePeriod
+            },
+            user_id: userId ? userId : null,        
+        });
+
+        search.save();
         res.json({ success: true, message: "Rooms found", data: names });
 
         

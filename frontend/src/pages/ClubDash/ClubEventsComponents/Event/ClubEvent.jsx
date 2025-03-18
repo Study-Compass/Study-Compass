@@ -18,25 +18,23 @@ function ClubEvent({event}){
         setPopupOpen(false);
     }
 
-    const date = new Date(event.date);
+    const date = new Date(event.start_time);
     
 
     return(
         <div className="club-event-component" >
             <Popup isOpen={popupOpen} onClose={onPopupClose} customClassName={"wide-content"}>
-                <clubFullEvent event={event}/>
+                <ClubFullEvent event={event}/>
             </Popup>
             <div className="info">
-                <h1>{event.name}</h1>
+                <h1 className="title">{event.name}</h1>
                 {/* <p>{event.location }</p> */}
                 {/* display date in day of the week, month/day */}
                 <div className="row">
-                    <img src={event.user_id.image ? event.user_id.image : defaultAvatar} alt="" />
-                    <p className="user-name">{event.user_id.name}</p>
-                </div>
-                <div className="row">
                     <Icon icon="heroicons:calendar-16-solid" />
                     <p>{date.toLocaleString('default', {weekday: 'long'})} {date.toLocaleString('default', {month: 'numeric'})}/{date.getDate()}</p>
+                </div>
+                <div className="row">
                     <Icon icon="fluent:location-28-filled" />
                     <p>{event.location}</p>
                 </div>

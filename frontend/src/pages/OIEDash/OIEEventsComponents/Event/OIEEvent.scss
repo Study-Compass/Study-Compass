@@ -2,6 +2,7 @@
     display:flex;
     flex-direction: column;
     width:250px;
+    min-width:250px;
     gap:10px;
     padding:10px;
     box-sizing: border-box;
@@ -10,6 +11,8 @@
     border-radius: 10px;
     border: 1px solid var(--lightborder);
     justify-content: space-between;
+    animation: fadeIn 0.5s forwards;
+    opacity: 0;
 
     img{
         width:calc(100%);
@@ -21,11 +24,51 @@
         display:flex;
         flex-direction: column;
         gap:5px;
-        h1{
+        .oie-status{
+            padding:1px 12px;
+            border-radius: 5px;
+            width:fit-content;
+            background-color: var(--green);
+            &.approved{
+                background-color: var(--green);
+            }
+            &.not-applicable{
+                background-color: var(--dark-blue);
+            }
+            p{
+                font-size:11px;
+                color:var(--background);
+                margin:0;
+                font-family: 'Inter';
+                font-weight:500;
+            }
+        }
+
+        h2{
             font-size: 15px;
             font-weight: 600;
             margin: 0;
             color: var(--text);
+            font-weight: 700;
+            font-family: 'Satoshi';
+        }
+        
+        .level{
+            font-size:10px;
+            font-weight: 700;
+            color: var(--background);
+            background-color: var(--green);
+            padding:1px 5px;
+            border-radius: 5px;
+            &.faculty{
+                background-color: var(--blue);
+            }
+            &.organization{
+                background-color: var(--red);
+            }
+            &.developer{
+                background-color: var(--developerBlue);
+            }
         }
         
 
@@ -38,6 +81,9 @@
             .user-name{
                 font-weight: 700;
                 font-size:13px;
+                white-space: nowrap;  
+                overflow: hidden;    
+                text-overflow: ellipsis;
             }
             img{
                 width: 20px;
@@ -56,10 +102,11 @@
         height:fit-content;
         width:fit-content;
         padding:5px 15px;
-        font-size: 18px;
+        font-size: 14px;
         color:var(--text);
         background-color: var(--oie-background);
         pointer-events: all;
+        margin: 0;
         iconify-icon{
             transition: transform 0.2s;
         }

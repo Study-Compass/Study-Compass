@@ -19,6 +19,7 @@
 
 }
 
+
 .badge.normal p{
     margin:0 7px !important;
     color:white !important;
@@ -49,4 +50,8 @@
 
 .badge.developer{
     background-color: var(--developerBlue);
+}
+
+.badge.RCOS{
+    background-color: #D51F2B;
 }

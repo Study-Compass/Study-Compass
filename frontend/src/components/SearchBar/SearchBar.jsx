@@ -4,15 +4,16 @@ import x from '../../assets/x.svg';
 import { useNavigate } from 'react-router-dom';
 import tab from '../../assets/tab.svg';
 import useOutsideClick from '../../hooks/useClickOutside';
-import { set } from 'mongoose';
+import { nlp } from './nlp';
 
 /** 
 documentation:
 https://incongruous-reply-44a.notion.site/Frontend-SearchBar-Component-35e616d525f0492dac52ac9161b1945f
 */
 
+
 //need to add support for abbreviated versions
-function SearchBar({ data, onEnter, onSearch, room, onX, onBlur }) {
+function SearchBar({ data, addQuery, onEnter, onSearch, room, onX, onBlur }) {
     let navigate =  useNavigate();
     const itemRefs = useRef([]);
 
@@ -20,10 +21,9 @@ function SearchBar({ data, onEnter, onSearch, room, onX, onBlur }) {
     const [results, setResults] = useState([]);
     const [lower, setLower] = useState("")
     const [dataAbb, setDataAbb] = useState([]);
+    const [debouncedInput, setDebouncedInput] = useState(searchInput);
 
     const [isFocused, setIsFocused] = useState(false);
-
-
 
     const [selected, setSelected] = useState(0);
 
@@ -121,10 +121,6 @@ function SearchBar({ data, onEnter, onSearch, room, onX, onBlur }) {
         if(searchInput === "none"){
             setSearchInput("");
         }
-        if(searchInput === "free until"){
-            setLower("<span>free untils</span>");
-            return;
-        }
         if (searchInput === '' || !isFocused) {
             setResults([]);
             setLower("");
@@ -159,6 +155,28 @@ function SearchBar({ data, onEnter, onSearch, room, onX, onBlur }) {
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [searchInput, dataAbb]);
+
+    useEffect(() => {
+        // disabling nlp for now, uncomment if needed
+        // const handler = setTimeout(() => {
+        // setDebouncedInput(searchInput);
+        // }, 600); 
+
+        // return () => {
+        // clearTimeout(handler);
+        // };
+    }, [searchInput]);
+
+    useEffect(() => {
+        if (debouncedInput) {
+        const { newQuery, cleanedQuery } = nlp(debouncedInput);
+        if (newQuery) {
+            console.log(newQuery); // Log or use the new query object
+            addQuery("M", newQuery); // Call your function to add the query
+            setSearchInput(cleanedQuery); // Update the input if necessary
+        }
+        }
+    }, [debouncedInput]);
 
     function next(){
         setSearchInput(prev => prev.toLowerCase());

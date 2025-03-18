@@ -8,8 +8,13 @@
     box-shadow:var(--shadow);
     background-color: var(--background);
     border-radius: 10px;
-    border: 1px solid var(--lightborder);
-
+    border: 1px solid var(--lighterborder);
+    cursor:pointer;
+    
+    iconify-icon{
+        font-size: 16px;
+        color: var(--text);
+    }
     img{
         width:calc(100%);
         border-radius: 5px;

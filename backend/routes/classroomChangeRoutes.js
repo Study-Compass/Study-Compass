@@ -1,10 +1,10 @@
 const express = require('express');
-const Classroom = require('../schemas/classroom.js');
-const Schedule = require('../schemas/schedule.js');
-const Rating = require('../schemas/rating.js');
-const User = require('../schemas/user.js');
-const Report = require('../schemas/report.js');
-const { verifyToken, verifyTokenOptional } = require('../middlewares/verifyToken');
+const classroomSchema = require('../schemas/classroom.js');
+const scheduleSchema = require('../schemas/schedule.js');
+const ratingSchema = require('../schemas/rating.js');
+const userSchema = require('../schemas/user.js');
+const reportSchema = require('../schemas/report.js');
+const { verifyToken, authorizeRoles } = require('../middlewares/verifyToken');
 const { sortByAvailability } = require('../helpers.js');
 const multer = require('multer');
 const path = require('path');
@@ -20,6 +20,8 @@ router.post('/changeclassroom', async (req, res) => {
     const imageUrl = req.body.imageUrl;
 
     try{
+        const Classroom = mongoose.model('Classroom', classroomSchema, 'classrooms1');
+
         const classroom = await Classroom.findOne({_id: id});
 
         if (!classroom) {
@@ -44,6 +46,8 @@ router.post('/save', verifyToken, async (req, res) => {
     const operation = req.body.operation; // true is add, false is remove
 
     try {
+        const Classroom = mongoose.model('Classroom', classroomSchema, 'classrooms1');
+        const User = mongoose.model('User', userSchema, 'users');
         const classroom = await Classroom.findOne({ _id: roomId });
         if (!classroom) {
             console.log(`POST: /save/${roomId}/${userId} failed`);
@@ -104,6 +108,7 @@ router.post('/upload-image/:classroomName', upload.single('image'), async (req, 
   };
 
   try {
+    const Classroom = mongoose.model('Classroom', classroomSchema, 'classrooms1');
     // Upload image to S3
     const s3Response = await s3.upload(s3Params).promise();
     const imageUrl = s3Response.Location;
@@ -122,16 +127,19 @@ router.post('/upload-image/:classroomName', upload.single('image'), async (req, 
   }
 });
 
-router.post('/main-search-change', verifyToken, async (req, res) => {
+router.post('/main-search-change', verifyToken, authorizeRoles('admin'), async (req, res) => {
     const userId = req.user.userId;
     const classroomId = req.body.classroomId;
     try{
+        const Classroom = mongoose.model('Classroom', classroomSchema, 'classrooms1');
+        const User = mongoose.model('User', userSchema, 'users');
+
         const user = await User.findOne({ _id: userId });
         if (!user) {
             console.log(`POST: /main-search-change/${userId} failed`);
             return res.status(404).json({ success: false, message: "User not found" });
         }
-        if(!user.admin){
+        if(!user.roles.includes('admin')) {
             console.log(`POST: /main-search-change/${userId} failed`);
             return res.status(403).json({ success: false, message: "User not authorized" });
         }

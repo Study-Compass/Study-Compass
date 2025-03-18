@@ -2,23 +2,24 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const eventSchema = new mongoose.Schema({
-    user_id: {
-        type: Schema.Types.ObjectId,
-        ref: 'User',
-        required: true,
-    },
     name: {
         type: String,
         required: true,
         trim: true, // trims whitespace
     },
     type:{
-        type:String, //study, campus event
+        type:String, 
         required:true,
     },
-    hosting:{
-        type:String, //only if campus event
-        required:false,
+    hostingId: {
+        type: Schema.Types.ObjectId,
+        required: true,
+        refPath: 'hostingType'
+    },
+    hostingType: {
+        type: String,
+        required: true,
+        enum: ['User', 'Org']
     },
     going:{
         type:Array,
@@ -28,13 +29,17 @@ const eventSchema = new mongoose.Schema({
         type:String,
         required:true,
     },
-    date:{
+    start_time:{
+        type:Date,
+        required:true,
+    },
+    end_time:{
         type:Date,
         required:true,
     },
     description:{
         type:String,
-        required:true,
+        required:false, 
     },
     image:{
         type:String,
@@ -44,11 +49,30 @@ const eventSchema = new mongoose.Schema({
         type: Schema.Types.ObjectId,
         ref: 'Classroom'
     },
-
+    visibility:{
+        type:String,
+        required:true,
+    },
+    expectedAttendance:{
+        type:Number,
+        required:true,
+    },
+    approvalReference:{
+        type: Schema.Types.ObjectId,
+        ref: 'ApprovalInstance'
+    },
+    status:{
+        type:String,
+        required:true,
+        enum: ['approved', 'pending', 'rejected', 'not-applicable'],
+        default: 'not-applicable'
+    },
+    contact:{
+        type:String,
+        required:false,
+    },
 }, {
     timestamps: true // automatically adds 'createdAt' and 'updatedAt' fields
 });
 
-const Event = mongoose.model('Event', eventSchema , 'events');
-
-module.exports = Event;
+module.exports = eventSchema;

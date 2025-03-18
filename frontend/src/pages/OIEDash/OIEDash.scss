@@ -1,8 +1,6 @@
 :root{
     --oie-background: #EFEFEF
 }
-
-
 .oie-dash{
     overflow: hidden;
     height:100vh;
@@ -18,28 +16,74 @@
         padding-top:20px;
         box-sizing: border-box;
         animation: show 1s forwards;
+        justify-content: space-between;
+        .top{
+            display: flex;
+            align-items: center;
+            flex-direction: column;
+        }
+        .bottom{
+            display: flex;
+            width:100%;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            .user{
+                display: flex;
+                align-items: center;
+                gap:10px;
+                padding: 10px;
+                border-radius: 10px;
+                width:fit-content;
+                img{
+                    width:30px;
+                    height:30px;
+                    border-radius: 50%;
+                }
+                p{
+                    font-family: 'Inter';
+                    font-weight: 600;
+                    color:var(--text);
+                    &.username{
+                        font-size: 15px;
+                    }
+                    &.email{
+                        font-size: 13px;
+                        color: var(--darkborder);
+                    }
+                }
+            }
+            .back{
+                display: flex;
+                gap: 5px;
+                width:fit-content;
+                width:100%;
+                justify-content: center;
+                padding: 5px 0;
+                box-sizing: border-box;
+                cursor: pointer;
+                transition: all 0.3s;
+                background-color: var(--oie-background);
+                p{
+                    font-family: 'Inter';
+                    font-weight: 600;
+                    color:var(--text);
+                    font-size: 12px;
+                }
+                &:hover{
+                    filter:brightness(0.92);
+                }
+            }
+        }   
         .logo{
             position: relative;
-            width:85%;
+            width:80%;
             img{
                 width:100%;
             }
-            .oie-badge{
-                font-size:12px;
-                background-color: var(--red);
-                width:fit-content;
-                padding:0px 8px;
-                border-radius: 7px;
-                position: absolute;
-                left:25%;
-                bottom:0;
-                p{
-                    color: var(--background);
-                    font-family: 'Inter';
-                    font-weight:500;
-                }
-            }
+
         }
+        
         .nav{
             width:100%;
             display: flex;
@@ -52,21 +96,28 @@
                 list-style: none;
                 box-sizing: border-box;
                 padding: 0 8px;
+                display: flex;
+                flex-direction: column;
+                gap: 5px;
                 li{
                     display:flex;
                     align-items: center;
                     justify-content: flex-start;
                     gap:10px;
                     padding:5px 10px;
-                    &.selected{
-                        background-color: var(--background);
-                        border-radius: 10px;
-                        border: 1px solid var(--lightborder)
-                    }
-                    
-                    img{
-                        width:25px;
-                        height:25px
+                    cursor: pointer;
+                    border-radius: 10px;
+                    transition: all 0.2s;
+                    -webkit-user-select: none;
+                    user-select: none;
+
+
+                    img, iconify-icon{
+                        width:20px;
+                        height:20px;
+                        font-size:20px;
+                        color: var(--text);
+                        transition: all 0.2s;
                     }
 
                     p{
@@ -74,6 +125,26 @@
                         font-weight: 600;
                         color:var(--text);
                         font-size: 14px;
+                        transition: all 0.2s;
+                    }
+
+                    &:hover{
+                        background-color: var(--club-dark);
+                    }
+
+                    &.selected{
+                        // background-color: var(--background);
+                        // border-radius: 10px;
+                        // border: 1px solid var(--lightborder)
+                        p{
+                            color: var(--red);
+                        }
+                        iconify-icon{
+                            color: var(--red);
+                        }
+                        background-color: var(--red-transparent);
+                        &:hover{
+                        }
                     }
 
                 }
@@ -83,15 +154,40 @@
             animation: hide 1s forwards;
         }
     }
+
     .dash-right{
         position: relative;
         flex-grow: 1;
         display:flex;
         background-color: var(--background);
-        margin: 10px 10px 10px 0;
-        border-radius: 15px;
-        border: 1px solid var(--lightborder);
         box-shadow: var(--shadow);
+        width:calc(100% - 200px);
+        height: 100vh;
+        max-height: 100vh;
+        overflow: hidden;
+
+        &.maximized{
+            width:100%;
+        }
+
+        .dash-content{
+            position: absolute;
+            top:0;
+            left:0;
+            max-width:100%;
+            width:100%;
+            opacity: 0;
+            pointer-events:none;
+            transition: all 0.5s;
+            display:flex;
+            flex-direction: column;
+            min-height:100%;
+                &.visible{
+                    opacity: 1;
+                    pointer-events:all;
+                }
+        }
+
         
         .expand{
             position: absolute;
@@ -114,7 +210,7 @@
             
         }
 
-        &::after{
+        &::before{
             content: '';
             position: absolute;
             width:100%;
@@ -126,10 +222,10 @@
             border-radius: 20px;
             transition: all 1s;
         }
-        &.minimized::after{
+        &.minimized::before{
             transform:scale(1);
         }
-        &.maximized::after{
+        &.maximized::before{
             transform:scale(1.2);
         }
     }
