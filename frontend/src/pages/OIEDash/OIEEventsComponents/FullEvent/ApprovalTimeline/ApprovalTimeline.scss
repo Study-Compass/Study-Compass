@@ -1,0 +1,95 @@
+.timeline-container {
+    /* Just some padding and a light overall style */
+    padding: 1rem;
+    background-color: #fff;
+  }
+  
+  /* Each “step” is one row across the page. */
+  .timeline-step {
+    display: flex;
+    align-items: flex-start;
+    position: relative;
+    margin-bottom: 2rem;
+  
+    /* You can tweak spacing/position as needed. */
+  }
+  
+  /* DATE on the left */
+  .step-date {
+    width: 140px;
+    text-align: right;
+    color: #666;
+    margin-right: 1rem;
+    font-size: 0.9rem;
+    line-height: 1.4;
+  }
+  
+  /* The middle “column” that holds the dot & line. */
+  .timeline-marker {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-right: 1rem; /* space before the content */
+  }
+  
+  /* The dot itself */
+  .marker-circle {
+    width: 1rem;
+    height: 1rem;
+    border: 3px solid #ccc;
+    border-radius: 50%;
+    background-color: #fff;
+    z-index: 1;
+    transition: transform 0.3s ease, border-color 0.3s ease, background-color 0.3s ease;
+  
+    &.completed {
+      border-color: #4caf50;
+      background-color: #4caf50;
+    }
+  
+    &.active {
+      /* “Pulsing” or “grow” effect */
+      animation: pulse 0.8s infinite alternate ease-in-out;
+      border-color: #2196f3;
+      background-color: #2196f3;
+    }
+  }
+  
+  /* The vertical line that connects the steps. */
+  .marker-line {
+    flex: 1; /* fill remaining vertical space */
+    width: 2px;
+    background-color: #ccc;
+    margin-top: 0.25rem; /* gap between circle and line */
+  }
+  
+  /* The step’s text on the right */
+  .timeline-content {
+    background-color: #f9f9f9;
+    border-radius: 4px;
+    padding: 0.5rem 1rem;
+    flex: 1; /* Expand to fill available width */
+  
+    .content-title {
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+  
+    .content-subtext {
+      color: #666;
+      font-size: 0.9rem;
+    }
+  }
+  
+  /* Keyframes for active “pulse” animation. 
+     You could do “scale(1.2) -> scale(1.0)” or something else. */
+  @keyframes pulse {
+    0% {
+      transform: scale(1.2);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+  

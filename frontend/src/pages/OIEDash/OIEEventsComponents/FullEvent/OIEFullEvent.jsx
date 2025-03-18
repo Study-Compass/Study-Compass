@@ -8,6 +8,7 @@ import { useFetch } from '../../../../hooks/useFetch';
 import { useNotification } from '../../../../NotificationContext';
 import axios from 'axios';
 import defaultAvatar from '../../../../assets/defaultAvatar.svg';
+import EventTimeline from './ApprovalTimeline/ApprovalTimeline';
 
 const acknowledgements = {
     'pspeak' : 'This event is asking the President to speak',
@@ -16,6 +17,29 @@ const acknowledgements = {
     'catering' : 'This event requires catering',
 
 }
+
+const sample = {
+    name: 'Sample Event',
+    createdAt: '2025-03-12T16:00:00Z',
+    start_time: '2025-03-19T18:00:00Z',
+    approvalReference: {
+      currentStepIndex: 1,
+      approvals: [
+        {
+          role: 'Heffner Alumni House',
+          status: 'approved',
+          approvedByUserId: '123abc',
+          approvedAt: '2025-03-12T18:00:00Z'
+        },
+        {
+          role: 'OIE',
+          status: 'pending'
+        }
+      ]
+    },
+    // ...
+  }
+  
 
 function OIEFullEvent({ event, eventId = null, setEdited }){
     const { addNotification } = useNotification();
@@ -101,17 +125,17 @@ function OIEFullEvent({ event, eventId = null, setEdited }){
 
     useEffect(() => {
         if(fullEvent.data){
-            const check = {};
-            fullEvent.data.event.OIE.checkListItems.forEach((item)=>{
-                //find index of item in config, then set checked to true
-                const index = data.config.checklist.findIndex((configItem) => configItem.title.toLowerCase() === item.toLowerCase());
-                if(index === -1){
-                    return;
-                }
-                check[index] = true;
+            // const check = {};
+            // fullEvent.data.event.OIE.checkListItems.forEach((item)=>{
+            //     //find index of item in config, then set checked to true
+            //     const index = data.config.checklist.findIndex((configItem) => configItem.title.toLowerCase() === item.toLowerCase());
+            //     if(index === -1){
+            //         return;
+            //     }
+            //     check[index] = true;
 
-            });
-            setChecked(check);
+            // });
+            // setChecked(check);
         }
     }, [fullEvent.data]);
 
@@ -166,31 +190,7 @@ function OIEFullEvent({ event, eventId = null, setEdited }){
                     <div className="status"> 
                         {!fullEvent.loading && 
                             <>
-                                <div className="row">
-                                    <div className={`status-dot ${fullEvent.data.event.OIE.status.toLowerCase()}`}></div>
-                                    <h2>{fullEvent.data.event.OIE.status}</h2>
-                                    <button className="accept" onClick={()=>handleApproved(true)}><Icon icon="icon-park-solid:check-one" />approve</button>
-                                    <button className="reject" onClick={()=>handleApproved(false)}><Icon icon="icon-park-solid:close-one" />reject</button>
-                                </div>
-                                <div className="col requirements">
-                                    <div className="requirement-header">
-                                        <p>OIE requirements met</p>
-                                    </div>
-                                    {event.OIEAcknowledgementItems.map((item, index) => (
-                                        <div className="requirement" key={index}>
-                                            <p>{acknowledgements[item]}</p>
-                                        </div>
-                                    ))}
-                                    {
-                                        event.expectedAttendance > 100 &&
-                                            <div className="requirement">
-                                                <p>{acknowledgements.people}</p>
-                                            </div>
-                                    }
-                                </div>
-                                <p>Approval requested {new Date(fullEvent.data.event.createdAt).toLocaleString('default', {weekday: 'long'})}, {new Date(fullEvent.data.event.createdAt).toLocaleString('default', {month: 'long'})} {new Date(fullEvent.data.event.createdAt).getDate()}</p>
-                                <p className="contact">contact: {event.contact}</p>
-
+                                <EventTimeline event={sample} />
                             </>
                         }
                     </div>
