@@ -6,6 +6,7 @@ const crypto = require('crypto'); // For generating API keys
 const mongoose = require('mongoose');
 const {verifyToken}= require('../middlewares/verifyToken');
 const getModels = require('../services/getModelService.js');
+require('dotenv').config();
 
 // Generate a new API key 
 router.post('/create_api', verifyToken, async (req, res) => { 
@@ -124,6 +125,29 @@ router.delete('/delete-api', verifyToken, apiKeyMiddleware, async (req, res) => 
     }
 });
 
+//temporary logic just to test connection
+function checkApiKey(req, res, next) {
+    const apiKey = req.headers['x-api-key'];
+    if (apiKey === process.env.EDUREKA_API) {
+      return next();
+    } else {
+      return res.status(403).json({ error: 'Forbidden: Invalid API key' });
+    }
+}
+
+router.get('/api/events', limiter(100), checkApiKey, async (req, res) => {
+    
+    try {
+        const { Event } = getModels(req, 'Event');
+        const events = await Event.find({});
+
+        console.log('GET: /api/events successful. Events:', events);
+        res.status(200).json(events);
+    } catch (error) {
+        console.error('GET: /api/events failed. Error:', error);
+        res.status(500).json({ error: 'Unable to retrieve events' });
+    }
+});
 
 
 module.exports = router;
