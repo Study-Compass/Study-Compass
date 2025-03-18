@@ -6,10 +6,11 @@ const apiKeyRateLimiter = require('../middlewares/rateLimit.js');
 const apiKeyMiddleware = async (req, res, next) => {
     
     //User attached Api Key
-    const apiKey = req.headers['x-api-key']; // Verify apiId CHANGED 
+    const apiKey = req.headers['x-api-key']; // Verify apiId CHANGED see if it works  HAVE TO CHANGE
     try {
         //Verifies the Existence
         const apiKeyData = await API.findOne({apiKey}); //Check if works
+        
 
         console.log(apiKeyData);
         if (!apiKeyData) {
@@ -18,7 +19,7 @@ const apiKeyMiddleware = async (req, res, next) => {
         }
 
         //Add a status for rate limit here, better status more usages
-        const clearance = apiKeyData.Authorization ||"default"; //NEED TO ATTACH A TAG WITH KEY, test both cases, front end will handle who gets the tag
+        const clearance = apiKeyData.Authorization || "default"; // NEED TO ATTACH A TAG WITH KEY, test both cases, front end will handle who gets the tag
         let maxRequests;
 
         //Basic Framework if we want to change the different types
@@ -32,7 +33,7 @@ const apiKeyMiddleware = async (req, res, next) => {
                 console.log(apiKeyData, "Authorized User Key: Limited ", maxRequests, " requests.\nCurrent Usage: ", apiKeyData.usageCount);
                 break;
 
-            default: //Default with no tag is still unauthorized
+            default: //Default with no tag is still unauthorized, see if this work
                 maxRequests = 100;
                 console.log(apiKeyData, "Unauthorized User Key: Limited ", maxRequests, " requests.\nCurrent Usage: ", apiKeyData.usageCount);
                 break;
@@ -62,6 +63,3 @@ const apiKeyMiddleware = async (req, res, next) => {
 
 
 module.exports = { apiKeyMiddleware };
-
-
-//New task to do is to now apply apiKeyMiddleware into different branches to see if will return me a status 

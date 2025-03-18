@@ -18,6 +18,7 @@ const searchSchema = require('../schemas/search');
 const studyHistorySchema = require('../schemas/studyHistory');
 const userSchema = require('../schemas/user');
 const visitSchema = require('../schemas/visit');
+const apiSchema = require('../schemas/api');
 
 const getModels = (req, ...names) => {
     const models = {
@@ -40,7 +41,8 @@ const getModels = (req, ...names) => {
         Search: req.db.model('Search', searchSchema, 'searches'),
         StudyHistory: req.db.model('StudyHistory', studyHistorySchema, 'studyHistories'),
         User: req.db.model('User', userSchema, 'users'),
-        Visit: req.db.model('Visit', visitSchema, 'visits')
+        Visit: req.db.model('Visit', visitSchema, 'visits'),
+        Api: req.db.model('Api', apiSchema, 'api')
     };
 
     return names.reduce((acc, name) => {

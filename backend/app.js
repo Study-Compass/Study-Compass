@@ -66,6 +66,8 @@ app.use(async (req, res, next) => {
         res.status(500).send('Database connection error');
     }
 });
+// berkeley.study-compass.com
+
 
 const upload = multer({
     storage: multer.memoryStorage(),

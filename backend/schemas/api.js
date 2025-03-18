@@ -22,12 +22,14 @@ const apiSchema = new Schema({
         default: 0, 
     },
     Authorization: {
-        type: String,
-        required: true,
-        default:['Unauthorized', 'Authorized'],
+         type: String, 
+         enum: ["Unauthorized", "Authorized"], 
+         default: "default" 
+        }
 
-    }
 });
-const API = mongoose.model("api", apiSchema);
+// const API = mongoose.model("api", apiSchema);
 
-module.exports = API;
+// module.exports = API;//NO LONGER SUPPORTED 
+
+module.exports = apiSchema;

@@ -1,17 +1,21 @@
 const express = require('express');
 const router = express.Router();
-const Api = require('../schemas/api.js');
-const User = require('../schemas/user.js');
 const limiter = require('../middlewares/rateLimit.js'); // Rate limiting middleware
 const {apiKeyMiddleware} = require('../middlewares/apiKeyMiddleware.js'); // API key validation
 const crypto = require('crypto'); // For generating API keys
 const mongoose = require('mongoose');
 const {verifyToken}= require('../middlewares/verifyToken');
+const getModels = require('../services/getModelService.js');
 
 // Generate a new API key 
 router.post('/create_api', verifyToken, async (req, res) => { 
     try {
+        const { Api } = getModels(req, 'Api'); 
+        //Add a set authorization here, just a tag to connect to api key front end will handle assigning
+        //Authorized or Unauthorized try both 
+
        const userId = req.user.userId;
+       const user_status = req.headers["Authorization"];// see if this works
 
         // Generate API key and verify user does not have any pre-existing one
         const existingApi = await Api.findOne({ owner: userId });
@@ -25,6 +29,7 @@ router.post('/create_api', verifyToken, async (req, res) => {
         const newApi = new Api({
             api_key: apiKey,
             owner: userId,
+            Authorization: user_status // see if this works
         });
 
         await newApi.save();
@@ -71,14 +76,22 @@ Look through middleware debugger for anything
 //so thunder clients say "Authorization:" unauthorized_org , "apikey"
 -api caller program
 
+
+
+
+3/11/25
+Changed interface and teach new syntax
+Every route where i call a database route
+small change or medium change
 */
 
 
 
-router.get('/details', verifyToken, apiKeyMiddleware, async (req, res) => { //This is a place holder
+router.get('/details', apiKeyMiddleware, async (req, res) => { //This is a place holder
     //Should allow access to any route,(will this be specified?)
+    const apiKey = req.headers['x-api-key'];// see if this call works
     try {
-        const apiEntry = req.apiKeyData;
+        const apiEntry = req.apiKey;
 
         if (!apiEntry) {
             console.log('API key not found', error);
@@ -99,6 +112,7 @@ router.get('/details', verifyToken, apiKeyMiddleware, async (req, res) => { //Th
 router.delete('/delete-api', verifyToken, apiKeyMiddleware, async (req, res) => {
     const userId = req.user.userId;
     try {
+        const { Api } = getModels(req, 'Api');
         const deletedApi = await Api.findOneAndDelete({ owner: userId }); 
         
         if (!deletedApi) {
