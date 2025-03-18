@@ -58,7 +58,6 @@ router.post('/create_api', verifyToken, async (req, res) => {
 //associating a header : with an api key
 /*
 Tasks to do: 
-change user id to strictly api idea
 find a way to test the request coming from a different server (new api with a new routing system
 ): create a new repositiory, a light weight server to use fetch or axios to call routes from a different server  (dont know the logistics) 
 Set up one route/action 
@@ -91,7 +90,7 @@ router.get('/details', apiKeyMiddleware, async (req, res, next) => {
     const apiKey = req.headers['x-api-key'];
 
     try {
-        const apiKeyData = req.apiKeyData; // Assuming you set this in apiKeyMiddleware
+        const apiKeyData = req.apiKeyData; 
         if (!apiKeyData) {
             return res.status(404).json({ error: 'API key not found' });
         }
@@ -99,8 +98,8 @@ router.get('/details', apiKeyMiddleware, async (req, res, next) => {
         console.log('GET: /details successful. API key details:', apiKeyData);
         return res.status(200).json(apiKeyData);
     } catch (error) {
-        console.error('GET: /details failed. Error:', error);  // Correctly reference 'error'
-        return next(error);  // Pass the error to the next middleware or global error handler
+        console.error('GET: /details failed. Error:', error);  
+        return next(error); 
     }
 });
 
