@@ -7,7 +7,7 @@
     z-index: 1;
     display: flex;
     flex-direction: column;
-    gap:30px;
+    gap:55px;
     transition: padding 1s ease-in-out;
 
     &.maximized{
@@ -49,6 +49,9 @@
         .meeting{
             display: flex;
             gap: 10px;
+            h1{
+                
+            }
         }
     }
 

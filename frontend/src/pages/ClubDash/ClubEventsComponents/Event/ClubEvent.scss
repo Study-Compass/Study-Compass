@@ -28,6 +28,22 @@
             color: var(--text);
 
         }
+        .ongoing-badge {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 16px;
+            font-weight: bold;
+            font-size: 10px;
+            width: fit-content;
+            background-color: var(--red-transparent);
+            color: var(--red);
+
+            p{
+                color: var(--red); 
+            }
+        }
         
 
         .row{
@@ -51,6 +67,7 @@
                 color: var(--text);
                 font-family: 'Inter';
             }
+
         }
     }
     .button{
