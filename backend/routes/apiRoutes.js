@@ -149,5 +149,11 @@ router.get('/api/events', limiter(100), checkApiKey, async (req, res) => {
     }
 });
 
+//simple post request, returns what it gets
+router.post('/api/test', limiter(100), checkApiKey, async (req, res) => {
+    console.log('POST: /api/test successful. Request body:', req.body);
+    res.status(200).json(req.body);
+});
+
 
 module.exports = router;
