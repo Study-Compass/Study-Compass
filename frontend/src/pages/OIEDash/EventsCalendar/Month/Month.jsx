@@ -23,7 +23,7 @@ const getMonthName = (month) => {
 };
 
 function Month({ height, changeToWeek, filter}) {
-    const [month, setMonth] = useState(2);
+    const [month, setMonth] = useState(3);
     const [year, setYear] = useState(2025);
     const filterParam = encodeURIComponent(JSON.stringify(filter));
     const url = `/get-events-by-month?month=${month}&year=${year}&filter=${filterParam}`;

@@ -284,32 +284,36 @@ router.get('/get-event/:event_id', verifyTokenOptional, async (req, res) => {
 
     try {
         const user = user_id ? await User.findById(user_id) : null;
-        const event = await Event.findById(event_id).populate('classroom_id').populate('hostingId');
+        let eventQuery = Event.findById(event_id);
+
+        // Populate approvalReference conditionally based on approvalInstance
+        const approvalInstance = await ApprovalInstance.findOne({ eventId: event_id });
+
+        if (approvalInstance && user) {
+            // Check if user has approval roles if approvalInstance exists
+            if (user.approvalRoles.length > 0) {
+                eventQuery = eventQuery.populate('classroom_id').populate('hostingId').populate('approvalReference');
+            } else {
+                // If no approval roles, return an unauthorized response
+                return res.status(403).json({
+                    success: false,
+                    message: 'You are not authorized to view this page.'
+                });
+            }
+        } else {
+            // If no approvalInstance exists, just return the event without additional population
+            eventQuery = eventQuery.populate('classroom_id').populate('hostingId');
+        }
+
+        const event = await eventQuery;
+
         if (!event) {
             return res.status(404).json({
                 success: false,
                 message: 'Event not found.'
             });
         }
-        const approvalInstance = await ApprovalInstance.findOne({ eventId: event_id });
-        if (approvalInstance) {
-            if (!user){
-                return res.status(403).json({
-                    success: false,
-                    message: 'You are not authorized to view this page.'
-                });
-            } else {    
-                //check that user has approval role
-                if(user.approvalRoles.length > 0){
-                    let newEvent = event.toObject();
-                    newEvent["approvalInstance"] = approvalInstance;
-                    return res.status(202).json({
-                        success: true,
-                        event: newEvent
-                    });
-                }
-            }
-        }
+
         return res.status(200).json({
             success: true,
             event
@@ -322,7 +326,6 @@ router.get('/get-event/:event_id', verifyTokenOptional, async (req, res) => {
         });
     }
 });
-
 router.post('/approve-event', verifyToken, async (req, res) => {
     const { Event, User, ApprovalInstance } = getModels(req, 'Event', 'User', 'ApprovalInstance');
     const user_id = req.user.userId;

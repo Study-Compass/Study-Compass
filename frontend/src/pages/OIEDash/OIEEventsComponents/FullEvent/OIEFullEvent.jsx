@@ -143,8 +143,6 @@ function OIEFullEvent({ event, eventId = null, setEdited }){
         return "";
     }
 
-    console.log(event.OIEAcknowledgementItems)
-
     return(
         <div className="full-event oie">
             <div className="tabs">
@@ -188,9 +186,9 @@ function OIEFullEvent({ event, eventId = null, setEdited }){
                 <div className={`check ${tab === "check" && "visible"}`}>
                     <h1>Approval Status</h1>
                     <div className="status"> 
-                        {!fullEvent.loading && 
+                        {!fullEvent.loading && fullEvent.data && 
                             <>
-                                <EventTimeline event={sample} />
+                                <EventTimeline event={fullEvent.data.event} />
                             </>
                         }
                     </div>
