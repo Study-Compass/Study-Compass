@@ -6,12 +6,12 @@ import ClubFullEvent from '../FullEvent/ClubFullEvent';
 import { Icon } from '@iconify-icon/react/dist/iconify.mjs';
 import defaultAvatar from '../../../../assets/defaultAvatar.svg';
 
-function ClubEvent({event, onGoing}){
+function ClubEvent({event, onGoing, onExpand}){
     const [popupOpen, setPopupOpen] = useState(false);
     const navigate = useNavigate();
 
     const handleEventClick = (event) => {
-        setPopupOpen(true);
+        onExpand(event);
     }
 
     const onPopupClose = () => {

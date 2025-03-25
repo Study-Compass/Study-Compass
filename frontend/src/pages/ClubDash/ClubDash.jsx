@@ -204,7 +204,7 @@ function ClubDash(){
                 }
                 {
                     currentPage =="meetings" &&
-                    <MeetingManagement expandedClass = {expandedClass}  meetings={meetings.data}/>
+                    <MeetingManagement expandedClass = {expandedClass}  meetings={meetings.data} onExpand={onExpand}/>
                 }
                 <div className={`expand`} onClick={onExpand}>
                     <Icon icon="material-symbols:expand-content-rounded" />
