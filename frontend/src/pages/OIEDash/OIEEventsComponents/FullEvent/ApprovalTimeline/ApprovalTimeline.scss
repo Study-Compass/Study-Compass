@@ -37,7 +37,6 @@
     .timeline-container {
         /* Just some padding and a light overall style */
         padding: 1rem;
-        background-color: var(--lightest);
     }
 
     /* Each “step” is one row across the page. */
@@ -45,10 +44,11 @@
         display: flex;
         align-items: flex-start;
         position: relative;
-        margin-bottom: 2rem;
+        padding-bottom: 2rem;
 
         /* You can tweak spacing/position as needed. */
     }
+
 
     /* DATE on the left */
     .step-date {
@@ -84,26 +84,58 @@
     }
 
     .marker-container {
-
+        display: grid;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width:19px;
+        height:19px;
+        iconify-icon{
+            width:19px;
+            height:19px;
+            position: absolute;
+            align-self:center;
+            justify-self: center;
+            font-size:19px;
+            z-index: 2;
+            border-radius: 50%;
+            color:var(--background);
+            transition: all 0.2s;
+            &.completed{
+                background-color: var(--green);   
+                color: var(--background);
+            }
+            &.active{
+                background-color: var(--yellow);
+                color: var(--yellow);
+                transition: all 0.8s ease 0.6s;
+            }
+        }
         .marker-circle {
-            width: 0.8rem;
-            height: 0.8rem;
-            border: 3px solid #ccc;
+            width: 19px;
+            height: 19px;
+            border: 2px solid  var(--lightborder);
+            box-sizing: border-box;
             border-radius: 50%;
             background-color: #fff;
             z-index: 1;
+            position: absolute;
+            align-self:center;
+            justify-self: center;
             transition: transform 0.3s ease, border-color 0.3s ease, background-color 0.3s ease;
-
-            &.completed {
-                border-color: var(--green);
-                background-color: var(--green);
-            }
-
+    
             &.active {
                 /* “Pulsing” or “grow” effect */
                 animation: pulse 0.8s infinite alternate ease-in-out;
-                border-color: #2196f3;
-                background-color: #2196f3;
+                border-color: var(--yellow);
+                background-color: var(--yellow);
+                opacity:0.4;
+            }
+
+            &.completed {
+                background-color: var(--green);
+                border-color: var(--green);
+                animation: pulse-once 0.6s ease-in-out;
             }
         }
     }
@@ -111,13 +143,36 @@
     /* The dot itself */
 
     /* The vertical line that connects the steps. */
+
     .marker-line {
-        flex: 1;
-        /* fill remaining vertical space */
+        position:absolute;
+        top:0;
+        align-self:center;
         width: 2px;
-        background-color: #ccc;
-        margin-top: 0.25rem;
-        /* gap between circle and line */
+        background: linear-gradient(to bottom, var(--green) 70%, var(--yellow) 100%);
+        overflow:hidden;
+        transition: top 0.5s;
+        &::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            height:100%;
+            width:2px;
+            background-color: var(--lightborder);
+            transition: all 0.5s ease 0.5s;
+        }
+        &.active{
+            &::before{
+                top:100%;
+            }
+        }
+        &.completed{
+            background: linear-gradient(to bottom, var(--green) 100%, var(--yellow) 100%);
+
+            &::before{
+                top:100%;
+            }
+        }
     }
 
     /* The step’s text on the right */
@@ -140,11 +195,18 @@
         }
     }
 
+    .timeline-step:last-child {
+        padding-bottom: 10px;
+        .marker-line {
+            display: none;
+        }
+    }
+
     /* Keyframes for active “pulse” animation. 
          You could do “scale(1.2) -> scale(1.0)” or something else. */
     @keyframes pulse {
         0% {
-            transform: scale(1.2);
+            transform: scale(1.4);
         }
 
         100% {
@@ -153,3 +215,18 @@
     }
 
 }
+
+@keyframes pulse-once {
+    0% {
+      transform: scale(1);
+      opacity: 0.4
+    }
+    50% {
+      transform: scale(1.5);
+      opacity: 0.2
+    }
+    100% {
+      transform: scale(2);
+      opacity: 0;
+    }
+  }
