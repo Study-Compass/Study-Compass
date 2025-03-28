@@ -46,7 +46,7 @@
             width:100px;
             justify-content: left;
             align-content: flex-start;
-            background-color: black; 
+            // background-color: black; 
             border-radius: 50%;
         }
 
@@ -75,7 +75,7 @@
                     height: 22px;
                 }
 
-                &.ongoing{
+                &.status{
                     display: flex;
                     flex-direction: row;
                     align-items: center;

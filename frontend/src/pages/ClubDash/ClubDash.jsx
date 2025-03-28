@@ -18,7 +18,7 @@ function ClubDash(){
     const [clubId, setClubId] = useState(useParams().id);
     const [expanded, setExpanded] = useState(false);
     const [expandedClass, setExpandedClass] = useState("");
-    const{isAuthenticated, isAuthenticating, user} = useAuth();
+    const {isAuthenticated, isAuthenticating, user} = useAuth();
     const navigate  = useNavigate();
     const [userInfo, setUserInfo] = useState(null);
 
@@ -204,7 +204,7 @@ function ClubDash(){
                 }
                 {
                     currentPage =="meetings" &&
-                    <MeetingManagement expandedClass = {expandedClass}  meetings={meetings.data} onExpand={onExpand}/>
+                    <MeetingManagement expandedClass = {expandedClass}  meetings={meetings.data} onExpand={onExpand} clubName={clubId} picture={orgData.data.org.overview.org_profile_image}/>     
                 }
                 <div className={`expand`} onClick={onExpand}>
                     <Icon icon="material-symbols:expand-content-rounded" />

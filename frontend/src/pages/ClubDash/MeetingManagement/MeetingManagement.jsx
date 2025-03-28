@@ -5,7 +5,7 @@ import ClubEvent from "../ClubEventsComponents/Event/ClubEvent";
 import EventMeeting from "../ClubEventsComponents/EventMeeting/EventMeeting";
 
 
-function MeetingManagement({expandedClass,meetings, onExpand}){
+function MeetingManagement({expandedClass,meetings, onExpand, clubName, picture}){
     const [onGoing, setOnGoing] = useState(false);
 
     const [selectedMeeting, setSelectedMeeting] = useState(null);
@@ -20,8 +20,9 @@ function MeetingManagement({expandedClass,meetings, onExpand}){
         onExpand();
     }
 
+
     if(selectedMeeting){
-        return <EventMeeting openDash={backToDash} />
+        return <EventMeeting openDash={backToDash} clubName={clubName} event = {selectedMeeting} picture = {picture}/>
     }
 
 
@@ -40,7 +41,9 @@ function MeetingManagement({expandedClass,meetings, onExpand}){
                                 console.log("HERE");
                                 //check if meeting is upcoming or past
                                 if(new Date(meeting.start_time) < new Date() && new Date() < new Date(meeting.end_time)){
-                                    return <ClubEvent key={index} event={meeting}  onGoing = {true} onExpand={handleExpand}/>
+                                    return <ClubEvent key={index} event={meeting}  onGoing = {true} onExpand={handleExpand} />
+                                    
+
                                 }
                             }) : <h2>no meetings scheduled</h2>
                         }
@@ -51,7 +54,7 @@ function MeetingManagement({expandedClass,meetings, onExpand}){
                             meetings && meetings.events && meetings.events.length > 0 ? meetings.events.map((meeting, index) => {
                                 //check if meeting is upcoming or past
                                 if(new Date(meeting.start_time) > new Date()){
-                                    return <ClubEvent key={index} event={meeting} />
+                                    return <ClubEvent key={index} event={meeting} clubName={clubName} />
                                 }
                             }) : <h2>no meetings scheduled</h2>
                         }
