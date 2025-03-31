@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import logo from '../../assets/Brand Image/EventsLogo.svg';
 import defaultAvatar from '../../assets/defaultAvatar.svg';
 import useAuth from '../../hooks/useAuth';
@@ -11,12 +11,27 @@ function Dashboard({ menuItems, children, additionalClass = '' }) {
     const [expandedClass, setExpandedClass] = useState("");
     const [currentDisplay, setCurrentDisplay] = useState(0);
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
 
     const {user} = useAuth();
+
+    useEffect(() => {
+        // Get the page from URL parameters, default to 0 if not specified
+        const page = parseInt(searchParams.get('page') || '0');
+        if (page >= 0 && page < menuItems.length) {
+            setCurrentDisplay(page);
+        }
+    }, [searchParams, menuItems.length]);
 
     const onExpand = () => {
         setExpanded(prev => !prev);
         setExpandedClass(expanded ? "minimized" : "maximized");
+    }
+
+    const handlePageChange = (index) => {
+        setCurrentDisplay(index);
+        // Update URL with the new page number
+        navigate(`?page=${index}`, { replace: true });
     }
 
     return (
@@ -29,7 +44,9 @@ function Dashboard({ menuItems, children, additionalClass = '' }) {
                     <nav className="nav">
                         <ul>
                             {menuItems.map((item, index) => (
-                                <li key={index} className={`${currentDisplay === index ? "selected" : ""}`} onClick={() => setCurrentDisplay(index)}>
+                                <li key={index} 
+                                    className={`${currentDisplay === index ? "selected" : ""}`} 
+                                    onClick={() => handlePageChange(index)}>
                                     <Icon icon={item.icon} />
                                     <p>{item.label}</p>
                                 </li>

@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams, useParams } from 'react-router-dom';
-import Configuration from './Configuration/Configuration';
+import ApprovalConfig from './ApprovalConfig/ApprovalConfig';
 import EventsCalendar from './EventsCalendar/EventsCalendar';
 import Dashboard from '../../components/Dashboard/Dashboard';
 
 import Dash from './Dash/Dash';
 import ManageEvents from './ManageEvents/ManageEvents';
+import Approval from '../RootDash/ManageFlow/Approval/Approval';
 
 
 function OIEDash(){
@@ -23,7 +24,7 @@ function OIEDash(){
             <Dash name={approvalId} />
             <EventsCalendar />
             <ManageEvents />
-            <Configuration />
+            <ApprovalConfig />
         </Dashboard>
     )
 }

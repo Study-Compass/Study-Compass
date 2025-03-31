@@ -126,7 +126,7 @@
     
             &.active {
                 /* “Pulsing” or “grow” effect */
-                animation: pulse 0.8s infinite alternate ease-in-out;
+                animation: approval-pulse 0.8s infinite alternate ease-in-out;
                 border-color: var(--yellow);
                 background-color: var(--yellow);
                 opacity:0.4;
@@ -204,7 +204,7 @@
 
     /* Keyframes for active “pulse” animation. 
          You could do “scale(1.2) -> scale(1.0)” or something else. */
-    @keyframes pulse {
+    @keyframes approval-pulse {
         0% {
             transform: scale(1.4);
         }
@@ -219,11 +219,11 @@
 @keyframes pulse-once {
     0% {
       transform: scale(1);
-      opacity: 0.4
+      opacity: 0.6
     }
     50% {
       transform: scale(1.5);
-      opacity: 0.2
+      opacity: 0.4
     }
     100% {
       transform: scale(2);

@@ -33,6 +33,7 @@ const EventTimeline = ({ event }) => {
             date: new Date(event?.createdAt || Date.now()),
             subText: `created by ${event.hostingId?.name || "someone"}`,
             status: "completed",
+            approval:false
         },
         ...approvals.map((appr) => ({
             title: `${appr.role} Approval`,
@@ -44,12 +45,14 @@ const EventTimeline = ({ event }) => {
                         ? "Rejected"
                         : "Waiting for approval",
             status: appr.status,
+            approval:true
         })),
         {
             title: "Proposed Event Date",
             date: new Date(event?.start_time || Date.now()),
             subText: "",
             status: "upcoming",
+            approval:false
         },
     ];
 
@@ -131,7 +134,7 @@ const EventTimeline = ({ event }) => {
                                     <div className="content-subtext">{step.subText}</div>
                                 )}
                                 {
-                                    index === currentStepIndex+1 && (
+                                    index === currentStepIndex+1 && timelineSteps[currentStepIndex+1].approval && (
                                         <div className="content-actions">
                                             <button className="approve" onClick={onApprove}>Approve</button>
                                             <button className="reject">Reject</button>

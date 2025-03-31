@@ -11,6 +11,7 @@ const stepSchema = new mongoose.Schema({
   criteria: {
     //store dynamic conditions here
     //example: { location: "AlumniHouse", minAttendees: 100 }
+    //dynamic conditions can include: location, attendees, 
     type: Map,
     of: mongoose.Schema.Types.Mixed,
     default: {}
