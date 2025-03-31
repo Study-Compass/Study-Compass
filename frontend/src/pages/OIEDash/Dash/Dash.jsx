@@ -20,7 +20,9 @@ function Dash({expandedClass, change, name}){
     useEffect(() => {
         if(weeklyRef.current){
             setTimeout(() => {  
+                if(weeklyRef.current){
                 setHeight(weeklyRef.current.clientHeight);
+                }
             }, 1000);
         }
     }, [weeklyRef]);
@@ -66,7 +68,7 @@ function Dash({expandedClass, change, name}){
         <div className={`dash ${expandedClass}`}>
             <header className="header">
                 <img src={OIEGradient} alt="" />
-                <h1>{name} Dashboard</h1>
+                <h1>Event Approval Dashboard</h1>
             </header>
             <div className="needs-approval">
                 <div className="approval-header">

@@ -40,8 +40,19 @@ const ApprovalConfig = ({ }) => {
                 <div className="config-container">
                     {
                         selectedStep && 
-                        <div>
-                            
+                        <div className="config-container-content">
+                            <div className="approval-criteria">
+                                <h2>Approval Criteria</h2>
+                                    {
+                                        Object.keys(selectedStep.criteria).map((criteria, i)=>{
+                                            return(
+                                                <div className="criteria-item" key={i}>
+                                                    <p>{criteria}</p>
+                                                </div>  
+                                            )
+                                        })
+                                    }
+                            </div>
                         </div>
                     }
                 </div>
