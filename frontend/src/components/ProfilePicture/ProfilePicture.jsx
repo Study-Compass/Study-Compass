@@ -55,6 +55,7 @@ function ProfilePicture(){
                     </div>
                 </div>
                 <hr />
+                <p className="section">GENERAL</p>
                 <Link to="/profile">
                     <div className="menu-item">
                         <img className="icon" src={ProfileIcon} alt="profile" />
@@ -67,22 +68,28 @@ function ProfilePicture(){
                         <p>Settings</p>
                     </div>
                 </Link>
-                <hr />
-                <Link to="/">
-                    <div className="menu-item">
-                        <img className="icon" src={Guide} alt="guide" />
-                        <p>Guide</p>
-                    </div>
-                </Link>
+                {user && (user.roles.includes('admin')) && 
+                    <Link  to="/create-org">
+                        <div className="menu-item" >
+                            <img className="icon" src={Settings} alt="settings" />
+                            <p>Create an Org</p>
+                        </div>
+                    </Link>
+                }
+                {user && (user.roles.includes('admin')||user.roles.includes('oie')) && 
+                    <>
+                        <hr />
+                        <p className="section">ADMINISTRATION</p>
+                    </>
+                }
+                
                 {
                     user && user.roles.includes('admin') && 
                     <>
-                        <hr />
-
                         <Link to="/admin">
                             <div className="menu-item">
                                 <Icon icon="bx:stats" />
-                                <p>Admin</p>
+                                <p>Analytics</p>
                             </div>
                         </Link>
                     </>
@@ -90,13 +97,53 @@ function ProfilePicture(){
                 {
                     user && user.roles.includes('oie') && 
                     <>
-                        <hr />
                         <Link to="/oie-dashboard">
                             <div className="menu-item">
                                 <img className="icon" src={RPI} alt="log out" />
                                 <p>OIE Admin</p>
                             </div>
                         </Link>
+                    </>
+                }
+                {
+                    user && user.clubAssociations.length > 0 && 
+                    <>
+                        <hr/>
+                        <p className="section">ORGS</p>
+                        {user.clubAssociations.map(
+                            (org)=>{
+                                const url = `/club-dashboard/${org.org_name}`
+                                return(
+                                    <Link to={`${url}`}>
+                                        <div className="menu-item">
+                                            <img className="icon" src={org.org_profile_image} alt="" />
+                                            <p>{org.org_name}</p>
+                                        </div>
+                                    </Link>
+                                )
+                            }
+                        )}
+
+                    </>
+                }
+                {
+                    user && user.approvalRoles.length > 0 && 
+                    <>
+                        <hr/>
+                        <p className="section">APPROVALS</p>
+                        {user.approvalRoles.map(
+                            (role)=>{
+                                const url = role === 'root' ? '/root-dashboard' : `/approval-dashboard/${role}` 
+                                return(
+                                    <Link to={`${url}`}>
+                                        <div className="menu-item">
+                                            <img className="icon" src={Stats} alt="" />
+                                            <p>{role}</p>
+                                        </div>
+                                    </Link>
+                                )
+                            }
+                        )}
                     </>
                 }
                 <hr />

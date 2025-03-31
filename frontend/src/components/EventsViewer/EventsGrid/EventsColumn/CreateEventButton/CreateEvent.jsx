@@ -1,14 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './CreateEvent.scss';
+import './CreateEventButton.scss';
 import {Icon} from '@iconify-icon/react';  
 import GradientButtonCover from '../../../../../assets/GradientButtonCover.png';
 
-function CreateEvent(){
+function CreateEventButton({origin = ""}){
     const navigate = useNavigate();
 
     const handleEventClick = () => {
-        navigate(`/create-event`);
+        if(origin === ""){
+            navigate(`/create-event`);
+        } else {
+            navigate(`/create-event`, {state: {origin}});
+        }
     }
 
     return(
@@ -25,4 +29,4 @@ function CreateEvent(){
 
 }
 
-export default CreateEvent;
+export default CreateEventButton;

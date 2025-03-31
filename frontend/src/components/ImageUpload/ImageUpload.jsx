@@ -5,7 +5,7 @@ import Upload from '../../assets/Icons/Upload.svg';
 import { Icon } from '@iconify-icon/react/dist/iconify.mjs';
 import CircleX from '../../assets/Icons/Circle-X.svg';
 
-const ImageUpload = ({ classroomName, onUpload, uploadText}) => {
+const ImageUpload = ({ classroomName, onUpload, uploadText="Upload Classroom Image"}) => {
     const [selectedFile, setSelectedFile] = useState(null);
     const [message, setMessage] = useState('');
     const [fileName, setFileName] = useState('');

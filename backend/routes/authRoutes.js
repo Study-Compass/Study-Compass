@@ -10,8 +10,7 @@ const router = express.Router();
 const { verifyToken } = require('../middlewares/verifyToken.js');
 
 const { authenticateWithGoogle, loginUser, registerUser } = require('../services/userServices.js');
-
-const User = require('../schemas/user.js');
+const getModels = require('../services/getModelService.js');
 
 function validateUsername(username) { //keeping logic external, for easier testing
     // Define the regex pattern
@@ -44,6 +43,8 @@ router.post('/register', async (req, res) => {
     const { username, email, password } = req.body;
 
     try {
+        const {User} = getModels(req, 'User');
+
         if (!validateUsername(username)) {
             console.log(`POST: /register registration of ${username} failed`);
             return res.status(405).json({
@@ -78,7 +79,7 @@ router.post('/register', async (req, res) => {
         await user.save();
 
         // Generate a token for the new user
-        const token = jwt.sign({ userId: user._id, roles: user.roles }, process.env.JWT_SECRET, { expiresIn: '1h' });
+        const token = jwt.sign({ userId: user._id, roles: user.roles }, process.env.JWT_SECRET, { expiresIn: '5d' });
         console.log(`POST: /register new user ${username}`);
         sendDiscordMessage(`New user registered`, `user ${username} registered`, "newUser");
         // Send the token to the client
@@ -109,7 +110,7 @@ router.post('/login', async (req, res) => {
 
     try {
         //check if it is an email or username
-        const { user, token } = await loginUser({ email, password });
+        const { user, token } = await loginUser({ email, password, req });
         console.log(`POST: /login user ${user.username} logged in`)
         res.status(200).json({
             success: true,
@@ -130,11 +131,14 @@ router.post('/login', async (req, res) => {
 
 router.get('/validate-token', verifyToken, async (req, res) => {
     try {
+        const {User} = getModels(req, 'User');
+
         const user = await User.findById(req.user.userId)
             .select('-password') // Add fields you want to exclude
-            .lean(); // Assuming Mongoose for DB operations
+            .lean()
+            .populate('clubAssociations'); 
         if (!user) {
-            console.log(`GET: /validate-token token is invalid`)
+            console.log(`GET: /validate-token token is invalid`);
             return res.status(404).json({ success: false, message: 'User not found' });
         }
         console.log(`GET: /validate-token token is valid for user ${user.username}`)
@@ -142,29 +146,11 @@ router.get('/validate-token', verifyToken, async (req, res) => {
             success: true,
             message: 'Token is valid',
             data: {
-                // user: {
-                //     _id: user._id,
-                //     username: user.username,
-                //     email: user.email,
-                //     name: user.name,
-                //     picture : user.picture,
-                //     saved: user.saved,
-                //     visited: user.visited,
-                //     partners: user.partners,
-                //     sessions: user.sessions,
-                //     hours: user.hours,
-                //     contributions: user.contributions,
-                //     onboarded: user.onboarded,
-                //     classroomPreferences: user.classroomPreferences,
-                //     recommendationPreferences: user.recommendationPreferences,
-                //     google: user.googleId ? true : false,
-                //     tags: user.tags                    
-                // }
                 user : user
             }
         });
     } catch (error) {
-        console.log(`GET: /validate-token token is invalid`)
+        console.log(`GET: /validate-token token is invalid`, error)
         res.status(500).json({
             success: false,
             message: 'Error fetching user details',
@@ -196,7 +182,7 @@ router.post('/google-login', async (req, res) => {
     }
 
     try {
-        const { user, token } = await authenticateWithGoogle(code, isRegister, url);
+        const { user, token } = await authenticateWithGoogle(code, isRegister, url, req);
         res.status(200).json({
             success: true,
             message: 'Google login successful',

@@ -1,15 +1,13 @@
 const express = require('express');
-const User = require('../schemas/user.js');
-const Developer = require('../schemas/developer.js');
-const { verifyToken, verifyTokenOptional } = require('../middlewares/verifyToken');
-const Classroom = require('../schemas/classroom.js');
-const Schedule = require('../schemas/schedule.js');
+const { verifyToken, verifyTokenOptional, authorizeRoles } = require('../middlewares/verifyToken');
 const cron = require('node-cron');
 const axios = require('axios');
-const { isProfane } = require('../services/profanityFilterService'); 
-const StudyHistory = require('../schemas/studyHistory.js'); 
+const { isProfane } = require('../services/profanityFilterService');
+const StudyHistory = require('../schemas/studyHistory.js');
 const { findNext } = require('../helpers.js');
 const { sendDiscordMessage } = require('../services/discordWebookService');
+const BadgeGrant = require('../schemas/badgeGrant');
+const getModels = require('../services/getModelService');
 const { uploadImageToS3, deleteAndUploadImageToS3 } = require('../services/imageUploadService');
 const multer = require('multer');
 
@@ -23,9 +21,10 @@ const upload = multer({
 
 const router = express.Router();
 
-router.post("/update-user", verifyToken, async (req, res) =>{
+router.post("/update-user", verifyToken, async (req, res) => {
+    const { User } = getModels(req, 'User');
     const { name, username, classroom, recommendation, onboarded } = req.body
-    try{
+    try {
         const user = await User.findById(req.user.userId);
         if (!user) {
             console.log(`POST: /update-user token is invalid`)
@@ -33,65 +32,67 @@ router.post("/update-user", verifyToken, async (req, res) =>{
         }
         user.name = name ? name : user.name;
         user.username = username ? username : user.username;
-        user.classroomPreferences  = classroom ? classroom : user.classroomPreferences;
+        user.classroomPreferences = classroom ? classroom : user.classroomPreferences;
         user.recommendationPreferences = recommendation ? recommendation : user.recommendationPreferences;
         user.onboarded = onboarded ? onboarded : user.onboarded;
-        
+
         await user.save();
         console.log(`POST: /update-user ${req.user.userId} successful`);
         return res.status(200).json({ success: true, message: 'User updated successfully' });
-    } catch(error){
-        console.log(`POST: /update-user ${req.user.userId} failed`)
+    } catch (error) {
+    console.log(`POST: /update-user ${req.user.userId} failed`)
         return res.status(500).json({ success: false, message: error.message });
     }
 });
 
 // check if username is available
-router.post("/check-username", verifyToken, async (req, res) =>{
+router.post("/check-username", verifyToken, async (req, res) => {
+    const { User } = getModels(req, 'User');
     const { username } = req.body;
     const userId = req.user.userId;
-    try{
+    try {
         //check if username is taken, regardless of casing
-        if(isProfane(username)){
+        if (isProfane(username)) {
             console.log(`POST: /check-username ${username} is profane`)
             return res.status(200).json({ success: false, message: 'Username does not abide by community standards' });
         }
         const reqUser = await User.findById(userId);
         const user = await User.findOne({ username: { $regex: new RegExp(username, "i") } });
-        if(user && user._id.toString() !== userId){
+        if (user && user._id.toString() !== userId) {
             console.log(`POST: /check-username ${username} is taken`)
             return res.status(200).json({ success: false, message: 'Username is taken' });
         }
         console.log(`POST: /check-username ${username} is available`)
         return res.status(200).json({ success: true, message: 'Username is available' });
-    } catch(error){
+    } catch (error) {
         console.log(`POST: /check-username ${username} failed`)
         return res.status(500).json({ success: false, message: 'Internal server error', error });
     }
 });
 
-router.post("/check-in", verifyToken, async (req, res) =>{
+router.post("/check-in", verifyToken, async (req, res) => {
+    const { Classroom, Schedule, StudyHistory } = getModels(req, 'Classroom', 'Schedule', 'StudyHistory');
     const { classroomId } = req.body;
-    try{
+    try {
         //check if user is checked in elsewhere in the checked_in array
-        const classrooms = await Classroom.find({checked_in: { $in: [req.user.userId] }});
-        
+        const classrooms = await Classroom.find({ checked_in: { $in: [req.user.userId] } });
+
         // const classrooms = await Classroom.find({ checkIns: req.user.userId });
-        if(classrooms.length > 0){
+        if (classrooms.length > 0) {
             console.log(`POST: /check-in ${req.user.userId} is already checked in`)
             return res.status(400).json({ success: false, message: 'User is already checked in' });
         }
         const classroom = await Classroom.findOne({ _id: classroomId });
         classroom.checked_in.push(req.user.userId);
         await classroom.save();
-        if(req.user.userId !== "65f474445dca7aca4fb5acaf"){
-            sendDiscordMessage(`User check-in`,`user ${req.user.userId} checked in to ${classroom.name}`,"normal");
+        if (req.user.userId !== "65f474445dca7aca4fb5acaf") {
+            sendDiscordMessage(`User check-in`, `user ${req.user.userId} checked in to ${classroom.name}`, "normal");
         }
         //create history object, preempt end time using findnext
         const schedule = await Schedule.findOne({ classroom_id: classroomId });
-        if(schedule){
+        if (schedule) {
             let endTime = findNext(schedule.weekly_schedule); //time in minutes from midnight
-            endTime = new Date(new Date().setHours(Math.floor(endTime/60), endTime%60, 0, 0));
+            endTime = new Date(new Date().setHours(Math.floor(endTime / 60), endTime % 60, 0, 0));
             const history = new StudyHistory({
                 user_id: req.user.userId,
                 classroom_id: classroomId,
@@ -106,39 +107,41 @@ router.post("/check-in", verifyToken, async (req, res) =>{
 
         console.log(`POST: /check-in ${req.user.userId} into ${classroom.name} successful`);
         return res.status(200).json({ success: true, message: 'Checked in successfully' });
-    } catch(error){
+    } catch (error) {
         console.log(`POST: /check-in ${req.user.userId} failed`);
         console.log(error);
         return res.status(500).json({ success: false, message: 'Internal server error', error });
     }
 });
 
-router.get("/checked-in", verifyToken, async (req, res) =>{
-    try{
+router.get("/checked-in", verifyToken, async (req, res) => {
+    const { Classroom } = getModels(req, 'Classroom');
+    try {
         const classrooms = await Classroom.find({ checked_in: { $in: [req.user.userId] } });
         console.log(`GET: /checked-in ${req.user.userId} successful`)
         return res.status(200).json({ success: true, message: 'Checked in classrooms retrieved', classrooms });
-    } catch(error){
+    } catch (error) {
         console.log(`GET: /checked-in ${req.user.userId} failed`)
         return res.status(500).json({ success: false, message: 'Internal server error', error });
     }
 });
 
-router.post("/check-out", verifyToken, async (req, res) =>{
+router.post("/check-out", verifyToken, async (req, res) => {
+    const { Classroom, Schedule, User, StudyHistory } = getModels(req, 'Classroom', 'Schedule', 'User', 'StudyHistory');
     const { classroomId } = req.body;
-    try{
+    try {
         const classroom = await Classroom.findOne({ _id: classroomId });
         classroom.checked_in = classroom.checked_in.filter(userId => userId !== req.user.userId);
         await classroom.save();
         const schedule = await Schedule.findOne({ classroom_id: classroomId });
-        if(schedule){
+        if (schedule) {
             //find latest history object
             const history = await StudyHistory.findOne({ user_id: req.user.userId, classroom_id: classroomId }).sort({ start_time: -1 });
             const endTime = new Date();
             //if time spent is less than 5 minutes, delete history object
-            if(history){
+            if (history) {
                 const timeDiff = endTime - history.start_time;
-                if(timeDiff < 300000){
+                if (timeDiff < 300000) {
                     await history.deleteOne();
                 } else {
                     //else update end time
@@ -146,10 +149,10 @@ router.post("/check-out", verifyToken, async (req, res) =>{
                     await history.save();
                     //update user stats
                     const user = await User.findOne({ _id: req.user.userId });
-                    user.hours += timeDiff/3600000;
+                    user.hours += timeDiff / 3600000;
                     //find if new classroom visited
                     const pastHistory = await StudyHistory.findOne({ user_id: req.user.userId, classroom_id: classroomId });
-                    if(!pastHistory){
+                    if (!pastHistory) {
                         user.visited.push(classroomId);
                     }
                 }
@@ -158,43 +161,45 @@ router.post("/check-out", verifyToken, async (req, res) =>{
         const io = req.app.get('io');
         io.to(classroomId).emit('check-out', { classroomId, userId: req.user.userId });
         console.log(`POST: /check-out ${req.user.userId} from ${classroom.name} successful`);
-        if(req.user.userId !== "65f474445dca7aca4fb5acaf"){
-            sendDiscordMessage(`User check-out`,`user ${req.user.userId} checked out of ${classroom.name}`,"normal");
+        if (req.user.userId !== "65f474445dca7aca4fb5acaf") {
+            sendDiscordMessage(`User check-out`, `user ${req.user.userId} checked out of ${classroom.name}`, "normal");
         }
         return res.status(200).json({ success: true, message: 'Checked out successfully' });
-    } catch(error){
+    } catch (error) {
         console.log(`POST: /check-out ${req.user.userId} failed`);
         console.log(error);
         return res.status(500).json({ success: false, message: 'Internal server error', error });
     }
 });
 
-router.get("/get-developer", verifyToken, async (req, res) =>{
-    try{
+router.get("/get-developer", verifyToken, async (req, res) => {
+    const { Developer } = getModels(req, 'Developer');
+    try {
         const developer = await Developer.findOne({ user_id: req.user.userId });
         console.log(`GET: /get-developer ${req.user.userId} successful`);
-        if(!developer){
+        if (!developer) {
             return res.status(204).json({ success: false, message: 'Developer not found' });
         }
         return res.status(200).json({ success: true, message: 'Developer retrieved', developer });
 
-    } catch(error){
+    } catch (error) {
         console.log(`GET: /get-developer ${req.user.userId} failed`)
         return res.status(500).json({ success: false, message: 'Internal server error', error });
     }
 });
 
-router.post("/update-developer", verifyToken, async (req, res) =>{
+router.post("/update-developer", verifyToken, async (req, res) => {
+    const { Developer, User } = getModels(req, 'Developer', 'User');
     const { type, commitment, goals, skills } = req.body;
-    try{
+    try {
         const developer = await Developer.findOne({ userId: req.user.userId });
         const user = await User.findById(req.user.userId);
-        
-        if(!developer){
+
+        if (!developer) {
             //craete developer
             const newDeveloper = new Developer({
                 user_id: req.user.userId,
-                name : user.name,
+                name: user.name,
                 type,
                 commitment,
                 goals,
@@ -215,36 +220,119 @@ router.post("/update-developer", verifyToken, async (req, res) =>{
         await developer.save();
         console.log(`POST: /update-developer ${req.user.userId} successful`);
         return res.status(200).json({ success: true, message: 'Developer updated successfully' });
-    } catch(error){
+    } catch (error) {
         console.log(`POST: /update-developer ${req.user.userId} failed`)
         return res.status(500).json({ success: false, message: 'Internal server error', error });
     }
 });
 
-router.get("/get-user", async (req, res) =>{
+router.get("/get-user", async (req, res) => {
+    const { User } = getModels(req, 'User');
     const userId = req.query.userId;
-    try{
+    try {
         const user = await User.findById(userId);
         console.log(`GET: /get-user ${req.query.userId} successful`);
         return res.status(200).json({ success: true, message: 'User retrieved', user });
-    } catch(error){
+    } catch (error) {
         console.log(`GET: /get-user ${req.query.userId} failed`)
         return res.status(500).json({ success: false, message: 'Internal server error', error });
     }
 });
 
 //route to get mulitple users, specified in array
-router.get("/get-users", async (req, res) =>{
+router.get("/get-users", async (req, res) => {
+    const { User } = getModels(req, 'User');
     const userIds = req.query.userIds;
-    try{
+    try {
         const users = await User.find({ _id: { $in: userIds } });
         console.log(`GET: /get-users ${req.query.userId} successful`);
         return res.status(200).json({ success: true, message: 'Users retrieved', users });
-    } catch(error){
+    } catch (error) {
         console.log(`GET: /get-users ${req.query.userId} failed`)
         return res.status(500).json({ success: false, message: 'Internal server error', error });
     }
 });
+
+router.post('/create-badge-grant', verifyToken, authorizeRoles('admin'), async (req, res) => {
+    const { BadgeGrant } = getModels(req, 'BadgeGrant');
+    try {
+        const { badgeContent, badgeColor, daysValid } = req.body;
+
+        // Input validation
+        if (!badgeContent || !badgeColor || !daysValid) {
+            return res.status(400).json({ error: 'All fields are required' });
+        }
+
+        const validFrom = new Date();
+        const validTo = new Date();
+        validTo.setDate(validTo.getDate() + daysValid);
+
+        const badgeGrant = new BadgeGrant({
+            badgeContent,
+            badgeColor,
+            validFrom,
+            validTo,
+        });
+
+        await badgeGrant.save();
+
+        res.status(201).json({
+            message: 'Badge grant created successfully',
+            hash: badgeGrant.hash,
+            validFrom,
+            validTo,
+        });
+    } catch (error) {
+        console.error('Error creating badge grant:', error);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
+router.post('/grant-badge', verifyToken, async (req, res) => {
+    const { BadgeGrant, User } = getModels(req, 'BadgeGrant', 'User');
+    try {
+        const { hash } = req.body;
+        const userId = req.user.userId;
+
+        if (!hash) {
+            return res.status(400).json({ error: 'Hash is required' });
+        }
+
+        const badgeGrant = await BadgeGrant.findOne({ hash });
+
+        if (!badgeGrant) {
+            return res.status(404).json({ error: 'Invalid badge grant' });
+        }
+
+        const currentDate = new Date();
+
+        //check if the today's date is within the valid period
+        if (currentDate < badgeGrant.validFrom || currentDate > badgeGrant.validTo) {
+            return res.status(400).json({ error: 'Badge grant is not valid at this time' });
+        }
+
+        const user = await User.findById(userId);
+
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+        if(user.tags.includes(badgeGrant.badgeContent)){
+            return res.status(406).json({ error: 'You\'ve already been granted this badge' });
+        }
+
+        // Append the badge to the user's badges array
+        user.tags.push(badgeGrant.badgeContent);
+
+        await user.save();
+        console.log(`POST: /grant-badge ${req.user.userId} successful`);
+
+        res.status(200).json({ message: 'Badge granted successfully', badges: user.badges, badge: {badgeContent:badgeGrant.badgeContent, badgeColor: badgeGrant.badgeColor} });
+    } catch (error) {
+        console.error('Error granting badge:', error);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
 
 router.post("/upload-user-image", verifyToken, upload.single('image'), async (req, res) =>{
     const file = req.file;

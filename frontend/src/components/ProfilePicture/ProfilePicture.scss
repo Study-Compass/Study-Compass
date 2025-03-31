@@ -83,6 +83,14 @@
     z-index: 1000;
 }
 
+.popup p.section{
+    font-size:10px;
+    color: var(--darkborder);
+    font-weight: 500;
+    margin:3px 0 0 10px;
+
+}
+
 .popup-content h3{
     transform:translateY(-2px);
     flex-grow:1;

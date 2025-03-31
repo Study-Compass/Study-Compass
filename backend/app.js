@@ -8,6 +8,8 @@ require('dotenv').config();
 const { createServer } = require('http');
 const { Server } = require('socket.io');
 const enforce = require('express-sslify');
+const { connectToDatabase } = require('./connectionsManager');
+
 const s3 = require('./aws-config');
 
 const app = express();
@@ -29,7 +31,11 @@ const io = new Server(server, {
 if (process.env.NODE_ENV === 'production') {
     app.use(enforce.HTTPS({ trustProtoHeader: true }));
     const corsOptions = {
-        origin: ['https://www.study-compass.com', 'https://studycompass.com'],
+        origin: [
+            'https://www.study-compass.com', 
+            'https://studycompass.com',
+            `http://${process.env.EDUREKA_IP}:${process.env.EDUREKA_PORT}`
+        ],
         optionsSuccessStatus: 200 // for legacy browser support
     };
     app.use(cors(corsOptions));
@@ -39,16 +45,28 @@ if (process.env.NODE_ENV === 'production') {
 app.use(express.json());
 app.use(cookieParser());
 
-if (process.env.NODE_ENV === 'production') {
-    mongoose.connect(process.env.MONGO_URL);
-} else {
-    mongoose.connect(process.env.MONGO_URL_LOCAL);
-}
-mongoose.connection.on('connected', () => {
-    console.log('Mongoose connected to DB.');
-});
-mongoose.connection.on('error', (err) => {
-    console.log('Mongoose connection error:', err);
+// if (process.env.NODE_ENV === 'production') {
+//     mongoose.connect(process.env.MONGO_URL);
+// } else {
+//     mongoose.connect(process.env.MONGO_URL_LOCAL);
+// }
+// mongoose.connection.on('connected', () => {
+//     console.log('Mongoose connected to DB.');
+// });
+// mongoose.connection.on('error', (err) => {
+//     console.log('Mongoose connection error:', err);
+// });
+
+app.use(async (req, res, next) => {
+    try {
+        const subdomain = req.headers.host.split('.')[0]; // Extract subdomain (e.g., 'ucb')
+        console.log(req.headers.host);
+        req.db = await connectToDatabase(subdomain);
+        next();
+    } catch (error) {
+        console.error('Error establishing database connection:', error);
+        res.status(500).send('Database connection error');
+    }
 });
 
 const upload = multer({
@@ -69,6 +87,8 @@ const ratingRoutes = require('./routes/ratingRoutes.js');
 const searchRoutes = require('./routes/searchRoutes.js');
 const eventRoutes = require('./routes/eventRoutes.js');
 const oieRoutes = require('./routes/oie-routes.js');
+const orgRoutes = require('./routes/orgRoutes.js');
+const workflowRoutes = require('./routes/workflowRoutes.js');
 
 app.use(authRoutes);
 app.use(dataRoutes);
@@ -80,9 +100,11 @@ app.use(eventRoutes);
 app.use(classroomChangeRoutes);
 app.use(ratingRoutes);
 app.use(searchRoutes);
+
 app.use(eventRoutes);
 app.use(oieRoutes);
-
+app.use(orgRoutes);
+app.use(workflowRoutes);
 
 // Serve static files from the React app in production
 if (process.env.NODE_ENV === 'production') {
@@ -145,6 +167,13 @@ app.post('/upload-image/:classroomName', upload.single('image'), async (req, res
         res.status(500).send('An error occurred while uploading the image or updating the classroom.');
     }
 });
+
+//greet route
+app.get('/api/greet', (req, res) => {
+    res.send('Hello from the backend!');
+});
+//how to call the above route
+// fetch('/api/greet').then(response => response.text()).then(data => console.log(data));
 
 
 // Socket.io functionality

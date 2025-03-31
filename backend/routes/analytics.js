@@ -1,17 +1,14 @@
 const express = require('express');
 const router = express.Router();
 const { isValid, formatISO, parseISO, setHours, startOfWeek, endOfWeek, setMinutes, setSeconds, setMilliseconds, eachHourOfInterval, eachDayOfInterval } = require('date-fns');
-const Visit = require('../schemas/visit'); 
-const Search = require('../schemas/search')
-const User = require('../schemas/user');
-const QR = require('../schemas/qr');
-const RepeatedVisit = require('../schemas/repeatedVisit');
 const { verifyToken, verifyTokenOptional } = require('../middlewares/verifyToken');
+const getModels = require('../services/getModelService');
 
 
 // Route to log a visit
 router.post('/log-visit', async (req, res) => {
     try {
+        const {Visit} = getModels(req, 'Visit');
         const visit = new Visit({ timestamp: new Date() });
         await visit.save();
         res.status(200).json({ message: 'Visit logged' });
@@ -21,6 +18,7 @@ router.post('/log-visit', async (req, res) => {
 });
 
 router.post('/log-repeated-visit', verifyTokenOptional, async (req, res) => {
+    const { RepeatedVisit } = getModels(req, 'RepeatedVisit');
     const { hash } = req.body;
     try {
         console.log('Logging repeated visit');
@@ -43,6 +41,8 @@ router.post('/log-repeated-visit', verifyTokenOptional, async (req, res) => {
 });
 
 router.get('/visits-by-day', async (req, res) => {
+    const {Visit} = getModels(req, 'Visit');
+
     try {
         const { startDate, endDate } = req.query;
 
@@ -116,6 +116,8 @@ router.get('/visits-by-day', async (req, res) => {
 
 // `/visits-by-hour` route: Fetches visits grouped by hour within the specified range and pads missing hours with 0 visits
 router.get('/visits-by-hour', async (req, res) => {
+    const {Visit} = getModels(req, 'Visit');
+
     try {
         const { startDate } = req.query;
 
@@ -191,6 +193,8 @@ router.get('/visits-by-hour', async (req, res) => {
 
 
 router.get('/visits-by-all', async (req, res) => {
+    const {Visit} = getModels(req, 'Visit');
+
     try {
         // Query to get the earliest and latest visit dates for padding the result
         const firstVisit = await Visit.findOne().sort({ timestamp: 1 });
@@ -253,7 +257,10 @@ router.get('/visits-by-all', async (req, res) => {
 });
 
 router.get('/users-by-day', async (req, res) => {
+    const { User } = getModels(req, 'User');
+
     try {
+
         const { startDate, endDate } = req.query;
 
         // Validate the dates
@@ -324,7 +331,10 @@ router.get('/users-by-day', async (req, res) => {
 });
 
 router.get('/users-by-hour', async (req, res) => {
+    const { User } = getModels(req, 'User');
+
     try {
+
         const { startDate } = req.query;
 
         // Validate the startDate
@@ -399,6 +409,8 @@ router.get('/users-by-hour', async (req, res) => {
 });
 
 router.get('/users-by-all', async (req, res) => {
+    const { User } = getModels(req, 'User');
+
     try {
         // Get the earliest and latest user creation dates
         const firstUser = await User.findOne().sort({ createdAt: 1 });
@@ -461,6 +473,8 @@ router.get('/users-by-all', async (req, res) => {
 });
 
 router.post('/qr', async (req, res) => {
+    const { QR } = getModels(req, 'QR');
+
     try {
         const { name, repeat } = req.body;
         const qr = await QR.findOne({ name: name });
@@ -490,6 +504,8 @@ router.post('/qr', async (req, res) => {
 });
 
 router.get('/searches-by-day', async (req, res) => {
+    const { Search } = getModels(req, 'Search');
+
     try {
         const { startDate, endDate } = req.query;
 
@@ -563,6 +579,7 @@ router.get('/searches-by-day', async (req, res) => {
 
 // `/visits-by-hour` route: Fetches visits grouped by hour within the specified range and pads missing hours with 0 visits
 router.get('/searches-by-hour', async (req, res) => {
+    const { Search } = getModels(req, 'Search');
     try {
         const { startDate } = req.query;
 
@@ -638,10 +655,13 @@ router.get('/searches-by-hour', async (req, res) => {
 
 
 router.get('/searches-by-all', async (req, res) => {
+    const { Search } = getModels(req, 'Search');
+
     try {
+
         // Query to get the earliest and latest visit dates for padding the result
-        const firstVisit = await Visit.findOne().sort({ timestamp: 1 });
-        const lastVisit = await Visit.findOne().sort({ timestamp: -1 });
+        const firstVisit = await Search.findOne().sort({ timestamp: 1 });
+        const lastVisit = await Search.findOne().sort({ timestamp: -1 });
 
         if (!firstVisit || !lastVisit) {
             return res.json([]); // No visits in the database

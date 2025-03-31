@@ -17,6 +17,28 @@
         max-width: 1500px;
         position: relative;
         z-index: 20;
+
+        .school{
+            display:flex;
+            align-items: center;
+            gap:10px;
+            cursor:pointer;
+            hr{
+                width: 2px;
+                height: 30px;
+                background-color: var(--text);
+                margin:0;
+                border-radius: 4px;
+            }
+            h2{
+                margin: 0;
+                font-size:20px;
+                font-family: 'Satoshi';
+                color: var(--red);
+                font-weight: 500;
+                
+            }
+        }
     }
     .checked-in-banner{
         position: absolute;

@@ -7,4 +7,4 @@ const QrSchema = new Schema({
     repeated: { type: Number, default: 0 },
 });
 
-module.exports = mongoose.model('QR', QrSchema, 'scans');
+module.exports = QrSchema;
