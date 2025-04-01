@@ -8,6 +8,17 @@ const { findNext } = require('../helpers.js');
 const { sendDiscordMessage } = require('../services/discordWebookService');
 const BadgeGrant = require('../schemas/badgeGrant');
 const getModels = require('../services/getModelService');
+const { uploadImageToS3, deleteAndUploadImageToS3 } = require('../services/imageUploadService');
+const multer = require('multer');
+const path = require('path');
+
+const upload = multer({
+    storage: multer.memoryStorage(),
+    limits: {
+        fileSize: 5 * 1024 * 1024, // 5 MB
+    },
+});
+
 
 const router = express.Router();
 
@@ -323,5 +334,40 @@ router.post('/grant-badge', verifyToken, async (req, res) => {
     }
 });
 
+
+router.post("/upload-user-image", verifyToken, upload.single('image'), async (req, res) =>{
+    const { User } = getModels(req, 'User');
+    const file = req.file;
+    console.log('uploading user image');
+    if(!file){
+        console.log(`POST: /upload-user-image ${req.user.userId} no file uploaded`)
+        return res.status(400).json({ success: false, message: 'No file uploaded' });
+    }
+    try{
+        const user = await User.findById(req.user.userId);
+        let imageUrl;
+        if(!user.picture){
+            // For new images, use user ID and timestamp in filename
+            const fileExtension = path.extname(file.originalname);
+            const timestamp = Date.now();
+            const fileName = `${req.user.userId}-${timestamp}${fileExtension}`;
+            imageUrl = await uploadImageToS3(file, "users", fileName);
+            user.picture = imageUrl;
+        } else {
+            // For replacing existing images, use user ID and timestamp in filename
+            const fileExtension = path.extname(file.originalname);
+            const timestamp = Date.now();
+            const fileName = `${req.user.userId}-${timestamp}${fileExtension}`;
+            imageUrl = await deleteAndUploadImageToS3(file, "users", user.picture, fileName);
+            user.picture = imageUrl;
+        }
+        await user.save();
+        console.log(`POST: /upload-user-image ${req.user.userId} successful`);
+        return res.status(200).json({ success: true, message: 'Image uploaded successfully', imageUrl });
+    } catch(error){
+        console.log(`POST: /upload-user-image ${req.user.userId} failed, ${error}`)
+        return res.status(500).json({ success: false, message: 'Internal server error', error });
+    }
+});
 
 module.exports = router;

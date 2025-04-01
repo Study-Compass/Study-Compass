@@ -15,7 +15,6 @@ const acknowledgements = {
     'people' : 'This event has over 100 people expected to attend',
     'alumni' : 'This event is planning to have an alumni speaker',
     'catering' : 'This event requires catering',
-
 }
 
 const sample = {
@@ -69,6 +68,7 @@ function OIEFullEvent({ event, eventId = null, setEdited }){
         newOIE.checkListItems = checkedItems;
         changeOIE(newOIE);
     }
+
 
     const handleApproved = async (status) => {
         const newApproval = {...fullEvent.data.event.approvalInstance};
