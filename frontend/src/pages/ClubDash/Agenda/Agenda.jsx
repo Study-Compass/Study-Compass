@@ -1,45 +1,13 @@
-import './EventMeeting.scss';
-import Agenda from '../../Agenda/Agenda';
+import './Agenda.scss';
 import React from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
-import calendar from '../../../../assets/calendar.svg';
-import left from '../../../../assets/arrow-small-left.svg';
-import qrcode from '../../../../assets/qr_code4.png';
+import calendar from '../../../assets/calendar.svg';
+import left from '../../../assets/arrow-small-left.svg';
+import qrcode from '../../../assets/qr_code4.png';
 import { Icon } from '@iconify-icon/react/dist/iconify.mjs';
 
-function EventMeeting({openDash, clubName, event, picture}){
+function Agenda({openDash, clubName, event, picture}){
 
-    const now = new Date();
-    const dateStart = new Date(event.start_time);
-    const dateEnd = new Date(event.end_time);
-
-    let meetingStatus = "future";
-    if (dateStart <= now && now <= dateEnd) {
-        meetingStatus = "ongoing";
-    } else if (now > dateEnd) {
-        meetingStatus = "past";
-    }
-    const formattedDate = dateStart.toLocaleDateString('en-US', { 
-        weekday: 'long', 
-        month: 'numeric', 
-        day: 'numeric' 
-    });
-
-    const formattedStartTime = dateStart.toLocaleTimeString('en-US', { 
-        hour: 'numeric', 
-        minute: '2-digit', 
-        hour12: true 
-    });
-
-    const formattedEndTime = dateEnd.toLocaleTimeString('en-US', { 
-        hour: 'numeric', 
-        minute: '2-digit', 
-        hour12: true 
-    });
-
-    function handleClick (){
-        return <Agenda openDash={openDash} clubName={clubName} event = {event} picture = {picture}/>;
-    }
     return(
     
         <header className="eventmeeting">
@@ -60,13 +28,13 @@ function EventMeeting({openDash, clubName, event, picture}){
                         <div className="info title">{clubName} {event.name}</div>
                         <div className="info time">
                             <img src={calendar} alt="" />
-                            {formattedDate}, {formattedStartTime} - {formattedEndTime}
+                            
                         </div>
 
                         <div className="info time status " >
                             <div className="circle">
                             </div>
-                            {meetingStatus}
+                            
                         </div>
                     </div>
                 </div>
@@ -77,13 +45,13 @@ function EventMeeting({openDash, clubName, event, picture}){
             
                 <div className="agenda">
                             <h1>
-                                attendance
+                                AGENDA
                             </h1> 
                     <div className="bodyA">
                         <h2>
                             <img src={qrcode} alt="" />
                         </h2>
-                        <button className="button" onClick={() => handleClick()}>
+                        <button className="button" >
                         {/* onClick={() => handleEventClick(event)} */}
                         <Icon icon="material-symbols:expand-content-rounded" />
                         <p>full screen</p>
@@ -102,4 +70,4 @@ function EventMeeting({openDash, clubName, event, picture}){
 
 }
 
-export default EventMeeting;
+export default Agenda;
