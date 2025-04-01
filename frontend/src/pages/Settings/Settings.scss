@@ -89,7 +89,7 @@
     flex-direction: column;
     font-family: 'Satoshi';
     font-size: 14px;
-    color: var(--border);
+    color: var(--darkborder);
     margin: 0 0 0px 0;
 }
 
@@ -199,6 +199,21 @@
     font-family: 'Satoshi';
     /* width: 79px; */
     /* height: 42px; */
+    .status{
+        font-weight:500;
+        & > div{
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            iconify-icon{
+                font-size:12px;
+            }
+            img{
+                height:13px;
+                width:13px;
+            }
+        }
+    }
 }
 
 .settings-right .settings-rows-container{
@@ -239,7 +254,7 @@
     display: flex;
     flex-direction: row;
     margin: 0px;
-    color: var(--border);
+    color: var(--darkborder);
     font-size: 12px;
 }
 
@@ -286,8 +301,10 @@
     display: flex;
     flex-direction: row;
     margin: 0px;
-    color: var(--border);
+    color: var(--darkborder);
     font-size: 15px;
+    font-weight: 600;
+    font-family: 'Inter';
 }
 
 .settings-right hr{
@@ -299,7 +316,7 @@
 
 }
 
-.settings-right img{
+.settings-right img.pfp{
     display: flex;
     flex-direction: row;
     height:62px;

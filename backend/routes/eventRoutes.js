@@ -3,13 +3,40 @@ const router = express.Router();
 const { verifyToken, verifyTokenOptional, authorizeRoles } = require('../middlewares/verifyToken');
 const getModels = require('../services/getModelService');
 const { createApprovalInstance, getEventsWithAuthorization } = require('../utilities/workflowUtilities');
+const multer = require('multer');
+const path = require('path');
+const { uploadImageToS3, upload } = require('../services/imageUploadService');
 
-router.post('/create-event', verifyToken, async (req, res) => {
+// Error handling middleware for multer
+const handleMulterError = (err, req, res, next) => {
+    if (err instanceof multer.MulterError) {
+        if (err.code === 'LIMIT_FILE_SIZE') {
+            return res.status(400).json({
+                success: false,
+                message: 'File size exceeds 5MB limit.'
+            });
+        }
+    } else if (err) {
+        return res.status(400).json({
+            success: false,
+            message: err.message
+        });
+    }
+    next();
+};
+
+router.post('/create-event', verifyToken, upload.single('image'), handleMulterError, async (req, res) => {
     const { Event, OIEStatus, User } = getModels(req, 'Event', 'OIEStatus', 'User');
     const user_id = req.user.userId;
     const orgId = req.body.orgId;
+    const file = req.file;
     
     try {
+        let eventData = { ...req.body };
+        
+        // Remove image field from eventData if it exists
+        delete eventData.image;
+        
         let event;
 
         if(orgId){
@@ -21,36 +48,28 @@ router.post('/create-event', verifyToken, async (req, res) => {
                 })
             }
             event = new Event({
-                ...req.body,
+                ...eventData,
                 hostingId : orgId,
                 hostingType : 'Org',
             });
         } else {
             event = new Event({
-                ...req.body,
+                ...eventData,
                 hostingId : user_id,
                 hostingType : 'User',
             });
         }
-    
-        // let OIE;
-    
-        // if (event.expectedAttendance > 100 || event.OIEAcknowledgementItems && event.OIEAcknowledgementItems.length > 0) {
-        //     event.OIEStatus = "Pending";
-        //     OIE = new OIEStatus({
-        //         eventRef: event._id,
-        //         status: 'Pending',
-        //         checkListItems: [],
-        //     });
-        // }
 
-
-        // if (OIE) {
-        //     await OIE.save();
-        // }
-        // // attach oie reference 
-        // event.OIEReference = OIE ? OIE._id : null;
-        // // get required approvals
+        // Handle image upload if file is present
+        if (file) {
+            console.log('Uploading image');
+            const fileExtension = path.extname(file.originalname);
+            const fileName = `${event._id}${fileExtension}`;
+            const imageUrl = await uploadImageToS3(file, 'events', fileName);
+            event.image = imageUrl;
+            console.log('Image uploaded successfully:', imageUrl);
+        }
+    
         const approvalInstance = await createApprovalInstance(req, event._id, event);
         if (approvalInstance) {
             event.approvalReference = approvalInstance._id;
@@ -65,7 +84,8 @@ router.post('/create-event', verifyToken, async (req, res) => {
         console.log('POST: /create-event successful');
         res.status(201).json({
             success: true,
-            message: 'Event created successfully.'
+            message: 'Event created successfully.',
+            eventId: event._id
         });
     } catch (error) {
         console.log('POST: /create-event failed', error);
@@ -501,6 +521,46 @@ router.get('/get-events-by-range', verifyToken, authorizeRoles('oie'), async (re
     }
 });
 
+// Upload event image
+router.post('/upload-event-image', verifyToken, upload.single('image'), async (req, res) => {
+    const { Event } = getModels(req, 'Event');
+    const file = req.file;
+    const { eventId } = req.body;
 
+    if (!file) {
+        return res.status(400).json({ success: false, message: 'No file uploaded' });
+    }
+
+    try {
+        const event = await Event.findById(eventId);
+        if (!event) {
+            return res.status(404).json({ success: false, message: 'Event not found' });
+        }
+
+        // Create filename using event ID and original extension
+        const fileExtension = path.extname(file.originalname);
+        const fileName = `${eventId}${fileExtension}`;
+
+        // Upload image to S3
+        const imageUrl = await uploadImageToS3(file, 'events', fileName);
+        
+        // Update event with new image URL
+        event.image = imageUrl;
+        await event.save();
+
+        return res.status(200).json({ 
+            success: true, 
+            message: 'Event image uploaded successfully',
+            imageUrl 
+        });
+    } catch (error) {
+        console.error('Error uploading event image:', error);
+        return res.status(500).json({ 
+            success: false, 
+            message: 'Failed to upload event image',
+            error: error.message 
+        });
+    }
+});
 
 module.exports = router;

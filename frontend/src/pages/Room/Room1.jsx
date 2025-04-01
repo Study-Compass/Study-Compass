@@ -343,6 +343,10 @@ function Room() {
     },[numLoaded]);
 
     const handleFreeNow = async () => {
+        if(freeNow){
+            setFreeNow(false);
+            return;   
+        }
         const query = fetchFreeNow();
         allPurposeFreeNow(query);
         setFreeNow(true);
@@ -352,6 +356,14 @@ function Room() {
         //if weekend
         if(new Date().getDay() === 0 || new Date().getDay() === 6){
             handleFreeNow();
+            return;
+        }
+        if(freeNow){
+            setFreeNow(false);
+            //remove query
+            clearQuery();
+            setContentState("empty");
+            return;
         }
         const now = new Date();
         const day = now.getDay();

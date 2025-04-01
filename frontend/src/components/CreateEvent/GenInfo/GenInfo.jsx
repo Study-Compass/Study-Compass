@@ -11,9 +11,10 @@ function GenInfo({next, visible, setInfo}){
     const [eventType, setEventType] = useState("");
     const [visibility, setVisibility] = useState("");
     const [expectedAttendance, setExpectedAttendance] = useState("");
+    const [selectedFile, setSelectedFile] = useState(null);
+    const [imagePreview, setImagePreview] = useState(null);
 
     const [nextActive, setNextActive] = useState(false);
-    const [image, setImage] = useState(null);
 
     useEffect(()=>{
         if(title && eventType && description && visibility && expectedAttendance){
@@ -25,11 +26,11 @@ function GenInfo({next, visible, setInfo}){
             description, 
             type: eventType, 
             visibility, 
-            expectedAttendance, 
-            image
+            expectedAttendance,
+            selectedFile // Store the selected file in the info object
         }));
     }
-    ,[title, description, eventType, visibility, image, expectedAttendance]);
+    ,[title, description, eventType, visibility, expectedAttendance, selectedFile]);
 
     const handleChange = (e) => {
         const {name, value} = e.target;
@@ -54,6 +55,21 @@ function GenInfo({next, visible, setInfo}){
                 break;
         }
     }
+
+    const handleFileSelect = (file) => {
+        setSelectedFile(file);
+        // Create a preview URL for the image
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            setImagePreview(reader.result);
+        };
+        reader.readAsDataURL(file);
+    };
+
+    const handleFileClear = () => {
+        setSelectedFile(null);
+        setImagePreview(null);
+    };
 
     return(
         <div className={`gen-info create-component ${visible && "visible"}`}>
@@ -109,7 +125,11 @@ function GenInfo({next, visible, setInfo}){
                 <div className="col preview-col">
                     <div className="input-field">
                         <p>Flier</p>
-                        <ImageUpload uploadText="Drag and Drop to Upload" onUpload={setImage}/>
+                        <ImageUpload 
+                            uploadText="Drag and Drop to Upload" 
+                            onFileSelect={handleFileSelect}
+                            onFileClear={handleFileClear}
+                        />
                     </div>
                 </div>
             </div>

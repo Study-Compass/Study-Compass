@@ -9,6 +9,8 @@ import defaultAvatar from '../../../../../assets/defaultAvatar.svg'
 function FullEvent({ event }){
     const navigate = useNavigate();
 
+    console.log(event);
+
     const handleEventClick = () => {
         navigate(`/create-event`);
     }
@@ -51,7 +53,7 @@ function FullEvent({ event }){
     return(
         <div className="full-event">
             <div className="image">
-                <img src={MockPoster} alt="" />
+                <img src={event.image ? event.image : MockPoster} alt="" />
             </div>
             <div className="event-content">
                 <h1>{event.name}</h1>

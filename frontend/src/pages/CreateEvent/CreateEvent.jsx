@@ -13,6 +13,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import useAuth from '../../hooks/useAuth';
 import { Icon } from '@iconify-icon/react/dist/iconify.mjs';
 import defaultAvatar from '../../assets/defaultAvatar.svg'
+import postRequest from '../../utils/postRequest';
 
 function CreateEvent(){
     const location = useLocation();
@@ -96,8 +97,7 @@ function CreateEvent(){
         const location1 = info.location;
         console.log(location1);
         let formattedInfo = {
-            ...info,
-            image:null
+            ...info
         }
         if (alias.text !== user.username){
             formattedInfo = {
@@ -105,10 +105,25 @@ function CreateEvent(){
                 orgId: alias.id,
             }
         }
-        const response = await createEvent(formattedInfo);
-        if(response){
-            addNotification({title: "Event created", message: "Your event has been created", type: "success"});
 
+        // Create FormData if we have an image
+        const formData = new FormData();
+        if (info.selectedFile) {
+            console.log('Uploading image');
+            formData.append('image', info.selectedFile);
+        }
+
+        // Append all other event data
+        Object.keys(formattedInfo).forEach(key => {
+            if (key !== 'selectedFile' && key !== 'image') {
+                formData.append(key, formattedInfo[key]);
+            }
+        });
+
+        const response = await createEvent(formData);
+
+        if(response){
+            addNotification({title: "Event created", message: "Your event has been created successfully", type: "success"});
         } else {
             addNotification({title: "Failed to create event", message: "An error occurred while creating your event", type: "error"});
         }
