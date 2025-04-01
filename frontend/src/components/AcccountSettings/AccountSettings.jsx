@@ -9,11 +9,14 @@ import check from '../../assets/Icons/Check.svg';
 import waiting from '../../assets/Icons/Waiting.svg';
 import error from '../../assets/circle-warning.svg';
 import unavailable from '../../assets/Icons/Circle-X.svg';
-
+import useAuth from '../../hooks/useAuth.js';
 import { Icon } from '@iconify-icon/react/dist/iconify.mjs';
 import ImageUpload from '../ImageUpload/ImageUpload';
+import axios from 'axios';
 
 function AccountSettings({ settingsRightSide, width, handleBackClick, userInfo }) {
+
+    const { validateToken } = useAuth();
 
     // const [active, setActive] = useState(false);
 
@@ -28,10 +31,52 @@ function AccountSettings({ settingsRightSide, width, handleBackClick, userInfo }
     const [intialName, setInitialName] = useState(userInfo.name);
 
     const [uploadPfp, setUploadPfp] = useState(false);
+    const [profilePicture, setProfilePicture] = useState(userInfo.picture);
+    const [isUploading, setIsUploading] = useState(false);
+    const [selectedFile, setSelectedFile] = useState(null);
     
     const [editEmail, setEditEmail] = useState(false);
     const [email, setEmail] = useState(userInfo.email);
     
+    const handleFileSelect = (file) => {
+        setSelectedFile(file);
+    };
+
+    const handleProfilePictureUpload = async (file) => {
+        setIsUploading(true);
+        const formData = new FormData();
+        formData.append('image', file);
+
+        try {
+            const response = await axios.post('/upload-user-image', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                }
+            });
+
+            if (response.data.success) {
+                setProfilePicture(response.data.imageUrl);
+                setUploadPfp(false);
+                validateToken();
+                addNotification({title: 'Profile Picture Updated', message: 'Your profile picture has been updated successfully', type: 'success'});
+            } else {
+                addNotification({title: 'Upload Failed', message: response.data.message || 'Failed to upload profile picture', type: 'error'});
+            }
+        } catch (error) {
+            console.error('Error uploading file:', error);
+            addNotification({title: 'Upload Error', message: error.response?.data?.message || 'Error uploading profile picture', type: 'error'});
+        } finally {
+            setIsUploading(false);
+            setSelectedFile(null);
+        }
+    };
+
+    const handleFileClear = () => {
+        setSelectedFile(null);
+        setUploadPfp(false);
+    };
+
     const validUsername = async (username) => {
         if (username === null || username === "") {
             return;
@@ -132,7 +177,7 @@ function AccountSettings({ settingsRightSide, width, handleBackClick, userInfo }
 
                 <div className='name-settings'>
                     <div className="picture-container">
-                        <img className="pfp" src={userInfo.picture ? userInfo.picture : pfp} alt="" />
+                        <img className="pfp" src={profilePicture ? profilePicture : pfp} alt="" />
                         <div className="add-picture" onClick={uploadPfpToggle}>
                             <Icon icon="mdi:image-add"/>
                         </div>
@@ -146,7 +191,14 @@ function AccountSettings({ settingsRightSide, width, handleBackClick, userInfo }
 
                 </div>
                 <div className={`pfp-upload ${uploadPfp && "active"}`}>
-                    <ImageUpload uploadText="upload new profile picture" onUpload={console.log}/>
+                    <ImageUpload 
+                        uploadText="Upload new profile picture" 
+                        onFileSelect={handleFileSelect}
+                        onUpload={handleProfilePictureUpload}
+                        onFileClear={handleFileClear}
+                        isUploading={isUploading}
+                        uploadMessage="Maximum size: 5MB"
+                    />
                 </div>
 
                 <h2>security settings</h2>

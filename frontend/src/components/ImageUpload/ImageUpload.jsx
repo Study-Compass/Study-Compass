@@ -1,11 +1,17 @@
 import React, { useState, useRef } from 'react';
-import axios from 'axios';
 import './ImageUpload.scss';
-import Upload from '../../assets/Icons/Upload.svg';
 import { Icon } from '@iconify-icon/react/dist/iconify.mjs';
 import CircleX from '../../assets/Icons/Circle-X.svg';
 
-const ImageUpload = ({ classroomName, onUpload, uploadText="Upload Classroom Image"}) => {
+const ImageUpload = ({ 
+    onFileSelect,
+    onUpload,
+    uploadText = "Upload Image",
+    maxSize = 5, // in MB
+    onFileClear,
+    isUploading = false,
+    uploadMessage = "Maximum size: 5MB"
+}) => {
     const [selectedFile, setSelectedFile] = useState(null);
     const [message, setMessage] = useState('');
     const [fileName, setFileName] = useState('');
@@ -18,36 +24,21 @@ const ImageUpload = ({ classroomName, onUpload, uploadText="Upload Classroom Ima
         handleFile(file);
     };
 
-    const onFileUpload = async () => {
-        if (!selectedFile) {
-            setMessage('No file selected');
-            return;
-        }
-
-        const formData = new FormData(); 
-        formData.append('image', selectedFile);
-
-        try {
-            //   const classroomName = 'exampleClassroom'; // Replace with dynamic value if needed
-
-        } catch (error) {
-            console.error('Error uploading file:', error);
-            setMessage('Error uploading file');
-        }
-    };
-
     const handleFile = (file) => {
         if (file) {
+            if (file.size > maxSize * 1024 * 1024) {
+                setMessage(`File size must be less than ${maxSize}MB`);
+                return;
+            }
             setSelectedFile(file);
             setFileName(file.name);
             setMessage('');
             const reader = new FileReader();
             reader.onload = () => {
                 setImage(reader.result);
-                // onUpload(reader.result);
+                onFileSelect?.(file);
             };
             reader.readAsDataURL(file);
-            
         }
     };
 
@@ -67,6 +58,21 @@ const ImageUpload = ({ classroomName, onUpload, uploadText="Upload Classroom Ima
         setIsDragging(false);
     };
 
+    const handleClear = () => {
+        setSelectedFile(null);
+        setFileName('');
+        setMessage('');
+        setImage(null);
+        if (fileInputRef.current) fileInputRef.current.value = null;
+        onFileClear?.();
+    };
+
+    const handleUpload = () => {
+        if (selectedFile) {
+            onUpload?.(selectedFile);
+        }
+    };
+
     return (
         <div
             className={`file-upload ${isDragging ? 'drag-over' : ''} ${selectedFile ? 'active' : ''}`}
@@ -76,34 +82,32 @@ const ImageUpload = ({ classroomName, onUpload, uploadText="Upload Classroom Ima
         >   
             {image ? <img src={image} alt="preview" className="preview" /> : <Icon className="upload-icon" icon={isDragging? "line-md:uploading-loop" : "line-md:uploading"} />}
 
-            <h3>{selectedFile ? fileName : uploadText ? uploadText: "Upload Classroom Image"}</h3>
+            <h3>{selectedFile ? fileName : uploadText}</h3>
             <input
                 type="file"
                 ref={fileInputRef}
                 id="fileInput"
                 onChange={onFileChange}
-                style={{ display: 'none' }} // Hide the default file input
+                accept="image/*"
+                style={{ display: 'none' }}
             />
             {
                 selectedFile ? 
-                ""
+                <div className="upload-actions">
+                    <button 
+                        className="upload-button" 
+                        onClick={handleUpload}
+                        disabled={isUploading}
+                    >
+                        {isUploading ? 'Uploading...' : 'Upload'}
+                    </button>
+                    <img src={CircleX} className="clear" onClick={handleClear}/>
+                </div>
                 :
                 <>
                     <label htmlFor="fileInput" className="upload-button">Choose File</label>
-                    <p>{message ? message : "Maximum size: 5MB"}</p>
-
+                    <p>{message || uploadMessage}</p>
                 </>
-            }
-            
-            
-            {
-                selectedFile && <img src={CircleX} className="clear" onClick={() => {
-                    setSelectedFile(null);
-                    setFileName('');
-                    setMessage('');
-                    setImage(null);
-                    if (fileInputRef.current) fileInputRef.current.value = null; 
-                }}/>
             }
         </div>
     );
