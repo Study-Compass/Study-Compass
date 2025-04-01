@@ -126,7 +126,7 @@ function GenInfo({next, visible, setInfo}){
                     <div className="input-field">
                         <p>Flier</p>
                         <ImageUpload 
-                            uploadText="Drag and Drop to Upload" 
+                            uploadText="Drag and Drop to Upload, or" 
                             onFileSelect={handleFileSelect}
                             onFileClear={handleFileClear}
                         />

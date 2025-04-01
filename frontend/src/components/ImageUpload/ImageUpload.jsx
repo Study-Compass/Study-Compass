@@ -82,7 +82,7 @@ const ImageUpload = ({
         >   
             {image ? <img src={image} alt="preview" className="preview" /> : <Icon className="upload-icon" icon={isDragging? "line-md:uploading-loop" : "line-md:uploading"} />}
 
-            <h3>{selectedFile ? fileName : uploadText}</h3>
+            <h3 className="upload-text">{selectedFile ? fileName : uploadText}</h3>
             <input
                 type="file"
                 ref={fileInputRef}
@@ -106,7 +106,7 @@ const ImageUpload = ({
                 :
                 <>
                     <label htmlFor="fileInput" className="upload-button">Choose File</label>
-                    <p>{message || uploadMessage}</p>
+                    <p className="upload-message">{message || uploadMessage}</p>
                 </>
             }
         </div>

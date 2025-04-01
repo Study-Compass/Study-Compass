@@ -37,7 +37,7 @@
     }
 }
 
-.file-upload h3{
+.file-upload h3.upload-text{
     font-family: 'Inter';
     font-weight: 500;
     font-size:15px;
@@ -48,7 +48,7 @@
 }
 
 
-.file-upload p{
+.file-upload p.upload-message{
     font-family: 'Inter';
     font-weight: 500;
     font-size:12px;
@@ -62,9 +62,9 @@
     font-weight: 600;
     border-radius: 5px;
     padding: 3px 12px;
-    background-color: var(--border);
+    background-color: var(--red);
     color: white;
-    font-size: 13px;
+    font-size: 14px;
     transition: all 0.3s;
     border:none;
     outline:none;
@@ -75,7 +75,7 @@
 }
 
 .file-upload .upload-button.active{
-    background-color: rgba(250,117, 109,0.74);
+    background-color: var(--darkborder);
 }
 
 .file-upload .clear{
