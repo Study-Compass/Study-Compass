@@ -29,7 +29,7 @@ router.post('/create_api', verifyToken, async (req, res) => {
         const newApi = new Api({
             api_key: apiKey,
             owner: userId,
-            Authorization: user_status // see if this works
+            Authorization: "Unauthorized" // see if this works
         });
 
         await newApi.save();
@@ -56,6 +56,9 @@ router.post('/create_api', verifyToken, async (req, res) => {
 //this is the only one that takes outside servers that not our front, prolly only given to none verify token routes, change user validity to api valdity
 
 //associating a header : with an api key
+
+
+
 /*
 Tasks to do: 
 find a way to test the request coming from a different server (new api with a new routing system
@@ -64,19 +67,11 @@ Set up one route/action
 
 calling a different api to another server 
 
-have the new header that signifys an api request,  if the api request to see if valid, if so let them through the next process
-maybe add more validity
-Unauthorized organization vs authorized prompt for rate (header in the schema), hard code how much rate each gets
-
-Look through middleware debugger for anything 
 
 - change validity from user, to strictly api key validation- make sure exists and cant be looped around
 - rate limiting authority verification | associate the api in the create function with a tag based on their user id, would need to be assigned that tag from front end, but have it in schema 
 //so thunder clients say "Authorization:" unauthorized_org , "apikey"
 -api caller program
-
-
-
 
 3/11/25
 Changed interface and teach new syntax

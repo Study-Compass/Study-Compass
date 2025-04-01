@@ -9,7 +9,6 @@ const { verifyToken, verifyTokenOptional } = require('../middlewares/verifyToken
 const { sortByAvailability } = require('../helpers.js');
 const multer = require('multer');
 const path = require('path');
-const s3 = require('../aws-config');
 const mongoose = require('mongoose');
 const { clean } = require('../services/profanityFilterService');
 const getModels = require('../services/getModelService');

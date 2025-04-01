@@ -10,6 +10,8 @@ const limiter=(maxRequests)=>{
     // Limit each IP to 100 requests per windowMs
     max: maxRequests,
     message: 'Too many requests, please try again later.',
+    standardHeaders: true,
+    legacyHeaders:false
 });
 };
 

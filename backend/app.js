@@ -10,6 +10,7 @@ const { Server } = require('socket.io');
 const enforce = require('express-sslify');
 const { connectToDatabase } = require('./connectionsManager');
 
+const s3 = require('./aws-config');
 
 const app = express();
 const port = process.env.PORT || 5001;

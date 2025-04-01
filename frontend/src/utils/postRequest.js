@@ -4,7 +4,7 @@ import axios from 'axios';
  * helper function to make POST requests using axios.
  * 
  * @param {string} url - The endpoint URL to which the POST request is sent.
- * @param {object} body - The request payload.
+ * @param {object|FormData} body - The request payload.
  * @param {object} options - Additional axios options (optional).
  * @returns {Promise<object>} - The response data or an error message.
  */
@@ -13,8 +13,8 @@ const postRequest = async (url, body, options = {}) => {
     const token = localStorage.getItem('token');
 
     const headers = {
-      'Content-Type': 'application/json',
       ...(token && { Authorization: `Bearer ${token}` }),
+      ...(body instanceof FormData ? {} : { 'Content-Type': 'application/json' }),
       ...options.headers,
     };
     const response = await axios.post(url, body, {
