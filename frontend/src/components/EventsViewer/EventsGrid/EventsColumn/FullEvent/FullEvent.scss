@@ -9,6 +9,7 @@
     overflow:hidden;
     padding:20px;
     box-sizing: border-box;
+    min-height:500px;
     
     iconify-icon{
         font-size: 20px;
@@ -17,11 +18,10 @@
 
     .image{
         max-width: 35%;
-        img{
-            width:100%;
-            border-radius: 10px;
-            box-shadow: var(--shadow);
-        }
+        border-radius: 10px;
+        box-shadow: var(--shadow);
+        width:100%;
+
     }
     .event-content{
         flex-grow: 1;

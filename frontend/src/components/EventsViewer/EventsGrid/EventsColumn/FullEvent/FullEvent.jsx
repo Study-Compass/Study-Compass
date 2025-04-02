@@ -52,9 +52,9 @@ function FullEvent({ event }){
 
     return(
         <div className="full-event">
-            <div className="image">
-                <img src={event.image ? event.image : MockPoster} alt="" />
-            </div>
+            { event.image &&
+                <img src={event.image ? event.image : ""} alt="" className="image"/>
+            }
             <div className="event-content">
                 <h1>{event.name}</h1>
                 {renderHostingStatus()}
@@ -68,6 +68,9 @@ function FullEvent({ event }){
                 <div className="row">
                     <Icon icon="fluent:location-28-filled" />
                     <p>{event.location}</p>
+                </div>
+                <div className="row event-description">
+                    <p>{event.description}</p>
                 </div>
             </div>
             <img src={StarGradient} alt="" className="gradient" />

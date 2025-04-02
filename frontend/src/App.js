@@ -34,6 +34,7 @@ import { WebSocketProvider } from './WebSocketContext';
 import Layout from './pages/Layout/Layout';
 import axios from 'axios';
 import CreateEvent from './pages/CreateEvent/CreateEvent';
+import EventsDash from './pages/EventsDash/EventsDash';
 
 function App() {
     useEffect(() => {
@@ -142,6 +143,7 @@ function App() {
                                                 <Route path='/create-org' element={<CreateOrg/>}/>
                                                 <Route path="/root-dashboard" element={<RootDash/>}/>
                                                 <Route path="/approval-dashboard/:id" element={<OIEDash/>}/>
+                                                <Route path="/events-dashboard" element={<EventsDash/>}/>
                                             </Route>
 
                                             {/* oie routes */}

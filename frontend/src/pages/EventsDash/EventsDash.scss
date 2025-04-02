@@ -1,0 +1,11 @@
+.general-dash.events-dash{
+    .dash-left{
+        background-color: var(--background);
+        box-shadow: var(--shadow);
+        z-index: 2;
+        border-right: 1px solid var(--lighterborder);
+    }
+    .dash-right{
+        box-shadow:none;
+    }
+}

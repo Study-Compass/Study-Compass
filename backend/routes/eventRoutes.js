@@ -506,7 +506,7 @@ router.get('/get-events-by-range', verifyToken, authorizeRoles('oie'), async (re
         };
 
 
-        const events = await getEventsWithAuthorization(req, filterObj, ['Heffner Alumni House'], startOfRange, endOfRange, ['classroom_id', 'hostingId']);
+        const events = await getEventsWithAuthorization(req, filterObj, roles, startOfRange, endOfRange, ['classroom_id', 'hostingId']);
         console.log(events);
         // const events = await Event.find(query)
         //     .populate('classroom_id')
@@ -565,6 +565,85 @@ router.post('/upload-event-image', verifyToken, upload.single('image'), async (r
             success: false, 
             message: 'Failed to upload event image',
             error: error.message 
+        });
+    }
+});
+
+router.get('/get-future-events', verifyToken, authorizeRoles('oie'), async (req, res) => {
+    const { Event, OIEStatus } = getModels(req, 'Event', 'OIEStatus');
+    const { page = 1, limit = 10, filter, roles } = req.query;
+    const currentTime = new Date();
+
+    try {
+        let filterObj;
+        const safeOperators = ['$gte', '$lte', '$eq', '$ne', '$in']; // Allow only these
+        if (filter) {
+            try {
+                const decodedFilter = JSON.parse(decodeURIComponent(filter));
+                Object.keys(decodedFilter).forEach(key => {
+                    if (typeof decodedFilter[key] === 'object') {
+                        Object.keys(decodedFilter[key]).forEach(op => {
+                            if (!safeOperators.includes(op)) {
+                                throw new Error('Invalid query operator');
+                            }
+                        });
+                    }
+                });
+                filterObj = decodedFilter;
+            } catch (error) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Invalid filter format.',
+                });
+            }
+        }
+
+        // Base query for future and ongoing events
+        let query = {
+            end_time: { $gte: currentTime }
+        };
+
+        // Add additional filters if they exist
+        if (filterObj && filterObj.type !== "all") {
+            query = { ...query, ...filterObj };
+        }
+
+        // Get total count for pagination
+        const totalEvents = await Event.countDocuments(query);
+
+        // Calculate pagination
+        const skip = (parseInt(page) - 1) * parseInt(limit);
+        const totalPages = Math.ceil(totalEvents / parseInt(limit));
+
+        // Get paginated events with authorization, sorting by start_time
+        const events = await getEventsWithAuthorization(
+            req,
+            filterObj,
+            roles,
+            currentTime,
+            new Date('9999-12-31'), // Far future date to get all future events
+            ['classroom_id', 'hostingId'],
+            skip,
+            parseInt(limit),
+            { start_time: 1 } // Sort by start_time in ascending order
+        );
+
+        console.log('GET: /get-future-events successful');
+        res.status(200).json({
+            success: true,
+            events,
+            pagination: {
+                total: totalEvents,
+                totalPages,
+                currentPage: parseInt(page),
+                limit: parseInt(limit)
+            }
+        });
+    } catch (error) {
+        console.log('GET: /get-future-events failed', error);
+        res.status(500).json({
+            success: false,
+            message: error.message
         });
     }
 });
