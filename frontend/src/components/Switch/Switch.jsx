@@ -12,12 +12,14 @@ function Switch({ options, onChange, selectedPass, setSelectedPass}) {
         if (optionRefs.current[selected] && containerRef.current) {
             setTimeout(() => {
                 //necessary for weird dom stuff
-                const containerRect = containerRef.current.getBoundingClientRect();
-                const rect = optionRefs.current[selected].getBoundingClientRect();
+                if(containerRef.current){
+                    const containerRect = containerRef.current.getBoundingClientRect();
+                    const rect = optionRefs.current[selected].getBoundingClientRect();
                 setHighlightStyle({
                     left: rect.left - containerRect.left,
-                    width: rect.width
-                });
+                        width: rect.width
+                    });
+                }
             }, 100);
         }
     }, [selected]);

@@ -6,8 +6,6 @@ import FullEvent from '../FullEvent/FullEvent';
 import { Icon } from '@iconify-icon/react/dist/iconify.mjs';
 import defaultAvatar from '../../../../../assets/defaultAvatar.svg'
 
-
-
 function Event({event}){
     const renderHostingStatus = () => {
         let hostingImage = '';
@@ -53,10 +51,20 @@ function Event({event}){
     }
 
     const date = new Date(event.start_time);
+
+    const isOngoing = () => {
+        const now = new Date();
+        return date.getTime() < now.getTime() && date.getTime() + event.duration * 60000 > now.getTime();
+    }
+
+    const isInactive = () => {
+        const now = new Date();
+        return date.getTime() + event.duration * 60000 < now.getTime();
+    }
     
 
     return(
-        <div className="event-component" onClick={() => handleEventClick(event)}>
+        <div className={`event-component ${isOngoing() ? 'ongoing' : isInactive() ? 'inactive' : ''}`} onClick={() => handleEventClick(event)}>
             <Popup isOpen={popupOpen} onClose={onPopupClose} customClassName={"wide-content no-styling no-padding"}>
                 <FullEvent event={event}/>
             </Popup>

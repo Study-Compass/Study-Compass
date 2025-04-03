@@ -16,12 +16,16 @@
         color: var(--text);
     }
 
-    .image{
-        max-width: 35%;
-        border-radius: 10px;
-        box-shadow: var(--shadow);
-        width:100%;
-
+    .image-container{
+        width: 35%;
+        flex-shrink: 0;
+        img{
+            width: 100%;
+            height: auto;
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            display: block;
+        }
     }
     .event-content{
         flex-grow: 1;

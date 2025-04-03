@@ -178,7 +178,7 @@ const WeeklyCalendar = ({ startOfWeek, events, height, dayClick }) => {
     };
 
     return (
-        <div className="oie-weekly-calendar-container" style={{ height: `${height}px` }} ref={ref}>
+        <div className="oie-weekly-calendar-container" style={{ height: `${height}` }} ref={ref}>
             {/* current time line */}
             <div className="calendar-header">
                 <div className="time-header"></div>

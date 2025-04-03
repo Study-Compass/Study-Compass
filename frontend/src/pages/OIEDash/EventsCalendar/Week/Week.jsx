@@ -3,8 +3,9 @@ import { Icon } from '@iconify-icon/react/dist/iconify.mjs';
 import { useFetch } from '../../../../hooks/useFetch';
 import './Week.scss';
 import WeeklyCalendar from './WeeklyCalendar/WeeklyCalendar';
+import Switch from '../../../../components/Switch/Switch';
 
-function Week({ height, changeToDay, start = '2025-1-26', startingText = "", nav=true , filter}) {
+function Week({ height, changeToDay, start = new Date(new Date().setDate(new Date().getDate() - new Date().getDay())), startingText = "", nav=true , filter, setView = () => {}, view = 1, showSwitch = true }) {
     const initialStartDate = typeof start === 'string' ? new Date(start) : start;
     const initialEndDate = new Date(initialStartDate);
     initialEndDate.setDate(initialEndDate.getDate() + 6);
@@ -41,7 +42,7 @@ function Week({ height, changeToDay, start = '2025-1-26', startingText = "", nav
 
     return (
         <>
-            <div className="header">
+            <div className="weekly-header">
                 <div className="time-period">
                     {nav &&
                         <div className="arrows">
@@ -51,12 +52,13 @@ function Week({ height, changeToDay, start = '2025-1-26', startingText = "", nav
                     }
                     <h1>{startingText}{nav && `${formattedDate(startOfWeek)} to ${formattedDate(endOfWeek)}`}</h1>
                 </div>
+                {showSwitch && <Switch options={["month", "week", "day"]} onChange={setView} selectedPass={view} setSelectedPass={setView}/>}
             </div>
-            <div className="week">
+            <div className="week" style={{ height: `${height}` }}>
                 <WeeklyCalendar 
                     events={events.data ? events.data.events : []} 
                     startOfWeek={startOfWeek} 
-                    height={height} 
+                    height={"100%"} 
                     dayClick={changeToDay} 
                 />
             </div>

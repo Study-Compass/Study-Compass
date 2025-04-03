@@ -4,17 +4,39 @@ import { useNavigate } from 'react-router-dom';
 import { Icon } from '@iconify-icon/react/dist/iconify.mjs';
 import Dashboard from '../../components/Dashboard/Dashboard';
 import Explore from './Explore/Explore';
+import MyEvents from './MyEvents/MyEvents';
+import Loader from '../../components/Loader/Loader';
 
 function EventsDash({  }){
+    const [showLoading, setShowLoading] = useState(true);
     const menuItems = [
         { label: 'Explore', icon: 'mingcute:compass-fill' },
+        { label: 'My Events', icon: 'mingcute:calendar-fill' },
     ];
 
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setShowLoading(false);
+        }, 2500); // 2s delay + 1.5s animation duration
+
+        return () => clearTimeout(timer);
+    }, []);
+
     return (
-        <Dashboard menuItems={menuItems} additionalClass='events-dash'>
-            <Explore />
-            <div></div>
-        </Dashboard>
+        <>
+            {showLoading && (
+                <div className="loading-overlay">
+                    <div className="loader-container">
+                        <Loader />
+                        <div className="loading-bar"/>
+                    </div>
+                </div>
+            )}
+            <Dashboard menuItems={menuItems} additionalClass='events-dash'>
+                <Explore />
+                <MyEvents />
+            </Dashboard>
+        </>
     )
 }
 

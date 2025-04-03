@@ -6,11 +6,19 @@ import RPIlogo from '../../../assets/Rpi.png';
 import compass from '../../../assets/Brand Image/discover.svg';
 import FilterPanel from '../../../components/FilterPanel/FilterPanel';
 import Event from '../../../components/EventsViewer/EventsGrid/EventsColumn/Event/Event';
+import Switch from '../../../components/Switch/Switch';
+import Month from '../../../pages/OIEDash/EventsCalendar/Month/Month';
+import Week from '../../../pages/OIEDash/EventsCalendar/Week/Week';
+import Day from '../../../pages/OIEDash/EventsCalendar/Day/Day';
 
 function Explore(){
     const roles = [''];
     const [page, setPage] = useState(1);
     const limit = 15;
+
+    const [view, setView] = useState(0);
+
+    const [viewType, setViewType] = useState(0);
 
     // Define our available filter options.
     const filterOptions = {
@@ -118,22 +126,31 @@ function Explore(){
             </div>
             <div className="explore-content">
                 <div className="sidebar">
+
                     <div className="sidebar-header">
                         <img src={compass} alt="compass" />
                         <h2>explore</h2>
                     </div>
+                    <Switch
+                        options={['list', 'calendar']}
+                        selectedPass={viewType}
+                        setSelectedPass={setViewType}
+                        onChange={setViewType}
+                    />
                     <FilterPanel 
                         filterOptions={filterOptions}
                         filters={filters}
                         onFilterToggle={toggleFilter}
                     />
                 </div>
-                <div className="events">
+                <div className="explore-events">
                     {futureEvents.loading ? (
                         <div className="loading">Loading events...</div>
                     ) : futureEvents.error ? (
                         <div className="error">Error loading events</div>
-                    ) : futureEvents.data ? (
+                    ) : futureEvents.data ? 
+                    viewType === 0 ? 
+                    (
                         <div className="events-list">
                             {groupEventsByDate(futureEvents.data.events).map(({ date, events }) => (
                                 <div key={date.toISOString()} className="date-group">
@@ -144,7 +161,18 @@ function Explore(){
                                 </div>
                             ))}
                         </div>
-                    ) : null}
+                    ) 
+                    :
+                    (
+                        view === 0 ?
+                        <Month height={'calc(100% - 44px)'} filter={{}} changeToWeek={() => {}} view={view} setView={setView}/>
+                        : view === 1 ?
+                        <Week height={'calc(100% - 44px)'} filter={{}} changeToDay={() => {}} view={view} setView={setView}/>
+                        :
+                        <Day height={'calc(100% - 44px)'} filter={{}} view={view} setView={setView}/>
+                    )
+                    
+                    : null}
                 </div>
             </div>
         </div>

@@ -419,6 +419,8 @@ router.get('/get-events-by-month', verifyToken, authorizeRoles('oie'), async (re
     }
 
     try {
+        //log params
+        console.log(month, year, filter);
         // Parse month and year into integers
         const parsedMonth = parseInt(month, 10) - 1; // JavaScript months are 0-indexed
         const parsedYear = parseInt(year, 10);
@@ -572,7 +574,9 @@ router.post('/upload-event-image', verifyToken, upload.single('image'), async (r
 router.get('/get-future-events', verifyToken, authorizeRoles('oie'), async (req, res) => {
     const { Event, OIEStatus } = getModels(req, 'Event', 'OIEStatus');
     const { page = 1, limit = 10, filter, roles } = req.query;
-    const currentTime = new Date();
+    
+    const currentDate = new Date();
+    currentDate.setHours(0, 0, 0, 0);
 
     try {
         let filterObj;
@@ -598,9 +602,9 @@ router.get('/get-future-events', verifyToken, authorizeRoles('oie'), async (req,
             }
         }
 
-        // Base query for future and ongoing events
+        // Base query for events from the start of today
         let query = {
-            end_time: { $gte: currentTime }
+            end_time: { $gte: currentDate }
         };
 
         // Add additional filters if they exist
@@ -620,7 +624,7 @@ router.get('/get-future-events', verifyToken, authorizeRoles('oie'), async (req,
             req,
             filterObj,
             roles,
-            currentTime,
+            currentDate,
             new Date('9999-12-31'), // Far future date to get all future events
             ['classroom_id', 'hostingId'],
             skip,

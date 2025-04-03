@@ -52,9 +52,11 @@ function FullEvent({ event }){
 
     return(
         <div className="full-event">
-            { event.image &&
-                <img src={event.image ? event.image : ""} alt="" className="image"/>
-            }
+                { event.image &&
+                    <div className="image-container">
+                        <img src={event.image ? event.image : ""} alt="" className=""/>
+                    </div>
+                }
             <div className="event-content">
                 <h1>{event.name}</h1>
                 {renderHostingStatus()}
