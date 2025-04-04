@@ -482,6 +482,21 @@
     pointer-events: none;
 }
 
+.classroom-component .view-check-in button{
+    font-size: 500px;
+    font-family: 'Inter';
+    font-weight: 650;
+    color: white;
+    background-color:  white;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 20px;
+    flex-grow:1;
+    cursor: pointer;
+    transition: all 0.3s;
+
+}
+
 @media (max-width:500px) {
     .classroom-component .check-in button{
         font-size:15px;

@@ -15,6 +15,7 @@ import Popup from '../Popup/Popup.jsx';
 import UserRating from './UserRating/UserRating.jsx';
 import AllRatings from './AllRatings/AllRatings.jsx';
 import RatingGraph from './AllRatings/RatingGraph/RatingGraph.jsx';
+import ViewCheckedIn from './ViewCheckedIn/ViewCheckedIn.jsx';
 
 import Edit from '../../assets/Icons/Edit.svg';
 import Outlets from '../../assets/Icons/Outlets.svg';
@@ -230,6 +231,12 @@ function Classroom({ room, state, setState, schedule, roomName, width, setShowMo
     const handleOpenAllRatings = () => setIsAllRatingsOpen(true);
     const handleCloseAllRatings = () => setIsAllRatingsOpen(false);
 
+    //Ghea Move this later.
+    const [isCurrentlyCheckedInOpen, setCurrentlyCheckedIn] = useState(false);
+    
+    const handleOpenCheckedInPopup = () => setCurrentlyCheckedIn(true);
+    const handleCloseCheckedInPopup = () => setCurrentlyCheckedIn(false);
+
     if (!room) {
         return <Loader />;
     }
@@ -302,6 +309,9 @@ function Classroom({ room, state, setState, schedule, roomName, width, setShowMo
             </Popup>
             <Popup isOpen={isRatingPopupOpen} onClose={handleCloseRatingPopup}>
                 <RatingComponent classroomId={room._id} rating={rating} setRating={setRating} name={room.name} reload={reload} />
+            </Popup>
+            <Popup isOpen={isCurrentlyCheckedInOpen} onClose={handleCloseCheckedInPopup} className="view-checked-in">
+                <ViewCheckedIn currentUser={user} users={Object.values(checkedInUsers)} room={Object.values(room)} reload={reload}/>
             </Popup>
             <div className={`whole-page ${isClassImgOpen ? 'in' : 'out'}`}>
                 <div className={`img-pop-up ${isClassImgOpen ? 'in' : 'out'}`} ref={ref}>
@@ -401,7 +411,8 @@ function Classroom({ room, state, setState, schedule, roomName, width, setShowMo
                         {success ? "free" : "class in session"} {message}
                     </div>
                     {room && room.checked_in && room.checked_in.length > 0 &&
-                        <CheckedIn users={Object.values(checkedInUsers)} />
+                        <button className="view-check-in" onClick={handleOpenCheckedInPopup} ><CheckedIn users={Object.values(checkedInUsers)}/></button> 
+                        // <CheckedIn users={Object.values(checkedInUsers)} onClick={handleOpenCheckedInPopup}/> 
                     }
                     <div className="button-container">
                         {width < 800 && <button className="schedule-button" onClick={() => { setShowMobileCalendar(true) }}>view-schedule</button>}

@@ -136,7 +136,6 @@ function App() {
                                             {/* features under development */}
                                             <Route element={ <ProtectedRoute authorizedRoles={['admin', 'developer']}/> }>
                                                 <Route path="/org/:name" element={<OrgDisplay/>}/>
-                                                <Route path="/create-event" element={<CreateEvent/>}/>
                                                 <Route path="/events" element={<Events/>}/>
                                                 <Route path="/club-dashboard/:id" element={<ClubDash/>}/>
                                                 <Route path='/create-org' element={<CreateOrg/>}/>
@@ -145,6 +144,7 @@ function App() {
                                             {/* oie routes */}
                                             <Route element={ <ProtectedRoute authorizedRoles={['admin', 'developer', 'oie']}/> }>
                                                 <Route path="/oie-dashboard" element={<OIEDash/>}/>
+                                                <Route path="/create-event" element={<CreateEvent/>}/>
                                             </Route>
                                         </Route>
                                     </Routes>
