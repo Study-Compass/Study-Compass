@@ -652,4 +652,29 @@ router.get('/get-future-events', verifyToken, authorizeRoles('oie'), async (req,
     }
 });
 
+router.get('/get-my-events', verifyToken, async (req, res) => {
+    const {User, Event} = getModels(req, 'User', 'Event');
+    const userId = req.user.userId;
+    try{
+        let userEvents = await Event.find({hostingId: userId});
+        if(userEvents){
+            console.log('GET: /get-my-events successfull');
+            return res.status(200).json({
+                success:true,
+                message : "my events found",
+                events: userEvents
+            });
+        } else {
+            console.log('GET: /get-my-events empty');
+            return res.status(200).json({
+                success:true,
+                message: "no events found",
+                events: []
+            });
+        }
+    } catch(error){
+
+    }
+});
+
 module.exports = router;
