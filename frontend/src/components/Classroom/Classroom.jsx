@@ -310,7 +310,7 @@ function Classroom({ room, state, setState, schedule, roomName, width, setShowMo
             <Popup isOpen={isRatingPopupOpen} onClose={handleCloseRatingPopup}>
                 <RatingComponent classroomId={room._id} rating={rating} setRating={setRating} name={room.name} reload={reload} />
             </Popup>
-            <Popup isOpen={isCurrentlyCheckedInOpen} onClose={handleCloseCheckedInPopup} className="view-checked-in">
+            <Popup customClassName="view-checked-in" isOpen={isCurrentlyCheckedInOpen} onClose={handleCloseCheckedInPopup}>
                 <ViewCheckedIn currentUser={user} users={Object.values(checkedInUsers)} room={Object.values(room)} reload={reload}/>
             </Popup>
             <div className={`whole-page ${isClassImgOpen ? 'in' : 'out'}`}>
@@ -418,7 +418,7 @@ function Classroom({ room, state, setState, schedule, roomName, width, setShowMo
                         {width < 800 && <button className="schedule-button" onClick={() => { setShowMobileCalendar(true) }}>view-schedule</button>}
                         {
                             user && room.checked_in.includes(user._id) ?
-                                <button className="out" onClick={handleCheckOut}>check out</button>
+                                <button className="out check-in-button" onClick={handleCheckOut}>check out</button>
                                 :
                                 <button disabled={!success || !isAuthenticated} className="check-in-button" onClick={handleCheckIn}>check in</button>
                         }

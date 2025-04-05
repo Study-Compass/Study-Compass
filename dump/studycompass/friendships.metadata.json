@@ -1,1 +1,0 @@
-{"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_"}],"uuid":"9ea9101fdd584116b7733cb598b4169e","collectionName":"friendships","type":"collection"}
