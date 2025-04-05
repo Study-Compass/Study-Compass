@@ -45,7 +45,7 @@
         }
 
         h2{
-            font-size: 17px;
+            font-size: 15px;
             font-weight: 600;
             margin: 0;
             color: var(--text);
@@ -60,6 +60,15 @@
             background-color: var(--green);
             padding:1px 5px;
             border-radius: 5px;
+            &.faculty{
+                background-color: var(--blue);
+            }
+            &.organization{
+                background-color: var(--red);
+            }
+            &.developer{
+                background-color: var(--developerBlue);
+            }
         }
         
 
@@ -72,6 +81,9 @@
             .user-name{
                 font-weight: 700;
                 font-size:13px;
+                white-space: nowrap;  
+                overflow: hidden;    
+                text-overflow: ellipsis;
             }
             img{
                 width: 20px;
@@ -90,10 +102,11 @@
         height:fit-content;
         width:fit-content;
         padding:5px 15px;
-        font-size: 18px;
+        font-size: 14px;
         color:var(--text);
         background-color: var(--oie-background);
         pointer-events: all;
+        margin: 0;
         iconify-icon{
             transition: transform 0.2s;
         }

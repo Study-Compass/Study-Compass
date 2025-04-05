@@ -1,20 +1,46 @@
 const express = require('express');
 const router = express.Router();
 const { verifyToken, verifyTokenOptional, authorizeRoles } = require('../middlewares/verifyToken');
-const Event = require('../schemas/event');
-const User = require('../schemas/user');
-const Classroom = require('../schemas/classroom');
-const OIEStatus = require('../schemas/OIE');
-const Org = require('../schemas/org')
+const getModels = require('../services/getModelService');
+const { createApprovalInstance, getEventsWithAuthorization } = require('../utilities/workflowUtilities');
+const multer = require('multer');
+const path = require('path');
+const { uploadImageToS3, upload } = require('../services/imageUploadService');
 
-router.post('/create-event', verifyToken, async (req, res) => {
+// Error handling middleware for multer
+const handleMulterError = (err, req, res, next) => {
+    if (err instanceof multer.MulterError) {
+        if (err.code === 'LIMIT_FILE_SIZE') {
+            return res.status(400).json({
+                success: false,
+                message: 'File size exceeds 5MB limit.'
+            });
+        }
+    } else if (err) {
+        return res.status(400).json({
+            success: false,
+            message: err.message
+        });
+    }
+    next();
+};
+
+router.post('/create-event', verifyToken, upload.single('image'), handleMulterError, async (req, res) => {
+    const { Event, OIEStatus, User } = getModels(req, 'Event', 'OIEStatus', 'User');
     const user_id = req.user.userId;
     const orgId = req.body.orgId;
+    const file = req.file;
     
     try {
+        let eventData = { ...req.body };
+        
+        // Remove image field from eventData if it exists
+        delete eventData.image;
+        
         let event;
 
         if(orgId){
+            console.log(orgId);
             const user = await User.findById(user_id);
             if(!user.clubAssociations.includes(orgId)){
                 return res.status(403).json({
@@ -22,38 +48,44 @@ router.post('/create-event', verifyToken, async (req, res) => {
                 })
             }
             event = new Event({
-                ...req.body,
-                hostingId : user_id,
-                hostingType : 'User',
-            });
-        } else {
-            event = new Event({
-                ...req.body,
+                ...eventData,
                 hostingId : orgId,
                 hostingType : 'Org',
             });
-        }
-    
-        let OIE;
-    
-        if (event.expectedAttendance > 100 || event.OIEAcknowledgementItems && event.OIEAcknowledgementItems.length > 0) {
-            event.OIEStatus = "Pending";
-            OIE = new OIEStatus({
-                eventRef: event._id,
-                status: 'Pending',
-                checkListItems: [],
+        } else {
+            event = new Event({
+                ...eventData,
+                hostingId : user_id,
+                hostingType : 'User',
             });
         }
 
+        // Handle image upload if file is present
+        if (file) {
+            console.log('Uploading image');
+            const fileExtension = path.extname(file.originalname);
+            const fileName = `${event._id}${fileExtension}`;
+            const imageUrl = await uploadImageToS3(file, 'events', fileName);
+            event.image = imageUrl;
+            console.log('Image uploaded successfully:', imageUrl);
+        }
+    
+        const approvalInstance = await createApprovalInstance(req, event._id, event);
+        if (approvalInstance) {
+            event.approvalReference = approvalInstance._id;
+            console.log('Approval instance created');
+            console.log(event.approvalInstance);
+            event.status = 'pending';
+        } else{
+            event.status = 'not-applicable';
+        }
 
         await event.save();
-        if (OIE) {
-            await OIE.save();
-        }
         console.log('POST: /create-event successful');
         res.status(201).json({
             success: true,
-            message: 'Event created successfully.'
+            message: 'Event created successfully.',
+            eventId: event._id
         });
     } catch (error) {
         console.log('POST: /create-event failed', error);
@@ -66,6 +98,7 @@ router.post('/create-event', verifyToken, async (req, res) => {
 
 // Get all events created by the user
 router.get('/get-events', verifyToken, async (req, res) => {
+    const { Event, User } = getModels(req, 'Event', 'User');
     const user_id = req.user.userId;
 
     try {
@@ -86,11 +119,14 @@ router.get('/get-events', verifyToken, async (req, res) => {
 
 // Get all events
 router.get('/get-all-events', verifyTokenOptional, async (req, res) => {
+    const { Event, User } = getModels(req, 'Event', 'User');
     try {
         // const events = await Event.find({}).populate('classroom_id');
         //get all events, attach user object to the event
         //mkae sure event doesn't have rejected or pending status
-        const events = await Event.find({ OIEStatus: { $nin: ['Rejected', 'Pending'] } }).populate('classroom_id');
+        const events = await Event.find({ OIEStatus: { $nin: ['Rejected', 'Pending'] } })
+            .populate('classroom_id')
+            .populate('hostingId');
         console.log('GET: /get-all-events successful');
         res.status(200).json({
             success: true,
@@ -107,6 +143,7 @@ router.get('/get-all-events', verifyTokenOptional, async (req, res) => {
 
 // Get all events in a classroom
 router.get('/get-classroom-events/:classroom_id', verifyTokenOptional, async (req, res) => {
+    const { Event } = getModels(req, 'Event');
     const { classroom_id } = req.params;
 
     try {
@@ -125,6 +162,7 @@ router.get('/get-classroom-events/:classroom_id', verifyTokenOptional, async (re
 
 // Get all events user is going to
 router.get('/get-going-events', verifyToken, async (req, res) => {
+    const { Event, User } = getModels(req, 'Event', 'User');
     const user_id = req.user.userId;
 
     try {
@@ -144,6 +182,7 @@ router.get('/get-going-events', verifyToken, async (req, res) => {
 
 // delete event
 router.delete('/delete-event/:event_id', verifyToken, async (req, res) => {
+    const { Event } = getModels(req, 'Event');
     const { event_id } = req.params;
     const user_id = req.user.userId;
 
@@ -178,6 +217,7 @@ router.delete('/delete-event/:event_id', verifyToken, async (req, res) => {
 
 //get all oie-unapproved events
 router.get('/oie/get-pending-events', verifyToken, authorizeRoles('oie'), async (req, res) => {
+    const { Event, User } = getModels(req, 'Event', 'User');
     try {
         const user = await User.findById(req.user.userId);
         if (!user) {
@@ -203,6 +243,7 @@ router.get('/oie/get-pending-events', verifyToken, authorizeRoles('oie'), async 
 
 //get all oie-unapproved events
 router.get('/oie/get-approved-events', verifyToken, authorizeRoles('oie'), async (req, res) => {
+    const { Event, User } = getModels(req, 'Event', 'User');
     try {
         const user = await User.findById(req.user.userId);
         if (!user ) {
@@ -228,6 +269,7 @@ router.get('/oie/get-approved-events', verifyToken, authorizeRoles('oie'), async
 
 //get all oie-unapproved events
 router.get('/oie/get-rejected-events', verifyToken, authorizeRoles('oie'), async (req, res) => {
+    const { Event, User } = getModels(req, 'Event', 'User');
     try {
         const user = await User.findById(req.user.userId);
         if (!user) {
@@ -252,6 +294,7 @@ router.get('/oie/get-rejected-events', verifyToken, authorizeRoles('oie'), async
 });
 
 router.get('/get-event/:event_id', verifyTokenOptional, async (req, res) => {
+    const { Event, User, OIEStatus, ApprovalInstance } = getModels(req, 'Event', 'User', 'OIEStatus', 'ApprovalInstance');
     const { event_id } = req.params;
     const user_id = req.user ? req.user.userId : null;
 
@@ -264,31 +307,26 @@ router.get('/get-event/:event_id', verifyTokenOptional, async (req, res) => {
                 message: 'Event not found.'
             });
         }
-        if (event.OIEStatus !== 'Not Applicable') {
+        const approvalInstance = await ApprovalInstance.findOne({ eventId: event_id });
+        if (approvalInstance) {
             if (!user){
                 return res.status(403).json({
                     success: false,
                     message: 'You are not authorized to view this page.'
                 });
             } else {    
-                const OIE = await OIEStatus.findOne({ eventRef: event_id });
-                if (OIE) {
-                    //attach to event object
+                //check that user has approval role
+                if(user.approvalRoles.length > 0){
                     let newEvent = event.toObject();
-                    newEvent["OIE"] = OIE;
+                    newEvent["approvalInstance"] = approvalInstance;
                     return res.status(202).json({
                         success: true,
                         event: newEvent
                     });
                 }
-                return res.status(200).json({
-                    success: true,
-                    event
-                });
             }
         }
-        console.log('GET: /get-event successful');
-        res.status(200).json({
+        return res.status(200).json({
             success: true,
             event
         });
@@ -302,6 +340,7 @@ router.get('/get-event/:event_id', verifyTokenOptional, async (req, res) => {
 });
 
 router.post('/approve-event', verifyToken, async (req, res) => {
+    const { Event, User, ApprovalInstance } = getModels(req, 'Event', 'User', 'ApprovalInstance');
     const user_id = req.user.userId;
     const { event_id } = req.body;
 
@@ -320,13 +359,32 @@ router.post('/approve-event', verifyToken, async (req, res) => {
                 message: 'Event not found.'
             });
         }
-        if (event.OIEStatus !== 'Pending') {
-            return res.status(400).json({
+        // if (event.OIEStatus !== 'Pending') {
+        //     return res.status(400).json({
+        //         success: false,
+        //         message: 'Event is not pending approval.'
+        //     });
+        // }
+        // event.OIEStatus = 'Approved';
+        const approvalInstance = await ApprovalInstance.findOne({ eventId: event_id });
+        if (!approvalInstance) {
+            return res.status(404).json({
                 success: false,
-                message: 'Event is not pending approval.'
+                message: 'Approval instance not found.'
             });
         }
-        event.OIEStatus = 'Approved';
+        const roleNeeded = approvalInstance.approvals[approvalInstance.currentStepIndex].role;
+        if (!user.approvalRoles.includes(roleNeeded)) {
+            return res.status(403).json({
+                success: false,
+                message: 'You are not authorized to approve this event.'
+            });
+        }
+        approvalInstance.approvals[approvalInstance.currentStepIndex].status = 'approved';
+        approvalInstance.approvals[approvalInstance.currentStepIndex].approvedByUserId = user_id;
+        approvalInstance.approvals[approvalInstance.currentStepIndex].approvedAt = new Date();
+        approvalInstance.currentStepIndex++;
+            
         await event.save();
         console.log('POST: /approve-event successful');
         res.status(200).json({
@@ -343,7 +401,8 @@ router.post('/approve-event', verifyToken, async (req, res) => {
 });
 
 router.get('/get-events-by-month', verifyToken, authorizeRoles('oie'), async (req, res) => {
-    const { month, year } = req.query;
+    const { Event } = getModels(req, 'Event');
+    const { month, year, filter } = req.query;
 
     if (!month || !year) {
         return res.status(400).json({
@@ -357,14 +416,24 @@ router.get('/get-events-by-month', verifyToken, authorizeRoles('oie'), async (re
         const parsedMonth = parseInt(month, 10) - 1; // JavaScript months are 0-indexed
         const parsedYear = parseInt(year, 10);
 
+        const filterObj = filter ? JSON.parse(decodeURIComponent(filter)) : null;
+
         // Construct the start and end of the month
         const startOfMonth = new Date(parsedYear, parsedMonth, 1); // First day of the month
         const endOfMonth = new Date(parsedYear, parsedMonth + 1, 0, 23, 59, 59, 999); // Last day of the month
+        
+        const query = filterObj && filterObj.type !== "all" ?{
+            start_time: { $gte: startOfMonth, $lte: endOfMonth },
+            ...filterObj
+        } :
+        {
+            start_time: { $gte: startOfMonth, $lte: endOfMonth },
+        };
 
         // Query events with dates within the range
-        const events = await Event.find({
-            start_time: { $gte: startOfMonth, $lte: endOfMonth }
-        }).populate('classroom_id');
+        const events = await Event.find(query)
+            .populate('classroom_id')
+            .populate('hostingId');
 
         console.log('GET: /get-events-by-month successful');
         res.status(200).json({
@@ -381,7 +450,8 @@ router.get('/get-events-by-month', verifyToken, authorizeRoles('oie'), async (re
 });
 
 router.get('/get-events-by-range', verifyToken, authorizeRoles('oie'), async (req, res) => {
-    const { start, end } = req.query;
+    const { Event, OIEStatus } = getModels(req, 'Event', 'OIEStatus');
+    const { start, end, filter, roles } = req.query;
 
     if (!start || !end) {
         return res.status(400).json({
@@ -393,10 +463,49 @@ router.get('/get-events-by-range', verifyToken, authorizeRoles('oie'), async (re
     try {
         const startOfRange = new Date(start);
         const endOfRange = new Date(end);
+        //log dates
+        //make into eastern time
+        //print formatted time
+        let filterObj;
 
-        const events = await Event.find({
-            start_time: { $gte: startOfRange, $lte: endOfRange }
-        }).populate('classroom_id');
+        const safeOperators = ['$gte', '$lte', '$eq', '$ne', '$in']; // Allow only these
+        if (filter) {
+            try {
+                const decodedFilter = JSON.parse(decodeURIComponent(filter));
+                Object.keys(decodedFilter).forEach(key => {
+                    if (typeof decodedFilter[key] === 'object') {
+                        Object.keys(decodedFilter[key]).forEach(op => {
+                            if (!safeOperators.includes(op)) {
+                                throw new Error('Invalid query operator');
+                            }
+                        });
+                    }
+                });
+                filterObj = decodedFilter;
+            } catch (error) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Invalid filter format.',
+                });
+            }
+        }
+
+        let query = filterObj && filterObj.type !== "all" ?{
+            start_time: { $gte: startOfRange, $lte: endOfRange },
+            ...filterObj
+        } :
+        {
+            start_time: { $gte: startOfRange, $lte: endOfRange },
+        };
+
+
+        const events = await getEventsWithAuthorization(req, filterObj, [], startOfRange, endOfRange, ['classroom_id', 'hostingId']);
+        console.log(events);
+
+        // const events = await Event.find(query)
+        //     .populate('classroom_id')
+        //     .populate('hostingId')
+        //     // .populate('OIEReference');
 
         console.log('GET: /get-events-by-week successful');
         res.status(200).json({
@@ -412,7 +521,46 @@ router.get('/get-events-by-range', verifyToken, authorizeRoles('oie'), async (re
     }
 });
 
+// Upload event image
+router.post('/upload-event-image', verifyToken, upload.single('image'), async (req, res) => {
+    const { Event } = getModels(req, 'Event');
+    const file = req.file;
+    const { eventId } = req.body;
 
+    if (!file) {
+        return res.status(400).json({ success: false, message: 'No file uploaded' });
+    }
+
+    try {
+        const event = await Event.findById(eventId);
+        if (!event) {
+            return res.status(404).json({ success: false, message: 'Event not found' });
+        }
+
+        // Create filename using event ID and original extension
+        const fileExtension = path.extname(file.originalname);
+        const fileName = `${eventId}${fileExtension}`;
+
+        // Upload image to S3
+        const imageUrl = await uploadImageToS3(file, 'events', fileName);
+        
+        // Update event with new image URL
+        event.image = imageUrl;
+        await event.save();
+
+        return res.status(200).json({ 
+            success: true, 
+            message: 'Event image uploaded successfully',
+            imageUrl 
+        });
+    } catch (error) {
+        console.error('Error uploading event image:', error);
+        return res.status(500).json({ 
+            success: false, 
+            message: 'Failed to upload event image',
+            error: error.message 
+        });
+    }
+});
 
 module.exports = router;
-

@@ -5,9 +5,14 @@
     --dark: rgba(226, 226, 226, 1);
     --lightred: rgba(250, 117, 109, 0.3);
     --red: rgba(250, 117, 109, 1);
+    --red-transparent: rgba(250, 117, 109, 0.1);
     --salmon: #FF8888;
     --blue: #87AFF1;
     --text: #414141;
+    --light-text: #828282;
+    --lighter-text: #5C5C5C;
+    --lightest-text: #B1B1B1;
+
     --block: #EA8D8D;
     --default-font: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
@@ -37,6 +42,14 @@
     --text-rgba: 65, 65, 65;
 
     --background:white;
+    --rs-btn-link-text: var(--red) !important;   
+    --rs-btn-primary-bg: var(--red) !important;
+    
+    
+    /* statuses */
+    --green-main: #6EB25F;
+    --green-bg: rgba(147,235,127, 0.32);
+
 }
 
 .dark-mode{
@@ -382,4 +395,49 @@ textarea{
     z-index: 9999;
     top:0;
     left:0; 
+}
+
+.rs-input{
+    cursor: pointer;
+}
+
+.rs-picker-daterange-header.rs-picker-tab-active-end::after, .rs-picker-daterange-header.rs-picker-tab-active-start::after{
+    border-bottom: 2px solid var(--red) !important;
+}
+
+.rs-calendar-table-cell-content:hover {
+    background-color: #FBECEB !important;
+}
+
+.rs-picker-popup .rs-calendar .rs-calendar-table-cell:hover .rs-calendar-table-cell-content {
+   color: var(--red) !important;
+}
+.rs-calendar-table-cell-is-today .rs-calendar-table-cell-content{
+    box-shadow: inset 0 0 0 1px var(--red) !important;
+}
+
+.rs-calendar-table-cell-selected .rs-calendar-table-cell-content{
+    background-color: var(--red) !important;
+    color: var(--background) !important;
+}
+
+.rs-calendar-table-cell-in-range::before{
+    background-color: #FBECEB !important;
+}
+
+.rs-picker-popup .rs-calendar .rs-calendar-table-cell:hover .rs-calendar-table-cell-content{
+    background-color: #FBECEB !important;
+}
+
+.rs-input-group:not(.rs-input-group-disabled):hover, .rs-input-group:not(.rs-input-group-disabled).rs-input-group-focus, .rs-input-group:focus-within{
+    border-color: var(--red) !important;
+}
+
+.rs-btn-primary:hover, .rs-btn-primary:focus{
+    background-color: var(--red) !important;
+
+}
+
+.rs-btn-link:hover, .rs-btn-link:focus{
+    color: var(--red) !important;
 }

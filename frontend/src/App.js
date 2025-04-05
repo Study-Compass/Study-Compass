@@ -10,6 +10,7 @@ import Error from './pages/Error/Error';
 import Onboard from './pages/OnBoarding/Onboard';
 import Settings from './pages/Settings/Settings';
 import Friends from './pages/Friends/Friends';
+import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute';
 import Org from './pages/Org/Org';
 import Profile from './pages/Profile/Profile';
 import Landing from './pages/Landing/Landing';
@@ -21,6 +22,8 @@ import OIEDash from './pages/OIEDash/OIEDash';
 import NewBadge from './pages/NewBadge/NewBadge';
 import CreateOrg from './pages/CreateOrg/CreateOrg';
 import ClubDash from './pages/ClubDash/ClubDash';
+import OrgDisplay from './pages/Org/OrgDisplay';
+import RootDash from './pages/RootDash/RootDash';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './AuthContext';
 import { CacheProvider } from './CacheContext';
@@ -104,6 +107,7 @@ function App() {
                                     <ProfileCreationProvider>
                                     <Routes>
                                         <Route path='/' element={<Layout/>}>
+                                            {/* publicly accessible pages */}
                                             <Route path="/qr/:id" element={<QR/>}/>
                                             <Route index element={<Landing/> }/>
                                             <Route path="/room/:roomid" element={<Room1 />}/>
@@ -112,25 +116,41 @@ function App() {
                                             <Route path="/login" element={<Login />}/>
                                             <Route path="*" element={<Error />}/>
                                             <Route path="/error/:errorCode" element={<Error />}/>
-                                            <Route path="/onboard" element={<Onboard />}/>
-                                            <Route path="/profile" element={<Profile/>}/>
-                                            <Route path="/friends" element={<Friends/>}/>
                                             <Route path="/landing" element={<Landing/>}/>
-                                            <Route path="/settings" element={<Settings/>}/>
                                             <Route path="/org" element={<Org/>}/>
                                             <Route path="/documentation" element={<Redirect/>}/>
-                                            <Route path="/developer-onboarding" element={<DeveloperOnboard/>}/>
-                                            <Route path="/admin" element={<Admin/>}/>
-                                            <Route path="/create-event" element={<CreateEvent/>}/>
-                                            <Route path="/events" element={<Events/>}/>
-                                            <Route path="/oie-dashboard" element={<OIEDash/>}/>
                                             <Route path="/new-badge/:hash" element={<NewBadge/>}/>
                                             <Route path="/new-badge" element={<NewBadge/>}/>
-                                            <Route path="/new-badge/:hash" element={<NewBadge/>}/>
-                                            <Route path="/club-dashboard/:id" element={<ClubDash/>}/>
-                                            <Route path="/new-badge/:hash" element={<NewBadge/>}/>
-                                            <Route path='/create-org' element={<CreateOrg/>}/>
-                                            <Route path="/new-badge" element={<NewBadge/>}/>
+
+                                            {/* logged in routes */}
+                                            <Route element={ <ProtectedRoute/> }>
+                                                <Route path="/profile" element={<Profile/>}/>
+                                                <Route path="/onboard" element={<Onboard />}/>
+                                                <Route path="/friends" element={<Friends/>}/>
+                                                <Route path="/settings" element={<Settings/>}/>
+                                                <Route path="/developer-onboarding" element={<DeveloperOnboard/>}/>
+                                            </Route>
+
+                                            {/* admin routes */}
+                                            <Route element={ <ProtectedRoute authorizedRoles={['admin']}/> }>
+                                                <Route path="/admin" element={<Admin/>}/>
+                                            </Route>
+
+                                            {/* features under development */}
+                                            <Route element={ <ProtectedRoute authorizedRoles={['admin', 'developer']}/> }>
+                                                <Route path="/org/:name" element={<OrgDisplay/>}/>
+                                                <Route path="/events" element={<Events/>}/>
+                                                <Route path="/club-dashboard/:id" element={<ClubDash/>}/>
+                                                <Route path='/create-org' element={<CreateOrg/>}/>
+                                                <Route path="/root-dashboard" element={<RootDash/>}/>
+                                                <Route path="/approval-dashboard/:id" element={<OIEDash/>}/>
+                                            </Route>
+
+                                            {/* oie routes */}
+                                            <Route element={ <ProtectedRoute authorizedRoles={['admin', 'developer', 'oie']}/> }>
+                                                <Route path="/oie-dashboard" element={<OIEDash/>}/>
+                                                <Route path="/create-event" element={<CreateEvent/>}/>
+                                            </Route>
                                         </Route>
                                     </Routes>
                                     </ProfileCreationProvider>

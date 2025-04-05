@@ -9,12 +9,15 @@ import GenInfo from '../../components/CreateEvent/GenInfo/GenInfo';
 import Review from '../../components/CreateEvent/Review/Review';
 import { useNotification } from '../../NotificationContext';
 import { createEvent } from './CreateEventHelpers';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import useAuth from '../../hooks/useAuth';
 import { Icon } from '@iconify-icon/react/dist/iconify.mjs';
 import defaultAvatar from '../../assets/defaultAvatar.svg'
+import postRequest from '../../utils/postRequest';
 
 function CreateEvent(){
+    const location = useLocation();
+    const origin = location.state ? location.state.origin : "";
     const [step, setStep] = useState(0);
     const [info, setInfo] = useState({});
     const [finishedStep, setFinishedStep] = useState(0);
@@ -36,12 +39,26 @@ function CreateEvent(){
         if(!(user.roles.includes('oie') || user.roles.includes('admin') || user.roles.includes('developer'))){
             navigate('/');
         }
-        setAlias({
-            img: user.pfp ? user.pfp : defaultAvatar,
-            text: user.username,
-            id: user._id,
-            type: 'user'
-        })
+        if(origin && origin !== ""){
+            const club = user.clubAssociations.find((org)=>org.org_name === origin);
+            if(club){
+                setAlias({
+                    img: club.org_profile_image,
+                    text: club.org_name,
+                    id: club._id,
+                    type: 'club'
+                });
+            } else {
+                navigate('/');
+            }
+        } else {
+            setAlias({
+                img: user.pfp ? user.pfp : defaultAvatar,
+                text: user.username,
+                id: user._id,
+                type: 'user'
+            });
+        }
     }, [isAuthenticating, isAuthenticated, user]);
 
     const {addNotification} = useNotification();
@@ -50,6 +67,10 @@ function CreateEvent(){
         setStep(step+1);
         setFinishedStep(step+1);
     }
+
+    useEffect(()=>{
+        console.log(info);
+    }, [info])
 
     const renderStep = () => {
         switch(step){
@@ -75,14 +96,34 @@ function CreateEvent(){
     const onSubmit = async () => {
         const location1 = info.location;
         console.log(location1);
-        const formattedInfo = {
-            ...info,
-            image:null
+        let formattedInfo = {
+            ...info
         }
-        const response = await createEvent(formattedInfo);
-        if(response){
-            // addNotification({title: "Event created", message: "Your event has been created", type: "success"});
+        if (alias.text !== user.username){
+            formattedInfo = {
+                ...formattedInfo,
+                orgId: alias.id,
+            }
+        }
 
+        // Create FormData if we have an image
+        const formData = new FormData();
+        if (info.selectedFile) {
+            console.log('Uploading image');
+            formData.append('image', info.selectedFile);
+        }
+
+        // Append all other event data
+        Object.keys(formattedInfo).forEach(key => {
+            if (key !== 'selectedFile' && key !== 'image') {
+                formData.append(key, formattedInfo[key]);
+            }
+        });
+
+        const response = await createEvent(formData);
+
+        if(response){
+            addNotification({title: "Event created", message: "Your event has been created successfully", type: "success"});
         } else {
             addNotification({title: "Failed to create event", message: "An error occurred while creating your event", type: "error"});
         }

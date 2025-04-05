@@ -1,17 +1,14 @@
-import axios from 'axios';
+import postRequest from '../../utils/postRequest';
 
-const createEvent = async (body) => {
-    try{
-        const response = await axios.post('/create-event', body , {
-            headers: {
-                'Authorization': `Bearer ${localStorage.getItem('token')}`,
-            }
-        });
-        return response.data;
+export const createEvent = async (eventData) => {
+    try {
+        const response = await postRequest('/create-event', eventData);
+        if (response.success) {
+            return response;
+        }
+        return null;
+    } catch (error) {
+        console.error('Error creating event:', error);
+        return null;
     }
-    catch(error){
-        throw error;
-    }
-}
-
-export { createEvent };
+};

@@ -68,12 +68,14 @@ function ProfilePicture(){
                         <p>Settings</p>
                     </div>
                 </Link>
-                <Link  to="/create-org">
-                    <div className="menu-item" >
-                        <img className="icon" src={Settings} alt="settings" />
-                        <p>Create an Org</p>
-                    </div>
-                </Link>
+                {user && (user.roles.includes('admin')) && 
+                    <Link  to="/create-org">
+                        <div className="menu-item" >
+                            <img className="icon" src={Settings} alt="settings" />
+                            <p>Create an Org</p>
+                        </div>
+                    </Link>
+                }
                 {user && (user.roles.includes('admin')||user.roles.includes('oie')) && 
                     <>
                         <hr />
@@ -122,6 +124,26 @@ function ProfilePicture(){
                             }
                         )}
 
+                    </>
+                }
+                {
+                    user && user.approvalRoles.length > 0 && 
+                    <>
+                        <hr/>
+                        <p className="section">APPROVALS</p>
+                        {user.approvalRoles.map(
+                            (role)=>{
+                                const url = role === 'root' ? '/root-dashboard' : `/approval-dashboard/${role}` 
+                                return(
+                                    <Link to={`${url}`}>
+                                        <div className="menu-item">
+                                            <img className="icon" src={Stats} alt="" />
+                                            <p>{role}</p>
+                                        </div>
+                                    </Link>
+                                )
+                            }
+                        )}
                     </>
                 }
                 <hr />

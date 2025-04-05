@@ -19,7 +19,7 @@ const eventSchema = new mongoose.Schema({
     hostingType: {
         type: String,
         required: true,
-        enum: ['User', 'Club']
+        enum: ['User', 'Org']
     },
     going:{
         type:Array,
@@ -39,7 +39,7 @@ const eventSchema = new mongoose.Schema({
     },
     description:{
         type:String,
-        required:false,
+        required:false, 
     },
     image:{
         type:String,
@@ -57,19 +57,15 @@ const eventSchema = new mongoose.Schema({
         type:Number,
         required:true,
     },
-    OIEStatus:{
+    approvalReference:{
+        type: Schema.Types.ObjectId,
+        ref: 'ApprovalInstance'
+    },
+    status:{
         type:String,
         required:true,
-        enum: ['Pending', 'Approved', 'Rejected', 'Not Applicable'],
-        default: 'Not Applicable'
-    },
-    OIEReference: {
-        type: Schema.Types.ObjectId,
-        ref: 'OIEStatus'
-    },
-    OIEAcknowledgementItems: {
-        type: Array,
-        default: []
+        enum: ['approved', 'pending', 'rejected', 'not-applicable'],
+        default: 'not-applicable'
     },
     contact:{
         type:String,
@@ -79,6 +75,4 @@ const eventSchema = new mongoose.Schema({
     timestamps: true // automatically adds 'createdAt' and 'updatedAt' fields
 });
 
-const Event = mongoose.model('Event', eventSchema , 'events');
-
-module.exports = Event;
+module.exports = eventSchema;

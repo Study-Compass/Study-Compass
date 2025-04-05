@@ -130,13 +130,13 @@ function Room() {
     },[roomid]);
 
     function changeURL(option) {
-        navigate(`/room/${option}`);
+        navigate(`/room/${encodeURI(option)}`);
         fetchData(roomIds[option]);
         setContentState("calendarSearchResult");
     }
 
     function changeURL2(option) {
-        navigate(`/room/${option}`);
+        navigate(`/room/${encodeURI(option)}`);
         fetchData(roomIds[option]);
         setContentState("classroom");
     }
@@ -278,6 +278,7 @@ function Room() {
         //     setContentState("calendarSearch");  
         // }
      // eslint-disable-next-line react-hooks/exhaustive-deps
+     console.log(query);
     }, [query])
 
     useEffect(() => {
@@ -342,6 +343,10 @@ function Room() {
     },[numLoaded]);
 
     const handleFreeNow = async () => {
+        if(freeNow){
+            setFreeNow(false);
+            return;   
+        }
         const query = fetchFreeNow();
         allPurposeFreeNow(query);
         setFreeNow(true);
@@ -351,6 +356,14 @@ function Room() {
         //if weekend
         if(new Date().getDay() === 0 || new Date().getDay() === 6){
             handleFreeNow();
+            return;
+        }
+        if(freeNow){
+            setFreeNow(false);
+            //remove query
+            clearQuery();
+            setContentState("empty");
+            return;
         }
         const now = new Date();
         const day = now.getDay();
@@ -391,7 +404,7 @@ function Room() {
                                 givenRoom={recommendedRoom}
                             />
                         }
-                        <SearchBar data={rooms} onEnter={changeURL2} room={contentState === "classroom" || contentState === "calendarSearchResult" ? roomName : searchQuery } onX={onX} onSearch={onSearch} query={searchQuery} onBlur={setSearchFocus} />
+                        <SearchBar data={rooms} addQuery={addQuery} onEnter={changeURL2} room={contentState === "classroom" || contentState === "calendarSearchResult" ? roomName : searchQuery } onX={onX} onSearch={onSearch} query={searchQuery} onBlur={setSearchFocus} />
                         {contentState === "classroom" || contentState === "calendarSearchResult"  ? 
                             <Classroom  
                                 room={room} 

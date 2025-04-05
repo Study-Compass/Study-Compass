@@ -22,16 +22,17 @@ const getMonthName = (month) => {
     return months[month - 1];
 };
 
-
-function Month({ height, changeToWeek }) {
-    const [month, setMonth] = useState(12);
-    const [year, setYear] = useState(2024);
-    const url = `/get-events-by-month?month=${month}&year=${year}`;
+function Month({ height, changeToWeek, filter}) {
+    const [month, setMonth] = useState(2);
+    const [year, setYear] = useState(2025);
+    const filterParam = encodeURIComponent(JSON.stringify(filter));
+    const url = `/get-events-by-month?month=${month}&year=${year}&filter=${filterParam}`;
     const events = useFetch(url);
     const daysInMonth = getDaysInMonth(month, year); // Total days in the given month
     const firstDayOfWeek = getFirstDayOfWeek(month, year); // Starting weekday
     const currentMonth = new Date().getMonth() + 1;
     const currentYear = new Date().getFullYear();
+    const currentDay = new Date().getDate();
 
     const emptyCells = Array.from({ length: firstDayOfWeek }, (_, i) => (
         <div key={`empty-${i}`} className="calendar__day is-disabled"></div>
@@ -47,7 +48,7 @@ function Month({ height, changeToWeek }) {
 
     const dayCells = Array.from({ length: daysInMonth }, (_, i) => (
         <div key={`day-${i}`} className="calendar__day">
-            <div className="day-header">
+            <div className={`day-header ${i + 1 === currentDay && month === currentMonth && year === currentYear ? "is-today" : ""}`}>
                 <p>{i + 1}</p>
             </div>
             <div className="events">
@@ -72,9 +73,6 @@ function Month({ height, changeToWeek }) {
         rows.push(allCells.slice(i, i + 7));
     }
 
-    useEffect(() => {
-        console.log(month);
-    }, [month]);
 
     const nextMonth = () => {
         setMonth(month === 12 ? 1 : month + 1);
@@ -106,7 +104,7 @@ function Month({ height, changeToWeek }) {
             </div>
             <div className="month" style={{ height: `${height}px` }}>
                 <div className="calendar-header">
-                    {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
+                    {["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"].map((day) => (
                         <div key={day} className="day">
                             <p>{day}</p>
                         </div>

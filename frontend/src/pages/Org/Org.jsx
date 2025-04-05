@@ -3,14 +3,17 @@ import rpiLogo from "../../assets/Icons/rpiLogo.svg";
 import person from "../../assets/Icons/Profile.svg";
 import calendar from "../../assets/Icons/Calendar.svg";
 import locate from "../../assets/Icons/Locate.svg";
+import profile from "../../assets/Icons/Profile2.svg";
 
 import Header from '../../components/Header/Header';
 
 
 import './Org.scss';
 
-const Org = ({}) => {
-    // console.log(org);
+const Org = ({ org }) => {
+    // const { overview, members, followers } = org;
+    
+    console.log(org);
     return (
         <div className="org-page page">
             <Header />
@@ -25,7 +28,8 @@ const Org = ({}) => {
                 <div className="org-info">
 
                     <div className="org-header">
-                        {/* <h2 className="name">{org.overview.org_name}</h2> */}
+                        <h2 className="name">{org.overview.org_name}</h2>
+                        {/* <h2 className="name"> Name </h2> */}
                         <div className="status">Union Recognized</div>
                     </div>
 
@@ -35,7 +39,12 @@ const Org = ({}) => {
                     <p className="stats">
                         <img src = {person} alt =""/>
                         250 followers • 50 members
+                        
+                        <img src = {profile} className='mutuals' alt =""/>
+                        <img src = {profile} alt =""/>
+                        Friend and 1 other are members
                     </p>
+                    
                     <div className="actions">
                         <button>Join</button>
                         <button>Follow</button>
@@ -60,7 +69,7 @@ const Org = ({}) => {
                 </div> */}
 
                 <div className="meeting-schedule">
-                    <h3>Meetings Schedule</h3>
+                    <h3>meetings schedule</h3>
                     <div className="meeting-card">
                         <div className='title'>
                             <img src={rpiLogo} alt="" className='logo'/>

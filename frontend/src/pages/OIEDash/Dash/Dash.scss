@@ -1,5 +1,5 @@
-.dash{
-    height: 100%;
+.oie-dash .dash{
+    height: 100vh;
     width:100%;
     padding:20px;
     box-sizing: border-box;
@@ -8,9 +8,10 @@
     flex-direction: column;
     gap:10px;
     transition: padding 1s ease-in-out;
+    max-height:100vh;
 
     &.maximized{
-        padding:5px;
+        padding:20px;
     }
 
     header.header{
@@ -19,7 +20,6 @@
         border-radius: 13px;
         overflow: hidden;
         display:flex;
-        align-items: center;
         h1{
             z-index: 2;
             padding-left:13%;
@@ -37,20 +37,22 @@
         flex-direction: column;
         h1{
             font-size: 20px;
-            margin-left:10px;
-            margin-bottom:5px;
+            margin: 0;
         }
         .approval-header{
             display: flex;
             gap: 15px;
+            align-items: center;
+            box-sizing: border-box;
+            padding:0 10px;
             button{
                 font-family: 'Inter';
-                font-size: 14px;
+                font-size: 13px;
                 outline:none;
                 border-radius: 8px;
                 border:none;
                 font-weight: 600;
-                padding: 5px 25px;
+                padding: 3px 18px;
                 cursor: pointer;
                 height:fit-content;
             }
@@ -63,6 +65,25 @@
 
             &::-webkit-scrollbar {
                 height:6px;
+            }
+        }
+    }
+    .week-container{
+        display: flex;
+        gap: 10px;
+        flex-direction: column;
+        flex-grow:1;
+        // max-height:60%;
+        // overflow-y:hidden;
+        .header .time-period{
+            display: flex;
+            justify-content: space-between;
+            box-sizing: border-box;
+            padding: 0 10px;
+            align-items: center;
+            h1{
+                margin: 0;
+                font-size:20px
             }
         }
     }

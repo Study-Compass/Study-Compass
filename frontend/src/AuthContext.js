@@ -100,7 +100,7 @@ export const AuthProvider = ({ children }) => {
         localStorage.removeItem('token');
         setIsAuthenticated(false);
         setUser(null);
-        addNotification({title: 'Logged out successfully',success: 'success'});
+        addNotification({title: 'Logged out successfully',type: 'success'});
     };
 
     const getDeveloper = async () => {

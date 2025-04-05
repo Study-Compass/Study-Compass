@@ -6,4 +6,4 @@ const RepeatedVisitSchema = new mongoose.Schema({
     hash: { type: String, required: true },
 });
 
-module.exports = mongoose.model('RepeatedVisit', RepeatedVisitSchema);
+module.exports = RepeatedVisitSchema;

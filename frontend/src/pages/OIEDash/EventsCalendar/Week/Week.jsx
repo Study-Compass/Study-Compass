@@ -2,42 +2,66 @@ import React, { useEffect, useState } from 'react';
 import { Icon } from '@iconify-icon/react/dist/iconify.mjs';
 import { useFetch } from '../../../../hooks/useFetch';
 import './Week.scss';
-import WeekComponent from '../../../../components/NewCalendar/WeekComponent/WeekComponent';
+import WeeklyCalendar from './WeeklyCalendar/WeeklyCalendar';
 
-function Week({height, changeToDay, start='2024-12-01'}){
-    console.log(start);
-    //get end date
-    const end = new Date(start);
-    end.setDate(end.getDate() + 6);
-    const url = `/get-events-by-range?start=${encodeURIComponent(start)}&end=${encodeURIComponent(end)}`;
-    const events = useFetch(url);
+function Week({ height, changeToDay, start = '2025-1-26', startingText = "", nav=true , filter}) {
+    const initialStartDate = typeof start === 'string' ? new Date(start) : start;
+    const initialEndDate = new Date(initialStartDate);
+    initialEndDate.setDate(initialEndDate.getDate() + 6);
+    initialEndDate.setHours(23, 59, 59, 999);
 
-    useEffect(() => {
-        console.log(events);
-    }, [events]);
+    const [startOfWeek, setStartOfWeek] = useState(initialStartDate);
+    const [endOfWeek, setEndOfWeek] = useState(initialEndDate);
 
     const formattedDate = (date) => {
-        const d = new Date(date);
-        return `${d.toDateString().split(" ")[1]} ${d.toDateString().split(" ")[2]}`;
-    }
+        return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    };
 
-    return(
+    const updateWeek = (days) => {
+        setStartOfWeek((prev) => {
+            const newStart = new Date(prev);
+            newStart.setDate(newStart.getDate() + days);
+            return newStart;
+        });
+
+        setEndOfWeek((prev) => {
+            const newEnd = new Date(prev);
+            newEnd.setDate(newEnd.getDate() + days);
+            newEnd.setHours(23, 59, 59, 999);
+            return newEnd;
+        });
+    };
+
+    const filterParam = encodeURIComponent(JSON.stringify(filter));
+
+    const url = `/get-events-by-range?start=${encodeURIComponent(startOfWeek.toISOString())}&end=${encodeURIComponent(endOfWeek.toISOString())}&filter=${filterParam}`;
+    const events = useFetch(url);
+
+
+
+    return (
         <>
             <div className="header">
                 <div className="time-period">
-                    <div className="arrows">
-                        <Icon icon="charm:chevron-left" />
-                        <Icon icon="charm:chevron-right" />
-                    </div>
-                    {/* date formatted <Month Name> <Day Number> */}
-                    <h1>{formattedDate(start)} to {formattedDate(end)}</h1>
+                    {nav &&
+                        <div className="arrows">
+                            <Icon icon="charm:chevron-left" onClick={() => updateWeek(-7)} />
+                            <Icon icon="charm:chevron-right" onClick={() => updateWeek(7)} />
+                        </div>
+                    }
+                    <h1>{startingText}{nav && `${formattedDate(startOfWeek)} to ${formattedDate(endOfWeek)}`}</h1>
                 </div>
             </div>
             <div className="week">
-                <WeekComponent height={height} start={start} events={events} changeToDay={changeToDay}/>
+                <WeeklyCalendar 
+                    events={events.data ? events.data.events : []} 
+                    startOfWeek={startOfWeek} 
+                    height={height} 
+                    dayClick={changeToDay} 
+                />
             </div>
         </>
-    )
+    );
 }
 
 export default Week;

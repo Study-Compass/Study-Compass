@@ -1,9 +1,5 @@
 const express = require('express');
-const User = require('../schemas/user.js');
-const Developer = require('../schemas/developer.js');
 const { verifyToken, verifyTokenOptional, authorizeRoles } = require('../middlewares/verifyToken');
-const Classroom = require('../schemas/classroom.js');
-const Schedule = require('../schemas/schedule.js');
 const cron = require('node-cron');
 const axios = require('axios');
 const { isProfane } = require('../services/profanityFilterService');
@@ -11,10 +7,23 @@ const StudyHistory = require('../schemas/studyHistory.js');
 const { findNext } = require('../helpers.js');
 const { sendDiscordMessage } = require('../services/discordWebookService');
 const BadgeGrant = require('../schemas/badgeGrant');
+const getModels = require('../services/getModelService');
+const { uploadImageToS3, deleteAndUploadImageToS3 } = require('../services/imageUploadService');
+const multer = require('multer');
+const path = require('path');
+
+const upload = multer({
+    storage: multer.memoryStorage(),
+    limits: {
+        fileSize: 5 * 1024 * 1024, // 5 MB
+    },
+});
+
 
 const router = express.Router();
 
 router.post("/update-user", verifyToken, async (req, res) => {
+    const { User } = getModels(req, 'User');
     const { name, username, classroom, recommendation, onboarded } = req.body
     try {
         const user = await User.findById(req.user.userId);
@@ -32,13 +41,14 @@ router.post("/update-user", verifyToken, async (req, res) => {
         console.log(`POST: /update-user ${req.user.userId} successful`);
         return res.status(200).json({ success: true, message: 'User updated successfully' });
     } catch (error) {
-        console.log(`POST: /update-user ${req.user.userId} failed`)
+    console.log(`POST: /update-user ${req.user.userId} failed`)
         return res.status(500).json({ success: false, message: error.message });
     }
 });
 
 // check if username is available
 router.post("/check-username", verifyToken, async (req, res) => {
+    const { User } = getModels(req, 'User');
     const { username } = req.body;
     const userId = req.user.userId;
     try {
@@ -62,6 +72,7 @@ router.post("/check-username", verifyToken, async (req, res) => {
 });
 
 router.post("/check-in", verifyToken, async (req, res) => {
+    const { Classroom, Schedule, StudyHistory } = getModels(req, 'Classroom', 'Schedule', 'StudyHistory');
     const { classroomId } = req.body;
     try {
         //check if user is checked in elsewhere in the checked_in array
@@ -105,6 +116,7 @@ router.post("/check-in", verifyToken, async (req, res) => {
 });
 
 router.get("/checked-in", verifyToken, async (req, res) => {
+    const { Classroom } = getModels(req, 'Classroom');
     try {
         const classrooms = await Classroom.find({ checked_in: { $in: [req.user.userId] } });
         console.log(`GET: /checked-in ${req.user.userId} successful`)
@@ -116,6 +128,7 @@ router.get("/checked-in", verifyToken, async (req, res) => {
 });
 
 router.post("/check-out", verifyToken, async (req, res) => {
+    const { Classroom, Schedule, User, StudyHistory } = getModels(req, 'Classroom', 'Schedule', 'User', 'StudyHistory');
     const { classroomId } = req.body;
     try {
         const classroom = await Classroom.findOne({ _id: classroomId });
@@ -161,6 +174,7 @@ router.post("/check-out", verifyToken, async (req, res) => {
 });
 
 router.get("/get-developer", verifyToken, async (req, res) => {
+    const { Developer } = getModels(req, 'Developer');
     try {
         const developer = await Developer.findOne({ user_id: req.user.userId });
         console.log(`GET: /get-developer ${req.user.userId} successful`);
@@ -176,6 +190,7 @@ router.get("/get-developer", verifyToken, async (req, res) => {
 });
 
 router.post("/update-developer", verifyToken, async (req, res) => {
+    const { Developer, User } = getModels(req, 'Developer', 'User');
     const { type, commitment, goals, skills } = req.body;
     try {
         const developer = await Developer.findOne({ userId: req.user.userId });
@@ -213,6 +228,7 @@ router.post("/update-developer", verifyToken, async (req, res) => {
 });
 
 router.get("/get-user", async (req, res) => {
+    const { User } = getModels(req, 'User');
     const userId = req.query.userId;
     try {
         const user = await User.findById(userId);
@@ -226,6 +242,7 @@ router.get("/get-user", async (req, res) => {
 
 //route to get mulitple users, specified in array
 router.get("/get-users", async (req, res) => {
+    const { User } = getModels(req, 'User');
     const userIds = req.query.userIds;
     try {
         const users = await User.find({ _id: { $in: userIds } });
@@ -238,6 +255,7 @@ router.get("/get-users", async (req, res) => {
 });
 
 router.post('/create-badge-grant', verifyToken, authorizeRoles('admin'), async (req, res) => {
+    const { BadgeGrant } = getModels(req, 'BadgeGrant');
     try {
         const { badgeContent, badgeColor, daysValid } = req.body;
 
@@ -272,6 +290,7 @@ router.post('/create-badge-grant', verifyToken, authorizeRoles('admin'), async (
 });
 
 router.post('/grant-badge', verifyToken, async (req, res) => {
+    const { BadgeGrant, User } = getModels(req, 'BadgeGrant', 'User');
     try {
         const { hash } = req.body;
         const userId = req.user.userId;
@@ -315,5 +334,40 @@ router.post('/grant-badge', verifyToken, async (req, res) => {
     }
 });
 
+
+router.post("/upload-user-image", verifyToken, upload.single('image'), async (req, res) =>{
+    const { User } = getModels(req, 'User');
+    const file = req.file;
+    console.log('uploading user image');
+    if(!file){
+        console.log(`POST: /upload-user-image ${req.user.userId} no file uploaded`)
+        return res.status(400).json({ success: false, message: 'No file uploaded' });
+    }
+    try{
+        const user = await User.findById(req.user.userId);
+        let imageUrl;
+        if(!user.picture){
+            // For new images, use user ID and timestamp in filename
+            const fileExtension = path.extname(file.originalname);
+            const timestamp = Date.now();
+            const fileName = `${req.user.userId}-${timestamp}${fileExtension}`;
+            imageUrl = await uploadImageToS3(file, "users", fileName);
+            user.picture = imageUrl;
+        } else {
+            // For replacing existing images, use user ID and timestamp in filename
+            const fileExtension = path.extname(file.originalname);
+            const timestamp = Date.now();
+            const fileName = `${req.user.userId}-${timestamp}${fileExtension}`;
+            imageUrl = await deleteAndUploadImageToS3(file, "users", user.picture, fileName);
+            user.picture = imageUrl;
+        }
+        await user.save();
+        console.log(`POST: /upload-user-image ${req.user.userId} successful`);
+        return res.status(200).json({ success: true, message: 'Image uploaded successfully', imageUrl });
+    } catch(error){
+        console.log(`POST: /upload-user-image ${req.user.userId} failed, ${error}`)
+        return res.status(500).json({ success: false, message: 'Internal server error', error });
+    }
+});
 
 module.exports = router;

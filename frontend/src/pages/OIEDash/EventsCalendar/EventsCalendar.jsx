@@ -3,17 +3,17 @@ import Switch from '../../../components/Switch/Switch';
 import './EventsCalendar.scss';
 import Month from './Month/Month';
 import Week from './Week/Week';
-import { Icon } from '@iconify-icon/react/dist/iconify.mjs';
+import Day from './Day/Day';
+import Filter from '../../../components/Filter/Filter';
+
 
 function EventsCalendar({expandedClass}){
     const [view, setView] = useState(0); //0: month, 1: week:, 2: day, 3: list
     const [contentHeight, setContentHeight] = useState(100);
-    const [start, setStart] = useState("2024-12-01");
+    const [start, setStart] = useState("2025-2-2");
+    const [selected, setSelected] = useState("2025-2-5");
     const contentRef = useRef(null);
-
-    useEffect(() => {
-        console.log(start);
-    }, [start]);
+    const [filter, setFilter] = useState({type: "all"});
 
     useEffect(() => {
         if(contentRef.current){
@@ -30,19 +30,26 @@ function EventsCalendar({expandedClass}){
 
     const changeToDay = (day) => {
         console.log(day);
+        setSelected(day);
         setView(2);
-    } 
+    }
 
     return (
         <div className={`events-calendar ${expandedClass}`}>
-            <Switch options={["month", "week", "day", "list"]} onChange={setView} selectedPass={view} setSelectedPass={setView}/>
+            <div className="top-bar">
+                <Switch options={["month", "week", "day", "list"]} onChange={setView} selectedPass={view} setSelectedPass={setView}/>
+                <Filter options={["all", "study", "campus", "social", "club", "meeting", "sports"]} selected={filter.type} setSelected={(type)=>setFilter({...filter, type})} label={"filter"}/>
+            </div>
 
             <div className="content" ref={contentRef}>
                 {
-                    view === 0 && <Month height={contentHeight} changeToWeek={changeToWeek} view={view} setView={setView}/>
+                    view === 0 && <Month height={contentHeight} changeToWeek={changeToWeek} view={view} setView={setView} filter={filter}/>
                 }
                 {
-                    view === 1 && <Week height={contentHeight} changeToDay={changeToDay} start={start}/>
+                    view === 1 && <Week height={contentHeight} changeToDay={changeToDay} start={start} filter={filter}/>
+                }
+                {
+                    view === 2 && <Day height={contentHeight} start={selected} filter={filter}/>
                 }
 
             </div>

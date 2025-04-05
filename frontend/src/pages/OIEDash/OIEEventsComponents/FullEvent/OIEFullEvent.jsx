@@ -7,6 +7,14 @@ import MockPoster from '../../../../assets/MockPoster.png';
 import { useFetch } from '../../../../hooks/useFetch';
 import { useNotification } from '../../../../NotificationContext';
 import axios from 'axios';
+import defaultAvatar from '../../../../assets/defaultAvatar.svg';
+
+const acknowledgements = {
+    'pspeak' : 'This event is asking the President to speak',
+    'people' : 'This event has over 100 people expected to attend',
+    'alumni' : 'This event is planning to have an alumni speaker',
+    'catering' : 'This event requires catering',
+}
 
 function OIEFullEvent({ event, eventId = null, setEdited }){
     const { addNotification } = useNotification();
@@ -37,11 +45,45 @@ function OIEFullEvent({ event, eventId = null, setEdited }){
         changeOIE(newOIE);
     }
 
+
     const handleApproved = async (status) => {
         const newOIE = {...fullEvent.data.event.OIE};
         newOIE.status = status ? "Approved" : "Rejected";
         changeOIE(newOIE);
         fullEvent.refetch();
+    }
+
+    const renderHostingStatus = () => {
+        let hostingImage = '';
+        let hostingName = '';
+        let level = '';
+        if(!event.hostingType){
+            return;
+        }
+        if(event.hostingType === "User"){
+            hostingImage = event.hostingId.image ? event.hostingId.image : defaultAvatar;
+            hostingName = event.hostingId.name;
+            if(event.hostingId.roles.includes("developer")){
+                level = "Developer";
+            } else if(event.hostingId.roles.includes("oie")){
+                level = "Faculty";
+            } else {
+                level = "Student";
+            }
+        } else {
+            hostingImage = event.hostingId.org_profile_image;
+            hostingName = event.hostingId.org_name;
+            level = "Organization";
+        }
+        return (
+            <div className={`row hosting ${level.toLowerCase()}`}>
+                <img src={hostingImage} alt="" />
+                <p className="user-name">{hostingName}</p>
+                <div className={`level ${level.toLowerCase()}`}>
+                    {level}
+                </div>
+            </div>
+        );
     }
 
     const changeOIE = async (newOIE) => {
@@ -77,6 +119,8 @@ function OIEFullEvent({ event, eventId = null, setEdited }){
         return "";
     }
 
+    console.log(event.OIEAcknowledgementItems)
+
     return(
         <div className="full-event oie">
             <div className="tabs">
@@ -101,6 +145,9 @@ function OIEFullEvent({ event, eventId = null, setEdited }){
                     <div className="content">
                         <h1>{event.name}</h1>
                         <div className="row">
+                            {renderHostingStatus()}
+                        </div>
+                        <div className="row">
                             <Icon icon="heroicons:calendar-16-solid" />
                             <div className="col">
                                 <p>{date.toLocaleString('default', {weekday: 'long'})}, {date.toLocaleString('default', {month: 'long'})} {date.getDate()}</p>
@@ -122,8 +169,8 @@ function OIEFullEvent({ event, eventId = null, setEdited }){
                                 <div className="row">
                                     <div className={`status-dot ${fullEvent.data.event.OIE.status.toLowerCase()}`}></div>
                                     <h2>{fullEvent.data.event.OIE.status}</h2>
-                                    <button className="accept" onClick={()=>handleApproved(true)}><Icon icon="icon-park-solid:check-one" /> accept</button>
-                                    <button className="reject" onClick={()=>handleApproved(false)}><Icon icon="icon-park-solid:close-one" /> reject</button>
+                                    <button className="accept" onClick={()=>handleApproved(true)}><Icon icon="icon-park-solid:check-one" />approve</button>
+                                    <button className="reject" onClick={()=>handleApproved(false)}><Icon icon="icon-park-solid:close-one" />reject</button>
                                 </div>
                                 <div className="col requirements">
                                     <div className="requirement-header">
@@ -131,12 +178,18 @@ function OIEFullEvent({ event, eventId = null, setEdited }){
                                     </div>
                                     {event.OIEAcknowledgementItems.map((item, index) => (
                                         <div className="requirement" key={index}>
-                                            <p>{item}</p>
+                                            <p>{acknowledgements[item]}</p>
                                         </div>
                                     ))}
+                                    {
+                                        event.expectedAttendance > 100 &&
+                                            <div className="requirement">
+                                                <p>{acknowledgements.people}</p>
+                                            </div>
+                                    }
                                 </div>
                                 <p>Approval requested {new Date(fullEvent.data.event.createdAt).toLocaleString('default', {weekday: 'long'})}, {new Date(fullEvent.data.event.createdAt).toLocaleString('default', {month: 'long'})} {new Date(fullEvent.data.event.createdAt).getDate()}</p>
-                                <p className="contact">contact: jbliu88@gmail.com</p>
+                                <p className="contact">contact: {event.contact}</p>
 
                             </>
                         }

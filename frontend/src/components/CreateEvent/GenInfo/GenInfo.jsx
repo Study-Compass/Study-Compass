@@ -11,9 +11,10 @@ function GenInfo({next, visible, setInfo}){
     const [eventType, setEventType] = useState("");
     const [visibility, setVisibility] = useState("");
     const [expectedAttendance, setExpectedAttendance] = useState("");
+    const [selectedFile, setSelectedFile] = useState(null);
+    const [imagePreview, setImagePreview] = useState(null);
 
     const [nextActive, setNextActive] = useState(false);
-    const [image, setImage] = useState(null);
 
     useEffect(()=>{
         if(title && eventType && description && visibility && expectedAttendance){
@@ -25,17 +26,14 @@ function GenInfo({next, visible, setInfo}){
             description, 
             type: eventType, 
             visibility, 
-            expectedAttendance, 
-            image
+            expectedAttendance,
+            selectedFile // Store the selected file in the info object
         }));
     }
-    ,[title, description, eventType, visibility, image, expectedAttendance]);
+    ,[title, description, eventType, visibility, expectedAttendance, selectedFile]);
 
     const handleChange = (e) => {
         const {name, value} = e.target;
-        console.log(e.target);
-        console.log(name);
-        console.log(value);
         switch(name){
             case "title":
                 setTitle(value);
@@ -58,6 +56,21 @@ function GenInfo({next, visible, setInfo}){
         }
     }
 
+    const handleFileSelect = (file) => {
+        setSelectedFile(file);
+        // Create a preview URL for the image
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            setImagePreview(reader.result);
+        };
+        reader.readAsDataURL(file);
+    };
+
+    const handleFileClear = () => {
+        setSelectedFile(null);
+        setImagePreview(null);
+    };
+
     return(
         <div className={`gen-info create-component ${visible && "visible"}`}>
             <h1>general information</h1>
@@ -76,7 +89,12 @@ function GenInfo({next, visible, setInfo}){
                         <select className="" name="eventType" onChange={handleChange} value={eventType}>
                             <option value="" disabled selected></option>
                             <option value="study">study event</option>
+                            <option value="workshop">workshop</option>
                             <option value="campus">campus event</option>
+                            <option value="social">social event</option>
+                            <option value="club">club event</option>
+                            <option value="meeting">club meeting</option>
+                            <option value="sports">sports event</option>
                         </select>
                     </div>
                     <div className="input-field mandatory">
@@ -107,7 +125,11 @@ function GenInfo({next, visible, setInfo}){
                 <div className="col preview-col">
                     <div className="input-field">
                         <p>Flier</p>
-                        <ImageUpload uploadText="Drag and Drop to Upload" onUpload={setImage}/>
+                        <ImageUpload 
+                            uploadText="Drag and Drop to Upload" 
+                            onFileSelect={handleFileSelect}
+                            onFileClear={handleFileClear}
+                        />
                     </div>
                 </div>
             </div>

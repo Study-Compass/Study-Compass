@@ -33,7 +33,4 @@ const developerSchema = new mongoose.Schema({
 });
 
 
-
-const Developer = mongoose.model('Developer', developerSchema , 'developers');
-
-module.exports = Developer;
+module.exports = developerSchema;
