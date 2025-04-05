@@ -479,11 +479,11 @@ router.post('/check-org-name', verifyToken, async (req, res) => {
 router.post('/send-email', async (req,res) => {
     try{
         
-        const emailHTML = await render(React.createElement(ForgotEmail, { name: "James" }));
+        const emailHTML = await render(React.createElement(ForgotEmail, { name: "James", link: "https://study-compass.com" }));
 
         const { data, error } = await resend.emails.send({
-            from: "Study Compass <whereAreYouStudying@study-compass.com>",
-            to: ["jbliu88@gmail.com"],
+            from: "Study Compass <support@study-compass.com>",
+            to: ["jbliu02@gmail.com"],
             subject: "hello world",
             html: emailHTML,
           });

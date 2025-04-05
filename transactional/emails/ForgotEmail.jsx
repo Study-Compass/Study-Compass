@@ -1,8 +1,8 @@
 import React from "react";
-import { Html, Section, Row, Text, Column, Img, Container, Font, Button} from "@react-email/components";
+import { Html, Section, Row, Text, Column, Img, Container, Font, Button, Head } from "@react-email/components";
 import { text } from "stream/consumers";
 
-const MyEmail = ({ name }) => {
+const MyEmail = ({ name, link }) => {
     const textStyles = {
         fontSize: 16,
         lineHeight: "24px",
@@ -11,11 +11,11 @@ const MyEmail = ({ name }) => {
     };
     return (
   <Html style={{margin:0,width:'100%'}}>
-    <Section style={{margin:0,padding:'30px 0px',width:'100%',height:'100%',backgroundColor:"#F0F2F3"}}>
-        <Section style={{ textAlign: 'center', margin:'auto', maxWidth:'600px',backgroundColor:'#FFFFFF',borderRadius:10,overflow:'hidden' }}>
+    <Section style={{margin:0,padding:'30px 0px',width:'100%',height:'100%',backgroundColor:"#F0F2F3"}} className="email-container">
+        <Section style={{ textAlign: 'center', margin:'auto', maxWidth:'600px',backgroundColor:'#FFFFFF',borderRadius:10,overflow:'hidden' }} className="email-content">
             <Row>
                 <Img 
-                    src="https://studycompass.s3.us-east-1.amazonaws.com/Header.png"
+                    src="https://studycompass.s3.us-east-1.amazonaws.com/email/Header.png"
                     style={{
                         width: "100%",
                         objectFit: "cover",
@@ -49,7 +49,7 @@ const MyEmail = ({ name }) => {
                         To reset your password, please click on the link below:
                         </Text>
                         <Button
-                            href="https://react.email"
+                            href={link}
                             style={{
                                 width: "60%",
                                 boxSizing: "border-box",
@@ -58,12 +58,14 @@ const MyEmail = ({ name }) => {
                                 textAlign: "center",
                                 backgroundColor: "#FA756D",
                                 color: "white",
+                                textDecoration: "none",
+                                fontSize: 17,
                             }}
                             >
                                 reset password
                         </Button>
                         <Text style={textStyles}>
-                        For security reasons, this link will expire in 30 minutes. If you didn’t request this password reset, you can safely ignore this email.
+                        For security reasons, this link will expire in 30 minutes. If you didn't request this password reset, you can safely ignore this email.
                         </Text>
                         <Text style={textStyles}>
                             Happy Studying!
