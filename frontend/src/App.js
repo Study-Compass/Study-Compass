@@ -24,6 +24,8 @@ import CreateOrg from './pages/CreateOrg/CreateOrg';
 import ClubDash from './pages/ClubDash/ClubDash';
 import OrgDisplay from './pages/Org/OrgDisplay';
 import RootDash from './pages/RootDash/RootDash';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './AuthContext';
 import { CacheProvider } from './CacheContext';
@@ -114,6 +116,8 @@ function App() {
                                             <Route path="/room1/:roomid" element={<Room1 />}/>
                                             <Route path="/register" element={<Register />}/>
                                             <Route path="/login" element={<Login />}/>
+                                            <Route path="/forgot-password" element={<ForgotPassword />}/>
+                                            <Route path="/reset-password" element={<ResetPassword />}/>
                                             <Route path="*" element={<Error />}/>
                                             <Route path="/error/:errorCode" element={<Error />}/>
                                             <Route path="/landing" element={<Landing/>}/>

@@ -656,11 +656,64 @@ router.post("/check-org-name", verifyToken, async (req, res) => {
                 .json({ success: false, message: "Org name already exists" });
         }
         console.log(`POST: /org-name-check`);
-        return res.json({ success: true, message: 'Org name is available' });
-    } catch (error){
-        console.log('POST: /org-name-check failed', error);
-        return res.status(500).json({ success: false, message: 'Error checking org name', error: error.message });
+        return res.json({ success: true, message: "Org name is available" });
+    } catch (error) {
+        console.log("POST: /org-name-check failed", error);
+        return res
+            .status(500)
+            .json({
+                success: false,
+                message: "Error checking org name",
+                error: error.message,
+            });
     }
 });
+
+router.get('/get-meetings/:name', verifyToken, async(req,res)=>{
+    const { Org, Event } = getModels(req, "Org", "Event");
+    const name = req.params.name;
+    try {
+        const org = await Org.find({name:name});
+        const events = await Event.find({hosting: org._id, type: "meeting"});
+        console.log(`GET: /get-meetings`);
+        res.json({
+            success: true,
+            message: "Meetings retrieved successfully",
+            events,
+        });
+    } catch (error) {
+        console.log(`GET: /get-meetings failed`, error);
+        return res
+            .status(500)
+            .json({
+                success: false,
+                message: "Error retrieving meetings",
+                error: error.message,
+            });
+    }
+});
+
+router.post('/send-email', async (req,res) => {
+    try{
+        
+        const emailHTML = await render(React.createElement(ForgotEmail, { name: "James", link: "https://study-compass.com" }));
+
+        const { data, error } = await resend.emails.send({
+            from: "Study Compass <support@study-compass.com>",
+            to: ["jbliu02@gmail.com"],
+            subject: "hello world",
+            html: emailHTML,
+          });
+        if(error){
+            console.log('POST: email sending error', error);
+            return res.status(500).json({ success: false, message: 'Error sending email', error: error.message });
+        }
+        res.status(200).json({ success: true, message: 'Email sent successfully', data });
+    } catch (error){
+        console.log('POST: email sending error');
+        res.status(500).json({ success: false, message: 'Error sending email', error: error.message });
+    }
+});
+
 
 module.exports = router;
