@@ -76,7 +76,7 @@ function ResetPassword() {
                 // Redirect to login after 3 seconds
                 setTimeout(() => {
                     navigate('/login');
-                }, 3000);
+                }, 2000);
             }
         } catch (error) {
             console.error('Error resetting password:', error);
@@ -91,7 +91,7 @@ function ResetPassword() {
         }
     };
 
-    if (true) {
+    if (isReset) {
         return (
             <div className="main-login">
                 <div className="block"></div>
