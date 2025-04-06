@@ -73,17 +73,21 @@
         flex-direction: column;
         flex-grow:1;
         padding:20px;
+        box-sizing: border-box;
         // max-height:60%;
         // overflow-y:hidden;
-        .header .time-period{
-            display: flex;
-            justify-content: space-between;
-            box-sizing: border-box;
-            padding: 0 10px;
-            align-items: center;
-            h1{
-                margin: 0;
-                font-size:20px
+        .weekly-header {
+            height:30px;
+            .time-period{
+                display: flex;
+                justify-content: space-between;
+                box-sizing: border-box;
+                padding: 0 10px;
+                align-items: center;
+                h1{
+                    margin: 0;
+                    font-size:20px;
+                }
             }
         }
     }

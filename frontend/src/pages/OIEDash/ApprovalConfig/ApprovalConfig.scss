@@ -14,8 +14,13 @@
         padding: 20px;
 
     }
+    .approval-container{
+        padding:0px 40px;
+        display: flex;
+        flex-direction: column;
+        gap:10px;
+    }
     .config-content{
-        margin:0 20px 20px 20px;
         display: flex;
         flex-direction: column;
         border: 1px solid var(--lighterborder);
@@ -31,7 +36,22 @@
             justify-content: space-between;
             background-color: var(--background);
             border-bottom: 1px solid var(--lighterborder);
-
+            .row{
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                h2{
+                    font-size: 16px;
+                    margin: 0;
+                    font-family: "Satoshi";
+                    font-weight: 400;
+                    color: var(--lighter-text);
+                }
+                iconify-icon{
+                    font-size:18px;
+                    color: var(--text);
+                }
+            }
             select{
                 font-size:13px;
                 font-family: 'Satoshi';

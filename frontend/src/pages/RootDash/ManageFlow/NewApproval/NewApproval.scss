@@ -1,63 +1,81 @@
-.new-approval{
-    width:100%;
-    height:500px;
+.new-approval {
     display: flex;
     flex-direction: column;
-    border: 1px solid var(--lighterborder);
-    background-color: var(--background);
-    border-radius: 10px;
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
     box-sizing: border-box;
-    overflow: hidden;
-    .header{
-        display: flex;
-        width:100%;
-        padding: 10px 15px;
+}
+
+.header {
+    margin-bottom: 20px;
+    
+    h2 {
+        font-size: 24px;
+        font-weight: 700;
+        margin: 0 0 5px 0;
+        color: var(--text);
+    }
+    
+    p {
+        font-size: 16px;
+        color: var(--border);
+        margin: 0;
+    }
+}
+
+.content {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 100%;
+}
+
+.field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    
+    label {
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--text);
+    }
+    
+    input.short {
+        height: 40px;
+        border-radius: 8px;
+        border: 1px solid var(--lightborder);
+        padding: 0 12px;
+        font-size: 16px;
         background-color: var(--background);
-        display: flex;
-        flex-direction: column;
-
-        h2{
-            margin: 0;
-            font-family: 'Satoshi';
-            font-size:22px;
+        color: var(--text);
+        
+        &:focus {
+            outline: none;
+            border-color: var(--border);
         }
-        p{
-            font-family: 'Satoshi';
-            font-size: 15px;
-            color:var(--lighter-text);
-        }
-
     }
-    .flag{
-        padding:10px;
-        font-size:14px;
-        width: calc(100% - 20px);
-        margin:auto;
-        margin-top:5px;
-        margin-bottom:5px;
+}
+
+.submit-button {
+    margin-top: 10px;
+    height: 45px;
+    border-radius: 8px;
+    background-color: var(--primary);
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    
+    &:hover {
+        // background-color: darken(var(--red), 10%);
     }
-    .content{
-        padding: 5px 15px;
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-        .field{
-            display: flex;
-            flex-direction: column;
-            box-sizing: border-box;
-            gap: 5px;
-            label{
-                font-family: 'Inter';
-                font-weight:700;
-                font-size:14px;
-                color: var(--text);
-                margin-left:5px;
-            }
-            input{
-                &.short{
-                    width:200px;
-                }
-            }
-        }
+    
+    &:focus {
+        outline: none;
     }
 }

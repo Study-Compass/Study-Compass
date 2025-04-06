@@ -15,7 +15,7 @@
             font-family: 'Inter';
             font-weight: 600;
             color: var(--text);
-            font-size: 17px;
+            font-size: 15px;
         }
     }
     .select-options{
@@ -39,16 +39,25 @@
             font-family: 'Inter';
             font-weight:600;
             border-radius: 4px;
-            font-size:17px;
+            font-size:15px;
             -webkit-user-select: none;
             user-select: none;
             color: var(--text);
+            text-wrap: nowrap;
             &:hover{
                 background-color: var(--lighter);
             }
             &.selected{
                 background-color: var(--red-transparent);
                 color: var(--red);
+            }
+            &.placeholder{
+                // background-color: var(--lighter);
+                color: var(--darkborder);
+                pointer-events: none;
+                &:hover{
+                    background-color: transparent;
+                }
             }
         }
 

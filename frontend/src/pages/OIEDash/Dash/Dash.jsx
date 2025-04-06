@@ -23,7 +23,7 @@ function Dash({expandedClass, change, name}){
                 if(weeklyRef.current){
                 setHeight(weeklyRef.current.clientHeight);
                 }
-            }, 1000);
+            }, 100);
         }
     }, [weeklyRef]);
 
@@ -90,7 +90,7 @@ function Dash({expandedClass, change, name}){
             <div className="week-container" ref={weeklyRef}>    
                 {
                     height !== 0 &&
-                    <Week changeToDay={changeToDay} startingText='this week at a glance' nav={false} height={height-50} start={getSunday()} filter={{}}/>
+                    <Week changeToDay={changeToDay} startingText='this week at a glance' nav={false} height={`${height-50-40}px`} start={getSunday()} filter={{}} showSwitch={false}/>
                 }
             </div>
         </div>

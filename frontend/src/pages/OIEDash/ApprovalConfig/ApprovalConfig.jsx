@@ -2,7 +2,7 @@ import React, {useEffect, useState} from 'react';
 import './ApprovalConfig.scss';
 import { useFetch } from '../../../hooks/useFetch';
 import Select from '../../../components/Select/Select';
-
+import { Icon } from '@iconify-icon/react/dist/iconify.mjs';
 const ApprovalConfig = ({ }) => {
     //nuanced search based on login items
     const approvalSteps = useFetch('/get-approval-steps');
@@ -29,32 +29,38 @@ const ApprovalConfig = ({ }) => {
             <div className="header">
                 <h1>Approval Configuration</h1>
             </div>
-            <div className="config-content">
-                <div className="config-header">
-                    <Select
-                        options={steps.map((step, i)=>step.role)}
-                        onChange={onChange}
-                        defaultValue={"Select an approval step"}
-                    />
-                </div>
-                <div className="config-container">
-                    {
-                        selectedStep && 
-                        <div className="config-container-content">
-                            <div className="approval-criteria">
-                                <h2>Approval Criteria</h2>
-                                    {
-                                        Object.keys(selectedStep.criteria).map((criteria, i)=>{
-                                            return(
-                                                <div className="criteria-item" key={i}>
-                                                    <p>{criteria}</p>
-                                                </div>  
-                                            )
-                                        })
-                                    }
-                            </div>
+            <div className="approval-container">
+                <Select
+                    options={steps.map((step, i)=>step.role)}
+                    onChange={onChange}
+                    defaultValue={"Select an approval step"}
+                />
+                <div className="config-content">
+                    <div className="config-header">
+                        <div className='row'>
+                            <Icon icon="mage:wrench-fill" />
+                            <h2>configuration</h2>
                         </div>
-                    }
+                    </div>
+                    <div className="config-container">
+                        {
+                            selectedStep && 
+                            <div className="config-container-content">
+                                <div className="approval-criteria">
+                                    <h2>Approval Criteria</h2>
+                                        {
+                                            Object.keys(selectedStep.criteria).map((criteria, i)=>{
+                                                return(
+                                                    <div className="criteria-item" key={i}>
+                                                        <p>{criteria}</p>
+                                                    </div>  
+                                                )
+                                            })
+                                        }
+                                </div>
+                            </div>
+                        }
+                    </div>
                 </div>
             </div>
         </div>

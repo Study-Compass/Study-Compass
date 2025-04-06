@@ -3,7 +3,7 @@ import './Select.scss';
 import { Icon } from '@iconify-icon/react/dist/iconify.mjs';
 import useOutsideClick from '../../hooks/useClickOutside';
 
-const Select = ({ options, onChange, defaultValue }) => {
+const Select = ({ options, onChange, defaultValue, placeholder = 'Select an option' }) => {
     const [selectedOption, setSelectedOption] = useState(defaultValue);
     const [isOpen, setIsOpen] = useState(false);
 
@@ -30,12 +30,15 @@ const Select = ({ options, onChange, defaultValue }) => {
         <div className="select-container">
             <div className="select-header" onClick={() => setIsOpen(!isOpen)}>
                 <div className="select-header-text">
-                    {selectedOption || 'Select an option'}
+                    {selectedOption || placeholder}
                 </div>
                 <Icon icon="ic:round-keyboard-arrow-down"/>
             </div>
             {isOpen && (
                 <div className="select-options" ref={ref}>
+                    <div className="select-option placeholder">
+                        {placeholder}
+                    </div>
                     {options.map((option, index) => (
                         <div
                             key={index}
