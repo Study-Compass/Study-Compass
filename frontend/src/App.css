@@ -13,6 +13,8 @@
     --lighter-text: #5C5C5C;
     --lightest-text: #B1B1B1;
 
+    --link-blue: rgba(48, 107, 172, 0.80);
+
     --block: #EA8D8D;
     --default-font: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
