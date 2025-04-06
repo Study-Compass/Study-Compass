@@ -55,7 +55,7 @@
     }
 }
 
-// Forgot Password and Reset Password styles
+// Form styles
 .form-title {
     font-size: 24px;
     font-weight: 600;
@@ -72,7 +72,8 @@
 }
 
 .forgot-password-form,
-.reset-password-form {
+.reset-password-form,
+.verify-code-form {
     width: 100%;
     max-width: 400px;
     margin: 0 auto;
@@ -80,21 +81,21 @@
 
 .form-group {
     margin-bottom: 15px;
-}
 
-.form-group label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: 500;
-    color: #414141;
-}
+    label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: 500;
+        color: #414141;
+    }
 
-.form-group input {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 16px;
+    input {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 16px;
+    }
 }
 
 .error-message {
@@ -106,22 +107,22 @@
 .success-message {
     text-align: center;
     padding: 20px;
-}
 
-.success-message h2 {
-    color: #2ecc71;
-    margin-bottom: 10px;
-}
+    h2 {
+        color: #2ecc71;
+        margin-bottom: 10px;
+    }
 
-.success-message p {
-    margin-bottom: 15px;
-    color: #414141;
-}
+    p {
+        margin-bottom: 15px;
+        color: #414141;
+    }
 
-.success-message .note {
-    font-size: 14px;
-    color: #666;
-    font-style: italic;
+    .note {
+        font-size: 14px;
+        color: #666;
+        font-style: italic;
+    }
 }
 
 .form-footer {
@@ -134,11 +135,10 @@
     color: #3498db;
     text-decoration: none;
     font-size: 14px;
-}
 
-.back-to-login:hover,
-.forgot-password-link:hover {
-    text-decoration: underline;
+    &:hover {
+        text-decoration: underline;
+    }
 }
 
 .submit-button {
@@ -152,17 +152,18 @@
     font-weight: 500;
     cursor: pointer;
     transition: background-color 0.3s;
+
+    &:hover {
+        background-color: #e86c64;
+    }
+
+    &:disabled {
+        background-color: #ccc;
+        cursor: not-allowed;
+    }
 }
 
-.submit-button:hover {
-    background-color: #e86c64;
-}
-
-.submit-button:disabled {
-    background-color: #ccc;
-    cursor: not-allowed;
-}
-
+// Verification code styles
 .verification-code-input {
     letter-spacing: 0.5em;
     font-size: 1.5em;
@@ -270,6 +271,7 @@
     }
 }
 
+// Reset password form specific styles
 .reset-password-form {
     width: 100%;
     max-width: 400px;
@@ -305,6 +307,7 @@
     }
 }
 
+// Verify code form specific styles
 .verify-code-form {
     width: 100%;
     max-width: 400px;
