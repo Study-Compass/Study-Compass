@@ -190,12 +190,12 @@ function ForgotPassword() {
                 
                 {!isCodeSent ? (
                     <>
-                        <h2 className="form-title">Forgot Password</h2>
+                        <h2 className="form-title">Forgot Password?</h2>
                         <p className="form-subtitle">
-                            Enter your email address and we'll send you a verification code to reset your password.
+                            No worries! Enter your email address and we'll send you a verification code to reset your password.
                         </p>
                         
-                        <form onSubmit={handleRequestCode} className="forgot-password-form">
+                        <form onSubmit={handleRequestCode} className="forgot-password-form form">
                             <div className="form-group">
                                 <label htmlFor="email">Email Address</label>
                                 <input
@@ -212,7 +212,7 @@ function ForgotPassword() {
                             
                             <button 
                                 type="submit" 
-                                className="submit-button"
+                                className="active button submit-button"
                                 disabled={isSubmitting}
                             >
                                 {isSubmitting ? 'Sending...' : 'Send Verification Code'}

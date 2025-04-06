@@ -157,8 +157,8 @@ function LoginForm() {
                     <input type="password" name="password" value={formData.password} onChange={handleChange} placeholder="Enter your password..." required />
                 </div>
                 <button type="submit" className={`button ${valid ? "active":""}`}>Log In</button>
-                <p className="already">Don't have an account? <Link to="/register" state={{from:location.state?.from || "/room/none"}}>Register</Link></p>
                 <div className="form-footer">
+                    <p className="already">Don't have an account? <Link to="/register" state={{from:location.state?.from || "/room/none"}}>Register</Link></p>
                     <Link to="/forgot-password" className="forgot-password-link">
                         Forgot Password?
                     </Link>

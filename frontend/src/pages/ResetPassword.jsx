@@ -4,6 +4,7 @@ import axios from 'axios';
 import logo from '../assets/red_logo.svg';
 import { useNotification } from '../NotificationContext';
 import './Login.scss';
+import { Icon } from '@iconify-icon/react/dist/iconify.mjs';
 
 function ResetPassword() {
     const [newPassword, setNewPassword] = useState('');
@@ -90,17 +91,17 @@ function ResetPassword() {
         }
     };
 
-    if (isReset) {
+    if (true) {
         return (
             <div className="main-login">
                 <div className="block"></div>
                 <div className="login-container">
                     <img src={logo} alt="Study Compass Logo" className="logo" />
                     <div className="success-message">
-                        <h2>Password Reset Successful</h2>
+                        <h2><Icon icon="icon-park-solid:check-one"/> All done!</h2>
                         <p>Your password has been reset successfully.</p>
                         <p>You will be redirected to the login page in a few seconds.</p>
-                        <Link to="/login" className="submit-button">
+                        <Link to="/login" className="submit-button button active">
                             Go to Login
                         </Link>
                     </div>
@@ -121,7 +122,7 @@ function ResetPassword() {
                     Please enter your new password below.
                 </p>
                 
-                <form onSubmit={handleResetPassword} className="reset-password-form">
+                <form onSubmit={handleResetPassword} className="reset-password-form form">
                     <div className="form-group">
                         <label htmlFor="newPassword">New Password</label>
                         <input
@@ -150,7 +151,7 @@ function ResetPassword() {
                     
                     <button 
                         type="submit" 
-                        className="submit-button"
+                        className="submit-button button active"
                         disabled={isSubmitting || !passwordsMatch || !isPasswordValid}
                     >
                         {isSubmitting ? 'Resetting...' : 'Reset Password'}

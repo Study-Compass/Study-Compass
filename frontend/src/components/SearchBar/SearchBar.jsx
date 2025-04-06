@@ -158,13 +158,13 @@ function SearchBar({ data, addQuery, onEnter, onSearch, room, onX, onBlur }) {
 
     useEffect(() => {
         // disabling nlp for now, uncomment if needed
-        // const handler = setTimeout(() => {
-        // setDebouncedInput(searchInput);
-        // }, 600); 
+        const handler = setTimeout(() => {
+        setDebouncedInput(searchInput);
+        }, 600); 
 
-        // return () => {
-        // clearTimeout(handler);
-        // };
+        return () => {
+        clearTimeout(handler);
+        };
     }, [searchInput]);
 
     useEffect(() => {
