@@ -181,6 +181,95 @@
     }
 }
 
+// Shop Pay style verification code
+.verification-code-container {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 360px;
+    margin: 0 auto;
+    gap: 8px;
+}
+
+.verification-code-digit {
+    width: 48px;
+    height: 56px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 24px;
+    font-weight: 600;
+    text-align: center;
+    background-color: #fff;
+    transition: all 0.2s ease;
+    
+    &:focus {
+        outline: none;
+        border-color: #FA756D;
+        box-shadow: 0 0 0 2px rgba(250, 117, 109, 0.2);
+    }
+    
+    &:hover {
+        border-color: #FA756D;
+    }
+    
+    // Verifying state
+    &.verifying {
+        background-color: #f5f5f5;
+        border-color: #ccc;
+        color: #666;
+        animation: pulse 1.5s infinite;
+    }
+    
+    // Success state
+    &.success {
+        background-color: #e8f5e9;
+        border-color: #4caf50;
+        color: #2e7d32;
+    }
+    
+    // Error state
+    &.error {
+        background-color: #ffebee;
+        border-color: #f44336;
+        color: #c62828;
+    }
+    
+    // Disabled state
+    &:disabled {
+        cursor: not-allowed;
+        opacity: 0.8;
+    }
+}
+
+// Verification status messages
+.verification-status {
+    margin-top: 12px;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 500;
+    
+    &.verifying {
+        color: #666;
+    }
+    
+    &.success {
+        color: #2e7d32;
+    }
+}
+
+// Pulse animation for verifying state
+@keyframes pulse {
+    0% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.7;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
 .reset-password-form {
     width: 100%;
     max-width: 400px;
