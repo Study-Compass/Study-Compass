@@ -16,6 +16,26 @@
         margin-bottom: 100px;
         // gap: 50px;
         padding: 0 60px;
+        width:300px;
+        .button.submit-button{
+            transition: background-color 0.3s;
+            background-color: var(--red);
+            color: white;
+            margin-bottom:10px;
+            margin-top:0;
+            height: 40px;
+
+            &:hover {
+                background-color: #e86c64;
+                filter:none;
+            }
+        
+            &:disabled {
+                background-color: #ccc;
+                cursor: not-allowed;
+                opacity: 0.5;
+            }
+        }
     }
 
     .block{
@@ -51,6 +71,287 @@
         
         .block{
             display: none;
+        }
+    }
+}
+
+// Form styles
+.form-title {
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: var(--text);
+    text-align: center;
+    font-family: 'Satoshi';
+}
+
+.form-subtitle {
+    font-size: 15px;
+    color: #666;
+    margin-bottom: 20px;
+    text-align: center;
+    font-family: 'Inter';
+    font-weight: 400;
+}
+
+.forgot-password-form,
+.reset-password-form,
+.verify-code-form {
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+.reset-password-form{
+    gap:0;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    width:100%;
+
+    label {
+        font-family: Inter, sans-serif;
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--text);
+        margin: 0 0 5px 7px;
+    }
+}
+
+.error-message {
+    color: #e74c3c;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.success-message {
+    text-align: center;
+    padding: 20px;
+
+    h2 {
+        font-family: 'Satoshi';
+        iconify-icon{
+            color: var(--green);
+        }
+        margin-bottom: 10px;
+    }
+
+    p {
+        margin-bottom: 13px;
+        font-size:14px;
+        color: #414141;
+    }
+
+    .note {
+        font-size: 14px;
+        color: #666;
+        font-style: italic;
+    }
+    .submit-button{
+    
+    }
+}
+
+.form-footer {
+    text-align: center;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.back-to-login,
+.forgot-password-link {
+    color: rgba(48, 107, 172, 0.80);
+    text-decoration: none;
+    font-size: 13px;
+    font-family:Inter, sans-serif;
+    width: 100%;
+    &:hover {
+        text-decoration: underline;
+    }
+}
+
+
+
+// Verification code styles
+.verification-code-input {
+    letter-spacing: 0.5em;
+    font-size: 1.5em;
+    text-align: center;
+    font-weight: bold;
+    padding: 0.5em;
+    width: 100%;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #f9f9f9;
+    
+    &:focus {
+        outline: none;
+        border-color: #4a90e2;
+        box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+    }
+}
+
+// Shop Pay style verification code
+.verification-code-container {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 360px;
+    margin: 0 auto;
+    gap: 8px;
+}
+
+.verification-code-digit {
+    width: 48px;
+    height: 56px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 24px;
+    font-weight: 600;
+    text-align: center;
+    background-color: #fff;
+    transition: all 0.2s ease;
+    
+    &:focus {
+        outline: none;
+        border-color: #FA756D;
+        box-shadow: 0 0 0 2px rgba(250, 117, 109, 0.2);
+    }
+    
+    &:hover {
+        border-color: #FA756D;
+    }
+    
+    // Verifying state
+    &.verifying {
+        background-color: #f5f5f5;
+        border-color: #ccc;
+        color: #666;
+        animation: pulse 1.5s infinite;
+    }
+    
+    // Success state
+    &.success {
+        background-color: #e8f5e9;
+        border-color: #4caf50;
+        color: #2e7d32;
+    }
+    
+    // Error state
+    &.error {
+        background-color: #ffebee;
+        border-color: #f44336;
+        color: #c62828;
+    }
+    
+    // Disabled state
+    &:disabled {
+        cursor: not-allowed;
+        opacity: 0.8;
+    }
+}
+
+// Verification status messages
+.verification-status {
+    margin-top: 12px;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 500;
+    
+    &.verifying {
+        color: #666;
+    }
+    
+    &.success {
+        color: #2e7d32;
+    }
+}
+
+// Pulse animation for verifying state
+@keyframes pulse {
+    0% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.7;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+// Reset password form specific styles
+.reset-password-form {
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
+    
+    .form-group {
+        margin-bottom: 1.5rem;
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #333;
+        }
+        
+        input {
+            width: 100%;
+            // padding: 0.75rem;
+            // border: 1px solid #ccc;
+            // border-radius: 4px;
+            // font-size: 1rem;
+            
+            &:focus {
+                outline: none;
+                border-color: #4a90e2;
+                box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+            }
+            
+            &.verification-code {
+                @extend .verification-code-input;
+            }
+        }
+    }
+}
+
+// Verify code form specific styles
+.verify-code-form {
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
+    
+    .form-group {
+        margin-bottom: 1.5rem;
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #333;
+        }
+        
+        input {
+            width: 100%;
+            padding: 0.2rem;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 1rem;
+            
+            &:focus {
+                outline: none;
+                border-color: #4a90e2;
+                box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+            }
+            
+            &.verification-code {
+                @extend .verification-code-input;
+            }
         }
     }
 }
