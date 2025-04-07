@@ -11,6 +11,7 @@ import Onboard from './pages/OnBoarding/Onboard';
 import Settings from './pages/Settings/Settings';
 import Friends from './pages/Friends/Friends';
 import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute';
+import Org from './pages/Org/Org';
 import Profile from './pages/Profile/Profile';
 import Landing from './pages/Landing/Landing';
 import Events from './pages/Events/Events';
@@ -23,6 +24,8 @@ import CreateOrg from './pages/CreateOrg/CreateOrg';
 import ClubDash from './pages/ClubDash/ClubDash';
 import OrgDisplay from './pages/Org/OrgDisplay';
 import RootDash from './pages/RootDash/RootDash';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './AuthContext';
 import { CacheProvider } from './CacheContext';
@@ -113,9 +116,12 @@ function App() {
                                             <Route path="/room1/:roomid" element={<Room1 />}/>
                                             <Route path="/register" element={<Register />}/>
                                             <Route path="/login" element={<Login />}/>
+                                            <Route path="/forgot-password" element={<ForgotPassword />}/>
+                                            <Route path="/reset-password" element={<ResetPassword />}/>
                                             <Route path="*" element={<Error />}/>
                                             <Route path="/error/:errorCode" element={<Error />}/>
                                             <Route path="/landing" element={<Landing/>}/>
+                                            <Route path="/org" element={<Org/>}/>
                                             <Route path="/documentation" element={<Redirect/>}/>
                                             <Route path="/new-badge/:hash" element={<NewBadge/>}/>
                                             <Route path="/new-badge" element={<NewBadge/>}/>

@@ -1,0 +1,14 @@
+{
+    "compilerOptions": {
+      "module": "commonjs",
+      "target": "es5",
+      "jsx": "react",
+      "outDir": "./dist",
+      "strict": true,
+      "esModuleInterop": true,
+      "allowJs": true, 
+      "allowSyntheticDefaultImports": true
+    },
+    "include": ["emails/**/*"]
+  }
+  

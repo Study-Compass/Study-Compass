@@ -7,6 +7,11 @@ const {
 const mongoose = require("mongoose");
 const { clean, isProfane } = require("../services/profanityFilterService.js");
 const getModels = require("../services/getModelService.js");
+const { Resend } = require('resend');
+const { render } = require('@react-email/render')
+const React = require('react');
+const ForgotEmail = require('../emails/ForgotEmail').default;
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 //Route to get a specific org by name
 router.get("/get-org/:id", verifyToken, async (req, res) => {
@@ -687,5 +692,28 @@ router.get('/get-meetings/:name', verifyToken, async(req,res)=>{
             });
     }
 });
+
+router.post('/send-email', async (req,res) => {
+    try{
+        
+        const emailHTML = await render(React.createElement(ForgotEmail, { name: "James", link: "https://study-compass.com" }));
+
+        const { data, error } = await resend.emails.send({
+            from: "Study Compass <support@study-compass.com>",
+            to: ["jbliu02@gmail.com"],
+            subject: "hello world",
+            html: emailHTML,
+          });
+        if(error){
+            console.log('POST: email sending error', error);
+            return res.status(500).json({ success: false, message: 'Error sending email', error: error.message });
+        }
+        res.status(200).json({ success: true, message: 'Email sent successfully', data });
+    } catch (error){
+        console.log('POST: email sending error');
+        res.status(500).json({ success: false, message: 'Error sending email', error: error.message });
+    }
+});
+
 
 module.exports = router;
