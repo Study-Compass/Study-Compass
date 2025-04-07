@@ -26,7 +26,9 @@
         margin-left:5px;
         flex-direction: column;
         width:100%;
-        overflow-x: scroll;
+        overflow-x: hidden;
+        overflow-y: auto;
+        
         button .check-in{
             font-size: 14px;
             font-family: 'Inter';
@@ -95,4 +97,38 @@
 
 }
 
+.checked-in-users .button-container{
+    display: flex;
+    gap:10px;
+    margin-top:10px;
+    width:20%;
+}
+
+button.check-in-button{
+    font-size: 15px;
+    font-family: 'Inter';
+    font-weight: 650;
+    color: white;
+    background-color: var(--green);
+    border: none;
+    border-radius: 8px;
+    padding: 12px 20px;
+    flex-grow:1;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.checked-in-users button.out{
+    background-color: var(--red);
+}
+
+.checked-in-users button:hover{
+    cursor:pointer;
+}
+
+.checked-in-users button:disabled{
+    background-color: var(--lighterborder);
+    color: var(--border);
+    cursor: not-allowed;
+}
 

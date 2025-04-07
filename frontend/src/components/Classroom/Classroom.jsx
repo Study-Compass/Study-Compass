@@ -311,7 +311,7 @@ function Classroom({ room, state, setState, schedule, roomName, width, setShowMo
                 <RatingComponent classroomId={room._id} rating={rating} setRating={setRating} name={room.name} reload={reload} />
             </Popup>
             <Popup customClassName="view-checked-in" isOpen={isCurrentlyCheckedInOpen} onClose={handleCloseCheckedInPopup}>
-                <ViewCheckedIn currentUser={user} users={Object.values(checkedInUsers)} room={Object.values(room)} reload={reload}/>
+                <ViewCheckedIn currentUser={user} users={Object.values(checkedInUsers)} room={room} checkIn={handleCheckIn} checkOut={handleCheckOut} reload={reload}/>
             </Popup>
             <div className={`whole-page ${isClassImgOpen ? 'in' : 'out'}`}>
                 <div className={`img-pop-up ${isClassImgOpen ? 'in' : 'out'}`} ref={ref}>
@@ -410,10 +410,12 @@ function Classroom({ room, state, setState, schedule, roomName, width, setShowMo
                         </div>
                         {success ? "free" : "class in session"} {message}
                     </div>
-                    {room && room.checked_in && room.checked_in.length > 0 &&
-                        <button className="view-check-in" onClick={handleOpenCheckedInPopup} ><CheckedIn users={Object.values(checkedInUsers)}/></button> 
-                        // <CheckedIn users={Object.values(checkedInUsers)} onClick={handleOpenCheckedInPopup}/> 
-                    }
+                    <div className="button-container">
+                        {room && room.checked_in && room.checked_in.length > 0 &&
+                            <button className="view-check-in-button" onClick={handleOpenCheckedInPopup} ><CheckedIn users={Object.values(checkedInUsers)}/></button> 
+                        }
+                    </div>
+                    
                     <div className="button-container">
                         {width < 800 && <button className="schedule-button" onClick={() => { setShowMobileCalendar(true) }}>view-schedule</button>}
                         {

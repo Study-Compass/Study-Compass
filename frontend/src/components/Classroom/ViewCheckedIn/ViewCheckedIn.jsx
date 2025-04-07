@@ -5,7 +5,7 @@ import Badges from '../../Badges/Badges';
 import './ViewCheckedIn.scss';
 
 
-function ViewCheckedIn({currentUser, users, room}){
+function ViewCheckedIn({currentUser, users, room, checkIn, checkOut, addFriend}){
     const [error, setError] = useState([]);
     useEffect(() => {
         //populate error array with all false for every user
@@ -17,7 +17,6 @@ function ViewCheckedIn({currentUser, users, room}){
         newError[index] = true;
         setError(newError);
     }
-
     useEffect(() => {
         console.log(error);
     }, [error]);
@@ -43,6 +42,9 @@ function ViewCheckedIn({currentUser, users, room}){
                                     <h4>@{user.username}</h4>
                                     <Badges badges={user && user.tags} size="9px"/>
                                 </div>
+                                <div className="add-friend">
+
+                                </div>
                             </div>
                         
                         {users.length===1 ? 
@@ -53,15 +55,14 @@ function ViewCheckedIn({currentUser, users, room}){
                     )
                 })}
             </div>
-            <button className="check-in">check out</button>
-            {/* <div className="button-container">
+            <div className="button-container">   
                 {
-                    room.checked_in.includes(currentUser._id) ?
-                        <button className="out">check out</button>
-                        :
-                        <button className="check-in-button">check in</button>
+                    currentUser && room.checked_in.includes(currentUser._id) ?
+                    <button className="out check-in-button" onClick={checkOut}>check out</button>
+                    :
+                    <button className="check-in-button" onClick={checkIn}>check in</button>
                 }
-            </div> */}
+            </div>
         </div>
     )
 }
