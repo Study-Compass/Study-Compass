@@ -152,7 +152,7 @@ function UserSearch({
                                 </div>
                                 <div className="user-info">
                                     <h3>{user.name}</h3>
-                                    <p>@{user.username}</p>
+                                    <p>@{user.email}</p>
                                 </div>
                             </div>
                         </div>

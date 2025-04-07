@@ -111,15 +111,15 @@ function NewApproval(){
                     />
                 </div>
                 <div className="field">
+                    <SelectedUsers 
+                        users={selectedUsers}
+                        onRemoveUser={handleRemoveUser}
+                    />
                     <label htmlFor="user-search">Add Users</label>
                     <UserSearch 
                         onUserSelect={handleUserSelect}
                         placeholder="Search for users by name or username"
                         excludeIds={selectedUsers.map(user => user._id)}
-                    />
-                    <SelectedUsers 
-                        users={selectedUsers}
-                        onRemoveUser={handleRemoveUser}
                     />
                 </div>
                 <button type="submit" className="submit-button">

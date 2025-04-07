@@ -443,3 +443,17 @@ textarea{
 .rs-btn-link:hover, .rs-btn-link:focus{
     color: var(--red) !important;
 }
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    width:100%;
+
+    label {
+        font-family: Inter, sans-serif;
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--text);
+        margin: 0 0 5px 7px;
+    }
+}
