@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Test Client</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .response {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+            white-space: pre-wrap;
+        }
+        .error {
+            color: red;
+        }
+        .success {
+            color: green;
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .reset-button {
+            background-color: #ff9800;
+        }
+        .reset-button:hover {
+            background-color: #f57c00;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>API Test Client</h1>
+        
+        <div class="form-group">
+            <label for="baseUrl">API Base URL:</label>
+            <input type="text" id="baseUrl" value="http://localhost:3000">
+        </div>
+        
+        <div class="form-group">
+            <label for="apiKey">API Key:</label>
+            <input type="text" id="apiKey" placeholder="Enter your API key">
+        </div>
+        
+        <div class="form-group">
+            <label for="endpoint">Endpoint:</label>
+            <select id="endpoint">
+                <option value="/api/public">/api/public (GET)</option>
+                <option value="/api/details">/api/details (GET)</option>
+                <option value="/api/events">/api/events (GET)</option>
+                <option value="/api/test">/api/test (POST)</option>
+                <option value="/api/sensitive">/api/sensitive (POST)</option>
+                <option value="/api/rotate-api-key">/api/rotate-api-key (POST)</option>
+                <option value="/api/reset-rate-limit">/api/reset-rate-limit (POST)</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="method">Method:</label>
+            <select id="method">
+                <option value="GET">GET</option>
+                <option value="POST">POST</option>
+                <option value="PUT">PUT</option>
+                <option value="DELETE">DELETE</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="body">Request Body (for POST/PUT):</label>
+            <input type="text" id="body" placeholder="Enter JSON data">
+        </div>
+        
+        <div class="button-group">
+            <button onclick="sendRequest()">Send Request</button>
+            <button class="reset-button" onclick="resetRateLimit()">Reset Rate Limit</button>
+        </div>
+        
+        <div class="response" id="response"></div>
+    </div>
+
+    <script>
+        async function sendRequest() {
+            const baseUrl = document.getElementById('baseUrl').value;
+            const apiKey = document.getElementById('apiKey').value;
+            const endpoint = document.getElementById('endpoint').value;
+            const method = document.getElementById('method').value;
+            const body = document.getElementById('body').value;
+            const responseDiv = document.getElementById('response');
+            
+            try {
+                const headers = {
+                    'Content-Type': 'application/json'
+                };
+                
+                if (apiKey) {
+                    headers['x-api-key'] = apiKey;
+                }
+                
+                const options = {
+                    method: method,
+                    headers: headers,
+                    mode: 'cors'
+                };
+                
+                if (method !== 'GET' && body) {
+                    options.body = body;
+                }
+                
+                const response = await fetch(`${baseUrl}${endpoint}`, options);
+                const data = await response.json();
+                
+                responseDiv.innerHTML = `
+                    <div class="${response.ok ? 'success' : 'error'}">
+                        Status: ${response.status}
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    </div>
+                `;
+            } catch (error) {
+                responseDiv.innerHTML = `
+                    <div class="error">
+                        Error: ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        async function resetRateLimit() {
+            const baseUrl = document.getElementById('baseUrl').value;
+            const apiKey = document.getElementById('apiKey').value;
+            const responseDiv = document.getElementById('response');
+            
+            if (!apiKey) {
+                responseDiv.innerHTML = `
+                    <div class="error">
+                        Error: API key is required to reset rate limit
+                    </div>
+                `;
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${baseUrl}/api/reset-rate-limit`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-api-key': apiKey
+                    },
+                    mode: 'cors'
+                });
+                
+                const data = await response.json();
+                
+                responseDiv.innerHTML = `
+                    <div class="${response.ok ? 'success' : 'error'}">
+                        Status: ${response.status}
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    </div>
+                `;
+            } catch (error) {
+                responseDiv.innerHTML = `
+                    <div class="error">
+                        Error: ${error.message}
+                    </div>
+                `;
+            }
+        }
+    </script>
+</body>
+</html> 

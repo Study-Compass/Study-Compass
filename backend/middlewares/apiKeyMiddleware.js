@@ -1,67 +1,42 @@
-const API = require('../schemas/api.js');
-const limiter = require('../middlewares/rateLimit.js'); 
+const mongoose = require('mongoose');
 const getModels = require('../services/getModelService.js');
 
-// Middleware for validating API keys and enforcing rate limits
 const apiKeyMiddleware = async (req, res, next) => {
-    const { Api } = getModels(req, 'Api');
-    const apiKey = req.headers['x-api-key']; 
-    
     try {
-        console.log("Received API Key");
-        const apiKeyData = await Api.findOne({ api_key: apiKey }); 
+        const apiKey = req.headers['x-api-key'];
         
+        if (!apiKey) {
+            return res.status(401).json({ error: 'API key is required' });
+        }
+
+        const { Api } = getModels(req, 'Api');
+        const apiKeyData = await Api.findOne({ api_key: apiKey });
+
         if (!apiKeyData) {
-            console.log("API key does not exist for user");
-            return res.status(401).json({ error: 'API key does not exist for user' });
+            return res.status(401).json({ error: 'Invalid API key' });
         }
 
-        // Determine clearance level and rate limits
-        const clearance = apiKeyData.Authorization || "default"; 
-        let maxRequests;
-
-        switch (clearance) {
-            case "Unauthorized":
-                maxRequests = 100;
-                break;
-            case "Authorized":
-                maxRequests = 500;
-                break;
-            default:
-                maxRequests = 100; 
-                break;
+        //check if API key is expired
+        if (apiKeyData.expiresAt && new Date() > apiKeyData.expiresAt) {
+            return res.status(401).json({ error: 'API key has expired' });
         }
 
-        console.log(`Clearance: ${clearance} | Max Requests: ${maxRequests} | Current Usage: ${apiKeyData.usageCount}`);
-
-        // BLOCK EXCESSIVE REQUESTS BEFORE PROCESSING
-        if (apiKeyData.usageCount >= maxRequests) {
-            console.log(`Exceded limit (${apiKeyData.usageCount}/${maxRequests}). Blocking request.`);
-            return res.status(429).json({ error: 'Rate limit exceeded. Please try again later.' });
-        }
-
-        // Increment usage count and save
-        apiKeyData.usageCount = (apiKeyData.usageCount || 0) + 1;
-        await apiKeyData.save();
-
-        console.log(`API Key Used. New usage count: ${apiKeyData.usageCount}`);
-
-        // Attach API key data to the request object for use in later routes
-        req.apiKeyData = apiKeyData;
-
-        // Apply Rate Limiter Middleware
-        const apiKeyRateLimiter = limiter(maxRequests);
-        apiKeyRateLimiter(req, res, (error) => {
-            if (error) {
-                return res.status(429).json({ error: 'Rate limit exceeded. Please try again later.' });
+        //check IP whitelist if configured
+        if (apiKeyData.allowedIPs && apiKeyData.allowedIPs.length > 0) {
+            const clientIP = req.ip;
+            if (!apiKeyData.allowedIPs.includes(clientIP)) {
+                return res.status(403).json({ error: 'IP not whitelisted' });
             }
-            next();
-        });
+        }
 
+        //attach API key data to request for use in other middleware
+        req.apiKeyData = apiKeyData;
+        next();
     } catch (error) {
-        console.error('Error verifying API key:', error);
-        return res.status(500).json({ error: 'Could not verify API key' });
+        console.error('API Key Middleware Error:', error);
+        res.status(500).json({ error: 'Internal server error' });
     }
 };
 
 module.exports = { apiKeyMiddleware };
+
