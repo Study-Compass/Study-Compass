@@ -28,17 +28,36 @@ const io = new Server(server, {
     }
 });
 
+//cors configuration
 if (process.env.NODE_ENV === 'production') {
     app.use(enforce.HTTPS({ trustProtoHeader: true }));
     const corsOptions = {
         origin: [
             'https://www.study-compass.com', 
             'https://studycompass.com',
-            `http://${process.env.EDUREKA_IP}:${process.env.EDUREKA_PORT}`
+            // `http://${process.env.EDUREKA_IP}:${process.env.EDUREKA_PORT}`
         ],
         optionsSuccessStatus: 200 // for legacy browser support
     };
-    app.use(cors(corsOptions));
+    
+    //apply CORS policy to all routes EXCEPT /api routes
+    app.use((req, res, next) => {
+        if (req.path.startsWith('/api')) {
+            return next();
+        }
+        return cors(corsOptions)(req, res, next);
+    });
+} else {
+    //in development, use a more permissive CORS policy for non-API routes
+    app.use((req, res, next) => {
+        if (req.path.startsWith('/api')) {
+            return next();
+        }
+        return cors({
+            origin: true, //allow all origins in development
+            credentials: true
+        })(req, res, next);
+    });
 }
 
 // Other middleware
@@ -68,6 +87,8 @@ app.use(async (req, res, next) => {
         res.status(500).send('Database connection error');
     }
 });
+// berkeley.study-compass.com
+
 
 const upload = multer({
     storage: multer.memoryStorage(),
@@ -87,22 +108,22 @@ const ratingRoutes = require('./routes/ratingRoutes.js');
 const searchRoutes = require('./routes/searchRoutes.js');
 const eventRoutes = require('./routes/eventRoutes.js');
 const oieRoutes = require('./routes/oie-routes.js');
+const apiRoutes = require('./routes/apiRoutes.js'); //Added Pk ERROR
 const orgRoutes = require('./routes/orgRoutes.js');
 const workflowRoutes = require('./routes/workflowRoutes.js');
 
+// Mount routes
 app.use(authRoutes);
 app.use(dataRoutes);
 app.use(friendRoutes);
 app.use(userRoutes);
 app.use(analyticsRoutes);
-app.use(eventRoutes);
-
 app.use(classroomChangeRoutes);
 app.use(ratingRoutes);
 app.use(searchRoutes);
-
 app.use(eventRoutes);
 app.use(oieRoutes);
+app.use('/api', apiRoutes); // API routes with their own CORS configuration
 app.use(orgRoutes);
 app.use(workflowRoutes);
 
