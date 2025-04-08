@@ -93,10 +93,12 @@ function ViewCheckedIn({currentUser, users, room, checkIn, checkOut}){
                                 <div className="add-friend" onClick={ handleFriendRequest }>
                                     add
                                 </div>
+                                
                             </div>
                             
                             {users.length===1 ? <span></span> : <span className="multiple-user"></span>} 
                         </div>
+                        
                     )
                 })}
             </div>
