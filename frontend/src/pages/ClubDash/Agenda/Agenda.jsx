@@ -6,11 +6,11 @@ import left from '../../../assets/arrow-small-left.svg';
 import qrcode from '../../../assets/qr_code4.png';
 import { Icon } from '@iconify-icon/react/dist/iconify.mjs';
 
-function Agenda({openDash, clubName, event, picture}){
+function Agenda({openDash, clubName, event, picture, formattedDate, formattedStartTime, formattedEndTime}){
+    
 
     return(
-    
-        <header className="eventmeeting">
+        <div className="Agenda">
             <div className="back" onClick={openDash}>
                 <button>
                     <img src={left} alt="" />
@@ -18,7 +18,7 @@ function Agenda({openDash, clubName, event, picture}){
                     <Link to="/club-dashboard" ></Link>
                 </button>          
             </div>
-            <div className="center">
+            <div className='Middle'>
                 <div className="header">
                     <div className="circle">
                     <img src={picture} alt="" />
@@ -26,42 +26,27 @@ function Agenda({openDash, clubName, event, picture}){
 
                     <div className="info">
                         <div className="info title">{clubName} {event.name}</div>
-                        <div className="info time">
-                            <img src={calendar} alt="" />
-                            
+                            <div className="info time">
+                                <img src={calendar} alt="" />
+                                {formattedDate}, {formattedStartTime} - {formattedEndTime}
+                            </div>
                         </div>
 
-                        <div className="info time status " >
-                            <div className="circle">
-                            </div>
-                            
-                        </div>
-                    </div>
+                </div>
+                <div className='subtitle'>
+                    <p>
+                        scan for attendance
+                    </p>
+                    <h2>
+                        <img src={qrcode} alt="" />
+                    </h2>
                 </div>
 
-
+                
 
             </div>
-            
-                <div className="agenda">
-                            <h1>
-                                AGENDA
-                            </h1> 
-                    <div className="bodyA">
-                        <h2>
-                            <img src={qrcode} alt="" />
-                        </h2>
-                        <button className="button" >
-                        {/* onClick={() => handleEventClick(event)} */}
-                        <Icon icon="material-symbols:expand-content-rounded" />
-                        <p>full screen</p>
-                        </button>
-                    </div>
-                    
 
-                </div>
-
-        </header>
+        </div>
     )
 
 

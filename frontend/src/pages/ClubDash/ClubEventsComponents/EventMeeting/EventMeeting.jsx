@@ -1,6 +1,6 @@
 import './EventMeeting.scss';
 import Agenda from '../../Agenda/Agenda';
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import calendar from '../../../../assets/calendar.svg';
 import left from '../../../../assets/arrow-small-left.svg';
@@ -8,6 +8,8 @@ import qrcode from '../../../../assets/qr_code4.png';
 import { Icon } from '@iconify-icon/react/dist/iconify.mjs';
 
 function EventMeeting({openDash, clubName, event, picture}){
+
+    const [showAgenda, setShowAgenda] = useState(false);
 
     const now = new Date();
     const dateStart = new Date(event.start_time);
@@ -37,11 +39,11 @@ function EventMeeting({openDash, clubName, event, picture}){
         hour12: true 
     });
 
-    function handleClick (){
-        return <Agenda openDash={openDash} clubName={clubName} event = {event} picture = {picture}/>;
+    if (showAgenda) {
+        return <Agenda openDash={openDash} clubName={clubName} event={event} picture={picture} formattedDate={formattedDate} formattedStartTime={formattedStartTime} formattedEndTime={formattedEndTime}/>;
     }
     return(
-    
+        // <Agenda openDash={openDash} clubName={clubName} event = {event} picture = {picture}/>
         <header className="eventmeeting">
             <div className="back" onClick={openDash}>
                 <button>
@@ -83,7 +85,7 @@ function EventMeeting({openDash, clubName, event, picture}){
                         <h2>
                             <img src={qrcode} alt="" />
                         </h2>
-                        <button className="button" onClick={() => handleClick()}>
+                        <button className="button" onClick={() => setShowAgenda(true)}>
                         {/* onClick={() => handleEventClick(event)} */}
                         <Icon icon="material-symbols:expand-content-rounded" />
                         <p>full screen</p>
