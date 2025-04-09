@@ -171,7 +171,7 @@ function AccountSettings({ settingsRightSide, width, handleBackClick, userInfo }
     const unlinkSchoolEmail = async () => {
         try {
             // Call API to unlink school email
-            const response = await postRequest('/unlink-school-email');
+            const response = await postRequest('/verify-affiliated-email/unlink');
             
             if (response.success) {
                 addNotification({title: 'School Email Unlinked', message: 'Your school email has been successfully unlinked', type: 'success'});
@@ -333,7 +333,7 @@ function AccountSettings({ settingsRightSide, width, handleBackClick, userInfo }
                             <>
                                 <div className="content">
                                     <h3><Icon icon="gridicons:institution"/>School Verification</h3>
-                                    <p className='unverified'> <Icon icon="fontisto:broken-link" /> connect your school email to verify your account</p>
+                                    <p className='unverified'> <Icon icon="tabler:exclamation-circle" /> connect your school email to verify your account</p>
                                 </div>
                                 <div className="actions">
                                     <button onClick={() => navigate('/verify-email')}>connect</button>

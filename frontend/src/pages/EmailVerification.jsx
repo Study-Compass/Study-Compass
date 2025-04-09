@@ -18,11 +18,17 @@ function EmailVerification() {
     const { addNotification } = useNotification();
     const navigate = useNavigate();
     const inputRefs = useRef([]);
-    const { validateToken } = useAuth();
+    const { validateToken, user } = useAuth();
     // Initialize refs for each input field
     useEffect(() => {
         inputRefs.current = inputRefs.current.slice(0, 6);
     }, []);
+
+    useEffect(() => {
+        if (user.affiliatedEmailVerified) {
+            navigate('/settings');
+        }
+    }, [user.affiliatedEmailVerified, navigate]);
 
     // Auto-verify when all digits are entered
     useEffect(() => {
@@ -39,7 +45,7 @@ function EmailVerification() {
 
         try {
             const response = await postRequest('/verify-affiliated-email/request', { email });
-            
+            console.log(response);
             if (!response.error) {
                 setIsCodeSent(true);
                 addNotification({ 
@@ -53,6 +59,12 @@ function EmailVerification() {
                         inputRefs.current[0].focus();
                     }
                 }, 100);
+            } else {
+                addNotification({
+                    title: 'Error',
+                    message: response.message,
+                    type: 'error'
+                });
             }
         } catch (error) {
             console.error('Error requesting verification code:', error);

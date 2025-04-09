@@ -389,38 +389,5 @@ router.post('/reset-password', async (req, res) => {
     }
 });
 
-// Unlink school email endpoint
-router.post('/unlink-school-email', verifyToken, async (req, res) => {
-    try {
-        const { User } = getModels(req, 'User');
-        
-        // Find user by ID
-        const user = await User.findById(req.user.userId);
-        
-        if (!user) {
-            return res.status(404).json({
-                success: false,
-                message: 'User not found'
-            });
-        }
-
-        // Remove the affiliated email
-        user.affiliatedEmail = null;
-        await user.save();
-
-        console.log(`POST: /unlink-school-email school email unlinked for user ${user.username}`);
-        res.status(200).json({
-            success: true,
-            message: 'School email unlinked successfully'
-        });
-    } catch (error) {
-        console.log(`POST: /unlink-school-email failed`, error);
-        res.status(500).json({
-            success: false,
-            message: 'Error unlinking school email',
-            error: error.message
-        });
-    }
-});
 
 module.exports = router;

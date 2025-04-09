@@ -24,14 +24,17 @@ const postRequest = async (url, body, options = {}) => {
 
     return response.data;
   } catch (error) {
-    console.error('POST request error:', error.message);
+    console.error('POST request error:', error.message);  
 
     if (error.response) {
-      return { error: error.response.data.error };
+      return { 
+        error: true,
+        message: error.response.data.message
+       };
     } else if (error.request) {
-      return { error: 'No response received from server' };
+        return { error: true, message: 'No response received from server' };
     } else {
-      return { error: error.message };
+      return { error: true, message:  error.message };
     }
   }
 };
