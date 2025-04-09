@@ -13,17 +13,21 @@ import useAuth from '../../hooks/useAuth.js';
 import { Icon } from '@iconify-icon/react/dist/iconify.mjs';
 import ImageUpload from '../ImageUpload/ImageUpload';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+import postRequest from '../../utils/postRequest.js';
 
 function AccountSettings({ settingsRightSide, width, handleBackClick, userInfo }) {
 
     const { validateToken } = useAuth();
-
+    const navigate = useNavigate();
     // const [active, setActive] = useState(false);
 
     // const [changeUsername, setChangeUsername] = 
     const [name, setName] = useState(userInfo.name);
     const [username, setUsername] = useState(userInfo.username);
     const [editUsername, setEditUsername] = useState(false);
+    const [editName, setEditName] = useState(false);
+    const [editEmail, setEditEmail] = useState(false);
 
     const [usernameValid, setUsernameValid] = useState(1);
     const { addNotification } = useNotification();
@@ -35,7 +39,6 @@ function AccountSettings({ settingsRightSide, width, handleBackClick, userInfo }
     const [isUploading, setIsUploading] = useState(false);
     const [selectedFile, setSelectedFile] = useState(null);
     
-    const [editEmail, setEditEmail] = useState(false);
     const [email, setEmail] = useState(userInfo.email);
     
     const handleFileSelect = (file) => {
@@ -144,7 +147,18 @@ function AccountSettings({ settingsRightSide, width, handleBackClick, userInfo }
         try{
             saveUser(name, null, null, null, null, null);
             setInitialName(name);
+            setEditName(false);
             addNotification({title: 'Name saved', message: 'Your name has been changed successfully', type: 'success'});
+        } catch (error) {
+            addNotification({title: 'Error saving user', message: error.message, type: 'error'});
+        }
+    };
+
+    const saveEmail = () => {
+        try{
+            saveUser(null, null, email, null, null, null);
+            setEditEmail(false);
+            addNotification({title: 'Email saved', message: 'Your email has been changed successfully', type: 'success'});
         } catch (error) {
             addNotification({title: 'Error saving user', message: error.message, type: 'error'});
         }
@@ -154,6 +168,23 @@ function AccountSettings({ settingsRightSide, width, handleBackClick, userInfo }
         addNotification({title: 'Interanl Error', message: 'an internal error occurred', type: 'error'});
     };
     
+    const unlinkSchoolEmail = async () => {
+        try {
+            // Call API to unlink school email
+            const response = await postRequest('/unlink-school-email');
+            
+            if (response.success) {
+                addNotification({title: 'School Email Unlinked', message: 'Your school email has been successfully unlinked', type: 'success'});
+                // Refresh user data or update state
+                validateToken();
+            } else {
+                addNotification({title: 'Unlink Failed', message: response.message || 'Failed to unlink school email', type: 'error'});
+            }
+        } catch (error) {
+            console.error('Error unlinking school email:', error);
+            addNotification({title: 'Unlink Error', message: error.message || 'Error unlinking school email', type: 'error'});
+        }
+    };
 
     const uploadPfpToggle = () => {
         setUploadPfp(!uploadPfp);
@@ -172,9 +203,7 @@ function AccountSettings({ settingsRightSide, width, handleBackClick, userInfo }
 
             <div className='profile'>
 
-                <h2>profile settings</h2>
-                <hr />
-
+                <h2>Profile Settings</h2>
                 <div className='name-settings'>
                     <div className="picture-container">
                         <img className="pfp" src={profilePicture ? profilePicture : pfp} alt="" />
@@ -182,15 +211,7 @@ function AccountSettings({ settingsRightSide, width, handleBackClick, userInfo }
                             <Icon icon="mdi:image-add"/>
                         </div>
                     </div>
-
-                    <div className='input-name'>
-                        <h3>name:</h3>
-                        <input type="text" value={name} onChange={handleNameChange}/>
-                        {name !== intialName && <button className='save-name' onClick={saveName}>save</button>}
-                    </div>
-
-                </div>
-                <div className={`pfp-upload ${uploadPfp && "active"}`}>
+                    <div className={`pfp-upload ${uploadPfp && "active"}`}>
                     <ImageUpload 
                         uploadText="Upload new profile picture" 
                         onFileSelect={handleFileSelect}
@@ -200,10 +221,27 @@ function AccountSettings({ settingsRightSide, width, handleBackClick, userInfo }
                         uploadMessage="Maximum size: 5MB"
                     />
                 </div>
-
-                <h2>security settings</h2>
-                <hr />
-                <div className="settings-rows-container">
+                    <div className='user-container'>
+                        <div className='email'>
+                            {editName ? (
+                                <input type="text" value={name} onChange={handleNameChange} autoFocus />
+                            ) : (
+                                <>
+                                    <h3>Name</h3>
+                                    <p>{name}</p>
+                                </>
+                            )}
+                        </div>
+                        <button onClick={() => {
+                            if (editName) {
+                                saveName();
+                            } else {
+                                setEditName(true);
+                            }
+                        }}>
+                            {editName ? 'save' : 'change name'}
+                        </button>
+                    </div>
                     <div className='user-container'>
                         <div className='user'>
                         {editUsername ? (
@@ -222,7 +260,7 @@ function AccountSettings({ settingsRightSide, width, handleBackClick, userInfo }
                                 ): 
                                 (
                                 <>
-                                    <h3>username</h3>
+                                    <h3>Username</h3>
                                     <p>@{username}</p>
                                 </>
                                 )
@@ -234,28 +272,41 @@ function AccountSettings({ settingsRightSide, width, handleBackClick, userInfo }
                         <button disabled={usernameValid !== 1} onClick={(saveUsername)}> {editUsername ? 'save' : 'change username'} </button>
 
                     </div>
+
+                </div>
+
+                <hr />
+                <h2>Security Settings</h2>
+                <div className="settings-rows-container">
                     <div className='user-container'>
                         <div className='email'>
                         {editEmail ? (
                                 <input
                                     type="text" value={email} onChange={handleEmailChange}
-                                    onBlur={saveUsername}
                                     autoFocus
                                 /> ): 
                                 (
                                 <>
-                                    <h3>email</h3>
+                                    <h3>Email</h3>
                                     <p>{userInfo.email}</p>
                                 </>
                                 )  
                         }
                         </div>
-                        <button onClick={() => setEditEmail(true)}>change email</button>
+                        <button onClick={() => {
+                            if (editEmail) {
+                                saveEmail();
+                            } else {
+                                setEditEmail(true);
+                            }
+                        }}>
+                            {editEmail ? 'save' : 'change email'}
+                        </button>
 
                     </div>
                     <div className='user-container'>
                         <div className='password'>
-                            <h3>password</h3>
+                            <h3>Password</h3>
                             <p>enabled</p>
                         </div>
                         <button>change password</button>
@@ -263,8 +314,35 @@ function AccountSettings({ settingsRightSide, width, handleBackClick, userInfo }
                     </div>
                 </div>
 
-                <h2>danger zone</h2>
                 <hr />
+                <h2>Connected Accounts</h2>
+                <div className='connected-accounts'>
+                    <div className="school">
+                        {
+                            userInfo.affiliatedEmail ? 
+                            <>
+                                <div className="content">
+                                    <h3><Icon icon="gridicons:institution"/>School Verification</h3>
+                                    <p className='verified'>connected to {userInfo.affiliatedEmail}</p>
+                                </div>
+                                <div className="actions">
+                                    <button onClick={unlinkSchoolEmail}><Icon icon="ci:link-break"/> unlink</button>
+                                </div>
+                            </>
+                            :
+                            <>
+                                <div className="content">
+                                    <h3><Icon icon="gridicons:institution"/>School Verification</h3>
+                                    <p className='unverified'> <Icon icon="fontisto:broken-link" /> connect your school email to verify your account</p>
+                                </div>
+                                <div className="actions">
+                                    <button onClick={() => navigate('/verify-email')}>connect</button>
+                                </div>
+                            </>
+                        }
+                    </div>
+                </div>
+                <h2>Danger Zone</h2>
                 <div className="settings-rows-container">
                     <div className='delete' onClick={deleteAccount}>
                         <button>
@@ -275,13 +353,7 @@ function AccountSettings({ settingsRightSide, width, handleBackClick, userInfo }
                 </div>
 
             </div>
-            <div className='security'>
-
-            </div>
-
-            <div className='danger'>
-
-            </div>
+            
 
         </div>
     )

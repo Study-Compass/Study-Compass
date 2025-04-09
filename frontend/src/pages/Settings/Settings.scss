@@ -150,10 +150,11 @@
 
 .settings-right .name-settings{
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     font-family: 'Satoshi';
-    gap: 20px;
     margin-top:10px;
+    width:100%;
+    margin-bottom:12px;
 }
 
 .settings-right .name-settings .input-name{
@@ -176,15 +177,16 @@
     box-sizing: border-box;
     justify-content: space-between;
     align-items: center;
+    margin-bottom: 12px;
 }
 
 .settings-right .user-container button{
     display: flex;
     flex-direction: column;
-    font-family: 'Inter';
+    font-family: 'Satoshi';
     font-weight:500;
     color: var(--text);
-    font-size: 12px;
+    font-size: 13px;
     padding: 5px 9px;
     height: fit-content;
     outline: none;
@@ -221,8 +223,7 @@
     flex-direction: column;
     width: 100%;
     /* height: 42px; */
-    gap:10px;
-    margin: 10px 0;
+    margin: 12px 0;
 }
 
 .settings-right .user-container .email{
@@ -292,7 +293,7 @@
     font-family: 'Inter';
     font-size: 13px;
     color: var(--text);
-    font-weight: 600;
+    font-weight: 500;
     margin: 0px;
     margin-bottom: 7px;
 }
@@ -302,8 +303,8 @@
     flex-direction: row;
     margin: 0px;
     color: var(--darkborder);
-    font-size: 15px;
-    font-weight: 600;
+    font-size: 13px;
+    font-weight: 500;
     font-family: 'Inter';
 }
 

@@ -5,6 +5,7 @@ import logo from '../assets/red_logo.svg';
 import { useNotification } from '../NotificationContext';
 import './Login.scss';
 import postRequest from '../utils/postRequest';
+import useAuth from '../hooks/useAuth';
 
 function EmailVerification() {
     const [email, setEmail] = useState('');
@@ -17,7 +18,7 @@ function EmailVerification() {
     const { addNotification } = useNotification();
     const navigate = useNavigate();
     const inputRefs = useRef([]);
-
+    const { validateToken } = useAuth();
     // Initialize refs for each input field
     useEffect(() => {
         inputRefs.current = inputRefs.current.slice(0, 6);
@@ -90,8 +91,9 @@ function EmailVerification() {
                     type: 'success' 
                 });
                 
+                validateToken();
                 setTimeout(() => {
-                    navigate('/profile'); // Redirect to profile page after verification
+                    navigate('/settings'); // Redirect to profile page after verification
                 }, 1000);
             }
         } catch (error) {
@@ -168,9 +170,7 @@ function EmailVerification() {
     };
 
     return (
-        <div className="main-login">
-            <div className="block"></div>
-
+        <div className="main-login verify-email">
             <div className="login-container">
                 <img src={logo} alt="Study Compass Logo" className="logo" />
                 
@@ -250,8 +250,8 @@ function EmailVerification() {
                 )}
                 
                 <div className="form-footer">
-                    <Link to="/profile" className="back-to-profile">
-                        Back to Profile
+                    <Link to="/settings" className="back-to-profile">
+                        Back to Settings
                     </Link>
                 </div>
             </div>
