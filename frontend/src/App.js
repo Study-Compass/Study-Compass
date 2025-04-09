@@ -26,6 +26,7 @@ import OrgDisplay from './pages/Org/OrgDisplay';
 import RootDash from './pages/RootDash/RootDash';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
+import EmailVerification from './pages/EmailVerification';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './AuthContext';
 import { CacheProvider } from './CacheContext';
@@ -133,6 +134,7 @@ function App() {
                                                 <Route path="/friends" element={<Friends/>}/>
                                                 <Route path="/settings" element={<Settings/>}/>
                                                 <Route path="/developer-onboarding" element={<DeveloperOnboard/>}/>
+                                                <Route path="/verify-email" element={<EmailVerification/>}/>
                                             </Route>
 
                                             {/* admin routes */}

@@ -44,6 +44,7 @@ if (process.env.NODE_ENV === 'production') {
 // Other middleware
 app.use(express.json());
 app.use(cookieParser());
+app.use(express.urlencoded({ extended: true }));
 
 // if (process.env.NODE_ENV === 'production') {
 //     mongoose.connect(process.env.MONGO_URL);
@@ -89,22 +90,21 @@ const eventRoutes = require('./routes/eventRoutes.js');
 const oieRoutes = require('./routes/oie-routes.js');
 const orgRoutes = require('./routes/orgRoutes.js');
 const workflowRoutes = require('./routes/workflowRoutes.js');
+const affiliatedEmailRoutes = require('./routes/affiliatedEmailRoutes.js');
 
 app.use(authRoutes);
 app.use(dataRoutes);
 app.use(friendRoutes);
 app.use(userRoutes);
 app.use(analyticsRoutes);
-app.use(eventRoutes);
-
+app.use(searchRoutes);
 app.use(classroomChangeRoutes);
 app.use(ratingRoutes);
-app.use(searchRoutes);
-
 app.use(eventRoutes);
 app.use(oieRoutes);
 app.use(orgRoutes);
 app.use(workflowRoutes);
+app.use('/verify-affiliated-email', affiliatedEmailRoutes);
 
 // Serve static files from the React app in production
 if (process.env.NODE_ENV === 'production') {
