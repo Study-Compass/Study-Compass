@@ -39,7 +39,6 @@ function MeetingManagement({expandedClass,meetings, onExpand, clubName, picture}
                         {
                             meetings && meetings.events && meetings.events.length > 0 ? meetings.events.map((meeting, index) => {
                                 console.log("HERE");
-                                //check if meeting is upcoming or past
                                 if(new Date(meeting.start_time) < new Date() && new Date() < new Date(meeting.end_time)){
                                     return <ClubEvent key={index} event={meeting}  onGoing = {true} onExpand={handleExpand} />
                                     
@@ -54,7 +53,7 @@ function MeetingManagement({expandedClass,meetings, onExpand, clubName, picture}
                             meetings && meetings.events && meetings.events.length > 0 ? meetings.events.map((meeting, index) => {
                                 //check if meeting is upcoming or past
                                 if(new Date(meeting.start_time) > new Date()){
-                                    return <ClubEvent key={index} event={meeting} clubName={clubName} />
+                                    return <ClubEvent key={index} event={meeting} clubName={clubName} onExpand={handleExpand}/>
                                 }
                             }) : <h2>no meetings scheduled</h2>
                         }
