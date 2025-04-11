@@ -6,6 +6,7 @@ const { createApprovalInstance, getEventsWithAuthorization } = require('../utili
 const multer = require('multer');
 const path = require('path');
 const { uploadImageToS3, upload } = require('../services/imageUploadService');
+const IntegrationsService = require('./integrations/integrationsService');
 
 // Error handling middleware for multer
 const handleMulterError = (err, req, res, next) => {
@@ -67,7 +68,7 @@ router.post('/create-event', verifyToken, upload.single('image'), handleMulterEr
             const fileName = `${event._id}${fileExtension}`;
             const imageUrl = await uploadImageToS3(file, 'events', fileName);
             event.image = imageUrl;
-            console.log('Image uploaded successfully:', imageUrl);
+            //console.log('Image uploaded successfully:', imageUrl);
         }
     
         const approvalInstance = await createApprovalInstance(req, event._id, event);
@@ -81,6 +82,15 @@ router.post('/create-event', verifyToken, upload.single('image'), handleMulterEr
         }
 
         await event.save();
+
+        //run school-specific integrations if they exist
+        eventData = await IntegrationsService.runIntegration(
+            req.school,  
+            'create-event',
+            event,
+            req.db 
+        );
+        
         console.log('POST: /create-event successful');
         res.status(201).json({
             success: true,
@@ -121,10 +131,10 @@ router.get('/get-events', verifyToken, async (req, res) => {
 router.get('/get-all-events', verifyTokenOptional, async (req, res) => {
     const { Event, User } = getModels(req, 'Event', 'User');
     try {
-        // const events = await Event.find({}).populate('classroom_id');
-        //get all events, attach user object to the event
-        //mkae sure event doesn't have rejected or pending status
-        const events = await Event.find({ OIEStatus: { $nin: ['Rejected', 'Pending'] } })
+        const events = await Event.find({ 
+            OIEStatus: { $nin: ['Rejected', 'Pending'] },
+            isDeleted: false 
+        })
             .populate('classroom_id')
             .populate('hostingId');
         console.log('GET: /get-all-events successful');
@@ -195,14 +205,17 @@ router.delete('/delete-event/:event_id', verifyToken, async (req, res) => {
             });
         }
 
-        if (event.user_id.toString() !== user_id.toString()) {
+        if (event.hostingId.toString() !== user_id.toString()) {
             return res.status(403).json({
                 success: false,
                 message: 'You are not authorized to delete this event.'
             });
         }
 
-        await Event.deleteOne({ _id: event_id });
+        // Soft delete by setting isDeleted flag
+        event.isDeleted = true;
+        await event.save();
+
         res.status(200).json({
             success: true,
             message: 'Event deleted successfully.'
@@ -304,7 +317,7 @@ router.get('/get-event/:event_id', verifyTokenOptional, async (req, res) => {
 
     try {
         const user = user_id ? await User.findById(user_id) : null;
-        let eventQuery = Event.findById(event_id);
+        let eventQuery = Event.findOne({ _id: event_id });
 
         // Populate approvalReference conditionally based on approvalInstance
         const approvalInstance = await ApprovalInstance.findOne({ eventId: event_id });
@@ -572,7 +585,7 @@ router.post('/upload-event-image', verifyToken, upload.single('image'), async (r
 });
 
 router.get('/get-future-events', verifyToken, authorizeRoles('oie'), async (req, res) => {
-    const { Event, OIEStatus } = getModels(req, 'Event', 'OIEStatus');
+    const { Event } = getModels(req, 'Event');
     const { page = 1, limit = 10, filter, roles } = req.query;
     
     const currentDate = new Date();
@@ -656,7 +669,10 @@ router.get('/get-my-events', verifyToken, async (req, res) => {
     const {User, Event} = getModels(req, 'User', 'Event');
     const userId = req.user.userId;
     try{
-        let userEvents = await Event.find({hostingId: userId});
+        let userEvents = await Event.find({
+            hostingId: userId,
+            isDeleted: false
+        });
         if(userEvents){
             console.log('GET: /get-my-events successfull');
             return res.status(200).json({
@@ -673,7 +689,59 @@ router.get('/get-my-events', verifyToken, async (req, res) => {
             });
         }
     } catch(error){
+        console.log('GET: /get-my-events failed', error);
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+});
 
+// flush out this route,
+router.post('/create-event-from-template', verifyToken, async (req, res) => {
+    const {Event, User} = getModels(req, 'Event', 'User');
+    const userId = req.user.userId;
+    const {templateId} = req.body;
+    
+    try{
+        const template = await Event.findById(templateId);
+        if(!template){
+            return res.status(404).json({success: false, message: 'Template not found'});
+        }
+    } catch(error){
+        console.log('POST: /create-event-from-template failed', error);
+    }
+});
+
+//development route to shift events forward a week
+router.post('/shift-events-forward', verifyToken, async (req, res) => {
+    const {Event} = getModels(req, 'Event');
+    const {days} = req.body;
+
+    if(process.env.NODE_ENV !== 'development'){
+        return res.status(403).json({
+            success: false,
+            message: 'This route is only available in development mode'
+        });
+    }
+    
+    try{
+        const events = await Event.find({});
+        for(const event of events){
+            event.start_time = new Date(event.start_time.getTime() + days * 24 * 60 * 60 * 1000);
+            await event.save();
+        }
+        console.log('POST: /shift-events-forward successful');
+        res.status(200).json({
+            success: true,
+            message: 'Events shifted forward successfully'
+        });
+    } catch(error){
+        console.log('POST: /shift-events-forward failed', error);
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
     }
 });
 

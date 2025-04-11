@@ -10,8 +10,11 @@ import Switch from '../../../components/Switch/Switch';
 import Month from '../../../pages/OIEDash/EventsCalendar/Month/Month';
 import Week from '../../../pages/OIEDash/EventsCalendar/Week/Week';
 import Day from '../../../pages/OIEDash/EventsCalendar/Day/Day';
+import useAuth from '../../../hooks/useAuth';
+import postRequest from '../../../utils/postRequest';
 
 function Explore(){
+    const {user} = useAuth();
     const roles = [''];
     const [page, setPage] = useState(1);
     const limit = 15;
@@ -142,6 +145,16 @@ function Explore(){
                         filters={filters}
                         onFilterToggle={toggleFilter}
                     />
+                    {
+                        user.roles.includes('admin') && (
+                            <button onClick={() => {
+                                postRequest('/shift-events-forward', {days: 7});
+                                console.log('Events shifted forward successfully');
+                            }}>
+                                Shift Events Forward
+                            </button>
+                        )
+                    }
                 </div>
                 <div className="explore-events">
                     {futureEvents.loading ? (

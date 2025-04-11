@@ -71,6 +71,10 @@ const eventSchema = new mongoose.Schema({
         type:String,
         required:false,
     },
+    isDeleted: {
+        type: Boolean,
+        default: false
+    }
 }, {
     timestamps: true // automatically adds 'createdAt' and 'updatedAt' fields
 });
