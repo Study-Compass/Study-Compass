@@ -6,16 +6,15 @@ import left from '../../../assets/arrow-small-left.svg';
 import qrcode from '../../../assets/qr_code4.png';
 import { Icon } from '@iconify-icon/react/dist/iconify.mjs';
 
-function Agenda({openDash, clubName, event, picture, formattedDate, formattedStartTime, formattedEndTime}){
+function Agenda({openDash, clubName, event, picture, formattedDate, formattedStartTime, formattedEndTime, showMeeting}){
     
 
     return(
         <div className="Agenda">
-            <div className="back" onClick={openDash}>
+            <div className="back" onClick={showMeeting}>
                 <button>
                     <img src={left} alt="" />
-                    back to dashboard
-                    <Link to="/club-dashboard" ></Link>
+                    back to meeting
                 </button>          
             </div>
             <div className='Middle'>

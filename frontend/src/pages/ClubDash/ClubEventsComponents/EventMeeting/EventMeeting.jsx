@@ -39,9 +39,13 @@ function EventMeeting({openDash, clubName, event, picture}){
         hour12: true 
     });
 
+    const handleCloseAgenda = () => {
+        setShowAgenda(false);
+    };
     if (showAgenda) {
-        return <Agenda openDash={openDash} clubName={clubName} event={event} picture={picture} formattedDate={formattedDate} formattedStartTime={formattedStartTime} formattedEndTime={formattedEndTime}/>;
+        return <Agenda openDash={openDash} clubName={clubName} event={event} picture={picture} formattedDate={formattedDate} formattedStartTime={formattedStartTime} formattedEndTime={formattedEndTime} showMeeting={handleCloseAgenda}/>;
     }
+
     return(
         // <Agenda openDash={openDash} clubName={clubName} event = {event} picture = {picture}/>
         <header className="eventmeeting">
