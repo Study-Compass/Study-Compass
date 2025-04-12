@@ -668,27 +668,58 @@ router.get('/get-future-events', verifyToken, authorizeRoles('oie'), async (req,
 router.get('/get-my-events', verifyToken, async (req, res) => {
     const {User, Event} = getModels(req, 'User', 'Event');
     const userId = req.user.userId;
-    try{
-        let userEvents = await Event.find({
+    const { type = 'future', sort = 'asc' } = req.query;
+    const currentDate = new Date();
+
+    try {
+        let query = {
             hostingId: userId,
             isDeleted: false
-        });
-        if(userEvents){
-            console.log('GET: /get-my-events successfull');
+        };
+
+        // Apply filter based on the type parameter
+        switch(type) {
+            case 'future':
+                query.start_time = { $gte: currentDate };
+                break;
+            case 'past':
+                query.end_time = { $lt: currentDate };
+                break;
+            case 'archived':
+                query.isDeleted = true;
+                break;
+            case 'ongoing':
+                query.start_time = { $lte: currentDate };
+                query.end_time = { $gte: currentDate };
+                break;
+            default:
+                // Default to future events
+                query.start_time = { $gte: currentDate };
+        }
+
+        // Determine sort order
+        const sortOrder = sort === 'desc' ? -1 : 1;
+
+        let userEvents = await Event.find(query)
+            .populate('hostingId')
+            .sort({ start_time: sortOrder });
+
+        if(userEvents) {
+            console.log('GET: /get-my-events successful');
             return res.status(200).json({
-                success:true,
-                message : "my events found",
+                success: true,
+                message: "events found",
                 events: userEvents
             });
         } else {
             console.log('GET: /get-my-events empty');
             return res.status(200).json({
-                success:true,
+                success: true,
                 message: "no events found",
                 events: []
             });
         }
-    } catch(error){
+    } catch(error) {
         console.log('GET: /get-my-events failed', error);
         res.status(500).json({
             success: false,
