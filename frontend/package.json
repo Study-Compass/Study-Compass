@@ -24,6 +24,7 @@
     "css-loader": "^6.5.1",
     "css-minimizer-webpack-plugin": "^3.2.0",
     "date-fns": "^4.1.0",
+    "dayjs": "^1.11.13",
     "dotenv": "^10.0.0",
     "dotenv-expand": "^5.1.0",
     "eslint": "^8.3.0",

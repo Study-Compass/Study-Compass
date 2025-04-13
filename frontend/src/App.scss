@@ -514,7 +514,7 @@ textarea{
             justify-content: flex-start;
             overflow-y:auto;
             max-height: 100%;
-            
+            flex-grow: 1;
         }
         &.row{
             flex-wrap:nowrap;

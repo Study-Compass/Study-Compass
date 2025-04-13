@@ -313,6 +313,7 @@ router.get('/oie/get-rejected-events', verifyToken, authorizeRoles('oie'), async
 router.get('/get-event/:event_id', verifyTokenOptional, async (req, res) => {
     const { Event, User, OIEStatus, ApprovalInstance } = getModels(req, 'Event', 'User', 'OIEStatus', 'ApprovalInstance');
     const { event_id } = req.params;
+    const { type } = req.query;
     const user_id = req.user ? req.user.userId : null;
 
     try {
@@ -325,7 +326,21 @@ router.get('/get-event/:event_id', verifyTokenOptional, async (req, res) => {
         if (approvalInstance && user) {
             // Check if user has approval roles if approvalInstance exists
             if (user.approvalRoles.length > 0) {
-                eventQuery = eventQuery.populate('classroom_id').populate('hostingId').populate('approvalReference');
+                if(type === 'approval'){
+                    eventQuery = eventQuery
+                        .populate('classroom_id')
+                        .populate('hostingId')
+                        .populate({
+                            path: 'approvalReference',
+                            populate: {
+                            path: 'comments.userId', // populate userId inside comments
+                            model: 'User'
+                            }
+                        });
+
+                } else {
+                    eventQuery = eventQuery.populate('classroom_id').populate('hostingId');
+                }
             } else {
                 // If no approval roles, return an unauthorized response
                 return res.status(403).json({
@@ -341,7 +356,7 @@ router.get('/get-event/:event_id', verifyTokenOptional, async (req, res) => {
         const event = await eventQuery;
 
         if (!event) {
-            return res.status(404).json({
+        return res.status(404).json({
                 success: false,
                 message: 'Event not found.'
             });
@@ -694,7 +709,7 @@ router.get('/get-my-events', verifyToken, async (req, res) => {
                 break;
             default:
                 // Default to future events
-                query.start_time = { $gte: currentDate };
+                // query.start_time = { $gte: currentDate };
         }
 
         // Determine sort order
@@ -705,14 +720,14 @@ router.get('/get-my-events', verifyToken, async (req, res) => {
             .sort({ start_time: sortOrder });
 
         if(userEvents) {
-            console.log('GET: /get-my-events successful');
+            console.log(`GET: /get-my-events successful ${type}`);
             return res.status(200).json({
                 success: true,
                 message: "events found",
                 events: userEvents
             });
         } else {
-            console.log('GET: /get-my-events empty');
+            console.log(`GET: /get-my-events empty ${type}`);
             return res.status(200).json({
                 success: true,
                 message: "no events found",
@@ -760,6 +775,7 @@ router.post('/shift-events-forward', verifyToken, async (req, res) => {
         const events = await Event.find({});
         for(const event of events){
             event.start_time = new Date(event.start_time.getTime() + days * 24 * 60 * 60 * 1000);
+            event.end_time = new Date(event.end_time.getTime() + days * 24 * 60 * 60 * 1000);
             await event.save();
         }
         console.log('POST: /shift-events-forward successful');
@@ -771,6 +787,125 @@ router.post('/shift-events-forward', verifyToken, async (req, res) => {
         console.log('POST: /shift-events-forward failed', error);
         res.status(500).json({
             success: false,
+            message: error.message
+        });
+    }
+});
+
+router.post('/add-approval-comment', verifyToken, async (req, res) => {
+    const { Event, User, ApprovalInstance } = getModels(req, 'Event', 'User', 'ApprovalInstance');
+    const user_id = req.user.userId;
+    const { event_id, comment, parentCommentId } = req.body;
+
+    try {
+        const user = await User.findById(user_id);
+        if(!user) {
+            return res.status(403).json({
+                success: false,
+                message: 'You are not authorized to add comments.'
+            });
+        }
+
+        const event = await Event.findById(event_id);
+        if (!event) {
+        return res.status(404).json({
+                success: false,
+                message: 'Event not found.'
+            });
+        }
+
+        const approvalInstance = await ApprovalInstance.findOne({ eventId: event_id });
+        if (!approvalInstance) {
+            return res.status(404).json({
+                success: false,
+                message: 'Approval instance not found.'
+            });
+        }
+
+        // If parentCommentId is provided, verify it exists
+        if (parentCommentId) {
+            const parentComment = approvalInstance.comments.id(parentCommentId);
+            if (!parentComment) {
+                //check if parent comment is a reply
+                return res.status(404).json({
+                    success: false,
+                    message: 'Parent comment not found.'
+                });
+            }
+        }
+
+        // Add comment to the current approval step
+        //push to the front of the array
+        approvalInstance.comments.unshift({
+            userId: user_id,
+            text: comment,
+            createdAt: new Date(),
+            parentCommentId: parentCommentId || null
+        });
+
+        await approvalInstance.save();
+
+        
+        console.log('POST: /add-approval-comment successful');
+        res.status(200).json({
+            success: true,
+            message: 'Comment added successfully.',
+            comment: approvalInstance.comments[0]
+        });
+    } catch (error) {
+        console.log('POST: /add-approval-comment failed', error);
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+});
+
+router.post('/delete-approval-comment', verifyToken, async (req, res) => {
+    const { Event, User, ApprovalInstance } = getModels(req, 'Event', 'User', 'ApprovalInstance');
+    const user_id = req.user.userId;
+    const { event_id, comment_id } = req.body;
+
+    try {
+        const event = await Event.findById(event_id);
+        if (!event) {
+            return res.status(404).json({
+                success: false,
+                message: 'Event not found.'
+            });
+        }
+
+        const approvalInstance = await ApprovalInstance.findOne({ eventId: event_id });
+        if (!approvalInstance) {
+            return res.status(404).json({
+                success: false,
+                message: 'Approval instance not found.' 
+            });
+        }
+
+        //find comment in approval instance
+        const comment = approvalInstance.comments.id(comment_id);
+        if (!comment) {
+            return res.status(404).json({
+                success: false,
+                message: 'Comment not found.'
+            });
+        }
+
+        //delete comment
+        approvalInstance.comments.pull(comment_id); 
+
+        await approvalInstance.save();
+
+        console.log('POST: /delete-approval-comment successful');
+        res.status(200).json({
+            success: true,
+            message: 'Comment deleted successfully.'
+        });
+    } catch (error) {
+        console.log('POST: /delete-approval-comment failed', error);
+        res.status(500).json({
+            success: false, 
             message: error.message
         });
     }

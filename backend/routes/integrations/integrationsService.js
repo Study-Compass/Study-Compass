@@ -53,7 +53,11 @@ class IntegrationsService {
         }
 
         try {
-            return await integrations[school][action](data, db);
+            if(process.env.NODE_ENV === 'production'){
+                return await integrations[school][action](data, db);
+            } else {
+                return data;
+            }
         } catch (error) {
             console.error(`Integration failed for ${school} - ${action}:`, error);
             return data; //return original data if integration fails

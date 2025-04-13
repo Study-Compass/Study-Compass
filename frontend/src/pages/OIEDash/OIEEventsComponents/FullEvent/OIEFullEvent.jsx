@@ -9,7 +9,8 @@ import { useNotification } from '../../../../NotificationContext';
 import axios from 'axios';
 import defaultAvatar from '../../../../assets/defaultAvatar.svg';
 import EventTimeline from './ApprovalTimeline/ApprovalTimeline';
-
+import CommentsSection from '../../../../components/CommentsSection.jsx/CommentsSection';
+import postRequest from '../../../../utils/postRequest';
 const acknowledgements = {
     'pspeak' : 'This event is asking the President to speak',
     'people' : 'This event has over 100 people expected to attend',
@@ -44,13 +45,24 @@ function OIEFullEvent({ event, eventId = null, setEdited }){
     const { addNotification } = useNotification();
 
     const { data, loading, error } = useFetch('/config');
-    const fullEvent = useFetch(`/get-event/${eventId ? eventId :event._id}`);
-
+    const fullEvent = useFetch(`/get-event/${eventId ? eventId :event._id}?type=approval`);
+    const fullEventRef = useRef(null);
     const date = new Date(event.start_time);
     const dateEnd = new Date(event.end_time);
 
     const [tab, setTab] = useState("info");
     const [checked, setChecked] = useState({});
+    const [newComment, setNewComment] = useState('');
+
+    const [height, setHeight] = useState(0);
+    const [initialHeight, setInitialHeight] = useState(0);
+
+    useEffect(() => {
+        if(initialHeight === 0){
+            setInitialHeight(fullEventRef.current.clientHeight);
+            setHeight(fullEventRef.current.clientHeight);
+        }
+    }, [fullEventRef]);
 
     const handleCheck = async (index) => {
         console.log(index);
@@ -136,6 +148,7 @@ function OIEFullEvent({ event, eventId = null, setEdited }){
 
             // });
             // setChecked(check);
+            console.log(fullEvent.data.event.approvalReference);
         }
     }, [fullEvent.data]);
 
@@ -144,15 +157,15 @@ function OIEFullEvent({ event, eventId = null, setEdited }){
     }
 
     return(
-        <div className="full-event oie">
+        <div className="full-event oie" ref={fullEventRef} style={{height: `${height}px`}}>
             <div className="tabs">
-                <div className={`tab ${tab === "info" && "selected"}`} onClick={()=>setTab('info')} >
+                <div className={`tab ${tab === "info" && "selected"}`} onClick={()=>{setTab('info');setHeight(initialHeight)}}>
                     <div className="tab-content">
                         <Icon icon="akar-icons:info-fill" />
                         <p>info</p>
                     </div>
                 </div>
-                <div className={`tab ${tab === "check" && "selected"}`} onClick={()=> setTab('check')}>
+                <div className={`tab ${tab === "check" && "selected"}`} onClick={()=>{ setTab('check');setHeight(700)}}>
                     <div className="tab-content">
                         <Icon icon="icon-park-solid:check-one" />
                         <p>check</p>
@@ -192,20 +205,14 @@ function OIEFullEvent({ event, eventId = null, setEdited }){
                             </>
                         }
                     </div>
-                    {/* <h1>Checklist</h1>
-                    <div className="checklist">
-                        {!loading && data.config.checklist.map((item, index) => (
-                            <div className={`check-item ${checked[index] && "checked"}`} key={index} onClick={()=>handleCheck(index)} >
-                                <div className="row">
-                                    <Icon icon={checked[index] ? "icon-park-outline:check-one" : "mdi:circle-outline"} />
-                                    <div className="col">
-                                        <h2>{item.title}</h2>
-                                        <p>{item.description}</p>
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
-                    </div> */}
+                    
+                    {!fullEvent.loading && fullEvent.data && (
+                        <CommentsSection
+                            comments={fullEvent.data.event.approvalReference?.comments || []}
+                            eventId={event._id}
+
+                        />
+                    )}
                 </div>
             </div>
         </div>
