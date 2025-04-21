@@ -112,7 +112,10 @@ router.get('/get-approval-steps', verifyToken, authorizeRoles('admin', 'root'), 
 
     } catch(error){
         console.log(error);
-    }
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
 });
 
 
