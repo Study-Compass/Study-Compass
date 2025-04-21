@@ -116,6 +116,7 @@ router.get('/get-approval-steps', verifyToken, authorizeRoles('admin', 'root'), 
             success: false,
             message: error.message
         });
+    }
 });
 
 
