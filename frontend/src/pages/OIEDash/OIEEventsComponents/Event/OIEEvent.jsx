@@ -1,17 +1,22 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './OIEEvent.scss';
 import { useNavigate } from 'react-router-dom';
 import Popup from '../../../../components/Popup/Popup';
 import OIEFullEvent from '../FullEvent/OIEFullEvent';
 import { Icon } from '@iconify-icon/react/dist/iconify.mjs';
 import FullEvent from '../../../../components/EventsViewer/EventsGrid/EventsColumn/FullEvent/FullEvent';
-
+import { useNotification } from '../../../../NotificationContext';
 import defaultAvatar from '../../../../assets/defaultAvatar.svg';
+import deleteRequest from '../../../../utils/deleteRequest';
 
-function OIEEvent({event, showStatus=false, refetch, showOIE=false, index, showExpand=true}){
+function OIEEvent({event, showStatus=false, refetch, showOIE=false, index, showExpand=true, manage=false}){
     const [popupOpen, setPopupOpen] = useState(false);
     const [edited, setEdited] = useState(false);
     const navigate = useNavigate();
+    const { addNotification } = useNotification();
+    const [managePopupOpen, setManagePopupOpen] = useState(false);
+    const managePopupRef = useRef(null);
+    const [archived, setArchived] = useState(false);
 
     const handleEventClick = (event) => {
         setPopupOpen(true);
@@ -66,8 +71,34 @@ function OIEEvent({event, showStatus=false, refetch, showOIE=false, index, showE
         );
     }
 
+    const onArchiveEvent = async () => {
+        const response = await deleteRequest(`/delete-event/${event._id}`);
+        console.log(response);
+        if(response.success){
+            setArchived(true);
+            //wait for animation
+            setTimeout(() => {
+                refetch?.();
+            }, 500);
+        } else {
+            addNotification({
+                title: "Error",
+                message: response.message,
+                type: "error"
+            });
+        }
+    }
+
+    const onOpenManagePopup = () => {
+        setManagePopupOpen(!managePopupOpen);
+    }
+
+    const onCloseManagePopup = () => {
+        setManagePopupOpen(false);
+    }
+
     return(
-        <div className="oie-event-component" style={index ? {animationDelay: `${index * 0.1}s`}:{}}>
+        <div className={`oie-event-component ${managePopupOpen ? "manage" : ""} ${archived && "archived"}`} style={index ? {animationDelay: `${index * 0.1}s`}:{}}>
             <Popup isOpen={popupOpen} onClose={onPopupClose} customClassName={"wide-content no-padding no-styling oie"} waitForLoad={true} >
                 {showOIE && !(event.OIEStatus === "Not Applicable") ?
                     <OIEFullEvent event={event} refetch={refetch} setEdited={setEdited}/>
@@ -92,13 +123,32 @@ function OIEEvent({event, showStatus=false, refetch, showOIE=false, index, showE
                     <p>{event.location}</p>
                 </div>
             </div>
+            <div className="event-button-container">
+                {
+                    showExpand && 
+                    <button className="button" onClick={() => handleEventClick(event)}>
+                        <Icon icon="material-symbols:expand-content-rounded" />
+                        <p>details</p>
+                    </button>
+                }
+                {
+                    manage &&
+                    <button className="button" onClick={onOpenManagePopup} ref={managePopupRef}>
+                        <Icon icon="fluent:edit-48-filled" />
+                        <p>manage</p>
+                    </button>
+                }
+            </div>
             {
-                showExpand && 
-                <button className="button" onClick={() => handleEventClick(event)}>
-                    <Icon icon="material-symbols:expand-content-rounded" />
-                    <p>details</p>
-                </button>
+                manage && managePopupOpen &&
+                <div className="manage-actions" >
+                    <button>edit</button>
+                    <button onClick={onArchiveEvent}>archive</button>
+                    <button onClick={onCloseManagePopup}>cancel</button>
+                </div>
             }
+
+
         </div>
     );
 

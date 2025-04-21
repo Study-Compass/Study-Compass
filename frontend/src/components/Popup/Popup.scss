@@ -55,7 +55,11 @@
       width:95%;
       .close-popup{
         background-color: var(--background);
-        padding:7px;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         top:5px;
         right:10px;
         border-radius:50%;

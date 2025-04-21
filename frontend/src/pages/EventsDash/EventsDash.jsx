@@ -6,12 +6,14 @@ import Dashboard from '../../components/Dashboard/Dashboard';
 import Explore from './Explore/Explore';
 import MyEvents from './MyEvents/MyEvents';
 import Loader from '../../components/Loader/Loader';
+import Orgs from './Orgs/Orgs';
 
 function EventsDash({  }){
-    const [showLoading, setShowLoading] = useState(true);
+    const [showLoading, setShowLoading] = useState(false);
     const menuItems = [
         { label: 'Explore', icon: 'mingcute:compass-fill' },
         { label: 'My Events', icon: 'mingcute:calendar-fill' },
+        { label: 'Organizations',  icon: 'mingcute:calendar-fill' }
     ];
 
     useEffect(() => {
@@ -35,6 +37,7 @@ function EventsDash({  }){
             <Dashboard menuItems={menuItems} additionalClass='events-dash'>
                 <Explore />
                 <MyEvents />
+                <Orgs/>
             </Dashboard>
         </>
     )

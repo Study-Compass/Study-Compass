@@ -414,9 +414,35 @@ router.post('/grant-badge', verifyToken, async (req, res) => {
         res.status(200).json({ message: 'Badge granted successfully', badges: user.badges, badge: {badgeContent:badgeGrant.badgeContent, badgeColor: badgeGrant.badgeColor} });
     } catch (error) {
         console.error('Error granting badge:', error);
-        res.status(500).json({ error: 'Server error' });
+        res.status(500).json({ error: error});
     }
 });
+
+router.post('/renew-badge-grant', verifyToken, authorizeRoles('admin'), async (req,res) => {
+    
+})
+
+router.get('/get-badge-grants', verifyToken, authorizeRoles('admin'), async (req,res) => {
+    const { User, BadgeGrant } = getModels(req, 'User', 'BadgeGrant');
+    try{
+        const user = await User.findById(req.user.userId);
+        if(!user || !user.roles.includes('admin')){
+            return res.status(403).json({
+                success: false,
+                message: 'You don\'t have permissions to view badge grants'
+            })
+        }
+        const badgeGrants = await BadgeGrant.find({});
+        return res.status(200).json({
+            success:true,
+            badgeGrants
+        })
+    } catch (error){
+        console.error('Error getting badges:', error);
+        res.status(500).json({erorr:error})
+    }
+});
+
 
 
 router.post("/upload-user-image", verifyToken, upload.single('image'), async (req, res) =>{

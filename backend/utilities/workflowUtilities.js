@@ -60,6 +60,8 @@ async function getEventsWithAuthorization(req, filterObj = {}, roleNames = [], s
         let matchStage = {
             start_time: { $gte: startOfRange, $lte: endOfRange },
             ...(filterObj?.type !== "all" ? filterObj : {}), 
+            isDeleted: false
+
         };
 
         //if no roles, only return "approved" or "not applicable" events

@@ -205,7 +205,7 @@ router.delete('/delete-event/:event_id', verifyToken, async (req, res) => {
             });
         }
 
-        if (event.hostingId.toString() !== user_id.toString()) {
+        if (event.hostingId.toString() !== user_id.toString() && !user.approvalRoles.includes('admin')) {
             return res.status(403).json({
                 success: false,
                 message: 'You are not authorized to delete this event.'

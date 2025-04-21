@@ -40,7 +40,9 @@ function MyEvents(){
             <div className="heading">
                 <h1>My Events</h1>
             </div>
-            <CreateEventButton />
+            <div className="event-button-container">
+                <CreateEventButton row={true} color="red"/>
+            </div>
             <div className="item-container">
                 <div className="item-header">
                     <div className="header-row">
@@ -64,11 +66,12 @@ function MyEvents(){
                         
                     </div>
                 </div>
-                <div className="items item-grid">
-                    {myEvents.data && myEvents.data.events.map((event)=>(
-                        <OIEEvent key={event._id} event={event} showOIE={event.approvalReference} />
-                    ))}
-
+                <div className="items-container">
+                    <div className="items item-grid">
+                        {myEvents.data && myEvents.data.events.map((event)=>(
+                            <OIEEvent key={event._id} event={event} showOIE={event.approvalReference} manage={true} refetch={myEvents.refetch} />
+                        ))}
+                    </div>
                 </div>
             </div>
         </div>

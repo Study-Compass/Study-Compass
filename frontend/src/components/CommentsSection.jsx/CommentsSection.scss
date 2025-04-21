@@ -4,9 +4,10 @@
 
     h2 {
         margin-bottom: 1.5rem;
-        color: #333;
+        color: var(--text);
         font-size: 1.2rem;
         font-weight: 600;
+        font-family: 'Satoshi'
     }
 
     .comments-list {
