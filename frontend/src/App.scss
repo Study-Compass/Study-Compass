@@ -5,6 +5,7 @@
     --dark: rgba(226, 226, 226, 1);
     --lightred: rgba(250, 117, 109, 0.3);
     --red: rgba(250, 117, 109, 1);
+    --dark-red: rgba(208, 96, 88, 1);
     --red-transparent: rgba(250, 117, 109, 0.1);
     --salmon: #FF8888;
     --blue: #87AFF1;
@@ -442,4 +443,88 @@ textarea{
 
 .rs-btn-link:hover, .rs-btn-link:focus{
     color: var(--red) !important;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    width:100%;
+
+    label {
+        font-family: Inter, sans-serif;
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--text);
+        margin: 0 0 5px 7px;
+    }
+}
+
+.item-container{
+    display: flex;
+    flex-direction: column;
+    width:100%;
+    background-color: var(--background);
+    border-radius: 15px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--lightborder);
+    box-sizing: border-box;
+    flex-shrink: 1;
+    flex-grow: 1;
+    overflow: hidden;
+    .item-header{
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        width:100%;
+        border-bottom: 1px solid var(--lightborder);
+        padding: 8px 15px;
+        box-sizing: border-box; 
+        & > div{
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap:5px;
+        }
+        iconify-icon{
+            font-size: 16px;
+            color: var(--lighter-text);
+        }
+        h1, h2, h3{
+            font-size: 16px;
+            margin: 0;
+            font-family: "Satoshi";
+            font-weight: 400;
+            color: var(--lighter-text);
+        }
+    }
+    .items-container{
+        flex-grow:1;
+        background-color: var(--lightest);
+        overflow-y:auto;
+        .items{
+            padding: 15px;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+            width:100%;
+            box-sizing: border-box;
+            gap:10px;
+            background-color: var(--lightest);
+    
+            &.item-grid{
+                flex-wrap:wrap;
+                align-items: flex-start;
+                justify-content: flex-start;
+                overflow-y:auto;
+                max-height: 100%;
+                flex-grow: 1;
+            }
+            &.row{
+                flex-wrap:nowrap;
+                overflow-x: auto;
+            }
+        }
+    }
 }

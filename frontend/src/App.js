@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import './App.css';
+import './App.scss';
 import './assets/fonts.css';
 import Room from './pages/Room/Room';
 import Room1 from './pages/Room/Room1';
@@ -37,6 +37,7 @@ import { WebSocketProvider } from './WebSocketContext';
 import Layout from './pages/Layout/Layout';
 import axios from 'axios';
 import CreateEvent from './pages/CreateEvent/CreateEvent';
+import EventsDash from './pages/EventsDash/EventsDash';
 
 function App() {
     useEffect(() => {
@@ -148,6 +149,7 @@ function App() {
                                                 <Route path='/create-org' element={<CreateOrg/>}/>
                                                 <Route path="/root-dashboard" element={<RootDash/>}/>
                                                 <Route path="/approval-dashboard/:id" element={<OIEDash/>}/>
+                                                <Route path="/events-dashboard" element={<EventsDash/>}/>
                                             </Route>
 
                                             {/* oie routes */}

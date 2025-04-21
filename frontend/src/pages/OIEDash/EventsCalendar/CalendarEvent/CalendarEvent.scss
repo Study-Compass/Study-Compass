@@ -44,5 +44,8 @@
             margin-bottom: 4px;
         }
     }
-
+    &.pending{
+        background-color: #FBEBBB;
+        border-left: 4px solid var(--yellow);
+    }
 }

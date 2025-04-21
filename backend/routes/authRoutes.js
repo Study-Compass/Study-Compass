@@ -171,7 +171,11 @@ router.get('/validate-token', verifyToken, async (req, res) => {
 router.post('/verify-email', async (req, res) => {
     const { email } = req.body;
     const apiKey = process.env.HUNTER_API; // Replace with your actual API key
-  
+    
+    if(process.env.NODE_ENV === 'development'){
+        return res.status(200).json({success:true});
+    }
+
     try {
       const response = await axios(`https://api.hunter.io/v2/email-verifier?email=${email}&api_key=${apiKey}`);
       res.json(response.data);

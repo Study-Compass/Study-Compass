@@ -1,7 +1,6 @@
 .oie-dash .dash{
     height: 100vh;
     width:100%;
-    padding:20px;
     box-sizing: border-box;
     z-index: 1;
     display: flex;
@@ -17,7 +16,6 @@
     header.header{
         height:110px;
         position: relative;
-        border-radius: 13px;
         overflow: hidden;
         display:flex;
         h1{
@@ -35,6 +33,7 @@
     .needs-approval{
         display: flex;
         flex-direction: column;
+        padding:20px;
         h1{
             font-size: 20px;
             margin: 0;
@@ -73,17 +72,22 @@
         gap: 10px;
         flex-direction: column;
         flex-grow:1;
+        padding:20px;
+        box-sizing: border-box;
         // max-height:60%;
         // overflow-y:hidden;
-        .header .time-period{
-            display: flex;
-            justify-content: space-between;
-            box-sizing: border-box;
-            padding: 0 10px;
-            align-items: center;
-            h1{
-                margin: 0;
-                font-size:20px
+        .weekly-header {
+            height:30px;
+            .time-period{
+                display: flex;
+                justify-content: space-between;
+                box-sizing: border-box;
+                padding: 0 10px;
+                align-items: center;
+                h1{
+                    margin: 0;
+                    font-size:20px;
+                }
             }
         }
     }

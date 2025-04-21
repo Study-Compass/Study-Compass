@@ -43,13 +43,13 @@ function EventsCalendar({expandedClass}){
 
             <div className="content" ref={contentRef}>
                 {
-                    view === 0 && <Month height={contentHeight} changeToWeek={changeToWeek} view={view} setView={setView} filter={filter}/>
+                    view === 0 && <Month height={`${contentHeight}px`} changeToWeek={changeToWeek} view={view} setView={setView} filter={filter}/>
                 }
                 {
-                    view === 1 && <Week height={contentHeight} changeToDay={changeToDay} start={start} filter={filter}/>
+                    view === 1 && <Week height={`${contentHeight}px`} changeToDay={changeToDay} start={start} filter={filter} view={view} setView={setView}/>
                 }
                 {
-                    view === 2 && <Day height={contentHeight} start={selected} filter={filter}/>
+                    view === 2 && <Day height={`${contentHeight}px`} start={selected} filter={filter} view={view} setView={setView}/>
                 }
 
             </div>

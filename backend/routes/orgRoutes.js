@@ -715,5 +715,23 @@ router.post('/send-email', async (req,res) => {
     }
 });
 
+router.get('/get-orgs', async (req, res) => {
+    try{
+        const { Org } = getModels(req, 'Org');
+        const orgs = await Org.find();
+        console.log('GET: /get-orgs successful')
+        res.status(200).json({
+            success:true,
+            orgs:orgs
+        })
+    } catch (error){
+        console.log('GET: /get-orgs failed', error);
+        res.status(500).json({
+            sucess:false,
+            
+        })
+    }
+});
+
 
 module.exports = router;

@@ -86,6 +86,38 @@ router.post('/add-approval', verifyToken, authorizeRoles('admin', 'root'), async
     }
 });
 
+router.get('/get-approval-steps', verifyToken, authorizeRoles('admin', 'root'), async (req,res) => {
+    const { ApprovalFlow, User, } = getModels(req,'ApprovalFlow', 'User');
+    try{
+        console.log('GET: /get-approval-steps');
+        const user = await User.findById(req.user.userId);
+        if(!user) return res.status(403).json({success:false, message: "User not found"});
+        if(!user.approvalRoles || user.approvalRoles.length === 0) return res.status(403).json({success:false, message: "User not authorized"});
+
+        const approvalFlow = await ApprovalFlow.find();
+        if(!approvalFlow){
+            return res.status(500).json({success:false, message:"Approvals not configured"});
+        }
+        const steps = 
+            user.roles.includes('admin') || user.roles.includes('root') ? 
+                approvalFlow[0].steps
+                : 
+                approvalFlow[0].steps.filter(step => user.approvalRoles.includes(step.role));
+        console.log(approvalFlow[0].steps);
+
+        return res.status(200).json({
+            success:true,
+            steps: steps
+        })
+
+    } catch(error){
+        console.log(error);
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+});
+
 
 //need a route to get workflow
 //need a route to add and remove workflow items

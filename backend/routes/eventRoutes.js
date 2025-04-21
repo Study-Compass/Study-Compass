@@ -6,6 +6,7 @@ const { createApprovalInstance, getEventsWithAuthorization } = require('../utili
 const multer = require('multer');
 const path = require('path');
 const { uploadImageToS3, upload } = require('../services/imageUploadService');
+const IntegrationsService = require('./integrations/integrationsService');
 
 // Error handling middleware for multer
 const handleMulterError = (err, req, res, next) => {
@@ -67,7 +68,7 @@ router.post('/create-event', verifyToken, upload.single('image'), handleMulterEr
             const fileName = `${event._id}${fileExtension}`;
             const imageUrl = await uploadImageToS3(file, 'events', fileName);
             event.image = imageUrl;
-            console.log('Image uploaded successfully:', imageUrl);
+            //console.log('Image uploaded successfully:', imageUrl);
         }
     
         const approvalInstance = await createApprovalInstance(req, event._id, event);
@@ -81,6 +82,15 @@ router.post('/create-event', verifyToken, upload.single('image'), handleMulterEr
         }
 
         await event.save();
+
+        //run school-specific integrations if they exist
+        eventData = await IntegrationsService.runIntegration(
+            req.school,  
+            'create-event',
+            event,
+            req.db 
+        );
+        
         console.log('POST: /create-event successful');
         res.status(201).json({
             success: true,
@@ -121,10 +131,10 @@ router.get('/get-events', verifyToken, async (req, res) => {
 router.get('/get-all-events', verifyTokenOptional, async (req, res) => {
     const { Event, User } = getModels(req, 'Event', 'User');
     try {
-        // const events = await Event.find({}).populate('classroom_id');
-        //get all events, attach user object to the event
-        //mkae sure event doesn't have rejected or pending status
-        const events = await Event.find({ OIEStatus: { $nin: ['Rejected', 'Pending'] } })
+        const events = await Event.find({ 
+            OIEStatus: { $nin: ['Rejected', 'Pending'] },
+            isDeleted: false 
+        })
             .populate('classroom_id')
             .populate('hostingId');
         console.log('GET: /get-all-events successful');
@@ -195,14 +205,17 @@ router.delete('/delete-event/:event_id', verifyToken, async (req, res) => {
             });
         }
 
-        if (event.user_id.toString() !== user_id.toString()) {
+        if (event.hostingId.toString() !== user_id.toString() && !user.approvalRoles.includes('admin')) {
             return res.status(403).json({
                 success: false,
                 message: 'You are not authorized to delete this event.'
             });
         }
 
-        await Event.deleteOne({ _id: event_id });
+        // Soft delete by setting isDeleted flag
+        event.isDeleted = true;
+        await event.save();
+
         res.status(200).json({
             success: true,
             message: 'Event deleted successfully.'
@@ -217,28 +230,32 @@ router.delete('/delete-event/:event_id', verifyToken, async (req, res) => {
 
 //get all oie-unapproved events
 router.get('/oie/get-pending-events', verifyToken, authorizeRoles('oie'), async (req, res) => {
-    const { Event, User } = getModels(req, 'Event', 'User');
+    const { Event, OIEStatus } = getModels(req, 'Event', 'OIEStatus');
+    // const { start, end, filter, roles } = req.query;
+
+    const start = new Date();
+    const end = new Date();
+    end.setDate(start.getDate() + 99);
+    const filter = { status: 'pending'};
+    const roles = ['Heffner Alumni House'];
+
     try {
-        const user = await User.findById(req.user.userId);
-        if (!user) {
-            return res.status(403).json({
-                success: false,
-                message: 'You are not authorized to view this page.'
-            });
-        }
-        const events = await Event.find({ OIEStatus: 'Pending' }).populate('classroom_id').populate('hostingId');
-        console.log('GET: /oie/get-pending-events successful');
+        const events = await getEventsWithAuthorization(req, filter, ['Heffner Alumni House'], start, end, ['classroom_id', 'hostingId']);
+        console.log(events);
+
+        console.log('GET: /get-events-by-pending successful');
         res.status(200).json({
             success: true,
             events
         });
     } catch (error) {
-        console.log('GET: /oie/get-pending-events failed', error);
+        console.log('GET: /get-events-by-week failed', error);
         res.status(500).json({
             success: false,
             message: error.message
         });
     }
+
 });
 
 //get all oie-unapproved events
@@ -296,36 +313,55 @@ router.get('/oie/get-rejected-events', verifyToken, authorizeRoles('oie'), async
 router.get('/get-event/:event_id', verifyTokenOptional, async (req, res) => {
     const { Event, User, OIEStatus, ApprovalInstance } = getModels(req, 'Event', 'User', 'OIEStatus', 'ApprovalInstance');
     const { event_id } = req.params;
+    const { type } = req.query;
     const user_id = req.user ? req.user.userId : null;
 
     try {
         const user = user_id ? await User.findById(user_id) : null;
-        const event = await Event.findById(event_id).populate('classroom_id').populate('hostingId');
-        if (!event) {
-            return res.status(404).json({
-                success: false,
-                message: 'Event not found.'
-            });
-        }
+        let eventQuery = Event.findOne({ _id: event_id });
+
+        // Populate approvalReference conditionally based on approvalInstance
         const approvalInstance = await ApprovalInstance.findOne({ eventId: event_id });
-        if (approvalInstance) {
-            if (!user){
+
+        if (approvalInstance && user) {
+            // Check if user has approval roles if approvalInstance exists
+            if (user.approvalRoles.length > 0) {
+                if(type === 'approval'){
+                    eventQuery = eventQuery
+                        .populate('classroom_id')
+                        .populate('hostingId')
+                        .populate({
+                            path: 'approvalReference',
+                            populate: {
+                            path: 'comments.userId', // populate userId inside comments
+                            model: 'User'
+                            }
+                        });
+
+                } else {
+                    eventQuery = eventQuery.populate('classroom_id').populate('hostingId');
+                }
+            } else {
+                // If no approval roles, return an unauthorized response
                 return res.status(403).json({
                     success: false,
                     message: 'You are not authorized to view this page.'
                 });
-            } else {    
-                //check that user has approval role
-                if(user.approvalRoles.length > 0){
-                    let newEvent = event.toObject();
-                    newEvent["approvalInstance"] = approvalInstance;
-                    return res.status(202).json({
-                        success: true,
-                        event: newEvent
-                    });
-                }
             }
+        } else {
+            // If no approvalInstance exists, just return the event without additional population
+            eventQuery = eventQuery.populate('classroom_id').populate('hostingId');
         }
+
+        const event = await eventQuery;
+
+        if (!event) {
+        return res.status(404).json({
+                success: false,
+                message: 'Event not found.'
+            });
+        }
+
         return res.status(200).json({
             success: true,
             event
@@ -338,7 +374,6 @@ router.get('/get-event/:event_id', verifyTokenOptional, async (req, res) => {
         });
     }
 });
-
 router.post('/approve-event', verifyToken, async (req, res) => {
     const { Event, User, ApprovalInstance } = getModels(req, 'Event', 'User', 'ApprovalInstance');
     const user_id = req.user.userId;
@@ -412,6 +447,8 @@ router.get('/get-events-by-month', verifyToken, authorizeRoles('oie'), async (re
     }
 
     try {
+        //log params
+        console.log(month, year, filter);
         // Parse month and year into integers
         const parsedMonth = parseInt(month, 10) - 1; // JavaScript months are 0-indexed
         const parsedYear = parseInt(year, 10);
@@ -499,9 +536,8 @@ router.get('/get-events-by-range', verifyToken, authorizeRoles('oie'), async (re
         };
 
 
-        const events = await getEventsWithAuthorization(req, filterObj, [], startOfRange, endOfRange, ['classroom_id', 'hostingId']);
+        const events = await getEventsWithAuthorization(req, filterObj, roles, startOfRange, endOfRange, ['classroom_id', 'hostingId']);
         console.log(events);
-
         // const events = await Event.find(query)
         //     .populate('classroom_id')
         //     .populate('hostingId')
@@ -559,6 +595,318 @@ router.post('/upload-event-image', verifyToken, upload.single('image'), async (r
             success: false, 
             message: 'Failed to upload event image',
             error: error.message 
+        });
+    }
+});
+
+router.get('/get-future-events', verifyToken, authorizeRoles('oie'), async (req, res) => {
+    const { Event } = getModels(req, 'Event');
+    const { page = 1, limit = 10, filter, roles } = req.query;
+    
+    const currentDate = new Date();
+    currentDate.setHours(0, 0, 0, 0);
+
+    try {
+        let filterObj;
+        const safeOperators = ['$gte', '$lte', '$eq', '$ne', '$in']; // Allow only these
+        if (filter) {
+            try {
+                const decodedFilter = JSON.parse(decodeURIComponent(filter));
+                Object.keys(decodedFilter).forEach(key => {
+                    if (typeof decodedFilter[key] === 'object') {
+                        Object.keys(decodedFilter[key]).forEach(op => {
+                            if (!safeOperators.includes(op)) {
+                                throw new Error('Invalid query operator');
+                            }
+                        });
+                    }
+                });
+                filterObj = decodedFilter;
+            } catch (error) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Invalid filter format.',
+                });
+            }
+        }
+
+        // Base query for events from the start of today
+        let query = {
+            end_time: { $gte: currentDate }
+        };
+
+        // Add additional filters if they exist
+        if (filterObj && filterObj.type !== "all") {
+            query = { ...query, ...filterObj };
+        }
+
+        // Get total count for pagination
+        const totalEvents = await Event.countDocuments(query);
+
+        // Calculate pagination
+        const skip = (parseInt(page) - 1) * parseInt(limit);
+        const totalPages = Math.ceil(totalEvents / parseInt(limit));
+
+        // Get paginated events with authorization, sorting by start_time
+        const events = await getEventsWithAuthorization(
+            req,
+            filterObj,
+            roles,
+            currentDate,
+            new Date('9999-12-31'), // Far future date to get all future events
+            ['classroom_id', 'hostingId'],
+            skip,
+            parseInt(limit),
+            { start_time: 1 } // Sort by start_time in ascending order
+        );
+
+        console.log('GET: /get-future-events successful');
+        res.status(200).json({
+            success: true,
+            events,
+            pagination: {
+                total: totalEvents,
+                totalPages,
+                currentPage: parseInt(page),
+                limit: parseInt(limit)
+            }
+        });
+    } catch (error) {
+        console.log('GET: /get-future-events failed', error);
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+});
+
+router.get('/get-my-events', verifyToken, async (req, res) => {
+    const {User, Event} = getModels(req, 'User', 'Event');
+    const userId = req.user.userId;
+    const { type = 'future', sort = 'asc' } = req.query;
+    const currentDate = new Date();
+
+    try {
+        let query = {
+            hostingId: userId,
+            isDeleted: false
+        };
+
+        // Apply filter based on the type parameter
+        switch(type) {
+            case 'future':
+                query.start_time = { $gte: currentDate };
+                break;
+            case 'past':
+                query.end_time = { $lt: currentDate };
+                break;
+            case 'archived':
+                query.isDeleted = true;
+                break;
+            case 'ongoing':
+                query.start_time = { $lte: currentDate };
+                query.end_time = { $gte: currentDate };
+                break;
+            default:
+                // Default to future events
+                // query.start_time = { $gte: currentDate };
+        }
+
+        // Determine sort order
+        const sortOrder = sort === 'desc' ? -1 : 1;
+
+        let userEvents = await Event.find(query)
+            .populate('hostingId')
+            .sort({ start_time: sortOrder });
+
+        if(userEvents) {
+            console.log(`GET: /get-my-events successful ${type}`);
+            return res.status(200).json({
+                success: true,
+                message: "events found",
+                events: userEvents
+            });
+        } else {
+            console.log(`GET: /get-my-events empty ${type}`);
+            return res.status(200).json({
+                success: true,
+                message: "no events found",
+                events: []
+            });
+        }
+    } catch(error) {
+        console.log('GET: /get-my-events failed', error);
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+});
+
+// flush out this route,
+router.post('/create-event-from-template', verifyToken, async (req, res) => {
+    const {Event, User} = getModels(req, 'Event', 'User');
+    const userId = req.user.userId;
+    const {templateId} = req.body;
+    
+    try{
+        const template = await Event.findById(templateId);
+        if(!template){
+            return res.status(404).json({success: false, message: 'Template not found'});
+        }
+    } catch(error){
+        console.log('POST: /create-event-from-template failed', error);
+    }
+});
+
+//development route to shift events forward a week
+router.post('/shift-events-forward', verifyToken, async (req, res) => {
+    const {Event} = getModels(req, 'Event');
+    const {days} = req.body;
+
+    if(process.env.NODE_ENV !== 'development'){
+        return res.status(403).json({
+            success: false,
+            message: 'This route is only available in development mode'
+        });
+    }
+    
+    try{
+        const events = await Event.find({});
+        for(const event of events){
+            event.start_time = new Date(event.start_time.getTime() + days * 24 * 60 * 60 * 1000);
+            event.end_time = new Date(event.end_time.getTime() + days * 24 * 60 * 60 * 1000);
+            await event.save();
+        }
+        console.log('POST: /shift-events-forward successful');
+        res.status(200).json({
+            success: true,
+            message: 'Events shifted forward successfully'
+        });
+    } catch(error){
+        console.log('POST: /shift-events-forward failed', error);
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+});
+
+router.post('/add-approval-comment', verifyToken, async (req, res) => {
+    const { Event, User, ApprovalInstance } = getModels(req, 'Event', 'User', 'ApprovalInstance');
+    const user_id = req.user.userId;
+    const { event_id, comment, parentCommentId } = req.body;
+
+    try {
+        const user = await User.findById(user_id);
+        if(!user) {
+            return res.status(403).json({
+                success: false,
+                message: 'You are not authorized to add comments.'
+            });
+        }
+
+        const event = await Event.findById(event_id);
+        if (!event) {
+        return res.status(404).json({
+                success: false,
+                message: 'Event not found.'
+            });
+        }
+
+        const approvalInstance = await ApprovalInstance.findOne({ eventId: event_id });
+        if (!approvalInstance) {
+            return res.status(404).json({
+                success: false,
+                message: 'Approval instance not found.'
+            });
+        }
+
+        // If parentCommentId is provided, verify it exists
+        if (parentCommentId) {
+            const parentComment = approvalInstance.comments.id(parentCommentId);
+            if (!parentComment) {
+                //check if parent comment is a reply
+                return res.status(404).json({
+                    success: false,
+                    message: 'Parent comment not found.'
+                });
+            }
+        }
+
+        // Add comment to the current approval step
+        //push to the front of the array
+        approvalInstance.comments.unshift({
+            userId: user_id,
+            text: comment,
+            createdAt: new Date(),
+            parentCommentId: parentCommentId || null
+        });
+
+        await approvalInstance.save();
+
+        
+        console.log('POST: /add-approval-comment successful');
+        res.status(200).json({
+            success: true,
+            message: 'Comment added successfully.',
+            comment: approvalInstance.comments[0]
+        });
+    } catch (error) {
+        console.log('POST: /add-approval-comment failed', error);
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+});
+
+router.post('/delete-approval-comment', verifyToken, async (req, res) => {
+    const { Event, User, ApprovalInstance } = getModels(req, 'Event', 'User', 'ApprovalInstance');
+    const user_id = req.user.userId;
+    const { event_id, comment_id } = req.body;
+
+    try {
+        const event = await Event.findById(event_id);
+        if (!event) {
+            return res.status(404).json({
+                success: false,
+                message: 'Event not found.'
+            });
+        }
+
+        const approvalInstance = await ApprovalInstance.findOne({ eventId: event_id });
+        if (!approvalInstance) {
+            return res.status(404).json({
+                success: false,
+                message: 'Approval instance not found.' 
+            });
+        }
+
+        //find comment in approval instance
+        const comment = approvalInstance.comments.id(comment_id);
+        if (!comment) {
+            return res.status(404).json({
+                success: false,
+                message: 'Comment not found.'
+            });
+        }
+
+        //delete comment
+        approvalInstance.comments.pull(comment_id); 
+
+        await approvalInstance.save();
+
+        console.log('POST: /delete-approval-comment successful');
+        res.status(200).json({
+            success: true,
+            message: 'Comment deleted successfully.'
+        });
+    } catch (error) {
+        console.log('POST: /delete-approval-comment failed', error);
+        res.status(500).json({
+            success: false, 
+            message: error.message
         });
     }
 });

@@ -192,12 +192,14 @@ function AccountSettings({ settingsRightSide, width, handleBackClick, userInfo }
                 </div>
                 <div className={`pfp-upload ${uploadPfp && "active"}`}>
                     <ImageUpload 
-                        uploadText="Upload new profile picture" 
+                        uploadText="Drag your image here" 
                         onFileSelect={handleFileSelect}
                         onUpload={handleProfilePictureUpload}
                         onFileClear={handleFileClear}
                         isUploading={isUploading}
                         uploadMessage="Maximum size: 5MB"
+                        fontSize={13}
+                        orientation="horizontal"
                     />
                 </div>
 

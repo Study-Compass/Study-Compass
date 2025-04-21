@@ -4,6 +4,9 @@
     .content{
         box-sizing: border-box;
         padding: 20px 40px;
+        display: flex;
+        flex-direction: column;
+        gap:10px;
         .approvals{
             display: flex;
             flex-direction: column;
@@ -64,6 +67,12 @@
                 padding: 5px 15px;
                 align-items: center;
                 cursor:pointer;
+                border: 1px solid var(--lighterborder);
+                box-shadow: var(--shadow);
+                background-color: var(--background);
+                padding:20px 30px;
+                font-size:16px; 
+                border-radius: 10px;
             }
         }
     }
