@@ -12,9 +12,11 @@ import Week from '../../../pages/OIEDash/EventsCalendar/Week/Week';
 import Day from '../../../pages/OIEDash/EventsCalendar/Day/Day';
 import useAuth from '../../../hooks/useAuth';
 import postRequest from '../../../utils/postRequest';
+import { useNotification } from '../../../NotificationContext';
 
 function Explore(){
     const {user} = useAuth();
+    const {addNotification} = useNotification();
     const roles = [''];
     const [page, setPage] = useState(1);
     const limit = 15;
@@ -27,22 +29,22 @@ function Explore(){
     const filterOptions = {
         eventTypes: {
             label: "event type",
-            options: ["study", "workshop", "meeting", "campus", "social", "sports"],
-            optionValues: ["study", "workshop", "meeting", "campus", "social", "sports"],
+            options: ["social", "workshop", "meeting", "campus", "study", "sports"],
+            optionValues: ["social", "workshop", "meeting", "campus", "study", "sports"],
             field: 'type'
         },
         eventCreator: {
             label: "event creator",
             options: ["student", "faculty", "administration", "organization", "sports"],
-            optionValues: ["user", "faculty", "oie", "org", "sports"],
-            field: 'creator'
+            optionValues: ["User", "faculty", "Admin", "Org", "asdasdad"],
+            field: 'hostingType'
         }
     };
 
     // Store raw selected filter values
     const [filters, setFilters] = useState({
         type: [],
-        creator: []
+        hostingType: []
     });
 
     // Build the API filters object
@@ -147,9 +149,9 @@ function Explore(){
                     />
                     {
                         user.roles.includes('admin') && (
-                            <button onClick={() => {
+                            <button className='shift-events-forward' onClick={() => {
                                 postRequest('/shift-events-forward', {days: 7});
-                                console.log('Events shifted forward successfully');
+                                addNotification('Events shifted forward successfully');
                             }}>
                                 Shift Events Forward
                             </button>
@@ -173,16 +175,21 @@ function Explore(){
                                     ))}
                                 </div>
                             ))}
+                            {
+                                groupEventsByDate(futureEvents.data.events).length === 0 && (
+                                    <div className="no-events">No events found</div>
+                                )
+                            }
                         </div>
                     ) 
                     :
                     (
                         view === 0 ?
-                        <Month height={'calc(100% - 44px)'} filter={{}} changeToWeek={() => {}} view={view} setView={setView}/>
+                        <Month height={'calc(100% - 44px)'} filter={filterParam} changeToWeek={() => {}} view={view} setView={setView}/>
                         : view === 1 ?
-                        <Week height={'calc(100% - 44px)'} filter={{}} changeToDay={() => {}} view={view} setView={setView}/>
+                        <Week height={'calc(100% - 44px)'} filter={filterParam} changeToDay={() => {}} view={view} setView={setView}/>
                         :
-                        <Day height={'calc(100% - 44px)'} filter={{}} view={view} setView={setView}/>
+                        <Day height={'calc(100% - 44px)'} filter={filterParam} view={view} setView={setView}/>
                     )
                     
                     : null}
