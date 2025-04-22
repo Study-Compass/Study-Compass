@@ -436,8 +436,8 @@ router.post('/approve-event', verifyToken, async (req, res) => {
 });
 
 router.get('/get-events-by-month', verifyToken, authorizeRoles('oie'), async (req, res) => {
-    const { Event } = getModels(req, 'Event');
-    const { month, year, filter } = req.query;
+    const { Event, OIEStatus } = getModels(req, 'Event', 'OIEStatus');
+    const { month, year, filter, roles } = req.query;
 
     if (!month || !year) {
         return res.status(400).json({
@@ -447,30 +447,39 @@ router.get('/get-events-by-month', verifyToken, authorizeRoles('oie'), async (re
     }
 
     try {
-        //log params
-        console.log(month, year, filter);
+        console.log(filter);
         // Parse month and year into integers
         const parsedMonth = parseInt(month, 10) - 1; // JavaScript months are 0-indexed
         const parsedYear = parseInt(year, 10);
 
-        const filterObj = filter ? JSON.parse(decodeURIComponent(filter)) : null;
-
         // Construct the start and end of the month
         const startOfMonth = new Date(parsedYear, parsedMonth, 1); // First day of the month
         const endOfMonth = new Date(parsedYear, parsedMonth + 1, 0, 23, 59, 59, 999); // Last day of the month
-        
-        const query = filterObj && filterObj.type !== "all" ?{
-            start_time: { $gte: startOfMonth, $lte: endOfMonth },
-            ...filterObj
-        } :
-        {
-            start_time: { $gte: startOfMonth, $lte: endOfMonth },
-        };
 
-        // Query events with dates within the range
-        const events = await Event.find(query)
-            .populate('classroom_id')
-            .populate('hostingId');
+        let filterObj;
+        const safeOperators = ['$gte', '$lte', '$eq', '$ne', '$in']; // Allow only these
+        if (filter) {
+            try {
+                const decodedFilter = JSON.parse(decodeURIComponent(filter));
+                Object.keys(decodedFilter).forEach(key => {
+                    if (typeof decodedFilter[key] === 'object') {
+                        Object.keys(decodedFilter[key]).forEach(op => {
+                            if (!safeOperators.includes(op)) {
+                                throw new Error('Invalid query operator');
+                            }
+                        });
+                    }
+                });
+                filterObj = decodedFilter;
+            } catch (error) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Invalid filter format.',
+                });
+            }
+        }
+
+        const events = await getEventsWithAuthorization(req, filterObj, roles, startOfMonth, endOfMonth, ['classroom_id', 'hostingId']);
 
         console.log('GET: /get-events-by-month successful');
         res.status(200).json({
@@ -760,16 +769,18 @@ router.post('/create-event-from-template', verifyToken, async (req, res) => {
 });
 
 //development route to shift events forward a week
-router.post('/shift-events-forward', verifyToken, async (req, res) => {
+router.post('/shift-events-forward', verifyToken, authorizeRoles('admin'), async (req, res) => {
     const {Event} = getModels(req, 'Event');
     const {days} = req.body;
 
-    if(process.env.NODE_ENV !== 'development'){
-        return res.status(403).json({
-            success: false,
-            message: 'This route is only available in development mode'
-        });
-    }
+    // ENABLE UPON RELEASE
+    // if(process.env.NODE_ENV !== 'development'){
+    //     return res.status(403).json({
+    //         success: false,
+    //         message: 'This route is only available in development mode'
+    //     });
+    // }
+
     
     try{
         const events = await Event.find({});

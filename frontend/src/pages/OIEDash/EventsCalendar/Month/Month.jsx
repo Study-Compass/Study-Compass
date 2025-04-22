@@ -19,7 +19,7 @@ function Month({ height, changeToWeek, filter, showSwitch = true, setView = () =
     const [month, setMonth] = useState(new Date().getMonth() + 1);
     const [year, setYear] = useState(2025);
     const filterParam = encodeURIComponent(JSON.stringify(filter));
-    const url = `/get-events-by-month?month=${month}&year=${year}&filter=${filterParam}`;
+    const url = `/get-events-by-month?month=${month}&year=${year}&filter=${filter}`;
     const events = useFetch(url);
     
     const currentMonth = new Date().getMonth() + 1;

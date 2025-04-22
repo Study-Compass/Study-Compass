@@ -30,6 +30,7 @@
         border-radius: 20px;
         background-color: var(--background);
         position: relative;
+        flex-grow:1;
         ::-webkit-scrollbar-thumb{
             border: 2px solid var(--background);
             box-sizing: border-box;
