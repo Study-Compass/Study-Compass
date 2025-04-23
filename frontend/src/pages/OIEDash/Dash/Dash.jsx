@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import './Dash.scss';
-import OIEGradient from '../../../assets/OIE-Gradient.png';
+import GradientHeader from '../../../assets/Gradients/ApprovalGrad.png'
 import { getAllEvents, getOIEEvents } from '../../../components/EventsViewer/EventHelpers';
 import OIEEvent from '../OIEEventsComponents/Event/OIEEvent';
 import { useFetch } from '../../../hooks/useFetch';
@@ -23,7 +23,7 @@ function Dash({expandedClass, change, name}){
                 if(weeklyRef.current){
                 setHeight(weeklyRef.current.clientHeight);
                 }
-            }, 100);
+            }, 200);
         }
     }, [weeklyRef]);
 
@@ -66,10 +66,14 @@ function Dash({expandedClass, change, name}){
 
     return (
         <div className={`dash ${expandedClass}`}>
-            <header className="header">
+            <img src={GradientHeader} alt="" className="grad" />
+            {/* <header className="header">
                 <img src={OIEGradient} alt="" />
                 <h1>Event Approval Dashboard</h1>
-            </header>
+            </header> */}
+            <div className="header">
+                <h1>Dashboard</h1>
+            </div>
             <div className="needs-approval">
                 <div className="approval-header">
                     <h1>events pending approval</h1>
@@ -90,7 +94,7 @@ function Dash({expandedClass, change, name}){
             <div className="week-container" ref={weeklyRef}>    
                 {
                     height !== 0 &&
-                    <Week changeToDay={changeToDay} startingText='this week at a glance' nav={false} height={`${height-50-40}px`} start={getSunday()} filter={{}} showSwitch={false}/>
+                    <Week changeToDay={changeToDay} startingText='this week at a glance' nav={false} height={`${height-50}px`} start={getSunday()} filter={{}} showSwitch={false}/>
                 }
             </div>
         </div>

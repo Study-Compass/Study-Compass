@@ -3,7 +3,7 @@ import './BadgeGrant.scss';
 
 const BadgeGrant = ({badgeGrant}) => {
     const today = new Date();
-    const validFrom = new Date(badgeGrant.vallidFrom);
+    const validFrom = new Date(badgeGrant.validFrom);
     const validTo = new Date(badgeGrant.validTo);
     const isInactive = (today < validFrom || today > validTo);
     return (

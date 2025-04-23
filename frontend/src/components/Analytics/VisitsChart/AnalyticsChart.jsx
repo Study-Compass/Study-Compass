@@ -77,7 +77,7 @@ const AnalyticsChart = ({endpoint, heading, color}) => {
     if (chartRef.current) {
       const chart = chartRef.current;
       const ctx = chart.ctx;
-      const gradient = ctx.createLinearGradient(0, 0, 0, 250); // Customize start/end points of the gradient
+      const gradient = ctx.createLinearGradient(0, 0, 0, 190); // Customize start/end points of the gradient
       gradient.addColorStop(0, `rgba(${r}, ${g}, ${b}, 0.8)`);
       gradient.addColorStop(1, `rgba(${r}, ${g}, ${b}, 0)`);
 
@@ -122,7 +122,7 @@ const AnalyticsChart = ({endpoint, heading, color}) => {
               {
                   data: counts,
                   fill: true,
-                  backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                  backgroundColor: 'transparent',
                   borderColor: `rgba(${r}, ${g}, ${b}, 0.8)`,
                   pointBackgroundColor: `rgba(${r}, ${g}, ${b}, 1)`,
                   pointBorderColor: '#fff',

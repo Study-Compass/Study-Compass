@@ -6,6 +6,9 @@ import BlueGrad1 from '../../assets/BlueGrad1.png';
 import BlueGrad2 from '../../assets/BlueGrad2.png';
 
 import Analytics from '../../components/Analytics/Analytics';
+import Dashboard from '../../components/Dashboard/Dashboard';
+import BadgeManager from './BadgeManager/BadgeManager';
+import ManageUsers from './ManageUsers/ManageUsers';
 
 import './Admin.scss';
 
@@ -29,29 +32,21 @@ function Admin(){
             </div>
         );
     }
-    return(
-        <div className="admin">
-            <Header />
-            <div className="content">
-                <div className="banner">
-                    <h1>admin dashboard</h1>
-                    <img src={BlueGrad1} alt="" className="tr"/>
-                    <img src={BlueGrad2} alt="" className="bl"/>
 
-                </div>
-                <div className="options">
-                    <button className={`${showPage === "analytics" ? "selected" : ""}`} onClick={() => toggleAnalytics("analytics")}>
-                        analytics
-                    </button>
-                    <button className={`${showPage === "users" ? "selected" : ""}`} onClick={() => toggleAnalytics("users")}>
-                        users
-                    </button>
-                </div>
-                {
-                    showPage === "analytics" && <Analytics />
-                }
-            </div>
-        </div>
+    const menuItems = [
+        { label: 'General', icon: 'ic:round-dashboard' },
+        { label: 'Analytics', icon: 'bx:stats' },
+        { label: 'Manage Users', icon: 'ic:round-dashboard'},
+        { label: 'Badge Grants', icon: 'bx:stats'}
+    ]
+
+    return(
+        <Dashboard menuItems={menuItems} additionalClass='admin'>
+            <div></div>
+            <Analytics/>
+            <ManageUsers/>
+            <BadgeManager/>
+        </Dashboard>
     );
 }
 
