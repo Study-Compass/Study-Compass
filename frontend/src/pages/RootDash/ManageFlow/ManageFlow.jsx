@@ -36,11 +36,17 @@ function ManageFlow(){
                 <p>Define the way approvals work</p>
             </header>
             <div className="content">
+                <div className="create-approval">
+                    <button onClick={openPopup}>
+                        <Icon icon="fluent:add-12-filled"/>
+                        <p>create new approval rule</p>
+                    </button>
+                </div>
                 <div className="approvals">
                     <div className="container-header">
                         <div className="approval-left">
                             <Icon icon="icon-park-solid:check-one"/>
-                            <h2>approvals</h2>
+                            <h2>approval rules</h2>
                         </div>
                         <button onClick={console.log}>
                             <Icon icon="fluent:flow-16-filled"/>
@@ -54,12 +60,6 @@ function ManageFlow(){
                             })
                         }
                     </div>
-                </div>
-                <div className="create-approval">
-                    <button onClick={openPopup}>
-                        <Icon icon="fluent:add-12-filled"/>
-                        <p>create new approval</p>
-                    </button>
                 </div>
             </div>
         </div>

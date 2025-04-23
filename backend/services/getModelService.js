@@ -26,7 +26,7 @@ const approvalFlowInstance = require('../schemas/events/approvalInstance');
 
 const getModels = (req, ...names) => {
     const models = {
-        BadgeGrant: req.db.model('BadgeGrant', badgeGrantSchema, 'badgeGrants'),
+        BadgeGrant: req.db.model('BadgeGrant', badgeGrantSchema, 'badgegrants'),
         Building: req.db.model('Building', buildingSchema, 'buildings'),
         Classroom: req.db.model('Classroom', classroomSchema, 'classrooms1'),
         Developer: req.db.model('Developer', developerSchema, 'developers'),

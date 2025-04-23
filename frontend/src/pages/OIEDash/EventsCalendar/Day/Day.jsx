@@ -2,8 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { Icon } from '@iconify-icon/react/dist/iconify.mjs';
 import { useFetch } from '../../../../hooks/useFetch';
 import DailyCalendar from './DailyCalendar/DailyCalendar';
+import Switch from '../../../../components/Switch/Switch';
+import './Day.scss';
 
-function Day({ height, start = new Date(new Date().setHours(0, 0, 0, 0)) , startingText = "", nav=true }) {
+function Day({ height, start = new Date(new Date().setHours(0, 0, 0, 0)) , startingText = "", nav=true, setView = () => {}, view = 2, showSwitch = true }) {
     const initialStartDate = typeof start === 'string' ? new Date(start) : start;
 
     const [day, setDay] = useState(initialStartDate);
@@ -33,7 +35,7 @@ function Day({ height, start = new Date(new Date().setHours(0, 0, 0, 0)) , start
 
     return (
         <>
-            <div className="header">
+            <div className="daily-header">
                 <div className="time-period">
                     {nav &&
                         <div className="arrows">
@@ -43,12 +45,13 @@ function Day({ height, start = new Date(new Date().setHours(0, 0, 0, 0)) , start
                     }
                     <h1>{startingText}{nav && `${formattedDate(day)}`}</h1>
                 </div>
+                {showSwitch && <Switch options={["month", "week", "day"]} onChange={setView} selectedPass={view} setSelectedPass={setView}/>}
             </div>
-            <div className="week">
+            <div className="week" style={{ height: `${height}` }}>
                 <DailyCalendar 
                     events={events.data ? events.data.events : []} 
                     selectedDay={day} 
-                    height={height} 
+                    height={'100%'} 
                 />
             </div>
         </>

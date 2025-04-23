@@ -254,6 +254,90 @@ router.get("/get-users", async (req, res) => {
     }
 });
 
+// Advanced user search with configurable filters
+router.get("/search-users", verifyToken, async (req, res) => {
+    const { User } = getModels(req, 'User');
+    const { 
+        query, 
+        roles, 
+        tags, 
+        limit = 20, 
+        skip = 0,
+        sortBy = 'username',
+        sortOrder = 'asc',
+        excludeIds = []
+    } = req.query;
+    
+    try {
+        // Build the search query
+        let searchQuery = {};
+        
+        // Text search on username or name
+        if (query) {
+            searchQuery.$or = [
+                { username: { $regex: new RegExp(query, 'i') } },
+                { name: { $regex: new RegExp(query, 'i') } }
+            ];
+        }
+        
+        // Filter by roles if provided
+        if (roles) {
+            const roleArray = Array.isArray(roles) ? roles : [roles];
+            searchQuery.roles = { $in: roleArray };
+        }
+        
+        // Filter by tags if provided
+        if (tags) {
+            const tagArray = Array.isArray(tags) ? tags : [tags];
+            searchQuery.tags = { $in: tagArray };
+        }
+        
+        // Exclude specific user IDs if provided
+        if (excludeIds && excludeIds.length > 0) {
+            let excludeArray;
+            try {
+                // Try to parse as JSON if it's a string
+                excludeArray = typeof excludeIds === 'string' ? JSON.parse(excludeIds) : excludeIds;
+                // Ensure it's an array
+                excludeArray = Array.isArray(excludeArray) ? excludeArray : [excludeArray];
+            } catch (error) {
+                console.error('Error parsing excludeIds:', error);
+                excludeArray = [excludeIds];
+            }
+            searchQuery._id = { $nin: excludeArray };
+        }
+        
+        // Build sort object
+        const sort = {};
+        sort[sortBy] = sortOrder === 'asc' ? 1 : -1;
+        
+        // Execute the query with pagination
+        const users = await User.find(searchQuery)
+            .sort(sort)
+            .limit(parseInt(limit))
+            .skip(parseInt(skip))
+            .select('-password -googleId'); // Exclude sensitive fields
+        
+        // Get total count for pagination
+        const total = await User.countDocuments(searchQuery);
+        
+        console.log(`GET: /search-users successful`);
+        return res.status(200).json({ 
+            success: true, 
+            message: 'Users found', 
+            data: users,
+            pagination: {
+                total,
+                limit: parseInt(limit),
+                skip: parseInt(skip)
+            }
+        });
+    } catch (error) {
+        console.log(`GET: /search-users failed`, error);
+        return res.status(500).json({ success: false, message: 'Internal server error', error });
+    }
+});
+
 router.post('/create-badge-grant', verifyToken, authorizeRoles('admin'), async (req, res) => {
     const { BadgeGrant } = getModels(req, 'BadgeGrant');
     try {
@@ -330,9 +414,35 @@ router.post('/grant-badge', verifyToken, async (req, res) => {
         res.status(200).json({ message: 'Badge granted successfully', badges: user.badges, badge: {badgeContent:badgeGrant.badgeContent, badgeColor: badgeGrant.badgeColor} });
     } catch (error) {
         console.error('Error granting badge:', error);
-        res.status(500).json({ error: 'Server error' });
+        res.status(500).json({ error: error});
     }
 });
+
+router.post('/renew-badge-grant', verifyToken, authorizeRoles('admin'), async (req,res) => {
+    
+})
+
+router.get('/get-badge-grants', verifyToken, authorizeRoles('admin'), async (req,res) => {
+    const { User, BadgeGrant } = getModels(req, 'User', 'BadgeGrant');
+    try{
+        const user = await User.findById(req.user.userId);
+        if(!user || !user.roles.includes('admin')){
+            return res.status(403).json({
+                success: false,
+                message: 'You don\'t have permissions to view badge grants'
+            })
+        }
+        const badgeGrants = await BadgeGrant.find({});
+        return res.status(200).json({
+            success:true,
+            badgeGrants
+        })
+    } catch (error){
+        console.error('Error getting badges:', error);
+        res.status(500).json({erorr:error})
+    }
+});
+
 
 
 router.post("/upload-user-image", verifyToken, upload.single('image'), async (req, res) =>{

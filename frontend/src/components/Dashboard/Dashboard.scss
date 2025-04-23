@@ -15,8 +15,13 @@
         align-items: center;
         padding-top:20px;
         box-sizing: border-box;
-        animation: show 1s forwards;
+        // animation: show 1s forwards;
+        transition: width 0.6s, opacity 0s;
         justify-content: space-between;
+        background-color: var(--background);
+        box-shadow: var(--shadow);
+        z-index: 2;
+        border-right: 1px solid var(--lighterborder);
         .top{
             display: flex;
             align-items: center;
@@ -89,8 +94,8 @@
             display: flex;
             padding:0 5px;
             box-sizing: border-box;
-            margin-top:20px;
             flex-direction: column;
+            transition: all 0.5s;
             
             ul{
                 list-style: none;
@@ -151,7 +156,9 @@
             }
         }
         &.hidden{
-            animation: hide 1s forwards;
+            width:0;
+            opacity: 0;
+
         }
     }
 
@@ -262,7 +269,7 @@
 }
 
 
-/* Showing animation: width first, then opacity */
+// /* Showing animation: width first, then opacity */
 @keyframes show {
     0% {
       width: 10px;

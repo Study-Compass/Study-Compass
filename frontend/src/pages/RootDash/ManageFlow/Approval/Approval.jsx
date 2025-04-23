@@ -6,7 +6,7 @@ import { Icon } from '@iconify-icon/react/dist/iconify.mjs';
 function Approval({approval}){
     const icons = {
         'location' : 'fluent:location-28-filled',
-        'attendance' : 'bi:people-fill',
+        'minAttendees' : 'bi:people-fill',
     }
     return(
         <div className="approval col">

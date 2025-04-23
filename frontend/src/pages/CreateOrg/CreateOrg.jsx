@@ -134,6 +134,10 @@ function CreateOrg(){
         setTimeout(() => {
             setCurrent(current+1);
         }, 500);
+        
+        if(current === 0){
+            setValidNext(false);
+        }
 
         if(current === 4){
             try{
@@ -239,7 +243,12 @@ function CreateOrg(){
                             <Loader/>
                             <h2>tell us a little bit about your organization</h2>
                             <p>Give users a description of what your org is about, feel free to be descriptive!</p>
-                            <textarea type="text" value={description} onChange={handleDescChange} className="text-input"/>
+                            <textarea 
+                                value={description} 
+                                onChange={handleDescChange} 
+                                className="text-input"
+                                maxLength={500}
+                            />
                         </div>
                     }
                     { current === 3 &&

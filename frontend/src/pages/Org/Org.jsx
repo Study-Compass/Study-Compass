@@ -21,21 +21,25 @@ const Org = ({ org }) => {
 
                 <div className="top-header-box">
                     <div className="org-logo">
-                        <img src={rpiLogo} alt=""/>
+                        <div className="img-container">
+                            <img src={org.overview.org_profile_image ? org.overview.org_profile_image : rpiLogo} alt=""/>
+                        </div>
                     </div>
                 </div>
 
                 <div className="org-info">
+                    <div className="col">
+                        <div className="org-header">
+                            <h2 className="name">{org.overview.org_name}</h2>
+                            {/* <h2 className="name"> Name </h2> */}
+                            <div className="status">Union Recognized</div>
+                        </div>
 
-                    <div className="org-header">
-                        <h2 className="name">{org.overview.org_name}</h2>
-                        {/* <h2 className="name"> Name </h2> */}
-                        <div className="status">Union Recognized</div>
+                        <p className="description">
+                            {org.overview.org_description}
+                        </p>
                     </div>
-
-                    <p className="description">
-                        {/* {org.overview.org_description} */}
-                    </p>
+                    
                     <p className="stats">
                         <img src = {person} alt =""/>
                         250 followers • 50 members

@@ -34,7 +34,6 @@ if (process.env.NODE_ENV === 'production') {
         origin: [
             'https://www.study-compass.com', 
             'https://studycompass.com',
-            `http://${process.env.EDUREKA_IP}:${process.env.EDUREKA_PORT}`
         ],
         optionsSuccessStatus: 200 // for legacy browser support
     };
@@ -60,8 +59,9 @@ app.use(cookieParser());
 app.use(async (req, res, next) => {
     try {
         const subdomain = req.headers.host.split('.')[0]; // Extract subdomain (e.g., 'ucb')
-        console.log(req.headers.host);
         req.db = await connectToDatabase(subdomain);
+        req.school = !subdomain.includes('localhost') ? subdomain : 'rpi';
+        console.log(req.school);
         next();
     } catch (error) {
         console.error('Error establishing database connection:', error);
