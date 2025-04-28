@@ -50,6 +50,10 @@
     margin: 0 20px;
     overflow:hidden;
 
+    &.narrow-content{
+      max-width: 400px;
+    }
+
     &.wide-content{
       max-width: 1000px;
       width:95%;
@@ -85,6 +89,9 @@
     &.oie{
         max-height:700px;
     }
+    &.manage-user{
+        max-width: 600px;
+    }    
   }
 
   .popup-overlay .popup-content.no-styling {
@@ -134,6 +141,7 @@
     animation: slideOut 0.3s forwards;
   }
   
+
   /* Animations */
   @keyframes fadeIn {
     from {

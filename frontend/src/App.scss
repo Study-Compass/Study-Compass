@@ -7,6 +7,7 @@
     --red: rgba(250, 117, 109, 1);
     --dark-red: rgba(208, 96, 88, 1);
     --red-transparent: rgba(250, 117, 109, 0.1);
+    --dark-red-transparent: rgba(250, 117, 109, 0.6); 
     --salmon: #FF8888;
     --blue: #87AFF1;
     --text: #414141;
@@ -366,6 +367,10 @@ button{
     outline:none;
     border:none;
     border-radius:5px;
+    padding:5px 10px;
+    font-family: 'Inter';
+    font-weight: 600;
+    border-radius: 8px;
 
 }
 

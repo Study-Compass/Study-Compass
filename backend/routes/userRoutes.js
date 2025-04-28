@@ -480,4 +480,63 @@ router.post("/upload-user-image", verifyToken, upload.single('image'), async (re
     }
 });
 
+//add or remove role from user
+
+router.post('/manage-roles', verifyToken, authorizeRoles('admin'), async (req,res) => {
+    const { role, userId } = req.body;
+    const { User } = getModels(req, 'User');
+    try{
+        console.log(`${userId}`);
+        const user = await User.findById(userId);
+        console.log('asd');
+        if(!user){
+            return res.status(404).json({
+                success:false,
+            })
+        } else {
+            const admin = await User.findById(req.user.userId);
+            console.log(admin);
+            if(!admin || !(admin.roles.includes('admin'))){
+                console.log('POST: /manage-roles unauthorized');
+                return res.status(403);
+            } else {
+                //update role
+                if(user.roles.includes(role)){
+                    //remove role
+                    console.log('asd')
+                    user.roles = user.roles.filter((i) => i !== role);
+                    console.log(user.roles);
+                    await user.save();
+                    console.log(`POST: /manage-roles, successfully added ${role}`);
+
+                    return res.status(200).json({
+                        success:true,
+                        message:'successfully renoved role from user'
+                    })
+                } else {
+                    console.log('asd')
+                    user.roles.push(role);
+                    console.log(user);
+                    const response = await user.save();
+                    if(response){
+                        console.log(response)
+                    }
+                    console.log('gothere')
+                    console.log(`POST: /manage-roles, successfully added ${role}`);
+                    return res.status(200).json({
+                        success: true,
+                        message: "successfuly aded new role to user"
+                    })
+                }
+            }
+        }
+    } catch (error){
+        console.log(error);
+        return res.status(500).json({
+            success:false,
+            error
+        })
+    }
+})
+
 module.exports = router;

@@ -7,8 +7,10 @@ import BlueGrad2 from '../../assets/BlueGrad2.png';
 
 import Analytics from '../../components/Analytics/Analytics';
 import Dashboard from '../../components/Dashboard/Dashboard';
+import General from './General/General'
 import BadgeManager from './BadgeManager/BadgeManager';
 import ManageUsers from './ManageUsers/ManageUsers';
+
 
 import './Admin.scss';
 
@@ -42,7 +44,7 @@ function Admin(){
 
     return(
         <Dashboard menuItems={menuItems} additionalClass='admin'>
-            <div></div>
+            <General/>
             <Analytics/>
             <ManageUsers/>
             <BadgeManager/>

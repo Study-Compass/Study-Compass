@@ -1,0 +1,27 @@
+.activate-badge{
+    display: flex;
+    flex-direction: column;
+    width:100%;
+    gap: 10px;
+    align-items: center;
+    .activate-input{
+        font-family: 'Inter';
+        font-weight: 500;
+        font-size:18px;
+        display: flex;
+        gap: 5px;
+        align-items: center;
+    }
+    input{
+        font-size:20px;
+        width:50px;
+    }
+    button{
+        width:100%;
+        font-size:16px;
+        font-family: 'Inter';
+        font-weight: 500;
+        background-color: var(--green-bg);
+        color: var(--green);
+    }
+}

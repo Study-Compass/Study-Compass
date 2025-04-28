@@ -217,7 +217,7 @@
         background-color: #f5f5f5;
         border-color: #ccc;
         color: #666;
-        animation: pulse 1.5s infinite;
+        animation: pulsing 1.5s infinite;
     }
     
     // Success state
@@ -258,7 +258,7 @@
 }
 
 // Pulse animation for verifying state
-@keyframes pulse {
+@keyframes pulsing {
     0% {
         opacity: 1;
     }

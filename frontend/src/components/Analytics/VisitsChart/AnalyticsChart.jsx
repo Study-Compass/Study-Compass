@@ -204,7 +204,7 @@ const AnalyticsChart = ({endpoint, heading, color}) => {
                       },
                       y: {
                         grid:{
-                            display: true,
+                            display: false,
                             drawBorder: false,
                         },
                         border:{
