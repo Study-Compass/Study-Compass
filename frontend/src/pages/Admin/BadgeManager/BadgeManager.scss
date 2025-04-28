@@ -1,0 +1,16 @@
+
+.badge-manager{
+    z-index: 1;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+
+    .badge-grants{
+        display: flex;
+        gap: 10px;
+    }
+}
+
+
+  

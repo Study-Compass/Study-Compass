@@ -8,9 +8,27 @@
     gap:10px;
     transition: padding 1s ease-in-out;
     max-height:100vh;
+    padding: 25px 30px;
 
     &.maximized{
         padding:20px;
+    }
+    
+    .header{
+        h1{
+            font-family: 'Satoshi';
+            font-size:30px;
+            font-weight: 700;
+            margin-left: 10px;
+        }
+    }
+    
+    img.grad{
+        position:absolute;
+        top:0;
+        left:0;
+        height:100px;
+        z-index: -1;
     }
 
     header.header{
@@ -33,9 +51,8 @@
     .needs-approval{
         display: flex;
         flex-direction: column;
-        padding:20px;
         h1{
-            font-size: 20px;
+            font-size: 18px;
             margin: 0;
         }
         .approval-header{
@@ -72,7 +89,6 @@
         gap: 10px;
         flex-direction: column;
         flex-grow:1;
-        padding:20px;
         box-sizing: border-box;
         // max-height:60%;
         // overflow-y:hidden;
@@ -86,7 +102,7 @@
                 align-items: center;
                 h1{
                     margin: 0;
-                    font-size:20px;
+                    font-size:18px;
                 }
             }
         }

@@ -218,6 +218,23 @@
             
         }
 
+        .simple-header{
+            h1{
+                font-family: 'Satoshi';
+                font-size:30px;
+                font-weight: 700;
+                margin-left: 10px;
+            }
+        }
+        
+        img.grad{
+            position:absolute;
+            top:0;
+            left:0;
+            height:100px;
+            z-index: -1;
+        }
+
         .dash header.header{
             height:110px;
             position: relative;

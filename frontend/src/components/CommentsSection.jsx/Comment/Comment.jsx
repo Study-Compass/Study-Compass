@@ -73,7 +73,7 @@ function Comment({ comment, eventId, onReplyAdded, hasReplies=true, lastReply=fa
     };
 
     return (
-        <div className={`comment ${comment.parentCommentId ? 'reply' : ''} ${comment.newComment ? 'new-comment' : ''}`}>
+        <div className={`approval-comment ${comment.parentCommentId ? 'reply' : ''} ${comment.newComment ? 'new-comment' : ''}`}>
             <div className="profile-column">
                 {
                     comment.parentCommentId && (

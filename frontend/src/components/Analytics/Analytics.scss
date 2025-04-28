@@ -1,9 +1,13 @@
 .analytics{
     display:flex;
-    flex-direction:column;
     align-items:center;
     justify-content:center;
-
+    width:100%;
+    flex-wrap:wrap;
+    z-index: 2;
+    padding:20px;
+    box-sizing: border-box;
+    overflow: auto;
     .heading{
         
     }
