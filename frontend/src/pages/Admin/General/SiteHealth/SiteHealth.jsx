@@ -93,7 +93,7 @@ const SiteHealth = ({}) => {
                             </div>
                             <Icon icon="material-symbols-light:database" />
                             <p>database</p>
-                            <p className="stat">latency: <b><AnimatedNumber value={health.data.statuses.database.latency} /></b>ms</p>
+                            <p className="stat">latency: <b><AnimatedNumber value={parseFloat(health.data.statuses.database.latency)} /></b>ms</p>
 
                         </div>
                     </div>

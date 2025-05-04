@@ -12,7 +12,7 @@ function Dash({expandedClass, change, name}){
     const [pendingEvents, setPendingEvents] = useState([]);
 
     const fetchEvents = useFetch('/get-all-events');
-    const fetchPendingEvents = useFetch('/oie/get-pending-events');
+    const fetchPendingEvents = useFetch(`/oie/get-pending-events?role=${name}`);
 
     const weeklyRef = useRef(null);
     const [height, setHeight] = useState(0);
@@ -72,7 +72,7 @@ function Dash({expandedClass, change, name}){
                 <h1>Event Approval Dashboard</h1>
             </header> */}
             <div className="header">
-                <h1>Dashboard</h1>
+                <h1>{name} Dashboard</h1>
             </div>
             <div className="needs-approval">
                 <div className="approval-header">
@@ -84,7 +84,7 @@ function Dash({expandedClass, change, name}){
                         pendingEvents.map((event, index) => {
                             if(index < 5){
                                 return (
-                                    <OIEEvent event={event} key={index} refetch={refetch} showOIE={true}/>
+                                    <OIEEvent event={event} key={index} refetch={refetch} showOIE={true} viewingRole={name}/>
                                 )
                             }
                         })

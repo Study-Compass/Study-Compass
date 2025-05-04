@@ -41,7 +41,7 @@ const sample = {
   }
   
 
-function OIEFullEvent({ event, eventId = null, setEdited }){
+function OIEFullEvent({ event, eventId = null, setEdited, viewingRole }){
     const { addNotification } = useNotification();
 
     const { data, loading, error } = useFetch('/config');
@@ -151,7 +151,6 @@ function OIEFullEvent({ event, eventId = null, setEdited }){
             console.log(fullEvent.data.event.approvalReference);
         }
     }, [fullEvent.data]);
-
     if(!event){
         return "";
     }
@@ -201,7 +200,7 @@ function OIEFullEvent({ event, eventId = null, setEdited }){
                     <div className="status"> 
                         {!fullEvent.loading && fullEvent.data && 
                             <>
-                                <EventTimeline event={fullEvent.data.event} />
+                                <EventTimeline event={fullEvent.data.event} viewingRole={viewingRole} showApproval={viewingRole !== null}/>
                             </>
                         }
                     </div>

@@ -9,7 +9,7 @@ import { useNotification } from '../../../../NotificationContext';
 import defaultAvatar from '../../../../assets/defaultAvatar.svg';
 import deleteRequest from '../../../../utils/deleteRequest';
 
-function OIEEvent({event, showStatus=false, refetch, showOIE=false, index, showExpand=true, manage=false}){
+function OIEEvent({event, showStatus=false, refetch, showOIE=false, index, showExpand=true, manage=false, viewingRole}){
     const [popupOpen, setPopupOpen] = useState(false);
     const [edited, setEdited] = useState(false);
     const navigate = useNavigate();
@@ -101,7 +101,7 @@ function OIEEvent({event, showStatus=false, refetch, showOIE=false, index, showE
         <div className={`oie-event-component ${managePopupOpen ? "manage" : ""} ${archived && "archived"}`} style={index ? {animationDelay: `${index * 0.1}s`}:{}}>
             <Popup isOpen={popupOpen} onClose={onPopupClose} customClassName={"wide-content no-padding no-styling oie"} waitForLoad={true} >
                 {showOIE && !(event.OIEStatus === "Not Applicable") ?
-                    <OIEFullEvent event={event} refetch={refetch} setEdited={setEdited}/>
+                    <OIEFullEvent event={event} refetch={refetch} setEdited={setEdited} viewingRole={viewingRole}/>
                 :
                     <FullEvent event={event}/>
                 }

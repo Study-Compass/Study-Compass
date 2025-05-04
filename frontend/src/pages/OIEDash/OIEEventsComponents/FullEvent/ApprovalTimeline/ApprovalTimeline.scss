@@ -1,3 +1,25 @@
+.approve-container{
+    margin-top: 20px;
+    .timeline-approval{
+        padding: 20px;
+        display: flex;
+        gap: 10px;
+        button.button{
+            padding: 10px 10px;
+            height:fit-content;
+            margin: 0;
+            &.approve{
+                background-color: var(--green-bg);
+                color: var(--green);    
+            }
+            &.reject{
+                background-color: var(--red-transparent);
+                color:var(--red);
+            }
+        }
+    }
+}
+
 .timeline {
     overflow: hidden;
     border: 1px solid var(--lighterborder);
@@ -168,7 +190,6 @@
         }
         &.completed{
             background: linear-gradient(to bottom, var(--green) 100%, var(--yellow) 100%);
-
             &::before{
                 top:100%;
             }
@@ -222,9 +243,9 @@
       opacity: 0.6
     }
     50% {
-      transform: scale(1.5);
-      opacity: 0.4
-    }
+    //   transform: scale(1.5);
+    //   opacity: 0.4
+    }   
     100% {
       transform: scale(2);
       opacity: 0;
