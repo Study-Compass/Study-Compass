@@ -1,4 +1,7 @@
 .review{
+    .event-preview{
+        width:100%;
+    }
     .review-content{
         display:flex;
         gap:20px;
@@ -6,9 +9,7 @@
         flex-direction: column;
         .col{
             justify-content: space-between;
-            padding: 20px;
             box-sizing: border-box;
-            gap: 20px;
         }
         .preview{
             display:flex;

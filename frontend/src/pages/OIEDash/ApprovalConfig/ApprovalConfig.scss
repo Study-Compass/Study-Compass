@@ -12,7 +12,28 @@
     max-height:100vh;
     .header{
         padding: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
 
+        .form-buttons {
+            display: flex;
+            gap: 10px;
+
+            button {
+                padding: 10px 20px;
+                background-color: var(--red);
+                color: white;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+                transition: opacity 0.2s;
+
+                &:hover {
+                    opacity: 0.9;
+                }
+            }
+        }
     }
     .approval-container{
         padding:0px 40px;

@@ -3,15 +3,20 @@ import './ApprovalConfig.scss';
 import { useFetch } from '../../../hooks/useFetch';
 import Select from '../../../components/Select/Select';
 import { Icon } from '@iconify-icon/react/dist/iconify.mjs';
-const ApprovalConfig = ({ }) => {
-    //nuanced search based on login items
-    const approvalSteps = useFetch('/get-approval-steps');
-    
-    const [steps, setSteps] = useState([])
-    const [selectedStep, setSelectedStep] = useState(null);
+import FormBuilder from '../../../components/FormBuilder/FormBuilder';
+import FormViewer from '../../../components/FormViewer/FormViewer';
+import Popup from '../../../components/Popup/Popup';
 
-    const onChange= (option) => {
-        console.log(steps.find((step)=>step.role === option))
+const ApprovalConfig = ({ }) => {
+    const approvalSteps = useFetch('/get-approval-steps');
+    const [steps, setSteps] = useState([]);
+    const [selectedStep, setSelectedStep] = useState(null);
+    const [showFormBuilder, setShowFormBuilder] = useState(false);
+    const [showFormViewer, setShowFormViewer] = useState(false);
+    const [currentForm, setCurrentForm] = useState(null);
+
+    const onChange = (option) => {
+        console.log(steps.find((step)=>step.role === option));
         setSelectedStep(steps.find((step)=>step.role === option));
     }
 
@@ -24,10 +29,61 @@ const ApprovalConfig = ({ }) => {
         }
     },[approvalSteps]);
 
+    const handleFormSave = (form) => {
+        console.log('Form saved:', form);
+        setCurrentForm(form);
+        setShowFormBuilder(false);
+    };
+
+    const handleFormSubmit = (responses) => {
+        console.log('Form responses:', responses);
+        setShowFormViewer(false);
+    };
+
+    const mockForm = {
+        title: "Approval Feedback Form",
+        description: "Please provide feedback about this approval request",
+        questions: [
+            {
+                id: "1",
+                type: "short",
+                question: "What is your name?",
+                required: true
+            },
+            {
+                id: "2",
+                type: "multiple_choice",
+                question: "What is your decision?",
+                required: true,
+                options: ["Approve", "Reject", "Request Changes"]
+            },
+            {
+                id: "3",
+                type: "long",
+                question: "Please provide any additional comments or feedback",
+                required: false
+            }
+        ]
+    };
+
     return(
         <div className="approval-config">
             <div className="header">
                 <h1>Approval Configuration</h1>
+                <div className="form-buttons">
+                    <button onClick={() => {
+                        if(!currentForm){
+                            setCurrentForm(mockForm);
+                        }
+                        setShowFormBuilder(true);
+                        }}>Create Approval Form</button>
+                    <button onClick={() => {
+                        if(!currentForm){
+                            setCurrentForm();
+                        }
+                        setShowFormViewer(true);
+                    }}>View Sample Form</button>
+                </div>
             </div>
             <div className="approval-container">
                 <Select
@@ -63,8 +119,16 @@ const ApprovalConfig = ({ }) => {
                     </div>
                 </div>
             </div>
+
+            <Popup isOpen={showFormBuilder} onClose={() => setShowFormBuilder(false)} customClassName="wide-content">
+                <FormBuilder initialForm={currentForm} onSave={handleFormSave} />
+            </Popup>
+
+            <Popup isOpen={showFormViewer} onClose={() => setShowFormViewer(false)} customClassName="wide-content">
+                <FormViewer form={currentForm} onSubmit={handleFormSubmit} />
+            </Popup>
         </div>
     )
 }
 
-export default ApprovalConfig;  
+export default ApprovalConfig;
