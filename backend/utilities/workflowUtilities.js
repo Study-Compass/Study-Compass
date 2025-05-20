@@ -9,11 +9,11 @@ async function getRequiredApprovals(req, event){
     }
     let approvals = [];
     approvalFlow.steps.forEach(step => {
-        console.log("step", step.criteria.keys());    
-        step.criteria.keys().forEach(criteria => {
+        console.log("step", step.criteria);    
+        step.criteria.forEach(criteria => {
             console.log("criteria", criteria);
             //check if criteria is met
-            switch(criteria){
+            switch(criteria.criteria){
                 case 'location':
                     console.log("event.location", event.location);
                     console.log("step.criteria.location", step.criteria.get('location'));

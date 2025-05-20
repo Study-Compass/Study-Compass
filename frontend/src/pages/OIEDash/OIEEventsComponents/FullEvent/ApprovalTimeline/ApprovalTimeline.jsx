@@ -16,7 +16,7 @@ const gradient_colors = {
 
 }
 
-const EventTimeline = ({ event, showApproval=false, viewingRole}) => {
+const EventTimeline = ({ event, showApproval=false, viewingRole }) => {
     const { approvalReference } = event || {};
     const [currentStepIndex, setCurrentStepIndex] = useState(approvalReference?.currentStepIndex ?? 2);
     const approvals = approvalReference?.approvals || [];

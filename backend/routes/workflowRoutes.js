@@ -210,6 +210,48 @@ router.get('/get-approval-steps', verifyToken, authorizeRoles('admin', 'root'), 
     }
 });
 
+router.post('/create-form', verifyToken, authorizeRoles('admin', 'root'), async (req, res) => {
+    const { ApprovalFlow, Form } = getModels(req, 'ApprovalFlow', 'Form');
+    const { form, approvalId } = req.body;
+    try{
+        const newForm = new Form(form);
+        await newForm.save();
+        const approvalFlow = await ApprovalFlow.findOne();
+        if(!approvalFlow) return res.status(404);
+        approvalFlow.steps.find(step => step._id.equals(approvalId)).formDefinition = newForm._id;
+        await approvalFlow.save();
+        return res.status(200).json({success:true, message: "Form created"});
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+});
+
+router.post('/edit-form', verifyToken, authorizeRoles('admin', 'root'), async (req, res) => {
+    const { ApprovalFlow, Form } = getModels(req, 'ApprovalFlow', 'Form');
+    const { formId, form } = req.body;
+    try{
+        const approvalFlow = await ApprovalFlow.findOne();
+        if(!approvalFlow) return res.status(404);
+        const form = await Form.findById(formId);
+        if(!form) return res.status(404);
+        form.form = form;
+        await form.save();
+        return res.status(200).json({success:true, message: "Form updated"});
+    } catch(error){
+        console.log(error);
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+});
+
+
+
 
 //need a route to get workflow
 //need a route to add and remove workflow items

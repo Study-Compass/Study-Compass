@@ -6,14 +6,19 @@ import { Icon } from '@iconify-icon/react/dist/iconify.mjs';
 import FormBuilder from '../../../components/FormBuilder/FormBuilder';
 import FormViewer from '../../../components/FormViewer/FormViewer';
 import Popup from '../../../components/Popup/Popup';
+import HeaderContainer from '../../../components/HeaderContainer/HeaderContainer';
+import SlideSwitch from '../../../components/SlideSwitch/SlideSwitch';
+import ApprovalCriteria from './ApprovalCriteria/ApprovalCriteria';
 
-const ApprovalConfig = ({ }) => {
+const ApprovalConfig = ({ approvalId }) => {
     const approvalSteps = useFetch('/get-approval-steps');
     const [steps, setSteps] = useState([]);
-    const [selectedStep, setSelectedStep] = useState(null);
+    const [selectedStep, setSelectedStep] = useState(steps.find((step)=>step.role === approvalId));
     const [showFormBuilder, setShowFormBuilder] = useState(false);
     const [showFormViewer, setShowFormViewer] = useState(false);
     const [currentForm, setCurrentForm] = useState(null);
+
+    const [conditionalApproval, setConditionalApproval] = useState(true); //temporary for demo, make this dynamic
 
     const onChange = (option) => {
         console.log(steps.find((step)=>step.role === option));
@@ -23,6 +28,8 @@ const ApprovalConfig = ({ }) => {
     useEffect(()=>{
         if(approvalSteps.data){
             setSteps(approvalSteps.data.steps);
+            setSelectedStep(approvalSteps.data.steps.find((step)=>step.role === approvalId));
+            console.log(approvalSteps.data.steps.find((step)=>step.role === approvalId));
         }
         if(approvalSteps.error){
             console.log(approvalSteps.error);
@@ -41,19 +48,19 @@ const ApprovalConfig = ({ }) => {
     };
 
     const mockForm = {
-        title: "Approval Feedback Form",
-        description: "Please provide feedback about this approval request",
+        title: "Heffner Alumni House Form",
+        description: "The space you requested requires additional information, please fill out the form below.",
         questions: [
             {
                 id: "1",
                 type: "short",
-                question: "What is your name?",
+                question: "Will you require catering?",
                 required: true
             },
             {
                 id: "2",
                 type: "multiple_choice",
-                question: "What is your decision?",
+                question: "example multiple choice question",
                 required: true,
                 options: ["Approve", "Reject", "Request Changes"]
             },
@@ -62,9 +69,26 @@ const ApprovalConfig = ({ }) => {
                 type: "long",
                 question: "Please provide any additional comments or feedback",
                 required: false
-            }
+            },
+            {
+                id: "5",
+                type: "select_multiple",
+                question: "example select all choice question",
+                required: true,
+                options: ["Option 1", "Option 2", "Option 3"]
+            },
         ]
     };
+    const handleCriteriaChange = (key, value) => {
+        const newCriteria = {...selectedStep.criteria};
+        newCriteria[key] = value;
+        console.log(newCriteria);
+        setSelectedStep({...selectedStep, criteria: newCriteria});
+    }
+
+    if(!selectedStep){
+        return null;
+    }
 
     return(
         <div className="approval-config">
@@ -76,7 +100,7 @@ const ApprovalConfig = ({ }) => {
                             setCurrentForm(mockForm);
                         }
                         setShowFormBuilder(true);
-                        }}>Create Approval Form</button>
+                        }}>Edit Approval Form</button>
                     <button onClick={() => {
                         if(!currentForm){
                             setCurrentForm();
@@ -85,41 +109,32 @@ const ApprovalConfig = ({ }) => {
                     }}>View Sample Form</button>
                 </div>
             </div>
-            <div className="approval-container">
-                <Select
-                    options={steps.map((step, i)=>step.role)}
-                    onChange={onChange}
-                    defaultValue={"Select an approval step"}
-                />
-                <div className="config-content">
-                    <div className="config-header">
-                        <div className='row'>
-                            <Icon icon="mage:wrench-fill" />
-                            <h2>configuration</h2>
-                        </div>
-                    </div>
-                    <div className="config-container">
-                        {
-                            selectedStep && 
+            <div className="config-item">
+                <div className="config-title">
+                    <SlideSwitch checked={conditionalApproval} onChange={()=>setConditionalApproval(!conditionalApproval)}/>
+                    <h2>Conditional Approval</h2>
+                </div>
+                {
+                    conditionalApproval && 
+                    <div className="approval-container">
+                        <HeaderContainer icon="mage:wrench-fill" header="approval conditions" subheader="Configure the approval process for your organization">
                             <div className="config-container-content">
                                 <div className="approval-criteria">
-                                    <h2>Approval Criteria</h2>
-                                        {
-                                            Object.keys(selectedStep.criteria).map((criteria, i)=>{
-                                                return(
-                                                    <div className="criteria-item" key={i}>
-                                                        <p>{criteria}</p>
-                                                    </div>  
-                                                )
-                                            })
-                                        }
+                                    {
+                                        Object.keys(selectedStep.criteria).map((criteriaItem, i)=>{
+                                            console.log(criteriaItem);  
+                                            return(
+                                                <ApprovalCriteria criteria={selectedStep.criteria} onChange={handleCriteriaChange} approvalKey={criteriaItem} />
+                                            )
+                                        })
+                                    }
                                 </div>
                             </div>
-                        }
+                        </HeaderContainer>
                     </div>
-                </div>
+                }
             </div>
-
+            
             <Popup isOpen={showFormBuilder} onClose={() => setShowFormBuilder(false)} customClassName="wide-content">
                 <FormBuilder initialForm={currentForm} onSave={handleFormSave} />
             </Popup>

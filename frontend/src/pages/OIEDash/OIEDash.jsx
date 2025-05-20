@@ -24,7 +24,7 @@ function OIEDash(){
             <Dash name={approvalId} />
             <EventsCalendar />
             <ManageEvents />
-            <ApprovalConfig />
+            <ApprovalConfig approvalId={approvalId} />
         </Dashboard>
     )
 }

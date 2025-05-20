@@ -6,16 +6,14 @@ const fieldSchema = new mongoose.Schema({
   //possibly more: options (for select), validations, defaultValue, etc.
 });
 
+const criteriaSchema = new mongoose.Schema({
+    type: String,
+    value: mongoose.Schema.Types.Mixed,
+})
+
 const stepSchema = new mongoose.Schema({
   role: String, // e.g. "AlumniHouseAdmin", "EventsOfficeAdmin"
-  criteria: {
-    //store dynamic conditions here
-    //example: { location: "AlumniHouse", minAttendees: 100 }
-    //dynamic conditions can include: location, attendees, 
-    type: Map,
-    of: mongoose.Schema.Types.Mixed,
-    default: {}
-  },
+  criteria: [criteriaSchema],
   checkItems:[
     {
       type: String,
@@ -24,8 +22,10 @@ const stepSchema = new mongoose.Schema({
     }
   ],
   formDefinition: {
-    fields: [fieldSchema],
-    default: {}
+    //reference
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Form',
+    required: true,
   },
   // Possibly an `order` field or we rely on the array index for ordering
 });

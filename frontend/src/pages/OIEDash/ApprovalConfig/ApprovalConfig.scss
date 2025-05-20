@@ -10,11 +10,14 @@
     gap:10px;
     transition: padding 1s ease-in-out;
     max-height:100vh;
+    align-items: center;
     .header{
-        padding: 20px;
+        padding: 25px 30px 10px 30px;
         display: flex;
         justify-content: space-between;
         align-items: center;
+        width:100%;
+        box-sizing: border-box;
 
         .form-buttons {
             display: flex;
@@ -35,12 +38,26 @@
             }
         }
     }
-    .approval-container{
-        padding:0px 40px;
+    
+    .config-item{
+        padding:0px 30px;
         display: flex;
         flex-direction: column;
         gap:10px;
+        width:80%;
+        min-width:20%;
+        .config-title{
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            h2{
+                font-family: 'Inter';
+                font-weight:700;
+                font-size:20px
+            }
+        }
     }
+
     .config-content{
         display: flex;
         flex-direction: column;
