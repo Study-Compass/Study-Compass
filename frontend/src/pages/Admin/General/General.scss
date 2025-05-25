@@ -4,4 +4,17 @@
     box-sizing: border-box;
     padding: 25px 30px;
     width:100%;
+    gap: 20px;
+    .general-content{
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+    .analytics-container{
+        display: flex;
+        gap: 20px;
+        padding: 10px;
+        box-sizing: border-box;
+        flex-wrap: wrap;
+    }
 }
