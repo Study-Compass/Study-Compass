@@ -78,4 +78,26 @@
     }
 
 
+    &.simple{
+        overflow: hidden;
+        height:150px;
+        width:250px;
+        border:none;
+        box-shadow: none;
+        background-color: transparent;
+        .chart-container{
+            scale: 1.2;
+            height:80px;
+        }
+        .row{
+            margin-bottom: 30px;
+            margin-top:0;
+            h3{
+                font-weight: 700;
+                font-size:20px;
+                font-family: 'Satoshi';
+            }
+        }
+
+    }
 }
