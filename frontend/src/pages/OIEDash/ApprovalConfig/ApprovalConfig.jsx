@@ -21,7 +21,6 @@ const ApprovalConfig = ({ approvalId }) => {
     const [conditionalApproval, setConditionalApproval] = useState(true); //temporary for demo, make this dynamic
 
     const onChange = (option) => {
-        console.log(steps.find((step)=>step.role === option));
         setSelectedStep(steps.find((step)=>step.role === option));
     }
 
@@ -29,21 +28,20 @@ const ApprovalConfig = ({ approvalId }) => {
         if(approvalSteps.data){
             setSteps(approvalSteps.data.steps);
             setSelectedStep(approvalSteps.data.steps.find((step)=>step.role === approvalId));
-            console.log(approvalSteps.data.steps.find((step)=>step.role === approvalId));
         }
         if(approvalSteps.error){
             console.log(approvalSteps.error);
         }
-    },[approvalSteps]);
+    },[approvalSteps.data]);
+
+    useEffect(()=> {console.log(selectedStep)}, [selectedStep])
 
     const handleFormSave = (form) => {
-        console.log('Form saved:', form);
         setCurrentForm(form);
         setShowFormBuilder(false);
     };
 
     const handleFormSubmit = (responses) => {
-        console.log('Form responses:', responses);
         setShowFormViewer(false);
     };
 
@@ -79,11 +77,18 @@ const ApprovalConfig = ({ approvalId }) => {
             },
         ]
     };
-    const handleCriteriaChange = (key, value) => {
-        const newCriteria = {...selectedStep.criteria};
-        newCriteria[key] = value;
+
+    const hasStepChanged = (selectedStep) => {
+        console.log('asdf');
+        return JSON.stringify(selectedStep) === JSON.stringify(steps.find((step)=>step.role === approvalId));
+    }
+
+    const handleCriteriaChange = (index, key, value) => {
+        const newCriteria = [...selectedStep.criteria]
         console.log(newCriteria);
-        setSelectedStep({...selectedStep, criteria: newCriteria});
+        newCriteria[index] = {_id:selectedStep.criteria[index]._id,[key]: value};
+        console.log(newCriteria);
+        setSelectedStep({...selectedStep, criteria:newCriteria})
     }
 
     if(!selectedStep){
@@ -92,7 +97,7 @@ const ApprovalConfig = ({ approvalId }) => {
 
     return(
         <div className="approval-config">
-            <div className="header">
+            <div className="header">    
                 <h1>Approval Configuration</h1>
                 <div className="form-buttons">
                     <button onClick={() => {
@@ -117,18 +122,17 @@ const ApprovalConfig = ({ approvalId }) => {
                 {
                     conditionalApproval && 
                     <div className="approval-container">
-                        <HeaderContainer icon="mage:wrench-fill" header="approval conditions" subheader="Configure the approval process for your organization">
+                        <HeaderContainer icon="mage:wrench-fill" header="approval conditions" subheader="Configure the approval process for your organization" right={hasStepChanged(selectedStep) ? null : <>save</>}>
                             <div className="config-container-content">
-                                <div className="approval-criteria">
+                                {/* <div className="approval-criteria"> */}
                                     {
-                                        Object.keys(selectedStep.criteria).map((criteriaItem, i)=>{
-                                            console.log(criteriaItem);  
+                                        selectedStep.criteria.map((criteriaItem, i)=>{
                                             return(
-                                                <ApprovalCriteria criteria={selectedStep.criteria} onChange={handleCriteriaChange} approvalKey={criteriaItem} />
+                                                <ApprovalCriteria key={`${criteriaItem}${i}`} criteria={criteriaItem} onChange={(key, value) => handleCriteriaChange(i, key, value)} approvalKey={criteriaItem} />
                                             )
                                         })
                                     }
-                                </div>
+                                {/* </div> */}
                             </div>
                         </HeaderContainer>
                     </div>

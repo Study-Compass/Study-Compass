@@ -29,11 +29,11 @@ export const AuthProvider = ({ children }) => {
             // Make the GET request to the validate-token endpoint
             const response = await axios.get('/validate-token', config);
 
-            console.log('Token validation response:', response.data);
+            // console.log('Token validation response:', response.data);
             // Handle response...
             if (response.data.success) {
                 setUser(response.data.data.user);
-                console.log(response.data.data.user);
+                // console.log(response.data.data.user);
                 setIsAuthenticated(true);
                 setIsAuthenticating(false);
                 getCheckedIn();

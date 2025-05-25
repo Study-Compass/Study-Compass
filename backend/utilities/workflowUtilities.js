@@ -1,37 +1,106 @@
 const getModels = require('../services/getModelService');
 
-async function getRequiredApprovals(req, event){
-    console.log(event);
-    const { ApprovalFlow } = getModels(req,'ApprovalFlow');
+// Helper function to evaluate a single condition
+function evaluateCondition(condition, event) {
+    const value = event[condition.field];
+    if (value === undefined) return false;
+
+    switch (condition.operator) {
+        // String operators
+        case 'equals':
+            return value === condition.value;
+        case 'notEquals':
+            return value !== condition.value;
+        case 'contains':
+            return value.includes(condition.value);
+        case 'notContains':
+            return !value.includes(condition.value);
+        case 'in':
+            return condition.value.includes(value);
+        case 'notIn':
+            return !condition.value.includes(value);
+
+        // Number operators
+        case 'greaterThan':
+            return value > condition.value;
+        case 'lessThan':
+            return value < condition.value;
+        case 'greaterThanOrEqual':
+            return value >= condition.value;
+        case 'lessThanOrEqual':
+            return value <= condition.value;
+
+        // Boolean operators
+        case 'equals':
+            return value === condition.value;
+        case 'notEquals':
+            return value !== condition.value;
+
+        // Date operators
+        case 'before':
+            return new Date(value) < new Date(condition.value);
+        case 'after':
+            return new Date(value) > new Date(condition.value);
+        case 'between':
+            return new Date(value) >= new Date(condition.value[0]) && 
+                   new Date(value) <= new Date(condition.value[1]);
+
+        default:
+            return false;
+    }
+}
+
+// Helper function to evaluate a condition group
+async function evaluateConditionGroup(group, event) {
+    if (!group) return false;
+
+    // Evaluate all conditions in this group
+    const conditionResults = group.conditions.map(condition => 
+        evaluateCondition(condition, event)
+    );
+
+    // Evaluate all nested groups
+    const groupResults = await Promise.all(
+        group.groups.map(nestedGroup => 
+            evaluateConditionGroup(nestedGroup, event)
+        )
+    );
+
+    // Combine all results based on the logical operator
+    const allResults = [...conditionResults, ...groupResults];
+    
+    if (group.logicalOperator === 'AND') {
+        return allResults.every(result => result === true);
+    } else { // OR
+        return allResults.some(result => result === true);
+    }
+}
+
+async function getRequiredApprovals(req, event) {
+    const { ApprovalFlow } = getModels(req, 'ApprovalFlow');
     const approvalFlow = await ApprovalFlow.findOne();
-    if(!approvalFlow.steps){
+    
+    if (!approvalFlow?.steps) {
         return [];
     }
-    let approvals = [];
-    approvalFlow.steps.forEach(step => {
-        console.log("step", step.criteria);    
-        step.criteria.forEach(criteria => {
-            console.log("criteria", criteria);
-            //check if criteria is met
-            switch(criteria.criteria){
-                case 'location':
-                    console.log("event.location", event.location);
-                    console.log("step.criteria.location", step.criteria.get('location'));
-                    if(event.location === step.criteria.get('location')){
-                        approvals.push(step.role);
-                    }
-                case 'minAttendees':
-                    console.log("event.expectedAttendance", event.expectedAttendance);
-                    console.log("step.criteria.minAttendees", step.criteria.get('minAttendees'));
-                    if(event.expectedAttendance >= step.criteria.get('minAttendees')){
-                        approvals.push(step.role);
-                    }   
-                default:
-                    return;
-            }
-        });
-    });
-    return approvals;
+
+    const approvals = new Set(); // Use Set to avoid duplicate roles
+
+    for (const step of approvalFlow.steps) {
+        // Evaluate all condition groups for this step
+        const groupResults = await Promise.all(
+            step.conditionGroups.map(group => 
+                evaluateConditionGroup(group, event)
+            )
+        );
+
+        // If any group evaluates to true, add the role to approvals
+        if (groupResults.some(result => result === true)) {
+            approvals.add(step.role);
+        }
+    }
+
+    return Array.from(approvals);
 }
 
 const createApprovalInstance = async (req, eventId, event) => {
@@ -61,7 +130,6 @@ async function getEventsWithAuthorization(req, filterObj = {}, roleNames = [], s
             start_time: { $gte: startOfRange, $lte: endOfRange },
             ...(filterObj?.type !== "all" ? filterObj : {}), 
             isDeleted: false
-
         };
 
         //if no roles, only return "approved" or "not applicable" events

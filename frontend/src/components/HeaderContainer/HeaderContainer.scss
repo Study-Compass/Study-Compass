@@ -10,10 +10,14 @@
     
     .header-container-header{
         display: flex;
-        justify-content: space-between;
         padding: 8px 15px;
         border-bottom:1px solid var(--lighterborder);
+        width:100%;
+        box-sizing: border-box;
         .row{
+            width:100%;
+            display: flex;
+            justify-content: space-between;
             & > div{
                 display: flex;
                 align-items: center;

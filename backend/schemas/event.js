@@ -74,6 +74,10 @@ const eventSchema = new mongoose.Schema({
     isDeleted: {
         type: Boolean,
         default: false
+    },
+    rssId: {
+        type: String,
+        required: false,
     }
 }, {
     timestamps: true // automatically adds 'createdAt' and 'updatedAt' fields

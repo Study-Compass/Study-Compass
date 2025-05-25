@@ -2,17 +2,22 @@ import React, {useState} from 'react';
 import './ApprovalCriteria.scss';
 import Select from '../../../../components/Select/Select';
 
-const ApprovalCriteria = ({criteria, onChange, approvalKey}) => {
+const criteriaMap = {
+    location: 'location',
+    minAttendees: 'attendee count'
+}
+
+const ApprovalCriteria = ({criteria, onChange}) => {
     const [internalCriteria, setInternalCriteria] = useState(criteria);
     const [editing, setEditing] = useState(false);
-    console.log(approvalKey);
-    const onApprovalChange = (prev, key, value) => {
+    const onApprovalChange = (key, value) => {
         onChange(key, value);
     }
+
     return(
         <div className="criteria-option">
-            <Select options={['location', 'attendee count']} onChange={(option)=>onApprovalChange(approvalKey, option, null)} defaultValue={approvalKey} />
-            <input type="text" value={criteria[approvalKey]} onChange={(e)=>{onApprovalChange(approvalKey, approvalKey, e.target.value )}}/>
+            <Select options={['location', 'attendee count']} onChange={(option)=>onApprovalChange(option, '')} defaultValue={criteriaMap[Object.keys(criteria)[1] ]} />
+            <input type="text" value={criteria[Object.keys(criteria)[1]]} onChange={(e)=>{onApprovalChange(Object.keys(criteria)[1], e.target.value)}}/>
         </div>
     )
 }
