@@ -33,3 +33,7 @@ venv/
 .vscode/
 
 scripts/
+.env*
+.flaskenv*
+!.env.project
+!.env.vault
