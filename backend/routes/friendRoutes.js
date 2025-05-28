@@ -105,14 +105,13 @@ router.get('/getFriends', verifyToken, async (req, res) => {
 
 router.get('/friend-requests', verifyToken, async (req, res) => {
     const { Friendship } = getModels(req, 'Friendship');
-    const userId = req.user._id;
+    const userId = req.user.userId;
 
     try {
         const requests = await Friendship.find({
             recipient: userId,
-            status: 'pending'
-        }).populate('requester', 'username');
-
+            status: 'pending'   
+        }).populate('requester');
         res.json({
             success: true,
             message: 'Friend requests found',
