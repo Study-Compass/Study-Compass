@@ -1,18 +1,27 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
-const fieldSchema = new mongoose.Schema({
-  type: String,    // "text", "select", "checkbox", ...
-  label: String,
-  //possibly more: options (for select), validations, defaultValue, etc.
-});
 
 // Define available operators for different field types
-const OPERATORS = {
-  string: ['equals', 'notEquals', 'contains', 'notContains', 'in', 'notIn'],
-  number: ['equals', 'notEquals', 'greaterThan', 'lessThan', 'greaterThanOrEqual', 'lessThanOrEqual', 'in', 'notIn'],
-  boolean: ['equals', 'notEquals'],
-  date: ['equals', 'notEquals', 'before', 'after', 'between']
+const operators = {
+  string: ["equals", "notEquals", "contains", "notContains", "in", "notIn"],
+  number: ["equals", "notEquals", "greaterThan", "lessThan", "greaterThanOrEqual", "lessThanOrEqual", "in", "notIn"],
+  boolean: ["equals", "notEquals"],
+  date: ["equals", "notEquals", "before", "after", "between"]
 };
+
+
+// Schema for allowed operators for a field
+const allowedOperatorSchema = new mongoose.Schema({
+  type: {
+    type: String,
+    required: true
+  },
+  operators: [{
+    type: String,
+    required: true
+  }]
+});
+
 
 // Schema for a single condition
 const conditionSchema = new mongoose.Schema({
@@ -25,26 +34,25 @@ const conditionSchema = new mongoose.Schema({
     required: true
   },
   value: mongoose.Schema.Types.Mixed,
-  // For 'in' and 'notIn' operators, value will be an array
+  // For "in" and "notIn" operators, value will be an array
 });
 
-// Schema for a group of conditions with a logical operator
+// Schema for a group of conditions
 const conditionGroupSchema = new mongoose.Schema({
-  logicalOperator: {
-    type: String,
-    enum: ['AND', 'OR'],
-    required: true
-  },
   conditions: [conditionSchema],
-  groups: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'ConditionGroup'
+  conditionLogicalOperators: [{
+    type: String,
+    enum: ["AND", "OR"],
   }]
 });
 
 const stepSchema = new mongoose.Schema({
   role: String, // e.g. "AlumniHouseAdmin", "EventsOfficeAdmin"
   conditionGroups: [conditionGroupSchema],
+  groupLogicalOperators: [{
+    type: String,
+    enum: ["AND", "OR"],
+  }],
   checkItems:[
     {
       type: String,
@@ -54,8 +62,8 @@ const stepSchema = new mongoose.Schema({
   ],
   formDefinition: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Form',
-    required: true,
+    ref: "Form",
+    // required: true,
   },
 });
 
@@ -68,7 +76,7 @@ const fieldDefinitionSchema = new mongoose.Schema({
   },
   type: {
     type: String,
-    enum: ['string', 'number', 'boolean', 'date'],
+    enum: ["string", "number", "boolean", "date"],
     required: true
   },
   label: {
@@ -76,18 +84,24 @@ const fieldDefinitionSchema = new mongoose.Schema({
     required: true
   },
   description: String,
-  validation: {
-    required: Boolean,
-    min: Number,
-    max: Number,
-    pattern: String,
-    // Add more validation options as needed
-  }
+  inputType: {
+    type: String,
+    enum: ["text", "number", "boolean", "date"],
+    required: true
+  },
+//   validation: {
+//     required: Boolean,
+//     min: Number,
+//     max: Number,
+//     pattern: String,
+//     // Add more validation options as needed
+//   }
 });
 
 const approvalFlowDefinition = new mongoose.Schema({
   steps: [stepSchema],
   fieldDefinitions: [fieldDefinitionSchema],
+  allowedOperators: [allowedOperatorSchema],
   version: {
     type: Number,
     default: 1
@@ -95,43 +109,56 @@ const approvalFlowDefinition = new mongoose.Schema({
 }, { timestamps: true });
 
 /*
-Example of a complex workflow definition:
+Example of a complex workflow definition with the new structure:
 {
   steps: [
     {
-      role: 'AlumniHouseAdmin',
+      role: "AlumniHouseAdmin",
       conditionGroups: [
         {
-          logicalOperator: 'OR',
           conditions: [
             {
-              field: 'location',
-              operator: 'equals',
-              value: 'AlumniHouse'
+              field: "location",
+              operator: "equals",
+              value: "AlumniHouse"
             },
             {
-              field: 'location',
-              operator: 'equals',
-              value: 'StudentCenter'
+              field: "location",
+              operator: "equals",
+              value: "StudentCenter"
+            },
+            {
+              field: "expectedAttendance",
+              operator: "greaterThan",
+              value: 50
             }
           ],
-          groups: [
-            {
-              logicalOperator: 'AND',
-              conditions: [
-                {
-                  field: 'expectedAttendance',
-                  operator: 'greaterThan',
-                  value: 100
-                },
-                {
-                  field: 'requiresSecurity',
-                  operator: 'equals',
-                  value: true
-                }
-              ]
-            }
-          ]
+          conditionLogicalOperators: ["OR", "AND"]
+        }
+      ],
+      groupLogicalOperators: ["OR"],
+      allowedOperators: [
+        {
+          field: "location",
+          operators: ["equals", "notEquals", "in", "notIn"]
+        },
+        {
+          field: "expectedAttendance",
+          operators: ["greaterThan", "lessThan", "equals", "notEquals"]
+        }
+      ],
+      sortingFields: [
+        {
+          field: "location",
+          type: "string",
+          label: "Event Location",
+          allowedOperators: ["equals", "notEquals", "in", "notIn"]
+        },
+        {
+          field: "expectedAttendance",
+          type: "number",
+          label: "Expected Attendance",
+          allowedOperators: ["greaterThan", "lessThan", "equals", "notEquals"]
         }
       ],
       formDefinition: { ... }
@@ -139,16 +166,16 @@ Example of a complex workflow definition:
   ],
   fieldDefinitions: [
     {
-      name: 'location',
-      type: 'string',
-      label: 'Event Location',
-      description: 'The physical location of the event'
+      name: "location",
+      type: "string",
+      label: "Event Location",
+      description: "The physical location of the event"
     },
     {
-      name: 'expectedAttendance',
-      type: 'number',
-      label: 'Expected Attendance',
-      description: 'Number of expected attendees',
+      name: "expectedAttendance",
+      type: "number",
+      label: "Expected Attendance",
+      description: "Number of expected attendees",
       validation: {
         required: true,
         min: 0

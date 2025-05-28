@@ -9,25 +9,37 @@ import Popup from '../../../components/Popup/Popup';
 import HeaderContainer from '../../../components/HeaderContainer/HeaderContainer';
 import SlideSwitch from '../../../components/SlideSwitch/SlideSwitch';
 import ApprovalCriteria from './ApprovalCriteria/ApprovalCriteria';
+import Rule from './Rule/Rule';
+import postRequest from '../../../utils/postRequest';
 
 const ApprovalConfig = ({ approvalId }) => {
     const approvalSteps = useFetch('/get-approval-steps');
     const [steps, setSteps] = useState([]);
+    const [fieldDefinitions, setFieldDefinitions] = useState([]);
+    const [allowedOperators, setAllowedOperators] = useState([]);
     const [selectedStep, setSelectedStep] = useState(steps.find((step)=>step.role === approvalId));
     const [showFormBuilder, setShowFormBuilder] = useState(false);
     const [showFormViewer, setShowFormViewer] = useState(false);
     const [currentForm, setCurrentForm] = useState(null);
+    const [hasChanges, setHasChanges] = useState(false);
+    const [pendingChanges, setPendingChanges] = useState({});
+
+    const [saveButton, setSaveButton] = useState(0);
 
     const [conditionalApproval, setConditionalApproval] = useState(true); //temporary for demo, make this dynamic
 
     const onChange = (option) => {
         setSelectedStep(steps.find((step)=>step.role === option));
+        setHasChanges(false);
+        setPendingChanges({});
     }
 
     useEffect(()=>{
         if(approvalSteps.data){
             setSteps(approvalSteps.data.steps);
             setSelectedStep(approvalSteps.data.steps.find((step)=>step.role === approvalId));
+            setFieldDefinitions(approvalSteps.data.fieldDefinitions);
+            setAllowedOperators(approvalSteps.data.allowedOperators);
         }
         if(approvalSteps.error){
             console.log(approvalSteps.error);
@@ -43,6 +55,39 @@ const ApprovalConfig = ({ approvalId }) => {
 
     const handleFormSubmit = (responses) => {
         setShowFormViewer(false);
+    };
+
+    const handleRuleChange = (updates) => {
+        setHasChanges(true);
+        setPendingChanges(prev => ({
+            ...prev,
+            ...updates
+        }));
+    };
+
+    const handleSave = async () => {
+        if (!selectedStep || !hasChanges) return;
+
+        try {
+            const response = await postRequest('/update-approval-flow', {
+                stepIndex: steps.findIndex(step => step.role === selectedStep.role),
+                updates: pendingChanges
+            });
+
+            if (response.success) {
+                setHasChanges(false);
+                setPendingChanges({});
+                // Update local state with the response data
+                setSelectedStep(prev => ({
+                    ...prev,
+                    ...response.data
+                }));
+            } else {
+                console.error('Failed to save changes:', response.message);
+            }
+        } catch (error) {
+            console.error('Error saving changes:', error);
+        }
     };
 
     const mockForm = {
@@ -91,6 +136,50 @@ const ApprovalConfig = ({ approvalId }) => {
         setSelectedStep({...selectedStep, criteria:newCriteria})
     }
 
+    const handleAddRuleGroup = (i) => {
+        const newGroup = {
+            conditions: [{
+                field: fieldDefinitions[0].name,
+                operator: allowedOperators.find(op => op.type === fieldDefinitions[0].type)?.operators[0] || 'equals',
+                value: ''
+            }],
+            conditionLogicalOperators: []
+        };
+
+        const newGroupLogicalOperators = selectedStep.conditionGroups.length > 0 ? [...selectedStep.groupLogicalOperators, 'OR'] : selectedStep.groupLogicalOperators;
+
+        setSelectedStep(prev => ({
+            ...prev,
+            conditionGroups: [...prev.conditionGroups, newGroup],
+            groupLogicalOperators: newGroupLogicalOperators
+        }));
+
+        setHasChanges(true);
+        setPendingChanges(prev => ({
+            ...prev,
+            conditionGroups: [...selectedStep.conditionGroups, newGroup],
+            groupLogicalOperators: newGroupLogicalOperators
+        }));
+    };
+
+    const handleDeleteRuleGroup = (index) => {
+        const newGroups = selectedStep.conditionGroups.filter((_, i) => i !== index);
+        const newGroupLogicalOperators = selectedStep.groupLogicalOperators.filter((_, i) => i !== index - 1);
+
+        setSelectedStep(prev => ({
+            ...prev,
+            conditionGroups: newGroups,
+            groupLogicalOperators: newGroupLogicalOperators
+        }));
+
+        setHasChanges(true);
+        setPendingChanges(prev => ({
+            ...prev,
+            conditionGroups: newGroups,
+            groupLogicalOperators: newGroupLogicalOperators
+        }));
+    };
+
     if(!selectedStep){
         return null;
     }
@@ -115,24 +204,66 @@ const ApprovalConfig = ({ approvalId }) => {
                 </div>
             </div>
             <div className="config-item">
-                <div className="config-title">
+                {/* <div className="config-title">
+                    <div className="">
+                        <h2>Conditional Approval</h2>
+                        <p>asdf</p>
+                    </div>
+                    
                     <SlideSwitch checked={conditionalApproval} onChange={()=>setConditionalApproval(!conditionalApproval)}/>
-                    <h2>Conditional Approval</h2>
-                </div>
+                </div> */}
                 {
                     conditionalApproval && 
                     <div className="approval-container">
-                        <HeaderContainer icon="mage:wrench-fill" header="approval conditions" subheader="Configure the approval process for your organization" right={hasStepChanged(selectedStep) ? null : <>save</>}>
+                        <HeaderContainer 
+                            icon="mage:wrench-fill" 
+                            header="approval conditions" 
+                            subheader="Configure the approval process for your organization" 
+                            right={
+                                <div className="header-actions">
+                                    <button className="add-group-button" onClick={handleAddRuleGroup}>
+                                        <Icon icon="mdi:plus" />
+                                        add rule
+                                    </button>
+                                    {hasChanges && (
+                                        <button className="save-button" onClick={handleSave}>
+                                            save changes
+                                        </button>
+                                    )}
+                                </div>
+                            }
+                        >
                             <div className="config-container-content">
-                                {/* <div className="approval-criteria"> */}
-                                    {
-                                        selectedStep.criteria.map((criteriaItem, i)=>{
-                                            return(
-                                                <ApprovalCriteria key={`${criteriaItem}${i}`} criteria={criteriaItem} onChange={(key, value) => handleCriteriaChange(i, key, value)} approvalKey={criteriaItem} />
-                                            )
-                                        })
-                                    }
-                                {/* </div> */}
+                                {
+                                    selectedStep.conditionGroups.map((group, i)=>{
+                                        return(
+                                            <Rule 
+                                                index={i}
+                                                key={`${group}${i}`} 
+                                                group={group} 
+                                                onChange={(updates) => {
+                                                    const newGroups = [...selectedStep.conditionGroups];
+                                                    newGroups[i] = {
+                                                        ...newGroups[i],
+                                                        ...updates.conditionGroups[0]
+                                                    };
+                                                    setSelectedStep(prev => ({
+                                                        ...prev,
+                                                        conditionGroups: newGroups
+                                                    }));
+                                                    setHasChanges(true);
+                                                    setPendingChanges(prev => ({
+                                                        ...prev,
+                                                        conditionGroups: newGroups
+                                                    }));
+                                                }} 
+                                                fieldDefinitions={fieldDefinitions} 
+                                                allowedOperators={allowedOperators}
+                                                onDelete={handleDeleteRuleGroup}
+                                            />
+                                        )
+                                    })
+                                }
                             </div>
                         </HeaderContainer>
                     </div>

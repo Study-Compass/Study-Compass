@@ -50,30 +50,77 @@ function evaluateCondition(condition, event) {
     }
 }
 
-// Helper function to evaluate a condition group
-async function evaluateConditionGroup(group, event) {
-    if (!group) return false;
+// Helper function to evaluate conditions within a group using their logical operators
+function evaluateConditions(conditions, operators, event) {
+    if (!conditions || conditions.length === 0) {
+        return false;
+    }
 
-    // Evaluate all conditions in this group
-    const conditionResults = group.conditions.map(condition => 
+    // If there's only one condition, return its result
+    if (conditions.length === 1) {
+        return evaluateCondition(conditions[0], event);
+    }
+
+    // Evaluate each condition
+    const conditionResults = conditions.map(condition => 
         evaluateCondition(condition, event)
     );
 
-    // Evaluate all nested groups
-    const groupResults = await Promise.all(
-        group.groups.map(nestedGroup => 
-            evaluateConditionGroup(nestedGroup, event)
-        )
+    // Combine results using the operators
+    let result = conditionResults[0];
+    for (let i = 0; i < operators.length; i++) {
+        const operator = operators[i];
+        const nextResult = conditionResults[i + 1];
+        
+        if (operator === 'AND') {
+            result = result && nextResult;
+        } else { // OR
+            result = result || nextResult;
+        }
+    }
+
+    return result;
+}
+
+// Helper function to evaluate a condition group
+function evaluateConditionGroup(group, event) {
+    if (!group || !group.conditions || group.conditions.length === 0) {
+        return false;
+    }
+
+    return evaluateConditions(group.conditions, group.conditionLogicalOperators, event);
+}
+
+// Helper function to evaluate multiple condition groups with their logical operators
+function evaluateConditionGroups(groups, operators, event) {
+    if (!groups || groups.length === 0) {
+        return false;
+    }
+
+    // If there's only one group, return its result
+    if (groups.length === 1) {
+        return evaluateConditionGroup(groups[0], event);
+    }
+
+    // Evaluate each group
+    const groupResults = groups.map(group => 
+        evaluateConditionGroup(group, event)
     );
 
-    // Combine all results based on the logical operator
-    const allResults = [...conditionResults, ...groupResults];
-    
-    if (group.logicalOperator === 'AND') {
-        return allResults.every(result => result === true);
-    } else { // OR
-        return allResults.some(result => result === true);
+    // Combine results using the operators
+    let result = groupResults[0];
+    for (let i = 0; i < operators.length; i++) {
+        const operator = operators[i];
+        const nextResult = groupResults[i + 1];
+        
+        if (operator === 'AND') {
+            result = result && nextResult;
+        } else { // OR
+            result = result || nextResult;
+        }
     }
+
+    return result;
 }
 
 async function getRequiredApprovals(req, event) {
@@ -88,14 +135,13 @@ async function getRequiredApprovals(req, event) {
 
     for (const step of approvalFlow.steps) {
         // Evaluate all condition groups for this step
-        const groupResults = await Promise.all(
-            step.conditionGroups.map(group => 
-                evaluateConditionGroup(group, event)
-            )
+        const isApprovalRequired = evaluateConditionGroups(
+            step.conditionGroups,
+            step.groupLogicalOperators,
+            event
         );
 
-        // If any group evaluates to true, add the role to approvals
-        if (groupResults.some(result => result === true)) {
+        if (isApprovalRequired) {
             approvals.add(step.role);
         }
     }
