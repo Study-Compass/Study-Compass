@@ -19,6 +19,8 @@ function CreateEvent(){
     const location = useLocation();
     const origin = location.state ? location.state.origin : "";
     const [step, setStep] = useState(0);
+    const [currentSubStep, setCurrentSubStep] = useState(0);
+    const subSteps = [[1], [1, 1, 1], [1]];
     const [info, setInfo] = useState({});
     const [finishedStep, setFinishedStep] = useState(0);
     const {isAuthenticated, isAuthenticating, user} = useAuth();
@@ -64,8 +66,14 @@ function CreateEvent(){
     const {addNotification} = useNotification();
     
     const nextStep = () => {
-        setStep(step+1);
-        setFinishedStep(step+1);
+        if(subSteps[step].length > currentSubStep + 1){
+            setCurrentSubStep(currentSubStep + 1);
+            return;
+        } else {
+            setStep(step+1);
+            setCurrentSubStep(0);
+            setFinishedStep(step+1);
+        }
     }
 
     useEffect(()=>{
@@ -195,9 +203,11 @@ function CreateEvent(){
                         </div>
                     </div>
                     <div className="create-workspace">
-                        <GenInfo next={nextStep} visible={step === 0} setInfo={setInfo}/>
-                        <WhenWhere next={nextStep} visible={step === 1} setInfo={setInfo}/>
-                        <Review next={nextStep} visible={step === 2} info={info} setInfo={setInfo} onSubmit={onSubmit}/>
+                        <GenInfo next={nextStep} visible={step === 0 && currentSubStep === 0} setInfo={setInfo}/>
+                        <WhenWhere next={nextStep} visible={step === 1 && currentSubStep === 0} setInfo={setInfo}/>
+                        <WhenWhere next={nextStep} visible={step === 1 && currentSubStep === 1} setInfo={setInfo}/>
+                        <WhenWhere next={nextStep} visible={step === 1 && currentSubStep === 2} setInfo={setInfo}/>
+                        <Review next={nextStep} visible={step === 2 && currentSubStep === 0} info={info} setInfo={setInfo} onSubmit={onSubmit}/>
                     </div>
                 </div>
             </div>
