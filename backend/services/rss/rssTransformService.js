@@ -104,23 +104,23 @@ class RssTransformService {
      */
     async transformFeed(xmlContent, options = {}) {
         try {
-            // Clean XML content before parsing
+            //clean XML content before parsing
             const cleanedXml = this.cleanXmlContent(xmlContent);
-            // Parse XML content
+            //parse XML content
             const parsedFeed = await parseXml(cleanedXml);
             
-            // Get the channel or feed object
+            //get the channel or feed object
             const feed = parsedFeed.rss?.channel || parsedFeed.feed;
             if (!feed) {
                 throw new Error('Invalid RSS feed format');
             }
-            // Get items from feed
+            //get items from feed
             const items = Array.isArray(feed[0].item) ? feed[0].item : [feed[0].item];
-            // Transform items into events
+            //transform items into events
             const events = items.map(item => {
                 const event = {};
                 
-                // Apply mappings to create event object
+                //apply mappings to create event object
                 Object.entries(this.defaultMappings).forEach(([field, config]) => {
                     const value = this.extractValue(item, config.paths);
                     if (value !== null) {
@@ -128,13 +128,20 @@ class RssTransformService {
                     }
                 });
 
-                // Set default values for required fields
+                //set default values for required fields
                 event.visibility = options.visibility || 'public';
                 event.expectedAttendance = options.expectedAttendance || 0;
                 event.status = options.status || 'not-applicable';
-                event.isDeleted = options.isDeleted || false;
+                //all other options
+                Object.entries(options).forEach(([key, value]) => {
+                    if (key !== 'visibility' && key !== 'expectedAttendance' && key !== 'status') {
+                        event[key] = value;
+                    }
+                });
+                //if isDeleted is provided, use it, otherwise use the default value
+                // event.isDeleted = item.isDeleted || options.isDeleted || false;
                 
-                // If no end_time is provided, set it to start_time + 1 hour
+                //if no end_time is provided, set it to start_time + 1 hour
                 if (!event.end_time && event.start_time) {
                     event.end_time = new Date(event.start_time.getTime() + 60 * 60 * 1000);
                 }

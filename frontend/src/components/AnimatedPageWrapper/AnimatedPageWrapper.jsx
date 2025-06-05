@@ -13,7 +13,6 @@ export default function AnimatedPageWrapper({ children, watchFullPath = false })
     ? location.key + location.pathname + location.search + location.hash
     : location.pathname.includes('room') ? location.pathname.split('/')[1] : location.pathname;
 
- console.log(animationKey);
 
   return (
     <AnimatePresence mode="wait">

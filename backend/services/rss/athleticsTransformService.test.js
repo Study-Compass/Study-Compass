@@ -57,6 +57,7 @@ async function testRssTransform() {
                 start_time: {
                     paths: ['ev:startdate'],
                     transform: (value) => {
+                        //check if value has a time or is just a date
                         const dateValue = getValue(value);
                         if (!dateValue) return null;
                         return new Date(dateValue);
@@ -112,6 +113,16 @@ async function testRssTransform() {
                         const gameIdValue = getValue(value);
                         if (!gameIdValue) return null;
                         return gameIdValue.trim();
+                    }
+                },
+                isDeleted: {
+                    paths: ["ev:startdate"],
+                    transform: (value) => {
+                        //don't show events that don't have a time and just a date
+                        if (value.contains('T')){
+                            return false;
+                        }
+                        return true;
                     }
                 }
             },

@@ -18,6 +18,7 @@ const searchSchema = require('../schemas/search');
 const studyHistorySchema = require('../schemas/studyHistory');
 const userSchema = require('../schemas/user');
 const visitSchema = require('../schemas/visit');
+const rssFeedSchema = require('../schemas/events/rssFeed');
 
 //events
 const approvalFlowDefinition = require('../schemas/events/approvalFlowDefinition');
@@ -46,7 +47,8 @@ const getModels = (req, ...names) => {
         User: req.db.model('User', userSchema, 'users'),
         Visit: req.db.model('Visit', visitSchema, 'visits'),
         ApprovalFlow: req.db.model('ApprovalFlow', approvalFlowDefinition, 'approvalFlows'),
-        ApprovalInstance: req.db.model('ApprovalInstance', approvalFlowInstance, 'approvalInstances')
+        ApprovalInstance: req.db.model('ApprovalInstance', approvalFlowInstance, 'approvalInstances'),
+        RssFeed: req.db.model('RssFeed', rssFeedSchema, 'rssFeeds')
     };
 
     return names.reduce((acc, name) => {

@@ -1,1405 +1,179 @@
 [
   {
-    "name": "Women's Tennis vs Bard College",
-    "description": "[W] Women&#39;s Tennis vs Bard College\\nW 7-0\\n",
+    "name": "Summer 2025 Undergraduate Research Program Accepting Applications",
+    "description": "The Summer 2025 Undergraduate Research Program is accepting applications as of April 1, 2025.\\nUndergrad students may pursue research as a paid URP assistant working in the labs with RPI faculty researchers. The sponsoring department or faculty is responsible for the financial support a URP student assistant receives, with a matching fund up to $500 provided by the Office of Undergraduate Education.\\nThe deadline to apply is May 30, 2025, for more info please visit the attached link.",
     "start_time": {
-      "$date": "2025-04-22T20:00:00.000Z"
+      "$date": "2025-04-01T04:00:00.000Z"
     },
     "end_time": {
-      "$date": "2025-04-22T23:00:00.000Z"
+      "$date": "2025-04-01T05:00:00.000Z"
     },
-    "location": "Troy, NY, Sharp Courts",
-    "type": "Women&#39;s Tennis",
-    "rssId": "https://rpiathletics.com/calendar.aspx?game_id=20219&sport_id=23",
-    "opponent": "Bard College",
-    "gameId": "20219",
+    "location": "Online",
+    "contact": "Tuesday, April 1, 2025 12:00 AM - Fri , May 30, 2025 5:00 PM  Where: Online  Description: The Summer 2025 Undergraduate Research Program is accepting applications as of April 1, 2025.\\nUndergrad students may pursue research as a paid URP assistant working in the labs with RPI faculty researchers. The sponsoring department or faculty is responsible for the financial support a URP student assistant receives, with a matching fund up to $500 provided by the Office of Undergraduate Education.\\nThe deadline to apply is May 30, 2025, for more info please visit the attached link.   Cooper Gangemi",
+    "type": "Office for Research, Undergraduate Students, Morning Mail, Morning Mail - Students, Research Administration and Finance",
+    "rssId": "calPath=%2Fpublic%2Fcals%2FMainCal&guid=CAL-00f19cc6-94f1347a-0195-d3d66fa1-00003523calendars@rpi.edu&recurrenceId=",
     "visibility": "public",
     "expectedAttendance": 0,
     "status": "not-applicable",
     "isDeleted": false
   },
   {
-    "name": "Men's Tennis at Union College",
-    "description": "[W] Men&#39;s Tennis at Union College - MAKE-UP FROM TUE 4/15\\nW 7-0\\n",
+    "name": "CASE Research Exhibited at Time Space Existence",
+    "description": "CASE is proud to feature research in Time Space Existence, a biennial exhibition hosted by ECC Italy running from May 2025 through November 2025.\\nThe group exhibition invites international architects, designers, artists, academics, and researchers to engage with the pivotal theme of Repair, Regenerate, and Reuse. The show presents a dynamic array of works that offer innovative responses to some of the most urgent environmental, environmental, social, and cultural challenges of our time.",
     "start_time": {
-      "$date": "2025-04-22T20:00:00.000Z"
+      "$date": "2025-05-09T22:00:00.000Z"
     },
     "end_time": {
-      "$date": "2025-04-22T23:00:00.000Z"
+      "$date": "2025-05-10T07:00:00.000Z"
     },
-    "location": "Schenectady, NY",
-    "type": "Men&#39;s Tennis at Union College - MAKE-UP FROM TUE 4/15",
-    "rssId": "https://rpiathletics.com/calendar.aspx?game_id=20248&sport_id=12",
-    "opponent": "Union College",
-    "gameId": "20248",
+    "location": "Palazzo Mora Strada Nova, 3659 Venezia VE, Italy 30121",
+    "contact": "Where: Palazzo Mora Strada Nova, 3659 Venezia VE, Italy 30121  Description: CASE is proud to feature research in Time Space Existence, a biennial exhibition hosted by ECC Italy running from May 2025 through November 2025.\\nThe group exhibition invites international architects, designers, artists, academics, and researchers to engage with the pivotal theme of Repair, Regenerate, and Reuse. The show presents a dynamic array of works that offer innovative responses to some of the most urgent environmental, environmental, social, and cultural challenges of our time.   Kathie Brill 7187551688",
+    "type": "Exhibits, Arts, Architecture",
+    "rssId": "calPath=%2Fpublic%2Fcals%2FMainCal&guid=CAL-00f19cc5-96ac82aa-0196-e988d49f-00004534calendars@rpi.edu&recurrenceId=",
     "visibility": "public",
     "expectedAttendance": 0,
     "status": "not-applicable",
     "isDeleted": false
   },
   {
-    "name": "Baseball at Williams College",
-    "description": "[W] Baseball at Williams College\\nW 8-5\\nStreaming Video: https://www.nsnsports.net/colleges/williams-college/\\n",
+    "name": "Pittsburgh Building Closed for Renovations This Summer",
+    "description": "The Pittsburgh Building will be fully closed for renovations beginning Monday, May 12, and will remain inaccessible through Wednesday, August 21. During this period, no access will be permitted for any faculty, staff, students, or visitors. Please plan accordingly. Thank you for your cooperation as we work to improve our facilities.",
     "start_time": {
-      "$date": "2025-04-23T20:00:00.000Z"
+      "$date": "2025-05-12T04:00:00.000Z"
     },
     "end_time": {
-      "$date": "2025-04-23T23:00:00.000Z"
+      "$date": "2025-05-12T05:00:00.000Z"
     },
-    "location": "Williamstown, MA",
-    "type": "Baseball at Williams College",
-    "rssId": "https://rpiathletics.com/calendar.aspx?game_id=20184&sport_id=2",
-    "opponent": "Williams College",
-    "gameId": "20184",
+    "location": "Pittsburgh Bldg.",
+    "contact": "Monday, May 12, 2025 12:00 AM - Thu , August 21, 2025 12:00 AM  Where: Pittsburgh Bldg.  Description: The Pittsburgh Building will be fully closed for renovations beginning Monday, May 12, and will remain inaccessible through Wednesday, August 21. During this period, no access will be permitted for any faculty, staff, students, or visitors. Please plan accordingly. Thank you for your cooperation as we work to improve our facilities.   Victoria Luzinas 518-276-6590",
+    "type": "Construction, TV - Facilities, TV - SoM, Lally School of Management, TV, General Calendars, Scheduled openings_closings, Morning Mail, Morning Mail - Community",
+    "rssId": "calPath=%2Fpublic%2Fcals%2FMainCal&guid=CAL-00f19cc5-94f1324e-0196-a1ef0e98-00006ee6calendars@rpi.edu&recurrenceId=",
     "visibility": "public",
     "expectedAttendance": 0,
     "status": "not-applicable",
     "isDeleted": false
   },
   {
-    "name": "Women's Tennis at Union College",
-    "description": "[W] Women&#39;s Tennis at Union College - MAKE-UP FROM WED 4/16\\nW 6-1\\n",
+    "name": "Archer Center Professional Leadership Program Recruiting for Summer 2025",
+    "description": "The Archer Center for Student Leadership Development is recruiting students for the summer cohort of the Professional Leadership Program (PLP). PLP meetings are Wednesdays from 6-8pm from June 4th - August 13th and dinner is provided. The program includes industry networking opportunities to help participants sharpen their leadership awareness, knowledge, and skills. If you are interested, contact Susan Henry at henrys3@rpi.edu or Susan Henry on Webex.",
     "start_time": {
-      "$date": "2025-04-23T20:00:00.000Z"
+      "$date": "2025-05-15T04:00:00.000Z"
     },
     "end_time": {
-      "$date": "2025-04-23T23:00:00.000Z"
+      "$date": "2025-05-15T05:00:00.000Z"
     },
-    "location": "Schenectady, NY",
-    "type": "Women&#39;s Tennis at Union College - MAKE-UP FROM WED 4/16",
-    "rssId": "https://rpiathletics.com/calendar.aspx?game_id=20299&sport_id=23",
-    "opponent": "Union College",
-    "gameId": "20299",
+    "location": "CBIS Bruggeman Room",
+    "contact": "Thursday, May 15, 2025 - Wed , May 28, 2025 (all day)  Where: CBIS Bruggeman Room  Description: The Archer Center for Student Leadership Development is recruiting students for the summer cohort of the Professional Leadership Program (PLP). PLP meetings are Wednesdays from 6-8pm from June 4th - August 13th and dinner is provided. The program includes industry networking opportunities to help participants sharpen their leadership awareness, knowledge, and skills. If you are interested, contact Susan Henry at henrys3@rpi.edu or Susan Henry on Webex.   Amy Youmans 5182762288",
+    "type": "Training, Workshops, Archer Center for Student Leadership Development, Morning Mail, Morning Mail - Students",
+    "rssId": "calPath=%2Fpublic%2Fcals%2FMainCal&guid=CAL-00f19cc5-96ac82aa-0196-d43f3def-0000773dcalendars@rpi.edu&recurrenceId=",
     "visibility": "public",
     "expectedAttendance": 0,
     "status": "not-applicable",
     "isDeleted": false
   },
   {
-    "name": "Men's Golf at Liberty League Championship | at Turning Stone",
-    "description": "[N] Men&#39;s Golf at Liberty League Championship | at Turning Stone \\n 2nd / 7 Teams\\n",
+    "name": "Graduate Christian Fellowship Bible Study",
+    "description": "Graduate Christian Fellowship is a group of graduate students who regularly meet for a meal and Bible study throughout the Fall and Spring semesters. We meet in the Library Conference Room from 6:00pm to 7:30pm every Tuesday. Anyone is welcome to come.",
     "start_time": {
-      "$date": "2025-04-25T16:00:00.000Z"
+      "$date": "2025-05-20T22:00:00.000Z"
     },
     "end_time": {
-      "$date": "2025-04-27T03:59:59.999Z"
+      "$date": "2025-05-20T23:00:00.000Z"
     },
-    "location": "Verona, NY",
-    "type": "Other",
-    "rssId": "https://rpiathletics.com/calendar.aspx?game_id=20274&sport_id=6",
-    "opponent": "Liberty League Championship | at Turning Stone",
-    "gameId": "20274",
+    "location": "Library Conference Room",
+    "contact": "Tuesday, May 20, 2025 6:00 PM - 8:00 PM  Where: Library Conference Room  Description: Graduate Christian Fellowship is a group of graduate students who regularly meet for a meal and Bible study throughout the Fall and Spring semesters. We meet in the Library Conference Room from 6:00pm to 7:30pm every Tuesday. Anyone is welcome to come.   RPI Graduate Christian Fellowship",
+    "type": "Social Events, Religious_Spiritual, Graduate Students",
+    "rssId": "calPath=%2Fpublic%2Fcals%2FMainCal&guid=CAL-ff808181-6bc1f5da-016d-40a9ab8f-000013eecalendars@rpi.edu&recurrenceId=20250520T220000Z",
     "visibility": "public",
     "expectedAttendance": 0,
     "status": "not-applicable",
     "isDeleted": false
   },
   {
-    "name": "Men's Track and Field vs RPI Capital District Classic",
-    "description": "[N] Men&#39;s Track and Field vs RPI Capital District Classic\\n 1st / 10 Teams\\nStreaming Video: https://rpiathletics.com/sports/2024/4/12/TRACK_LIVESTREAM.aspx\\n",
+    "name": "Day Hike",
+    "description": "Please visit recwell.rpi.edu or reach out to weinew2@rpi.edu for more information.",
     "start_time": {
-      "$date": "2025-04-25T18:00:00.000Z"
+      "$date": "2025-05-21T14:00:00.000Z"
     },
     "end_time": {
-      "$date": "2025-04-25T21:00:00.000Z"
+      "$date": "2025-05-21T15:00:00.000Z"
     },
-    "location": "Troy, NY, Harkness Field",
-    "type": "Other",
-    "rssId": "https://rpiathletics.com/calendar.aspx?game_id=20116&sport_id=13",
-    "opponent": "RPI Capital District Classic",
-    "gameId": "20116",
+    "location": "Rensselaer Union Horseshoe",
+    "contact": "Wednesday, May 21, 2025 10:00 AM - 3:00 PM  Where: Rensselaer Union Horseshoe  Description: Please visit recwell.rpi.edu or reach out to weinew2@rpi.edu for more information.   Mueller Center 518-276-2874",
+    "type": "Student Life, Morning Mail, Morning Mail - Community, Morning Mail - Faculty and Staff, Morning Mail - Students, Rensselaer Union",
+    "rssId": "calPath=%2Fpublic%2Fcals%2FMainCal&guid=CAL-00f19cc5-96ac82aa-0196-c4eb0760-00004348calendars@rpi.edu&recurrenceId=",
     "visibility": "public",
     "expectedAttendance": 0,
     "status": "not-applicable",
     "isDeleted": false
   },
   {
-    "name": "Women's Track & Field vs RPI Capital District Classic",
-    "description": "[N] Women&#39;s Track & Field vs RPI Capital District Classic\\n 1st / 12 Teams\\nStreaming Video: https://rpiathletics.com/sports/2024/4/12/TRACK_LIVESTREAM.aspx\\n",
+    "name": "Troy Compost seeks Volunteers",
+    "description": "Troy Compost has been organizing a number of big composting initiatives in Troy, such as the Farmer's Market foodscraps collection, a project that diverts food waste from landfills to get composted at local farms instead. Volunteering with us is a 2-hour, low-intensity, educational gig that does good work for a community organization, local farms, and the Troy waste stream. You don't have to be an expert on compost to help out. Contact Guy Schaffer at schafe@rpi.edu for more information.",
     "start_time": {
-      "$date": "2025-04-25T18:00:00.000Z"
+      "$date": "2025-05-24T12:00:00.000Z"
     },
     "end_time": {
-      "$date": "2025-04-25T21:00:00.000Z"
+      "$date": "2025-05-24T13:00:00.000Z"
     },
-    "location": "Troy, NY, Harkness Field",
-    "type": "Other",
-    "rssId": "https://rpiathletics.com/calendar.aspx?game_id=20101&sport_id=24",
-    "opponent": "RPI Capital District Classic",
-    "gameId": "20101",
+    "location": "Campus-wide",
+    "contact": "Saturday, May 24, 2025 8:00 AM - 2:00 PM  Where: Campus-wide  Description: Troy Compost has been organizing a number of big composting initiatives in Troy, such as the Farmer's Market foodscraps collection, a project that diverts food waste from landfills to get composted at local farms instead. Volunteering with us is a 2-hour, low-intensity, educational gig that does good work for a community organization, local farms, and the Troy waste stream. You don't have to be an expert on compost to help out. Contact Guy Schaffer at schafe@rpi.edu for more information.   Green Greeks",
+    "type": "Calls for Participation",
+    "rssId": "calPath=%2Fpublic%2Fcals%2FMainCal&guid=CAL-00f19a8c-40dc2ade-0141-761034da-00002b79calendars@rpi.edu&recurrenceId=20250524T120000Z",
     "visibility": "public",
     "expectedAttendance": 0,
     "status": "not-applicable",
     "isDeleted": false
   },
   {
-    "name": "Women's Tennis at Vassar College",
-    "description": "[L] Women&#39;s Tennis at Vassar College\\nL 0-7\\n",
+    "name": "Memorial Day-no classes. Staff holiday.",
+    "description": "Memorial Day-no classes. Staff holiday.",
     "start_time": {
-      "$date": "2025-04-25T19:00:00.000Z"
+      "$date": "2025-05-26T04:00:00.000Z"
     },
     "end_time": {
-      "$date": "2025-04-25T22:00:00.000Z"
+      "$date": "2025-05-26T05:00:00.000Z"
     },
-    "location": "Poughkeepsie, NY",
-    "type": "Other",
-    "rssId": "https://rpiathletics.com/calendar.aspx?game_id=20234&sport_id=23",
-    "opponent": "Vassar College",
-    "gameId": "20234",
+    "location": "Campus-wide",
+    "contact": "Monday, May 26, 2025 (all day)  Where: Campus-wide  Description: Memorial Day-no classes. Staff holiday.   Office of the Registrar 518-276-6231",
+    "type": "Academic Calendar, General Calendars",
+    "rssId": "calPath=%2Fpublic%2Fcals%2FMainCal&guid=CAL-00f19cc6-9364e181-0193-b8cab703-000042eecalendars@rpi.edu&recurrenceId=",
     "visibility": "public",
     "expectedAttendance": 0,
     "status": "not-applicable",
     "isDeleted": false
   },
   {
-    "name": "Baseball vs Union College",
-    "description": "[W] Baseball vs Union College\\nW 6-4\\nStreaming Video: https://rpiathletics.com/sports/2021/4/21/baseball-live.aspx\\n",
+    "name": "Last day for students to drop a course in Summer Session II without being issued a W grade",
+    "description": "Last day for students to drop a course in Summer Session II without being issued a W grade",
     "start_time": {
-      "$date": "2025-04-25T20:00:00.000Z"
+      "$date": "2025-05-27T04:00:00.000Z"
     },
     "end_time": {
-      "$date": "2025-04-25T23:00:00.000Z"
+      "$date": "2025-05-27T05:00:00.000Z"
     },
-    "location": "Troy, NY, Robison Field at Karl Steffen Ballpark",
-    "type": "Baseball",
-    "rssId": "https://rpiathletics.com/calendar.aspx?game_id=20185&sport_id=2",
-    "opponent": "Union College",
-    "gameId": "20185",
+    "location": "Campus-wide",
+    "contact": "Tuesday, May 27, 2025 (all day)  Where: Campus-wide  Description: Last day for students to drop a course in Summer Session II without being issued a W grade   Office of the Registrar 518-276-6231",
+    "type": "Academic Calendar, General Calendars",
+    "rssId": "calPath=%2Fpublic%2Fcals%2FMainCal&guid=CAL-00f19cc5-94f1324e-0195-6cd42b0d-0000596bcalendars@rpi.edu&recurrenceId=",
     "visibility": "public",
     "expectedAttendance": 0,
     "status": "not-applicable",
     "isDeleted": false
   },
   {
-    "name": "Baseball at Union College",
-    "description": "POSTPONED Baseball at Union College\\nStreaming Video: https://unionathletics.com/sports/2018/11/13/baseball-video.aspx\\n",
+    "name": "Last day for students to add courses, change sections, or to put courses on audit for Summer Session II",
+    "description": "Last day for students to add courses, change sections, or to put courses on audit for Summer Session II",
     "start_time": {
-      "$date": "2025-04-26T16:00:00.000Z"
+      "$date": "2025-05-27T04:00:00.000Z"
     },
     "end_time": {
-      "$date": "2025-04-26T19:00:00.000Z"
+      "$date": "2025-05-27T05:00:00.000Z"
     },
-    "location": "Schenectady, NY",
-    "type": "Other",
-    "rssId": "https://rpiathletics.com/calendar.aspx?game_id=20186&sport_id=2",
-    "opponent": "Union College",
-    "gameId": "20186",
-    "visibility": "public",
-    "expectedAttendance": 0,
-    "status": "not-applicable",
-    "isDeleted": false
-  },
-  {
-    "name": "Men's Lacrosse at St. Lawrence University",
-    "description": "[L] Men&#39;s Lacrosse at St. Lawrence University\\nL 6-9\\nStreaming Video: https://saintsathletics.com/sports/2014/3/20/MLAX_0320143600.aspx\\n",
-    "start_time": {
-      "$date": "2025-04-26T17:00:00.000Z"
-    },
-    "end_time": {
-      "$date": "2025-04-26T20:00:00.000Z"
-    },
-    "location": "Canton, NY",
-    "type": "Other",
-    "rssId": "https://rpiathletics.com/calendar.aspx?game_id=20136&sport_id=9",
-    "opponent": "St. Lawrence University",
-    "gameId": "20136",
-    "visibility": "public",
-    "expectedAttendance": 0,
-    "status": "not-applicable",
-    "isDeleted": false
-  },
-  {
-    "name": "Men's Tennis at Vassar College",
-    "description": "[W] Men&#39;s Tennis at Vassar College\\nW 5-2\\n",
-    "start_time": {
-      "$date": "2025-04-26T17:00:00.000Z"
-    },
-    "end_time": {
-      "$date": "2025-04-26T20:00:00.000Z"
-    },
-    "location": "Poughkeepsie, NY",
-    "type": "Men&#39;s Tennis at Vassar College",
-    "rssId": "https://rpiathletics.com/calendar.aspx?game_id=20250&sport_id=12",
-    "opponent": "Vassar College",
-    "gameId": "20250",
-    "visibility": "public",
-    "expectedAttendance": 0,
-    "status": "not-applicable",
-    "isDeleted": false
-  },
-  {
-    "name": "Softball vs Clarkson University",
-    "description": "POSTPONED Softball vs Clarkson University\\nStreaming Video: https://rpiathletics.com/sports/2021/4/21/softball-live.aspx\\n",
-    "start_time": {
-      "$date": "2025-04-26T17:00:00.000Z"
-    },
-    "end_time": {
-      "$date": "2025-04-26T19:00:00.000Z"
-    },
-    "location": "Troy, NY, Doris Robison Field",
-    "type": "Other",
-    "rssId": "https://rpiathletics.com/calendar.aspx?game_id=20215&sport_id=21",
-    "opponent": "Clarkson University",
-    "gameId": "20215",
-    "visibility": "public",
-    "expectedAttendance": 0,
-    "status": "not-applicable",
-    "isDeleted": false
-  },
-  {
-    "name": "Baseball at Union College",
-    "description": "POSTPONED Baseball at Union College\\nStreaming Video: https://unionathletics.com/sports/2018/11/13/baseball-video.aspx\\n",
-    "start_time": {
-      "$date": "2025-04-26T19:00:00.000Z"
-    },
-    "end_time": {
-      "$date": "2025-04-26T22:00:00.000Z"
-    },
-    "location": "Schenectady, NY",
-    "type": "Other",
-    "rssId": "https://rpiathletics.com/calendar.aspx?game_id=20187&sport_id=2",
-    "opponent": "Union College",
-    "gameId": "20187",
-    "visibility": "public",
-    "expectedAttendance": 0,
-    "status": "not-applicable",
-    "isDeleted": false
-  },
-  {
-    "name": "Women's Lacrosse at Clarkson University",
-    "description": "[W] Women&#39;s Lacrosse at Clarkson University\\nW 12-11\\nStreaming Video: http://clarksonathletics.com/sports/2018/2/28/clarkson-womens-lacrosse-from-hantz-field.aspx\\n",
-    "start_time": {
-      "$date": "2025-04-26T19:00:00.000Z"
-    },
-    "end_time": {
-      "$date": "2025-04-26T22:00:00.000Z"
-    },
-    "location": "Potsdam, NY",
-    "type": "Women&#39;s Lacrosse at Clarkson Uni",
-    "rssId": "https://rpiathletics.com/calendar.aspx?game_id=20151&sport_id=19",
-    "opponent": "Clarkson University",
-    "gameId": "20151",
-    "visibility": "public",
-    "expectedAttendance": 0,
-    "status": "not-applicable",
-    "isDeleted": false
-  },
-  {
-    "name": "Softball vs Clarkson University",
-    "description": "POSTPONED Softball vs Clarkson University\\nStreaming Video: https://rpiathletics.com/sports/2021/4/21/softball-live.aspx\\n",
-    "start_time": {
-      "$date": "2025-04-26T19:00:00.000Z"
-    },
-    "end_time": {
-      "$date": "2025-04-26T21:00:00.000Z"
-    },
-    "location": "Troy, NY, Doris Robison Field",
-    "type": "Other",
-    "rssId": "https://rpiathletics.com/calendar.aspx?game_id=20303&sport_id=21",
-    "opponent": "Clarkson University",
-    "gameId": "20303",
-    "visibility": "public",
-    "expectedAttendance": 0,
-    "status": "not-applicable",
-    "isDeleted": false
-  },
-  {
-    "name": "Baseball at Union College",
-    "description": "[W] Baseball at Union College\\nW 15-4 (8 innings)\\nStreaming Video: https://unionathletics.com/sports/2018/11/13/baseball-video.aspx\\n",
-    "start_time": {
-      "$date": "2025-04-27T16:00:00.000Z"
-    },
-    "end_time": {
-      "$date": "2025-04-27T19:00:00.000Z"
-    },
-    "location": "Schenectady, NY",
-    "type": "Baseball at Union College",
-    "rssId": "https://rpiathletics.com/calendar.aspx?game_id=20300&sport_id=2",
-    "opponent": "Union College",
-    "gameId": "20300",
-    "visibility": "public",
-    "expectedAttendance": 0,
-    "status": "not-applicable",
-    "isDeleted": false
-  },
-  {
-    "name": "Softball vs Clarkson University",
-    "description": "[L] Softball vs Clarkson University\\nL 1-8\\nStreaming Video: https://rpiathletics.com/sports/2021/4/21/softball-live.aspx\\n",
-    "start_time": {
-      "$date": "2025-04-27T17:00:00.000Z"
-    },
-    "end_time": {
-      "$date": "2025-04-27T19:00:00.000Z"
-    },
-    "location": "Troy, NY, Doris Robison Field",
-    "type": "Other",
-    "rssId": "https://rpiathletics.com/calendar.aspx?game_id=20302&sport_id=21",
-    "opponent": "Clarkson University",
-    "gameId": "20302",
-    "visibility": "public",
-    "expectedAttendance": 0,
-    "status": "not-applicable",
-    "isDeleted": false
-  },
-  {
-    "name": "Baseball at Union College",
-    "description": "[L] Baseball at Union College\\nL 5-8\\nStreaming Video: https://unionathletics.com/sports/2018/11/13/baseball-video.aspx\\n",
-    "start_time": {
-      "$date": "2025-04-27T19:00:00.000Z"
-    },
-    "end_time": {
-      "$date": "2025-04-27T22:00:00.000Z"
-    },
-    "location": "Schenectady, NY",
-    "type": "Other",
-    "rssId": "https://rpiathletics.com/calendar.aspx?game_id=20301&sport_id=2",
-    "opponent": "Union College",
-    "gameId": "20301",
-    "visibility": "public",
-    "expectedAttendance": 0,
-    "status": "not-applicable",
-    "isDeleted": false
-  },
-  {
-    "name": "Softball vs Clarkson University",
-    "description": "[W] Softball vs Clarkson University\\nW 8-0 (5 innings)\\nStreaming Video: https://rpiathletics.com/sports/2021/4/21/softball-live.aspx\\n",
-    "start_time": {
-      "$date": "2025-04-27T19:00:00.000Z"
-    },
-    "end_time": {
-      "$date": "2025-04-27T21:00:00.000Z"
-    },
-    "location": "Troy, NY, Doris Robison Field",
-    "type": "Softball",
-    "rssId": "https://rpiathletics.com/calendar.aspx?game_id=20216&sport_id=21",
-    "opponent": "Clarkson University",
-    "gameId": "20216",
-    "visibility": "public",
-    "expectedAttendance": 0,
-    "status": "not-applicable",
-    "isDeleted": false
-  },
-  {
-    "name": "Baseball at Middlebury College",
-    "description": "[L] Baseball at Middlebury College\\nL 2-12\\nStreaming Video: https://www.nsnsports.net/colleges/middlebury/?bfplayvid=2348690\\n",
-    "start_time": {
-      "$date": "2025-04-30T20:00:00.000Z"
-    },
-    "end_time": {
-      "$date": "2025-04-30T23:00:00.000Z"
-    },
-    "location": "Middlebury, VT",
-    "type": "Other",
-    "rssId": "https://rpiathletics.com/calendar.aspx?game_id=20188&sport_id=2",
-    "opponent": "Middlebury College",
-    "gameId": "20188",
-    "visibility": "public",
-    "expectedAttendance": 0,
-    "status": "not-applicable",
-    "isDeleted": false
-  },
-  {
-    "name": "Women's Lacrosse at Union College",
-    "description": "[L] Women&#39;s Lacrosse at Union College - Continuation from Tue 4/29\\nL 7-14\\nStreaming Video: https://unionathletics.com/sports/2018/11/13/wlax-video.aspx\\n",
-    "start_time": {
-      "$date": "2025-04-30T21:00:00.000Z"
-    },
-    "end_time": {
-      "$date": "2025-05-01T00:00:00.000Z"
-    },
-    "location": "Schenectady, NY",
-    "type": "Other",
-    "rssId": "https://rpiathletics.com/calendar.aspx?game_id=20305&sport_id=19",
-    "opponent": "Union College",
-    "gameId": "20305",
-    "visibility": "public",
-    "expectedAttendance": 0,
-    "status": "not-applicable",
-    "isDeleted": false
-  },
-  {
-    "name": "Men's Track and Field at Liberty League Championships at RIT",
-    "description": "[N] Men&#39;s Track and Field at Liberty League Championships at RIT\\n 1st / 8 Teams\\nStreaming Video: https://ritathletics.com/showcase?Live=1738\\n",
-    "start_time": {
-      "$date": "2025-05-02T00:00:00.000Z"
-    },
-    "end_time": {
-      "$date": "2025-05-03T03:59:59.999Z"
-    },
-    "location": "Rochester, NY",
-    "type": "Other",
-    "rssId": "https://rpiathletics.com/calendar.aspx?game_id=20117&sport_id=13",
-    "opponent": "Liberty League Championships at RIT",
-    "gameId": "20117",
-    "visibility": "public",
-    "expectedAttendance": 0,
-    "status": "not-applicable",
-    "isDeleted": false
-  },
-  {
-    "name": "Women's Track & Field at Liberty League Championships at RIT",
-    "description": "[N] Women&#39;s Track & Field at Liberty League Championships at RIT\\n 3rd / 8 Teams\\nStreaming Video: https://ritathletics.com/showcase?Live=1738\\n",
-    "start_time": {
-      "$date": "2025-05-02T00:00:00.000Z"
-    },
-    "end_time": {
-      "$date": "2025-05-03T03:59:59.999Z"
-    },
-    "location": "Rochester, NY",
-    "type": "Other",
-    "rssId": "https://rpiathletics.com/calendar.aspx?game_id=20102&sport_id=24",
-    "opponent": "Liberty League Championships at RIT",
-    "gameId": "20102",
-    "visibility": "public",
-    "expectedAttendance": 0,
-    "status": "not-applicable",
-    "isDeleted": false
-  },
-  {
-    "name": "Women's Tennis vs Ithaca College | First Round",
-    "description": "[W] Women&#39;s Tennis vs Ithaca College | First Round\\nW 4-0\\n",
-    "start_time": {
-      "$date": "2025-05-02T15:30:00.000Z"
-    },
-    "end_time": {
-      "$date": "2025-05-02T18:30:00.000Z"
-    },
-    "location": "Cornell, NY",
-    "type": "Women&#39;s Tennis",
-    "rssId": "https://rpiathletics.com/calendar.aspx?game_id=20252&sport_id=23",
-    "opponent": "Ithaca College | First Round",
-    "gameId": "20252",
-    "visibility": "public",
-    "expectedAttendance": 0,
-    "status": "not-applicable",
-    "isDeleted": false
-  },
-  {
-    "name": "Baseball vs RIT | Liberty League Crossover Series (Game One)",
-    "description": "[W] Baseball vs RIT | Liberty League Crossover Series (Game One)\\nW 6-3\\nStreaming Video: https://rpiathletics.com/sports/2021/4/21/baseball-live.aspx\\n",
-    "start_time": {
-      "$date": "2025-05-02T16:00:00.000Z"
-    },
-    "end_time": {
-      "$date": "2025-05-02T19:00:00.000Z"
-    },
-    "location": "Troy, NY, Robison Field at Karl Steffen Ballpark",
-    "type": "Baseball",
-    "rssId": "https://rpiathletics.com/calendar.aspx?game_id=20307&sport_id=2",
-    "opponent": "RIT | Liberty League Crossover Series (Game One)",
-    "gameId": "20307",
-    "visibility": "public",
-    "expectedAttendance": 0,
-    "status": "not-applicable",
-    "isDeleted": false
-  },
-  {
-    "name": "Baseball vs RIT | Liberty League Crossover Series (Game Two)",
-    "description": "[W] Baseball vs RIT | Liberty League Crossover Series (Game Two)\\nW 11-0 (8 innings)\\nStreaming Video: https://rpiathletics.com/sports/2021/4/21/baseball-live.aspx\\n",
-    "start_time": {
-      "$date": "2025-05-02T19:30:00.000Z"
-    },
-    "end_time": {
-      "$date": "2025-05-02T22:30:00.000Z"
-    },
-    "location": "Troy, NY, Robison Field at Karl Steffen Ballpark",
-    "type": "Baseball",
-    "rssId": "https://rpiathletics.com/calendar.aspx?game_id=20306&sport_id=2",
-    "opponent": "RIT | Liberty League Crossover Series (Game Two)",
-    "gameId": "20306",
-    "visibility": "public",
-    "expectedAttendance": 0,
-    "status": "not-applicable",
-    "isDeleted": false
-  },
-  {
-    "name": "Men's Lacrosse at St. Lawrence University | Semifinals",
-    "description": "[L] Men&#39;s Lacrosse at St. Lawrence University | Semifinals\\nL 7-9\\nStreaming Video: https://saintsathletics.com/sports/2014/3/20/MLAX_0320143600.aspx\\n",
-    "start_time": {
-      "$date": "2025-05-02T20:00:00.000Z"
-    },
-    "end_time": {
-      "$date": "2025-05-02T23:00:00.000Z"
-    },
-    "location": "Canton, NY",
-    "type": "Other",
-    "rssId": "https://rpiathletics.com/calendar.aspx?game_id=20304&sport_id=9",
-    "opponent": "St. Lawrence University | Semifinals",
-    "gameId": "20304",
-    "visibility": "public",
-    "expectedAttendance": 0,
-    "status": "not-applicable",
-    "isDeleted": false
-  },
-  {
-    "name": "Women's Tennis vs Vassar College | Semifinals - at Ithaca",
-    "description": "[L] Women&#39;s Tennis vs Vassar College | Semifinals - at Ithaca\\nL 2-4\\n",
-    "start_time": {
-      "$date": "2025-05-03T15:30:00.000Z"
-    },
-    "end_time": {
-      "$date": "2025-05-03T18:30:00.000Z"
-    },
-    "location": "Cornell, NY",
-    "type": "Other",
-    "rssId": "https://rpiathletics.com/calendar.aspx?game_id=20309&sport_id=23",
-    "opponent": "Vassar College | Semifinals",
-    "gameId": "20309",
-    "visibility": "public",
-    "expectedAttendance": 0,
-    "status": "not-applicable",
-    "isDeleted": false
-  },
-  {
-    "name": "Softball at St. Lawrence University",
-    "description": "[W] Softball at St. Lawrence University\\nW 1-0 (10 innings)\\nStreaming Video: https://saintsathletics.com/sports/2019/4/2/2019-saints-softball-broadcasts.aspx\\n",
-    "start_time": {
-      "$date": "2025-05-03T18:00:00.000Z"
-    },
-    "end_time": {
-      "$date": "2025-05-03T20:00:00.000Z"
-    },
-    "location": "Canton, NY",
-    "type": "Softball at St. Lawrence Uni",
-    "rssId": "https://rpiathletics.com/calendar.aspx?game_id=20217&sport_id=21",
-    "opponent": "St. Lawrence University",
-    "gameId": "20217",
-    "visibility": "public",
-    "expectedAttendance": 0,
-    "status": "not-applicable",
-    "isDeleted": false
-  },
-  {
-    "name": "Men's Tennis vs Skidmore College | Semifinals - at Ithaca",
-    "description": "[W] Men&#39;s Tennis vs Skidmore College | Semifinals - at Ithaca\\nW 4-0\\n",
-    "start_time": {
-      "$date": "2025-05-03T18:15:00.000Z"
-    },
-    "end_time": {
-      "$date": "2025-05-03T21:15:00.000Z"
-    },
-    "location": "Cornell, NY",
-    "type": "Men&#39;s Tennis",
-    "rssId": "https://rpiathletics.com/calendar.aspx?game_id=20251&sport_id=12",
-    "opponent": "Skidmore College | Semifinals",
-    "gameId": "20251",
-    "visibility": "public",
-    "expectedAttendance": 0,
-    "status": "not-applicable",
-    "isDeleted": false
-  },
-  {
-    "name": "Softball at St. Lawrence University",
-    "description": "[W] Softball at St. Lawrence University\\nW 13-7\\nStreaming Video: https://saintsathletics.com/sports/2019/4/2/2019-saints-softball-broadcasts.aspx\\n",
-    "start_time": {
-      "$date": "2025-05-03T20:00:00.000Z"
-    },
-    "end_time": {
-      "$date": "2025-05-03T22:00:00.000Z"
-    },
-    "location": "Canton, NY",
-    "type": "Softball at St. Lawrence Uni",
-    "rssId": "https://rpiathletics.com/calendar.aspx?game_id=20218&sport_id=21",
-    "opponent": "St. Lawrence University",
-    "gameId": "20218",
-    "visibility": "public",
-    "expectedAttendance": 0,
-    "status": "not-applicable",
-    "isDeleted": false
-  },
-  {
-    "name": "Men's Tennis vs Hobart College | Championship - at Ithaca",
-    "description": "[W] Men&#39;s Tennis vs Hobart College | Championship - at Ithaca\\nW 4-0\\n",
-    "start_time": {
-      "$date": "2025-05-04T17:00:00.000Z"
-    },
-    "end_time": {
-      "$date": "2025-05-04T20:00:00.000Z"
-    },
-    "location": "Cornell, NY",
-    "type": "Men&#39;s Tennis",
-    "rssId": "https://rpiathletics.com/calendar.aspx?game_id=20313&sport_id=12",
-    "opponent": "Hobart College | Championship",
-    "gameId": "20313",
-    "visibility": "public",
-    "expectedAttendance": 0,
-    "status": "not-applicable",
-    "isDeleted": false
-  },
-  {
-    "name": "Softball vs St. Lawrence University | Play-In Game",
-    "description": "[W] Softball vs St. Lawrence University | Play-In Game\\nW 8-0 (5 innings)\\nStreaming Video: https://uofrathletics.com/watch/\\n",
-    "start_time": {
-      "$date": "2025-05-08T14:00:00.000Z"
-    },
-    "end_time": {
-      "$date": "2025-05-08T16:00:00.000Z"
-    },
-    "location": "Rochester, NY",
-    "type": "Softball",
-    "rssId": "https://rpiathletics.com/calendar.aspx?game_id=20314&sport_id=21",
-    "opponent": "St. Lawrence University | Play-In Game",
-    "gameId": "20314",
-    "visibility": "public",
-    "expectedAttendance": 0,
-    "status": "not-applicable",
-    "isDeleted": false
-  },
-  {
-    "name": "Baseball at Ithaca College",
-    "description": "[L] Baseball at Ithaca College\\nL 1-13\\nStreaming Video: https://www.youtube.com/@BomberSports/streams\\n",
-    "start_time": {
-      "$date": "2025-05-08T16:00:00.000Z"
-    },
-    "end_time": {
-      "$date": "2025-05-08T19:00:00.000Z"
-    },
-    "location": "Ithaca, NY",
-    "type": "Other",
-    "rssId": "https://rpiathletics.com/calendar.aspx?game_id=20310&sport_id=2",
-    "opponent": "Ithaca College",
-    "gameId": "20310",
-    "visibility": "public",
-    "expectedAttendance": 0,
-    "status": "not-applicable",
-    "isDeleted": false
-  },
-  {
-    "name": "Softball vs University of Rochester",
-    "description": "[L] Softball vs University of Rochester\\nL 1-4\\nStreaming Video: https://uofrathletics.com/watch/\\n",
-    "start_time": {
-      "$date": "2025-05-08T16:30:00.000Z"
-    },
-    "end_time": {
-      "$date": "2025-05-08T18:30:00.000Z"
-    },
-    "location": "Rochester, NY",
-    "type": "Other",
-    "rssId": "https://rpiathletics.com/calendar.aspx?game_id=20331&sport_id=21",
-    "opponent": "University of Rochester",
-    "gameId": "20331",
-    "visibility": "public",
-    "expectedAttendance": 0,
-    "status": "not-applicable",
-    "isDeleted": false
-  },
-  {
-    "name": "Women's Track & Field at Williams F.I.R.E Meet",
-    "description": "[N] Women&#39;s Track & Field at Williams F.I.R.E Meet\\n Individuals Only\\n",
-    "start_time": {
-      "$date": "2025-05-09T00:00:00.000Z"
-    },
-    "end_time": {
-      "$date": "2025-05-10T03:59:59.999Z"
-    },
-    "location": "Williamstown, MA",
-    "type": "Other",
-    "rssId": "https://rpiathletics.com/calendar.aspx?game_id=20103&sport_id=24",
-    "opponent": "Williams F.I.R.E Meet",
-    "gameId": "20103",
-    "visibility": "public",
-    "expectedAttendance": 0,
-    "status": "not-applicable",
-    "isDeleted": false
-  },
-  {
-    "name": "Men's Track and Field at Williams F.I.R.E Meet",
-    "description": "[N] Men&#39;s Track and Field at Williams F.I.R.E Meet\\n Individuals Only\\n",
-    "start_time": {
-      "$date": "2025-05-09T00:00:00.000Z"
-    },
-    "end_time": {
-      "$date": "2025-05-10T03:59:59.999Z"
-    },
-    "location": "Williamstown, MA",
-    "type": "Other",
-    "rssId": "https://rpiathletics.com/calendar.aspx?game_id=20118&sport_id=13",
-    "opponent": "Williams F.I.R.E Meet",
-    "gameId": "20118",
-    "visibility": "public",
-    "expectedAttendance": 0,
-    "status": "not-applicable",
-    "isDeleted": false
-  },
-  {
-    "name": "Baseball vs Clarkson University",
-    "description": "[W] Baseball vs Clarkson University\\nW 10-1\\nStreaming Video: https://www.youtube.com/@BomberSports/streams\\n",
-    "start_time": {
-      "$date": "2025-05-09T14:00:00.000Z"
-    },
-    "end_time": {
-      "$date": "2025-05-09T17:00:00.000Z"
-    },
-    "location": "Ithaca, NY",
-    "type": "Baseball",
-    "rssId": "https://rpiathletics.com/calendar.aspx?game_id=20316&sport_id=2",
-    "opponent": "Clarkson University",
-    "gameId": "20316",
-    "visibility": "public",
-    "expectedAttendance": 0,
-    "status": "not-applicable",
-    "isDeleted": false
-  },
-  {
-    "name": "Softball vs Clarkson University",
-    "description": "[W] Softball vs Clarkson University\\nW 6-2\\nStreaming Video: https://uofrathletics.com/watch/\\n",
-    "start_time": {
-      "$date": "2025-05-09T16:30:00.000Z"
-    },
-    "end_time": {
-      "$date": "2025-05-09T18:30:00.000Z"
-    },
-    "location": "Rochester, NY",
-    "type": "Softball",
-    "rssId": "https://rpiathletics.com/calendar.aspx?game_id=20332&sport_id=21",
-    "opponent": "Clarkson University",
-    "gameId": "20332",
-    "visibility": "public",
-    "expectedAttendance": 0,
-    "status": "not-applicable",
-    "isDeleted": false
-  },
-  {
-    "name": "Softball vs University of Rochester",
-    "description": "[W] Softball vs University of Rochester\\nW 5-3\\nStreaming Video: https://uofrathletics.com/watch/\\n",
-    "start_time": {
-      "$date": "2025-05-09T19:00:00.000Z"
-    },
-    "end_time": {
-      "$date": "2025-05-09T21:00:00.000Z"
-    },
-    "location": "Rochester, NY",
-    "type": "Softball",
-    "rssId": "https://rpiathletics.com/calendar.aspx?game_id=20334&sport_id=21",
-    "opponent": "University of Rochester",
-    "gameId": "20334",
-    "visibility": "public",
-    "expectedAttendance": 0,
-    "status": "not-applicable",
-    "isDeleted": false
-  },
-  {
-    "name": "Baseball vs Skidmore College",
-    "description": "POSTPONED Baseball vs Skidmore College\\nStreaming Video: https://www.youtube.com/@BomberSports/streams\\n",
-    "start_time": {
-      "$date": "2025-05-09T20:00:00.000Z"
-    },
-    "end_time": {
-      "$date": "2025-05-09T23:00:00.000Z"
-    },
-    "location": "Ithaca, NY",
-    "type": "Other",
-    "rssId": "https://rpiathletics.com/calendar.aspx?game_id=20333&sport_id=2",
-    "opponent": "Skidmore College",
-    "gameId": "20333",
-    "visibility": "public",
-    "expectedAttendance": 0,
-    "status": "not-applicable",
-    "isDeleted": false
-  },
-  {
-    "name": "Baseball vs Skidmore College - RE-SCHEDULED FROM 5/9",
-    "description": "[W] Baseball vs Skidmore College - RE-SCHEDULED FROM 5/9\\nW 14-3\\nStreaming Video: https://www.youtube.com/@BomberSports/streams\\n",
-    "start_time": {
-      "$date": "2025-05-10T15:00:00.000Z"
-    },
-    "end_time": {
-      "$date": "2025-05-10T18:00:00.000Z"
-    },
-    "location": "Ithaca, NY",
-    "type": "Baseball",
-    "rssId": "https://rpiathletics.com/calendar.aspx?game_id=20337&sport_id=2",
-    "opponent": "Skidmore College",
-    "gameId": "20337",
-    "visibility": "public",
-    "expectedAttendance": 0,
-    "status": "not-applicable",
-    "isDeleted": false
-  },
-  {
-    "name": "Softball vs Ithaca College",
-    "description": "[L] Softball vs Ithaca College\\nL 0-8 (6 innings) \\nStreaming Video: https://uofrathletics.com/watch/\\n",
-    "start_time": {
-      "$date": "2025-05-10T16:00:00.000Z"
-    },
-    "end_time": {
-      "$date": "2025-05-10T18:00:00.000Z"
-    },
-    "location": "Rochester, NY, Doris Robison Field",
-    "type": "Other",
-    "rssId": "https://rpiathletics.com/calendar.aspx?game_id=20335&sport_id=21",
-    "opponent": "Ithaca College",
-    "gameId": "20335",
-    "visibility": "public",
-    "expectedAttendance": 0,
-    "status": "not-applicable",
-    "isDeleted": false
-  },
-  {
-    "name": "Baseball vs Ithaca College | Championship (Game One)",
-    "description": "[W] Baseball vs Ithaca College | Championship (Game One)\\nW 16-6\\nStreaming Video: https://www.youtube.com/@BomberSports/streams\\n",
-    "start_time": {
-      "$date": "2025-05-10T19:00:00.000Z"
-    },
-    "end_time": {
-      "$date": "2025-05-10T22:00:00.000Z"
-    },
-    "location": "Ithaca, NY",
-    "type": "Baseball",
-    "rssId": "https://rpiathletics.com/calendar.aspx?game_id=20338&sport_id=2",
-    "opponent": "Ithaca College | Championship (Game One)",
-    "gameId": "20338",
-    "visibility": "public",
-    "expectedAttendance": 0,
-    "status": "not-applicable",
-    "isDeleted": false
-  },
-  {
-    "name": "Men's Lacrosse vs Williams College | Second Round - at Wesleyan University (Conn.)",
-    "description": "[W] Men&#39;s Lacrosse vs Williams College | Second Round - at Wesleyan University (Conn.)\\nW 14-10\\nStreaming Video: https://www.ncaa.com/game/6448615\\n",
-    "start_time": {
-      "$date": "2025-05-10T19:00:00.000Z"
-    },
-    "end_time": {
-      "$date": "2025-05-10T22:00:00.000Z"
-    },
-    "location": "Middletown, Conn.",
-    "type": "Men&#39;s Lacrosse",
-    "rssId": "https://rpiathletics.com/calendar.aspx?game_id=20317&sport_id=9",
-    "opponent": "Williams College | Second Round",
-    "gameId": "20317",
-    "visibility": "public",
-    "expectedAttendance": 0,
-    "status": "not-applicable",
-    "isDeleted": false
-  },
-  {
-    "name": "Men's Tennis vs Amherst College | Second Round - Moved Indoors to Bass River Tennis Club",
-    "description": "[W] Men&#39;s Tennis vs Amherst College | Second Round - Moved Indoors to Bass River Tennis Club\\nW 4-3\\nStreaming Video: https://web.playsight.com/facility/tufts-university-tennis/home\\n",
-    "start_time": {
-      "$date": "2025-05-10T19:00:00.000Z"
-    },
-    "end_time": {
-      "$date": "2025-05-10T22:00:00.000Z"
-    },
-    "location": "Medford, Mass.",
-    "type": "Men&#39;s Tennis",
-    "rssId": "https://rpiathletics.com/calendar.aspx?game_id=20318&sport_id=12",
-    "opponent": "Amherst College | Second Round",
-    "gameId": "20318",
-    "visibility": "public",
-    "expectedAttendance": 0,
-    "status": "not-applicable",
-    "isDeleted": false
-  },
-  {
-    "name": "Baseball vs Ithaca College | Championship (Game Two)",
-    "description": "[W] Baseball vs Ithaca College | Championship (Game Two)\\nW 4-1\\nStreaming Video: https://www.youtube.com/@BomberSports/streams\\n",
-    "start_time": {
-      "$date": "2025-05-11T16:00:00.000Z"
-    },
-    "end_time": {
-      "$date": "2025-05-11T19:00:00.000Z"
-    },
-    "location": "Ithaca, NY",
-    "type": "Baseball",
-    "rssId": "https://rpiathletics.com/calendar.aspx?game_id=20340&sport_id=2",
-    "opponent": "Ithaca College | Championship (Game Two)",
-    "gameId": "20340",
-    "visibility": "public",
-    "expectedAttendance": 0,
-    "status": "not-applicable",
-    "isDeleted": false
-  },
-  {
-    "name": "Men's Tennis vs Tufts University | Third Round - Scheduled for outdoors at Tufts University",
-    "description": "[L] Men&#39;s Tennis vs Tufts University | Third Round - Scheduled for outdoors at Tufts University\\nL 1-4\\nStreaming Video: https://web.playsight.com/facility/tufts-university-tennis/home\\n",
-    "start_time": {
-      "$date": "2025-05-11T16:00:00.000Z"
-    },
-    "end_time": {
-      "$date": "2025-05-11T19:00:00.000Z"
-    },
-    "location": "Medford, Mass.",
-    "type": "Other",
-    "rssId": "https://rpiathletics.com/calendar.aspx?game_id=20341&sport_id=12",
-    "opponent": "Tufts University | Third Round",
-    "gameId": "20341",
-    "visibility": "public",
-    "expectedAttendance": 0,
-    "status": "not-applicable",
-    "isDeleted": false
-  },
-  {
-    "name": "Men's Lacrosse at Wesleyan University | Third Round",
-    "description": "[W] Men&#39;s Lacrosse at Wesleyan University | Third Round\\nW 13-7\\nStreaming Video: https://www.ncaa.com/game/6448625\\n",
-    "start_time": {
-      "$date": "2025-05-11T19:00:00.000Z"
-    },
-    "end_time": {
-      "$date": "2025-05-11T22:00:00.000Z"
-    },
-    "location": "Middletown, Conn.",
-    "type": "Men&#39;s Lacrosse at Wesleyan Uni",
-    "rssId": "https://rpiathletics.com/calendar.aspx?game_id=20339&sport_id=9",
-    "opponent": "Wesleyan University | Third Round",
-    "gameId": "20339",
-    "visibility": "public",
-    "expectedAttendance": 0,
-    "status": "not-applicable",
-    "isDeleted": false
-  },
-  {
-    "name": "Men's Track and Field at Widener Final Qualifier",
-    "description": "[N] Men&#39;s Track and Field at Widener Final Qualifier\\n Individuals Only\\n",
-    "start_time": {
-      "$date": "2025-05-12T00:00:00.000Z"
-    },
-    "end_time": {
-      "$date": "2025-05-12T07:00:00.000Z"
-    },
-    "location": "Chester, PA",
-    "type": "Other",
-    "rssId": "https://rpiathletics.com/calendar.aspx?game_id=20348&sport_id=13",
-    "opponent": "Widener Final Qualifier",
-    "gameId": "20348",
-    "visibility": "public",
-    "expectedAttendance": 0,
-    "status": "not-applicable",
-    "isDeleted": false
-  },
-  {
-    "name": "Women's Track & Field at Widener Final Qualifier",
-    "description": "[N] Women&#39;s Track & Field at Widener Final Qualifier\\n Individuals Only\\n",
-    "start_time": {
-      "$date": "2025-05-12T00:00:00.000Z"
-    },
-    "end_time": {
-      "$date": "2025-05-12T07:00:00.000Z"
-    },
-    "location": "Chester, PA",
-    "type": "Other",
-    "rssId": "https://rpiathletics.com/calendar.aspx?game_id=20349&sport_id=24",
-    "opponent": "Widener Final Qualifier",
-    "gameId": "20349",
-    "visibility": "public",
-    "expectedAttendance": 0,
-    "status": "not-applicable",
-    "isDeleted": false
-  },
-  {
-    "name": "Men's Track and Field at UMass Amherst Final Qualifier",
-    "description": "[N] Men&#39;s Track and Field at UMass Amherst Final Qualifier \\n Individuals Only\\n",
-    "start_time": {
-      "$date": "2025-05-15T00:00:00.000Z"
-    },
-    "end_time": {
-      "$date": "2025-05-15T07:00:00.000Z"
-    },
-    "location": "Amherst, MA",
-    "type": "Other",
-    "rssId": "https://rpiathletics.com/calendar.aspx?game_id=20119&sport_id=13",
-    "opponent": "UMass Amherst Final Qualifier",
-    "gameId": "20119",
-    "visibility": "public",
-    "expectedAttendance": 0,
-    "status": "not-applicable",
-    "isDeleted": false
-  },
-  {
-    "name": "Women's Track & Field at UMass Amherst Final Qualifier",
-    "description": "[N] Women&#39;s Track & Field at UMass Amherst Final Qualifier \\n Individuals Only\\n",
-    "start_time": {
-      "$date": "2025-05-15T00:00:00.000Z"
-    },
-    "end_time": {
-      "$date": "2025-05-15T07:00:00.000Z"
-    },
-    "location": "Amherst, MA",
-    "type": "Other",
-    "rssId": "https://rpiathletics.com/calendar.aspx?game_id=20104&sport_id=24",
-    "opponent": "UMass Amherst Final Qualifier",
-    "gameId": "20104",
-    "visibility": "public",
-    "expectedAttendance": 0,
-    "status": "not-applicable",
-    "isDeleted": false
-  },
-  {
-    "name": "Softball vs Tufts University - at host Rowan University",
-    "description": "[L] Softball vs Tufts University - at host Rowan University\\nL 1-8\\nStreaming Video: https://www.ncaa.com/game/6449417\\n",
-    "start_time": {
-      "$date": "2025-05-15T17:30:00.000Z"
-    },
-    "end_time": {
-      "$date": "2025-05-15T19:30:00.000Z"
-    },
-    "location": "Glassboro, NJ",
-    "type": "Other",
-    "rssId": "https://rpiathletics.com/calendar.aspx?game_id=20343&sport_id=21",
-    "opponent": "Tufts University",
-    "gameId": "20343",
-    "visibility": "public",
-    "expectedAttendance": 0,
-    "status": "not-applicable",
-    "isDeleted": false
-  },
-  {
-    "name": "Softball vs Cortland - at host Rowan University",
-    "description": "POSTPONED Softball vs Cortland - at host Rowan University\\nStreaming Video: https://www.ncaa.com/game/6449419\\n",
-    "start_time": {
-      "$date": "2025-05-16T17:30:00.000Z"
-    },
-    "end_time": {
-      "$date": "2025-05-16T19:30:00.000Z"
-    },
-    "location": "Glassboro, NJ",
-    "type": "Other",
-    "rssId": "https://rpiathletics.com/calendar.aspx?game_id=20346&sport_id=21",
-    "opponent": "Cortland",
-    "gameId": "20346",
-    "visibility": "public",
-    "expectedAttendance": 0,
-    "status": "not-applicable",
-    "isDeleted": false
-  },
-  {
-    "name": "Baseball vs Rutgers-Camden - at host Johns Hopkins",
-    "description": "[L] Baseball vs Rutgers-Camden - at host Johns Hopkins\\nL 5-6\\nStreaming Video: https://www.ncaa.com/game/6449528\\n",
-    "start_time": {
-      "$date": "2025-05-16T18:30:00.000Z"
-    },
-    "end_time": {
-      "$date": "2025-05-16T21:30:00.000Z"
-    },
-    "location": "Baltimore, MD",
-    "type": "Other",
-    "rssId": "https://rpiathletics.com/calendar.aspx?game_id=20344&sport_id=2",
-    "opponent": "Rutgers-Camden",
-    "gameId": "20344",
-    "visibility": "public",
-    "expectedAttendance": 0,
-    "status": "not-applicable",
-    "isDeleted": false
-  },
-  {
-    "name": "Baseball vs Farmingdale State College - at host Johns Hopkins",
-    "description": "[W] Baseball vs Farmingdale State College - at host Johns Hopkins\\nW 5-4\\nStreaming Video: https://www.ncaa.com/game/6449530\\n",
-    "start_time": {
-      "$date": "2025-05-17T15:00:00.000Z"
-    },
-    "end_time": {
-      "$date": "2025-05-17T18:00:00.000Z"
-    },
-    "location": "Baltimore, MD",
-    "type": "Baseball",
-    "rssId": "https://rpiathletics.com/calendar.aspx?game_id=20345&sport_id=2",
-    "opponent": "Farmingdale State College",
-    "gameId": "20345",
-    "visibility": "public",
-    "expectedAttendance": 0,
-    "status": "not-applicable",
-    "isDeleted": false
-  },
-  {
-    "name": "Softball vs Cortland - at host Rowan University",
-    "description": "[L] Softball vs Cortland - at host Rowan University\\nL 5-10\\nStreaming Video: https://www.ncaa.com/game/6449419\\n",
-    "start_time": {
-      "$date": "2025-05-17T17:30:00.000Z"
-    },
-    "end_time": {
-      "$date": "2025-05-17T19:30:00.000Z"
-    },
-    "location": "Glassboro, NJ",
-    "type": "Other",
-    "rssId": "https://rpiathletics.com/calendar.aspx?game_id=20347&sport_id=21",
-    "opponent": "Cortland",
-    "gameId": "20347",
-    "visibility": "public",
-    "expectedAttendance": 0,
-    "status": "not-applicable",
-    "isDeleted": false
-  },
-  {
-    "name": "Men's Lacrosse vs Dickinson College | Quarterfinals - at host RIT",
-    "description": "[L] Men&#39;s Lacrosse vs Dickinson College | Quarterfinals - at host RIT\\nL 9-11\\nStreaming Video: https://www.ncaa.com/game/6448630\\n",
-    "start_time": {
-      "$date": "2025-05-17T20:30:00.000Z"
-    },
-    "end_time": {
-      "$date": "2025-05-17T23:30:00.000Z"
-    },
-    "location": "Rochester, NY",
-    "type": "Other",
-    "rssId": "https://rpiathletics.com/calendar.aspx?game_id=20342&sport_id=9",
-    "opponent": "Dickinson College | Quarterfinals",
-    "gameId": "20342",
-    "visibility": "public",
-    "expectedAttendance": 0,
-    "status": "not-applicable",
-    "isDeleted": false
-  },
-  {
-    "name": "Baseball vs Rutgers-Camden - at host Johns Hopkins",
-    "description": "[W] Baseball vs Rutgers-Camden - at host Johns Hopkins\\nW 10-0\\nStreaming Video: https://www.ncaa.com/game/6449531\\n",
-    "start_time": {
-      "$date": "2025-05-17T22:00:00.000Z"
-    },
-    "end_time": {
-      "$date": "2025-05-18T01:00:00.000Z"
-    },
-    "location": "Baltimore, MD",
-    "type": "Baseball",
-    "rssId": "https://rpiathletics.com/calendar.aspx?game_id=20350&sport_id=2",
-    "opponent": "Rutgers-Camden",
-    "gameId": "20350",
-    "visibility": "public",
-    "expectedAttendance": 0,
-    "status": "not-applicable",
-    "isDeleted": false
-  },
-  {
-    "name": "Baseball at Johns Hopkins University | Regional Championship (Game One)",
-    "description": "[L] Baseball at Johns Hopkins University | Regional Championship (Game One)\\nL 5-17\\nStreaming Video: https://www.ncaa.com/game/6449532\\n",
-    "start_time": {
-      "$date": "2025-05-18T15:00:00.000Z"
-    },
-    "end_time": {
-      "$date": "2025-05-18T18:00:00.000Z"
-    },
-    "location": "Baltimore, MD",
-    "type": "Other",
-    "rssId": "https://rpiathletics.com/calendar.aspx?game_id=20351&sport_id=2",
-    "opponent": "Johns Hopkins University | Regional Championship (Game One)",
-    "gameId": "20351",
-    "visibility": "public",
-    "expectedAttendance": 0,
-    "status": "not-applicable",
-    "isDeleted": false
-  },
-  {
-    "name": "Women's Track & Field at NCAA Outdoor Championships | at Spire Academy",
-    "description": "Women&#39;s Track & Field at NCAA Outdoor Championships | at Spire Academy\\n",
-    "start_time": {
-      "$date": "2025-05-22T00:00:00.000Z"
-    },
-    "end_time": {
-      "$date": "2025-05-24T03:59:59.999Z"
-    },
-    "location": "Geneva, OH",
-    "type": "Other",
-    "rssId": "https://rpiathletics.com/calendar.aspx?game_id=20106&sport_id=24",
-    "opponent": "NCAA Outdoor Championships | at Spire Academy",
-    "gameId": "20106",
-    "visibility": "public",
-    "expectedAttendance": 0,
-    "status": "not-applicable",
-    "isDeleted": false
-  },
-  {
-    "name": "Men's Track and Field at NCAA Outdoor Championships | at Spire Academy",
-    "description": "Men&#39;s Track and Field at NCAA Outdoor Championships | at Spire Academy\\n",
-    "start_time": {
-      "$date": "2025-05-22T00:00:00.000Z"
-    },
-    "end_time": {
-      "$date": "2025-05-24T03:59:59.999Z"
-    },
-    "location": "Geneva, OH",
-    "type": "Other",
-    "rssId": "https://rpiathletics.com/calendar.aspx?game_id=20120&sport_id=13",
-    "opponent": "NCAA Outdoor Championships | at Spire Academy",
-    "gameId": "20120",
-    "visibility": "public",
-    "expectedAttendance": 0,
-    "status": "not-applicable",
-    "isDeleted": false
-  },
-  {
-    "name": "Football at Worcester Polytechnic Institute",
-    "description": "Football at Worcester Polytechnic Institute\\n",
-    "start_time": {
-      "$date": "2025-09-06T00:00:00.000Z"
-    },
-    "end_time": {
-      "$date": "2025-09-06T07:00:00.000Z"
-    },
-    "location": "Worcester, MA",
-    "type": "Other",
-    "rssId": "https://rpiathletics.com/calendar.aspx?game_id=20319&sport_id=5",
-    "opponent": "Worcester Polytechnic Institute",
-    "gameId": "20319",
-    "visibility": "public",
-    "expectedAttendance": 0,
-    "status": "not-applicable",
-    "isDeleted": false
-  },
-  {
-    "name": "Football at Utica University",
-    "description": "Football at Utica University\\n",
-    "start_time": {
-      "$date": "2025-09-13T00:00:00.000Z"
-    },
-    "end_time": {
-      "$date": "2025-09-13T07:00:00.000Z"
-    },
-    "location": "Utica, NY",
-    "type": "Other",
-    "rssId": "https://rpiathletics.com/calendar.aspx?game_id=20320&sport_id=5",
-    "opponent": "Utica University",
-    "gameId": "20320",
-    "visibility": "public",
-    "expectedAttendance": 0,
-    "status": "not-applicable",
-    "isDeleted": false
-  },
-  {
-    "name": "Football vs SUNY Brockport",
-    "description": "Football vs SUNY Brockport\\n",
-    "start_time": {
-      "$date": "2025-09-20T00:00:00.000Z"
-    },
-    "end_time": {
-      "$date": "2025-09-20T07:00:00.000Z"
-    },
-    "location": "Troy, NY, ECAV Stadium",
-    "type": "Other",
-    "rssId": "https://rpiathletics.com/calendar.aspx?game_id=20322&sport_id=5",
-    "opponent": "SUNY Brockport",
-    "gameId": "20322",
-    "visibility": "public",
-    "expectedAttendance": 0,
-    "status": "not-applicable",
-    "isDeleted": false
-  },
-  {
-    "name": "Football vs University of Rochester",
-    "description": "Football vs University of Rochester\\n",
-    "start_time": {
-      "$date": "2025-09-27T00:00:00.000Z"
-    },
-    "end_time": {
-      "$date": "2025-09-27T07:00:00.000Z"
-    },
-    "location": "Troy, NY, ECAV Stadium",
-    "type": "Other",
-    "rssId": "https://rpiathletics.com/calendar.aspx?game_id=20323&sport_id=5",
-    "opponent": "University of Rochester",
-    "gameId": "20323",
-    "visibility": "public",
-    "expectedAttendance": 0,
-    "status": "not-applicable",
-    "isDeleted": false
-  },
-  {
-    "name": "Football at Hobart College",
-    "description": "Football at Hobart College\\n",
-    "start_time": {
-      "$date": "2025-10-04T00:00:00.000Z"
-    },
-    "end_time": {
-      "$date": "2025-10-04T07:00:00.000Z"
-    },
-    "location": "Geneva, NY",
-    "type": "Other",
-    "rssId": "https://rpiathletics.com/calendar.aspx?game_id=20325&sport_id=5",
-    "opponent": "Hobart College",
-    "gameId": "20325",
-    "visibility": "public",
-    "expectedAttendance": 0,
-    "status": "not-applicable",
-    "isDeleted": false
-  },
-  {
-    "name": "Football vs Buffalo State",
-    "description": "Football vs Buffalo State\\n",
-    "start_time": {
-      "$date": "2025-10-11T00:00:00.000Z"
-    },
-    "end_time": {
-      "$date": "2025-10-11T07:00:00.000Z"
-    },
-    "location": "Troy, NY, ECAV Stadium",
-    "type": "Other",
-    "rssId": "https://rpiathletics.com/calendar.aspx?game_id=20326&sport_id=5",
-    "opponent": "Buffalo State",
-    "gameId": "20326",
-    "visibility": "public",
-    "expectedAttendance": 0,
-    "status": "not-applicable",
-    "isDeleted": false
-  },
-  {
-    "name": "Football at Hilbert College",
-    "description": "Football at Hilbert College\\n",
-    "start_time": {
-      "$date": "2025-10-25T00:00:00.000Z"
-    },
-    "end_time": {
-      "$date": "2025-10-25T07:00:00.000Z"
-    },
-    "location": "Hamburg, NY",
-    "type": "Other",
-    "rssId": "https://rpiathletics.com/calendar.aspx?game_id=20327&sport_id=5",
-    "opponent": "Hilbert College",
-    "gameId": "20327",
-    "visibility": "public",
-    "expectedAttendance": 0,
-    "status": "not-applicable",
-    "isDeleted": false
-  },
-  {
-    "name": "Football at St. Lawrence University",
-    "description": "Football at St. Lawrence University\\n",
-    "start_time": {
-      "$date": "2025-11-01T00:00:00.000Z"
-    },
-    "end_time": {
-      "$date": "2025-11-01T07:00:00.000Z"
-    },
-    "location": "Canton, NY",
-    "type": "Other",
-    "rssId": "https://rpiathletics.com/calendar.aspx?game_id=20328&sport_id=5",
-    "opponent": "St. Lawrence University",
-    "gameId": "20328",
-    "visibility": "public",
-    "expectedAttendance": 0,
-    "status": "not-applicable",
-    "isDeleted": false
-  },
-  {
-    "name": "Football vs Ithaca College",
-    "description": "Football vs Ithaca College\\n",
-    "start_time": {
-      "$date": "2025-11-08T00:00:00.000Z"
-    },
-    "end_time": {
-      "$date": "2025-11-08T08:00:00.000Z"
-    },
-    "location": "Troy, NY, ECAV Stadium",
-    "type": "Other",
-    "rssId": "https://rpiathletics.com/calendar.aspx?game_id=20329&sport_id=5",
-    "opponent": "Ithaca College",
-    "gameId": "20329",
-    "visibility": "public",
-    "expectedAttendance": 0,
-    "status": "not-applicable",
-    "isDeleted": false
-  },
-  {
-    "name": "Football at Union College",
-    "description": "Football at Union College\\n",
-    "start_time": {
-      "$date": "2025-11-15T00:00:00.000Z"
-    },
-    "end_time": {
-      "$date": "2025-11-15T08:00:00.000Z"
-    },
-    "location": "Schenectady, NY",
-    "type": "Other",
-    "rssId": "https://rpiathletics.com/calendar.aspx?game_id=20330&sport_id=5",
-    "opponent": "Union College",
-    "gameId": "20330",
+    "location": "Campus-wide",
+    "contact": "Tuesday, May 27, 2025 (all day)  Where: Campus-wide  Description: Last day for students to add courses, change sections, or to put courses on audit for Summer Session II   Office of the Registrar 518-276-6231",
+    "type": "Academic Calendar, General Calendars",
+    "rssId": "calPath=%2Fpublic%2Fcals%2FMainCal&guid=CAL-00f19cc5-94f1324e-0195-6cd69496-000060d9calendars@rpi.edu&recurrenceId=",
     "visibility": "public",
     "expectedAttendance": 0,
     "status": "not-applicable",

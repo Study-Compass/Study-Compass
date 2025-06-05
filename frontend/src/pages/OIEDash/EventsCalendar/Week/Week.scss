@@ -10,10 +10,28 @@
         gap:10px;
     }
 
+
     .arrows{
         display: flex;
         align-items: center;
         margin-bottom:10px;
+        .left-arrow, .right-arrow{
+            cursor: pointer;
+            padding: 5px;   
+            border-radius: 5px 0 0 5px;
+            background-color: var(--lighter);
+            border: 1px solid var(--lighterborder);
+            &:hover{
+                background-color: var(--light);
+            }
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .right-arrow{
+            border-radius: 0 5px 5px 0;
+
+        }
     }
     
 }

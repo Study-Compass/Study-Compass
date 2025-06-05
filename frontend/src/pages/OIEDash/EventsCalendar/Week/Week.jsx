@@ -46,8 +46,12 @@ function Week({ height, changeToDay, start = new Date(new Date().setDate(new Dat
                 <div className="time-period">
                     {nav &&
                         <div className="arrows">
-                            <Icon icon="charm:chevron-left" onClick={() => updateWeek(-7)} />
-                            <Icon icon="charm:chevron-right" onClick={() => updateWeek(7)} />
+                            <div className="left-arrow">
+                                <Icon icon="charm:chevron-left" onClick={() => updateWeek(-7)} />
+                            </div>
+                            <div className="right-arrow">
+                                <Icon icon="charm:chevron-right" onClick={() => updateWeek(7)} />
+                            </div>
                         </div>
                     }
                     <h1>{startingText}{nav && `${formattedDate(startOfWeek)} to ${formattedDate(endOfWeek)}`}</h1>

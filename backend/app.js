@@ -90,6 +90,8 @@ const oieRoutes = require('./routes/oie-routes.js');
 const orgRoutes = require('./routes/orgRoutes.js');
 const workflowRoutes = require('./routes/workflowRoutes.js');
 const adminRoutes = require('./routes/adminRoutes.js');
+const rssRoutes = require('./routes/events/rssRoutes.js');
+const cronRoutes = require('./routes/events/cronRoutes.js');
 
 app.use(authRoutes);
 app.use(dataRoutes);
@@ -107,6 +109,8 @@ app.use(oieRoutes);
 app.use(orgRoutes);
 app.use(workflowRoutes);
 app.use(adminRoutes);
+app.use(rssRoutes);
+app.use(cronRoutes);
 
 // Serve static files from the React app in production
 if (process.env.NODE_ENV === 'production') {
