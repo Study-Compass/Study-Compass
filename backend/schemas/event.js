@@ -78,6 +78,10 @@ const eventSchema = new mongoose.Schema({
     rssId: {
         type: String,
         required: false,
+    },
+    externalLink: {
+        type: String,
+        required: false,
     }
 }, {
     timestamps: true // automatically adds 'createdAt' and 'updatedAt' fields

@@ -8,6 +8,12 @@
     .time-period{
         display: flex;
         gap:10px;
+        h1{
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
     }
 
 

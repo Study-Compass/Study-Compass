@@ -117,7 +117,17 @@ class RssTransformService {
             //get items from feed
             const items = Array.isArray(feed[0].item) ? feed[0].item : [feed[0].item];
             //transform items into events
+            let logged = 0;
             const events = items.map(item => {
+                logged++;
+                if(logged < 10){
+                    //log all fields
+                    console.log('item');
+                    Object.keys(item).forEach(key => {
+                        console.log(key);
+                    });
+                }
+
                 const event = {};
                 
                 //apply mappings to create event object

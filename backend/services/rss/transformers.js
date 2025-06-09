@@ -127,8 +127,6 @@ const athleticsTransformer = {
         status: 'not-applicable',
         hostingId: "68409b5578c70a803cbe0f9e",
         hostingType: "Org",
-
-
     }
 };
 
@@ -141,7 +139,7 @@ const rpiTransformer = {
         description: {
             paths: ['description'],
             transform: (value) => {
-                const descValue = getValue(value)._;
+                const descValue = typeof getValue(value) === 'string' ? getValue(value) : getValue(value)?._;
                 if (!descValue) return null;
 
                 // Extract date range and location from description
@@ -208,6 +206,20 @@ const rpiTransformer = {
             paths: ['guid'],
             transform: (value) => {
                 return value[0]._?.trim()
+            }
+        },
+        type: {
+            paths: ['title'],
+            transform: (value) => {
+                return "campus";
+            }
+        },
+        externalLink: {
+            paths: ['link'],
+            transform: (value) => {
+                console.log('link');
+                console.log(value);
+                return value[0].trim()
             }
         }
     },

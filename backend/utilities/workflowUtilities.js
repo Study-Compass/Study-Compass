@@ -169,9 +169,20 @@ const createApprovalInstance = async (req, eventId, event) => {
     }
 }
 
-async function getEventsWithAuthorization(req, filterObj = {}, roleNames = [], startOfRange, endOfRange, populateFields = []) {
+async function getEventsWithAuthorization(req, filterObj = {}, roleNames = [], startOfRange, endOfRange, populateFields = [], skip = 0, limit = 0, sort = {}) {
     try {
         const { Event } = getModels(req, 'Event');
+
+        // log all params
+        console.log("startOfRange", startOfRange);
+        console.log("endOfRange", endOfRange);
+        console.log("filterObj", filterObj);
+        console.log("roleNames", roleNames);
+        console.log("populateFields", populateFields);
+        console.log("skip", skip);
+        console.log("limit", limit);
+        console.log("sort", sort);
+
         let matchStage = {
             start_time: { $gte: startOfRange, $lte: endOfRange },
             ...(filterObj?.type !== "all" ? filterObj : {}), 
@@ -185,6 +196,9 @@ async function getEventsWithAuthorization(req, filterObj = {}, roleNames = [], s
             if (populateFields.length > 0) {
                 populateFields.forEach(field => query.populate(field));
             }
+            if (skip) query = query.skip(skip);
+            if (limit) query = query.limit(limit);
+            if (Object.keys(sort).length > 0) query = query.sort(sort);
             return await query.lean();
         }
 
@@ -223,6 +237,19 @@ async function getEventsWithAuthorization(req, filterObj = {}, roleNames = [], s
                 }
             }
         ];
+
+        // Add sort stage if sort criteria provided
+        if (Object.keys(sort).length > 0) {
+            pipeline.push({ $sort: sort });
+        }
+
+        // Add skip and limit stages if provided
+        if (skip) {
+            pipeline.push({ $skip: skip });
+        }
+        if (limit) {
+            pipeline.push({ $limit: limit });
+        }
 
         populateFields.forEach(field => {
             if (field === "hostingId") {

@@ -61,17 +61,21 @@ function FullEvent({ event }){
                 <h1>{event.name}</h1>
                 {renderHostingStatus()}
                 <div className="row">
-                    <Icon icon="heroicons:calendar-16-solid" />
-                    <div className="col">
+                    <div className="row event-detail">
+                        <Icon icon="heroicons:calendar-16-solid" />
                         <p>{date.toLocaleString('default', {weekday: 'long'})}, {date.toLocaleString('default', {month: 'long'})} {date.getDate()}</p>
+                    </div>
+                    <div className="row event-detail">
+                        <Icon icon="heroicons:clock-16-solid" />
                         <p>{date.toLocaleString('default', {hour: 'numeric', minute: 'numeric', hour12: true})} -  {dateEnd.toLocaleString('default', {hour: 'numeric', minute: 'numeric', hour12: true})}</p>
                     </div>
-                </div>
-                <div className="row">
-                    <Icon icon="fluent:location-28-filled" />
-                    <p>{event.location}</p>
+                    <div className="row event-detail">
+                        <Icon icon="fluent:location-28-filled" />
+                        <p>{event.location}</p>
+                    </div>
                 </div>
                 <div className="row event-description">
+                    <h3>Description</h3>
                     <p>{event.description}</p>
                 </div>
             </div>

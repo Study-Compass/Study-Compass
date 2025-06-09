@@ -24,7 +24,7 @@ function Approval({approval}){
                         <p>Approval Criteria</p>
                     </div>
                     <div className="content">
-                        {
+                        {/* {
                             Object.keys(approval.criteria).map((criteria)=>{
                                 return (
                                     <div className="criteria-item">
@@ -33,7 +33,7 @@ function Approval({approval}){
                                     </div>
                                 )
                             })
-                        }
+                        } */}
                     </div>
                 </div>
                 <div className="col actions">

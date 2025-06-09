@@ -10,7 +10,7 @@
     border: 1px solid var(--lighterborder);
     position: relative;
     cursor:pointer;
-    
+    animation: event-load-in 1s ease-in-out;
     iconify-icon{
         font-size: 16px;
         color: var(--text);
@@ -98,4 +98,14 @@
         filter: grayscale(100%);
     }
 
+}
+
+@keyframes event-load-in {
+    from {
+        opacity:0;
+    }
+    to {
+        opacity: 1;
+        width:100%;
+    }
 }

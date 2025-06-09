@@ -485,6 +485,8 @@ router.get('/get-events-by-month', verifyToken, authorizeRoles('oie'), async (re
             }
         }
 
+        console.log('filterObj', filterObj);
+
         const events = await getEventsWithAuthorization(req, filterObj, roles, startOfMonth, endOfMonth, ['classroom_id', 'hostingId']);
 
         console.log('GET: /get-events-by-month successful');
@@ -542,14 +544,7 @@ router.get('/get-events-by-range', verifyToken, authorizeRoles('oie'), async (re
             }
         }
 
-        let query = filterObj && filterObj.type !== "all" ?{
-            start_time: { $gte: startOfRange, $lte: endOfRange },
-            ...filterObj
-        } :
-        {
-            start_time: { $gte: startOfRange, $lte: endOfRange },
-        };
-
+        console.log('filterObj', filterObj);
 
         const events = await getEventsWithAuthorization(req, filterObj, roles, startOfRange, endOfRange, ['classroom_id', 'hostingId']);
         // const events = await Event.find(query)
@@ -654,14 +649,11 @@ router.get('/get-future-events', verifyToken, authorizeRoles('oie'), async (req,
             query = { ...query, ...filterObj };
         }
 
-        // Get total count for pagination
-        const totalEvents = await Event.countDocuments(query);
-
         // Calculate pagination
         const skip = (parseInt(page) - 1) * parseInt(limit);
-        const totalPages = Math.ceil(totalEvents / parseInt(limit));
+        const sort = { start_time: 1 }; // Sort by start_time in ascending order
 
-        // Get paginated events with authorization, sorting by start_time
+        // Get paginated events with authorization
         const events = await getEventsWithAuthorization(
             req,
             filterObj,
@@ -671,8 +663,11 @@ router.get('/get-future-events', verifyToken, authorizeRoles('oie'), async (req,
             ['classroom_id', 'hostingId'],
             skip,
             parseInt(limit),
-            { start_time: 1 } // Sort by start_time in ascending order
+            sort
         );
+
+        // Get total count for pagination
+        const totalEvents = await Event.countDocuments(query);
 
         console.log('GET: /get-future-events successful');
         res.status(200).json({
@@ -680,7 +675,7 @@ router.get('/get-future-events', verifyToken, authorizeRoles('oie'), async (req,
             events,
             pagination: {
                 total: totalEvents,
-                totalPages,
+                totalPages: Math.ceil(totalEvents / parseInt(limit)),
                 currentPage: parseInt(page),
                 limit: parseInt(limit)
             }

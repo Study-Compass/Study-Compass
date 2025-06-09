@@ -43,9 +43,9 @@ router.post('/sync-rss', async (req, res) => {
         return res.status(200).json({
             success: true,
             message: 'Events created successfully',
-            createdEvents,
-            updatedEvents,
-            events,
+            eventsCreated: createdEvents,
+            eventsUpdated: updatedEvents,
+            events: events
         });
     } catch(error){
         return res.status(500).json({
