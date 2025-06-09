@@ -206,37 +206,37 @@ function Explore(){
                         <div className="loading">Loading events...</div>
                     ) : error ? (
                         <div className="error">Error loading events</div>
-                    ) : events.length > 0 ? 
-                    viewType === 0 ? 
-                    (
-                        <div className="events-list">
-                            {groupedEvents.map(({ date, events }, groupIndex) => (
-                                <div key={date.toISOString()} className="date-group">
-                                    <div className="date-separator">{formatDate(date)}</div>
-                                    {events.map((event, eventIndex) => {
-                                        const isLastElement = groupIndex === groupedEvents.length - 1 && 
-                                                           eventIndex === events.length - 1;
-                                        return (
-                                            <div 
-                                                key={`${event._id}-${eventIndex}`}
-                                                ref={isLastElement ? lastEventElementRef : null}
-                                            >
-                                                <Event event={event} />
-                                            </div>
-                                        );
-                                    })}
-                                </div>
-                            ))}
-                            <Loader />
-                            {loading && page > 1 && (
-                                <div ref={loadingRef} className="loading-more">
-                                    Loading more events...
-                                </div>
-                            )}
-                        </div>
-                    ) 
-                    :
-                    (
+                    ) : viewType === 0 ? (
+                        events.length > 0 ? (
+                            <div className="events-list">
+                                {groupedEvents.map(({ date, events }, groupIndex) => (
+                                    <div key={date.toISOString()} className="date-group">
+                                        <div className="date-separator">{formatDate(date)}</div>
+                                        {events.map((event, eventIndex) => {
+                                            const isLastElement = groupIndex === groupedEvents.length - 1 && 
+                                                               eventIndex === events.length - 1;
+                                            return (
+                                                <div 
+                                                    key={`${event._id}-${eventIndex}`}
+                                                    ref={isLastElement ? lastEventElementRef : null}
+                                                >
+                                                    <Event event={event} />
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                ))}
+                                <Loader />
+                                {loading && page > 1 && (
+                                    <div ref={loadingRef} className="loading-more">
+                                        Loading more events...
+                                    </div>
+                                )}
+                            </div>
+                        ) : (
+                            <div className="no-events">No events found</div>
+                        )
+                    ) : (
                         view === 0 ?
                         <Month 
                             height={'calc(100% - 44px)'} 
@@ -268,9 +268,6 @@ function Explore(){
                             view={view} 
                             setView={setView}
                         />
-                    )
-                    : (
-                        <div className="no-events">No events found</div>
                     )}
                 </div>
             </div>
