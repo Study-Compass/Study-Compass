@@ -21,6 +21,7 @@ function CreateEvent(){
     const [step, setStep] = useState(0);
     const [currentSubStep, setCurrentSubStep] = useState(0);
     const subSteps = [[1], [1, 1, 1], [1]];
+    const [whenWhereOrderBool, setWhenWhereOrderBool] = useState(false);
     const [info, setInfo] = useState({});
     const [finishedStep, setFinishedStep] = useState(0);
     const {isAuthenticated, isAuthenticating, user} = useAuth();
