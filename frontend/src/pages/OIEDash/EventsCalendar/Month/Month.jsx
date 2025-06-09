@@ -41,8 +41,12 @@ function Month({ height, changeToWeek, filter, showSwitch = true, setView = () =
             <div className="monthly-header">
                 <div className="time-period">
                     <div className="arrows">
-                        <Icon icon="charm:chevron-left" onClick={prevMonth}/>
-                        <Icon icon="charm:chevron-right" onClick={nextMonth}/>
+                        <div className="left-arrow" onClick={prevMonth}>
+                            <Icon icon="charm:chevron-left" /> 
+                        </div>
+                        <div className="right-arrow" onClick={nextMonth}>
+                            <Icon icon="charm:chevron-right" />
+                        </div>
                     </div>
                     <h1>{month === currentMonth && year === currentYear ? (<b>{getMonthName(month)}</b>): getMonthName(month)} {year}</h1>
                 </div>

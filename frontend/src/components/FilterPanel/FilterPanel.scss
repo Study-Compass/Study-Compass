@@ -44,6 +44,10 @@
                     width: fit-content;
                     font-size: 13px;
                     cursor: pointer;
+                    -webkit-user-select: none;
+                    -moz-user-select: none;
+                    -ms-user-select: none;
+                    user-select: none;
                     &.selected {
                         background-color: var(--red);
                         color: var(--background);

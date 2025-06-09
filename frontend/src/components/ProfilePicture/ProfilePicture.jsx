@@ -16,6 +16,7 @@ import useOutsideClick from '../../hooks/useClickOutside';
 import { useNotification } from '../../NotificationContext';
 import {Icon} from '@iconify-icon/react';  
 import RPI from '../../assets/Icons/RPI.svg';
+import { Squircle } from '@squircle-js/react'
 
 import {Link} from 'react-router-dom'
 
@@ -38,7 +39,7 @@ function ProfilePicture(){
     return(
         <div className="profile-picture">
             <img className="profile" src ={user.picture ? user.picture : pfp} onClick={()=>{setShowPopup(!showPopup)}}></img>
-            <div className={`popup ${showPopup ? "popup-active":""}`} ref={ref}>
+            <Squircle cornerRadius={15} cornerSmoothing={0} className={`popup ${showPopup ? "popup-active":""}`} ref={ref}>
                 <div className="popup-content">
                     <img className="profile" src ={user.picture ? user.picture : pfp}></img>
                     <div className="profile-info">
@@ -153,7 +154,7 @@ function ProfilePicture(){
                         <p>Logout</p>
                     </div>
                 </Link>
-            </div>
+            </Squircle>
         </div>
     )
 }

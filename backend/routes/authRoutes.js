@@ -118,7 +118,7 @@ router.post('/login', async (req, res) => {
     const { email, password } = req.body;
 
     try {
-        //check if it is an email or username
+        //check if it is an email or username, case insensitive for email
         const { user, token } = await loginUser({ email, password, req });
         console.log(`POST: /login user ${user.username} logged in`)
         res.status(200).json({

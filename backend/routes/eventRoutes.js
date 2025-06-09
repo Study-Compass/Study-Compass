@@ -231,16 +231,17 @@ router.delete('/delete-event/:event_id', verifyToken, async (req, res) => {
 //get all oie-unapproved events
 router.get('/oie/get-pending-events', verifyToken, authorizeRoles('oie'), async (req, res) => {
     const { Event, OIEStatus } = getModels(req, 'Event', 'OIEStatus');
+    const { role } = req.query;
     // const { start, end, filter, roles } = req.query;
 
     const start = new Date();
     const end = new Date();
     end.setDate(start.getDate() + 99);
     const filter = { status: 'pending'};
-    const roles = ['Heffner Alumni House'];
+    const roles = [role];
 
     try {
-        const events = await getEventsWithAuthorization(req, filter, ['Heffner Alumni House'], start, end, ['classroom_id', 'hostingId']);
+    const events = await getEventsWithAuthorization(req, filter, roles, start, end, ['classroom_id', 'hostingId']);
         console.log(events);
 
         console.log('GET: /get-events-by-pending successful');
@@ -260,28 +261,33 @@ router.get('/oie/get-pending-events', verifyToken, authorizeRoles('oie'), async 
 
 //get all oie-unapproved events
 router.get('/oie/get-approved-events', verifyToken, authorizeRoles('oie'), async (req, res) => {
-    const { Event, User } = getModels(req, 'Event', 'User');
+    const { Event, OIEStatus } = getModels(req, 'Event', 'OIEStatus');
+    const { role } = req.query;
+    // const { start, end, filter, roles } = req.query;
+
+    const start = new Date();
+    const end = new Date();
+    end.setDate(start.getDate() + 99);
+    const filter = { status: 'pending'};
+    const roles = [role];
+
     try {
-        const user = await User.findById(req.user.userId);
-        if (!user ) {
-            return res.status(403).json({
-                success: false,
-                message: 'You are not authorized to view this page.'
-            });
-        }
-        const events = await Event.find({ OIEStatus: 'Approved' }).populate('classroom_id').populate('hostingId');
-        console.log('GET: /oie/get-approved-events successful');
+    const events = await getEventsWithAuthorization(req, filter, roles, start, end, ['classroom_id', 'hostingId']);
+        console.log(events);
+
+        console.log('GET: /get-events-by-approved successful');
         res.status(200).json({
             success: true,
             events
         });
     } catch (error) {
-        console.log('GET: /oie/get-approved-events failed', error);
+        console.log('GET: /get-events-by-week failed', error);
         res.status(500).json({
             success: false,
             message: error.message
         });
     }
+
 });
 
 //get all oie-unapproved events
@@ -420,7 +426,7 @@ router.post('/approve-event', verifyToken, async (req, res) => {
         approvalInstance.approvals[approvalInstance.currentStepIndex].approvedAt = new Date();
         approvalInstance.currentStepIndex++;
             
-        await event.save();
+        await approvalInstance.save();
         console.log('POST: /approve-event successful');
         res.status(200).json({
             success: true,
@@ -479,6 +485,8 @@ router.get('/get-events-by-month', verifyToken, authorizeRoles('oie'), async (re
             }
         }
 
+        console.log('filterObj', filterObj);
+
         const events = await getEventsWithAuthorization(req, filterObj, roles, startOfMonth, endOfMonth, ['classroom_id', 'hostingId']);
 
         console.log('GET: /get-events-by-month successful');
@@ -536,17 +544,9 @@ router.get('/get-events-by-range', verifyToken, authorizeRoles('oie'), async (re
             }
         }
 
-        let query = filterObj && filterObj.type !== "all" ?{
-            start_time: { $gte: startOfRange, $lte: endOfRange },
-            ...filterObj
-        } :
-        {
-            start_time: { $gte: startOfRange, $lte: endOfRange },
-        };
-
+        console.log('filterObj', filterObj);
 
         const events = await getEventsWithAuthorization(req, filterObj, roles, startOfRange, endOfRange, ['classroom_id', 'hostingId']);
-        console.log(events);
         // const events = await Event.find(query)
         //     .populate('classroom_id')
         //     .populate('hostingId')
@@ -649,14 +649,11 @@ router.get('/get-future-events', verifyToken, authorizeRoles('oie'), async (req,
             query = { ...query, ...filterObj };
         }
 
-        // Get total count for pagination
-        const totalEvents = await Event.countDocuments(query);
-
         // Calculate pagination
         const skip = (parseInt(page) - 1) * parseInt(limit);
-        const totalPages = Math.ceil(totalEvents / parseInt(limit));
+        const sort = { start_time: 1 }; // Sort by start_time in ascending order
 
-        // Get paginated events with authorization, sorting by start_time
+        // Get paginated events with authorization
         const events = await getEventsWithAuthorization(
             req,
             filterObj,
@@ -666,8 +663,11 @@ router.get('/get-future-events', verifyToken, authorizeRoles('oie'), async (req,
             ['classroom_id', 'hostingId'],
             skip,
             parseInt(limit),
-            { start_time: 1 } // Sort by start_time in ascending order
+            sort
         );
+
+        // Get total count for pagination
+        const totalEvents = await Event.countDocuments(query);
 
         console.log('GET: /get-future-events successful');
         res.status(200).json({
@@ -675,7 +675,7 @@ router.get('/get-future-events', verifyToken, authorizeRoles('oie'), async (req,
             events,
             pagination: {
                 total: totalEvents,
-                totalPages,
+                totalPages: Math.ceil(totalEvents / parseInt(limit)),
                 currentPage: parseInt(page),
                 limit: parseInt(limit)
             }

@@ -44,6 +44,25 @@
             font-family: 'Inter';
         }
 
+        .event-detail{
+            background-color: var(--lighter);
+            border-radius: 10px;
+            border: 1px solid var(--lighterborder);
+            padding:3px 10px;
+            align-items: center;
+            cursor: pointer;
+            p{
+                font-size:14px;
+            }
+            iconify-icon{
+                font-size:15px;
+            }
+        }
+
+    }
+    .event-description{
+        display: flex;
+        flex-direction: column;
     }
     .gradient{
         position: absolute;

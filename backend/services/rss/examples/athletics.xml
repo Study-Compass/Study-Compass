@@ -1,0 +1,1335 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:ev="http://purl.org/rss/1.0/modules/event/" xmlns:s="http://sidearmsports.com/schemas/cal_rss/1.0/" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/"> 
+<channel>
+<title> Athletics</title><link>https://rpiathletics.com</link><atom:link rel="self" href="https://rpiathletics.com/calendar.ashx/calendar.rss?sport_id=0&amp;_=cmawqe1k100013b9t0xcqp6ee" />
+<description> </description>
+<item>
+<title>4/22 4:00 PM [W] Women&#39;s Tennis vs Bard College</title>
+<description>[W] Women&#39;s Tennis vs Bard College\nW 7-0\n</description>
+<link>https://rpiathletics.com/calendar.aspx?game_id=20219&amp;sport_id=23</link><guid isPermaLink="true">https://rpiathletics.com/calendar.aspx?game_id=20219&amp;sport_id=23</guid><ev:location>Troy, NY, Sharp Courts</ev:location>
+<ev:startdate>2025-04-22T20:00:00.0000000Z</ev:startdate>
+<ev:enddate>2025-04-22T23:00:00.0000000Z</ev:enddate>
+<s:localstartdate>2025-04-22T16:00:00.0000000</s:localstartdate>
+<s:localenddate>2025-04-22T19:00:00.0000000</s:localenddate>
+<s:teamlogo>https://rpiathletics.com/images/logos/site/site.png</s:teamlogo>
+<s:opponentlogo>https://rpiathletics.com/images/logos/sidearm_bard_logo.png</s:opponentlogo>
+<s:opponent>Bard College</s:opponent>
+<s:gameid>20219</s:gameid>
+<s:gamepromoname></s:gamepromoname>
+<s:links>
+<s:boxscore>https://rpiathletics.com/boxscore.aspx?id=20219</s:boxscore>
+<s:recap>https://rpiathletics.com/news/2025/4/22/womens-tennis-sweeps-bard-7-0.aspx</s:recap>
+</s:links>
+</item>
+<item>
+<title>4/22 4:00 PM [W] Men&#39;s Tennis at Union College - MAKE-UP FROM TUE 4/15</title>
+<description>[W] Men&#39;s Tennis at Union College - MAKE-UP FROM TUE 4/15\nW 7-0\n</description>
+<link>https://rpiathletics.com/calendar.aspx?game_id=20248&amp;sport_id=12</link><guid isPermaLink="true">https://rpiathletics.com/calendar.aspx?game_id=20248&amp;sport_id=12</guid><ev:location>Schenectady, NY</ev:location>
+<ev:startdate>2025-04-22T20:00:00.0000000Z</ev:startdate>
+<ev:enddate>2025-04-22T23:00:00.0000000Z</ev:enddate>
+<s:localstartdate>2025-04-22T16:00:00.0000000</s:localstartdate>
+<s:localenddate>2025-04-22T19:00:00.0000000</s:localenddate>
+<s:teamlogo>https://rpiathletics.com/images/logos/site/site.png</s:teamlogo>
+<s:opponentlogo>https://rpiathletics.com/images/logos/Union_Athletics_Logo_New.png</s:opponentlogo>
+<s:opponent>Union College</s:opponent>
+<s:gameid>20248</s:gameid>
+<s:gamepromoname>MAKE-UP FROM TUE 4/15</s:gamepromoname>
+<s:links>
+<s:boxscore>https://rpiathletics.com/boxscore.aspx?id=20248</s:boxscore>
+<s:recap>https://rpiathletics.com/news/2025/4/22/womens-tennis-sweeps-bard-7-0.aspx</s:recap>
+</s:links>
+</item>
+<item>
+<title>4/23 4:00 PM [W] Baseball at Williams College</title>
+<description>[W] Baseball at Williams College\nW 8-5\nStreaming Video: https://www.nsnsports.net/colleges/williams-college/\n</description>
+<link>https://rpiathletics.com/calendar.aspx?game_id=20184&amp;sport_id=2</link><guid isPermaLink="true">https://rpiathletics.com/calendar.aspx?game_id=20184&amp;sport_id=2</guid><ev:location>Williamstown, MA</ev:location>
+<ev:startdate>2025-04-23T20:00:00.0000000Z</ev:startdate>
+<ev:enddate>2025-04-23T23:00:00.0000000Z</ev:enddate>
+<s:localstartdate>2025-04-23T16:00:00.0000000</s:localstartdate>
+<s:localenddate>2025-04-23T19:00:00.0000000</s:localenddate>
+<s:teamlogo>https://rpiathletics.com/images/logos/site/site.png</s:teamlogo>
+<s:opponentlogo>https://rpiathletics.com/images/logos/WilliamsLogo2023.png</s:opponentlogo>
+<s:opponent>Williams College</s:opponent>
+<s:gameid>20184</s:gameid>
+<s:gamepromoname></s:gamepromoname>
+<s:links>
+<s:livestats>https://ephsports.williams.edu/sidearmstats/baseball/</s:livestats>
+<s:boxscore>https://rpiathletics.com/boxscore.aspx?id=20184</s:boxscore>
+<s:recap>https://rpiathletics.com/news/2025/4/23/baseball-travels-to-williams-for-8-5-win.aspx</s:recap>
+</s:links>
+</item>
+<item>
+<title>4/23 4:00 PM [W] Women&#39;s Tennis at Union College - MAKE-UP FROM WED 4/16</title>
+<description>[W] Women&#39;s Tennis at Union College - MAKE-UP FROM WED 4/16\nW 6-1\n</description>
+<link>https://rpiathletics.com/calendar.aspx?game_id=20299&amp;sport_id=23</link><guid isPermaLink="true">https://rpiathletics.com/calendar.aspx?game_id=20299&amp;sport_id=23</guid><ev:location>Schenectady, NY</ev:location>
+<ev:startdate>2025-04-23T20:00:00.0000000Z</ev:startdate>
+<ev:enddate>2025-04-23T23:00:00.0000000Z</ev:enddate>
+<s:localstartdate>2025-04-23T16:00:00.0000000</s:localstartdate>
+<s:localenddate>2025-04-23T19:00:00.0000000</s:localenddate>
+<s:teamlogo>https://rpiathletics.com/images/logos/site/site.png</s:teamlogo>
+<s:opponentlogo>https://rpiathletics.com/images/logos/Union_Athletics_Logo_New.png</s:opponentlogo>
+<s:opponent>Union College</s:opponent>
+<s:gameid>20299</s:gameid>
+<s:gamepromoname>MAKE-UP FROM WED 4/16</s:gamepromoname>
+<s:links>
+<s:boxscore>https://rpiathletics.com/boxscore.aspx?id=20299</s:boxscore>
+<s:recap>https://rpiathletics.com/news/2025/4/23/womens-tennis-dispatches-union-6-1.aspx</s:recap>
+</s:links>
+</item>
+<item>
+<title>4/25 12:00 PM [N] Men&#39;s Golf at Liberty League Championship | at Turning Stone </title>
+<description>[N] Men&#39;s Golf at Liberty League Championship | at Turning Stone \n 2nd / 7 Teams\n</description>
+<link>https://rpiathletics.com/calendar.aspx?game_id=20274&amp;sport_id=6</link><guid isPermaLink="true">https://rpiathletics.com/calendar.aspx?game_id=20274&amp;sport_id=6</guid><ev:location>Verona, NY</ev:location>
+<ev:startdate>2025-04-25T16:00:00.0000000Z</ev:startdate>
+<ev:enddate>2025-04-27T03:59:59.9999999Z</ev:enddate>
+<s:localstartdate>2025-04-25T12:00:00.0000000</s:localstartdate>
+<s:localenddate>2025-04-26T23:59:59.9999999</s:localenddate>
+<s:teamlogo>https://rpiathletics.com/images/logos/site/site.png</s:teamlogo>
+<s:opponentlogo>https://rpiathletics.com/images/logos/k5.png</s:opponentlogo>
+<s:opponent>Liberty League Championship | at Turning Stone </s:opponent>
+<s:gameid>20274</s:gameid>
+<s:gamepromoname></s:gamepromoname>
+<s:links>
+<s:recap>https://rpiathletics.com/news/2025/4/28/mens-golf-lindsey-engineers-each-finish-runner-up-at-liberty-league-championship.aspx</s:recap>
+</s:links>
+</item>
+<item>
+<title>4/25 2:00 PM [N] Men&#39;s Track and Field vs RPI Capital District Classic</title>
+<description>[N] Men&#39;s Track and Field vs RPI Capital District Classic\n 1st / 10 Teams\nStreaming Video: https://rpiathletics.com/sports/2024/4/12/TRACK_LIVESTREAM.aspx\n</description>
+<link>https://rpiathletics.com/calendar.aspx?game_id=20116&amp;sport_id=13</link><guid isPermaLink="true">https://rpiathletics.com/calendar.aspx?game_id=20116&amp;sport_id=13</guid><ev:location>Troy, NY, Harkness Field</ev:location>
+<ev:startdate>2025-04-25T18:00:00.0000000Z</ev:startdate>
+<ev:enddate>2025-04-25T21:00:00.0000000Z</ev:enddate>
+<s:localstartdate>2025-04-25T14:00:00.0000000</s:localstartdate>
+<s:localenddate>2025-04-25T17:00:00.0000000</s:localenddate>
+<s:teamlogo>https://rpiathletics.com/images/logos/site/site.png</s:teamlogo>
+<s:opponentlogo>https://rpiathletics.com/images/logos/q16.png</s:opponentlogo>
+<s:opponent>RPI Capital District Classic</s:opponent>
+<s:gameid>20116</s:gameid>
+<s:gamepromoname></s:gamepromoname>
+<s:links>
+<s:livestats>https://results.leonetiming.com/?mid=7851</s:livestats>
+<s:recap>https://rpiathletics.com/news/2025/4/25/mens-track-and-field-tallies-17-podiums-at-capital-district-classic.aspx</s:recap>
+</s:links>
+</item>
+<item>
+<title>4/25 2:00 PM [N] Women&#39;s Track &amp; Field vs RPI Capital District Classic</title>
+<description>[N] Women&#39;s Track &amp; Field vs RPI Capital District Classic\n 1st / 12 Teams\nStreaming Video: https://rpiathletics.com/sports/2024/4/12/TRACK_LIVESTREAM.aspx\n</description>
+<link>https://rpiathletics.com/calendar.aspx?game_id=20101&amp;sport_id=24</link><guid isPermaLink="true">https://rpiathletics.com/calendar.aspx?game_id=20101&amp;sport_id=24</guid><ev:location>Troy, NY, Harkness Field</ev:location>
+<ev:startdate>2025-04-25T18:00:00.0000000Z</ev:startdate>
+<ev:enddate>2025-04-25T21:00:00.0000000Z</ev:enddate>
+<s:localstartdate>2025-04-25T14:00:00.0000000</s:localstartdate>
+<s:localenddate>2025-04-25T17:00:00.0000000</s:localenddate>
+<s:teamlogo>https://rpiathletics.com/images/logos/site/site.png</s:teamlogo>
+<s:opponentlogo>https://rpiathletics.com/images/logos/q16.png</s:opponentlogo>
+<s:opponent>RPI Capital District Classic</s:opponent>
+<s:gameid>20101</s:gameid>
+<s:gamepromoname></s:gamepromoname>
+<s:links>
+<s:livestats>https://results.leonetiming.com/?mid=7851</s:livestats>
+<s:recap>https://rpiathletics.com/news/2025/4/25/womens-track-field-shines-at-capital-district-classic.aspx</s:recap>
+</s:links>
+</item>
+<item>
+<title>4/25 3:00 PM [L] Women&#39;s Tennis at Vassar College</title>
+<description>[L] Women&#39;s Tennis at Vassar College\nL 0-7\n</description>
+<link>https://rpiathletics.com/calendar.aspx?game_id=20234&amp;sport_id=23</link><guid isPermaLink="true">https://rpiathletics.com/calendar.aspx?game_id=20234&amp;sport_id=23</guid><ev:location>Poughkeepsie, NY</ev:location>
+<ev:startdate>2025-04-25T19:00:00.0000000Z</ev:startdate>
+<ev:enddate>2025-04-25T22:00:00.0000000Z</ev:enddate>
+<s:localstartdate>2025-04-25T15:00:00.0000000</s:localstartdate>
+<s:localenddate>2025-04-25T18:00:00.0000000</s:localenddate>
+<s:teamlogo>https://rpiathletics.com/images/logos/site/site.png</s:teamlogo>
+<s:opponentlogo>https://rpiathletics.com/images/logos/x18.png</s:opponentlogo>
+<s:opponent>Vassar College</s:opponent>
+<s:gameid>20234</s:gameid>
+<s:gamepromoname></s:gamepromoname>
+<s:links>
+<s:boxscore>https://rpiathletics.com/boxscore.aspx?id=20234</s:boxscore>
+</s:links>
+</item>
+<item>
+<title>4/25 4:00 PM [W] Baseball vs Union College</title>
+<description>[W] Baseball vs Union College\nW 6-4\nStreaming Video: https://rpiathletics.com/sports/2021/4/21/baseball-live.aspx\n</description>
+<link>https://rpiathletics.com/calendar.aspx?game_id=20185&amp;sport_id=2</link><guid isPermaLink="true">https://rpiathletics.com/calendar.aspx?game_id=20185&amp;sport_id=2</guid><ev:location>Troy, NY, Robison Field at Karl Steffen Ballpark</ev:location>
+<ev:startdate>2025-04-25T20:00:00.0000000Z</ev:startdate>
+<ev:enddate>2025-04-25T23:00:00.0000000Z</ev:enddate>
+<s:localstartdate>2025-04-25T16:00:00.0000000</s:localstartdate>
+<s:localenddate>2025-04-25T19:00:00.0000000</s:localenddate>
+<s:teamlogo>https://rpiathletics.com/images/logos/site/site.png</s:teamlogo>
+<s:opponentlogo>https://rpiathletics.com/images/logos/Union_Athletics_Logo_New.png</s:opponentlogo>
+<s:opponent>Union College</s:opponent>
+<s:gameid>20185</s:gameid>
+<s:gamepromoname></s:gamepromoname>
+<s:links>
+<s:livestats>http://www.sidearmstats.com/rpi/baseball/</s:livestats>
+<s:boxscore>https://rpiathletics.com/boxscore.aspx?id=20185</s:boxscore>
+<s:recap>https://rpiathletics.com/news/2025/4/25/baseball-scores-big-liberty-league-over-union.aspx</s:recap>
+</s:links>
+</item>
+<item>
+<title>4/26 12:00 PM POSTPONED Baseball at Union College</title>
+<description>POSTPONED Baseball at Union College\nStreaming Video: https://unionathletics.com/sports/2018/11/13/baseball-video.aspx\n</description>
+<link>https://rpiathletics.com/calendar.aspx?game_id=20186&amp;sport_id=2</link><guid isPermaLink="true">https://rpiathletics.com/calendar.aspx?game_id=20186&amp;sport_id=2</guid><ev:location>Schenectady, NY</ev:location>
+<ev:startdate>2025-04-26T16:00:00.0000000Z</ev:startdate>
+<ev:enddate>2025-04-26T19:00:00.0000000Z</ev:enddate>
+<s:localstartdate>2025-04-26T12:00:00.0000000</s:localstartdate>
+<s:localenddate>2025-04-26T15:00:00.0000000</s:localenddate>
+<s:teamlogo>https://rpiathletics.com/images/logos/site/site.png</s:teamlogo>
+<s:opponentlogo>https://rpiathletics.com/images/logos/Union_Athletics_Logo_New.png</s:opponentlogo>
+<s:opponent>Union College</s:opponent>
+<s:gameid>20186</s:gameid>
+<s:gamepromoname></s:gamepromoname>
+<s:links>
+<s:livestats>http://www.unionathletics.com/sidearmstats/baseball?_ga=2.102410755.304751139.1739201830-1511999653.1725402883&amp;_gl=1*xmg2b0*_ga*MTUxMTk5OTY1My4xNzI1NDAyODgz*_ga_QDTJMT872K*MTczOTIwMTgzMC4zNC4wLjE3MzkyMDE4MzAuMC4wLjA.</s:livestats>
+</s:links>
+</item>
+<item>
+<title>4/26 1:00 PM [L] Men&#39;s Lacrosse at St. Lawrence University</title>
+<description>[L] Men&#39;s Lacrosse at St. Lawrence University\nL 6-9\nStreaming Video: https://saintsathletics.com/sports/2014/3/20/MLAX_0320143600.aspx\n</description>
+<link>https://rpiathletics.com/calendar.aspx?game_id=20136&amp;sport_id=9</link><guid isPermaLink="true">https://rpiathletics.com/calendar.aspx?game_id=20136&amp;sport_id=9</guid><ev:location>Canton, NY</ev:location>
+<ev:startdate>2025-04-26T17:00:00.0000000Z</ev:startdate>
+<ev:enddate>2025-04-26T20:00:00.0000000Z</ev:enddate>
+<s:localstartdate>2025-04-26T13:00:00.0000000</s:localstartdate>
+<s:localenddate>2025-04-26T16:00:00.0000000</s:localenddate>
+<s:teamlogo>https://rpiathletics.com/images/logos/site/site.png</s:teamlogo>
+<s:opponentlogo>https://rpiathletics.com/images/logos/St_Lawrence_NY.png</s:opponentlogo>
+<s:opponent>St. Lawrence University</s:opponent>
+<s:gameid>20136</s:gameid>
+<s:gamepromoname></s:gamepromoname>
+<s:links>
+<s:livestats>http://www.sidearmstats.com/stlawu/mlax/</s:livestats>
+<s:boxscore>https://rpiathletics.com/boxscore.aspx?id=20136</s:boxscore>
+<s:recap>https://rpiathletics.com/news/2025/4/26/mens-lacrosse-concludes-regular-season-at-saint-lawrence.aspx</s:recap>
+</s:links>
+</item>
+<item>
+<title>4/26 1:00 PM [W] Men&#39;s Tennis at Vassar College</title>
+<description>[W] Men&#39;s Tennis at Vassar College\nW 5-2\n</description>
+<link>https://rpiathletics.com/calendar.aspx?game_id=20250&amp;sport_id=12</link><guid isPermaLink="true">https://rpiathletics.com/calendar.aspx?game_id=20250&amp;sport_id=12</guid><ev:location>Poughkeepsie, NY</ev:location>
+<ev:startdate>2025-04-26T17:00:00.0000000Z</ev:startdate>
+<ev:enddate>2025-04-26T20:00:00.0000000Z</ev:enddate>
+<s:localstartdate>2025-04-26T13:00:00.0000000</s:localstartdate>
+<s:localenddate>2025-04-26T16:00:00.0000000</s:localenddate>
+<s:teamlogo>https://rpiathletics.com/images/logos/site/site.png</s:teamlogo>
+<s:opponentlogo>https://rpiathletics.com/images/logos/x18.png</s:opponentlogo>
+<s:opponent>Vassar College</s:opponent>
+<s:gameid>20250</s:gameid>
+<s:gamepromoname></s:gamepromoname>
+<s:links>
+<s:boxscore>https://rpiathletics.com/boxscore.aspx?id=20250</s:boxscore>
+<s:recap>https://rpiathletics.com/news/2025/4/26/mens-tennis-finishes-undefeated-liberty-league-season-earns-top-seed-in-conference-tournament-with-5-2-win-at-vassar.aspx</s:recap>
+</s:links>
+</item>
+<item>
+<title>4/26 1:00 PM POSTPONED Softball vs Clarkson University</title>
+<description>POSTPONED Softball vs Clarkson University\nStreaming Video: https://rpiathletics.com/sports/2021/4/21/softball-live.aspx\n</description>
+<link>https://rpiathletics.com/calendar.aspx?game_id=20215&amp;sport_id=21</link><guid isPermaLink="true">https://rpiathletics.com/calendar.aspx?game_id=20215&amp;sport_id=21</guid><ev:location>Troy, NY, Doris Robison Field</ev:location>
+<ev:startdate>2025-04-26T17:00:00.0000000Z</ev:startdate>
+<ev:enddate>2025-04-26T19:00:00.0000000Z</ev:enddate>
+<s:localstartdate>2025-04-26T13:00:00.0000000</s:localstartdate>
+<s:localenddate>2025-04-26T15:00:00.0000000</s:localenddate>
+<s:teamlogo>https://rpiathletics.com/images/logos/site/site.png</s:teamlogo>
+<s:opponentlogo>https://rpiathletics.com/images/logos/clarkson.png</s:opponentlogo>
+<s:opponent>Clarkson University</s:opponent>
+<s:gameid>20215</s:gameid>
+<s:gamepromoname></s:gamepromoname>
+<s:links>
+<s:livestats>http://www.sidearmstats.com/rpi/softball/</s:livestats>
+</s:links>
+</item>
+<item>
+<title>4/26 3:00 PM POSTPONED Baseball at Union College</title>
+<description>POSTPONED Baseball at Union College\nStreaming Video: https://unionathletics.com/sports/2018/11/13/baseball-video.aspx\n</description>
+<link>https://rpiathletics.com/calendar.aspx?game_id=20187&amp;sport_id=2</link><guid isPermaLink="true">https://rpiathletics.com/calendar.aspx?game_id=20187&amp;sport_id=2</guid><ev:location>Schenectady, NY</ev:location>
+<ev:startdate>2025-04-26T19:00:00.0000000Z</ev:startdate>
+<ev:enddate>2025-04-26T22:00:00.0000000Z</ev:enddate>
+<s:localstartdate>2025-04-26T15:00:00.0000000</s:localstartdate>
+<s:localenddate>2025-04-26T18:00:00.0000000</s:localenddate>
+<s:teamlogo>https://rpiathletics.com/images/logos/site/site.png</s:teamlogo>
+<s:opponentlogo>https://rpiathletics.com/images/logos/Union_Athletics_Logo_New.png</s:opponentlogo>
+<s:opponent>Union College</s:opponent>
+<s:gameid>20187</s:gameid>
+<s:gamepromoname></s:gamepromoname>
+<s:links>
+<s:livestats>http://www.unionathletics.com/sidearmstats/baseball?_ga=2.102410755.304751139.1739201830-1511999653.1725402883&amp;_gl=1*xmg2b0*_ga*MTUxMTk5OTY1My4xNzI1NDAyODgz*_ga_QDTJMT872K*MTczOTIwMTgzMC4zNC4wLjE3MzkyMDE4MzAuMC4wLjA.</s:livestats>
+</s:links>
+</item>
+<item>
+<title>4/26 3:00 PM [W] Women&#39;s Lacrosse at Clarkson University</title>
+<description>[W] Women&#39;s Lacrosse at Clarkson University\nW 12-11\nStreaming Video: http://clarksonathletics.com/sports/2018/2/28/clarkson-womens-lacrosse-from-hantz-field.aspx\n</description>
+<link>https://rpiathletics.com/calendar.aspx?game_id=20151&amp;sport_id=19</link><guid isPermaLink="true">https://rpiathletics.com/calendar.aspx?game_id=20151&amp;sport_id=19</guid><ev:location>Potsdam, NY</ev:location>
+<ev:startdate>2025-04-26T19:00:00.0000000Z</ev:startdate>
+<ev:enddate>2025-04-26T22:00:00.0000000Z</ev:enddate>
+<s:localstartdate>2025-04-26T15:00:00.0000000</s:localstartdate>
+<s:localenddate>2025-04-26T18:00:00.0000000</s:localenddate>
+<s:teamlogo>https://rpiathletics.com/images/logos/site/site.png</s:teamlogo>
+<s:opponentlogo>https://rpiathletics.com/images/logos/clarkson.png</s:opponentlogo>
+<s:opponent>Clarkson University</s:opponent>
+<s:gameid>20151</s:gameid>
+<s:gamepromoname></s:gamepromoname>
+<s:links>
+<s:livestats>https://clarksonathletics.com/sidearmstats/wlax/summary</s:livestats>
+<s:boxscore>https://rpiathletics.com/boxscore.aspx?id=20151</s:boxscore>
+<s:recap>https://rpiathletics.com/news/2025/4/26/womens-lacrosse-graffs-seven-goals-gives-rpi-comeback-win-at-clarkson.aspx</s:recap>
+</s:links>
+</item>
+<item>
+<title>4/26 3:00 PM POSTPONED Softball vs Clarkson University</title>
+<description>POSTPONED Softball vs Clarkson University\nStreaming Video: https://rpiathletics.com/sports/2021/4/21/softball-live.aspx\n</description>
+<link>https://rpiathletics.com/calendar.aspx?game_id=20303&amp;sport_id=21</link><guid isPermaLink="true">https://rpiathletics.com/calendar.aspx?game_id=20303&amp;sport_id=21</guid><ev:location>Troy, NY, Doris Robison Field</ev:location>
+<ev:startdate>2025-04-26T19:00:00.0000000Z</ev:startdate>
+<ev:enddate>2025-04-26T21:00:00.0000000Z</ev:enddate>
+<s:localstartdate>2025-04-26T15:00:00.0000000</s:localstartdate>
+<s:localenddate>2025-04-26T17:00:00.0000000</s:localenddate>
+<s:teamlogo>https://rpiathletics.com/images/logos/site/site.png</s:teamlogo>
+<s:opponentlogo>https://rpiathletics.com/images/logos/clarkson.png</s:opponentlogo>
+<s:opponent>Clarkson University</s:opponent>
+<s:gameid>20303</s:gameid>
+<s:gamepromoname></s:gamepromoname>
+<s:links>
+<s:livestats>http://www.sidearmstats.com/rpi/softball/</s:livestats>
+</s:links>
+</item>
+<item>
+<title>4/27 12:00 PM [W] Baseball at Union College</title>
+<description>[W] Baseball at Union College\nW 15-4 (8 innings)\nStreaming Video: https://unionathletics.com/sports/2018/11/13/baseball-video.aspx\n</description>
+<link>https://rpiathletics.com/calendar.aspx?game_id=20300&amp;sport_id=2</link><guid isPermaLink="true">https://rpiathletics.com/calendar.aspx?game_id=20300&amp;sport_id=2</guid><ev:location>Schenectady, NY</ev:location>
+<ev:startdate>2025-04-27T16:00:00.0000000Z</ev:startdate>
+<ev:enddate>2025-04-27T19:00:00.0000000Z</ev:enddate>
+<s:localstartdate>2025-04-27T12:00:00.0000000</s:localstartdate>
+<s:localenddate>2025-04-27T15:00:00.0000000</s:localenddate>
+<s:teamlogo>https://rpiathletics.com/images/logos/site/site.png</s:teamlogo>
+<s:opponentlogo>https://rpiathletics.com/images/logos/Union_Athletics_Logo_New.png</s:opponentlogo>
+<s:opponent>Union College</s:opponent>
+<s:gameid>20300</s:gameid>
+<s:gamepromoname></s:gamepromoname>
+<s:links>
+<s:livestats>http://www.unionathletics.com/sidearmstats/baseball?_ga=2.102410755.304751139.1739201830-1511999653.1725402883&amp;_gl=1*xmg2b0*_ga*MTUxMTk5OTY1My4xNzI1NDAyODgz*_ga_QDTJMT872K*MTczOTIwMTgzMC4zNC4wLjE3MzkyMDE4MzAuMC4wLjA.</s:livestats>
+<s:boxscore>https://rpiathletics.com/boxscore.aspx?id=20300</s:boxscore>
+<s:recap>https://rpiathletics.com/news/2025/4/27/baseball-engineers-finish-regular-season-secure-home-field-in-liberty-league-crossover-series.aspx</s:recap>
+</s:links>
+</item>
+<item>
+<title>4/27 1:00 PM [L] Softball vs Clarkson University</title>
+<description>[L] Softball vs Clarkson University\nL 1-8\nStreaming Video: https://rpiathletics.com/sports/2021/4/21/softball-live.aspx\n</description>
+<link>https://rpiathletics.com/calendar.aspx?game_id=20302&amp;sport_id=21</link><guid isPermaLink="true">https://rpiathletics.com/calendar.aspx?game_id=20302&amp;sport_id=21</guid><ev:location>Troy, NY, Doris Robison Field</ev:location>
+<ev:startdate>2025-04-27T17:00:00.0000000Z</ev:startdate>
+<ev:enddate>2025-04-27T19:00:00.0000000Z</ev:enddate>
+<s:localstartdate>2025-04-27T13:00:00.0000000</s:localstartdate>
+<s:localenddate>2025-04-27T15:00:00.0000000</s:localenddate>
+<s:teamlogo>https://rpiathletics.com/images/logos/site/site.png</s:teamlogo>
+<s:opponentlogo>https://rpiathletics.com/images/logos/clarkson.png</s:opponentlogo>
+<s:opponent>Clarkson University</s:opponent>
+<s:gameid>20302</s:gameid>
+<s:gamepromoname></s:gamepromoname>
+<s:links>
+<s:livestats>http://www.sidearmstats.com/rpi/softball/</s:livestats>
+<s:boxscore>https://rpiathletics.com/boxscore.aspx?id=20302</s:boxscore>
+<s:recap>https://rpiathletics.com/news/2025/4/27/softball-gets-one-of-two-from-clarkson.aspx</s:recap>
+</s:links>
+</item>
+<item>
+<title>4/27 3:00 PM [L] Baseball at Union College</title>
+<description>[L] Baseball at Union College\nL 5-8\nStreaming Video: https://unionathletics.com/sports/2018/11/13/baseball-video.aspx\n</description>
+<link>https://rpiathletics.com/calendar.aspx?game_id=20301&amp;sport_id=2</link><guid isPermaLink="true">https://rpiathletics.com/calendar.aspx?game_id=20301&amp;sport_id=2</guid><ev:location>Schenectady, NY</ev:location>
+<ev:startdate>2025-04-27T19:00:00.0000000Z</ev:startdate>
+<ev:enddate>2025-04-27T22:00:00.0000000Z</ev:enddate>
+<s:localstartdate>2025-04-27T15:00:00.0000000</s:localstartdate>
+<s:localenddate>2025-04-27T18:00:00.0000000</s:localenddate>
+<s:teamlogo>https://rpiathletics.com/images/logos/site/site.png</s:teamlogo>
+<s:opponentlogo>https://rpiathletics.com/images/logos/Union_Athletics_Logo_New.png</s:opponentlogo>
+<s:opponent>Union College</s:opponent>
+<s:gameid>20301</s:gameid>
+<s:gamepromoname></s:gamepromoname>
+<s:links>
+<s:livestats>http://www.unionathletics.com/sidearmstats/baseball?_ga=2.102410755.304751139.1739201830-1511999653.1725402883&amp;_gl=1*xmg2b0*_ga*MTUxMTk5OTY1My4xNzI1NDAyODgz*_ga_QDTJMT872K*MTczOTIwMTgzMC4zNC4wLjE3MzkyMDE4MzAuMC4wLjA.</s:livestats>
+<s:boxscore>https://rpiathletics.com/boxscore.aspx?id=20301</s:boxscore>
+<s:recap>https://rpiathletics.com/news/2025/4/27/baseball-engineers-finish-regular-season-secure-home-field-in-liberty-league-crossover-series.aspx</s:recap>
+</s:links>
+</item>
+<item>
+<title>4/27 3:00 PM [W] Softball vs Clarkson University</title>
+<description>[W] Softball vs Clarkson University\nW 8-0 (5 innings)\nStreaming Video: https://rpiathletics.com/sports/2021/4/21/softball-live.aspx\n</description>
+<link>https://rpiathletics.com/calendar.aspx?game_id=20216&amp;sport_id=21</link><guid isPermaLink="true">https://rpiathletics.com/calendar.aspx?game_id=20216&amp;sport_id=21</guid><ev:location>Troy, NY, Doris Robison Field</ev:location>
+<ev:startdate>2025-04-27T19:00:00.0000000Z</ev:startdate>
+<ev:enddate>2025-04-27T21:00:00.0000000Z</ev:enddate>
+<s:localstartdate>2025-04-27T15:00:00.0000000</s:localstartdate>
+<s:localenddate>2025-04-27T17:00:00.0000000</s:localenddate>
+<s:teamlogo>https://rpiathletics.com/images/logos/site/site.png</s:teamlogo>
+<s:opponentlogo>https://rpiathletics.com/images/logos/clarkson.png</s:opponentlogo>
+<s:opponent>Clarkson University</s:opponent>
+<s:gameid>20216</s:gameid>
+<s:gamepromoname></s:gamepromoname>
+<s:links>
+<s:livestats>http://www.sidearmstats.com/rpi/softball/</s:livestats>
+<s:boxscore>https://rpiathletics.com/boxscore.aspx?id=20216</s:boxscore>
+<s:recap>https://rpiathletics.com/news/2025/4/27/softball-gets-one-of-two-from-clarkson.aspx</s:recap>
+</s:links>
+</item>
+<item>
+<title>4/30 4:00 PM [L] Baseball at Middlebury College</title>
+<description>[L] Baseball at Middlebury College\nL 2-12\nStreaming Video: https://www.nsnsports.net/colleges/middlebury/?bfplayvid=2348690\n</description>
+<link>https://rpiathletics.com/calendar.aspx?game_id=20188&amp;sport_id=2</link><guid isPermaLink="true">https://rpiathletics.com/calendar.aspx?game_id=20188&amp;sport_id=2</guid><ev:location>Middlebury, VT</ev:location>
+<ev:startdate>2025-04-30T20:00:00.0000000Z</ev:startdate>
+<ev:enddate>2025-04-30T23:00:00.0000000Z</ev:enddate>
+<s:localstartdate>2025-04-30T16:00:00.0000000</s:localstartdate>
+<s:localenddate>2025-04-30T19:00:00.0000000</s:localenddate>
+<s:teamlogo>https://rpiathletics.com/images/logos/site/site.png</s:teamlogo>
+<s:opponentlogo>https://rpiathletics.com/images/logos/Middlebury-Panther_200px.png</s:opponentlogo>
+<s:opponent>Middlebury College</s:opponent>
+<s:gameid>20188</s:gameid>
+<s:gamepromoname></s:gamepromoname>
+<s:links>
+<s:livestats>https://athletics.middlebury.edu/sidearmstats/baseball/summary</s:livestats>
+<s:boxscore>https://rpiathletics.com/boxscore.aspx?id=20188</s:boxscore>
+<s:recap>https://rpiathletics.com/news/2025/4/30/baseball-travels-to-middlebury.aspx</s:recap>
+</s:links>
+</item>
+<item>
+<title>4/30 5:00 PM [L] Women&#39;s Lacrosse at Union College - Continuation from Tue 4/29</title>
+<description>[L] Women&#39;s Lacrosse at Union College - Continuation from Tue 4/29\nL 7-14\nStreaming Video: https://unionathletics.com/sports/2018/11/13/wlax-video.aspx\n</description>
+<link>https://rpiathletics.com/calendar.aspx?game_id=20305&amp;sport_id=19</link><guid isPermaLink="true">https://rpiathletics.com/calendar.aspx?game_id=20305&amp;sport_id=19</guid><ev:location>Schenectady, NY</ev:location>
+<ev:startdate>2025-04-30T21:00:00.0000000Z</ev:startdate>
+<ev:enddate>2025-05-01T00:00:00.0000001Z</ev:enddate>
+<s:localstartdate>2025-04-30T17:00:00.0000000</s:localstartdate>
+<s:localenddate>2025-04-30T20:00:00.0000000</s:localenddate>
+<s:teamlogo>https://rpiathletics.com/images/logos/site/site.png</s:teamlogo>
+<s:opponentlogo>https://rpiathletics.com/images/logos/Union_Athletics_Logo_New.png</s:opponentlogo>
+<s:opponent>Union College</s:opponent>
+<s:gameid>20305</s:gameid>
+<s:gamepromoname>Continuation from Tue 4/29</s:gamepromoname>
+<s:links>
+<s:livestats>https://unionathletics.com/sidearmstats/wlax/summary</s:livestats>
+<s:boxscore>https://rpiathletics.com/boxscore.aspx?id=20305</s:boxscore>
+<s:recap>https://rpiathletics.com/news/2025/4/30/rpi-concludes-season-in-weather-effected-first-round-matchup-at-union.aspx</s:recap>
+</s:links>
+</item>
+<item>
+<title>5/2 [N] Men&#39;s Track and Field at Liberty League Championships at RIT</title>
+<description>[N] Men&#39;s Track and Field at Liberty League Championships at RIT\n 1st / 8 Teams\nStreaming Video: https://ritathletics.com/showcase?Live=1738\n</description>
+<link>https://rpiathletics.com/calendar.aspx?game_id=20117&amp;sport_id=13</link><guid isPermaLink="true">https://rpiathletics.com/calendar.aspx?game_id=20117&amp;sport_id=13</guid><ev:location>Rochester, NY</ev:location>
+<ev:startdate>2025-05-02</ev:startdate>
+<ev:enddate>2025-05-03T03:59:59.9999999Z</ev:enddate>
+<s:localstartdate>2025-05-02</s:localstartdate>
+<s:localenddate>2025-05-02T23:59:59.9999999</s:localenddate>
+<s:teamlogo>https://rpiathletics.com/images/logos/site/site.png</s:teamlogo>
+<s:opponentlogo>https://rpiathletics.com/images/logos/k5.png</s:opponentlogo>
+<s:opponent>Liberty League Championships at RIT</s:opponent>
+<s:gameid>20117</s:gameid>
+<s:gamepromoname></s:gamepromoname>
+<s:links>
+<s:recap>https://rpiathletics.com/news/2025/5/3/mens-track-field-cruises-to-third-straight-liberty-league-championship.aspx</s:recap>
+</s:links>
+</item>
+<item>
+<title>5/2 [N] Women&#39;s Track &amp; Field at Liberty League Championships at RIT</title>
+<description>[N] Women&#39;s Track &amp; Field at Liberty League Championships at RIT\n 3rd / 8 Teams\nStreaming Video: https://ritathletics.com/showcase?Live=1738\n</description>
+<link>https://rpiathletics.com/calendar.aspx?game_id=20102&amp;sport_id=24</link><guid isPermaLink="true">https://rpiathletics.com/calendar.aspx?game_id=20102&amp;sport_id=24</guid><ev:location>Rochester, NY</ev:location>
+<ev:startdate>2025-05-02</ev:startdate>
+<ev:enddate>2025-05-03T03:59:59.9999999Z</ev:enddate>
+<s:localstartdate>2025-05-02</s:localstartdate>
+<s:localenddate>2025-05-02T23:59:59.9999999</s:localenddate>
+<s:teamlogo>https://rpiathletics.com/images/logos/site/site.png</s:teamlogo>
+<s:opponentlogo>https://rpiathletics.com/images/logos/k5.png</s:opponentlogo>
+<s:opponent>Liberty League Championships at RIT</s:opponent>
+<s:gameid>20102</s:gameid>
+<s:gamepromoname></s:gamepromoname>
+<s:links>
+<s:recap>https://rpiathletics.com/news/2025/5/3/womens-track-field-places-third-at-liberty-league-championships.aspx</s:recap>
+</s:links>
+</item>
+<item>
+<title>5/2 11:30 AM [W] Women&#39;s Tennis vs Ithaca College | First Round</title>
+<description>[W] Women&#39;s Tennis vs Ithaca College | First Round\nW 4-0\n</description>
+<link>https://rpiathletics.com/calendar.aspx?game_id=20252&amp;sport_id=23</link><guid isPermaLink="true">https://rpiathletics.com/calendar.aspx?game_id=20252&amp;sport_id=23</guid><ev:location>Cornell, NY</ev:location>
+<ev:startdate>2025-05-02T15:30:00.0000000Z</ev:startdate>
+<ev:enddate>2025-05-02T18:30:00.0000000Z</ev:enddate>
+<s:localstartdate>2025-05-02T11:30:00.0000000</s:localstartdate>
+<s:localenddate>2025-05-02T14:30:00.0000000</s:localenddate>
+<s:teamlogo>https://rpiathletics.com/images/logos/site/site.png</s:teamlogo>
+<s:opponentlogo>https://rpiathletics.com/images/logos/Ithaca_.png</s:opponentlogo>
+<s:opponent>Ithaca College | First Round</s:opponent>
+<s:gameid>20252</s:gameid>
+<s:gamepromoname></s:gamepromoname>
+<s:links>
+<s:boxscore>https://rpiathletics.com/boxscore.aspx?id=20252</s:boxscore>
+<s:recap>https://rpiathletics.com/news/2025/5/2/womens-tennis-sweeps-ithaca-to-advance-to-liberty-league-semis.aspx</s:recap>
+</s:links>
+</item>
+<item>
+<title>5/2 12:00 PM [W] Baseball vs RIT | Liberty League Crossover Series (Game One)</title>
+<description>[W] Baseball vs RIT | Liberty League Crossover Series (Game One)\nW 6-3\nStreaming Video: https://rpiathletics.com/sports/2021/4/21/baseball-live.aspx\n</description>
+<link>https://rpiathletics.com/calendar.aspx?game_id=20307&amp;sport_id=2</link><guid isPermaLink="true">https://rpiathletics.com/calendar.aspx?game_id=20307&amp;sport_id=2</guid><ev:location>Troy, NY, Robison Field at Karl Steffen Ballpark</ev:location>
+<ev:startdate>2025-05-02T16:00:00.0000000Z</ev:startdate>
+<ev:enddate>2025-05-02T19:00:00.0000000Z</ev:enddate>
+<s:localstartdate>2025-05-02T12:00:00.0000000</s:localstartdate>
+<s:localenddate>2025-05-02T15:00:00.0000000</s:localenddate>
+<s:teamlogo>https://rpiathletics.com/images/logos/site/site.png</s:teamlogo>
+<s:opponentlogo>https://rpiathletics.com/images/logos/RIT_Site_Logo.png</s:opponentlogo>
+<s:opponent>RIT | Liberty League Crossover Series (Game One)</s:opponent>
+<s:gameid>20307</s:gameid>
+<s:gamepromoname></s:gamepromoname>
+<s:links>
+<s:livestats>http://www.sidearmstats.com/rpi/baseball/</s:livestats>
+<s:boxscore>https://rpiathletics.com/boxscore.aspx?id=20307</s:boxscore>
+<s:recap>https://rpiathletics.com/news/2025/5/2/baseball-sweeps-rit-in-liberty-league-crossover-series.aspx</s:recap>
+</s:links>
+</item>
+<item>
+<title>5/2 3:30 PM [W] Baseball vs RIT | Liberty League Crossover Series (Game Two)</title>
+<description>[W] Baseball vs RIT | Liberty League Crossover Series (Game Two)\nW 11-0 (8 innings)\nStreaming Video: https://rpiathletics.com/sports/2021/4/21/baseball-live.aspx\n</description>
+<link>https://rpiathletics.com/calendar.aspx?game_id=20306&amp;sport_id=2</link><guid isPermaLink="true">https://rpiathletics.com/calendar.aspx?game_id=20306&amp;sport_id=2</guid><ev:location>Troy, NY, Robison Field at Karl Steffen Ballpark</ev:location>
+<ev:startdate>2025-05-02T19:30:00.0000000Z</ev:startdate>
+<ev:enddate>2025-05-02T22:30:00.0000000Z</ev:enddate>
+<s:localstartdate>2025-05-02T15:30:00.0000000</s:localstartdate>
+<s:localenddate>2025-05-02T18:30:00.0000000</s:localenddate>
+<s:teamlogo>https://rpiathletics.com/images/logos/site/site.png</s:teamlogo>
+<s:opponentlogo>https://rpiathletics.com/images/logos/RIT_Site_Logo.png</s:opponentlogo>
+<s:opponent>RIT | Liberty League Crossover Series (Game Two)</s:opponent>
+<s:gameid>20306</s:gameid>
+<s:gamepromoname></s:gamepromoname>
+<s:links>
+<s:livestats>http://www.sidearmstats.com/rpi/baseball/</s:livestats>
+<s:boxscore>https://rpiathletics.com/boxscore.aspx?id=20306</s:boxscore>
+<s:recap>https://rpiathletics.com/news/2025/5/2/baseball-sweeps-rit-in-liberty-league-crossover-series.aspx</s:recap>
+</s:links>
+</item>
+<item>
+<title>5/2 4:00 PM [L] Men&#39;s Lacrosse at St. Lawrence University | Semifinals</title>
+<description>[L] Men&#39;s Lacrosse at St. Lawrence University | Semifinals\nL 7-9\nStreaming Video: https://saintsathletics.com/sports/2014/3/20/MLAX_0320143600.aspx\n</description>
+<link>https://rpiathletics.com/calendar.aspx?game_id=20304&amp;sport_id=9</link><guid isPermaLink="true">https://rpiathletics.com/calendar.aspx?game_id=20304&amp;sport_id=9</guid><ev:location>Canton, NY</ev:location>
+<ev:startdate>2025-05-02T20:00:00.0000000Z</ev:startdate>
+<ev:enddate>2025-05-02T23:00:00.0000000Z</ev:enddate>
+<s:localstartdate>2025-05-02T16:00:00.0000000</s:localstartdate>
+<s:localenddate>2025-05-02T19:00:00.0000000</s:localenddate>
+<s:teamlogo>https://rpiathletics.com/images/logos/site/site.png</s:teamlogo>
+<s:opponentlogo>https://rpiathletics.com/images/logos/St_Lawrence_NY.png</s:opponentlogo>
+<s:opponent>St. Lawrence University | Semifinals</s:opponent>
+<s:gameid>20304</s:gameid>
+<s:gamepromoname></s:gamepromoname>
+<s:links>
+<s:livestats>http://www.sidearmstats.com/stlawu/mlax/</s:livestats>
+<s:boxscore>https://rpiathletics.com/boxscore.aspx?id=20304</s:boxscore>
+<s:recap>https://rpiathletics.com/news/2025/5/2/mens-lacrosse-falls-in-liberty-league-semis-at-st-lawrence.aspx</s:recap>
+</s:links>
+</item>
+<item>
+<title>5/3 11:30 AM [L] Women&#39;s Tennis vs Vassar College | Semifinals - at Ithaca</title>
+<description>[L] Women&#39;s Tennis vs Vassar College | Semifinals - at Ithaca\nL 2-4\n</description>
+<link>https://rpiathletics.com/calendar.aspx?game_id=20309&amp;sport_id=23</link><guid isPermaLink="true">https://rpiathletics.com/calendar.aspx?game_id=20309&amp;sport_id=23</guid><ev:location>Cornell, NY</ev:location>
+<ev:startdate>2025-05-03T15:30:00.0000000Z</ev:startdate>
+<ev:enddate>2025-05-03T18:30:00.0000000Z</ev:enddate>
+<s:localstartdate>2025-05-03T11:30:00.0000000</s:localstartdate>
+<s:localenddate>2025-05-03T14:30:00.0000000</s:localenddate>
+<s:teamlogo>https://rpiathletics.com/images/logos/site/site.png</s:teamlogo>
+<s:opponentlogo>https://rpiathletics.com/images/logos/x18.png</s:opponentlogo>
+<s:opponent>Vassar College | Semifinals</s:opponent>
+<s:gameid>20309</s:gameid>
+<s:gamepromoname>at Ithaca</s:gamepromoname>
+<s:links>
+<s:livestats>https://ioncourt.com/leagues/2025-liberty-league-womens-tennis-championship</s:livestats>
+<s:boxscore>https://rpiathletics.com/boxscore.aspx?id=20309</s:boxscore>
+</s:links>
+</item>
+<item>
+<title>5/3 2:00 PM [W] Softball at St. Lawrence University</title>
+<description>[W] Softball at St. Lawrence University\nW 1-0 (10 innings)\nStreaming Video: https://saintsathletics.com/sports/2019/4/2/2019-saints-softball-broadcasts.aspx\n</description>
+<link>https://rpiathletics.com/calendar.aspx?game_id=20217&amp;sport_id=21</link><guid isPermaLink="true">https://rpiathletics.com/calendar.aspx?game_id=20217&amp;sport_id=21</guid><ev:location>Canton, NY</ev:location>
+<ev:startdate>2025-05-03T18:00:00.0000000Z</ev:startdate>
+<ev:enddate>2025-05-03T20:00:00.0000000Z</ev:enddate>
+<s:localstartdate>2025-05-03T14:00:00.0000000</s:localstartdate>
+<s:localenddate>2025-05-03T16:00:00.0000000</s:localenddate>
+<s:teamlogo>https://rpiathletics.com/images/logos/site/site.png</s:teamlogo>
+<s:opponentlogo>https://rpiathletics.com/images/logos/St_Lawrence_NY.png</s:opponentlogo>
+<s:opponent>St. Lawrence University</s:opponent>
+<s:gameid>20217</s:gameid>
+<s:gamepromoname></s:gamepromoname>
+<s:links>
+<s:livestats>https://saintsathletics.com/sidearmstats/softball/summary</s:livestats>
+<s:boxscore>https://rpiathletics.com/boxscore.aspx?id=20217</s:boxscore>
+<s:recap>https://rpiathletics.com/news/2025/5/3/softball-registers-sweep-at-st-lawrence.aspx</s:recap>
+</s:links>
+</item>
+<item>
+<title>5/3 2:15 PM [W] Men&#39;s Tennis vs Skidmore College | Semifinals - at Ithaca</title>
+<description>[W] Men&#39;s Tennis vs Skidmore College | Semifinals - at Ithaca\nW 4-0\n</description>
+<link>https://rpiathletics.com/calendar.aspx?game_id=20251&amp;sport_id=12</link><guid isPermaLink="true">https://rpiathletics.com/calendar.aspx?game_id=20251&amp;sport_id=12</guid><ev:location>Cornell, NY</ev:location>
+<ev:startdate>2025-05-03T18:15:00.0000000Z</ev:startdate>
+<ev:enddate>2025-05-03T21:15:00.0000000Z</ev:enddate>
+<s:localstartdate>2025-05-03T14:15:00.0000000</s:localstartdate>
+<s:localenddate>2025-05-03T17:15:00.0000000</s:localenddate>
+<s:teamlogo>https://rpiathletics.com/images/logos/site/site.png</s:teamlogo>
+<s:opponentlogo>https://rpiathletics.com/images/logos/SkidmoreLogo200x200.png</s:opponentlogo>
+<s:opponent>Skidmore College | Semifinals</s:opponent>
+<s:gameid>20251</s:gameid>
+<s:gamepromoname>at Ithaca</s:gamepromoname>
+<s:links>
+<s:livestats>https://ioncourt.com/leagues/2025-liberty-league-mens-tennis-championship</s:livestats>
+<s:boxscore>https://rpiathletics.com/boxscore.aspx?id=20251</s:boxscore>
+<s:recap>https://rpiathletics.com/news/2025/5/3/mens-tennis-on-to-liberty-leage-championship-following-semis-win-over-skidmore.aspx</s:recap>
+</s:links>
+</item>
+<item>
+<title>5/3 4:00 PM [W] Softball at St. Lawrence University</title>
+<description>[W] Softball at St. Lawrence University\nW 13-7\nStreaming Video: https://saintsathletics.com/sports/2019/4/2/2019-saints-softball-broadcasts.aspx\n</description>
+<link>https://rpiathletics.com/calendar.aspx?game_id=20218&amp;sport_id=21</link><guid isPermaLink="true">https://rpiathletics.com/calendar.aspx?game_id=20218&amp;sport_id=21</guid><ev:location>Canton, NY</ev:location>
+<ev:startdate>2025-05-03T20:00:00.0000000Z</ev:startdate>
+<ev:enddate>2025-05-03T22:00:00.0000000Z</ev:enddate>
+<s:localstartdate>2025-05-03T16:00:00.0000000</s:localstartdate>
+<s:localenddate>2025-05-03T18:00:00.0000000</s:localenddate>
+<s:teamlogo>https://rpiathletics.com/images/logos/site/site.png</s:teamlogo>
+<s:opponentlogo>https://rpiathletics.com/images/logos/St_Lawrence_NY.png</s:opponentlogo>
+<s:opponent>St. Lawrence University</s:opponent>
+<s:gameid>20218</s:gameid>
+<s:gamepromoname></s:gamepromoname>
+<s:links>
+<s:livestats>https://saintsathletics.com/sidearmstats/softball/summary</s:livestats>
+<s:boxscore>https://rpiathletics.com/boxscore.aspx?id=20218</s:boxscore>
+<s:recap>https://rpiathletics.com/news/2025/5/3/softball-registers-sweep-at-st-lawrence.aspx</s:recap>
+</s:links>
+</item>
+<item>
+<title>5/4 1:00 PM [W] Men&#39;s Tennis vs Hobart College | Championship - at Ithaca</title>
+<description>[W] Men&#39;s Tennis vs Hobart College | Championship - at Ithaca\nW 4-0\n</description>
+<link>https://rpiathletics.com/calendar.aspx?game_id=20313&amp;sport_id=12</link><guid isPermaLink="true">https://rpiathletics.com/calendar.aspx?game_id=20313&amp;sport_id=12</guid><ev:location>Cornell, NY</ev:location>
+<ev:startdate>2025-05-04T17:00:00.0000000Z</ev:startdate>
+<ev:enddate>2025-05-04T20:00:00.0000000Z</ev:enddate>
+<s:localstartdate>2025-05-04T13:00:00.0000000</s:localstartdate>
+<s:localenddate>2025-05-04T16:00:00.0000000</s:localenddate>
+<s:teamlogo>https://rpiathletics.com/images/logos/site/site.png</s:teamlogo>
+<s:opponentlogo>https://rpiathletics.com/images/2019/8/19/Hobart_Primary_Icon_200x200.png</s:opponentlogo>
+<s:opponent>Hobart College | Championship</s:opponent>
+<s:gameid>20313</s:gameid>
+<s:gamepromoname>at Ithaca</s:gamepromoname>
+<s:links>
+<s:livestats>https://ioncourt.com/leagues/2025-liberty-league-mens-tennis-championship</s:livestats>
+<s:boxscore>https://rpiathletics.com/boxscore.aspx?id=20313</s:boxscore>
+<s:recap>https://rpiathletics.com/news/2025/5/4/mens-tennis-finishes-liberty-league-championship-four-peat.aspx</s:recap>
+</s:links>
+</item>
+<item>
+<title>5/8 10:00 AM [W] Softball vs St. Lawrence University | Play-In Game</title>
+<description>[W] Softball vs St. Lawrence University | Play-In Game\nW 8-0 (5 innings)\nStreaming Video: https://uofrathletics.com/watch/\n</description>
+<link>https://rpiathletics.com/calendar.aspx?game_id=20314&amp;sport_id=21</link><guid isPermaLink="true">https://rpiathletics.com/calendar.aspx?game_id=20314&amp;sport_id=21</guid><ev:location>Rochester, NY</ev:location>
+<ev:startdate>2025-05-08T14:00:00.0000000Z</ev:startdate>
+<ev:enddate>2025-05-08T16:00:00.0000000Z</ev:enddate>
+<s:localstartdate>2025-05-08T10:00:00.0000000</s:localstartdate>
+<s:localenddate>2025-05-08T12:00:00.0000000</s:localenddate>
+<s:teamlogo>https://rpiathletics.com/images/logos/site/site.png</s:teamlogo>
+<s:opponentlogo>https://rpiathletics.com/images/logos/St_Lawrence_NY.png</s:opponentlogo>
+<s:opponent>St. Lawrence University | Play-In Game</s:opponent>
+<s:gameid>20314</s:gameid>
+<s:gamepromoname></s:gamepromoname>
+<s:links>
+<s:livestats>https://uofrathletics.com/sidearmstats/softball/summary</s:livestats>
+<s:boxscore>https://rpiathletics.com/boxscore.aspx?id=20314</s:boxscore>
+<s:recap>https://rpiathletics.com/news/2025/5/8/softball-wins-liberty-league-play-in-advance-to-face-rochester-at-12-30-pm.aspx</s:recap>
+</s:links>
+</item>
+<item>
+<title>5/8 12:00 PM [L] Baseball at Ithaca College</title>
+<description>[L] Baseball at Ithaca College\nL 1-13\nStreaming Video: https://www.youtube.com/@BomberSports/streams\n</description>
+<link>https://rpiathletics.com/calendar.aspx?game_id=20310&amp;sport_id=2</link><guid isPermaLink="true">https://rpiathletics.com/calendar.aspx?game_id=20310&amp;sport_id=2</guid><ev:location>Ithaca, NY</ev:location>
+<ev:startdate>2025-05-08T16:00:00.0000000Z</ev:startdate>
+<ev:enddate>2025-05-08T19:00:00.0000000Z</ev:enddate>
+<s:localstartdate>2025-05-08T12:00:00.0000000</s:localstartdate>
+<s:localenddate>2025-05-08T15:00:00.0000000</s:localenddate>
+<s:teamlogo>https://rpiathletics.com/images/logos/site/site.png</s:teamlogo>
+<s:opponentlogo>https://rpiathletics.com/images/logos/Ithaca_.png</s:opponentlogo>
+<s:opponent>Ithaca College</s:opponent>
+<s:gameid>20310</s:gameid>
+<s:gamepromoname></s:gamepromoname>
+<s:links>
+<s:livestats>https://athletics.ithaca.edu/sidearmstats/baseball/summary</s:livestats>
+<s:boxscore>https://rpiathletics.com/boxscore.aspx?id=20310</s:boxscore>
+<s:recap>https://rpiathletics.com/news/2025/5/8/baseball-falls-to-ithaca-in-liberty-league-championship-opener.aspx</s:recap>
+</s:links>
+</item>
+<item>
+<title>5/8 12:30 PM [L] Softball vs University of Rochester</title>
+<description>[L] Softball vs University of Rochester\nL 1-4\nStreaming Video: https://uofrathletics.com/watch/\n</description>
+<link>https://rpiathletics.com/calendar.aspx?game_id=20331&amp;sport_id=21</link><guid isPermaLink="true">https://rpiathletics.com/calendar.aspx?game_id=20331&amp;sport_id=21</guid><ev:location>Rochester, NY</ev:location>
+<ev:startdate>2025-05-08T16:30:00.0000000Z</ev:startdate>
+<ev:enddate>2025-05-08T18:30:00.0000000Z</ev:enddate>
+<s:localstartdate>2025-05-08T12:30:00.0000000</s:localstartdate>
+<s:localenddate>2025-05-08T14:30:00.0000000</s:localenddate>
+<s:teamlogo>https://rpiathletics.com/images/logos/site/site.png</s:teamlogo>
+<s:opponentlogo>https://rpiathletics.com/images/logos/Rochester.png</s:opponentlogo>
+<s:opponent>University of Rochester</s:opponent>
+<s:gameid>20331</s:gameid>
+<s:gamepromoname></s:gamepromoname>
+<s:links>
+<s:livestats>https://uofrathletics.com/sidearmstats/softball/summary</s:livestats>
+<s:boxscore>https://rpiathletics.com/boxscore.aspx?id=20331</s:boxscore>
+<s:recap>https://rpiathletics.com/news/2025/5/8/softball-defeated-by-rochester-in-liberty-league-tournament.aspx</s:recap>
+</s:links>
+</item>
+<item>
+<title>5/9 [N] Women&#39;s Track &amp; Field at Williams F.I.R.E Meet</title>
+<description>[N] Women&#39;s Track &amp; Field at Williams F.I.R.E Meet\n Individuals Only\n</description>
+<link>https://rpiathletics.com/calendar.aspx?game_id=20103&amp;sport_id=24</link><guid isPermaLink="true">https://rpiathletics.com/calendar.aspx?game_id=20103&amp;sport_id=24</guid><ev:location>Williamstown, MA</ev:location>
+<ev:startdate>2025-05-09</ev:startdate>
+<ev:enddate>2025-05-10T03:59:59.9999999Z</ev:enddate>
+<s:localstartdate>2025-05-09</s:localstartdate>
+<s:localenddate>2025-05-09T23:59:59.9999999</s:localenddate>
+<s:teamlogo>https://rpiathletics.com/images/logos/site/site.png</s:teamlogo>
+<s:opponentlogo>https://rpiathletics.com/images/logos/WilliamsLogo2023.png</s:opponentlogo>
+<s:opponent>Williams F.I.R.E Meet</s:opponent>
+<s:gameid>20103</s:gameid>
+<s:gamepromoname></s:gamepromoname>
+<s:links>
+</s:links>
+</item>
+<item>
+<title>5/9 [N] Men&#39;s Track and Field at Williams F.I.R.E Meet</title>
+<description>[N] Men&#39;s Track and Field at Williams F.I.R.E Meet\n Individuals Only\n</description>
+<link>https://rpiathletics.com/calendar.aspx?game_id=20118&amp;sport_id=13</link><guid isPermaLink="true">https://rpiathletics.com/calendar.aspx?game_id=20118&amp;sport_id=13</guid><ev:location>Williamstown, MA</ev:location>
+<ev:startdate>2025-05-09</ev:startdate>
+<ev:enddate>2025-05-10T03:59:59.9999999Z</ev:enddate>
+<s:localstartdate>2025-05-09</s:localstartdate>
+<s:localenddate>2025-05-09T23:59:59.9999999</s:localenddate>
+<s:teamlogo>https://rpiathletics.com/images/logos/site/site.png</s:teamlogo>
+<s:opponentlogo>https://rpiathletics.com/images/logos/WilliamsLogo2023.png</s:opponentlogo>
+<s:opponent>Williams F.I.R.E Meet</s:opponent>
+<s:gameid>20118</s:gameid>
+<s:gamepromoname></s:gamepromoname>
+<s:links>
+</s:links>
+</item>
+<item>
+<title>5/9 10:00 AM [W] Baseball vs Clarkson University</title>
+<description>[W] Baseball vs Clarkson University\nW 10-1\nStreaming Video: https://www.youtube.com/@BomberSports/streams\n</description>
+<link>https://rpiathletics.com/calendar.aspx?game_id=20316&amp;sport_id=2</link><guid isPermaLink="true">https://rpiathletics.com/calendar.aspx?game_id=20316&amp;sport_id=2</guid><ev:location>Ithaca, NY</ev:location>
+<ev:startdate>2025-05-09T14:00:00.0000000Z</ev:startdate>
+<ev:enddate>2025-05-09T17:00:00.0000000Z</ev:enddate>
+<s:localstartdate>2025-05-09T10:00:00.0000000</s:localstartdate>
+<s:localenddate>2025-05-09T13:00:00.0000000</s:localenddate>
+<s:teamlogo>https://rpiathletics.com/images/logos/site/site.png</s:teamlogo>
+<s:opponentlogo>https://rpiathletics.com/images/logos/clarkson.png</s:opponentlogo>
+<s:opponent>Clarkson University</s:opponent>
+<s:gameid>20316</s:gameid>
+<s:gamepromoname></s:gamepromoname>
+<s:links>
+<s:livestats>https://athletics.ithaca.edu/sidearmstats/baseball/summary</s:livestats>
+<s:boxscore>https://rpiathletics.com/boxscore.aspx?id=20316</s:boxscore>
+<s:recap>https://rpiathletics.com/news/2025/5/9/baseball-stays-alive-with-10-1-win-over-clarkson.aspx</s:recap>
+</s:links>
+</item>
+<item>
+<title>5/9 12:30 PM [W] Softball vs Clarkson University</title>
+<description>[W] Softball vs Clarkson University\nW 6-2\nStreaming Video: https://uofrathletics.com/watch/\n</description>
+<link>https://rpiathletics.com/calendar.aspx?game_id=20332&amp;sport_id=21</link><guid isPermaLink="true">https://rpiathletics.com/calendar.aspx?game_id=20332&amp;sport_id=21</guid><ev:location>Rochester, NY</ev:location>
+<ev:startdate>2025-05-09T16:30:00.0000000Z</ev:startdate>
+<ev:enddate>2025-05-09T18:30:00.0000000Z</ev:enddate>
+<s:localstartdate>2025-05-09T12:30:00.0000000</s:localstartdate>
+<s:localenddate>2025-05-09T14:30:00.0000000</s:localenddate>
+<s:teamlogo>https://rpiathletics.com/images/logos/site/site.png</s:teamlogo>
+<s:opponentlogo>https://rpiathletics.com/images/logos/clarkson.png</s:opponentlogo>
+<s:opponent>Clarkson University</s:opponent>
+<s:gameid>20332</s:gameid>
+<s:gamepromoname></s:gamepromoname>
+<s:links>
+<s:livestats>https://uofrathletics.com/sidearmstats/softball/summary</s:livestats>
+<s:boxscore>https://rpiathletics.com/boxscore.aspx?id=20332</s:boxscore>
+<s:recap>https://rpiathletics.com/news/2025/5/9/softball-rpi-eliminates-clarkson-and-rochester-earn-chance-to-face-ithaca-in-championship.aspx</s:recap>
+</s:links>
+</item>
+<item>
+<title>5/9 3:00 PM [W] Softball vs University of Rochester</title>
+<description>[W] Softball vs University of Rochester\nW 5-3\nStreaming Video: https://uofrathletics.com/watch/\n</description>
+<link>https://rpiathletics.com/calendar.aspx?game_id=20334&amp;sport_id=21</link><guid isPermaLink="true">https://rpiathletics.com/calendar.aspx?game_id=20334&amp;sport_id=21</guid><ev:location>Rochester, NY</ev:location>
+<ev:startdate>2025-05-09T19:00:00.0000000Z</ev:startdate>
+<ev:enddate>2025-05-09T21:00:00.0000000Z</ev:enddate>
+<s:localstartdate>2025-05-09T15:00:00.0000000</s:localstartdate>
+<s:localenddate>2025-05-09T17:00:00.0000000</s:localenddate>
+<s:teamlogo>https://rpiathletics.com/images/logos/site/site.png</s:teamlogo>
+<s:opponentlogo>https://rpiathletics.com/images/logos/Rochester.png</s:opponentlogo>
+<s:opponent>University of Rochester</s:opponent>
+<s:gameid>20334</s:gameid>
+<s:gamepromoname></s:gamepromoname>
+<s:links>
+<s:livestats>https://uofrathletics.com/sidearmstats/softball/summary</s:livestats>
+<s:boxscore>https://rpiathletics.com/boxscore.aspx?id=20334</s:boxscore>
+<s:recap>https://rpiathletics.com/news/2025/5/9/softball-rpi-eliminates-clarkson-and-rochester-earn-chance-to-face-ithaca-in-championship.aspx</s:recap>
+</s:links>
+</item>
+<item>
+<title>5/9 4:00 PM POSTPONED Baseball vs Skidmore College</title>
+<description>POSTPONED Baseball vs Skidmore College\nStreaming Video: https://www.youtube.com/@BomberSports/streams\n</description>
+<link>https://rpiathletics.com/calendar.aspx?game_id=20333&amp;sport_id=2</link><guid isPermaLink="true">https://rpiathletics.com/calendar.aspx?game_id=20333&amp;sport_id=2</guid><ev:location>Ithaca, NY</ev:location>
+<ev:startdate>2025-05-09T20:00:00.0000000Z</ev:startdate>
+<ev:enddate>2025-05-09T23:00:00.0000000Z</ev:enddate>
+<s:localstartdate>2025-05-09T16:00:00.0000000</s:localstartdate>
+<s:localenddate>2025-05-09T19:00:00.0000000</s:localenddate>
+<s:teamlogo>https://rpiathletics.com/images/logos/site/site.png</s:teamlogo>
+<s:opponentlogo>https://rpiathletics.com/images/logos/SkidmoreLogo200x200.png</s:opponentlogo>
+<s:opponent>Skidmore College</s:opponent>
+<s:gameid>20333</s:gameid>
+<s:gamepromoname></s:gamepromoname>
+<s:links>
+<s:livestats>https://athletics.ithaca.edu/sidearmstats/baseball/summary</s:livestats>
+</s:links>
+</item>
+<item>
+<title>5/10 11:00 AM [W] Baseball vs Skidmore College - RE-SCHEDULED FROM 5/9</title>
+<description>[W] Baseball vs Skidmore College - RE-SCHEDULED FROM 5/9\nW 14-3\nStreaming Video: https://www.youtube.com/@BomberSports/streams\n</description>
+<link>https://rpiathletics.com/calendar.aspx?game_id=20337&amp;sport_id=2</link><guid isPermaLink="true">https://rpiathletics.com/calendar.aspx?game_id=20337&amp;sport_id=2</guid><ev:location>Ithaca, NY</ev:location>
+<ev:startdate>2025-05-10T15:00:00.0000000Z</ev:startdate>
+<ev:enddate>2025-05-10T18:00:00.0000000Z</ev:enddate>
+<s:localstartdate>2025-05-10T11:00:00.0000000</s:localstartdate>
+<s:localenddate>2025-05-10T14:00:00.0000000</s:localenddate>
+<s:teamlogo>https://rpiathletics.com/images/logos/site/site.png</s:teamlogo>
+<s:opponentlogo>https://rpiathletics.com/images/logos/SkidmoreLogo200x200.png</s:opponentlogo>
+<s:opponent>Skidmore College</s:opponent>
+<s:gameid>20337</s:gameid>
+<s:gamepromoname>RE-SCHEDULED FROM 5/9</s:gamepromoname>
+<s:links>
+<s:livestats>https://athletics.ithaca.edu/sidearmstats/baseball/summary</s:livestats>
+<s:boxscore>https://rpiathletics.com/boxscore.aspx?id=20337</s:boxscore>
+<s:recap>https://rpiathletics.com/news/2025/5/10/baseball-pushes-liberty-league-championship-series-to-a-sunday-winner-take-all.aspx</s:recap>
+</s:links>
+</item>
+<item>
+<title>5/10 12:00 PM [L] Softball vs Ithaca College</title>
+<description>[L] Softball vs Ithaca College\nL 0-8 (6 innings) \nStreaming Video: https://uofrathletics.com/watch/\n</description>
+<link>https://rpiathletics.com/calendar.aspx?game_id=20335&amp;sport_id=21</link><guid isPermaLink="true">https://rpiathletics.com/calendar.aspx?game_id=20335&amp;sport_id=21</guid><ev:location>Rochester, NY, Doris Robison Field</ev:location>
+<ev:startdate>2025-05-10T16:00:00.0000000Z</ev:startdate>
+<ev:enddate>2025-05-10T18:00:00.0000000Z</ev:enddate>
+<s:localstartdate>2025-05-10T12:00:00.0000000</s:localstartdate>
+<s:localenddate>2025-05-10T14:00:00.0000000</s:localenddate>
+<s:teamlogo>https://rpiathletics.com/images/logos/site/site.png</s:teamlogo>
+<s:opponentlogo>https://rpiathletics.com/images/logos/Ithaca_.png</s:opponentlogo>
+<s:opponent>Ithaca College</s:opponent>
+<s:gameid>20335</s:gameid>
+<s:gamepromoname></s:gamepromoname>
+<s:links>
+<s:livestats>https://uofrathletics.com/sidearmstats/softball/summary</s:livestats>
+<s:boxscore>https://rpiathletics.com/boxscore.aspx?id=20335</s:boxscore>
+<s:recap>https://rpiathletics.com/news/2025/5/10/softball-falls-to-ithaca-in-liberty-league-championship.aspx</s:recap>
+</s:links>
+</item>
+<item>
+<title>5/10 3:00 PM [W] Baseball vs Ithaca College | Championship (Game One)</title>
+<description>[W] Baseball vs Ithaca College | Championship (Game One)\nW 16-6\nStreaming Video: https://www.youtube.com/@BomberSports/streams\n</description>
+<link>https://rpiathletics.com/calendar.aspx?game_id=20338&amp;sport_id=2</link><guid isPermaLink="true">https://rpiathletics.com/calendar.aspx?game_id=20338&amp;sport_id=2</guid><ev:location>Ithaca, NY</ev:location>
+<ev:startdate>2025-05-10T19:00:00.0000000Z</ev:startdate>
+<ev:enddate>2025-05-10T22:00:00.0000000Z</ev:enddate>
+<s:localstartdate>2025-05-10T15:00:00.0000000</s:localstartdate>
+<s:localenddate>2025-05-10T18:00:00.0000000</s:localenddate>
+<s:teamlogo>https://rpiathletics.com/images/logos/site/site.png</s:teamlogo>
+<s:opponentlogo>https://rpiathletics.com/images/logos/Ithaca_.png</s:opponentlogo>
+<s:opponent>Ithaca College | Championship (Game One)</s:opponent>
+<s:gameid>20338</s:gameid>
+<s:gamepromoname></s:gamepromoname>
+<s:links>
+<s:livestats>https://athletics.ithaca.edu/sidearmstats/baseball/summary</s:livestats>
+<s:boxscore>https://rpiathletics.com/boxscore.aspx?id=20338</s:boxscore>
+<s:recap>https://rpiathletics.com/news/2025/5/10/baseball-pushes-liberty-league-championship-series-to-a-sunday-winner-take-all.aspx</s:recap>
+</s:links>
+</item>
+<item>
+<title>5/10 3:00 PM [W] Men&#39;s Lacrosse vs Williams College | Second Round - at Wesleyan University (Conn.)</title>
+<description>[W] Men&#39;s Lacrosse vs Williams College | Second Round - at Wesleyan University (Conn.)\nW 14-10\nStreaming Video: https://www.ncaa.com/game/6448615\n</description>
+<link>https://rpiathletics.com/calendar.aspx?game_id=20317&amp;sport_id=9</link><guid isPermaLink="true">https://rpiathletics.com/calendar.aspx?game_id=20317&amp;sport_id=9</guid><ev:location>Middletown, Conn.</ev:location>
+<ev:startdate>2025-05-10T19:00:00.0000000Z</ev:startdate>
+<ev:enddate>2025-05-10T22:00:00.0000000Z</ev:enddate>
+<s:localstartdate>2025-05-10T15:00:00.0000000</s:localstartdate>
+<s:localenddate>2025-05-10T18:00:00.0000000</s:localenddate>
+<s:teamlogo>https://rpiathletics.com/images/logos/site/site.png</s:teamlogo>
+<s:opponentlogo>https://rpiathletics.com/images/logos/WilliamsLogo2023.png</s:opponentlogo>
+<s:opponent>Williams College | Second Round</s:opponent>
+<s:gameid>20317</s:gameid>
+<s:gamepromoname>at Wesleyan University (Conn.)</s:gamepromoname>
+<s:links>
+<s:livestats>https://athletics.wesleyan.edu/sidearmstats/mlax/summary</s:livestats>
+<s:boxscore>https://rpiathletics.com/boxscore.aspx?id=20317</s:boxscore>
+<s:recap>https://rpiathletics.com/news/2025/5/10/mens-lacrosse-begins-ncaa-journey-with-win-against-williams.aspx</s:recap>
+</s:links>
+</item>
+<item>
+<title>5/10 3:00 PM [W] Men&#39;s Tennis vs Amherst College | Second Round - Moved Indoors to Bass River Tennis Club</title>
+<description>[W] Men&#39;s Tennis vs Amherst College | Second Round - Moved Indoors to Bass River Tennis Club\nW 4-3\nStreaming Video: https://web.playsight.com/facility/tufts-university-tennis/home\n</description>
+<link>https://rpiathletics.com/calendar.aspx?game_id=20318&amp;sport_id=12</link><guid isPermaLink="true">https://rpiathletics.com/calendar.aspx?game_id=20318&amp;sport_id=12</guid><ev:location>Medford, Mass.</ev:location>
+<ev:startdate>2025-05-10T19:00:00.0000000Z</ev:startdate>
+<ev:enddate>2025-05-10T22:00:00.0000000Z</ev:enddate>
+<s:localstartdate>2025-05-10T15:00:00.0000000</s:localstartdate>
+<s:localenddate>2025-05-10T18:00:00.0000000</s:localenddate>
+<s:teamlogo>https://rpiathletics.com/images/logos/site/site.png</s:teamlogo>
+<s:opponentlogo>https://rpiathletics.com/images/logos/Amherst Mammoth (1).png</s:opponentlogo>
+<s:opponent>Amherst College | Second Round</s:opponent>
+<s:gameid>20318</s:gameid>
+<s:gamepromoname>Moved Indoors to Bass River Tennis Club</s:gamepromoname>
+<s:links>
+<s:livestats>https://ioncourt.com/leagues/2025-ncaa-diii-mens-regioal-at-tufts</s:livestats>
+<s:boxscore>https://rpiathletics.com/boxscore.aspx?id=20318</s:boxscore>
+<s:recap>https://rpiathletics.com/news/2025/5/10/mens-tennis-holds-on-for-4-3-win-versus-amherst-in-ncaa-opener.aspx</s:recap>
+</s:links>
+</item>
+<item>
+<title>5/11 12:00 PM [W] Baseball vs Ithaca College | Championship (Game Two)</title>
+<description>[W] Baseball vs Ithaca College | Championship (Game Two)\nW 4-1\nStreaming Video: https://www.youtube.com/@BomberSports/streams\n</description>
+<link>https://rpiathletics.com/calendar.aspx?game_id=20340&amp;sport_id=2</link><guid isPermaLink="true">https://rpiathletics.com/calendar.aspx?game_id=20340&amp;sport_id=2</guid><ev:location>Ithaca, NY</ev:location>
+<ev:startdate>2025-05-11T16:00:00.0000000Z</ev:startdate>
+<ev:enddate>2025-05-11T19:00:00.0000000Z</ev:enddate>
+<s:localstartdate>2025-05-11T12:00:00.0000000</s:localstartdate>
+<s:localenddate>2025-05-11T15:00:00.0000000</s:localenddate>
+<s:teamlogo>https://rpiathletics.com/images/logos/site/site.png</s:teamlogo>
+<s:opponentlogo>https://rpiathletics.com/images/logos/Ithaca_.png</s:opponentlogo>
+<s:opponent>Ithaca College | Championship (Game Two)</s:opponent>
+<s:gameid>20340</s:gameid>
+<s:gamepromoname></s:gamepromoname>
+<s:links>
+<s:livestats>https://athletics.ithaca.edu/sidearmstats/baseball/summary</s:livestats>
+<s:boxscore>https://rpiathletics.com/boxscore.aspx?id=20340</s:boxscore>
+<s:recap>https://rpiathletics.com/news/2025/5/11/rpi-wins-liberty-league-baseball-championship.aspx</s:recap>
+</s:links>
+</item>
+<item>
+<title>5/11 12:00 PM [L] Men&#39;s Tennis vs Tufts University | Third Round - Scheduled for outdoors at Tufts University</title>
+<description>[L] Men&#39;s Tennis vs Tufts University | Third Round - Scheduled for outdoors at Tufts University\nL 1-4\nStreaming Video: https://web.playsight.com/facility/tufts-university-tennis/home\n</description>
+<link>https://rpiathletics.com/calendar.aspx?game_id=20341&amp;sport_id=12</link><guid isPermaLink="true">https://rpiathletics.com/calendar.aspx?game_id=20341&amp;sport_id=12</guid><ev:location>Medford, Mass.</ev:location>
+<ev:startdate>2025-05-11T16:00:00.0000000Z</ev:startdate>
+<ev:enddate>2025-05-11T19:00:00.0000000Z</ev:enddate>
+<s:localstartdate>2025-05-11T12:00:00.0000000</s:localstartdate>
+<s:localenddate>2025-05-11T15:00:00.0000000</s:localenddate>
+<s:teamlogo>https://rpiathletics.com/images/logos/site/site.png</s:teamlogo>
+<s:opponentlogo>https://rpiathletics.com/images/logos/tufts.png</s:opponentlogo>
+<s:opponent>Tufts University | Third Round</s:opponent>
+<s:gameid>20341</s:gameid>
+<s:gamepromoname>Scheduled for outdoors at Tufts University</s:gamepromoname>
+<s:links>
+<s:livestats>https://ioncourt.com/leagues/2025-ncaa-diii-mens-regioal-at-tufts</s:livestats>
+<s:boxscore>https://rpiathletics.com/boxscore.aspx?id=20341</s:boxscore>
+<s:recap>https://rpiathletics.com/news/2025/5/11/mens-tennis-knocked-out-of-ncaa-championship-by-tufts.aspx</s:recap>
+</s:links>
+</item>
+<item>
+<title>5/11 3:00 PM [W] Men&#39;s Lacrosse at Wesleyan University | Third Round</title>
+<description>[W] Men&#39;s Lacrosse at Wesleyan University | Third Round\nW 13-7\nStreaming Video: https://www.ncaa.com/game/6448625\n</description>
+<link>https://rpiathletics.com/calendar.aspx?game_id=20339&amp;sport_id=9</link><guid isPermaLink="true">https://rpiathletics.com/calendar.aspx?game_id=20339&amp;sport_id=9</guid><ev:location>Middletown, Conn.</ev:location>
+<ev:startdate>2025-05-11T19:00:00.0000000Z</ev:startdate>
+<ev:enddate>2025-05-11T22:00:00.0000000Z</ev:enddate>
+<s:localstartdate>2025-05-11T15:00:00.0000000</s:localstartdate>
+<s:localenddate>2025-05-11T18:00:00.0000000</s:localenddate>
+<s:teamlogo>https://rpiathletics.com/images/logos/site/site.png</s:teamlogo>
+<s:opponentlogo>https://rpiathletics.com/images/logos/Wesleyan-University.png</s:opponentlogo>
+<s:opponent>Wesleyan University | Third Round</s:opponent>
+<s:gameid>20339</s:gameid>
+<s:gamepromoname></s:gamepromoname>
+<s:links>
+<s:livestats>https://athletics.wesleyan.edu/sidearmstats/mlax/summary</s:livestats>
+<s:boxscore>https://rpiathletics.com/boxscore.aspx?id=20339</s:boxscore>
+<s:recap>https://rpiathletics.com/news/2025/5/11/mens-lacrosse-blitzes-wesleyan-to-advance-to-ncaa-quarterfinals.aspx</s:recap>
+</s:links>
+</item>
+<item>
+<title>5/12 [N] Men&#39;s Track and Field at Widener Final Qualifier</title>
+<description>[N] Men&#39;s Track and Field at Widener Final Qualifier\n Individuals Only\n</description>
+<link>https://rpiathletics.com/calendar.aspx?game_id=20348&amp;sport_id=13</link><guid isPermaLink="true">https://rpiathletics.com/calendar.aspx?game_id=20348&amp;sport_id=13</guid><ev:location>Chester, PA</ev:location>
+<ev:startdate>2025-05-12</ev:startdate>
+<ev:enddate>2025-05-12T07:00:00.0000000Z</ev:enddate>
+<s:localstartdate>2025-05-12</s:localstartdate>
+<s:localenddate>2025-05-12T03:00:00.0000000</s:localenddate>
+<s:teamlogo>https://rpiathletics.com/images/logos/site/site.png</s:teamlogo>
+<s:opponentlogo>https://rpiathletics.com/images/logos/z7.png</s:opponentlogo>
+<s:opponent>Widener Final Qualifier</s:opponent>
+<s:gameid>20348</s:gameid>
+<s:gamepromoname></s:gamepromoname>
+<s:links>
+</s:links>
+</item>
+<item>
+<title>5/12 [N] Women&#39;s Track &amp; Field at Widener Final Qualifier</title>
+<description>[N] Women&#39;s Track &amp; Field at Widener Final Qualifier\n Individuals Only\n</description>
+<link>https://rpiathletics.com/calendar.aspx?game_id=20349&amp;sport_id=24</link><guid isPermaLink="true">https://rpiathletics.com/calendar.aspx?game_id=20349&amp;sport_id=24</guid><ev:location>Chester, PA</ev:location>
+<ev:startdate>2025-05-12</ev:startdate>
+<ev:enddate>2025-05-12T07:00:00.0000000Z</ev:enddate>
+<s:localstartdate>2025-05-12</s:localstartdate>
+<s:localenddate>2025-05-12T03:00:00.0000000</s:localenddate>
+<s:teamlogo>https://rpiathletics.com/images/logos/site/site.png</s:teamlogo>
+<s:opponentlogo>https://rpiathletics.com/images/logos/z7.png</s:opponentlogo>
+<s:opponent>Widener Final Qualifier</s:opponent>
+<s:gameid>20349</s:gameid>
+<s:gamepromoname></s:gamepromoname>
+<s:links>
+</s:links>
+</item>
+<item>
+<title>5/15 [N] Men&#39;s Track and Field at UMass Amherst Final Qualifier </title>
+<description>[N] Men&#39;s Track and Field at UMass Amherst Final Qualifier \n Individuals Only\n</description>
+<link>https://rpiathletics.com/calendar.aspx?game_id=20119&amp;sport_id=13</link><guid isPermaLink="true">https://rpiathletics.com/calendar.aspx?game_id=20119&amp;sport_id=13</guid><ev:location>Amherst, MA</ev:location>
+<ev:startdate>2025-05-15</ev:startdate>
+<ev:enddate>2025-05-15T07:00:00.0000000Z</ev:enddate>
+<s:localstartdate>2025-05-15</s:localstartdate>
+<s:localenddate>2025-05-15T03:00:00.0000000</s:localenddate>
+<s:teamlogo>https://rpiathletics.com/images/logos/site/site.png</s:teamlogo>
+<s:opponentlogo>https://rpiathletics.com/images/logos/UMASS.png</s:opponentlogo>
+<s:opponent>UMass Amherst Final Qualifier </s:opponent>
+<s:gameid>20119</s:gameid>
+<s:gamepromoname></s:gamepromoname>
+<s:links>
+</s:links>
+</item>
+<item>
+<title>5/15 [N] Women&#39;s Track &amp; Field at UMass Amherst Final Qualifier </title>
+<description>[N] Women&#39;s Track &amp; Field at UMass Amherst Final Qualifier \n Individuals Only\n</description>
+<link>https://rpiathletics.com/calendar.aspx?game_id=20104&amp;sport_id=24</link><guid isPermaLink="true">https://rpiathletics.com/calendar.aspx?game_id=20104&amp;sport_id=24</guid><ev:location>Amherst, MA</ev:location>
+<ev:startdate>2025-05-15</ev:startdate>
+<ev:enddate>2025-05-15T07:00:00.0000000Z</ev:enddate>
+<s:localstartdate>2025-05-15</s:localstartdate>
+<s:localenddate>2025-05-15T03:00:00.0000000</s:localenddate>
+<s:teamlogo>https://rpiathletics.com/images/logos/site/site.png</s:teamlogo>
+<s:opponentlogo>https://rpiathletics.com/images/logos/UMASS.png</s:opponentlogo>
+<s:opponent>UMass Amherst Final Qualifier </s:opponent>
+<s:gameid>20104</s:gameid>
+<s:gamepromoname></s:gamepromoname>
+<s:links>
+</s:links>
+</item>
+<item>
+<title>5/15 1:30 PM [L] Softball vs Tufts University - at host Rowan University</title>
+<description>[L] Softball vs Tufts University - at host Rowan University\nL 1-8\nStreaming Video: https://www.ncaa.com/game/6449417\n</description>
+<link>https://rpiathletics.com/calendar.aspx?game_id=20343&amp;sport_id=21</link><guid isPermaLink="true">https://rpiathletics.com/calendar.aspx?game_id=20343&amp;sport_id=21</guid><ev:location>Glassboro, NJ</ev:location>
+<ev:startdate>2025-05-15T17:30:00.0000000Z</ev:startdate>
+<ev:enddate>2025-05-15T19:30:00.0000000Z</ev:enddate>
+<s:localstartdate>2025-05-15T13:30:00.0000000</s:localstartdate>
+<s:localenddate>2025-05-15T15:30:00.0000000</s:localenddate>
+<s:teamlogo>https://rpiathletics.com/images/logos/site/site.png</s:teamlogo>
+<s:opponentlogo>https://rpiathletics.com/images/logos/tufts.png</s:opponentlogo>
+<s:opponent>Tufts University</s:opponent>
+<s:gameid>20343</s:gameid>
+<s:gamepromoname>at host Rowan University</s:gamepromoname>
+<s:links>
+<s:livestats>https://www.rowanathletics.com/sidearmstats/softball/summary</s:livestats>
+<s:boxscore>https://rpiathletics.com/boxscore.aspx?id=20343</s:boxscore>
+<s:recap>https://rpiathletics.com/news/2025/5/15/softball-begins-ncaas-against-powerhouse-tufts.aspx</s:recap>
+</s:links>
+</item>
+<item>
+<title>5/16 1:30 PM POSTPONED Softball vs Cortland - at host Rowan University</title>
+<description>POSTPONED Softball vs Cortland - at host Rowan University\nStreaming Video: https://www.ncaa.com/game/6449419\n</description>
+<link>https://rpiathletics.com/calendar.aspx?game_id=20346&amp;sport_id=21</link><guid isPermaLink="true">https://rpiathletics.com/calendar.aspx?game_id=20346&amp;sport_id=21</guid><ev:location>Glassboro, NJ</ev:location>
+<ev:startdate>2025-05-16T17:30:00.0000000Z</ev:startdate>
+<ev:enddate>2025-05-16T19:30:00.0000000Z</ev:enddate>
+<s:localstartdate>2025-05-16T13:30:00.0000000</s:localstartdate>
+<s:localenddate>2025-05-16T15:30:00.0000000</s:localenddate>
+<s:teamlogo>https://rpiathletics.com/images/logos/site/site.png</s:teamlogo>
+<s:opponentlogo>https://rpiathletics.com/images/logos/CortlandLogo2016.png</s:opponentlogo>
+<s:opponent>Cortland</s:opponent>
+<s:gameid>20346</s:gameid>
+<s:gamepromoname>at host Rowan University</s:gamepromoname>
+<s:links>
+<s:livestats>https://www.rowanathletics.com/sidearmstats/softball/media;team=home</s:livestats>
+</s:links>
+</item>
+<item>
+<title>5/16 2:30 PM [L] Baseball vs Rutgers-Camden - at host Johns Hopkins</title>
+<description>[L] Baseball vs Rutgers-Camden - at host Johns Hopkins\nL 5-6\nStreaming Video: https://www.ncaa.com/game/6449528\n</description>
+<link>https://rpiathletics.com/calendar.aspx?game_id=20344&amp;sport_id=2</link><guid isPermaLink="true">https://rpiathletics.com/calendar.aspx?game_id=20344&amp;sport_id=2</guid><ev:location>Baltimore, MD</ev:location>
+<ev:startdate>2025-05-16T18:30:00.0000000Z</ev:startdate>
+<ev:enddate>2025-05-16T21:30:00.0000000Z</ev:enddate>
+<s:localstartdate>2025-05-16T14:30:00.0000000</s:localstartdate>
+<s:localenddate>2025-05-16T17:30:00.0000000</s:localenddate>
+<s:teamlogo>https://rpiathletics.com/images/logos/site/site.png</s:teamlogo>
+<s:opponentlogo>https://rpiathletics.com/images/logos/rutgers-camden.png</s:opponentlogo>
+<s:opponent>Rutgers-Camden</s:opponent>
+<s:gameid>20344</s:gameid>
+<s:gamepromoname>at host Johns Hopkins</s:gamepromoname>
+<s:links>
+<s:livestats>https://hopkinssports.com/sidearmstats/baseball/summary</s:livestats>
+<s:boxscore>https://rpiathletics.com/boxscore.aspx?id=20344</s:boxscore>
+<s:recap>https://rpiathletics.com/news/2025/5/16/baseball-stung-in-ninth-inning-of-rain-delayed-ncaa-opener.aspx</s:recap>
+</s:links>
+</item>
+<item>
+<title>5/17 11:00 AM [W] Baseball vs Farmingdale State College - at host Johns Hopkins</title>
+<description>[W] Baseball vs Farmingdale State College - at host Johns Hopkins\nW 5-4\nStreaming Video: https://www.ncaa.com/game/6449530\n</description>
+<link>https://rpiathletics.com/calendar.aspx?game_id=20345&amp;sport_id=2</link><guid isPermaLink="true">https://rpiathletics.com/calendar.aspx?game_id=20345&amp;sport_id=2</guid><ev:location>Baltimore, MD</ev:location>
+<ev:startdate>2025-05-17T15:00:00.0000000Z</ev:startdate>
+<ev:enddate>2025-05-17T18:00:00.0000000Z</ev:enddate>
+<s:localstartdate>2025-05-17T11:00:00.0000000</s:localstartdate>
+<s:localenddate>2025-05-17T14:00:00.0000000</s:localenddate>
+<s:teamlogo>https://rpiathletics.com/images/logos/site/site.png</s:teamlogo>
+<s:opponentlogo>https://rpiathletics.com/images/logos/Farmingdale.png</s:opponentlogo>
+<s:opponent>Farmingdale State College</s:opponent>
+<s:gameid>20345</s:gameid>
+<s:gamepromoname>at host Johns Hopkins</s:gamepromoname>
+<s:links>
+<s:livestats>https://hopkinssports.com/sidearmstats/baseball/summary</s:livestats>
+<s:boxscore>https://rpiathletics.com/boxscore.aspx?id=20345</s:boxscore>
+<s:recap>https://rpiathletics.com/news/2025/5/17/baseball-chotiner-walk-off-advances-rpi-to-another-consolation-game.aspx</s:recap>
+</s:links>
+</item>
+<item>
+<title>5/17 1:30 PM [L] Softball vs Cortland - at host Rowan University</title>
+<description>[L] Softball vs Cortland - at host Rowan University\nL 5-10\nStreaming Video: https://www.ncaa.com/game/6449419\n</description>
+<link>https://rpiathletics.com/calendar.aspx?game_id=20347&amp;sport_id=21</link><guid isPermaLink="true">https://rpiathletics.com/calendar.aspx?game_id=20347&amp;sport_id=21</guid><ev:location>Glassboro, NJ</ev:location>
+<ev:startdate>2025-05-17T17:30:00.0000000Z</ev:startdate>
+<ev:enddate>2025-05-17T19:30:00.0000000Z</ev:enddate>
+<s:localstartdate>2025-05-17T13:30:00.0000000</s:localstartdate>
+<s:localenddate>2025-05-17T15:30:00.0000000</s:localenddate>
+<s:teamlogo>https://rpiathletics.com/images/logos/site/site.png</s:teamlogo>
+<s:opponentlogo>https://rpiathletics.com/images/logos/CortlandLogo2016.png</s:opponentlogo>
+<s:opponent>Cortland</s:opponent>
+<s:gameid>20347</s:gameid>
+<s:gamepromoname>at host Rowan University</s:gamepromoname>
+<s:links>
+<s:livestats>https://www.rowanathletics.com/sidearmstats/softball/media;team=home</s:livestats>
+<s:boxscore>https://rpiathletics.com/boxscore.aspx?id=20347</s:boxscore>
+<s:recap>https://rpiathletics.com/news/2025/5/17/softball-season-concludes-versus-cortland.aspx</s:recap>
+</s:links>
+</item>
+<item>
+<title>5/17 4:30 PM [L] Men&#39;s Lacrosse vs Dickinson College | Quarterfinals - at host RIT</title>
+<description>[L] Men&#39;s Lacrosse vs Dickinson College | Quarterfinals - at host RIT\nL 9-11\nStreaming Video: https://www.ncaa.com/game/6448630\n</description>
+<link>https://rpiathletics.com/calendar.aspx?game_id=20342&amp;sport_id=9</link><guid isPermaLink="true">https://rpiathletics.com/calendar.aspx?game_id=20342&amp;sport_id=9</guid><ev:location>Rochester, NY</ev:location>
+<ev:startdate>2025-05-17T20:30:00.0000000Z</ev:startdate>
+<ev:enddate>2025-05-17T23:30:00.0000000Z</ev:enddate>
+<s:localstartdate>2025-05-17T16:30:00.0000000</s:localstartdate>
+<s:localenddate>2025-05-17T19:30:00.0000000</s:localenddate>
+<s:teamlogo>https://rpiathletics.com/images/logos/site/site.png</s:teamlogo>
+<s:opponentlogo>https://rpiathletics.com/images/logos/Dickinson.png</s:opponentlogo>
+<s:opponent>Dickinson College | Quarterfinals</s:opponent>
+<s:gameid>20342</s:gameid>
+<s:gamepromoname>at host RIT</s:gamepromoname>
+<s:links>
+<s:livestats>http://www.sidearmstats.com/rit/mlax/</s:livestats>
+<s:boxscore>https://rpiathletics.com/boxscore.aspx?id=20342</s:boxscore>
+<s:recap>https://rpiathletics.com/news/2025/5/17/mens-lacrosse-upended-by-dickinson-in-ncaa-quarterfinals.aspx</s:recap>
+</s:links>
+</item>
+<item>
+<title>5/17 6:00 PM [W] Baseball vs Rutgers-Camden - at host Johns Hopkins</title>
+<description>[W] Baseball vs Rutgers-Camden - at host Johns Hopkins\nW 10-0\nStreaming Video: https://www.ncaa.com/game/6449531\n</description>
+<link>https://rpiathletics.com/calendar.aspx?game_id=20350&amp;sport_id=2</link><guid isPermaLink="true">https://rpiathletics.com/calendar.aspx?game_id=20350&amp;sport_id=2</guid><ev:location>Baltimore, MD</ev:location>
+<ev:startdate>2025-05-17T22:00:00.0000000Z</ev:startdate>
+<ev:enddate>2025-05-18T01:00:00.0000000Z</ev:enddate>
+<s:localstartdate>2025-05-17T18:00:00.0000000</s:localstartdate>
+<s:localenddate>2025-05-17T21:00:00.0000000</s:localenddate>
+<s:teamlogo>https://rpiathletics.com/images/logos/site/site.png</s:teamlogo>
+<s:opponentlogo>https://rpiathletics.com/images/logos/rutgers-camden.png</s:opponentlogo>
+<s:opponent>Rutgers-Camden</s:opponent>
+<s:gameid>20350</s:gameid>
+<s:gamepromoname>at host Johns Hopkins</s:gamepromoname>
+<s:links>
+<s:livestats>https://hopkinssports.com/sidearmstats/baseball/summary</s:livestats>
+<s:boxscore>https://rpiathletics.com/boxscore.aspx?id=20350</s:boxscore>
+<s:recap>https://rpiathletics.com/news/2025/5/17/baseball-blanks-rutgers-camden-to-advance-to-regional-final.aspx</s:recap>
+</s:links>
+</item>
+<item>
+<title>5/18 11:00 AM [L] Baseball at Johns Hopkins University | Regional Championship (Game One)</title>
+<description>[L] Baseball at Johns Hopkins University | Regional Championship (Game One)\nL 5-17\nStreaming Video: https://www.ncaa.com/game/6449532\n</description>
+<link>https://rpiathletics.com/calendar.aspx?game_id=20351&amp;sport_id=2</link><guid isPermaLink="true">https://rpiathletics.com/calendar.aspx?game_id=20351&amp;sport_id=2</guid><ev:location>Baltimore, MD</ev:location>
+<ev:startdate>2025-05-18T15:00:00.0000000Z</ev:startdate>
+<ev:enddate>2025-05-18T18:00:00.0000000Z</ev:enddate>
+<s:localstartdate>2025-05-18T11:00:00.0000000</s:localstartdate>
+<s:localenddate>2025-05-18T14:00:00.0000000</s:localenddate>
+<s:teamlogo>https://rpiathletics.com/images/logos/site/site.png</s:teamlogo>
+<s:opponentlogo>https://rpiathletics.com/images/logos/Johns-Hopkins.png</s:opponentlogo>
+<s:opponent>Johns Hopkins University | Regional Championship (Game One)</s:opponent>
+<s:gameid>20351</s:gameid>
+<s:gamepromoname></s:gamepromoname>
+<s:links>
+<s:livestats>https://hopkinssports.com/sidearmstats/baseball/summary</s:livestats>
+<s:boxscore>https://rpiathletics.com/boxscore.aspx?id=20351</s:boxscore>
+<s:recap>https://rpiathletics.com/news/2025/5/18/baseball-bested-by-top-ranked-johns-hopkins-in-ncaa-regional-championship.aspx</s:recap>
+</s:links>
+</item>
+<item>
+<title>5/22 Women&#39;s Track &amp; Field at NCAA Outdoor Championships | at Spire Academy</title>
+<description>Women&#39;s Track &amp; Field at NCAA Outdoor Championships | at Spire Academy\n</description>
+<link>https://rpiathletics.com/calendar.aspx?game_id=20106&amp;sport_id=24</link><guid isPermaLink="true">https://rpiathletics.com/calendar.aspx?game_id=20106&amp;sport_id=24</guid><ev:location>Geneva, OH</ev:location>
+<ev:startdate>2025-05-22</ev:startdate>
+<ev:enddate>2025-05-24T03:59:59.9999999Z</ev:enddate>
+<s:localstartdate>2025-05-22</s:localstartdate>
+<s:localenddate>2025-05-23T23:59:59.9999999</s:localenddate>
+<s:teamlogo>https://rpiathletics.com/images/logos/site/site.png</s:teamlogo>
+<s:opponentlogo>https://rpiathletics.com/images/logos/NCAA.png</s:opponentlogo>
+<s:opponent>NCAA Outdoor Championships | at Spire Academy</s:opponent>
+<s:gameid>20106</s:gameid>
+<s:gamepromoname></s:gamepromoname>
+<s:links>
+</s:links>
+</item>
+<item>
+<title>5/22 Men&#39;s Track and Field at NCAA Outdoor Championships | at Spire Academy</title>
+<description>Men&#39;s Track and Field at NCAA Outdoor Championships | at Spire Academy\n</description>
+<link>https://rpiathletics.com/calendar.aspx?game_id=20120&amp;sport_id=13</link><guid isPermaLink="true">https://rpiathletics.com/calendar.aspx?game_id=20120&amp;sport_id=13</guid><ev:location>Geneva, OH</ev:location>
+<ev:startdate>2025-05-22</ev:startdate>
+<ev:enddate>2025-05-24T03:59:59.9999999Z</ev:enddate>
+<s:localstartdate>2025-05-22</s:localstartdate>
+<s:localenddate>2025-05-23T23:59:59.9999999</s:localenddate>
+<s:teamlogo>https://rpiathletics.com/images/logos/site/site.png</s:teamlogo>
+<s:opponentlogo>https://rpiathletics.com/images/logos/NCAA.png</s:opponentlogo>
+<s:opponent>NCAA Outdoor Championships | at Spire Academy</s:opponent>
+<s:gameid>20120</s:gameid>
+<s:gamepromoname></s:gamepromoname>
+<s:links>
+</s:links>
+</item>
+<item>
+<title>9/6 Football at Worcester Polytechnic Institute</title>
+<description>Football at Worcester Polytechnic Institute\n</description>
+<link>https://rpiathletics.com/calendar.aspx?game_id=20319&amp;sport_id=5</link><guid isPermaLink="true">https://rpiathletics.com/calendar.aspx?game_id=20319&amp;sport_id=5</guid><ev:location>Worcester, MA</ev:location>
+<ev:startdate>2025-09-06</ev:startdate>
+<ev:enddate>2025-09-06T07:00:00.0000000Z</ev:enddate>
+<s:localstartdate>2025-09-06</s:localstartdate>
+<s:localenddate>2025-09-06T03:00:00.0000000</s:localenddate>
+<s:teamlogo>https://rpiathletics.com/images/logos/site/site.png</s:teamlogo>
+<s:opponentlogo>https://rpiathletics.com/images/logos/WPI.png</s:opponentlogo>
+<s:opponent>Worcester Polytechnic Institute</s:opponent>
+<s:gameid>20319</s:gameid>
+<s:gamepromoname></s:gamepromoname>
+<s:links>
+</s:links>
+</item>
+<item>
+<title>9/13 Football at Utica University</title>
+<description>Football at Utica University\n</description>
+<link>https://rpiathletics.com/calendar.aspx?game_id=20320&amp;sport_id=5</link><guid isPermaLink="true">https://rpiathletics.com/calendar.aspx?game_id=20320&amp;sport_id=5</guid><ev:location>Utica, NY</ev:location>
+<ev:startdate>2025-09-13</ev:startdate>
+<ev:enddate>2025-09-13T07:00:00.0000000Z</ev:enddate>
+<s:localstartdate>2025-09-13</s:localstartdate>
+<s:localenddate>2025-09-13T03:00:00.0000000</s:localenddate>
+<s:teamlogo>https://rpiathletics.com/images/logos/site/site.png</s:teamlogo>
+<s:opponentlogo>https://rpiathletics.com/images/logos/Moose_FulClrB_WhtBG (2) (1).png</s:opponentlogo>
+<s:opponent>Utica University</s:opponent>
+<s:gameid>20320</s:gameid>
+<s:gamepromoname></s:gamepromoname>
+<s:links>
+</s:links>
+</item>
+<item>
+<title>9/20 Football vs SUNY Brockport</title>
+<description>Football vs SUNY Brockport\n</description>
+<link>https://rpiathletics.com/calendar.aspx?game_id=20322&amp;sport_id=5</link><guid isPermaLink="true">https://rpiathletics.com/calendar.aspx?game_id=20322&amp;sport_id=5</guid><ev:location>Troy, NY, ECAV Stadium</ev:location>
+<ev:startdate>2025-09-20</ev:startdate>
+<ev:enddate>2025-09-20T07:00:00.0000000Z</ev:enddate>
+<s:localstartdate>2025-09-20</s:localstartdate>
+<s:localenddate>2025-09-20T03:00:00.0000000</s:localenddate>
+<s:teamlogo>https://rpiathletics.com/images/logos/site/site.png</s:teamlogo>
+<s:opponentlogo>https://rpiathletics.com/images/logos/Brockport_Global_200x200.png</s:opponentlogo>
+<s:opponent>SUNY Brockport</s:opponent>
+<s:gameid>20322</s:gameid>
+<s:gamepromoname></s:gamepromoname>
+<s:links>
+<s:livestats>http://www.sidearmstats.com/rpi/football/</s:livestats>
+</s:links>
+</item>
+<item>
+<title>9/27 Football vs University of Rochester</title>
+<description>Football vs University of Rochester\n</description>
+<link>https://rpiathletics.com/calendar.aspx?game_id=20323&amp;sport_id=5</link><guid isPermaLink="true">https://rpiathletics.com/calendar.aspx?game_id=20323&amp;sport_id=5</guid><ev:location>Troy, NY, ECAV Stadium</ev:location>
+<ev:startdate>2025-09-27</ev:startdate>
+<ev:enddate>2025-09-27T07:00:00.0000000Z</ev:enddate>
+<s:localstartdate>2025-09-27</s:localstartdate>
+<s:localenddate>2025-09-27T03:00:00.0000000</s:localenddate>
+<s:teamlogo>https://rpiathletics.com/images/logos/site/site.png</s:teamlogo>
+<s:opponentlogo>https://rpiathletics.com/images/logos/Rochester.png</s:opponentlogo>
+<s:opponent>University of Rochester</s:opponent>
+<s:gameid>20323</s:gameid>
+<s:gamepromoname></s:gamepromoname>
+<s:links>
+<s:livestats>http://www.sidearmstats.com/rpi/football/</s:livestats>
+</s:links>
+</item>
+<item>
+<title>10/4 Football at Hobart College</title>
+<description>Football at Hobart College\n</description>
+<link>https://rpiathletics.com/calendar.aspx?game_id=20325&amp;sport_id=5</link><guid isPermaLink="true">https://rpiathletics.com/calendar.aspx?game_id=20325&amp;sport_id=5</guid><ev:location>Geneva, NY</ev:location>
+<ev:startdate>2025-10-04</ev:startdate>
+<ev:enddate>2025-10-04T07:00:00.0000000Z</ev:enddate>
+<s:localstartdate>2025-10-04</s:localstartdate>
+<s:localenddate>2025-10-04T03:00:00.0000000</s:localenddate>
+<s:teamlogo>https://rpiathletics.com/images/logos/site/site.png</s:teamlogo>
+<s:opponentlogo>https://rpiathletics.com/images/2019/8/19/Hobart_Primary_Icon_200x200.png</s:opponentlogo>
+<s:opponent>Hobart College</s:opponent>
+<s:gameid>20325</s:gameid>
+<s:gamepromoname></s:gamepromoname>
+<s:links>
+</s:links>
+</item>
+<item>
+<title>10/11 Football vs Buffalo State</title>
+<description>Football vs Buffalo State\n</description>
+<link>https://rpiathletics.com/calendar.aspx?game_id=20326&amp;sport_id=5</link><guid isPermaLink="true">https://rpiathletics.com/calendar.aspx?game_id=20326&amp;sport_id=5</guid><ev:location>Troy, NY, ECAV Stadium</ev:location>
+<ev:startdate>2025-10-11</ev:startdate>
+<ev:enddate>2025-10-11T07:00:00.0000000Z</ev:enddate>
+<s:localstartdate>2025-10-11</s:localstartdate>
+<s:localenddate>2025-10-11T03:00:00.0000000</s:localenddate>
+<s:teamlogo>https://rpiathletics.com/images/logos/site/site.png</s:teamlogo>
+<s:opponentlogo>https://rpiathletics.com/images/logos/c1.png</s:opponentlogo>
+<s:opponent>Buffalo State</s:opponent>
+<s:gameid>20326</s:gameid>
+<s:gamepromoname></s:gamepromoname>
+<s:links>
+<s:livestats>http://www.sidearmstats.com/rpi/football/</s:livestats>
+</s:links>
+</item>
+<item>
+<title>10/25 Football at Hilbert College</title>
+<description>Football at Hilbert College\n</description>
+<link>https://rpiathletics.com/calendar.aspx?game_id=20327&amp;sport_id=5</link><guid isPermaLink="true">https://rpiathletics.com/calendar.aspx?game_id=20327&amp;sport_id=5</guid><ev:location>Hamburg, NY</ev:location>
+<ev:startdate>2025-10-25</ev:startdate>
+<ev:enddate>2025-10-25T07:00:00.0000000Z</ev:enddate>
+<s:localstartdate>2025-10-25</s:localstartdate>
+<s:localenddate>2025-10-25T03:00:00.0000000</s:localenddate>
+<s:teamlogo>https://rpiathletics.com/images/logos/site/site.png</s:teamlogo>
+<s:opponentlogo>https://rpiathletics.com/images/logos/hilbert-logo.png</s:opponentlogo>
+<s:opponent>Hilbert College</s:opponent>
+<s:gameid>20327</s:gameid>
+<s:gamepromoname></s:gamepromoname>
+<s:links>
+</s:links>
+</item>
+<item>
+<title>11/1 Football at St. Lawrence University</title>
+<description>Football at St. Lawrence University\n</description>
+<link>https://rpiathletics.com/calendar.aspx?game_id=20328&amp;sport_id=5</link><guid isPermaLink="true">https://rpiathletics.com/calendar.aspx?game_id=20328&amp;sport_id=5</guid><ev:location>Canton, NY</ev:location>
+<ev:startdate>2025-11-01</ev:startdate>
+<ev:enddate>2025-11-01T07:00:00.0000000Z</ev:enddate>
+<s:localstartdate>2025-11-01</s:localstartdate>
+<s:localenddate>2025-11-01T03:00:00.0000000</s:localenddate>
+<s:teamlogo>https://rpiathletics.com/images/logos/site/site.png</s:teamlogo>
+<s:opponentlogo>https://rpiathletics.com/images/logos/St_Lawrence_NY.png</s:opponentlogo>
+<s:opponent>St. Lawrence University</s:opponent>
+<s:gameid>20328</s:gameid>
+<s:gamepromoname></s:gamepromoname>
+<s:links>
+</s:links>
+</item>
+<item>
+<title>11/8 Football vs Ithaca College</title>
+<description>Football vs Ithaca College\n</description>
+<link>https://rpiathletics.com/calendar.aspx?game_id=20329&amp;sport_id=5</link><guid isPermaLink="true">https://rpiathletics.com/calendar.aspx?game_id=20329&amp;sport_id=5</guid><ev:location>Troy, NY, ECAV Stadium</ev:location>
+<ev:startdate>2025-11-08</ev:startdate>
+<ev:enddate>2025-11-08T08:00:00.0000000Z</ev:enddate>
+<s:localstartdate>2025-11-08</s:localstartdate>
+<s:localenddate>2025-11-08T03:00:00.0000000</s:localenddate>
+<s:teamlogo>https://rpiathletics.com/images/logos/site/site.png</s:teamlogo>
+<s:opponentlogo>https://rpiathletics.com/images/logos/Ithaca_.png</s:opponentlogo>
+<s:opponent>Ithaca College</s:opponent>
+<s:gameid>20329</s:gameid>
+<s:gamepromoname></s:gamepromoname>
+<s:links>
+<s:livestats>http://www.sidearmstats.com/rpi/football/</s:livestats>
+</s:links>
+</item>
+<item>
+<title>11/15 Football at Union College</title>
+<description>Football at Union College\n</description>
+<link>https://rpiathletics.com/calendar.aspx?game_id=20330&amp;sport_id=5</link><guid isPermaLink="true">https://rpiathletics.com/calendar.aspx?game_id=20330&amp;sport_id=5</guid><ev:location>Schenectady, NY</ev:location>
+<ev:startdate>2025-11-15</ev:startdate>
+<ev:enddate>2025-11-15T08:00:00.0000000Z</ev:enddate>
+<s:localstartdate>2025-11-15</s:localstartdate>
+<s:localenddate>2025-11-15T03:00:00.0000000</s:localenddate>
+<s:teamlogo>https://rpiathletics.com/images/logos/site/site.png</s:teamlogo>
+<s:opponentlogo>https://rpiathletics.com/images/logos/Union_Athletics_Logo_New.png</s:opponentlogo>
+<s:opponent>Union College</s:opponent>
+<s:gameid>20330</s:gameid>
+<s:gamepromoname></s:gamepromoname>
+<s:links>
+</s:links>
+</item>
+</channel>
+</rss>

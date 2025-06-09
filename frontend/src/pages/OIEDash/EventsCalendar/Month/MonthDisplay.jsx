@@ -87,7 +87,14 @@ const MonthDisplay = ({
             </div>
             <div className="calendar">
                 {rows.map((row, rowIndex) => (
-                    <div key={`row-${rowIndex}`} className="calendar__row" onClick={() => onWeekClick(getFirstDayOfWeekFromRow(rowIndex))}>
+                    <div 
+                        key={`row-${rowIndex}`} 
+                        className="calendar__row" 
+                        onClick={() => {
+                            const weekStart = getFirstDayOfWeekFromRow(rowIndex);
+                            onWeekClick(weekStart);
+                        }}
+                    >
                         {row}
                     </div>
                 ))}

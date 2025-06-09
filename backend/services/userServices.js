@@ -49,7 +49,7 @@ async function registerUser({ username, email, password, req }) {
     const hashedPassword = await bcrypt.hash(password, 10); // Example hashing
     const user = new User({
         username,
-        email,
+        email: email.toLowerCase(),
         password: hashedPassword
     });
     await user.save();
@@ -63,12 +63,12 @@ async function loginUser({ email, password, req }) {
     //check if it is an email or username
     let user;
     if (!email.includes('@')) {
-        user = await User.findOne({ username: email })
+        user = await User.findOne({ username: email.toLowerCase() })
             .select('-googleId') // Add fields to exclude
             .lean()
             .populate('clubAssociations'); 
     } else {
-        user = await User.findOne({ email })
+        user = await User.findOne({ email: email.toLowerCase() })
             .select('-googleId') // Add fields to exclude
             .lean()
             .populate('clubAssociations'); 

@@ -1,6 +1,8 @@
 import React, { useEffect } from 'react';
 import './App.scss';
 import './assets/fonts.css';
+import AnimatedPageWrapper from './components/AnimatedPageWrapper/AnimatedPageWrapper';
+
 import Room from './pages/Room/Room';
 import Room1 from './pages/Room/Room1';
 import Login from './pages/Login';
@@ -112,50 +114,50 @@ function App() {
                                         <Route path='/' element={<Layout/>}>
                                             {/* publicly accessible pages */}
                                             <Route path="/qr/:id" element={<QR/>}/>
-                                            <Route index element={<Landing/> }/>
-                                            <Route path="/room/:roomid" element={<Room1 />}/>
-                                            <Route path="/room1/:roomid" element={<Room1 />}/>
-                                            <Route path="/register" element={<Register />}/>
-                                            <Route path="/login" element={<Login />}/>
-                                            <Route path="/forgot-password" element={<ForgotPassword />}/>
-                                            <Route path="/reset-password" element={<ResetPassword />}/>
+                                            <Route index element={<AnimatedPageWrapper><Landing/></AnimatedPageWrapper>} />
+                                            <Route path="/room/:roomid" element={<AnimatedPageWrapper><Room1 /></AnimatedPageWrapper>}/>
+                                            <Route path="/room1/:roomid" element={<AnimatedPageWrapper><Room1 /></AnimatedPageWrapper>}/>
+                                            <Route path="/register" element={<AnimatedPageWrapper><Register /></AnimatedPageWrapper>}/>
+                                            <Route path="/login" element={<AnimatedPageWrapper><Login /></AnimatedPageWrapper>}/>
+                                            <Route path="/forgot-password" element={<AnimatedPageWrapper><ForgotPassword /></AnimatedPageWrapper>}/>
+                                            <Route path="/reset-password" element={<AnimatedPageWrapper><ResetPassword /></AnimatedPageWrapper>}/>
                                             <Route path="*" element={<Error />}/>
                                             <Route path="/error/:errorCode" element={<Error />}/>
-                                            <Route path="/landing" element={<Landing/>}/>
-                                            <Route path="/org" element={<Org/>}/>
+                                            <Route path="/landing" element={<AnimatedPageWrapper><Landing/></AnimatedPageWrapper>}/>
+                                            <Route path="/org" element={<AnimatedPageWrapper><Org/></AnimatedPageWrapper>}/>
                                             <Route path="/documentation" element={<Redirect/>}/>
-                                            <Route path="/new-badge/:hash" element={<NewBadge/>}/>
-                                            <Route path="/new-badge" element={<NewBadge/>}/>
+                                            <Route path="/new-badge/:hash" element={<AnimatedPageWrapper><NewBadge/></AnimatedPageWrapper>}/>
+                                            <Route path="/new-badge" element={<AnimatedPageWrapper><NewBadge/></AnimatedPageWrapper>}/>
 
                                             {/* logged in routes */}
                                             <Route element={ <ProtectedRoute/> }>
-                                                <Route path="/profile" element={<Profile/>}/>
-                                                <Route path="/onboard" element={<Onboard />}/>
-                                                <Route path="/friends" element={<Friends/>}/>
-                                                <Route path="/settings" element={<Settings/>}/>
-                                                <Route path="/developer-onboarding" element={<DeveloperOnboard/>}/>
+                                                <Route path="/profile" element={<AnimatedPageWrapper><Profile/></AnimatedPageWrapper>}/>
+                                                <Route path="/onboard" element={<AnimatedPageWrapper><Onboard /></AnimatedPageWrapper>}/>
+                                                <Route path="/friends" element={<AnimatedPageWrapper><Friends/></AnimatedPageWrapper>}/>
+                                                <Route path="/settings" element={<AnimatedPageWrapper><Settings/></AnimatedPageWrapper>}/>
+                                                <Route path="/developer-onboarding" element={<AnimatedPageWrapper><DeveloperOnboard/></AnimatedPageWrapper>}/>
                                             </Route>
 
                                             {/* admin routes */}
                                             <Route element={ <ProtectedRoute authorizedRoles={['admin']}/> }>
-                                                <Route path="/admin" element={<Admin/>}/>
+                                                <Route path="/admin" element={<AnimatedPageWrapper><Admin/></AnimatedPageWrapper>}/>
                                             </Route>
 
                                             {/* features under development */}
                                             <Route element={ <ProtectedRoute authorizedRoles={['admin', 'developer']}/> }>
-                                                <Route path="/org/:name" element={<OrgDisplay/>}/>
-                                                <Route path="/events" element={<Events/>}/>
-                                                <Route path="/club-dashboard/:id" element={<ClubDash/>}/>
-                                                <Route path='/create-org' element={<CreateOrg/>}/>
-                                                <Route path="/root-dashboard" element={<RootDash/>}/>
-                                                <Route path="/approval-dashboard/:id" element={<OIEDash/>}/>
-                                                <Route path="/events-dashboard" element={<EventsDash/>}/>
+                                                <Route path="/org/:name" element={<AnimatedPageWrapper><OrgDisplay/></AnimatedPageWrapper>}/>
+                                                <Route path="/events" element={<AnimatedPageWrapper><Events/></AnimatedPageWrapper>}/>
+                                                <Route path="/club-dashboard/:id" element={<AnimatedPageWrapper><ClubDash/></AnimatedPageWrapper>}/>
+                                                <Route path='/create-org' element={<AnimatedPageWrapper><CreateOrg/></AnimatedPageWrapper>}/>
+                                                <Route path="/root-dashboard" element={<AnimatedPageWrapper><RootDash/></AnimatedPageWrapper>}/>
+                                                <Route path="/approval-dashboard/:id" element={<AnimatedPageWrapper><OIEDash/></AnimatedPageWrapper>}/>
+                                                <Route path="/events-dashboard" element={<AnimatedPageWrapper><EventsDash/></AnimatedPageWrapper>}/>
                                             </Route>
 
                                             {/* oie routes */}
                                             <Route element={ <ProtectedRoute authorizedRoles={['admin', 'developer', 'oie']}/> }>
-                                                <Route path="/oie-dashboard" element={<OIEDash/>}/>
-                                                <Route path="/create-event" element={<CreateEvent/>}/>
+                                                <Route path="/oie-dashboard" element={<AnimatedPageWrapper><OIEDash/></AnimatedPageWrapper>}/>
+                                                <Route path="/create-event" element={<AnimatedPageWrapper><CreateEvent/></AnimatedPageWrapper   >}/>
                                             </Route>
                                         </Route>
                                     </Routes>

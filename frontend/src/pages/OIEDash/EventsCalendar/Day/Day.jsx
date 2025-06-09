@@ -39,8 +39,12 @@ function Day({ height, start = new Date(new Date().setHours(0, 0, 0, 0)) , start
                 <div className="time-period">
                     {nav &&
                         <div className="arrows">
-                            <Icon icon="charm:chevron-left" onClick={() => updateDay(-1)} />
-                            <Icon icon="charm:chevron-right" onClick={() => updateDay(1)} />
+                            <div className="left-arrow" onClick={() => updateDay(-1)}>
+                                <Icon icon="charm:chevron-left" />
+                            </div>
+                            <div className="right-arrow" onClick={() => updateDay(1)}>
+                                <Icon icon="charm:chevron-right" />
+                            </div>
                         </div>
                     }
                     <h1>{startingText}{nav && `${formattedDate(day)}`}</h1>
