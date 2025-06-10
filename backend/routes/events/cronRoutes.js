@@ -39,13 +39,17 @@ router.post('/sync-rss', async (req, res) => {
                 createdEvents++;
             }
         }
+        //update rss feed last synced
+        await RssFeed.findByIdAndUpdate(rssId, { lastSynced: new Date() });
         //write xml to file
+        console.log('POST: /sync-rss, updated events: ', updatedEvents, 'created events: ', createdEvents);
         return res.status(200).json({
             success: true,
             message: 'Events created successfully',
             eventsCreated: createdEvents,
             eventsUpdated: updatedEvents,
-            events: events
+            events: events,
+            xml: rssContent.data
         });
     } catch(error){
         return res.status(500).json({

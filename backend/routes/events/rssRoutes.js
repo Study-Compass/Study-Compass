@@ -10,7 +10,36 @@ router.post('/create-rss-feed', verifyToken, authorizeRoles('admin', 'root'), as
     return res.status(200).json({
         success: true,
         message: 'Rss feed created successfully',
-        rssFeed
+        data: rssFeed
+    });
+});
+
+router.get('/get-rss-feeds', verifyToken, authorizeRoles('admin', 'root'), async (req, res) => {
+    const { RssFeed } = getModels(req, 'RssFeed');
+    const rssFeeds = await RssFeed.find({});
+    return res.status(200).json({
+        success: true,
+        data: rssFeeds
+    });
+});
+
+router.delete('/delete-rss-feed', verifyToken, authorizeRoles('admin', 'root'), async (req, res) => {
+    const { RssFeed } = getModels(req, 'RssFeed');
+    const { id } = req.body;
+    await RssFeed.findByIdAndDelete(id);
+    return res.status(200).json({
+        success: true,
+        message: 'Rss feed deleted successfully'
+    });
+});
+
+router.put('/update-rss-feed', verifyToken, authorizeRoles('admin', 'root'), async (req, res) => {
+    const { RssFeed } = getModels(req, 'RssFeed');
+    const { id, name, url } = req.body;
+    await RssFeed.findByIdAndUpdate(id, { name, url });
+    return res.status(200).json({
+        success: true,
+        message: 'Rss feed updated successfully'
     });
 });
 

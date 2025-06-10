@@ -241,7 +241,7 @@ function Room() {
 
     function onSearch(query, attributes, sort){
         const queryString = new URLSearchParams({ query, attributes: JSON.stringify(attributes), sort }).toString();
-        navigate(`/room1/search?${queryString}`, { replace: true });        
+        navigate(`/room/search?${queryString}`, { replace: true });        
         setSearchAttributes(attributes);
         setSearchSort(sort);
         setSearchQuery(query);
