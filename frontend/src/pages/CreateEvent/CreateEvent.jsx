@@ -4,7 +4,7 @@ import Header from '../../components/Header/Header';
 import EventInfo from '../../assets/Icons/EventInfo.svg';
 import Calendar from '../../assets/Icons/Calendar.svg';
 import CheckBlack from '../../assets/Icons/CheckBlack.svg';
-import WhenWhere from '../../components/CreateEvent/WhenWhere/WhenWhere';
+import EventDateTimeSelection from '../../components/CreateEvent/EventDateTimeSelection/EventDateTimeSelection';
 import GenInfo from '../../components/CreateEvent/GenInfo/GenInfo';
 import Review from '../../components/CreateEvent/Review/Review';
 import CustomFormFill from '../../components/CreateEvent/CustomFormFill/CustomFormFill';
@@ -67,8 +67,8 @@ function CreateEvent(){
     const {addNotification} = useNotification();
     
     const nextStep = () => {
-        setStep(step+1);
-        setFinishedStep(step+1);
+            setStep(step+1);
+            setFinishedStep(step+1);
     }
 
     useEffect(()=>{
@@ -84,16 +84,16 @@ function CreateEvent(){
             case 0:
                 return <GenInfo next={nextStep}/>
             case 1:
-                return <WhenWhere next={nextStep}/>
+                return <EventDateTimeSelection next={nextStep}/>
             case 2:
+                return <EventDateTimeSelection next={nextStep}/>
+            case 3:
                 if(showForm){
-                    
                     return <CustomFormFill next={nextStep}/>
                 } else {
-                    console.log("here")
                     return <Review next={nextStep}/>
                 }
-            case 3:
+            case 4:
                 return <Review next={nextStep}/>
             default:
                 return <GenInfo next={nextStep}/>
@@ -201,7 +201,7 @@ function CreateEvent(){
                             </div>
                             <div className={`step ${step === 1 && "selected"}`}  onClick={()=>{handleSwitch(1)}}>
                                 <img src={Calendar} alt="" />
-                                <p>when & where</p>
+                                <p>when</p>
                             </div>
                             {
                                 showForm &&
@@ -218,7 +218,7 @@ function CreateEvent(){
                     </div>
                     <div className="create-workspace">
                         <GenInfo next={nextStep} visible={step === 0} setInfo={setInfo}/>
-                        <WhenWhere next={nextStep} visible={step === 1} setInfo={setInfo}/>
+                        <EventDateTimeSelection next={nextStep} visible={step === 1} setInfo={setInfo}/>
                         {
                             showForm &&
                             <CustomFormFill next={nextStep} visible={step === 2} setInfo={setInfo}/>
