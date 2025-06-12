@@ -8,29 +8,34 @@
     overflow: hidden;
     border-radius: 20px;
     box-sizing: border-box;
+    max-width:1000px;
+
     .rss-left{
         width: 20%;
         height: 100%;
         background-color: var(--background);
-        padding: 20px;
         box-sizing: border-box;
         display: flex;
         flex-direction: column;
-        gap: 20px;
         border-right: 1px solid var(--lightborder);
-
-        h2{
+        padding: 20px;
+        gap: 20px;
+        & >h2{
             margin: 0;
         }
         .checklist{
             display: flex;
             flex-direction: column;
-            gap: 10px;
             .checklist-item{
                 transition: all 0.3s ease-in-out;
                 display: flex;
                 align-items: flex-start;
                 gap: 10px;
+                // border-top: 1px solid var(--lightborder);
+                // padding: 8px 10px;
+                // &:first-child{
+                //     border-top: 1px solid var(--lightborder);
+                // }
                 iconify-icon{
                     transition: all 0.3s ease-in-out;
                     color: var(--darkborder);
@@ -96,7 +101,7 @@
                 flex-direction: row;
                 align-items: center;
                 gap: 10px;
-                padding: 10px 15px;
+                padding: 8px 12px;
                 border-radius: 10px;
                 background-color: transparent;
                 border: none;
@@ -108,10 +113,6 @@
                     background-color: var(--light);
                 }
 
-                iconify-icon{
-                    color: var(--text);
-                }
-                
                 &.active {
                     background-color: var(--light);
                     color: var(--text);
@@ -122,14 +123,15 @@
                 }
                 
                 p{
-                    font-size: 14px;
+                    font-size: 12px;
                     color: var(--lighter-text);
                     font-weight: 600;
                     transition: color 0.2s ease;
                 }
                 
                 iconify-icon {
-                    font-size: 20px;
+                    font-size: 18px;
+                    color: var(--text);
                 }
             }
         }
@@ -147,7 +149,7 @@
             
             .xml-viewer {
                 height: 100%;
-                background-color: var(--text);
+                background-color: #252B37;
                 border-radius: 8px;
                 overflow-y: auto;
             }
