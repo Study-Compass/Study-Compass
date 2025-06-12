@@ -1,5 +1,11 @@
 #!/bin/bash
+set -e
+
+#SSH setup
 mkdir -p ~/.ssh
 echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
 chmod 600 ~/.ssh/id_ed25519
 ssh-keyscan github.com >> ~/.ssh/known_hosts
+
+git submodule init
+git submodule update --depth 1 --recursive
