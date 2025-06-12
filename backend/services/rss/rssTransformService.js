@@ -120,13 +120,13 @@ class RssTransformService {
             let logged = 0;
             const events = items.map(item => {
                 logged++;
-                if(logged < 10){
-                    //log all fields
-                    console.log('item');
-                    Object.keys(item).forEach(key => {
-                        console.log(key);
-                    });
-                }
+                // if(logged < 10){
+                //     //log all fields
+                //     console.log('item');
+                //     Object.keys(item).forEach(key => {
+                //         console.log(key);
+                //     });
+                // }
 
                 const event = {};
                 

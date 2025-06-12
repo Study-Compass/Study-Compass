@@ -2,7 +2,6 @@ const badgeGrantSchema = require('../schemas/badgeGrant');
 const buildingSchema = require('../schemas/building');
 const classroomSchema = require('../schemas/classroom');
 const developerSchema = require('../schemas/developer');
-const eventSchema = require('../schemas/event');
 const friendshipSchema = require('../schemas/friendship');
 const OIESchema = require('../schemas/OIE');
 const OIEConfigSchema = require('../schemas/OIEConfig');
@@ -18,11 +17,12 @@ const searchSchema = require('../schemas/search');
 const studyHistorySchema = require('../schemas/studyHistory');
 const userSchema = require('../schemas/user');
 const visitSchema = require('../schemas/visit');
-const rssFeedSchema = require('../schemas/events/rssFeed');
 
 //events
-const approvalFlowDefinition = require('../schemas/events/approvalFlowDefinition');
-const approvalFlowInstance = require('../schemas/events/approvalInstance');
+const rssFeedSchema = require('../events/schemas/rssFeed');
+const approvalFlowDefinition = require('../events/schemas/approvalFlowDefinition');
+const approvalFlowInstance = require('../events/schemas/approvalInstance');
+const eventSchema = require('../events/schemas/event');
 
 const getModels = (req, ...names) => {
     const models = {

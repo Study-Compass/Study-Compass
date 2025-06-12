@@ -85,33 +85,25 @@ const analyticsRoutes = require('./routes/analytics.js');
 const classroomChangeRoutes = require('./routes/classroomChangeRoutes.js');
 const ratingRoutes = require('./routes/ratingRoutes.js');
 const searchRoutes = require('./routes/searchRoutes.js');
-const eventRoutes = require('./routes/eventRoutes.js');
-const oieRoutes = require('./routes/oie-routes.js');
 const orgRoutes = require('./routes/orgRoutes.js');
-const workflowRoutes = require('./routes/workflowRoutes.js');
 const adminRoutes = require('./routes/adminRoutes.js');
-const rssRoutes = require('./routes/events/rssRoutes.js');
-const cronRoutes = require('./routes/events/cronRoutes.js');
+const eventsRoutes = require('./events/index.js');
 
 app.use(authRoutes);
 app.use(dataRoutes);
 app.use(friendRoutes);
 app.use(userRoutes);
 app.use(analyticsRoutes);
-app.use(eventRoutes);
 
 app.use(classroomChangeRoutes);
 app.use(ratingRoutes);
 app.use(searchRoutes);
 
-app.use(eventRoutes);
-app.use(oieRoutes);
-app.use(orgRoutes);
-app.use(workflowRoutes);
-app.use(adminRoutes);
-app.use(rssRoutes);
-app.use(cronRoutes);
 
+app.use(orgRoutes);
+app.use(adminRoutes);
+
+app.use(eventsRoutes);
 // Serve static files from the React app in production
 if (process.env.NODE_ENV === 'production') {
     app.use(express.static(path.join(__dirname, '../frontend/build')));

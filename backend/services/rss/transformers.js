@@ -89,8 +89,6 @@ const athleticsTransformer = {
             transform: (value) => {
                 const guidValue = getValue(value);
                 if (!guidValue._) return null;
-                console.log('guidValue');
-                console.log(guidValue._);
                 return guidValue._.trim();
             }
         },
@@ -116,7 +114,6 @@ const athleticsTransformer = {
                 if (dateValue && dateValue.includes('T') ){
                     return false;
                 }
-                console.log('does not contain T');
                 return true;
             }
         }
@@ -217,8 +214,6 @@ const rpiTransformer = {
         externalLink: {
             paths: ['link'],
             transform: (value) => {
-                console.log('link');
-                console.log(value);
                 return value[0].trim()
             }
         }

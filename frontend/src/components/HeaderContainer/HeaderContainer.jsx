@@ -36,9 +36,11 @@ const HeaderContainer = ({children, icon, header, scroll, subheader, right, size
             <div className="header-container-header">
                 <div className="row">
                     <div>
-                        <div className="header-container-header-icon">
-                            <Icon icon={icon}/>
-                        </div>
+                        {icon && (
+                            <div className="header-container-header-icon">
+                                <Icon icon={icon}/>
+                            </div>
+                        )}
                         <div className="header-container-header-text">
                             <h2 id="header-text">{header}</h2>
                             {
