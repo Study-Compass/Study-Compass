@@ -61,7 +61,6 @@ function Event({event}){
         const now = new Date();
         return date.getTime() + event.duration * 60000 < now.getTime();
     }
-    
 
     return(
         <div className={`event-component ${isOngoing() ? 'ongoing' : isInactive() ? 'inactive' : ''}`} onClick={() => handleEventClick(event)}>

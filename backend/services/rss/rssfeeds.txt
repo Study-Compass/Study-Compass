@@ -1,3 +1,0 @@
-https://events.rpi.edu/feeder/main/eventsFeed.do?f=y&sort=dtstart.utc:asc&fexpr=(categories.href!="/public/.bedework/categories/Ongoing")%20and%20(entity_type="event"%20or%20entity_type="todo")&skinName=list-rss&count=10
-https://rpiathletics.com/rss.aspx?path=baseball
-https://rpiathletics.com/calendar.ashx/calendar.rss?sport_id=0&_=cmbh484xq00013b971gnmnyvk
