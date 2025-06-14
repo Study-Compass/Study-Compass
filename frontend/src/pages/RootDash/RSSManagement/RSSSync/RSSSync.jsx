@@ -14,7 +14,7 @@ const checkList = [
 
 function RSSSync({rssfeed}) {
     const [checklist, setChecklist] = useState([false,false,false]);
-    const [activeView, setActiveView] = useState('events'); // 'events' or 'xml'
+    const [activeView, setActiveView] = useState('events'); // 'events', 'xml', or 'json'
     const options = useMemo(() => ({
         method: 'POST',
         data: {
@@ -38,7 +38,9 @@ function RSSSync({rssfeed}) {
             }
         }, 700);
         setTimeout(() => {
-            if(loading){
+            if(!checklist[2]){
+                setChecklist([true,true,true]);
+            } else if(loading){
                 console.log("loading");
                 setChecklist([true,true,false]);
             }
@@ -92,6 +94,13 @@ function RSSSync({rssfeed}) {
                         <Icon icon="fluent:code-block-16-filled"/>
                         <p>xml</p>
                     </div>
+                    <div 
+                        className={`option ${activeView === 'json' ? 'active' : ''}`}
+                        onClick={() => setActiveView('json')}
+                    >
+                        <Icon icon="mdi:code-json"/>
+                        <p>json</p>
+                    </div>
                 </div>
                 <div className="workspace">
                     {
@@ -100,8 +109,10 @@ function RSSSync({rssfeed}) {
                                 data.events.map((event) => (
                                     <Event event={event} key={event._id} />
                                 ))
-                            ) : (
+                            ) : activeView === 'xml' ? (
                                 <XmlViewer xml={data.xml} />
+                            ) : (
+                                <XmlViewer xml={JSON.stringify(data.events, null, 2)} />
                             )
                         )
                     }
