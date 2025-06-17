@@ -117,7 +117,7 @@ function ProfilePicture(){
                                 return(
                                     <Link to={`${url}`}>
                                         <div className="menu-item">
-                                            <img className="icon" src={org.org_profile_image} alt="" />
+                                            <img className="icon org-icon" src={org.org_profile_image} alt="" />
                                             <p>{org.org_name}</p>
                                         </div>
                                     </Link>

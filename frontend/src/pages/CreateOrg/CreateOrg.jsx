@@ -16,6 +16,7 @@ import check from '../../assets/Icons/Check.svg';
 import waiting from '../../assets/Icons/Waiting.svg';
 import error from '../../assets/circle-warning.svg';
 import unavailable from '../../assets/Icons/Circle-X.svg';
+import postRequest from '../../utils/postRequest';
 
 function CreateOrg(){
     const [start, setStart] = useState(false);
@@ -29,6 +30,7 @@ function CreateOrg(){
     const [timeCommitment, setTimeCommitment] = useState(null);
     const [description, setDescription] = useState(""); 
     const [org, setOrg] = useState(null);
+    const [selectedFile, setSelectedFile] = useState(null);
 
     const navigate = useNavigate();
     const {addNotification} = useNotification();
@@ -89,8 +91,15 @@ function CreateOrg(){
 
     async function handleOrgCreation(name, description){
         try {
-            const response = await axios.post('/create-org', {org_name: name, org_profile_image: '/Logo.svg', org_description: description}, {headers: {"Authorization": `Bearer ${localStorage.getItem("token")}`}});
-            setOrg(response.data.org);
+            const formData = new FormData();
+            formData.append('org_name', name);
+            formData.append('org_description', description);
+            if (selectedFile) {
+                formData.append('image', selectedFile);
+            }
+
+            const response = await postRequest('/create-org', formData);
+            setOrg(response.org);
         } catch (error) {
             addNotification({ title: 'Error', message: error.message, type: 'error' });
             navigate('/');
@@ -141,6 +150,7 @@ function CreateOrg(){
 
         if(current === 4){
             try{
+                console.log('hello')
                 handleOrgCreation(name, description);
             } catch (error){
                 newError(error, navigate);
@@ -208,6 +218,10 @@ function CreateOrg(){
         setDescription(e.target.value);
     }
 
+    const handleFileSelect = (file) => {
+        setSelectedFile(file);
+    };
+
     return (
         <div className={`onboard ${start ? "visible" : ""} create-org`} style={{height: viewport}}>
             <img src={YellowRedGradient} alt="" className="yellow-red" />
@@ -255,8 +269,11 @@ function CreateOrg(){
                         <div className={`content ${current === 4 ? "going": ""} ${3 === currentTransition ? "": "beforeOnboard"}`} ref={el => contentRefs.current[3] = el}>
                             <Loader/>
                             <h2>upload a profile picture</h2>
-                            <p>Let's make it feel like home in here, feel free to cuztomize your logo!</p>
-                            <ImageUpload uploadText="Drag and Drop to Upload"/>
+                            <p>Let's make it feel like home in here, feel free to customize your logo!</p>
+                            <ImageUpload 
+                                uploadText="Drag and Drop to Upload"
+                                onFileSelect={handleFileSelect}
+                            />
                         </div>
                     }
                     { current === 4 &&

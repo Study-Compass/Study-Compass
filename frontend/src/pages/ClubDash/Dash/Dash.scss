@@ -1,7 +1,6 @@
 .club-dash .dash{
     height: 100%;
     width:100%;
-    padding:40px 48px;
     overflow:hidden;
     box-sizing: border-box;
     z-index: 1;
@@ -15,15 +14,13 @@
         overflow: hidden;
         display:flex;
         flex-direction: column;
-        gap: 10px;
         h1{
-            z-index: 2;
-            font-size: 20px;
-            font-family: 'Inter';
+            font-family: 'Satoshi';
+            font-size:30px;
             font-weight: 700;
-            margin: 0;
+            margin:0;
         }
-        h3{
+        p{
             font-size: 15px;
             font-family: 'Inter';
             font-weight: 500;

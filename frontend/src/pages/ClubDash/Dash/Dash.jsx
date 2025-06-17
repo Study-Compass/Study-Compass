@@ -4,7 +4,7 @@ import OIEGradient from '../../../assets/ClubGradient.png';
 import { getAllEvents } from '../../../components/EventsViewer/EventHelpers';
 import clubEvent from '../ClubEventsComponents/Event/ClubEvent';
 import people from '../../../assets/people.svg'
-import RedGrad from '../../../assets/Gradients/ClubAdminGrad.png';
+import OrgGrad from '../../../assets/Gradients/OrgGrad.png';
 import { Icon } from '@iconify-icon/react';
 import CreateEvent from '../../../components/EventsViewer/EventsGrid/EventsColumn/CreateEventButton/CreateEvent';
 import ClubEvent from '../ClubEventsComponents/Event/ClubEvent';
@@ -41,17 +41,17 @@ function Dash({expandedClass, openMembers, clubName, meetings}){
 
     return (
         <div className={`dash ${expandedClass}`}>
-            <img src={RedGrad} alt="" className="red-grad"/>
             <header className="header">
                 <h1>{welcomeText}, {clubName}</h1>
-                <h3>welcome back to your organization portal</h3>
+                <p>welcome back to your organization portal</p>
+                <img src={OrgGrad} alt="" />
             </header>
             <div className="row">
                 <div className="column">
                 <h1>manage membership</h1>
                 <div className="content membership">
-                        <h2><img src={people} alt="" />200 members <button onClick={openMembers}>manage</button></h2>
-                        <h2> <img src={people} alt="" />8 officers <button>manage</button></h2>
+                <h2><img src={people} alt="" />200 members <button onClick={openMembers}>manage</button></h2>
+                <h2> <img src={people} alt="" />8 officers <button>manage</button></h2>
                 </div>
                 </div>
                 <div className="column">

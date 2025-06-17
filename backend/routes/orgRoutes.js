@@ -12,6 +12,27 @@ const { render } = require('@react-email/render')
 const React = require('react');
 const ForgotEmail = require('../emails/ForgotEmail').default;
 const resend = new Resend(process.env.RESEND_API_KEY);
+const multer = require('multer');
+const path = require('path');
+const { uploadImageToS3, upload } = require('../services/imageUploadService');
+
+// Error handling middleware for multer
+const handleMulterError = (err, req, res, next) => {
+    if (err instanceof multer.MulterError) {
+        if (err.code === 'LIMIT_FILE_SIZE') {
+            return res.status(400).json({
+                success: false,
+                message: 'File size exceeds 5MB limit.'
+            });
+        }
+    } else if (err) {
+        return res.status(400).json({
+            success: false,
+            message: err.message
+        });
+    }
+    next();
+};
 
 //Route to get a specific org by name
 router.get("/get-org/:id", verifyToken, async (req, res) => {
@@ -87,15 +108,15 @@ router.get("/get-org-by-name/:name", verifyToken, async (req, res) => {
     }
 });
 
-router.post("/create-org", verifyToken, async (req, res) => {
+router.post("/create-org", verifyToken, upload.single('image'), handleMulterError, async (req, res) => {
     const { Org, OrgMember, User } = getModels(req, "Org", "OrgMember", "User");
     const {
         org_name,
-        org_profile_image,
         org_description,
         positions,
         weekly_meeting,
     } = req.body;
+    const file = req.file;
 
     try {
         //Verify user and have their orgs saved under them
@@ -140,13 +161,24 @@ router.post("/create-org", verifyToken, async (req, res) => {
 
         const newOrg = new Org({
             org_name: cleanOrgName,
-            org_profile_image: org_profile_image,
             org_description: cleanOrgDescription,
             positions: positions || ["chair", "officer", "regular"],
             weekly_meeting: weekly_meeting || null,
             //Owner is the user
             owner: userId,
         });
+
+        // Handle image upload if file is present
+        if (file) {
+            console.log('Uploading image');
+            const fileExtension = path.extname(file.originalname);
+            const fileName = `${newOrg._id}${fileExtension}`;
+            const imageUrl = await uploadImageToS3(file, 'orgs', fileName);
+            newOrg.org_profile_image = imageUrl;
+        } else {
+            // Set default image if no file uploaded
+            newOrg.org_profile_image = '/Logo.svg';
+        }
 
         const newMember = new OrgMember({
             //add new member to the org

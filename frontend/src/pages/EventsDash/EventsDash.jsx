@@ -7,6 +7,8 @@ import Explore from './Explore/Explore';
 import MyEvents from './MyEvents/MyEvents';
 import Loader from '../../components/Loader/Loader';
 import Orgs from './Orgs/Orgs';
+import eventsLogo from '../../assets/Brand Image/EventsLogo.svg';
+
 
 function EventsDash({  }){
     const [showLoading, setShowLoading] = useState(false);
@@ -34,7 +36,7 @@ function EventsDash({  }){
                     </div>
                 </div>
             )}
-            <Dashboard menuItems={menuItems} additionalClass='events-dash'>
+            <Dashboard menuItems={menuItems} additionalClass='events-dash' logo={eventsLogo}>
                 <Explore />
                 <MyEvents />
                 <Orgs/>

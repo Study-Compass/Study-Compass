@@ -17,6 +17,7 @@ const postRequest = async (url, body, options = {}) => {
       ...(body instanceof FormData ? {} : { 'Content-Type': 'application/json' }),
       ...options.headers,
     };
+    console.log(headers);
     const response = await axios.post(url, body, {
       headers,
       ...options,

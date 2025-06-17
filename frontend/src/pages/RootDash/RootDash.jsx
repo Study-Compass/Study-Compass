@@ -5,6 +5,7 @@ import RootManagement from './RootManagement/RootManagement';
 import ManageFlow from './ManageFlow/ManageFlow';
 import RSSManagement from './RSSManagement/RSSManagement';
 // import BadgeManager from './BadgeManager/BadgeManager';
+import eventsLogo from '../../assets/Brand Image/EventsLogo.svg';
 
 function RootDash(){
     const menuItems = [
@@ -14,7 +15,7 @@ function RootDash(){
     ];
 
     return (
-        <Dashboard menuItems={menuItems} additionalClass='root-dash'>
+        <Dashboard menuItems={menuItems} additionalClass='root-dash' logo={eventsLogo}>
             <RootManagement/>
             <ManageFlow/>
             <RSSManagement/>

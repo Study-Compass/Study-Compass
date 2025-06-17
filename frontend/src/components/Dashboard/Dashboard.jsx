@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import logo from '../../assets/Brand Image/EventsLogo.svg';
 import defaultAvatar from '../../assets/defaultAvatar.svg';
 import useAuth from '../../hooks/useAuth';
 import { Icon } from '@iconify-icon/react';
 import './Dashboard.scss'
 
-function Dashboard({ menuItems, children, additionalClass = '' }) {
+function Dashboard({ menuItems, children, additionalClass = '', middleItem=null, logo, primaryColor, secondaryColor} ) {
     const [expanded, setExpanded] = useState(false);
     const [expandedClass, setExpandedClass] = useState("");
     const [currentDisplay, setCurrentDisplay] = useState(0);
@@ -35,12 +34,19 @@ function Dashboard({ menuItems, children, additionalClass = '' }) {
     }
 
     return (
-        <div className={`general-dash ${additionalClass}`}>
+        <div 
+            className={`general-dash ${additionalClass}`} 
+            style={{
+                '--primary-color': primaryColor,
+                '--secondary-color': secondaryColor,
+            }}
+        >
             <div className={`dash-left ${expanded ? "hidden" : ""}`}>
                 <div className="top">
                     <div className="logo">
                         <img src={logo} alt="Logo" />
                     </div>
+                    {middleItem && middleItem}
                     <nav className="nav">
                         <ul>
                             {menuItems.map((item, index) => (
