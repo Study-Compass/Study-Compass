@@ -67,7 +67,10 @@ router.get("/get-org/:id", verifyToken, async (req, res) => {
 });
 
 router.get("/get-org-by-name/:name", verifyToken, async (req, res) => {
-    const { Org, OrgMember, OrgFollower, User } = getModels(req, "Org", "OrgMember", "OrgFollower", "User");
+    const { Org, OrgMember, OrgFollower, Event } = getModels(req, "Org", "OrgMember", "OrgFollower", "Event");
+    const { exhaustive } = req.query;
+    console.log(exhaustive);
+
     try {
         const orgName = req.params.name;
 
@@ -77,6 +80,17 @@ router.get("/get-org-by-name/:name", verifyToken, async (req, res) => {
             return res.status(404).json({ success: false, message: "Org not found" });
         }
 
+        const exhaustiveData = {
+            eventCount: 0,
+            memberCount: 0,
+            followerCount: 0,
+        }
+
+        if(exhaustive){
+            const eventCount = await Event.countDocuments({hostingId: org._id, start_time: {$gte: new Date()}, status: { $in: ["approved", "not-applicable"] }});
+            exhaustiveData.eventCount = eventCount;
+        console.log(exhaustiveData);
+        }
         const orgMembers = await OrgMember.find({ org_id: org._id }).populate(
             "user_id"
         );
@@ -94,7 +108,8 @@ router.get("/get-org-by-name/:name", verifyToken, async (req, res) => {
                 members: orgMembers,
                 followers: orgFollowers,
             },
-        });
+            exhaustive: exhaustive ? exhaustiveData : null
+        }); 
     } catch (error) {
         // Handle any errors that occur during the process
         console.log(`GET: /get-org-by-name failed`, error);
@@ -115,6 +130,7 @@ router.post("/create-org", verifyToken, upload.single('image'), handleMulterErro
         org_description,
         positions,
         weekly_meeting,
+        custom_roles
     } = req.body;
     const file = req.file;
 
@@ -159,10 +175,80 @@ router.post("/create-org", verifyToken, upload.single('image'), handleMulterErro
 
         const cleanOrgDescription = clean(org_description);
 
+        // Prepare default roles
+        const defaultRoles = [
+            {
+                name: 'owner',
+                displayName: 'Owner',
+                permissions: ['all'],
+                isDefault: false,
+                canManageMembers: true,
+                canManageRoles: true,
+                canManageEvents: true,
+                canViewAnalytics: true,
+                order: 0
+            },
+            {
+                name: 'admin',
+                displayName: 'Administrator',
+                permissions: ['manage_members', 'manage_events', 'view_analytics'],
+                isDefault: false,
+                canManageMembers: true,
+                canManageRoles: false,
+                canManageEvents: true,
+                canViewAnalytics: true,
+                order: 1
+            },
+            {
+                name: 'officer',
+                displayName: 'Officer',
+                permissions: ['manage_events'],
+                isDefault: false,
+                canManageMembers: false,
+                canManageRoles: false,
+                canManageEvents: true,
+                canViewAnalytics: false,
+                order: 2
+            },
+            {
+                name: 'member',
+                displayName: 'Member',
+                permissions: ['view_events'],
+                isDefault: true,
+                canManageMembers: false,
+                canManageRoles: false,
+                canManageEvents: false,
+                canViewAnalytics: false,
+                order: 3
+            }
+        ];
+
+        // Parse and merge custom roles if provided
+        let allRoles = [...defaultRoles];
+        if (custom_roles) {
+            try {
+                const parsedCustomRoles = JSON.parse(custom_roles);
+                if (Array.isArray(parsedCustomRoles)) {
+                    // Add custom roles with proper order
+                    parsedCustomRoles.forEach((customRole, index) => {
+                        const roleWithOrder = {
+                            ...customRole,
+                            order: defaultRoles.length + index,
+                            isDefault: false
+                        };
+                        allRoles.push(roleWithOrder);
+                    });
+                }
+            } catch (error) {
+                console.error('Error parsing custom roles:', error);
+                // Continue with default roles only if parsing fails
+            }
+        }
+
         const newOrg = new Org({
             org_name: cleanOrgName,
             org_description: cleanOrgDescription,
-            positions: positions || ["chair", "officer", "regular"],
+            positions: allRoles,
             weekly_meeting: weekly_meeting || null,
             //Owner is the user
             owner: userId,
@@ -184,7 +270,9 @@ router.post("/create-org", verifyToken, upload.single('image'), handleMulterErro
             //add new member to the org
             org_id: newOrg._id,
             user_id: userId,
-            status: 0,
+            role: 'owner', // Set the creator as owner
+            status: 'active',
+            assignedBy: userId
         });
 
         await newMember.save();

@@ -18,32 +18,39 @@
     cursor:pointer;
 }
 
+.popup-container{
+    position: absolute;
+    right:10px;
+    top:50px;
+    z-index: 20;
+    opacity: 0;
+    pointer-events: none;
+    transition:opacity 0.3s;
+}
+
+.popup-container.popup-active{
+    opacity: 1;
+    pointer-events: all;
+}
+
 .popup{
     display:flex;
     flex-direction: column;
     width:230px;
-    right:10px;
-    top:50px;
     box-sizing: border-box;
     // border-radius: 15px;
     background-color: var(--background);
-    transition:opacity 0.3s,
-               max-height 1s;
-    position: absolute;
+    transition:max-height 1s;
     background-color: transparent;
     border: 1px solid var(--lighterborder);
-    opacity: 0;
     overflow:hidden;
     padding: 0 0 4px 0;
-    z-index: 20;
-    pointer-events: none;
+    box-shadow: var(--shadow);
 }
-            
-.popup-active{
+
+.popup-active .popup{
     border: 1px solid var(--lighterborder);
-    opacity: 1;
     background-color: var(--background);
-    pointer-events: all;
     box-shadow: var(--shadow);
 }
 

@@ -1,5 +1,5 @@
 import React, { createContext, useContext } from 'react';
-import axios from 'axios';
+import apiRequest from './utils/postRequest';
 
 /** 
 documentation:
@@ -80,8 +80,9 @@ export const CacheProvider = ({children}) =>{
                     return cache[queryString];
                 }, 100);
             }
-            const response = await axios.post('/free', { query });
-            const responseBody = response.data;
+            
+            // Use postRequest instead of direct axios call
+            const responseBody = await apiRequest('/free', { query });
     
             if (!responseBody.success) {
                 // Log the error message if the operation was not successful
@@ -127,10 +128,9 @@ export const CacheProvider = ({children}) =>{
             return results.filter(result => result);
         }
     
-        // fetch missing data from the backend
+        // fetch missing data from the backend using postRequest
         try {
-            const response = await axios.post('/getbatch', { queries: fetchQueries, exhaustive: true });
-            const responseBody = response.data;
+            const responseBody = await apiRequest('/getbatch', { queries: fetchQueries, exhaustive: true });
             if (!responseBody.success) {
                 console.error('Error fetching batch data:', responseBody.message);
                 return;
@@ -154,16 +154,17 @@ export const CacheProvider = ({children}) =>{
             if(`${query}${attributes}${sort}` in cache){
                 return cache[`${query}${attributes}${sort}`];
             }
-            const response = await axios.get('/search', {
+            
+            // Use postRequest with GET method
+            const responseBody = await apiRequest('/search', null, {
+                method: 'GET',
                 params: {
                   query: query,
                   attributes: attributes, 
                   sort: sort
-                }, headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
                 }
-              });            
-            const responseBody = response.data;
+            });
+            
             if(!responseBody.success){
                 console.error('Error fetching search data:', responseBody.message);
                 return;
@@ -178,18 +179,17 @@ export const CacheProvider = ({children}) =>{
 
     const allSearch = async (nameQuery, timeQuery, attributes, sort) => {
         try{
-            // add cacheing logic
-            const response = await axios.get('/all-purpose-search', {
+            // Use postRequest with GET method
+            const responseBody = await apiRequest('/all-purpose-search', null, {
+                method: 'GET',
                 params:{
                     query : nameQuery,
                     timePeriod : timeQuery,
                     attributes : attributes,
                     sort : sort,
-                }, headers: {
-                    'Authorization' : `Bearer ${localStorage.getItem('token')}`
                 }
             });
-            const responseBody = response.data;
+            
             if(!responseBody.success){
                 console.error('Error fetching search data:', responseBody.message);
                 return;

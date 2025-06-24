@@ -1,6 +1,7 @@
 import React, { createContext, useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNotification } from './NotificationContext';
+import apiRequest from './utils/postRequest';
 
 /** 
 documentation:
@@ -18,32 +19,23 @@ export const AuthProvider = ({ children }) => {
     const { addNotification } = useNotification();
 
     const validateToken = async () => {
-        const token = localStorage.getItem('token');
         try {
-            // Set up the Authorization header
-            const config = {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            };
-            // Make the GET request to the validate-token endpoint
-            const response = await axios.get('/validate-token', config);
-
+            // Make the GET request to the validate-token endpoint with cookies
+            const response = await apiRequest('/validate-token', null, { method: 'GET' });
+            console.log('Token validation response:', response);
             // console.log('Token validation response:', response.data);
             // Handle response...
-            if (response.data.success) {
-                setUser(response.data.data.user);
-                // console.log(response.data.data.user);
+            if (response.success) {
+                setUser(response.data.user);
+                // console.log(response.data.user);
                 setIsAuthenticated(true);
                 setIsAuthenticating(false);
                 getCheckedIn();
             } else {
                 setIsAuthenticated(false);
                 setIsAuthenticating(false);
-                localStorage.removeItem('token');
             }
         } catch (error) {
-            localStorage.removeItem('token');
             console.log('Token expired or invalid');
             setIsAuthenticated(false);
             setIsAuthenticating(false);
@@ -52,20 +44,15 @@ export const AuthProvider = ({ children }) => {
     };
 
     useEffect(() => {
-        const token = localStorage.getItem('token');
-        if (token) {
-            validateToken();
-        } else {
-            setIsAuthenticated(false);
-            setIsAuthenticating(false);
-        }
+        validateToken();
     }, []);
 
     const login = async (credentials) => {
         try {
-            const response = await axios.post('/login', credentials);
+            const response = await axios.post('/login', credentials, {
+                withCredentials: true
+            });
             if (response.status === 200) {
-                localStorage.setItem('token', response.data.data.token);
                 setIsAuthenticated(true);
                 setUser(response.data.data.user);
                 console.log(response.data);
@@ -81,10 +68,12 @@ export const AuthProvider = ({ children }) => {
     const googleLogin = async (code, isRegister) => {
         try {
             const url = window.location.href;
-            const response = await axios.post('/google-login', { code, isRegister, url });
+            const response = await axios.post('/google-login', { code, isRegister, url }, {
+                withCredentials: true
+            });
             // Handle response from the backend (e.g., storing the token, redirecting the user)
             console.log('Backend response:', response.data);
-            localStorage.setItem('token', response.data.data.token);
+            console.log('User object from Google login:', response.data.data.user);
             setIsAuthenticated(true);
             setUser(response.data.data.user);
             // addNotification({title: 'Logged in successfully',type: 'success'});
@@ -96,22 +85,23 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
-    const logout = () => {
-        localStorage.removeItem('token');
-        setIsAuthenticated(false);
-        setUser(null);
-        addNotification({title: 'Logged out successfully',type: 'success'});
+    const logout = async () => {
+        try {
+            await axios.post('/logout', {}, { withCredentials: true });
+        } catch (error) {
+            console.error('Logout error:', error);
+        } finally {
+            setIsAuthenticated(false);
+            setUser(null);
+            addNotification({title: 'Logged out successfully',type: 'success'});
+        }
     };
 
     const getDeveloper = async () => {
         try {
-            const token = localStorage.getItem('token');
-            const config = {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            };
-            const response = await axios.get('/get-developer', config);
+            const response = await axios.get('/get-developer', {
+                withCredentials: true
+            });
             
             if (response.data.success) {
                 const responseBody = response.data;
@@ -128,13 +118,9 @@ export const AuthProvider = ({ children }) => {
 
     const getCheckedIn = async () => {
         try {
-            const token = localStorage.getItem('token');
-            const config = {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            };
-            const response = await axios.get('/checked-in', config);
+            const response = await axios.get('/checked-in', {
+                withCredentials: true
+            });
 
             if (response.data.success) {
                 const responseBody = response.data;

@@ -41,6 +41,9 @@
             display: flex;
             flex-direction: column;
             gap: 20px;
+            .switch{
+                width:fit-content;
+            }
             .sidebar-header{
                 display: flex;
                 align-items: center;

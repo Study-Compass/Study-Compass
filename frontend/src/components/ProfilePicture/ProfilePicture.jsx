@@ -36,125 +36,132 @@ function ProfilePicture(){
         setShowPopup(false);
     }, ["profile"]);
 
+    // Safety check - don't render if user is not loaded
+    if (!user) {
+        return null;
+    }
+
     return(
         <div className="profile-picture">
             <img className="profile" src ={user.picture ? user.picture : pfp} onClick={()=>{setShowPopup(!showPopup)}}></img>
-            <Squircle cornerRadius={15} cornerSmoothing={0} className={`popup ${showPopup ? "popup-active":""}`} ref={ref}>
-                <div className="popup-content">
-                    <img className="profile" src ={user.picture ? user.picture : pfp}></img>
-                    <div className="profile-info">
-                        <h3>{user.name ? user.name : user.username}</h3>
-                        {/* <div className="badges">
-                            <div className="badge" style={{backgroundColor:"#A0C4FF"}}>
-                                <p>beta tester</p>
-                            </div>
-                            <div className="badge" style={{backgroundColor:"#EA4335"}}>
-                                <p>admin</p>
-                            </div>
-                        </div> */}
-                        <Badges badges={user.tags ? user.tags : []}/>
+            <div ref={ref} className={`popup-container ${showPopup ? "popup-active":""}`}>
+                <Squircle cornerRadius={15} cornerSmoothing={0} className="popup">
+                    <div className="popup-content">
+                        <img className="profile" src ={user.picture ? user.picture : pfp}></img>
+                        <div className="profile-info">
+                            <h3>{user.name ? user.name : user.username}</h3>
+                            {/* <div className="badges">
+                                <div className="badge" style={{backgroundColor:"#A0C4FF"}}>
+                                    <p>beta tester</p>
+                                </div>
+                                <div className="badge" style={{backgroundColor:"#EA4335"}}>
+                                    <p>admin</p>
+                                </div>
+                            </div> */}
+                            <Badges badges={user.tags ? user.tags : []}/>
+                        </div>
                     </div>
-                </div>
-                <hr />
-                <p className="section">GENERAL</p>
-                <Link to="/profile">
-                    <div className="menu-item">
-                        <img className="icon" src={ProfileIcon} alt="profile" />
-                        <p>Profile</p>
-                    </div>
-                </Link>
-                <Link  to="/settings">
-                    <div className="menu-item" >
-                        <img className="icon" src={Settings} alt="settings" />
-                        <p>Settings</p>
-                    </div>
-                </Link>
-                {user && (user.roles.includes('admin')) && 
-                    <Link  to="/create-org">
-                        <div className="menu-item" >
-                            <img className="icon" src={Settings} alt="settings" />
-                            <p>Create an Org</p>
+                    <hr />
+                    <p className="section">GENERAL</p>
+                    <Link to="/profile">
+                        <div className="menu-item">
+                            <img className="icon" src={ProfileIcon} alt="profile" />
+                            <p>Profile</p>
                         </div>
                     </Link>
-                }
-                {user && (user.roles.includes('admin')||user.roles.includes('oie')) && 
-                    <>
-                        <hr />
-                        <p className="section">ADMINISTRATION</p>
-                    </>
-                }
-                
-                {
-                    user && user.roles.includes('admin') && 
-                    <>
-                        <Link to="/admin">
-                            <div className="menu-item">
-                                <Icon icon="bx:stats" />
-                                <p>Analytics</p>
+                    <Link  to="/settings">
+                        <div className="menu-item" >
+                            <img className="icon" src={Settings} alt="settings" />
+                            <p>Settings</p>
+                        </div>
+                    </Link>
+                    {user && user.roles && (user.roles.includes('admin')) && 
+                        <Link  to="/create-org">
+                            <div className="menu-item" >
+                                <img className="icon" src={Settings} alt="settings" />
+                                <p>Create an Org</p>
                             </div>
                         </Link>
-                    </>
-                }
-                {
-                    user && user.roles.includes('oie') && 
-                    <>
-                        <Link to="/oie-dashboard">
-                            <div className="menu-item">
-                                <img className="icon" src={RPI} alt="log out" />
-                                <p>OIE Admin</p>
-                            </div>
-                        </Link>
-                    </>
-                }
-                {
-                    user && user.clubAssociations.length > 0 && 
-                    <>
-                        <hr/>
-                        <p className="section">ORGS</p>
-                        {user.clubAssociations.map(
-                            (org)=>{
-                                const url = `/club-dashboard/${org.org_name}`
-                                return(
-                                    <Link to={`${url}`}>
-                                        <div className="menu-item">
-                                            <img className="icon org-icon" src={org.org_profile_image} alt="" />
-                                            <p>{org.org_name}</p>
-                                        </div>
-                                    </Link>
-                                )
-                            }
-                        )}
+                    }
+                    {user && user.roles && (user.roles.includes('admin')||user.roles.includes('oie')) && 
+                        <>
+                            <hr />
+                            <p className="section">ADMINISTRATION</p>
+                        </>
+                    }
+                    
+                    {
+                        user && user.roles && user.roles.includes('admin') && 
+                        <>
+                            <Link to="/admin">
+                                <div className="menu-item">
+                                    <Icon icon="bx:stats" />
+                                    <p>Analytics</p>
+                                </div>
+                            </Link>
+                        </>
+                    }
+                    {
+                        user && user.roles && user.roles.includes('oie') && 
+                        <>
+                            <Link to="/oie-dashboard">
+                                <div className="menu-item">
+                                    <img className="icon" src={RPI} alt="log out" />
+                                    <p>OIE Admin</p>
+                                </div>
+                            </Link>
+                        </>
+                    }
+                    {
+                        user && user.clubAssociations && user.clubAssociations.length > 0 && 
+                        <>
+                            <hr/>
+                            <p className="section">ORGS</p>
+                            {user.clubAssociations.map(
+                                (org)=>{
+                                    const url = `/club-dashboard/${org.org_name}`
+                                    return(
+                                        <Link to={`${url}`} key={org.org_name}>
+                                            <div className="menu-item">
+                                                <img className="icon org-icon" src={org.org_profile_image} alt="" />
+                                                <p>{org.org_name}</p>
+                                            </div>
+                                        </Link>
+                                    )
+                                }
+                            )}
 
-                    </>
-                }
-                {
-                    user && user.approvalRoles.length > 0 && 
-                    <>
-                        <hr/>
-                        <p className="section">APPROVALS</p>
-                        {user.approvalRoles.map(
-                            (role)=>{
-                                const url = role === 'root' ? '/root-dashboard' : `/approval-dashboard/${role}` 
-                                return(
-                                    <Link to={`${url}`}>
-                                        <div className="menu-item">
-                                            <img className="icon" src={Stats} alt="" />
-                                            <p>{role}</p>
-                                        </div>
-                                    </Link>
-                                )
-                            }
-                        )}
-                    </>
-                }
-                <hr />
-                <Link to="">
-                    <div className="menu-item" onClick={logout}>
-                        <img className="icon" src={Logout} alt="log out" />
-                        <p>Logout</p>
-                    </div>
-                </Link>
-            </Squircle>
+                        </>
+                    }
+                    {
+                        user && user.approvalRoles && user.approvalRoles.length > 0 && 
+                        <>
+                            <hr/>
+                            <p className="section">APPROVALS</p>
+                            {user.approvalRoles.map(
+                                (role)=>{
+                                    const url = role === 'root' ? '/root-dashboard' : `/approval-dashboard/${role}` 
+                                    return(
+                                        <Link to={`${url}`} key={role}>
+                                            <div className="menu-item">
+                                                <img className="icon" src={Stats} alt="" />
+                                                <p>{role}</p>
+                                            </div>
+                                        </Link>
+                                    )
+                                }
+                            )}
+                        </>
+                    }
+                    <hr />
+                    <Link to="">
+                        <div className="menu-item" onClick={logout}>
+                            <img className="icon" src={Logout} alt="log out" />
+                            <p>Logout</p>
+                        </div>
+                    </Link>
+                </Squircle>
+            </div>
         </div>
     )
 }

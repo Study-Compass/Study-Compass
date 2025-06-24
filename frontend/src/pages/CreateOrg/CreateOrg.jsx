@@ -10,6 +10,7 @@ import { useError } from '../../ErrorContext.js';
 import { useNotification } from '../../NotificationContext.js';
 import CardHeader from '../../components/ProfileCard/CardHeader/CardHeader.jsx';
 import ImageUpload from '../../components/ImageUpload/ImageUpload.jsx';
+import RoleManager from '../../components/RoleManager';
 import axios from 'axios';
 import { debounce } from '../../Query.js';
 import check from '../../assets/Icons/Check.svg';
@@ -31,6 +32,7 @@ function CreateOrg(){
     const [description, setDescription] = useState(""); 
     const [org, setOrg] = useState(null);
     const [selectedFile, setSelectedFile] = useState(null);
+    const [customRoles, setCustomRoles] = useState([]);
 
     const navigate = useNavigate();
     const {addNotification} = useNotification();
@@ -94,6 +96,7 @@ function CreateOrg(){
             const formData = new FormData();
             formData.append('org_name', name);
             formData.append('org_description', description);
+            formData.append('custom_roles', JSON.stringify(customRoles));
             if (selectedFile) {
                 formData.append('image', selectedFile);
             }
@@ -127,16 +130,12 @@ function CreateOrg(){
             return;
         }
         if(current === 4){
-            if("" === ""){
-                setValidNext(false);
-            } else {
-                setValidNext(true);
-            }
+            // Always allow proceeding from roles stage - roles are optional
+            setValidNext(true);
             return;
         }
 
-
-    },[current, name, description]);
+    },[current, name, description, customRoles]);
 
     useEffect(()=>{
         if(show === 0){return;}
@@ -222,6 +221,10 @@ function CreateOrg(){
         setSelectedFile(file);
     };
 
+    const handleRolesChange = (roles) => {
+        setCustomRoles(roles);
+    };
+
     return (
         <div className={`onboard ${start ? "visible" : ""} create-org`} style={{height: viewport}}>
             <img src={YellowRedGradient} alt="" className="yellow-red" />
@@ -279,9 +282,13 @@ function CreateOrg(){
                     { current === 4 &&
                         <div className={`content ${current === 5 ? "going": ""} ${4 === currentTransition ? "": "beforeOnboard"}`} ref={el => contentRefs.current[4] = el}>
                             <Loader/>
-                            <h2>define some roles</h2>
-                            <p>Lorem ipsum dolorem asdf asd f asd sdf sdfasdlfkjas;ldkf sdaflkjsdf sdflkjsdf lkj</p>
-                            <textarea type="text" value={description} onChange={handleDescChange} className="text-input"/>
+                            <h2>define custom roles (optional)</h2>
+                            <p>Create custom roles for your organization members. You can always add or modify these later.</p>
+                            <RoleManager 
+                                roles={customRoles}
+                                onRolesChange={handleRolesChange}
+                                isEditable={true}
+                            />
                         </div>
                     }
                     { current === 5 &&

@@ -5,14 +5,16 @@
     justify-content: space-between;
     height:44px;
     width:100%;
+    align-items: center;
     .time-period{
         display: flex;
         gap:10px;
-        h1{
+        h3{
             -webkit-user-select: none;
             -moz-user-select: none;
             -ms-user-select: none;
             user-select: none;
+            font-size:17px;
         }
     }
 

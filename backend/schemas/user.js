@@ -106,6 +106,11 @@ const userSchema = new mongoose.Schema({
             ref: 'Org'
         }
     ],
+    refreshToken: {
+        type: String,
+        required: false,
+        default: null
+    },
 
     
     // you can add more fields here if needed, like 'createdAt', 'updatedAt', etc.

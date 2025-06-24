@@ -539,4 +539,45 @@ router.post('/manage-roles', verifyToken, authorizeRoles('admin'), async (req,re
     }
 })
 
+// Get user by username (for development testing)
+router.post('/get-user-by-username', verifyToken, async (req, res) => {
+    const { User } = getModels(req, 'User');
+    const { username } = req.body;
+    
+    try {
+        if (!username) {
+            return res.status(400).json({
+                success: false,
+                message: 'Username is required'
+            });
+        }
+
+        const user = await User.findOne({ username: { $regex: new RegExp(username, "i") } });
+        
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: 'User not found'
+            });
+        }
+
+        // Return minimal user info for security
+        res.status(200).json({
+            success: true,
+            user: {
+                _id: user._id,
+                username: user.username,
+                name: user.name,
+                email: user.email
+            }
+        });
+    } catch (error) {
+        console.error('Error getting user by username:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Internal server error'
+        });
+    }
+});
+
 module.exports = router;

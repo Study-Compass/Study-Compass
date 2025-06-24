@@ -8,9 +8,9 @@
     display: inline-block;
     width: calc(3.7em * var(--size));
     height: calc(1.8em * var(--size));
-   }
    
-   .slide-switch input {
+   
+   input {
     display: none;
     opacity: 0;
     width: 0;
@@ -56,3 +56,4 @@
    input:checked + .slider:before {
     transform: translateX(calc(1.9em * var(--size)));
    }
+}

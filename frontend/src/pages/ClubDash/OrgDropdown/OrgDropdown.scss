@@ -22,8 +22,10 @@
         transition: all 0.6s;
     }
     img{
-        height:22px;
-        width:22px;
+        height:20px;
+        width:20px;
+        border-radius: 50%;
+        background: var(--background);
     }
     h1{
         font-family: 'Inter';
@@ -39,12 +41,46 @@
         top:calc(100% + 5px);
         left:0px;
         width:fit-content;
-        background-color: var(--background);
-        border-radius: 8px;
-        overflow:hidden;
-        padding: 5px;
         box-sizing: border-box;
-        box-shadow: var(--shadow);
+        animation: dropdownFadeIn 0.25s ease-out forwards;
+        transform-origin: top;
+        
+        @keyframes dropdownFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        &.dropdown-exit {
+            animation: dropdownFadeOut 0.2s ease-in forwards;
+        }
+        
+        @keyframes dropdownFadeOut {
+            from {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            to {
+                opacity: 0;
+                transform: translateY(-8px);
+            }
+        }
+        
+        .org-list{
+            overflow:hidden;
+            box-shadow: var(--shadow);
+            padding: 5px;
+            background-color: var(--background);
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
         .drop-option{
             padding: 5px 12px 5px 8px;
             cursor: pointer;
@@ -78,6 +114,8 @@
             width:100%;
             margin-top:5px;
             padding: 5px 10px;
+            box-shadow: var(--shadow);
+            background-color: var(--background);
             p{
                 font-family: 'Inter';
                 font-weight: 600;

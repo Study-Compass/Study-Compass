@@ -8,6 +8,8 @@ import { useNotification } from '../../NotificationContext';
 import {Icon} from '@iconify-icon/react';  
 import Dash from './Dash/Dash';
 import Members from './Members/Members';
+import Roles from './Roles/Roles';
+import Testing from './Testing/Testing';
 import {useFetch} from '../../hooks/useFetch';
 import { use } from 'react';
 import OrgDropdown from './OrgDropdown/OrgDropdown';
@@ -26,7 +28,7 @@ function ClubDash(){
     const { addNotification } = useNotification();
     const [showDrop, setShowDrop] = useState(false);
 
-    const orgData = useFetch(`/get-org-by-name/${clubId}`);
+    const orgData = useFetch(`/get-org-by-name/${clubId}?exhaustive=true`);
     const meetings = useFetch(`/get-meetings/${clubId}`);
 
     useEffect(()=>{
@@ -38,6 +40,8 @@ function ClubDash(){
     const menuItems = [
         { label: 'Dashboard', icon: 'ic:round-dashboard' },
         { label: 'Members', icon: 'mdi:account-group' },
+        { label: 'Roles', icon: 'mdi:shield-account' },
+        { label: 'Testing', icon: 'mdi:test-tube' },
     ];
 
     useEffect(()=>{
@@ -121,18 +125,20 @@ function ClubDash(){
 
     if(orgData.loading){
         return (
-            <Dashboard menuItems={menuItems} additionalClass='club-dash' middleItem={<OrgDropdown showDrop={showDrop} setShowDrop={setShowDrop} user={user} currentOrgName={clubId} onOrgChange={onOrgChange}/>} logo={orgLogo}>
+            <Dashboard menuItems={menuItems} additionalClass='club-dash' middleItem={<OrgDropdown showDrop={showDrop} setShowDrop={setShowDrop} user={user} currentOrgName={clubId} onOrgChange={onOrgChange}/>} logo={orgLogo} secondaryColor="#EDF6EE" primaryColor="#4DAA57">
                 <div className="loading-container"></div>
                 <div className="loading-container"></div>
-
+                <div className="loading-container"></div>
             </Dashboard>
         );
     }
 
     return (
-        <Dashboard menuItems={menuItems} additionalClass='club-dash' middleItem={<OrgDropdown showDrop={showDrop} setShowDrop={setShowDrop} user={user} currentOrgName={clubId} onOrgChange={onOrgChange}/>} logo={orgLogo}>
-            <Dash expandedClass={expandedClass} openMembers={openMembers} clubName={clubId} meetings={meetings.data}/> 
-            <Members expandedClass = {expandedClass} people={orgData.data.org.members} positions={orgData.data.org.overview.positions}/>
+        <Dashboard menuItems={menuItems} additionalClass='club-dash' middleItem={<OrgDropdown showDrop={showDrop} setShowDrop={setShowDrop} user={user} currentOrgName={clubId} onOrgChange={onOrgChange}/>} logo={orgLogo} secondaryColor="#EDF6EE" primaryColor="#4DAA57">
+            <Dash expandedClass={expandedClass} openMembers={openMembers} clubName={clubId} meetings={meetings.data} org={orgData.data}/> 
+            <Members expandedClass={expandedClass} />
+            <Roles expandedClass={expandedClass} org={orgData.data.org.overview}/>
+            <Testing expandedClass={expandedClass} org={orgData.data.org.overview}/>
         </Dashboard>
     )
 }

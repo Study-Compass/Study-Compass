@@ -171,8 +171,8 @@ function Friends() {
                             <div className={`friends-results ${showSearch ? "active" : ""}`}>
                                 {
                                     results.map(user => {
-                                        return <div onClick={()=>{handleFriendRequest(user.username)}}>
-                                            <Friend friend={user} key={user._id} isFriendRequest={true} reload={reload} setReload={setReload}/>
+                                        return <div onClick={()=>{handleFriendRequest(user.username)}} key={user._id}>
+                                            <Friend friend={user} isFriendRequest={true} reload={reload} setReload={setReload}/>
                                         </div>
 
                                     })

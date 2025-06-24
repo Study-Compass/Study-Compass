@@ -28,15 +28,19 @@ const io = new Server(server, {
     }
 });
 
+// Configure CORS for cookie-based authentication
+const corsOptions = {
+    origin: process.env.NODE_ENV === 'production'
+        ? ['https://www.study-compass.com', 'https://studycompass.com']
+        : 'http://localhost:3000',
+    credentials: true, // This is crucial for cookies
+    optionsSuccessStatus: 200 // for legacy browser support
+};
+
 if (process.env.NODE_ENV === 'production') {
     app.use(enforce.HTTPS({ trustProtoHeader: true }));
-    const corsOptions = {
-        origin: [
-            'https://www.study-compass.com', 
-            'https://studycompass.com',
-        ],
-        optionsSuccessStatus: 200 // for legacy browser support
-    };
+    app.use(cors(corsOptions));
+} else {
     app.use(cors(corsOptions));
 }
 
@@ -86,6 +90,7 @@ const classroomChangeRoutes = require('./routes/classroomChangeRoutes.js');
 const ratingRoutes = require('./routes/ratingRoutes.js');
 const searchRoutes = require('./routes/searchRoutes.js');
 const orgRoutes = require('./routes/orgRoutes.js');
+const orgRoleRoutes = require('./routes/orgRoleRoutes.js');
 const adminRoutes = require('./routes/adminRoutes.js');
 const eventsRoutes = require('./events/index.js');
 
@@ -101,6 +106,7 @@ app.use(searchRoutes);
 
 
 app.use(orgRoutes);
+app.use('/org-roles', orgRoleRoutes);
 app.use(adminRoutes);
 
 app.use(eventsRoutes);
