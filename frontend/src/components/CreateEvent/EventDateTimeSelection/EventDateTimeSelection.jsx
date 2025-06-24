@@ -1,47 +1,36 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import '../CreateComponents.scss'
 import './EventDateTimeSelection.scss'
 
 import { useCache } from '../../../CacheContext';
 import { addQueryHelper, removeQueryHelper, getCurrentWeek, getNextWeek, getPreviousWeek, getDateTime } from './EventDateTimeSelectionHelper';
 import { useNotification } from '../../../NotificationContext';
-import { Icon } from '@iconify-icon/react/dist/iconify.mjs';
+import { Icon } from '@iconify-icon/react/dist/iconify.js';
 import Month from '../../../pages/OIEDash/EventsCalendar/Month/Month';
 import Week from '../../../pages/OIEDash/EventsCalendar/Week/Week';
 import Day from '../../../pages/OIEDash/EventsCalendar/Day/Day';
+import SelectedRoomsPreview from '../../SelectedRoomsPreview/SelectedRoomsPreview';
+import {useFetch} from '../../../hooks/useFetch';
+import EventCalenderWrapper from '../../EventCalenderWrapper/EventCalenderWrapper';
 
-function EventDateTimeSelection({next, visible, setInfo}){
+
+function EventDateTimeSelection({next, visible, selectedRooms, setInfo}){
     const [selectedTimeOption, setSelectedTimeOption] = useState(null);
     const [selectedDate, setSelectedDate] = useState(null);
     const [view, setView] = useState(0); // 0: month, 1: week, 2: day
     const { addNotification } = useNotification();
 
-    const roomOptions = [
-        {
-            id: 'morning',
-            title: 'Morning',
-            description: '8:00 AM - 12:00 PM',
-            times: ['8:00 AM', '9:00 AM', '10:00 AM', '11:00 AM'],
-            icon: 'mdi:weather-sunny',
-            available: true
-        },
-        {
-            id: 'afternoon',
-            title: 'Afternoon',
-            description: '12:00 PM - 5:00 PM',
-            times: ['12:00 PM', '1:00 PM', '2:00 PM', '3:00 PM', '4:00 PM'],
-            icon: 'mdi:weather-partly-cloudy',
-            available: true
-        },
-        {
-            id: 'evening',
-            title: 'Evening',
-            description: '5:00 PM - 9:00 PM',
-            times: ['5:00 PM', '6:00 PM', '7:00 PM', '8:00 PM'],
-            icon: 'mdi:weather-night',
-            available: true
-        }
-    ];
+    // temp things
+    const TEMPDATE = new Date();
+
+
+    const options = useMemo(()=>({
+        data: {queries: ['65dd0786d6b91fde155c0097', '65dd0786d6b91fde155c0099', '65dd0786d6b91fde155c009b'], exhaustive: true},    
+        method: "POST"
+    }), []);
+
+    const { data, loading, error } = useFetch('/getbatch', options);
+    
 
     const handleTimeOptionSelect = (option) => {
         setSelectedTimeOption(option);
@@ -78,11 +67,11 @@ function EventDateTimeSelection({next, visible, setInfo}){
         <div className="event-date-time-selection">
             <div className="time-options-sidebar">
                 <h2>Room Options</h2>
-                {/* {roomOptions.map((option) => (
-                    
+                {/* {.map((option) => (
+                    <SelectedRoomsPreview id={option.id} selected={true} />
                 ))} */}
             </div>
-            <div className="calendar-container">
+            {/* <div className="calendar-container">
                 {view === 0 && (
                     <Month 
                         height="calc(100% - 44px)"
@@ -122,7 +111,8 @@ function EventDateTimeSelection({next, visible, setInfo}){
                         timeOption={selectedTimeOption}
                     />
                 )}
-            </div>
+            </div> */}
+            <EventCalenderWrapper roomList={data.data} start={TEMPDATE}/>
             <button 
                 className="next-button" 
                 onClick={handleNext}

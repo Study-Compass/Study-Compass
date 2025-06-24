@@ -32,6 +32,7 @@ const MonthDisplay = ({
     const daysInMonth = getDaysInMonth(month, year);
     const firstDayOfWeek = getFirstDayOfWeek(month, year);
 
+
     const emptyCells = Array.from({ length: firstDayOfWeek }, (_, i) => (
         <div key={`empty-${i}`} className="calendar__day is-disabled"></div>
     ));

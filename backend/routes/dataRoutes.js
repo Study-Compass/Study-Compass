@@ -121,8 +121,10 @@ router.post('/free', async (req, res) => {
 });
 
 router.post('/getbatch', async (req, res) => {
-    const queries = req.body.queries;
-    const exhaustive = req.body.exhaustive; // Option to retrieve just schedule data or both schedule and room data
+    // const queries = req.body.queries;
+    // const exhaustive = req.body.exhaustive; // Option to retrieve just schedule data or both schedule and room data
+
+    const {queries, exhaustive} = req.body; 
 
     console.log(`POST: /getbatch`, JSON.stringify(req.body.queries));
 
