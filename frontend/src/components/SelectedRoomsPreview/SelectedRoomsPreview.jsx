@@ -2,7 +2,7 @@ import React from 'react';
 import './SelectedRoomsPreview.scss';
 import FilledStar from '../../assets/Icons/FilledStar.svg';
 
-function SelectedRoomsPreview({name, rating, attributes, availability, selected = false}) {
+function SelectedRoomsPreview({name="Darrin Communications Center 330", rating=4.3, attributes, availability, selected = false}) {
 
     
     return (

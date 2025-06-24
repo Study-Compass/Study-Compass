@@ -67,9 +67,9 @@ function EventDateTimeSelection({next, visible, selectedRooms, setInfo}){
         <div className="event-date-time-selection">
             <div className="time-options-sidebar">
                 <h2>Room Options</h2>
-                {/* {.map((option) => (
+                {data.data.map((option) => (
                     <SelectedRoomsPreview id={option.id} selected={true} />
-                ))} */}
+                ))}
             </div>
             {/* <div className="calendar-container">
                 {view === 0 && (

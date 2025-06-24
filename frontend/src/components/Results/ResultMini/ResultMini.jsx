@@ -1,10 +1,10 @@
 import React from 'react';
-import './Result.scss';
+import './ResultMini.scss';
 import FilledStar from '../../../assets/Icons/FilledStar.svg';
 import Bookmark from '../../../assets/Icons/Bookmark.svg';
 import useAuth from '../../../hooks/useAuth';
 
-function Result1({ result, attributes, debouncedFetchData, changeURL, findNext, contentState }) {
+function ResultMini({ result, attributes, debouncedFetchData, changeURL, findNext, contentState }) {
     const schedule = result.data.weekly_schedule;
     const success = findNext(schedule).free;
     const message = findNext(schedule).message;
@@ -13,14 +13,14 @@ function Result1({ result, attributes, debouncedFetchData, changeURL, findNext, 
     console.log(result);
     return (
         <li
-            className={`result1 ${attributes.includes('restricted access') ? "restricted": "" }`}
+            className={`resultmini ${attributes.includes('restricted access') ? "restricted": "" }`}
             value={result.room.name} 
             onClick={() => {changeURL(result.room.name)}}
         >
             <div className="image">
                 {result.room.image ? <img src={`${process.env.PUBLIC_URL}${result.room.image}`} alt="classroom" width={100} height={75} />:""}
             </div>
-            <div className="result1-info">
+            <div className="resultmini-info">
                 <h2>{result.room.name.toLowerCase()}</h2>
                 <div className="info-row">      
                     <div className="rating">
@@ -43,4 +43,4 @@ function Result1({ result, attributes, debouncedFetchData, changeURL, findNext, 
     );
 }
 
-export default Result1;
+export default ResultMini;

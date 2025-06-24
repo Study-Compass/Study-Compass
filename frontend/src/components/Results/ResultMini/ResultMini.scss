@@ -1,4 +1,4 @@
-li.result1{
+li.resultmini{
     border-radius: 0;
     padding:10px;
     background-color: var(text);
@@ -13,7 +13,7 @@ li.result1{
     position: relative;
 }
 
-.result1 .image{
+.resultmini .image{
     overflow:hidden;
     border-radius: 5px;
     width:75px;
@@ -21,12 +21,12 @@ li.result1{
     min-width: 100px;
 }
 
-.result1:hover{
+.resultmini:hover{
     background-color: var(--lighterborder);
     cursor:pointer;
 }
 
-.result1 h2{
+.resultmini h2{
     font-family:'Inter';
     font-weight:600;
     font-size:14px;
@@ -35,46 +35,46 @@ li.result1{
     -webkit-hyphens: auto;
 }
 
-.result1-info{
+.resultmini-info{
     display:flex;
     flex-direction: column;
 }
 
-.result1-info-container{
+.resultmini-info-container{
     display:flex;
     flex-direction: row;
     gap:10px;
     align-items: center;
 }
 
-.result1 .rating{
+.resultmini .rating{
     display:flex;
     flex-direction: row;
     gap:5px;
     align-items: center;
 }
 
-.result1 .rating p{
+.resultmini .rating p{
     margin:0;
     font-size:13px;
     font-family:'Inter';
     font-weight:700;
 }
 
-.result1 .rating img{
+.resultmini .rating img{
     width:12px;
     height:12px;
 
 }
 
-.result1 .free-until{
+.resultmini .free-until{
     font-size:12px;
     padding: 0 0 0 15px
 }
 
 
 @media(max-width:500px){
-    .result1 h2{
+    .resultmini h2{
         font-family:'Inter';
         font-weight:600;
         font-size:16px;

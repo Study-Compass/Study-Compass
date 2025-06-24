@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import Bookmark from "../../../assets/Icons/Bookmark.svg"
 import DownArrow from "../../../assets/Icons/DownArrow.svg"
 import { useCache } from '../../../CacheContext';
-import Result1 from '../../Results/Result1/Result1';
+import ResultMini from '../../Results/ResultMini/ResultMini.jsx';
 import {findNext} from '../../../pages/Room/RoomHelpers.js';
 
 function SavedClassrooms({ userInfo }){
@@ -56,7 +56,7 @@ function SavedClassrooms({ userInfo }){
             <div className={`saved-content ${isOpen ? 'open' : ''}`}>
                 {
                     saved.map((room, index) => {
-                        return <Result1 key={index} result={room} attributes={[]} changeURL={changeURL} findNext={findNext} contentState="nameSearch"/>
+                        return <ResultMini key={index} result={room} attributes={[]} changeURL={changeURL} findNext={findNext} contentState="nameSearch"/>
                     })
                 }
             </div>

@@ -15,6 +15,7 @@ const getSunday = (date) => {
     const diff = date.getDate() - day;
     return new Date(date.setDate(diff));
 }
+
     
 
 function EventCalenderWrapper({roomList = [], start = new Date()}) {
@@ -22,8 +23,24 @@ function EventCalenderWrapper({roomList = [], start = new Date()}) {
     const [startDate, setStartDate] = useState(getSunday(start));
     const [view, setView] = useState(0);
 
+    const getDateText = () => {
+        switch (view) {
+            case 0:
+                return `${startDate.getFullYear()}-${startDate.getMonth()+1}-${startDate.getDate()}`;
+            case 1:
+                const startOfWeek = new Date(startDate);
+                const endOfWeek = new Date(startDate);
+                endOfWeek.setDate(endOfWeek.getDate() + 6);
+                return `${startOfWeek.getFullYear()}-${startOfWeek.getMonth()+1}-${startOfWeek.getDate()} to ${endOfWeek.getFullYear()}-${endOfWeek.getMonth()+1}-${endOfWeek.getDate()}`;
+            case 2:
+                return `${startDate.getFullYear()}-${startDate.getMonth()+1}-${startDate.getDate()}`;
+            default:
+                return '';
+        }
+    }
+
     return (
-        <div className='event-calender-wrapper'>
+        <div className='event-calender-wrapper' style={{flexGrow: 1}}>
             <div className="monthly-header">
                 <div className="time-period">
                     <div className="arrows">
