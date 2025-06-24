@@ -32,8 +32,8 @@ function EventDateTimeSelection({next, visible, selectedRooms, setInfo}){
     const { data, loading, error } = useFetch('/getbatch', options);
     
 
-    const handleTimeOptionSelect = (option) => {
-        setSelectedTimeOption(option);
+    const handleRoomSelection = (option) => {
+        
     };
 
     const handleDateSelect = (date) => {
@@ -68,7 +68,7 @@ function EventDateTimeSelection({next, visible, selectedRooms, setInfo}){
             <div className="time-options-sidebar">
                 <h2>Room Options</h2>
                 {data.data.map((option) => (
-                    <SelectedRoomsPreview id={option.id} selected={true} />
+                    <SelectedRoomsPreview room={option.room} selected={true} />
                 ))}
             </div>
             {/* <div className="calendar-container">

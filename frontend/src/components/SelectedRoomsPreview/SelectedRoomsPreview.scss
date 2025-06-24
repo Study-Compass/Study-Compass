@@ -4,14 +4,15 @@
     width: 100%;
     height: 100%;
     border-radius: 10px;
-
+    height:fit-content;
+    width:200px;
 }
 
 .selected-rooms-preview {
     border-radius: 0;
     padding:0;
     background-color: var(--background);
-    width:93%;
+    width:200px;
     border: 1px solid var(--lightborder);
     border-radius: 10px;
     margin-bottom: 15px;;
@@ -88,7 +89,7 @@
     color:var(--text);
 }
 
-.selected-rooms-preview-info{
+.preview-info{
     padding:0 15px 10px 15px;
     display:flex;
     flex-direction: column;

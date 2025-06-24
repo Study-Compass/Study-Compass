@@ -52,6 +52,7 @@ function EventCalenderWrapper({roomList = [], start = new Date()}) {
                         </div>
                     </div>
                     {/* <h1>{month === currentMonth && year === currentYear ? (<b>{getMonthName(month)}</b>): getMonthName(month)} {year}</h1> */}
+                    <h1>{getDateText()}</h1>
                 </div>
                 <Switch options={["month", "week", "day"]} onChange={()=>{}} selectedPass={view} setSelectedPass={setView}/>
             </div>
