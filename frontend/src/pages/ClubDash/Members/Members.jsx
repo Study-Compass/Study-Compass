@@ -297,8 +297,8 @@ function Members({ expandedClass, org }) {
                             </div>
                             <div className="filter-dropdown">
                                 <Select
-                                    options={roles.map(role => role.displayName)}
-                                    onChange={(value) => setFilterRole(value)}
+                                    options={['All Roles', ...roles.map(role => role.displayName)]}
+                                    onChange={(value) => setFilterRole(value === 'All Roles' ? 'all' : roles.find(role => role.displayName === value).name)}
                                     defaultValue="All Roles"
                                 />
                             </div>

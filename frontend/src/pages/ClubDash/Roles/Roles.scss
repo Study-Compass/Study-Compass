@@ -108,6 +108,7 @@
                 h4 {
                     color: var(--text);
                     font-family: 'Satoshi';
+                    padding-left: 10px;
                 }
             }
 
@@ -123,9 +124,10 @@
                 background: var(--background);
                 border: 1px solid var(--lighterborder);
                 box-shadow: var(--shadow);
+                transition: all 0.4s ease;
 
                 &:hover {
-                    border-color: var(--red);
+                    scale: 1.01;
                 }
 
                 .role-header {

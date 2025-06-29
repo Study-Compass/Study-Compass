@@ -9,6 +9,7 @@ import { Icon } from '@iconify-icon/react';
 import Week from '../../../pages/OIEDash/EventsCalendar/Week/Week';
 import CreateEventButton from '../../../components/EventsViewer/EventsGrid/EventsColumn/CreateEventButton/CreateEvent';
 import Notification from '../../../components/Notification/Notification';
+import useAuth from '../../../hooks/useAuth';
 
 function Dash({ expandedClass, openMembers, clubName, meetings, org }) {
     //define welcometext to be either good morning, good afternoon, or good evening, in one line
@@ -17,6 +18,7 @@ function Dash({ expandedClass, openMembers, clubName, meetings, org }) {
     const [events, setEvents] = useState([]);
     const weeklyRef = useRef(null);
     const [height, setHeight] = useState(0);
+    const { user } = useAuth();
 
     const filter = {
         "hostingId": { "$eq": org.org.overview._id }
@@ -38,7 +40,7 @@ function Dash({ expandedClass, openMembers, clubName, meetings, org }) {
     return (
         <div className={`dash ${expandedClass}`}>
             <header className="header">
-                <h1>{welcomeText}, {clubName}</h1>
+                <h1>{welcomeText}, {user.name}</h1>
                 <p>welcome back to your organization portal</p>
                 <img src={OrgGrad} alt="" />
             </header>

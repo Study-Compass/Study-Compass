@@ -96,6 +96,19 @@
             margin-bottom: 2rem;
             gap: 1rem;
 
+            .filter-dropdown{
+                display: flex;
+                flex-grow:1;
+                .select-container{
+                    height:100%;
+                    .select-header{
+                        height:100%;
+                        display: flex;
+                        align-items: center;
+                    }
+                }
+            }
+
             .search-filter {
                 display: flex;
                 gap: 1rem;
@@ -238,10 +251,11 @@
                 border: 1px solid var(--lighterborder);
                 border-radius: 12px;
                 box-shadow: var(--shadow);
-                transition: border-color 0.2s ease;
+                transition: all 0.4s ease;
+                cursor: pointer;
 
                 &:hover {
-                    border-color: var(--red);
+                    scale: 1.01;
                 }
 
                 .member-info {
@@ -290,9 +304,10 @@
 
                         .username {
                             font-size: 14px;
-                            color: var(--light-text);
-                            margin: 0 0 0.25rem 0;
+                            color: var(--lighter-text);
+                            margin: 0.25rem  0 0.25rem 0;
                             font-family: 'Inter', sans-serif;
+                            font-weight: 500;
                         }
 
                         .email {
@@ -369,6 +384,8 @@
                         }
                     }
                 }
+
+
             }
         }
     }

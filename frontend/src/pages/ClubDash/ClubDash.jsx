@@ -16,6 +16,7 @@ import OrgDropdown from './OrgDropdown/OrgDropdown';
 import Dashboard from '../../components/Dashboard/Dashboard';
 import orgLogo from '../../assets/Brand Image/OrgLogo.svg';
 import apiRequest from '../../utils/postRequest';
+import { useLocation } from 'react-router-dom';
 
 function ClubDash(){
     const [clubId, setClubId] = useState(useParams().id);
@@ -37,6 +38,8 @@ function ClubDash(){
 
     const orgData = useFetch(`/get-org-by-name/${clubId}?exhaustive=true`);
     const meetings = useFetch(`/get-meetings/${clubId}`);
+
+    const location = useLocation();
 
     useEffect(()=>{
         if(orgData){
@@ -184,8 +187,8 @@ function ClubDash(){
     }
 
     const onOrgChange = (org) => {
-        setClubId(org.org_name);
-
+        const newPath = `/club-dashboard/${org.org_name}`;
+        navigate(newPath);
     }
     
 

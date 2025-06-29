@@ -173,10 +173,11 @@
 
         .role-actions {
             position: absolute;
-            top: 1rem;
+            bottom: 1rem;
             right: 1rem;
             display: flex;
             gap: 0.5rem;
+
 
             button {
                 width: 32px;
@@ -190,6 +191,7 @@
                 transition: all 0.2s ease;
 
                 &.edit-btn {
+                    
                     background: rgba(59, 130, 246, 0.1);
                     color: #3b82f6;
 
