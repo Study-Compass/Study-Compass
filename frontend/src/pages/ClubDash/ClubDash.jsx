@@ -15,6 +15,7 @@ import { use } from 'react';
 import OrgDropdown from './OrgDropdown/OrgDropdown';
 import Dashboard from '../../components/Dashboard/Dashboard';
 import orgLogo from '../../assets/Brand Image/OrgLogo.svg';
+import apiRequest from '../../utils/postRequest';
 
 function ClubDash(){
     const [clubId, setClubId] = useState(useParams().id);
@@ -27,6 +28,12 @@ function ClubDash(){
     const [currentPage, setCurrentPage] = useState('dash');
     const { addNotification } = useNotification();
     const [showDrop, setShowDrop] = useState(false);
+    const [userPermissions, setUserPermissions] = useState({
+        canManageRoles: false,
+        canManageMembers: false,
+        canViewAnalytics: false
+    });
+    const [permissionsChecked, setPermissionsChecked] = useState(false);
 
     const orgData = useFetch(`/get-org-by-name/${clubId}?exhaustive=true`);
     const meetings = useFetch(`/get-meetings/${clubId}`);
@@ -37,12 +44,19 @@ function ClubDash(){
         }
     },[orgData]);
 
-    const menuItems = [
-        { label: 'Dashboard', icon: 'ic:round-dashboard' },
-        { label: 'Members', icon: 'mdi:account-group' },
-        { label: 'Roles', icon: 'mdi:shield-account' },
-        { label: 'Testing', icon: 'mdi:test-tube' },
+    // Base menu items - will be filtered based on permissions
+    const baseMenuItems = [
+        { label: 'Dashboard', icon: 'ic:round-dashboard', key: 'dash' },
+        { label: 'Members', icon: 'mdi:account-group', key: 'members', requiresPermission: 'canManageMembers' },
+        { label: 'Roles', icon: 'mdi:shield-account', key: 'roles', requiresPermission: 'canManageRoles' },
+        { label: 'Testing', icon: 'mdi:test-tube', key: 'testing' },
     ];
+
+    // Filter menu items based on user permissions
+    const menuItems = baseMenuItems.filter(item => {
+        if (!item.requiresPermission) return true;
+        return userPermissions[item.requiresPermission];
+    });
 
     useEffect(()=>{
         if(isAuthenticating){
@@ -67,10 +81,62 @@ function ClubDash(){
             }
             if(orgData.data){
                 console.log(orgData.data);
+                // Only check permissions once when org data is loaded
+                if (!permissionsChecked && orgData.data && user) {
+                    checkUserPermissions();
+                }
             }
         }
     }
-    ,[orgData]);
+    ,[orgData, user, permissionsChecked]);
+
+    const checkUserPermissions = async () => {
+        if (!orgData.data || !user || permissionsChecked) return;
+
+        try {
+            const org = orgData.data.org.overview;
+            
+            // Check if user is the owner
+            const isOwner = org.owner === user._id;
+            
+            if (isOwner) {
+                setUserPermissions({
+                    canManageRoles: true,
+                    canManageMembers: true,
+                    canViewAnalytics: true
+                });
+                setPermissionsChecked(true);
+                return;
+            }
+
+            // Get user's role in this organization
+            const response = await apiRequest(`/org-roles/${org._id}/members`, {}, {
+                method: 'GET'
+            });
+
+            if (response.success) {
+                const userMember = response.members.find(member => 
+                    member.user_id._id === user._id
+                );
+
+                if (userMember) {
+                    const userRoleData = org.positions.find(role => role.name === userMember.role);
+                    
+                    if (userRoleData) {
+                        setUserPermissions({
+                            canManageRoles: userRoleData.canManageRoles || userRoleData.permissions.includes('manage_roles') || userRoleData.permissions.includes('all'),
+                            canManageMembers: userRoleData.canManageMembers || userRoleData.permissions.includes('manage_members') || userRoleData.permissions.includes('all'),
+                            canViewAnalytics: userRoleData.canViewAnalytics || userRoleData.permissions.includes('view_analytics') || userRoleData.permissions.includes('all')
+                        });
+                    }
+                }
+            }
+        } catch (error) {
+            console.error('Error checking user permissions:', error);
+        } finally {
+            setPermissionsChecked(true);
+        }
+    };
 
     useEffect(()=>{ 
         if(meetings){
@@ -136,7 +202,7 @@ function ClubDash(){
     return (
         <Dashboard menuItems={menuItems} additionalClass='club-dash' middleItem={<OrgDropdown showDrop={showDrop} setShowDrop={setShowDrop} user={user} currentOrgName={clubId} onOrgChange={onOrgChange}/>} logo={orgLogo} secondaryColor="#EDF6EE" primaryColor="#4DAA57">
             <Dash expandedClass={expandedClass} openMembers={openMembers} clubName={clubId} meetings={meetings.data} org={orgData.data}/> 
-            <Members expandedClass={expandedClass} />
+            <Members expandedClass={expandedClass} org={orgData.data.org.overview}/>
             <Roles expandedClass={expandedClass} org={orgData.data.org.overview}/>
             <Testing expandedClass={expandedClass} org={orgData.data.org.overview}/>
         </Dashboard>

@@ -300,7 +300,9 @@ router.post('/:orgId/members/:userId/role', verifyToken, requireMemberManagement
         await member.save();   
 
         //for testing
-        user.clubAssociations.push(orgId);
+        if(!user.clubAssociations.find(club => club.org_name === orgId)){
+            user.clubAssociations.push(orgId);
+        }
 
         await user.save();
 
@@ -331,7 +333,7 @@ router.get('/:orgId/members', verifyToken, requireMemberManagement(), async (req
 
     try {
         const members = await OrgMember.getActiveMembers(orgId);
-
+        console.log('GET /org-roles/members', orgId, members);
         res.status(200).json({
             success: true,
             members,

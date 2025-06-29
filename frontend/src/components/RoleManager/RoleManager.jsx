@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import './RoleManager.scss';
 import { Icon } from '@iconify-icon/react';
+import { getOrgRoleColor } from '../../utils/orgUtils';
 
-const RoleManager = ({ roles, onRolesChange, isEditable = true }) => {
+
+const RoleManager = ({ roles, onRolesChange, isEditable = true, roleHighlight = false }) => {
     const [customRoles, setCustomRoles] = useState(roles || []);
     const [showAddForm, setShowAddForm] = useState(false);
     const [editingRole, setEditingRole] = useState(null);
@@ -138,19 +140,19 @@ const RoleManager = ({ roles, onRolesChange, isEditable = true }) => {
 
     return (
         <div className="role-manager">
-            <div className="role-manager-header">
+            {/* <div className="role-manager-header">
                 <h3>Organization Roles</h3>
                 <p>Define custom roles and their permissions for your organization</p>
-            </div>
+            </div> */}
 
-            {/* Default Roles */}
+            {/* default roles, need to make this dynamic at some point */}
             <div className="default-roles">
                 <h4>Default Roles</h4>
                 <div className="roles-grid">
                     <div className="role-card default">
                         <div className="role-header">
                             <h5>Owner</h5>
-                            <span className="role-badge owner">Owner</span>
+                            <span className="role-badge owner" style={{ backgroundColor: getOrgRoleColor('owner', 0.1), color: getOrgRoleColor('owner', 1) }}>Owner</span>
                         </div>
                         <p>Full access to all organization features</p>
                         <div className="permissions">
@@ -161,7 +163,7 @@ const RoleManager = ({ roles, onRolesChange, isEditable = true }) => {
                     <div className="role-card default">
                         <div className="role-header">
                             <h5>Administrator</h5>
-                            <span className="role-badge admin">Admin</span>
+                            <span className="role-badge admin" style={{ backgroundColor: getOrgRoleColor('admin', 0.1), color: getOrgRoleColor('admin', 1) }}>Admin</span>
                         </div>
                         <p>Can manage members, events, and view analytics</p>
                         <div className="permissions">
@@ -174,7 +176,7 @@ const RoleManager = ({ roles, onRolesChange, isEditable = true }) => {
                     <div className="role-card default">
                         <div className="role-header">
                             <h5>Officer</h5>
-                            <span className="role-badge officer">Officer</span>
+                            <span className="role-badge officer" style={{ backgroundColor: getOrgRoleColor('officer', 0.1), color: getOrgRoleColor('officer', 1) }}>Officer</span>
                         </div>
                         <p>Can manage events and view organization content</p>
                         <div className="permissions">
@@ -186,7 +188,7 @@ const RoleManager = ({ roles, onRolesChange, isEditable = true }) => {
                     <div className="role-card default">
                         <div className="role-header">
                             <h5>Member</h5>
-                            <span className="role-badge member">Member</span>
+                            <span className="role-badge member" style={{ backgroundColor: getOrgRoleColor('member', 0.1), color: getOrgRoleColor('member', 1) }}>Member</span>
                         </div>
                         <p>Basic access to view organization events</p>
                         <div className="permissions">

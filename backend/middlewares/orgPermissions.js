@@ -175,7 +175,7 @@ function requireOrgOwner(orgParam = 'orgId') {
  * @param {string} orgParam - The parameter name containing the org ID
  */
 function requireRoleManagement(orgParam = 'orgId') {
-    return requireOrgPermission('manage_members', orgParam);
+    return requireOrgPermission('manage_roles', orgParam);
 }
 
 /**

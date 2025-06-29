@@ -4,7 +4,7 @@
     height: 100%;
     width: 100%;
     overflow: hidden;
-    padding: 0 40px 20px 40px;
+    // padding: 0 40px 20px 40px;
     box-sizing: border-box;
 
     &.loading {
@@ -20,8 +20,6 @@
     }
 
     .header {
-        margin-bottom: 2rem;
-        text-align: center;
 
         h1 {
             font-family: 'Satoshi';
@@ -51,9 +49,39 @@
         p {
             font-size: 0.9rem;
             color: #dc2626;
+            margin: 0 0 0.5rem 0;
+            font-weight: 500;
+            font-family: 'Inter', sans-serif;
+
+            &:last-child {
+                margin-bottom: 0;
+            }
+        }
+    }
+
+    .user-role-info {
+        background: var(--red-transparent);
+        padding:10px;
+        text-align: center;
+        margin-bottom:10px;
+
+        p {
+            font-size: 0.9rem;
+            color: var(--red);
             margin: 0;
             font-weight: 500;
             font-family: 'Inter', sans-serif;
+
+            .role-badge {
+                background: var(--red);
+                color: white;
+                padding: 4px 8px;
+                border-radius: 12px;
+                font-size: 0.8rem;
+                font-weight: 600;
+                text-transform: capitalize;
+                margin-left: 0.5rem;
+            }
         }
     }
 
@@ -61,6 +89,7 @@
         flex: 1;
         overflow-y: auto;
         padding-right: 10px;
+        padding: 0 40px 20px 40px;
 
         // Customize RoleManager styles to match ClubDash theme
         .role-manager {
@@ -78,6 +107,7 @@
             .custom-roles {
                 h4 {
                     color: var(--text);
+                    font-family: 'Satoshi';
                 }
             }
 

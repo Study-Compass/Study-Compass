@@ -1,6 +1,5 @@
 .role-manager {
     width: 100%;
-    max-width: 800px;
     margin: 0 auto;
     font-family: 'Inter', sans-serif;
 
@@ -80,7 +79,7 @@
         background: var(--background);
         border: 1px solid var(--border);
         border-radius: 12px;
-        padding: 1.5rem;
+        padding: 16px 20px;
         position: relative;
         transition: all 0.2s ease;
 
@@ -104,7 +103,7 @@
             margin-bottom: 0.5rem;
 
             h5 {
-                font-size: 1.1rem;
+                font-size: 1rem;
                 font-weight: 600;
                 margin: 0;
                 color: var(--text-primary);

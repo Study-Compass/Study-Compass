@@ -144,7 +144,7 @@ function App() {
                                             </Route>
 
                                             {/* features under development */}
-                                            <Route element={ <ProtectedRoute authorizedRoles={['admin', 'developer']}/> }>
+                                            <Route element={ <ProtectedRoute authorizedRoles={['user', 'admin', 'developer']}/> }>
                                                 <Route path="/org/:name" element={<AnimatedPageWrapper><OrgDisplay/></AnimatedPageWrapper>}/>
                                                 <Route path="/events" element={<AnimatedPageWrapper><Events/></AnimatedPageWrapper>}/>
                                                 <Route path="/club-dashboard/:id" element={<AnimatedPageWrapper><ClubDash/></AnimatedPageWrapper>}/>
