@@ -7,6 +7,8 @@ import circleWarning from '../../../assets/circle-warning.svg';
 import { useGoogleLogin } from '@react-oauth/google';
 import axios from 'axios';
 import Flag from '../../Flag/Flag';
+import SAMLLoginButton from '../SAMLLoginButton/SAMLLoginButton';
+import { isSAMLEnabled, getUniversityDisplayName, getUniversityLogo, getUniversityClassName } from '../../../config/universities';
 
 function LoginForm() {
     const { isAuthenticated, login, googleLogin } = useAuth();
@@ -25,6 +27,13 @@ function LoginForm() {
     const googleLogo = generalIcons.google;
     const from = location.state?.from?.pathname || '/room/none';
     console.log(from);
+
+    // Get university info for SAML
+    const universityName = getUniversityDisplayName();
+    const universityLogo = getUniversityLogo();
+    const universityClassName = getUniversityClassName();
+    const samlEnabled = isSAMLEnabled();
+
     useEffect(() => {
       if (isAuthenticated){
         console.log("logged in already");
@@ -130,6 +139,19 @@ function LoginForm() {
         {errorText !== "" && 
             <Flag text={errorText} img={circleWarning} color={"#FD5858"} primary={"rgba(250, 117, 109, 0.16)"} accent={"#FD5858"} /> 
         }
+
+        {/* SAML Login Button - Show first if enabled */}
+        {samlEnabled && (
+            <SAMLLoginButton
+                universityName={universityName}
+                universityLogo={universityLogo}
+                className={universityClassName}
+                onError={setErrorText}
+                relayState={from}
+            />
+        )}
+
+        {/* Google Login Button */}
         <button type="button" className="button google" onClick={() => google()}>Continue with Google<img src={googleLogo} alt="google"/></button>
 
         <div className="divider">

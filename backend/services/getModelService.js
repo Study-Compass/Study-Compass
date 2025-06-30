@@ -17,6 +17,7 @@ const searchSchema = require('../schemas/search');
 const studyHistorySchema = require('../schemas/studyHistory');
 const userSchema = require('../schemas/user');
 const visitSchema = require('../schemas/visit');
+const samlConfigSchema = require('../schemas/samlConfig');
 
 //events
 const rssFeedSchema = require('../events/schemas/rssFeed');
@@ -41,6 +42,7 @@ const getModels = (req, ...names) => {
         Rating: req.db.model('Rating', ratingSchema, 'ratings'),
         RepeatedVisit: req.db.model('RepeatedVisit', repeatedVisitSchema, 'repeatedVisits'),
         Report: req.db.model('Report', reportSchema, 'reports'),
+        SAMLConfig: req.db.model('SAMLConfig', samlConfigSchema, 'samlConfigs'),
         Schedule: req.db.model('Schedule', scheduleSchema, 'schedules'),
         Search: req.db.model('Search', searchSchema, 'searches'),
         StudyHistory: req.db.model('StudyHistory', studyHistorySchema, 'studyHistories'),

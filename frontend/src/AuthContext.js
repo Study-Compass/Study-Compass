@@ -15,6 +15,7 @@ export const AuthProvider = ({ children }) => {
     const [isAuthenticating, setIsAuthenticating] = useState(true); // [1
     const [user, setUser] = useState(null);
     const [checkedIn, setCheckedIn] = useState(null);
+    const [authMethod, setAuthMethod] = useState(null); // 'google', 'saml', 'email'
 
     const { addNotification } = useNotification();
 
@@ -27,6 +28,14 @@ export const AuthProvider = ({ children }) => {
             // Handle response...
             if (response.success) {
                 setUser(response.data.user);
+                // Determine auth method from user data
+                if (response.data.user.samlProvider) {
+                    setAuthMethod('saml');
+                } else if (response.data.user.googleId) {
+                    setAuthMethod('google');
+                } else {
+                    setAuthMethod('email');
+                }
                 // console.log(response.data.user);
                 setIsAuthenticated(true);
                 setIsAuthenticating(false);
@@ -55,6 +64,7 @@ export const AuthProvider = ({ children }) => {
             if (response.status === 200) {
                 setIsAuthenticated(true);
                 setUser(response.data.data.user);
+                setAuthMethod('email');
                 console.log(response.data);
                 addNotification({ title:'Logged in successfully',type: 'success'});
             }
@@ -76,6 +86,7 @@ export const AuthProvider = ({ children }) => {
             console.log('User object from Google login:', response.data.data.user);
             setIsAuthenticated(true);
             setUser(response.data.data.user);
+            setAuthMethod('google');
             // addNotification({title: 'Logged in successfully',type: 'success'});
             // For example, redirect the user or store the received token in local storage
         } catch (error) {
@@ -85,14 +96,32 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
+    const samlLogin = async (relayState = null) => {
+        try {
+            // Redirect to SAML login endpoint
+            const baseUrl = window.location.origin;
+            const loginUrl = `${baseUrl}/auth/saml/login${relayState ? `?relayState=${encodeURIComponent(relayState)}` : ''}`;
+            window.location.href = loginUrl;
+        } catch (error) {
+            console.error('SAML login error:', error);
+            throw error;
+        }
+    };
+
     const logout = async () => {
         try {
-            await axios.post('/logout', {}, { withCredentials: true });
+            // Use SAML logout if user authenticated via SAML
+            if (authMethod === 'saml') {
+                await axios.post('/auth/saml/logout', {}, { withCredentials: true });
+            } else {
+                await axios.post('/logout', {}, { withCredentials: true });
+            }
         } catch (error) {
             console.error('Logout error:', error);
         } finally {
             setIsAuthenticated(false);
             setUser(null);
+            setAuthMethod(null);
             addNotification({title: 'Logged out successfully',type: 'success'});
         }
     };
@@ -138,7 +167,20 @@ export const AuthProvider = ({ children }) => {
     }
 
     return (
-        <AuthContext.Provider value={{ isAuthenticated, user, login, logout, googleLogin, validateToken, isAuthenticating, getDeveloper, checkedIn, getCheckedIn }}>
+        <AuthContext.Provider value={{ 
+            isAuthenticated, 
+            user, 
+            login, 
+            logout, 
+            googleLogin, 
+            samlLogin,
+            validateToken, 
+            isAuthenticating, 
+            getDeveloper, 
+            checkedIn, 
+            getCheckedIn,
+            authMethod 
+        }}>
             {children}
         </AuthContext.Provider>
     );

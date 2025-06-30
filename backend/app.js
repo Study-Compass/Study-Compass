@@ -82,6 +82,7 @@ const upload = multer({
 
 // Define your routes and other middleware
 const authRoutes = require('./routes/authRoutes.js');
+const samlRoutes = require('./routes/samlRoutes.js');
 const dataRoutes = require('./routes/dataRoutes.js');
 const friendRoutes = require('./routes/friendRoutes.js');
 const userRoutes = require('./routes/userRoutes.js');
@@ -95,6 +96,7 @@ const adminRoutes = require('./routes/adminRoutes.js');
 const eventsRoutes = require('./events/index.js');
 
 app.use(authRoutes);
+app.use('/auth/saml', samlRoutes);
 app.use(dataRoutes);
 app.use(friendRoutes);
 app.use(userRoutes);

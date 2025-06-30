@@ -22,6 +22,7 @@
     "react": "^19.0.0",
     "react-dom": "19.0.0",
     "resend": "^4.0.1",
+    "samlify": "^2.10.0",
     "socket.io": "^4.7.5",
     "ws": "^8.18.0",
     "xml2js": "^0.6.2"
@@ -30,7 +31,8 @@
   "version": "1.0.0",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "setup-saml": "node scripts/setupSAML.js"
   },
   "keywords": [],
   "author": "",
