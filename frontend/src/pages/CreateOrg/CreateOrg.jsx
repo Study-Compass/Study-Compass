@@ -10,12 +10,14 @@ import { useError } from '../../ErrorContext.js';
 import { useNotification } from '../../NotificationContext.js';
 import CardHeader from '../../components/ProfileCard/CardHeader/CardHeader.jsx';
 import ImageUpload from '../../components/ImageUpload/ImageUpload.jsx';
+import RoleManager from '../../components/RoleManager';
 import axios from 'axios';
 import { debounce } from '../../Query.js';
 import check from '../../assets/Icons/Check.svg';
 import waiting from '../../assets/Icons/Waiting.svg';
 import error from '../../assets/circle-warning.svg';
 import unavailable from '../../assets/Icons/Circle-X.svg';
+import postRequest from '../../utils/postRequest';
 
 function CreateOrg(){
     const [start, setStart] = useState(false);
@@ -29,6 +31,8 @@ function CreateOrg(){
     const [timeCommitment, setTimeCommitment] = useState(null);
     const [description, setDescription] = useState(""); 
     const [org, setOrg] = useState(null);
+    const [selectedFile, setSelectedFile] = useState(null);
+    const [customRoles, setCustomRoles] = useState([]);
 
     const navigate = useNavigate();
     const {addNotification} = useNotification();
@@ -89,8 +93,16 @@ function CreateOrg(){
 
     async function handleOrgCreation(name, description){
         try {
-            const response = await axios.post('/create-org', {org_name: name, org_profile_image: '/Logo.svg', org_description: description}, {headers: {"Authorization": `Bearer ${localStorage.getItem("token")}`}});
-            setOrg(response.data.org);
+            const formData = new FormData();
+            formData.append('org_name', name);
+            formData.append('org_description', description);
+            formData.append('custom_roles', JSON.stringify(customRoles));
+            if (selectedFile) {
+                formData.append('image', selectedFile);
+            }
+
+            const response = await postRequest('/create-org', formData);
+            setOrg(response.org);
         } catch (error) {
             addNotification({ title: 'Error', message: error.message, type: 'error' });
             navigate('/');
@@ -118,16 +130,12 @@ function CreateOrg(){
             return;
         }
         if(current === 4){
-            if("" === ""){
-                setValidNext(false);
-            } else {
-                setValidNext(true);
-            }
+            // Always allow proceeding from roles stage - roles are optional
+            setValidNext(true);
             return;
         }
 
-
-    },[current, name, description]);
+    },[current, name, description, customRoles]);
 
     useEffect(()=>{
         if(show === 0){return;}
@@ -141,6 +149,7 @@ function CreateOrg(){
 
         if(current === 4){
             try{
+                console.log('hello')
                 handleOrgCreation(name, description);
             } catch (error){
                 newError(error, navigate);
@@ -208,6 +217,14 @@ function CreateOrg(){
         setDescription(e.target.value);
     }
 
+    const handleFileSelect = (file) => {
+        setSelectedFile(file);
+    };
+
+    const handleRolesChange = (roles) => {
+        setCustomRoles(roles);
+    };
+
     return (
         <div className={`onboard ${start ? "visible" : ""} create-org`} style={{height: viewport}}>
             <img src={YellowRedGradient} alt="" className="yellow-red" />
@@ -255,16 +272,23 @@ function CreateOrg(){
                         <div className={`content ${current === 4 ? "going": ""} ${3 === currentTransition ? "": "beforeOnboard"}`} ref={el => contentRefs.current[3] = el}>
                             <Loader/>
                             <h2>upload a profile picture</h2>
-                            <p>Let's make it feel like home in here, feel free to cuztomize your logo!</p>
-                            <ImageUpload uploadText="Drag and Drop to Upload"/>
+                            <p>Let's make it feel like home in here, feel free to customize your logo!</p>
+                            <ImageUpload 
+                                uploadText="Drag and Drop to Upload"
+                                onFileSelect={handleFileSelect}
+                            />
                         </div>
                     }
                     { current === 4 &&
                         <div className={`content ${current === 5 ? "going": ""} ${4 === currentTransition ? "": "beforeOnboard"}`} ref={el => contentRefs.current[4] = el}>
                             <Loader/>
-                            <h2>define some roles</h2>
-                            <p>Lorem ipsum dolorem asdf asd f asd sdf sdfasdlfkjas;ldkf sdaflkjsdf sdflkjsdf lkj</p>
-                            <textarea type="text" value={description} onChange={handleDescChange} className="text-input"/>
+                            <h2>define custom roles (optional)</h2>
+                            <p>Create custom roles for your organization members. You can always add or modify these later.</p>
+                            <RoleManager 
+                                roles={customRoles}
+                                onRolesChange={handleRolesChange}
+                                isEditable={true}
+                            />
                         </div>
                     }
                     { current === 5 &&

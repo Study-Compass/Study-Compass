@@ -11,6 +11,8 @@ import General from './General/General'
 import BadgeManager from './BadgeManager/BadgeManager';
 import ManageUsers from './ManageUsers/ManageUsers';
 
+import eventsLogo from '../../assets/Brand Image/EventsLogo.svg';
+
 
 import './Admin.scss';
 
@@ -43,7 +45,7 @@ function Admin(){
     ]
 
     return(
-        <Dashboard menuItems={menuItems} additionalClass='admin'>
+        <Dashboard menuItems={menuItems} additionalClass='admin' logo={eventsLogo}>
             <General/>
             <Analytics/>
             <ManageUsers/>

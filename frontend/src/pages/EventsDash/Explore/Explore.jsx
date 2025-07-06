@@ -34,7 +34,7 @@ function Explore(){
     const filterOptions = {
         eventTypes: {
             label: "event type",
-            options: ["social", "workshop", "meeting", "campus", "study", "sports", "alumni", "arts"],
+            options: ["social", "workshop", "meeting", "campus", "study", "athletics", "alumni", "EMPAC"],
             optionValues: ["social", "workshop", "meeting", "campus", "study", "sports", "alumni", "arts"],
             field: 'type'
         },

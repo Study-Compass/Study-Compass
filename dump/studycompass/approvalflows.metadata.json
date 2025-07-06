@@ -1,0 +1,1 @@
+{"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_"},{"v":{"$numberInt":"2"},"key":{"fieldDefinitions.name":{"$numberInt":"1"}},"name":"fieldDefinitions.name_1","background":true,"unique":true}],"uuid":"685ec3b05886430d93251d4a9f9919d7","collectionName":"approvalFlows","type":"collection"}

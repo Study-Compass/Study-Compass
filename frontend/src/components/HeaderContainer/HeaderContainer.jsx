@@ -30,7 +30,7 @@ import { Icon } from '@iconify-icon/react/dist/iconify.mjs';
  * </HeaderContainer>
  */
 
-const HeaderContainer = ({children, icon, header, scroll, subheader, right, size = '16px', classN}) => {
+const HeaderContainer = ({children, icon, header, scroll, subheader, right, size = '16px', classN, subheaderRow}) => {
     return(
         <div className={`${classN} header-container`} style={{'--size' : size}}>
             <div className="header-container-header">
@@ -53,7 +53,7 @@ const HeaderContainer = ({children, icon, header, scroll, subheader, right, size
                     </div>
                     {right && right}
                 </div>
-
+                {subheaderRow && subheaderRow}
             </div>
             <div className="header-container-content">
                 {children}

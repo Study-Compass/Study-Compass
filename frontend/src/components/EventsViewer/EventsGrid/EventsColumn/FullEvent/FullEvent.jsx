@@ -74,6 +74,15 @@ function FullEvent({ event }){
                         <p>{event.location}</p>
                     </div>
                 </div>
+                    {
+                        event.externalLink &&
+                        <div className="row external-link">
+                            <a href={event.externalLink} target="_blank" rel="noopener noreferrer">
+                                <Icon icon="heroicons:arrow-top-right-on-square-20-solid" />
+                                <p>View Event External Link</p>
+                            </a>
+                        </div>
+                    }
                 <div className="row event-description">
                     <h3>Description</h3>
                     <p>{event.description}</p>

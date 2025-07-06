@@ -1,22 +1,44 @@
 const jwt = require('jsonwebtoken');
 
 const verifyToken = (req, res, next) => {
-    const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
+    // Check for token in cookies first, then headers (for backward compatibility)
+    const token = req.cookies.accessToken || 
+                  (req.headers['authorization'] && req.headers['authorization'].split(' ')[1]);
   
-    if (token == null) return res.sendStatus(401); // if there's no token
+    // console.log('🔍 Verifying token for:', req.path);
+    // console.log('📦 Cookies:', req.cookies);
+    // console.log('Token found:', !!token);
+  
+    if (token == null) {
+        console.log('❌ No token provided');
+        return res.status(401).json({ 
+            success: false, 
+            message: 'No access token provided',
+            code: 'NO_TOKEN'
+        });
+    }
 
     jwt.verify(token, process.env.JWT_SECRET, (err, decodedToken) => {
-      if (err) return res.sendStatus(403); // if the token is not valid
-    //   if (decodedToken && decodedToken.exp) {
-    //     const currentTime = Math.floor(Date.now() / 1000); // Current time in seconds
-    //     const timeLeft = decodedToken.exp - currentTime; // Time left in seconds
-    //     const hoursLeft = (timeLeft / 3600).toFixed(2); // Convert to hours and format to 2 decimal places
-
-    //     console.debug(`Token has ${hoursLeft} hours left until expiration.`);
-    //   }
-      req.user = decodedToken;
-      next();
+        if (err) {
+            if (err.name === 'TokenExpiredError') {
+                console.log('⏰ Token expired');
+                return res.status(401).json({ 
+                    success: false, 
+                    message: 'Access token expired',
+                    code: 'TOKEN_EXPIRED'
+                });
+            }
+            console.log('❌ Invalid token:', err.message);
+            return res.status(403).json({ 
+                success: false, 
+                message: 'Invalid access token',
+                code: 'INVALID_TOKEN'
+            });
+        }
+        //log time left
+        // console.log('✅ Token valid for user:', decodedToken.userId);
+        req.user = decodedToken;
+        next();
     });
 };
 
@@ -31,8 +53,9 @@ function authorizeRoles(...allowedRoles) {
 }
 
 const verifyTokenOptional = (req, res, next) => {
-  const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
+  // Check for token in cookies first, then headers
+  const token = req.cookies.accessToken || 
+                (req.headers['authorization'] && req.headers['authorization'].split(' ')[1]);
 
   // If there's no token, just move on without setting req.user
   if (token == null) {

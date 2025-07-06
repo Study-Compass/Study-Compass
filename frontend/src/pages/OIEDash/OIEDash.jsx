@@ -7,6 +7,7 @@ import Dashboard from '../../components/Dashboard/Dashboard';
 import Dash from './Dash/Dash';
 import ManageEvents from './ManageEvents/ManageEvents';
 import Approval from '../RootDash/ManageFlow/Approval/Approval';
+import eventsLogo from '../../assets/Brand Image/EventsLogo.svg';
 
 
 function OIEDash(){
@@ -20,7 +21,7 @@ function OIEDash(){
     ];
 
     return (
-        <Dashboard menuItems={menuItems} additionalClass='oie-dash'>
+        <Dashboard menuItems={menuItems} additionalClass='oie-dash' logo={eventsLogo}>
             <Dash name={approvalId} />
             <EventsCalendar />
             <ManageEvents />

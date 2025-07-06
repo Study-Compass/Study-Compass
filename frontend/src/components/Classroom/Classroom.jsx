@@ -106,7 +106,7 @@ function Classroom({ room, state, setState, schedule, roomName, width, setShowMo
         }
         getRatings(room._id)
             .then((response) => {
-                setRatings(response.data.data);
+                setRatings(response);
             })
             .catch((error) => {
                 console.log(error);

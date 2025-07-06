@@ -286,7 +286,7 @@ function Room() {
             
             try{
                 const recommendation = await getRecommendation();
-                setRecommendedRoom(recommendation.data.data);
+                setRecommendedRoom(recommendation.data);
             } catch (error){
                 console.log(error);
             }

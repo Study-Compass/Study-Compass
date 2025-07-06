@@ -1,5 +1,7 @@
 :root{
-    --oie-background: #EFEFEF
+    --oie-background: #EFEFEF;
+    --primary-color: var(--red);
+    --secondary-color: var(--red-transparent);
 }
 .general-dash{
     overflow: hidden;
@@ -142,12 +144,12 @@
                         // border-radius: 10px;
                         // border: 1px solid var(--lightborder)
                         p{
-                            color: var(--red);
+                            color: var(--primary-color);
                         }
                         iconify-icon{
-                            color: var(--red);
+                            color: var(--primary-color);
                         }
-                        background-color: var(--red-transparent);
+                        background-color: var(--secondary-color);
                         &:hover{
                         }
                     }
@@ -237,6 +239,7 @@
 
         .dash header.header{
             height:110px;
+            min-height:110px;
             position: relative;
             overflow: hidden;
             display:flex;

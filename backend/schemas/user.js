@@ -7,6 +7,24 @@ const userSchema = new mongoose.Schema({
         required: false,
         trim: true, // trims whitespace
     },
+    // SAML-related fields
+    samlId: {
+        type: String,
+        required: false,
+        trim: true,
+        sparse: true, // Allows multiple null values
+    },
+    samlProvider: {
+        type: String,
+        required: false,
+        trim: true,
+    },
+    // SAML attributes (stored as JSON for flexibility)
+    samlAttributes: {
+        type: Map,
+        of: String,
+        default: new Map()
+    },
     username: {
         type: String,
         required: false,
@@ -106,6 +124,11 @@ const userSchema = new mongoose.Schema({
             ref: 'Org'
         }
     ],
+    refreshToken: {
+        type: String,
+        required: false,
+        default: null
+    },
 
     
     // you can add more fields here if needed, like 'createdAt', 'updatedAt', etc.
