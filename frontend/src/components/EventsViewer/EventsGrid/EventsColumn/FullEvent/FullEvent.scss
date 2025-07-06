@@ -45,7 +45,6 @@
         }
 
         .event-detail{
-            background-color: var(--lighter);
             border-radius: 10px;
             border: 1px solid var(--lighterborder);
             padding:3px 10px;
@@ -56,6 +55,13 @@
             }
             iconify-icon{
                 font-size:15px;
+            }
+        }
+        .external-link{
+            a{
+                display: flex;
+                align-items: center;
+                gap:5px;
             }
         }
 

@@ -47,16 +47,23 @@ class SAMLService {
             throw new Error(`No active SAML configuration found for school: ${school}`);
         }
 
+        console.log(`Configuring IdP for school: ${school}`);
+        console.log(`Original SSO URL: ${config.idp.ssoUrl}`);
+        console.log(`Redirect SSO URL: ${config.idp.ssoUrl.replace('/POST/', '/Redirect/')}`);
+
         const idp = IdentityProvider({
             entityID: config.idp.entityId,
-            sso: {
-                redirectUrl: config.idp.ssoUrl,
-                postUrl: config.idp.ssoUrl
-            },
-            slo: config.idp.sloUrl ? {
-                redirectUrl: config.idp.sloUrl,
-                postUrl: config.idp.sloUrl
-            } : undefined,
+            singleSignOnService: [{
+                Binding: 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect',
+                Location: config.idp.ssoUrl.replace('/POST/', '/Redirect/')
+            }, {
+                Binding: 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST',
+                Location: config.idp.ssoUrl
+            }],
+            singleLogoutService: config.idp.sloUrl ? [{
+                Binding: 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect',
+                Location: config.idp.sloUrl
+            }] : undefined,
             x509Cert: [config.idp.x509Cert, ...config.idp.additionalCerts]
         });
 
@@ -72,12 +79,30 @@ class SAMLService {
         const sp = await this.getServiceProvider(school, req);
         const idp = await this.getIdentityProvider(school, req);
 
-        const request = sp.createLoginRequest(idp, 'redirect');
+        // Add debugging information
+        console.log(`Generating SAML login URL for school: ${school}`);
+        console.log(`SP Entity ID: ${sp.entityMeta.getEntityID()}`);
+        console.log(`IdP Entity ID: ${idp.entityMeta.getEntityID()}`);
+        console.log(`Input relay state: ${relayState}`);
+
+        // Generate a new relay state if none provided
+        const finalRelayState = relayState || crypto.randomBytes(16).toString('hex');
+        console.log(`Final relay state: ${finalRelayState}`);
+
+        // Create login request with proper options
+        const request = sp.createLoginRequest(idp, 'redirect', {
+            relayState: finalRelayState,
+            authnContextClassRef: 'urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport'
+        });
+        
+        console.log(`SAML Request ID: ${request.id}`);
+        console.log(`SAML Request URL: ${request.context}`);
+        console.log(`SAML Request Relay State: ${request.relayState}`);
         
         return {
             url: request.context,
             id: request.id,
-            relayState: relayState || crypto.randomBytes(16).toString('hex')
+            relayState: finalRelayState
         };
     }
 
@@ -313,6 +338,58 @@ class SAMLService {
             isValid: errors.length === 0,
             errors
         };
+    }
+
+    /**
+     * Debug SAML configuration for troubleshooting
+     */
+    async debugConfiguration(school, req) {
+        const { SAMLConfig } = getModels(req, 'SAMLConfig');
+        const config = await SAMLConfig.getActiveConfig(school);
+        
+        if (!config) {
+            throw new Error(`No active SAML configuration found for school: ${school}`);
+        }
+
+        console.log('=== SAML Configuration Debug ===');
+        console.log(`School: ${config.school}`);
+        console.log(`Entity ID: ${config.entityId}`);
+        console.log(`IdP Entity ID: ${config.idp.entityId}`);
+        console.log(`IdP SSO URL: ${config.idp.ssoUrl}`);
+        console.log(`SP ACS URL: ${config.sp.assertionConsumerService}`);
+        console.log(`Configuration Active: ${config.isActive}`);
+        console.log(`Created: ${config.createdAt}`);
+        console.log(`Updated: ${config.updatedAt}`);
+        
+        // Check if URLs are accessible
+        try {
+            const url = new URL(config.idp.ssoUrl);
+            console.log(`IdP SSO URL is valid: ${url.toString()}`);
+        } catch (error) {
+            console.error(`Invalid IdP SSO URL: ${config.idp.ssoUrl}`);
+        }
+        
+        try {
+            const url = new URL(config.sp.assertionConsumerService);
+            console.log(`SP ACS URL is valid: ${url.toString()}`);
+        } catch (error) {
+            console.error(`Invalid SP ACS URL: ${config.sp.assertionConsumerService}`);
+        }
+        
+        // Check certificate validity
+        if (config.idp.x509Cert) {
+            console.log(`IdP certificate length: ${config.idp.x509Cert.length} characters`);
+            console.log(`IdP certificate starts with: ${config.idp.x509Cert.substring(0, 50)}...`);
+        }
+        
+        if (config.sp.x509Cert) {
+            console.log(`SP certificate length: ${config.sp.x509Cert.length} characters`);
+            console.log(`SP certificate starts with: ${config.sp.x509Cert.substring(0, 50)}...`);
+        }
+        
+        console.log('=== End Debug ===');
+        
+        return config;
     }
 
     /**

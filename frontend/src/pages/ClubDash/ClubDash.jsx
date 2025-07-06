@@ -17,6 +17,7 @@ import Dashboard from '../../components/Dashboard/Dashboard';
 import orgLogo from '../../assets/Brand Image/OrgLogo.svg';
 import apiRequest from '../../utils/postRequest';
 import { useLocation } from 'react-router-dom';
+import EventsPanel from './EventsPanel/EventsPanel';
 
 function ClubDash(){
     const [clubId, setClubId] = useState(useParams().id);
@@ -50,6 +51,7 @@ function ClubDash(){
     // Base menu items - will be filtered based on permissions
     const baseMenuItems = [
         { label: 'Dashboard', icon: 'ic:round-dashboard', key: 'dash' },
+        { label: 'Events', icon: 'mingcute:calendar-fill', key: 'events',  },
         { label: 'Members', icon: 'mdi:account-group', key: 'members', requiresPermission: 'canManageMembers' },
         { label: 'Roles', icon: 'mdi:shield-account', key: 'roles', requiresPermission: 'canManageRoles' },
         { label: 'Testing', icon: 'mdi:test-tube', key: 'testing' },
@@ -205,6 +207,7 @@ function ClubDash(){
     return (
         <Dashboard menuItems={menuItems} additionalClass='club-dash' middleItem={<OrgDropdown showDrop={showDrop} setShowDrop={setShowDrop} user={user} currentOrgName={clubId} onOrgChange={onOrgChange}/>} logo={orgLogo} secondaryColor="#EDF6EE" primaryColor="#4DAA57">
             <Dash expandedClass={expandedClass} openMembers={openMembers} clubName={clubId} meetings={meetings.data} org={orgData.data}/> 
+            <EventsPanel expandedClass={expandedClass} orgId={orgData.data.org.overview._id}/>
             <Members expandedClass={expandedClass} org={orgData.data.org.overview}/>
             <Roles expandedClass={expandedClass} org={orgData.data.org.overview}/>
             <Testing expandedClass={expandedClass} org={orgData.data.org.overview}/>

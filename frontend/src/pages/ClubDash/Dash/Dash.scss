@@ -15,7 +15,11 @@
         font-family: 'Satoshi';
         color: var(--text);
     }
-    
+    .row.stats{
+        .column{
+            width:100%;
+        }
+    }
 
     header.header{
         position: relative;

@@ -1,17 +1,18 @@
 import React, { useEffect, useState, useRef } from 'react';
 import './Dash.scss';
-import OIEGradient from '../../../assets/ClubGradient.png';
-import { getAllEvents } from '../../../components/EventsViewer/EventHelpers';
-import clubEvent from '../ClubEventsComponents/Event/ClubEvent';
-import people from '../../../assets/people.svg'
 import OrgGrad from '../../../assets/Gradients/OrgGrad.png';
-import { Icon } from '@iconify-icon/react';
 import Week from '../../../pages/OIEDash/EventsCalendar/Week/Week';
-import CreateEventButton from '../../../components/EventsViewer/EventsGrid/EventsColumn/CreateEventButton/CreateEvent';
-import Notification from '../../../components/Notification/Notification';
 import useAuth from '../../../hooks/useAuth';
+import HeaderContainer from '../../../components/HeaderContainer/HeaderContainer';
+import { useFetch } from '../../../hooks/useFetch';
+import OIEEvent from '../../OIEDash/OIEEventsComponents/Event/OIEEvent';
+import OIEEventSkeleton from '../../OIEDash/OIEEventsComponents/Event/OIEEventSkeleton';
+import PulseDot from '../../../components/Interface/PulseDot/PulseDot';
+import DashStatus from '../../../components/Dashboard/DashStatus/DashStatus';
+import EventQuickLook from './EventQuickLook/EventQuickLook';
 
-function Dash({ expandedClass, openMembers, clubName, meetings, org }) {
+
+function Dash({ expandedClass, openMembers, clubName, meetings, org}) {
     //define welcometext to be either good morning, good afternoon, or good evening, in one line
     const welcomeText = `Good ${new Date().getHours() < 12 ? "Morning" : new Date().getHours() < 18 ? "Afternoon" : "Evening"}`;
 
@@ -19,10 +20,14 @@ function Dash({ expandedClass, openMembers, clubName, meetings, org }) {
     const weeklyRef = useRef(null);
     const [height, setHeight] = useState(0);
     const { user } = useAuth();
+    const [selectedTab, setSelectedTab] = useState("upcoming");
+
+
 
     const filter = {
         "hostingId": { "$eq": org.org.overview._id }
     }
+
 
     console.log(filter);
 
@@ -33,6 +38,7 @@ function Dash({ expandedClass, openMembers, clubName, meetings, org }) {
         }
     }, []);
 
+
     const handleEventClick = () => {
         console.log("create event");
     }
@@ -40,39 +46,52 @@ function Dash({ expandedClass, openMembers, clubName, meetings, org }) {
     return (
         <div className={`dash ${expandedClass}`}>
             <header className="header">
-                <h1>{welcomeText}, {user.name}</h1>
+                <h1>{welcomeText}, {clubName}</h1>
                 <p>welcome back to your organization portal</p>
                 <img src={OrgGrad} alt="" />
             </header>
             <div className="org-content">
-                <div className="row stats">
+                <DashStatus status="You have 4 unreviewed officer and member applications" action="view all" actionText="view all" color="var(--green)" />
+                <EventQuickLook org={org} />
+                {/* <div className="row stats">
+                    <div className="column">
+
+                    <div className="header">
+                        <h3>Stats</h3>
+                        <button>view all</button>
+                    </div>
+                    <div className="row stats-container">
+
                     <div className="stat">
-                        <h4>Upcoming Events</h4>
                         <div className="count">
                             <h1>{org.exhaustive.eventCount}</h1>
                         </div>
+                        <h4>Upcoming Events</h4>
                     </div>
                     <div className="stat">
-                        <h4>Pending Submissions</h4>
                         <div className="count">
                             <h1>3</h1>
                         </div>
+                        <h4>Pending Submissions</h4>
                     </div>
                     <div className="stat">
-                        <h4>This Week's Meetings</h4>
                         <div className="count">
                             <h1>10</h1>
                         </div>
+                        <h4>This Week's Meetings</h4>
                     </div>
                     <div className="stat">
-                        <h4>Members</h4>
                         <div className="count">
                             <h1>100</h1>
                         </div>
+                        <h4>Members</h4>
+                    </div>
                     </div>
 
-                </div>
-                <div className="row activity">
+                    </div>
+
+                </div> */}
+                {/* <div className="row activity">
                     <div className="column activity">
                         <div className="header">
                             <h3>Recent Activity</h3>
@@ -90,11 +109,11 @@ function Dash({ expandedClass, openMembers, clubName, meetings, org }) {
                             <CreateEventButton row={true} color="red"/>
                         </div>
                     </div>
-                </div>
+                </div> */}
                 <div className="week-container" ref={weeklyRef}>
                     {
                         height !== 0 &&
-                        <Week height={`${height-50}px`} changeToDay={() => { }} start={new Date()} nav={false} filter={filter} showSwitch={false} startingText="this week at a glance"/>
+                        <Week height={`${height-50}px`} changeToDay={() => { }} start={new Date()} nav={false} filter={filter} showSwitch={false} startingText="This Week at a Glance"/>
                     }
                 </div>
 

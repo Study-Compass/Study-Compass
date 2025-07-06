@@ -21,9 +21,17 @@ router.get('/login', async (req, res) => {
         const school = req.school;
         const relayState = req.query.relayState || req.query.RelayState;
         
+        console.log(`SAML Login initiated for school: ${school}`);
+        console.log(`Original relay state: ${relayState}`);
+        console.log(`Request headers:`, req.headers);
+        
+        // Clear cache to ensure fresh configuration
+        samlService.clearCache(school);
+        
         const { url, id, relayState: generatedRelayState } = await samlService.generateLoginUrl(school, req, relayState);
         
-        console.log(`GET: /auth/saml/login initiated for ${school}`);
+        console.log(`Generated SAML URL: ${url}`);
+        console.log(`Generated relay state: ${generatedRelayState}`);
         
         // Store relay state in session or cookie for validation
         res.cookie('samlRelayState', generatedRelayState, {
@@ -33,6 +41,7 @@ router.get('/login', async (req, res) => {
             maxAge: 5 * 60 * 1000 // 5 minutes
         });
         
+        console.log(`Redirecting to: ${url}`);
         res.redirect(url);
     } catch (error) {
         console.error('SAML login error:', error);
@@ -377,6 +386,29 @@ router.get('/test-login', verifyToken, authorizeRoles('admin', 'root'), async (r
         res.status(500).json({
             success: false,
             message: 'Failed to generate test login URL',
+            error: error.message
+        });
+    }
+});
+
+/**
+ * Debug SAML configuration
+ * GET /auth/saml/debug
+ */
+router.get('/debug', async (req, res) => {
+    try {
+        const school = req.school;
+        await samlService.debugConfiguration(school, req);
+        
+        res.json({
+            success: true,
+            message: 'Debug information logged to console'
+        });
+    } catch (error) {
+        console.error('SAML debug error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to debug SAML configuration',
             error: error.message
         });
     }
