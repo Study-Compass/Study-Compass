@@ -38,18 +38,30 @@ function Admin(){
     }
 
     const menuItems = [
-        { label: 'General', icon: 'ic:round-dashboard' },
-        { label: 'Analytics', icon: 'bx:stats' },
-        { label: 'Manage Users', icon: 'ic:round-dashboard'},
-        { label: 'Badge Grants', icon: 'bx:stats'}
+        { 
+            label: 'General', 
+            icon: 'ic:round-dashboard',
+            element: <General/>
+        },
+        { 
+            label: 'Analytics', 
+            icon: 'bx:stats',
+            element: <Analytics/>
+        },
+        { 
+            label: 'Manage Users', 
+            icon: 'ic:round-dashboard',
+            element: <ManageUsers/>
+        },
+        { 
+            label: 'Badge Grants', 
+            icon: 'bx:stats',
+            element: <BadgeManager/>
+        }
     ]
 
     return(
         <Dashboard menuItems={menuItems} additionalClass='admin' logo={eventsLogo}>
-            <General/>
-            <Analytics/>
-            <ManageUsers/>
-            <BadgeManager/>
         </Dashboard>
     );
 }

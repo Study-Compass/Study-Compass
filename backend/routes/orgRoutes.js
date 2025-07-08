@@ -302,7 +302,7 @@ router.post("/create-org", verifyToken, upload.single('image'), handleMulterErro
     }
 });
 
-router.post("/edit-org", verifyToken, async (req, res) => {
+router.post("/edit-org", verifyToken, upload.single('image'), handleMulterError, async (req, res) => {
     const { Org } = getModels(req, "Org");
     try {
         const {
@@ -314,6 +314,7 @@ router.post("/edit-org", verifyToken, async (req, res) => {
             org_name,
         } = req.body;
         const userId = req.user?.userId;
+        const file = req.file;
 
         // Validate that the essential fields are present
         if (!orgId) {
@@ -380,10 +381,18 @@ router.post("/edit-org", verifyToken, async (req, res) => {
             org.org_description = cleanOrgDescription;
         }
 
-        // Update other fields only if they are provided
-        if (org_profile_image) {
+        // Handle image upload if file is present
+        if (file) {
+            console.log('Uploading new image');
+            const fileExtension = path.extname(file.originalname);
+            const fileName = `${org._id}${fileExtension}`;
+            const imageUrl = await uploadImageToS3(file, 'orgs', fileName);
+            org.org_profile_image = imageUrl;
+        } else if (org_profile_image) {
             org.org_profile_image = org_profile_image;
         }
+
+        // Update other fields only if they are provided
         if (positions) {
             org.positions = positions;
         }

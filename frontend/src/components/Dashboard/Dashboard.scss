@@ -117,7 +117,7 @@
                     transition: all 0.2s;
                     -webkit-user-select: none;
                     user-select: none;
-
+                    position: relative;
 
                     img, iconify-icon{
                         width:20px;
@@ -127,16 +127,30 @@
                         transition: all 0.2s;
                     }
 
+                    .sub-indicator{
+                        position: absolute;
+                        right: 10px;
+                        font-size: 16px;
+                        color: var(--text);
+                        opacity: 0.7;
+                        transition: all 0.2s;
+                    }
+
                     p{
                         font-family: 'Inter';
                         font-weight: 600;
                         color:var(--text);
                         font-size: 14px;
                         transition: all 0.2s;
+                        flex: 1;
                     }
 
                     &:hover{
                         background-color: var(--club-dark);
+                        .sub-indicator{
+                            opacity: 1;
+                            transform: translateX(2px);
+                        }
                     }
 
                     &.selected{
@@ -154,6 +168,49 @@
                         }
                     }
 
+                }
+            }
+        }
+
+        .breadcrumb-nav{
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 15px;
+            margin-bottom: 10px;
+            background-color: var(--oie-background);
+            border-radius: 8px;
+            margin: 0 10px 10px 10px;
+            box-sizing: border-box;
+
+            .breadcrumb-item{
+                display: flex;
+                align-items: center;
+                gap: 4px;
+                cursor: pointer;
+                padding: 4px 8px;
+                border-radius: 6px;
+                transition: all 0.2s;
+                font-size: 12px;
+                font-weight: 500;
+                color: var(--text);
+
+                &:hover{
+                    background-color: var(--background);
+                }
+
+                &:first-child{
+                    color: var(--primary-color);
+                    font-weight: 600;
+                }
+
+                iconify-icon{
+                    font-size: 14px;
+                }
+
+                span{
+                    font-family: 'Inter';
                 }
             }
         }

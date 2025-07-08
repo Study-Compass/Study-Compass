@@ -41,6 +41,7 @@ import Layout from './pages/Layout/Layout';
 import axios from 'axios';
 import CreateEvent from './pages/CreateEvent/CreateEvent';
 import EventsDash from './pages/EventsDash/EventsDash';
+import SubSidebarExample from './components/Dashboard/SubSidebarExample';
 
 function App() {
     useEffect(() => {
@@ -161,6 +162,7 @@ function App() {
                                                 <Route path="/oie-dashboard" element={<AnimatedPageWrapper><OIEDash/></AnimatedPageWrapper>}/>
                                                 <Route path="/create-event" element={<AnimatedPageWrapper><CreateEvent/></AnimatedPageWrapper   >}/>
                                             </Route>
+
                                         </Route>
                                     </Routes>
                                     </ProfileCreationProvider>
