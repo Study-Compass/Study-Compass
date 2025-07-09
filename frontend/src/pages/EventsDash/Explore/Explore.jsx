@@ -54,14 +54,14 @@ function Explore(){
     const filterOptions = {
         eventTypes: {
             label: "event type",
-            options: ["social", "workshop", "meeting", "campus", "study", "athletics", "alumni", "EMPAC"],
-            optionValues: ["social", "workshop", "meeting", "campus", "study", "sports", "alumni", "arts"],
+            options: [ "meeting", "campus", "study", "athletics", "alumni", "EMPAC"],
+            optionValues: [ "meeting", "campus", "study", "sports", "alumni", "arts"],
             field: 'type'
         },
         eventCreator: {
             label: "event creator",
-            options: ["student", "faculty", "administration", "organization", "sports"],
-            optionValues: ["User", "faculty", "Admin", "Org", "asdasdad"],
+            options: ["student", "administration", "organization"],
+            optionValues: ["User", "Admin", "Org"],
             field: 'hostingType'
         }
     };
