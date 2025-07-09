@@ -14,18 +14,30 @@ function OIEDash(){
     const [approvalId, setApprovalId] = useState(useParams().id);
 
     const menuItems = [
-        { label: 'Dashboard', icon: 'ic:round-dashboard' },
-        { label: 'Event Calendar', icon: 'heroicons:calendar-16-solid' },
-        { label: 'Events Board', icon: 'heroicons-solid:view-boards' },
-        { label: 'Configuration', icon: 'flowbite:adjustments-horizontal-solid' }
+        { 
+            label: 'Dashboard', 
+            icon: 'ic:round-dashboard',
+            element: <Dash name={approvalId} />
+        },
+        { 
+            label: 'Event Calendar', 
+            icon: 'heroicons:calendar-16-solid',
+            element: <EventsCalendar />
+        },
+        { 
+            label: 'Events Board', 
+            icon: 'heroicons-solid:view-boards',
+            element: <ManageEvents />
+        },
+        { 
+            label: 'Configuration', 
+            icon: 'flowbite:adjustments-horizontal-solid',
+            element: <ApprovalConfig approvalId={approvalId} />
+        }
     ];
 
     return (
         <Dashboard menuItems={menuItems} additionalClass='oie-dash' logo={eventsLogo}>
-            <Dash name={approvalId} />
-            <EventsCalendar />
-            <ManageEvents />
-            <ApprovalConfig approvalId={approvalId} />
         </Dashboard>
     )
 }

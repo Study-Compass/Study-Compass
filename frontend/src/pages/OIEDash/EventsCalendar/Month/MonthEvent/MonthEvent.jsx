@@ -72,6 +72,8 @@ function MonthEvent({ event }) {
             return '#D6D6D6';
         } else if(event.type === 'sports'){
             return '#D3E8CF';
+        } else if(event.type === 'arts'){
+            return '#FBEBBB';
         } else {
             return '#FBD8D6';
         }
@@ -86,6 +88,8 @@ function MonthEvent({ event }) {
             return '#5C5C5C';
         } else if(event.type === 'sports'){
             return '#6EB25F';
+        } else if(event.type === 'arts'){
+            return '#FBBC05';
         } else {
             return 'rgba(250, 117, 109, 1)';
         }

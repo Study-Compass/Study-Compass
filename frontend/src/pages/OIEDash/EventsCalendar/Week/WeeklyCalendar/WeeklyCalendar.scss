@@ -84,6 +84,7 @@
         border-left: none;
         position: relative;
         z-index: 5;
+        overflow-x: hidden;
 
         .day-name {
             margin: 0;
@@ -247,5 +248,29 @@
         width: 100%;
         height: 1px;
         background-color: var(--border-color);
+    }
+}
+
+@media (max-width: 768px) {
+    .oie-weekly-calendar-container{
+        .time-header{
+            width:45px;
+        }
+        .time-column{
+            width:45px;
+        }
+        .time-label{
+            font-size: 0.5em;
+        }
+        .day-header{
+            .current-day{
+
+            }
+        }
+        .calendar-body{
+            .days-container{
+                .day-column{}
+            }
+        }
     }
 }

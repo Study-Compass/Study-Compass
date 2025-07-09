@@ -9,16 +9,25 @@ import eventsLogo from '../../assets/Brand Image/EventsLogo.svg';
 
 function RootDash(){
     const menuItems = [
-        { label: 'Dashboard', icon: 'ic:round-dashboard' },
-        { label: 'Manage Flow', icon: 'fluent:flow-16-filled' },
-        { label: 'RSS Management', icon: 'mdi:rss' },
+        { 
+            label: 'Dashboard', 
+            icon: 'ic:round-dashboard',
+            element: <RootManagement/>
+        },
+        { 
+            label: 'Manage Flow', 
+            icon: 'fluent:flow-16-filled',
+            element: <ManageFlow/>
+        },
+        { 
+            label: 'RSS Management', 
+            icon: 'mdi:rss',
+            element: <RSSManagement/>
+        },
     ];
 
     return (
         <Dashboard menuItems={menuItems} additionalClass='root-dash' logo={eventsLogo}>
-            <RootManagement/>
-            <ManageFlow/>
-            <RSSManagement/>
         </Dashboard>
     )
 }

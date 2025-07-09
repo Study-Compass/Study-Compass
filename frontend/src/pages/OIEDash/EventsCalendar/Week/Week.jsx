@@ -35,36 +35,75 @@ function Week({ height, changeToDay, start = new Date(new Date().setDate(new Dat
         });
     };
 
-    const url = `/get-events-by-range?start=${encodeURIComponent(startOfWeek.toISOString())}&end=${encodeURIComponent(endOfWeek.toISOString())}${filter ? `&filter=${encodeURIComponent(JSON.stringify(filter))}` : ''}`;
+    const handleKeyDown = (event, direction) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            if (direction === 'next') {
+                updateWeek(7);
+            } else {
+                updateWeek(-7);
+            }
+        }
+    };
+
+    const url = `/get-events-by-range?start=${encodeURIComponent(startOfWeek.toISOString())}&end=${encodeURIComponent(endOfWeek.toISOString())}${filter ? `&filter=${JSON.stringify(filter)}` : ''}`;
     const events = useFetch(url);
 
-
+    const weekRangeText = `${formattedDate(startOfWeek)} to ${formattedDate(endOfWeek)}`;
 
     return (
         <>  
             {
                 nav || startingText || showSwitch ?
-                <div className="weekly-header">
+                <header className="weekly-header">
                 <div className="time-period">
                     {nav &&
-                        <div className="arrows">
-                            <div className="left-arrow" onClick={() => updateWeek(-7)}>
-                                <Icon icon="charm:chevron-left" />
-                            </div>
-                            <div className="right-arrow" onClick={() => updateWeek(7)}>
-                                <Icon icon="charm:chevron-right" />
-                            </div>  
+                        <div className="arrows" role="group" aria-label="Week navigation">
+                            <button 
+                                className="left-arrow" 
+                                onClick={() => updateWeek(-7)}
+                                onKeyDown={(e) => handleKeyDown(e, 'prev')}
+                                aria-label={`Previous week, ${formattedDate(new Date(startOfWeek.getTime() - 7 * 24 * 60 * 60 * 1000))} to ${formattedDate(new Date(startOfWeek.getTime() - 24 * 60 * 60 * 1000))}`}
+                                type="button"
+                            >
+                                <Icon icon="charm:chevron-left" aria-hidden="true" />
+                            </button>
+                            <button 
+                                className="right-arrow" 
+                                onClick={() => updateWeek(7)}
+                                onKeyDown={(e) => handleKeyDown(e, 'next')}
+                                aria-label={`Next week, ${formattedDate(new Date(endOfWeek.getTime() + 24 * 60 * 60 * 1000))} to ${formattedDate(new Date(endOfWeek.getTime() + 7 * 24 * 60 * 60 * 1000))}`}
+                                type="button"
+                            >
+                                <Icon icon="charm:chevron-right" aria-hidden="true" />
+                            </button>  
                         </div>
                     }
-                    <h3>{startingText}{nav && `${formattedDate(startOfWeek)} to ${formattedDate(endOfWeek)}`}</h3>
+                    <h3 id="week-range-display">
+                        {startingText}{nav && weekRangeText}
+                    </h3>
                 </div>
-                {showSwitch && <Switch options={["month", "week", "day"]} onChange={setView} selectedPass={view} setSelectedPass={setView}/>}
-            </div>
+                {showSwitch && (
+                    <Switch 
+                        options={["month", "week", "day"]} 
+                        onChange={setView} 
+                        selectedPass={view} 
+                        setSelectedPass={setView}
+                        ariaLabel="Calendar view options"
+                    />
+                )}
+            </header>
 
                 :
                 null
             }
-            <div className="week" style={{ height: `${height}` }}>
+            <div 
+                className="week" 
+                style={{ height: `${height}` }}
+                role="region"
+                aria-labelledby="week-range-display"
+                aria-label={`Week view from ${weekRangeText}`}
+            >
                 <WeeklyCalendar 
                     events={events.data ? events.data.events : []} 
                     startOfWeek={startOfWeek} 

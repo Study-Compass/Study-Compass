@@ -5,16 +5,20 @@
     justify-content: space-between;
     height:44px;
     width:100%;
-    align-items: center;
+    align-items: flex-start;
     .time-period{
         display: flex;
         gap:10px;
+        // align-items: center;
         h3{
             -webkit-user-select: none;
             -moz-user-select: none;
             -ms-user-select: none;
             user-select: none;
             font-size:17px;
+            font-family: 'Satoshi', sans-serif;
+            color: var(--text);
+            margin-top:5px;
         }
     }
 

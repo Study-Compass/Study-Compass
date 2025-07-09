@@ -10,6 +10,7 @@ import Dash from './Dash/Dash';
 import Members from './Members/Members';
 import Roles from './Roles/Roles';
 import Testing from './Testing/Testing';
+import Settings from './OrgSettings/OrgSettings';
 import {useFetch} from '../../hooks/useFetch';
 import { use } from 'react';
 import OrgDropdown from './OrgDropdown/OrgDropdown';
@@ -49,19 +50,7 @@ function ClubDash(){
     },[orgData]);
 
     // Base menu items - will be filtered based on permissions
-    const baseMenuItems = [
-        { label: 'Dashboard', icon: 'ic:round-dashboard', key: 'dash' },
-        { label: 'Events', icon: 'mingcute:calendar-fill', key: 'events',  },
-        { label: 'Members', icon: 'mdi:account-group', key: 'members', requiresPermission: 'canManageMembers' },
-        { label: 'Roles', icon: 'mdi:shield-account', key: 'roles', requiresPermission: 'canManageRoles' },
-        { label: 'Testing', icon: 'mdi:test-tube', key: 'testing' },
-    ];
 
-    // Filter menu items based on user permissions
-    const menuItems = baseMenuItems.filter(item => {
-        if (!item.requiresPermission) return true;
-        return userPermissions[item.requiresPermission];
-    });
 
     useEffect(()=>{
         if(isAuthenticating){
@@ -184,7 +173,7 @@ function ClubDash(){
         }
     }
 
-    const openMembers = () =>{
+    function openMembers  (){
         setCurrentPage('members');
     }
 
@@ -192,25 +181,65 @@ function ClubDash(){
         const newPath = `/club-dashboard/${org.org_name}`;
         navigate(newPath);
     }
+
+    const baseMenuItems = [
+        { 
+            label: 'Dashboard', 
+            icon: 'ic:round-dashboard', 
+            key: 'dash',
+            element: <Dash expandedClass={expandedClass} openMembers={openMembers} clubName={clubId} meetings={meetings.data} org={orgData.data}/>
+        },
+        { 
+            label: 'Events', 
+            icon: 'mingcute:calendar-fill', 
+            key: 'events',
+            element: <EventsPanel expandedClass={expandedClass} orgId={orgData.data?.org?.overview?._id}/>
+        },
+        { 
+            label: 'Members', 
+            icon: 'mdi:account-group', 
+            key: 'members', 
+            requiresPermission: 'canManageMembers',
+            element: <Members expandedClass={expandedClass} org={orgData.data?.org?.overview}/>
+        },
+        { 
+            label: 'Roles', 
+            icon: 'mdi:shield-account', 
+            key: 'roles', 
+            requiresPermission: 'canManageRoles',
+            element: <Roles expandedClass={expandedClass} org={orgData.data?.org?.overview}/>
+        },
+        { 
+            label: 'Settings', 
+            icon: 'mdi:cog', 
+            key: 'settings',
+            element: <Settings expandedClass={expandedClass} org={orgData.data?.org?.overview}/>
+        },
+        { 
+            label: 'Testing', 
+            icon: 'mdi:test-tube', 
+            key: 'testing',
+            element: <Testing expandedClass={expandedClass} org={orgData.data?.org?.overview}/>
+        },
+    ];
+    // Filter menu items based on user permissions
+    const menuItems = baseMenuItems.filter(item => {
+        if (!item.requiresPermission) return true;
+        return userPermissions[item.requiresPermission];
+    });
+
     
 
     if(orgData.loading){
         return (
-            <Dashboard menuItems={menuItems} additionalClass='club-dash' middleItem={<OrgDropdown showDrop={showDrop} setShowDrop={setShowDrop} user={user} currentOrgName={clubId} onOrgChange={onOrgChange}/>} logo={orgLogo} secondaryColor="#EDF6EE" primaryColor="#4DAA57">
-                <div className="loading-container"></div>
-                <div className="loading-container"></div>
-                <div className="loading-container"></div>
-            </Dashboard>
+            <div></div>
         );
     }
 
+    
+
     return (
         <Dashboard menuItems={menuItems} additionalClass='club-dash' middleItem={<OrgDropdown showDrop={showDrop} setShowDrop={setShowDrop} user={user} currentOrgName={clubId} onOrgChange={onOrgChange}/>} logo={orgLogo} secondaryColor="#EDF6EE" primaryColor="#4DAA57">
-            <Dash expandedClass={expandedClass} openMembers={openMembers} clubName={clubId} meetings={meetings.data} org={orgData.data}/> 
-            <EventsPanel expandedClass={expandedClass} orgId={orgData.data.org.overview._id}/>
-            <Members expandedClass={expandedClass} org={orgData.data.org.overview}/>
-            <Roles expandedClass={expandedClass} org={orgData.data.org.overview}/>
-            <Testing expandedClass={expandedClass} org={orgData.data.org.overview}/>
         </Dashboard>
     )
 }

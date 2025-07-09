@@ -13,9 +13,21 @@ import eventsLogo from '../../assets/Brand Image/EventsLogo.svg';
 function EventsDash({  }){
     const [showLoading, setShowLoading] = useState(false);
     const menuItems = [
-        { label: 'Explore', icon: 'mingcute:compass-fill' },
-        { label: 'My Events', icon: 'mingcute:calendar-fill' },
-        { label: 'Organizations',  icon: 'mingcute:calendar-fill' }
+        { 
+            label: 'Explore', 
+            icon: 'mingcute:compass-fill',
+            element: <Explore />
+        },
+        // { 
+        //     label: 'My Events', 
+        //     icon: 'mingcute:calendar-fill',
+        //     element: <MyEvents />
+        // },
+        // { 
+        //     label: 'Organizations',  
+        //     icon: 'mingcute:calendar-fill',
+        //     element: <Orgs/>
+        // }
     ];
 
     useEffect(() => {
@@ -29,17 +41,19 @@ function EventsDash({  }){
     return (
         <>
             {showLoading && (
-                <div className="loading-overlay">
+                <div 
+                    className="loading-overlay" 
+                    role="status" 
+                    aria-live="polite" 
+                    aria-label="Loading events dashboard"
+                >
                     <div className="loader-container">
                         <Loader />
-                        <div className="loading-bar"/>
+                        <div className="loading-bar" aria-hidden="true"/>
                     </div>
                 </div>
             )}
             <Dashboard menuItems={menuItems} additionalClass='events-dash' logo={eventsLogo}>
-                <Explore />
-                <MyEvents />
-                <Orgs/>
             </Dashboard>
         </>
     )
