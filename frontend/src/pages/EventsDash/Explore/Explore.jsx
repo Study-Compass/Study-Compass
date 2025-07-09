@@ -14,6 +14,15 @@ import useAuth from '../../../hooks/useAuth';
 import postRequest from '../../../utils/postRequest';
 import { useNotification } from '../../../NotificationContext';
 import Loader from '../../../components/Loader/Loader';
+import eventsLogo from '../../../assets/Brand Image/EventsLogo.svg';
+import exploreBackgroundGradient from '../../../assets/Gradients/ExploreBackgroundGradient.png';
+
+const getSunday = () => {
+    const today = new Date();
+    const day = today.getDay();
+    const diff = today.getDate() - day;
+    return new Date(today.setDate(diff));
+}
 
 function Explore(){
     const {user} = useAuth();
@@ -29,6 +38,17 @@ function Explore(){
     const [view, setView] = useState(0);
     const [viewType, setViewType] = useState(0);
     const [selectedDate, setSelectedDate] = useState(new Date());
+
+    const [width, setWidth] = useState(window.innerWidth);
+    useEffect(() => { //useEffect for window resizing
+        function handleResize() {
+          setWidth(window.innerWidth);
+        }
+        window.addEventListener('resize', handleResize);
+  
+  
+        return () => window.removeEventListener('resize', handleResize);
+      }, []);
 
     // Define our available filter options.
     const filterOptions = {
@@ -65,9 +85,9 @@ function Explore(){
 
     // Build the filter query param as a JSON string
     const apiFilters = buildApiFilters();
-    const filterParam = encodeURIComponent(JSON.stringify(apiFilters));
+    const filterParam = apiFilters;
 
-    const { data, loading, error } = useFetch(`/get-future-events?roles=${roles}&page=${page}&limit=${limit}&filter=${filterParam}`);
+    const { data, loading, error } = useFetch(`/get-future-events?roles=${roles}&page=${page}&limit=${limit}&filter=${JSON.stringify(filterParam)}`);
 
     // Handle intersection observer for infinite scroll
     const lastEventElementRef = useCallback(node => {
@@ -141,6 +161,20 @@ function Explore(){
         });
     };
 
+    const changeView = (view) => {
+        if(view === 0){
+            //change to month
+
+        } else if(view === 1){
+            //change to week
+            setSelectedDate(getSunday());
+        } else if(view === 2){
+            //change to day
+            setSelectedDate(new Date());
+        }
+        setView(view);
+    }
+
     // Helper function to group events by date
     const groupEventsByDate = (events) => {
         if (!events) return [];
@@ -165,53 +199,103 @@ function Explore(){
         })).sort((a, b) => a.date - b.date);
     };
 
+
+
     const groupedEvents = groupEventsByDate(events);
 
     return(
-        <div className="explore">
-            <div className="heading">
+        <main className="explore" role="main" aria-label="Explore events">
+            <header className="heading">
                 <h1>Explore Events at </h1>
                 <img src={RPIlogo} alt="RPI Logo" />
-            </div>
+            </header>
             <div className="explore-content">
-                <div className="sidebar">
-                    <div className="sidebar-header">
-                        <img src={compass} alt="compass" />
-                        <h2>explore</h2>
-                    </div>
-                    <Switch
-                        options={['list', 'calendar']}
-                        selectedPass={viewType}
-                        setSelectedPass={setViewType}
-                        onChange={setViewType}
-                    />
-                    <FilterPanel 
-                        filterOptions={filterOptions}
-                        filters={filters}
-                        onFilterToggle={toggleFilter}
-                    />
-                    {
-                        user.roles.includes('admin') && (
-                            <button className='shift-events-forward' onClick={() => {
-                                postRequest('/shift-events-forward', {days: 7});
-                                addNotification('Events shifted forward successfully');
-                            }}>
-                                Shift Events Forward
-                            </button>
-                        )
-                    }
-                </div>
-                <div className="explore-events">
+                {
+                    width > 768 ? (
+                        <aside className="sidebar" role="complementary" aria-label="Event filters and view options">
+                            <div className="sidebar-header">
+                                <img src={compass} alt="Compass icon" />
+                                <h2>explore</h2>
+                            </div>
+                            <Switch
+                                options={['list', 'calendar']}
+                                selectedPass={viewType}
+                                setSelectedPass={setViewType}
+                                onChange={setViewType}
+                                ariaLabel="View type selection"
+                            />
+                            {
+                                viewType === 1 && (
+                                    <section className="legend" aria-labelledby="legend-header">
+                                        <div className="legend-header">
+                                            <p id="legend-header">color legend</p>
+                                        </div>
+                                        <div className="legend-content" role="list" aria-label="Event type color legend">
+                                            <div className="legend-item" role="listitem">
+                                                <div className="legend-item-color" style={{backgroundColor: 'rgba(250, 117, 109, 1)'}} aria-label="Campus event color"></div>
+                                                <p>campus</p>
+                                            </div>
+                                            <div className="legend-item" role="listitem">
+                                                <div className="legend-item-color" style={{backgroundColor: '#5C5C5C'}} aria-label="Alumni event color"></div>
+                                                <p>alumni</p>
+                                            </div>
+                                            <div className="legend-item" role="listitem">
+                                                <div className="legend-item-color" style={{backgroundColor: '#6EB25F'}} aria-label="Athletics event color"></div>
+                                                <p>athletics</p>
+                                            </div>
+                                            <div className="legend-item" role="listitem">
+                                                <div className="legend-item-color" style={{backgroundColor: '#FBEBBB'}} aria-label="Arts event color"></div>
+                                                <p>arts</p>
+                                            </div>
+                                        </div>
+                                    </section>
+
+                                )
+                            }
+                            <FilterPanel 
+                                filterOptions={filterOptions}
+                                filters={filters}
+                                onFilterToggle={toggleFilter}
+                            />
+                        </aside>
+                    )
+                    :
+                    (
+                        <aside className="sidebar mobile-sidebar" role="complementary" aria-label="Event filters and view options">
+                            <div className="sidebar-header">
+                                <div className="logo">
+                                    <img src={compass} alt="Compass icon" />
+                                    <h2>explore</h2>
+                                </div>
+                                <Switch
+                                    options={['list', 'calendar']}
+                                    selectedPass={viewType}
+                                    setSelectedPass={setViewType}
+                                    onChange={setViewType}
+                                    ariaLabel="View type selection"
+                                />
+                            </div>
+                            {/* <FilterPanel 
+                                filterOptions={filterOptions}
+                                filters={filters}
+                                onFilterToggle={toggleFilter}
+                            /> */}
+
+                        </aside>
+
+                    )
+                }
+                <section className="explore-events" role="region" aria-label="Events display">
                     {loading && page === 1 ? (
-                        <div className="loading">Loading events...</div>
+                        <div className="loading" role="status" aria-live="polite">Loading events...</div>
                     ) : error ? (
-                        <div className="error">Error loading events</div>
+                        <div className="error" role="alert">Error loading events</div>
                     ) : viewType === 0 ? (
                         events.length > 0 ? (
-                            <div className="events-list">
+                            <div className="events-list" role="list" aria-label="Events list">
                                 {groupedEvents.map(({ date, events }, groupIndex) => (
-                                    <div key={date.toISOString()} className="date-group">
-                                        <div className="date-separator">{formatDate(date)}</div>
+                                    <div key={date.toISOString()} className="date-group" role="group" aria-label={`Events on ${formatDate(date)}`}>
+                                        <div className="date-separator" role="heading" aria-level="2">{formatDate(date)}</div>
                                         {events.map((event, eventIndex) => {
                                             const isLastElement = groupIndex === groupedEvents.length - 1 && 
                                                                eventIndex === events.length - 1;
@@ -219,6 +303,7 @@ function Explore(){
                                                 <div 
                                                     key={`${event._id}-${eventIndex}`}
                                                     ref={isLastElement ? lastEventElementRef : null}
+                                                    role="listitem"
                                                 >
                                                     <Event event={event} />
                                                 </div>
@@ -228,13 +313,13 @@ function Explore(){
                                 ))}
                                 <Loader />
                                 {loading && page > 1 && (
-                                    <div ref={loadingRef} className="loading-more">
+                                    <div ref={loadingRef} className="loading-more" role="status" aria-live="polite">
                                         Loading more events...
                                     </div>
                                 )}
                             </div>
                         ) : (
-                            <div className="no-events">No events found</div>
+                            <div className="no-events" role="status">No events found</div>
                         )
                     ) : (
                         view === 0 ?
@@ -246,7 +331,7 @@ function Explore(){
                                 setView(1);
                             }} 
                             view={view} 
-                            setView={setView}
+                            setView={changeView}
                         />
                         : view === 1 ?
                         <Week 
@@ -258,7 +343,7 @@ function Explore(){
                                 setView(2);
                             }} 
                             view={view} 
-                            setView={setView}
+                            setView={changeView}
                         />
                         :
                         <Day 
@@ -266,12 +351,12 @@ function Explore(){
                             filter={filterParam} 
                             start={selectedDate}
                             view={view} 
-                            setView={setView}
+                            setView={changeView}
                         />
                     )}
-                </div>
+                </section>
             </div>
-        </div>
+        </main>
     )
 }
 

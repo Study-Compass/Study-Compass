@@ -19,7 +19,7 @@ function Month({ height, changeToWeek, filter, showSwitch = true, setView = () =
     const [month, setMonth] = useState(new Date().getMonth() + 1);
     const [year, setYear] = useState(2025);
     // const filterParam = encodeURIComponent(JSON.stringify(filter)); this caused some problems
-    const url = `/get-events-by-month?month=${month}&year=${year}&filter=${filter}`;
+    const url = `/get-events-by-month?month=${month}&year=${year}&filter=${JSON.stringify(filter)}`;
     const events = useFetch(url);
     
     const currentMonth = new Date().getMonth() + 1;
@@ -36,23 +36,62 @@ function Month({ height, changeToWeek, filter, showSwitch = true, setView = () =
         setYear(month === 1 ? year - 1 : year);
     }
 
+    const handleKeyDown = (event, direction) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            if (direction === 'next') {
+                nextMonth();
+            } else {
+                prevMonth();
+            }
+        }
+    }
+
+    const isCurrentMonth = month === currentMonth && year === currentYear;
+    const monthYearText = `${getMonthName(month)} ${year}`;
+
     return (
         <>
-            <div className="monthly-header">
+            <header className="monthly-header">
                 <div className="time-period">
-                    <div className="arrows">
-                        <div className="left-arrow" onClick={prevMonth}>
-                            <Icon icon="charm:chevron-left" /> 
-                        </div>
-                        <div className="right-arrow" onClick={nextMonth}>
-                            <Icon icon="charm:chevron-right" />
-                        </div>
+                    <div className="arrows" role="group" aria-label="Month navigation">
+                        <button 
+                            className="left-arrow" 
+                            onClick={prevMonth}
+                            onKeyDown={(e) => handleKeyDown(e, 'prev')}
+                            aria-label={`Previous month, ${month === 1 ? 'December' : getMonthName(month - 1)} ${month === 1 ? year - 1 : year}`}
+                            type="button"
+                        >
+                            <Icon icon="charm:chevron-left" aria-hidden="true" /> 
+                        </button>
+                        <button 
+                            className="right-arrow" 
+                            onClick={nextMonth}
+                            onKeyDown={(e) => handleKeyDown(e, 'next')}
+                            aria-label={`Next month, ${month === 12 ? 'January' : getMonthName(month + 1)} ${month === 12 ? year + 1 : year}`}
+                            type="button"
+                        >
+                            <Icon icon="charm:chevron-right" aria-hidden="true" />
+                        </button>
                     </div>
-                    <h1>{month === currentMonth && year === currentYear ? (<b>{getMonthName(month)}</b>): getMonthName(month)} {year}</h1>
+                    <h1 id="month-year-display">
+                        {isCurrentMonth ? (
+                            <strong>{getMonthName(month)}</strong>
+                        ) : (
+                            getMonthName(month)
+                        )} {year}
+                    </h1>
                 </div>
-                {showSwitch && <Switch options={["month", "week", "day"]} onChange={setView} selectedPass={view} setSelectedPass={setView}/>}
-
-            </div>
+                {showSwitch && (
+                    <Switch 
+                        options={["month", "week", "day"]} 
+                        onChange={setView} 
+                        selectedPass={view} 
+                        setSelectedPass={setView}
+                        ariaLabel="Calendar view options"
+                    />
+                )}
+            </header>
             <MonthDisplay 
                 month={month}
                 year={year}
@@ -62,6 +101,7 @@ function Month({ height, changeToWeek, filter, showSwitch = true, setView = () =
                 currentYear={currentYear}
                 currentDay={currentDay}
                 onWeekClick={changeToWeek}
+                monthYearText={monthYearText}
             />
         </>
     );

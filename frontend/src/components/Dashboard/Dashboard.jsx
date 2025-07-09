@@ -14,6 +14,17 @@ function Dashboard({ menuItems, children, additionalClass = '', middleItem=null,
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
 
+    const [width, setWidth] = useState(window.innerWidth);
+    useEffect(() => { //useEffect for window resizing
+        function handleResize() {
+          setWidth(window.innerWidth);
+        }
+        window.addEventListener('resize', handleResize);
+  
+  
+        return () => window.removeEventListener('resize', handleResize);
+      }, []);
+
     const {user} = useAuth();
 
     // Check if menuItems have elements or if we're using the old children pattern
@@ -153,6 +164,14 @@ function Dashboard({ menuItems, children, additionalClass = '', middleItem=null,
                 '--secondary-color': secondaryColor,
             }}
         >
+            {
+                width < 768 && 
+                (
+                    <div className="mobile-heading">
+                        <img src={logo} alt="Logo" />
+                    </div>
+                )
+            }
             <div className={`dash-left ${expanded ? "hidden" : ""}`}>
                 <div className="top">
                     <div className="logo">
@@ -183,15 +202,19 @@ function Dashboard({ menuItems, children, additionalClass = '', middleItem=null,
                     </nav>
                 </div>
                 <div className="bottom">
-                    <div className="user">
-                        <div className="avatar">
-                            <img src={user?.pfp || defaultAvatar} alt="User Avatar" />
+                    {
+                        user && (
+                        <div className="user">
+                            <div className="avatar">
+                                <img src={user?.pfp || defaultAvatar} alt="User Avatar" />
+                            </div>
+                            <div className="user-info">
+                                <p className="username">{user.name}</p>
+                                <p className="email">{user.email}</p>
+                            </div>
                         </div>
-                        <div className="user-info">
-                            <p className="username">{user.name}</p>
-                            <p className="email">{user.email}</p>
-                        </div>
-                    </div>
+                        )
+                    }
                     <div className="back" onClick={() => navigate('/room/none')}>
                         <Icon icon="ep:back" />
                         <p>Back to Study Compass</p>

@@ -346,6 +346,63 @@
 }
 
 
+@media (max-width: 1000px) {
+    .general-dash{
+        .dash-left{
+            width:150px;
+            .logo{
+                width:90%;
+            }
+            .nav{
+                ul{
+                    padding:0;
+                }
+            }
+        }
+    }
+}
+
+@media (max-width: 768px) {
+    .general-dash{
+        flex-direction: column;
+        .mobile-heading{
+            width:100%;
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            padding:10px 20px;
+            background-color: var(--background);
+            border-bottom: 1px solid var(--lighterborder);
+            img{
+                height:30px;
+            }
+        }
+        .dash-right{
+            width:100%;
+        }
+        .dash-left{
+            .logo{
+                width:80%;
+            }
+            .nav{
+                ul{
+                    padding:0;
+                }
+            }
+            width:220px;
+            position: fixed;
+            top:0;
+            left:0;
+            opacity: 0;
+            pointer-events:none;
+            height:100vh;
+            z-index: 100;
+            background-color: var(--background);
+            box-shadow: var(--shadow);
+        }
+    }
+}
+
 // /* Showing animation: width first, then opacity */
 @keyframes show {
     0% {

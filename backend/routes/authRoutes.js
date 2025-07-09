@@ -22,7 +22,7 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 const verificationCodes = new Map();
 
 
-const ACCESS_TOKEN_EXPIRY_MINUTES = 15;
+const ACCESS_TOKEN_EXPIRY_MINUTES = 1;
 const REFRESH_TOKEN_EXPIRY_DAYS = 30;
 // Token configuration
 const ACCESS_TOKEN_EXPIRY = `${ACCESS_TOKEN_EXPIRY_MINUTES}m`; // 1 minute
@@ -243,6 +243,9 @@ router.post('/refresh-token', async (req, res) => {
         // Check if refresh token exists in database
         const { User } = getModels(req, 'User');
         const user = await User.findById(decoded.userId);
+        console.log('🔄 Refresh token user:', user);
+        console.log('🔄 Refresh token refreshToken:', user.refreshToken);
+        console.log('🔄 Refresh token refreshToken:', refreshToken);    
         
         if (!user || user.refreshToken !== refreshToken) {
             console.log('POST: /refresh-token 401 refresh token not found in database or mismatch');

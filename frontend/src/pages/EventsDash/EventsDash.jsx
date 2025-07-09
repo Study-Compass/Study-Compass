@@ -18,16 +18,16 @@ function EventsDash({  }){
             icon: 'mingcute:compass-fill',
             element: <Explore />
         },
-        { 
-            label: 'My Events', 
-            icon: 'mingcute:calendar-fill',
-            element: <MyEvents />
-        },
-        { 
-            label: 'Organizations',  
-            icon: 'mingcute:calendar-fill',
-            element: <Orgs/>
-        }
+        // { 
+        //     label: 'My Events', 
+        //     icon: 'mingcute:calendar-fill',
+        //     element: <MyEvents />
+        // },
+        // { 
+        //     label: 'Organizations',  
+        //     icon: 'mingcute:calendar-fill',
+        //     element: <Orgs/>
+        // }
     ];
 
     useEffect(() => {
@@ -41,10 +41,15 @@ function EventsDash({  }){
     return (
         <>
             {showLoading && (
-                <div className="loading-overlay">
+                <div 
+                    className="loading-overlay" 
+                    role="status" 
+                    aria-live="polite" 
+                    aria-label="Loading events dashboard"
+                >
                     <div className="loader-container">
                         <Loader />
-                        <div className="loading-bar"/>
+                        <div className="loading-bar" aria-hidden="true"/>
                     </div>
                 </div>
             )}
