@@ -4,8 +4,12 @@ import { Icon } from '@iconify-icon/react';
 import { useNotification } from '../../../NotificationContext';
 import useAuth from '../../../hooks/useAuth';
 import apiRequest from '../../../utils/postRequest';
-import ImageUpload from '../../../components/ImageUpload/ImageUpload';
-import RoleManager from '../../../components/RoleManager';
+import { 
+    GeneralSettings, 
+    AppearanceSettings, 
+    RolesSettings, 
+    DangerZone 
+} from './components';
 import OrgGrad from '../../../assets/Gradients/OrgGrad.png';
 
 function Settings({ expandedClass, org }) {
@@ -273,149 +277,40 @@ function Settings({ expandedClass, org }) {
 
                     <div className="settings-content">
                         {activeSection === 'general' && (
-                            <div className="settings-section">
-                                <h2>General Settings</h2>
-                                <p>Manage basic organization information</p>
-
-                                <div className="form-group">
-                                    <label htmlFor="org_name">Organization Name</label>
-                                    <input
-                                        type="text"
-                                        id="org_name"
-                                        name="org_name"
-                                        value={formData.org_name}
-                                        onChange={handleInputChange}
-                                        disabled={!canManageSettings}
-                                        placeholder="Enter organization name"
-                                    />
-                                </div>
-
-                                <div className="form-group">
-                                    <label htmlFor="org_description">Description</label>
-                                    <textarea
-                                        id="org_description"
-                                        name="org_description"
-                                        value={formData.org_description}
-                                        onChange={handleInputChange}
-                                        disabled={!canManageSettings}
-                                        placeholder="Describe your organization"
-                                        rows={4}
-                                        maxLength={500}
-                                    />
-                                    <span className="char-count">{formData.org_description.length}/500</span>
-                                </div>
-
-                                <div className="form-group">
-                                    <label htmlFor="weekly_meeting">Weekly Meeting Time</label>
-                                    <input
-                                        type="text"
-                                        id="weekly_meeting"
-                                        name="weekly_meeting"
-                                        value={formData.weekly_meeting}
-                                        onChange={handleInputChange}
-                                        disabled={!canManageSettings}
-                                        placeholder="e.g., Every Monday at 6 PM"
-                                    />
-                                </div>
-
-                                {canManageSettings && (
-                                    <button 
-                                        className="save-button" 
-                                        onClick={handleSave}
-                                        disabled={saving}
-                                    >
-                                        {saving ? 'Saving...' : 'Save Changes'}
-                                    </button>
-                                )}
-                            </div>
+                            <GeneralSettings
+                                formData={formData}
+                                handleInputChange={handleInputChange}
+                                canManageSettings={canManageSettings}
+                                handleSave={handleSave}
+                                saving={saving}
+                            />
                         )}
 
                         {activeSection === 'appearance' && (
-                            <div className="settings-section">
-                                <h2>Appearance</h2>
-                                <p>Customize your organization's visual identity</p>
-
-                                <div className="form-group">
-                                    <label>Profile Picture</label>
-                                    <div className="current-image">
-                                        <img 
-                                            src={imagePreview || '/Logo.svg'} 
-                                            alt="Organization profile" 
-                                        />
-                                    </div>
-                                    <ImageUpload
-                                        onFileSelect={handleFileSelect}
-                                        uploadText="Upload new profile picture"
-                                        maxSize={5}
-                                        showPrompt={true}
-                                    />
-                                </div>
-
-                                {canManageSettings && (
-                                    <button 
-                                        className="save-button" 
-                                        onClick={handleSave}
-                                        disabled={saving}
-                                    >
-                                        {saving ? 'Saving...' : 'Save Changes'}
-                                    </button>
-                                )}
-                            </div>
+                            <AppearanceSettings
+                                imagePreview={imagePreview}
+                                handleFileSelect={handleFileSelect}
+                                canManageSettings={canManageSettings}
+                                handleSave={handleSave}
+                                saving={saving}
+                            />
                         )}
 
                         {activeSection === 'roles' && (
-                            <div className="settings-section">
-                                <h2>Roles & Permissions</h2>
-                                <p>Manage roles and permissions for organization members</p>
-
-                                {!canManageSettings && (
-                                    <div className="permission-warning">
-                                        <p>You don't have permission to manage roles in this organization.</p>
-                                        <p>Only organization owners and users with role management permissions can modify roles.</p>
-                                    </div>
-                                )}
-
-                                <div className="role-manager-container">
-                                    <RoleManager 
-                                        roles={formData.positions}
-                                        onRolesChange={handleRolesChange}
-                                        isEditable={canManageSettings}
-                                    />
-                                </div>
-
-                                {canManageSettings && (
-                                    <button 
-                                        className="save-button" 
-                                        onClick={handleSave}
-                                        disabled={saving}
-                                    >
-                                        {saving ? 'Saving...' : 'Save Changes'}
-                                    </button>
-                                )}
-                            </div>
+                            <RolesSettings
+                                formData={formData}
+                                handleRolesChange={handleRolesChange}
+                                canManageSettings={canManageSettings}
+                                handleSave={handleSave}
+                                saving={saving}
+                            />
                         )}
 
                         {activeSection === 'danger' && (
-                            <div className="settings-section">
-                                <h2>Danger Zone</h2>
-                                <p>Irreversible and destructive actions</p>
-
-                                <div className="danger-zone">
-                                    <div className="danger-item">
-                                        <div className="danger-content">
-                                            <h3>Delete Organization</h3>
-                                            <p>Permanently delete this organization and all its data. This action cannot be undone.</p>
-                                        </div>
-                                        <button 
-                                            className="delete-button"
-                                            onClick={handleDeleteOrg}
-                                            disabled={!canManageSettings}
-                                        >
-                                            Delete Organization
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
+                            <DangerZone
+                                handleDeleteOrg={handleDeleteOrg}
+                                canManageSettings={canManageSettings}
+                            />
                         )}
                     </div>
                 </div>
