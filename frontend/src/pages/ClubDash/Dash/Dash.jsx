@@ -33,8 +33,11 @@ function Dash({ expandedClass, openMembers, clubName, meetings, org}) {
 
     useEffect(() => {
         if (weeklyRef.current) {
-            const height = weeklyRef.current.clientHeight;
-            setHeight(height);
+            setTimeout(() => {
+                const height = weeklyRef?.current?.clientHeight;
+                setHeight(height);
+                console.log(height);
+            }, 100);
         }
     }, []);
 

@@ -3,7 +3,7 @@ import './OIEEvent.scss';
 import { Icon } from '@iconify-icon/react/dist/iconify.mjs';
 import defaultAvatar from '../../../../assets/defaultAvatar.svg';
 
-function OIEEventSkeleton({ index, showExpand = true, manage = false, showHosting = true, extraInfo }) {
+function OIEEventSkeleton({ index, showExpand = true, manage = false, showHosting = true, extraInfo, loading = true }) {
     // Hardcoded values for loading state
     const skeletonEvent = {
         name: "Loading Event Name...",
@@ -36,7 +36,7 @@ function OIEEventSkeleton({ index, showExpand = true, manage = false, showHostin
     }
 
     return(
-        <div className="oie-event-component skeleton" style={index ? {animationDelay: `${index * 0.1}s`}:{}}>
+        <div className={`oie-event-component skeleton ${loading ? '' : 'invisible'}`} style={{animationDelay: index ? `${index * 0.1}s` : '0s'}}>
             <div className="info">
                 {extraInfo && extraInfo}
                 <h2>{skeletonEvent.name}</h2>

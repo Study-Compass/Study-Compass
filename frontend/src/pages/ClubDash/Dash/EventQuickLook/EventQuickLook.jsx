@@ -6,6 +6,28 @@ import { useState } from "react";
 import { useFetch } from "../../../../hooks/useFetch";
 import './EventQuickLook.scss';
 
+function timeUntil(date) {
+    const now = new Date();
+    const diffMs = date - now;
+  
+    if (diffMs <= 0) {
+      return "now";
+    }
+  
+    const diffMinutes = Math.floor(diffMs / (1000 * 60));
+    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+  
+    if (diffMinutes < 60) {
+      return `${diffMinutes} min${diffMinutes !== 1 ? 's' : ''}`;
+    } else if (diffHours < 24) {
+      return `${diffHours} hr${diffHours !== 1 ? 's' : ''}`;
+    } else {
+      return `${diffDays} day${diffDays !== 1 ? 's' : ''}`;
+    }
+  }
+  
+
 const EventQuickLook = ({org}) => {
     const [selectedTab, setSelectedTab] = useState("upcoming");
     const upcomingEvents = useFetch(`/get-my-events?orgId=${org.org.overview._id}&type=future&sort=asc&limit=5`);
@@ -31,7 +53,7 @@ const EventQuickLook = ({org}) => {
                                     <p className="live-event-info-text">Stats</p>
                                 </div>
                                 <div>
-                                    <p className="time-until">In 12 hrs</p>
+                                    <p className="time-until">In {timeUntil(new Date(event.start_time))}</p>
                                     <p className="rsvps">10 rsvps</p>
                                 </div>
                             </div>
@@ -39,15 +61,19 @@ const EventQuickLook = ({org}) => {
                     ))
                 }
                 { 
-                    upcomingEvents.loading || upcomingEvents.data.events.length === 0 &&
-                    <OIEEventSkeleton showHosting={true} extraInfo={
-                        <div className="row live-event-info">
-                            <div>
-                                <PulseDot color="var(--green)" size="8px" pulse={true} />
-                                <p className="live-event-info-text">Stats</p>
+                    upcomingEvents.loading || !upcomingEvents.data || upcomingEvents.data.events.length === 0 &&
+                    <OIEEventSkeleton 
+                        howHosting={true} 
+                        extraInfo={
+                            <div className="row live-event-info">
+                                <div>
+                                    <PulseDot color="var(--green)" size="8px" pulse={true} />
+                                    <p className="live-event-info-text">Stats</p>
+                                </div>
                             </div>
-                        </div>
-                    } />
+                        } 
+                        loading={upcomingEvents.loading}
+                    />
                 }
             </div>
         </HeaderContainer>

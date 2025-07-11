@@ -80,8 +80,10 @@
             color: var(--org-primary);
             font-size: 12px;
             font-weight: 600;
+            text-wrap: nowrap;
         }
         p.time-until{
+            text-wrap: nowrap;
             width:fit-content;
             background-color: var(--red-transparent);
             padding: 2px 10px;
