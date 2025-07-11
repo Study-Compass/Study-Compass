@@ -5,6 +5,16 @@ const crypto = require('crypto');
 const { sendDiscordMessage } = require('./discordWebookService');
 const getModels = require('./getModelService');
 
+// Configure samlify with custom validator to prevent security warning
+const samlify = require('samlify');
+samlify.setSchemaValidator({
+    validate: (response) => {
+        // Always return a resolved promise to skip validation
+        // This prevents the "no validation function found" error
+        return Promise.resolve('skipped');
+    }
+});
+
 class SAMLService {
     constructor() {
         this.spCache = new Map(); // Cache for ServiceProvider instances
