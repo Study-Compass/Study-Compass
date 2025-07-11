@@ -138,22 +138,39 @@ class SAMLService {
      * Process SAML response and authenticate user
      */
     async processResponse(school, samlResponse, req) {
+        console.log('🔧 SAML Service: Processing response...');
+        console.log(`   School: ${school}`);
+        console.log(`   Response length: ${samlResponse.length}`);
+        
         const sp = await this.getServiceProvider(school, req);
         const idp = await this.getIdentityProvider(school, req);
 
+        console.log('🔧 SAML Service: Got SP and IdP instances');
+
         try {
+            console.log('🔧 SAML Service: Parsing login response...');
             const { extract } = await sp.parseLoginResponse(idp, 'post', { SAMLResponse: samlResponse });
             
+            console.log('🔧 SAML Service: Response parsed successfully');
+            console.log(`   Extract success: ${extract.success}`);
+            console.log(`   Extract nameID: ${extract.nameID}`);
+            console.log(`   Extract attributes:`, extract.attributes);
+            
             if (!extract.success) {
+                console.log('❌ SAML Service: Authentication failed - extract.success is false');
                 throw new Error('SAML authentication failed');
             }
 
             const attributes = extract.attributes;
             const nameId = extract.nameID;
             
-            return await this.authenticateUser(school, nameId, attributes, req);
+            console.log('🔧 SAML Service: Authenticating user...');
+            const result = await this.authenticateUser(school, nameId, attributes, req);
+            console.log('✅ SAML Service: User authenticated successfully');
+            return result;
         } catch (error) {
-            console.error('SAML response processing error:', error);
+            console.error('❌ SAML Service: Response processing error:', error);
+            console.error('   Error stack:', error.stack);
             throw new Error('Invalid SAML response');
         }
     }
@@ -162,16 +179,25 @@ class SAMLService {
      * Authenticate or create user from SAML attributes
      */
     async authenticateUser(school, nameId, attributes, req) {
+        console.log('🔧 SAML Service: Authenticating user...');
+        console.log(`   School: ${school}`);
+        console.log(`   NameID: ${nameId}`);
+        console.log(`   Raw attributes:`, attributes);
+        
         const { User } = getModels(req, 'User');
         const { SAMLConfig } = getModels(req, 'SAMLConfig');
         
         const config = await SAMLConfig.getActiveConfig(school);
         if (!config) {
+            console.log('❌ SAML Service: No active SAML configuration found');
             throw new Error('SAML configuration not found');
         }
 
+        console.log('🔧 SAML Service: Got SAML configuration');
+
         // Map SAML attributes to user fields
         const mappedAttributes = this.mapAttributes(attributes, config.attributeMapping);
+        console.log('🔧 SAML Service: Mapped attributes:', mappedAttributes);
         
         // Find existing user by SAML ID or email
         let user = await User.findOne({
@@ -181,18 +207,26 @@ class SAMLService {
             ]
         }).select('-password -refreshToken').lean().populate('clubAssociations');
 
+        console.log('🔧 SAML Service: User lookup result:', user ? `Found user ${user.username}` : 'No existing user found');
+
         if (!user && config.userProvisioning.autoCreateUsers) {
+            console.log('🔧 SAML Service: Creating new user...');
             // Create new user
             user = await this.createUserFromSAML(school, nameId, mappedAttributes, config, req);
+            console.log('✅ SAML Service: New user created:', user.username);
         } else if (user && config.userProvisioning.autoUpdateUsers) {
+            console.log('🔧 SAML Service: Updating existing user...');
             // Update existing user with latest SAML attributes
             user = await this.updateUserFromSAML(user._id, mappedAttributes, config, req);
+            console.log('✅ SAML Service: User updated:', user.username);
         }
 
         if (!user) {
+            console.log('❌ SAML Service: User authentication failed - no user found or created');
             throw new Error('User authentication failed');
         }
 
+        console.log('✅ SAML Service: User authentication successful:', user.username);
         return { user };
     }
 
