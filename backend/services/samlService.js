@@ -242,6 +242,7 @@ class SAMLService {
                 { email: mappedAttributes.email }
             ]
         }).select('-password -refreshToken').lean().populate('clubAssociations');
+        
 
         console.log('🔧 SAML Service: User lookup result:', user ? `Found user ${user.username}` : 'No existing user found');
 
