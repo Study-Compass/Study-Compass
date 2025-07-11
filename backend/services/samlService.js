@@ -109,10 +109,9 @@ class SAMLService {
                 Binding: 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect',
                 Location: config.idp.sloUrl
             }] : undefined,
-            // Temporarily disable certificate verification for testing
-            // TODO: Update with correct IdP certificate
-            // signingCert: idpCerts[0],
-            // encryptCert: idpCerts[0]
+            // Configure IdP certificates for signature verification
+            signingCert: idpCerts[0],
+            encryptCert: idpCerts[0]
         });
 
         this.idpCache.set(school, idp);
@@ -179,29 +178,21 @@ class SAMLService {
             const mockRequest = { body: responseData };
             console.log('🔧 SAML Service: Mock request body keys:', Object.keys(mockRequest.body));
             
-            // Try parsing with signature verification completely disabled
+            // Parse the SAML response with proper signature verification
             let extract;
             try {
-                console.log('🔧 SAML Service: Trying with signature verification disabled...');
+                console.log('🔧 SAML Service: Parsing SAML response with signature verification...');
+                const response = await sp.parseLoginResponse(idp, 'post', mockRequest);
+                extract = response.extract;
+            } catch (parseError) {
+                console.log('🔧 SAML Service: Standard parsing failed, trying with relaxed options...');
+                console.log('   Parse error:', parseError.message);
+                
+                // Try with relaxed signature verification
                 const response = await sp.parseLoginResponse(idp, 'post', mockRequest, {
-                    skipSignatureVerification: true,
-                    ignoreSignature: true,
-                    validateSignature: false,
                     allowUnencryptedAssertion: true
                 });
                 extract = response.extract;
-            } catch (parseError) {
-                console.log('🔧 SAML Service: Signature verification disabled failed, trying raw parsing...');
-                console.log('   Parse error:', parseError.message);
-                
-                // Try to manually decode the SAML response to see what's in it
-                const Buffer = require('buffer').Buffer;
-                const decodedResponse = Buffer.from(samlResponse, 'base64').toString('utf8');
-                console.log('🔧 SAML Service: Decoded response preview:', decodedResponse.substring(0, 500));
-                
-                // Try a different approach - use the raw response
-                const rawResponse = await sp.parseLoginResponse(idp, 'post', mockRequest);
-                extract = rawResponse.extract;
             }
             
             console.log('🔧 SAML Service: Response parsed successfully');
