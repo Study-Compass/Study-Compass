@@ -46,6 +46,7 @@ if (process.env.NODE_ENV === 'production') {
 
 // Other middleware
 app.use(express.json());
+app.use(express.urlencoded({ extended: true })); // Add this for form-encoded data
 app.use(cookieParser());
 
 // if (process.env.NODE_ENV === 'production') {
