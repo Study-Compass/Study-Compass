@@ -179,11 +179,24 @@ class SAMLService {
             const mockRequest = { body: responseData };
             console.log('🔧 SAML Service: Mock request body keys:', Object.keys(mockRequest.body));
             
-            // Try parsing with signature verification disabled first
-            const { extract } = await sp.parseLoginResponse(idp, 'post', mockRequest, {
-                skipSignatureVerification: true,
-                ignoreSignature: true
-            });
+            // Try parsing with raw response first
+            let extract;
+            try {
+                console.log('🔧 SAML Service: Trying raw response parsing...');
+                extract = await sp.parseLoginResponse(idp, 'post', mockRequest, {
+                    skipSignatureVerification: true,
+                    ignoreSignature: true,
+                    validateSignature: false,
+                    allowUnencryptedAssertion: true
+                });
+            } catch (parseError) {
+                console.log('🔧 SAML Service: Raw parsing failed, trying alternative method...');
+                console.log('   Parse error:', parseError.message);
+                
+                // Try alternative parsing method
+                const response = await sp.parseLoginResponse(idp, 'post', mockRequest);
+                extract = response.extract;
+            }
             
             console.log('🔧 SAML Service: Response parsed successfully');
             console.log(`   Extract success: ${extract.success}`);
