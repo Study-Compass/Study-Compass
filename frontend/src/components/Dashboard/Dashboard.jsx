@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import defaultAvatar from '../../assets/defaultAvatar.svg';
 import useAuth from '../../hooks/useAuth';
@@ -11,9 +11,15 @@ function Dashboard({ menuItems, children, additionalClass = '', middleItem=null,
     const [currentDisplay, setCurrentDisplay] = useState(0);
     const [navigationStack, setNavigationStack] = useState([]);
     const [currentSubItems, setCurrentSubItems] = useState(null);
+    const [isTransitioning, setIsTransitioning] = useState(false);
+    const [contentOpacity, setContentOpacity] = useState(1);
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
-
+    const [transitionDirection, setTransitionDirection] = useState('right');
+    const [showBackButton, setShowBackButton] = useState(false);
+    const [pendingNavigation, setPendingNavigation] = useState(null);
+    const [fakeMenuData, setFakeMenuData] = useState(null);
+    
     const [width, setWidth] = useState(window.innerWidth);
     useEffect(() => { //useEffect for window resizing
         function handleResize() {
@@ -33,10 +39,52 @@ function Dashboard({ menuItems, children, additionalClass = '', middleItem=null,
     useEffect(() => {
         // Get the page from URL parameters, default to 0 if not specified
         const page = parseInt(searchParams.get('page') || '0');
-        if (page >= 0 && page < menuItems.length) {
+        const sub = searchParams.get('sub');
+        
+        if (sub !== null) {
+            // We're in a sub-menu context
+            const subIndex = parseInt(sub);
+            if (subIndex >= 0) {
+                setCurrentDisplay(subIndex);
+            }
+        } else if (page >= 0 && page < menuItems.length) {
+            // We're in the main menu
             setCurrentDisplay(page);
         }
     }, [searchParams, menuItems.length]);
+
+    // Handle pending navigation after animation completes
+    useEffect(() => {
+        if (pendingNavigation && !isTransitioning) {
+            const { action, data } = pendingNavigation;
+            
+            if (action === 'subItemClick') {
+                setNavigationStack(prev => [...prev, { 
+                    parentIndex: data.parentIndex, 
+                    subIndex: 0, 
+                    items: data.subItems,
+                    parentLabel: menuItems[data.parentIndex].label 
+                }]);
+                setCurrentSubItems(data.subItems);
+                setCurrentDisplay(0);
+                navigate(`?page=${data.parentIndex}&sub=0`, { replace: true });
+            } else if (action === 'backToMain') {
+                setNavigationStack([]);
+                setCurrentSubItems(null);
+                setCurrentDisplay(0);
+                navigate(`?page=0`, { replace: true });
+            } else if (action === 'backStep') {
+                const newStack = [...navigationStack];
+                newStack.pop();
+                setNavigationStack(newStack);
+                setCurrentSubItems(newStack[newStack.length - 1].items);
+                setCurrentDisplay(newStack[newStack.length - 1].subIndex);
+                navigate(`?page=${newStack[newStack.length - 1].parentIndex}&sub=${newStack[newStack.length - 1].subIndex}`, { replace: true });
+            }
+            
+            setPendingNavigation(null);
+        }
+    }, [pendingNavigation, isTransitioning, navigationStack, menuItems, navigate]);
 
     const onExpand = () => {
         setExpanded(prev => !prev);
@@ -44,93 +92,186 @@ function Dashboard({ menuItems, children, additionalClass = '', middleItem=null,
     }
 
     const handlePageChange = (index) => {
-        setCurrentDisplay(index);
-        // Update URL with the new page number
-        navigate(`?page=${index}`, { replace: true });
+        // Start opacity transition
+        setContentOpacity(0);
+        
+        setTimeout(() => {
+            setCurrentDisplay(index);
+            // Update URL with the new page number
+            navigate(`?page=${index}`, { replace: true });
+            
+            // Fade content back in
+            setTimeout(() => {
+                setContentOpacity(1);
+            }, 50);
+        }, 200);
     }
 
-    const handleSubItemClick = (parentIndex, subIndex, subItems) => {
+    const handleSubItemClick = useCallback((parentIndex, subIndex, subItems) => {
         if (enableSubSidebar && subItems && subItems.length > 0) {
-            // Navigate to sub-sidebar
-            setNavigationStack(prev => [...prev, { 
-                parentIndex, 
-                subIndex, 
+            // Start opacity transition
+            setContentOpacity(0);
+            
+            // Set fake menu data for seamless transition
+            setFakeMenuData({
                 items: subItems,
-                parentLabel: menuItems[parentIndex].label 
-            }]);
-            setCurrentSubItems(subItems);
-            setCurrentDisplay(subIndex);
-            navigate(`?page=${parentIndex}&sub=${subIndex}`, { replace: true });
+                isSubMenu: true,
+                direction: 'right'
+            });
+            
+            // Start transition animation
+            setShowBackButton(true);
+            setIsTransitioning(true);
+            setTransitionDirection('right');
+            
+            // Set pending navigation to execute after animation
+            setPendingNavigation({
+                action: 'subItemClick',
+                data: { parentIndex, subIndex, subItems }
+            });
+            
+            // End transition after animation completes
+            setTimeout(() => {
+                setIsTransitioning(false);
+                setFakeMenuData(null); // Clear fake menu after transition
+                
+                // Fade content back in
+                setTimeout(() => {
+                    setContentOpacity(1);
+                }, 50);
+            }, 500);
         } else {
             // Regular page change
             handlePageChange(parentIndex);
         }
-    }
+    }, [enableSubSidebar, navigate]);
 
-    const handleBackToParent = () => {
-        if (navigationStack.length > 0) {
+    const handleBackToMain = useCallback(() => {
+        // Start opacity transition
+        setContentOpacity(0);
+        
+        // Set fake menu data for seamless transition
+        setFakeMenuData({
+            items: menuItems,
+            isSubMenu: false,
+            direction: 'left'
+        });
+        
+        // Start transition animation
+        setShowBackButton(false);
+        setIsTransitioning(true);
+        setTransitionDirection('left');
+        
+        // Set pending navigation to execute after animation
+        setPendingNavigation({
+            action: 'backToMain'
+        });
+        
+        // End transition after animation completes
+        setTimeout(() => {
+            setIsTransitioning(false);
+            setFakeMenuData(null); // Clear fake menu after transition
+            
+            // Fade content back in
+            setTimeout(() => {
+                setContentOpacity(1);
+            }, 50);
+        }, 500);
+    }, [menuItems]);
+
+    const handleBackStep = useCallback(() => {
+        // Start opacity transition
+        setContentOpacity(0);
+        
+        setIsTransitioning(true);
+        setTransitionDirection('left');
+        
+        if (navigationStack.length > 1) {
+            // Get the previous menu items for fake menu
             const newStack = [...navigationStack];
-            const currentLevel = newStack.pop();
+            newStack.pop();
+            const previousItems = newStack[newStack.length - 1].items;
             
-            if (newStack.length > 0) {
-                // Go back to previous sub-level
-                const previousLevel = newStack[newStack.length - 1];
-                setCurrentSubItems(previousLevel.items);
-                setCurrentDisplay(previousLevel.subIndex);
-                navigate(`?page=${previousLevel.parentIndex}&sub=${previousLevel.subIndex}`, { replace: true });
-            } else {
-                // Go back to main menu
-                setCurrentSubItems(null);
-                setCurrentDisplay(currentLevel.parentIndex);
-                navigate(`?page=${currentLevel.parentIndex}`, { replace: true });
-            }
+            // Set fake menu data for seamless transition
+            setFakeMenuData({
+                items: previousItems,
+                isSubMenu: true,
+                direction: 'left'
+            });
             
-            setNavigationStack(newStack);
+            // Set pending navigation to execute after animation
+            setPendingNavigation({
+                action: 'backStep'
+            });
+            
+            // End transition after animation completes
+            setTimeout(() => {
+                setIsTransitioning(false);
+                setFakeMenuData(null); // Clear fake menu after transition
+                
+                // Fade content back in
+                setTimeout(() => {
+                    setContentOpacity(1);
+                }, 50);
+            }, 500);
+        } else {
+            handleBackToMain();
         }
-    }
+    }, [navigationStack.length, handleBackToMain]);
 
-    const handleBackToMain = () => {
-        setNavigationStack([]);
-        setCurrentSubItems(null);
-        setCurrentDisplay(0);
-        navigate(`?page=0`, { replace: true });
-    }
+    useEffect(() => {
+        console.log("currentDisplay", currentDisplay);
+    }, [currentDisplay]);
 
     const renderNavItems = (items, isSubMenu = false) => {
-        return items.map((item, index) => (
-            <li key={index} 
-                className={`${currentDisplay === index ? "selected" : ""}`} 
-                onClick={() => {
-                    if (isSubMenu) {
-                        // Handle sub-sub items if they exist
-                        if (enableSubSidebar && item.subItems && item.subItems.length > 0) {
-                            handleSubItemClick(
-                                navigationStack[navigationStack.length - 1]?.parentIndex || 0, 
-                                index, 
-                                item.subItems
-                            );
-                        } else {
-                            setCurrentDisplay(index);
-                            navigate(`?page=${navigationStack[navigationStack.length - 1]?.parentIndex || 0}&sub=${index}`, { replace: true });
-                        }
-                    } else {
-                        // Main menu items
-                        if (enableSubSidebar && item.subItems && item.subItems.length > 0) {
-                            handleSubItemClick(index, 0, item.subItems);
-                        } else {
-                            handlePageChange(index);
-                        }
-                    }
-                }}>
-                <Icon icon={item.icon} />
-                <p>{item.label}</p>
-                {enableSubSidebar && item.subItems && item.subItems.length > 0 && (
-                    <Icon icon="material-symbols:chevron-right" className="sub-indicator" />
-                )}
-            </li>
-        ));
+        return (
+            <ul>
+                {items.map((item, index) => (
+                    <li key={index} 
+                        className={`${currentDisplay === index ? "selected" : ""}`} 
+                        onClick={() => {
+                            if (isSubMenu) {
+                                // Handle sub-sub items if they exist
+                                if (enableSubSidebar && item.subItems && item.subItems.length > 0) {
+                                    handleSubItemClick(
+                                        navigationStack[navigationStack.length - 1]?.parentIndex || 0, 
+                                        index, 
+                                        item.subItems
+                                    );
+                                } else {
+                                    // For sub-menu items without sub-items, just update display and URL
+                                    setContentOpacity(0);
+                                    setTimeout(() => {
+                                        setCurrentDisplay(index);
+                                        const currentParentIndex = navigationStack[navigationStack.length - 1]?.parentIndex || 0;
+                                        navigate(`?page=${currentParentIndex}&sub=${index}`, { replace: true });
+                                        
+                                        // Fade content back in
+                                        setTimeout(() => {
+                                            setContentOpacity(1);
+                                        }, 50);
+                                    }, 200);
+                                }
+                            } else {
+                                // Main menu items
+                                if (enableSubSidebar && item.subItems && item.subItems.length > 0) {
+                                    handleSubItemClick(index, 0, item.subItems);
+                                } else {
+                                    handlePageChange(index);
+                                }
+                            }
+                        }}>
+                        <Icon icon={item.icon} />
+                        <p>{item.label}</p>
+                        {enableSubSidebar && item.subItems && item.subItems.length > 0 && (
+                            <Icon icon="material-symbols:chevron-right" className="sub-indicator" />
+                        )}
+                    </li>
+                ))}
+            </ul>
+        );
     }
-
+    
     const getCurrentItems = () => {
         if (currentSubItems) {
             return currentSubItems;
@@ -154,6 +295,21 @@ function Dashboard({ menuItems, children, additionalClass = '', middleItem=null,
             }
             return children[currentDisplay];
         }
+    }
+
+    const fakeLoadIn = () => {
+        if (!isTransitioning || !fakeMenuData) {
+            return null;
+        }
+        
+        return (
+            <nav 
+                key={`fake-nav-${Date.now()}`}
+                className={`fake-nav nav ${fakeMenuData.direction}-direction`}
+            >
+                {renderNavItems(fakeMenuData.items, fakeMenuData.isSubMenu)}
+            </nav>
+        );
     }
 
     return (
@@ -180,9 +336,11 @@ function Dashboard({ menuItems, children, additionalClass = '', middleItem=null,
                     {middleItem && middleItem}
                     
                     {/* Breadcrumb navigation for sub-sidebar */}
-                    {enableSubSidebar && navigationStack.length > 0 && (
-                        <div className="breadcrumb-nav">
-                            <div className="breadcrumb-item" onClick={handleBackToMain}>
+                    {enableSubSidebar && (
+                        <div className="breadcrumb-nav" style={{
+                            height: showBackButton ? "30px" : "0",
+                        }}>
+                            {/* <div className="breadcrumb-item" onClick={handleBackToMain}>
                                 <Icon icon="material-symbols:home" />
                                 <span>Main</span>
                             </div>
@@ -191,15 +349,24 @@ function Dashboard({ menuItems, children, additionalClass = '', middleItem=null,
                                     <Icon icon="material-symbols:chevron-right" />
                                     <span>{level.parentLabel}</span>
                                 </div>
-                            ))}
+                            ))} */}
+                            <div className="back" onClick={handleBackStep}>
+                                <Icon icon="ep:back" />
+                                <p>Back</p>
+                            </div>
                         </div>
                     )}
-                    
-                    <nav className="nav">
-                        <ul>
+                    {/* main menu */}
+                    <div className="nav-container">
+                        <nav 
+                            key={`nav-${currentSubItems ? 'sub' : 'main'}`}
+                            className={`nav ${isTransitioning ? `${transitionDirection}-direction` : ''}`}
+                        >
                             {renderNavItems(getCurrentItems(), !!currentSubItems)}
-                        </ul>
-                    </nav>
+                        </nav>
+                        {fakeLoadIn()}
+                    </div>
+                    
                 </div>
                 <div className="bottom">
                     {
@@ -222,7 +389,15 @@ function Dashboard({ menuItems, children, additionalClass = '', middleItem=null,
                 </div>
             </div>
             <div className={`dash-right ${expandedClass}`}>
-                {getCurrentChildren()}
+                <div 
+                    className="dash-content"
+                    style={{
+                        opacity: contentOpacity,
+                        transition: 'opacity 0.3s ease-in-out'
+                    }}
+                >
+                    {getCurrentChildren()}
+                </div>
                 <div className={`expand`} onClick={onExpand}>
                     <Icon icon="material-symbols:expand-content-rounded" />
                 </div>

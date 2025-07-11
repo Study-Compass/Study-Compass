@@ -10,7 +10,7 @@ import Dash from './Dash/Dash';
 import Members from './Members/Members';
 import Roles from './Roles/Roles';
 import Testing from './Testing/Testing';
-import Settings from './OrgSettings/OrgSettings';
+
 import {useFetch} from '../../hooks/useFetch';
 import { use } from 'react';
 import OrgDropdown from './OrgDropdown/OrgDropdown';
@@ -19,6 +19,12 @@ import orgLogo from '../../assets/Brand Image/OrgLogo.svg';
 import apiRequest from '../../utils/postRequest';
 import { useLocation } from 'react-router-dom';
 import EventsPanel from './EventsPanel/EventsPanel';
+import { 
+    GeneralSettings, 
+    AppearanceSettings, 
+    RolesSettings, 
+    DangerZone 
+} from './OrgSettings/components';
 
 function ClubDash(){
     const [clubId, setClubId] = useState(useParams().id);
@@ -43,13 +49,11 @@ function ClubDash(){
 
     const location = useLocation();
 
-    useEffect(()=>{
-        if(orgData){
+    
 
-        }
-    },[orgData]);
 
-    // Base menu items - will be filtered based on permissions
+
+    
 
 
     useEffect(()=>{
@@ -131,6 +135,7 @@ function ClubDash(){
             setPermissionsChecked(true);
         }
     };
+    
 
     useEffect(()=>{ 
         if(meetings){
@@ -202,18 +207,39 @@ function ClubDash(){
             requiresPermission: 'canManageMembers',
             element: <Members expandedClass={expandedClass} org={orgData.data?.org?.overview}/>
         },
-        { 
-            label: 'Roles', 
-            icon: 'mdi:shield-account', 
-            key: 'roles', 
-            requiresPermission: 'canManageRoles',
-            element: <Roles expandedClass={expandedClass} org={orgData.data?.org?.overview}/>
-        },
+        // { 
+        //     label: 'Roles', 
+        //     icon: 'mdi:shield-account', 
+        //     key: 'roles', 
+        //     requiresPermission: 'canManageRoles',
+        //     element: <Roles expandedClass={expandedClass} org={orgData.data?.org?.overview}/>
+        // },
         { 
             label: 'Settings', 
             icon: 'mdi:cog', 
             key: 'settings',
-            element: <Settings expandedClass={expandedClass} org={orgData.data?.org?.overview}/>
+            subItems: [
+                {
+                    label: 'General',
+                    icon: 'mdi:cog',
+                    element: <GeneralSettings org={orgData.data?.org?.overview} expandedClass={expandedClass} />
+                },
+                {
+                    label: 'Appearance',
+                    icon: 'mdi:palette',
+                    element: <AppearanceSettings org={orgData.data?.org?.overview} expandedClass={expandedClass} />
+                },
+                {
+                    label: 'Roles & Permissions',
+                    icon: 'mdi:shield-account',
+                    element:  <Roles expandedClass={expandedClass} org={orgData.data?.org?.overview}/>
+                },
+                {
+                    label: 'Danger Zone',
+                    icon: 'mdi:alert-circle',
+                    element: <DangerZone org={orgData.data?.org?.overview} expandedClass={expandedClass} />
+                },
+            ]
         },
         { 
             label: 'Testing', 
@@ -239,7 +265,15 @@ function ClubDash(){
     
 
     return (
-        <Dashboard menuItems={menuItems} additionalClass='club-dash' middleItem={<OrgDropdown showDrop={showDrop} setShowDrop={setShowDrop} user={user} currentOrgName={clubId} onOrgChange={onOrgChange}/>} logo={orgLogo} secondaryColor="#EDF6EE" primaryColor="#4DAA57">
+        <Dashboard 
+        menuItems={menuItems} 
+        additionalClass='club-dash' 
+        middleItem={<OrgDropdown showDrop={showDrop} setShowDrop={setShowDrop} user={user} currentOrgName={clubId} onOrgChange={onOrgChange}/>} 
+        logo={orgLogo} 
+        secondaryColor="#EDF6EE" 
+        primaryColor="#4DAA57"
+        enableSubSidebar={true}
+        >
         </Dashboard>
     )
 }

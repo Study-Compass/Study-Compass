@@ -46,6 +46,9 @@
     overflow:hidden;
     padding: 0 0 4px 0;
     box-shadow: var(--shadow);
+    max-height:80vh;
+    overflow-y: auto;
+
 }
 
 .popup-active .popup{

@@ -1,4 +1,5 @@
 const getModels = require('../services/getModelService');
+const mongoose = require('mongoose');
 
 /**
  * Middleware to check if user has a specific permission in an organization
@@ -25,6 +26,7 @@ function requireOrgPermission(permission, orgParam = 'orgId') {
             });
 
             if (!member) {
+                console.log('Denied, You are not a member of this organization');
                 return res.status(403).json({
                     success: false,
                     message: 'You are not a member of this organization'
@@ -87,6 +89,7 @@ function requireAnyOrgPermission(permissions, orgParam = 'orgId') {
             });
 
             if (!member) {
+                console.log('Denied, You are not a member of this organization');
                 return res.status(403).json({
                     success: false,
                     message: 'You are not a member of this organization'
@@ -112,6 +115,7 @@ function requireAnyOrgPermission(permissions, orgParam = 'orgId') {
                 }
             }
 
+            console.log('Denied, You don\'t have the required permissions for this action');
             return res.status(403).json({
                 success: false,
                 message: `You don't have the required permissions for this action`

@@ -394,7 +394,17 @@ router.post("/edit-org", verifyToken, upload.single('image'), handleMulterError,
 
         // Update other fields only if they are provided
         if (positions) {
-            org.positions = positions;
+            try {
+                // Parse positions if it's a JSON string
+                const parsedPositions = typeof positions === 'string' ? JSON.parse(positions) : positions;
+                org.positions = parsedPositions;
+            } catch (error) {
+                console.error('Error parsing positions:', error);
+                return res.status(400).json({
+                    success: false,
+                    message: "Invalid positions data format"
+                });
+            }
         }
         if (weekly_meeting) {
             org.weekly_meeting = weekly_meeting;

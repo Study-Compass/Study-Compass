@@ -194,6 +194,10 @@ router.post('/logout', verifyToken, async (req, res) => {
 router.get('/metadata', async (req, res) => {
     try {
         const school = req.school;
+        
+        // Clear cache to ensure fresh configuration with updated certificates
+        samlService.clearCache(school);
+        
         const metadata = await samlService.generateMetadata(school, req);
         
         res.set('Content-Type', 'application/xml');
