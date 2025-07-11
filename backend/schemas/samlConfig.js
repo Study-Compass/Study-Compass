@@ -264,16 +264,7 @@ samlConfigSchema.methods.toSamlifyConfig = function() {
         signingCert: this.sp.x509Cert,
         encryptCert: this.sp.x509Cert, // Use same certificate for encryption
         privateKey: this.sp.privateKey,
-        // Add validation function to prevent security warning
-        validate: (response) => {
-            // Basic validation - check if response exists and has required fields
-            if (!response) {
-                return false;
-            }
-            // For now, return true to allow the response through
-            // In production, you might want to add more specific validation logic
-            return true;
-        }
+        // Note: Global validation is handled in samlService.js
     };
 };
 
