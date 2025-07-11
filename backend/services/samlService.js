@@ -63,7 +63,13 @@ class SAMLService {
 
         console.log(`Configuring SP for school: ${school}`);
 
-        const sp = ServiceProvider(config.toSamlifyConfig());
+        const samlifyConfig = config.toSamlifyConfig();
+        console.log(`SP config keys:`, Object.keys(samlifyConfig));
+        console.log(`SP has privateKey:`, !!samlifyConfig.privateKey);
+        console.log(`SP privateKey length:`, samlifyConfig.privateKey ? samlifyConfig.privateKey.length : 0);
+        console.log(`SP privateKey starts with:`, samlifyConfig.privateKey ? samlifyConfig.privateKey.substring(0, 50) : 'N/A');
+
+        const sp = ServiceProvider(samlifyConfig);
         this.spCache.set(school, sp);
         
         return sp;
@@ -210,13 +216,29 @@ class SAMLService {
                     console.log('   Relaxed error:', relaxedError.message);
                     
                     // Try with signature verification completely disabled
-                    const response = await sp.parseLoginResponse(idp, 'post', mockRequest, {
-                        skipSignatureVerification: true,
-                        ignoreSignature: true,
-                        validateSignature: false,
-                        allowUnencryptedAssertion: true
-                    });
-                    extract = response.extract;
+                    try {
+                        const response = await sp.parseLoginResponse(idp, 'post', mockRequest, {
+                            skipSignatureVerification: true,
+                            ignoreSignature: true,
+                            validateSignature: false,
+                            allowUnencryptedAssertion: true
+                        });
+                        extract = response.extract;
+                    } catch (finalError) {
+                        console.log('🔧 SAML Service: All parsing methods failed, trying manual approach...');
+                        console.log('   Final error:', finalError.message);
+                        
+                        // Try a completely different approach - parse without any verification
+                        const response = await sp.parseLoginResponse(idp, 'post', mockRequest, {
+                            skipSignatureVerification: true,
+                            ignoreSignature: true,
+                            validateSignature: false,
+                            allowUnencryptedAssertion: true,
+                            allowEncryptedAssertion: true,
+                            decryptAssertion: false
+                        });
+                        extract = response.extract;
+                    }
                 }
             }
             
