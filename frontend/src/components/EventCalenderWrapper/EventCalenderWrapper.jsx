@@ -18,11 +18,14 @@ const getSunday = (date) => {
 
     
 
-function EventCalenderWrapper({roomList = [], start = new Date()}) {
-    console.log(roomList);
+function EventCalenderWrapper({classSchedule, start = new Date()}) {
     const [startDate, setStartDate] = useState(getSunday(start));
     const [view, setView] = useState(0);
+    const [eventClassList, setEventClassList] = useState([]);
+    
 
+    console.log(classSchedule);
+    
     const getDateText = () => {
         switch (view) {
             case 0:
@@ -58,11 +61,11 @@ function EventCalenderWrapper({roomList = [], start = new Date()}) {
             </div>
             <container className="calendar-element-wrapper">
                 {view === 0 ? (
-                    <MonthDisplay month={startDate.getMonth()+1} year={startDate.getFullYear()} roomList={roomList} onWeekClick={()=>{}} currentDay={new Date().getDate} currentMonth={new Date().getMonth()+1}/>
+                    <MonthDisplay month={startDate.getMonth()+1} events={eventClassList} year={startDate.getFullYear()} onWeekClick={()=>{}} currentDay={new Date().getDate} currentMonth={new Date().getMonth()+1}/>
                 ) : view === 1 ? (
-                    <WeeklyCalendar startOfWeek={startDate} roomList={roomList} events={[]}/>
+                    <WeeklyCalendar startOfWeek={startDate}  events={eventClassList}/>
                 ) : (
-                    <DailyCalendar selectedDay={startDate} roomList={roomList} events={[]} />
+                    <DailyCalendar selectedDay={startDate} events={eventClassList} />
                 )}
             </container>
         </div>

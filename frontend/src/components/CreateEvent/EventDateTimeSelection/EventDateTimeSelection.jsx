@@ -14,8 +14,19 @@ import {useFetch} from '../../../hooks/useFetch';
 import EventCalenderWrapper from '../../EventCalenderWrapper/EventCalenderWrapper';
 
 
+const essentialEventFields = {
+    name: "",
+    type:"class",
+    description: "",
+    start_time: new Date(),
+    end_time: new Date(),
+    location: "",
+    image: "",
+}
+
 function EventDateTimeSelection({next, visible, selectedRooms, setInfo}){
     const [selectedTimeOption, setSelectedTimeOption] = useState(null);
+    const [selectedRoom, setSelectedRoom] = useState(0);
     const [selectedDate, setSelectedDate] = useState(null);
     const [view, setView] = useState(0); // 0: month, 1: week, 2: day
     const { addNotification } = useNotification();
@@ -32,8 +43,10 @@ function EventDateTimeSelection({next, visible, selectedRooms, setInfo}){
     const { data, loading, error } = useFetch('/getbatch', options);
     
 
-    const handleRoomSelection = (option) => {
-        
+    const handleRoomSelection = (index) => {
+        setSelectedRoom(data.data[index]);
+        console.log("Selected Room:", data.data[index]);
+            
     };
 
     const handleDateSelect = (date) => {
@@ -67,8 +80,8 @@ function EventDateTimeSelection({next, visible, selectedRooms, setInfo}){
         <div className="event-date-time-selection">
             <div className="time-options-sidebar">
                 <h2>Room Options</h2>
-                {data.data.map((option) => (
-                    <SelectedRoomsPreview room={option.room} selected={true} />
+                {data.data.map((option, index) => (
+                    <SelectedRoomsPreview room={option.room} selected={true} onSelect={handleRoomSelection} optionIndex={index}/>
                 ))}
             </div>
             {/* <div className="calendar-container">
@@ -112,7 +125,7 @@ function EventDateTimeSelection({next, visible, selectedRooms, setInfo}){
                     />
                 )}
             </div> */}
-            <EventCalenderWrapper roomList={data.data} start={TEMPDATE}/>
+            <EventCalenderWrapper classSchedule={selectedRoom} start={TEMPDATE}/>
             <button 
                 className="next-button" 
                 onClick={handleNext}
