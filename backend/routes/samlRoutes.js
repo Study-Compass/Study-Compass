@@ -62,24 +62,58 @@ router.post('/callback', async (req, res) => {
         const school = req.school;
         const { SAMLResponse, RelayState } = req.body;
         
+        // Enhanced logging for debugging
+        console.log('🔍 SAML Callback Debug Information:');
+        console.log(`   School: ${school}`);
+        console.log(`   Method: ${req.method}`);
+        console.log(`   URL: ${req.url}`);
+        console.log(`   Headers:`, req.headers);
+        console.log(`   Body keys:`, Object.keys(req.body || {}));
+        console.log(`   SAMLResponse present: ${!!SAMLResponse}`);
+        console.log(`   SAMLResponse length: ${SAMLResponse ? SAMLResponse.length : 0}`);
+        console.log(`   RelayState: ${RelayState}`);
+        console.log(`   Cookies:`, req.cookies);
+        console.log(`   User-Agent: ${req.headers['user-agent']}`);
+        console.log(`   Referer: ${req.headers.referer}`);
+        console.log(`   Origin: ${req.headers.origin}`);
+        
         if (!SAMLResponse) {
+            console.log('❌ SAML callback failed: No SAMLResponse in body');
+            console.log('   Available body fields:', Object.keys(req.body || {}));
+            console.log('   Body content:', req.body);
             return res.status(400).json({
                 success: false,
                 message: 'SAML response is required'
             });
         }
 
+        // Log SAML response details
+        console.log('✅ SAML Response received:');
+        console.log(`   Response length: ${SAMLResponse.length} characters`);
+        console.log(`   Response starts with: ${SAMLResponse.substring(0, 100)}...`);
+        console.log(`   Response ends with: ...${SAMLResponse.substring(SAMLResponse.length - 100)}`);
+
         // Validate relay state if provided
         if (RelayState && req.cookies.samlRelayState !== RelayState) {
-            console.log('SAML relay state mismatch');
+            console.log('❌ SAML relay state mismatch:');
+            console.log(`   Expected: ${req.cookies.samlRelayState}`);
+            console.log(`   Received: ${RelayState}`);
             return res.status(400).json({
                 success: false,
                 message: 'Invalid relay state'
             });
         }
 
+        console.log('🔧 Processing SAML response...');
+        
         // Process SAML response
         const { user } = await samlService.processResponse(school, SAMLResponse, req);
+        
+        console.log('✅ SAML response processed successfully:');
+        console.log(`   User ID: ${user._id}`);
+        console.log(`   Username: ${user.username}`);
+        console.log(`   Email: ${user.email}`);
+        console.log(`   SAML Provider: ${user.samlProvider}`);
         
         // Generate JWT tokens
         const accessToken = jwt.sign(
@@ -94,11 +128,15 @@ router.post('/callback', async (req, res) => {
             { expiresIn: REFRESH_TOKEN_EXPIRY }
         );
 
+        console.log('🔧 Generated JWT tokens');
+
         // Store refresh token in database
         const { User } = getModels(req, 'User');
         await User.findByIdAndUpdate(user._id, { 
             refreshToken: refreshToken 
         });
+
+        console.log('🔧 Stored refresh token in database');
 
         // Set cookies
         res.cookie('accessToken', accessToken, {
@@ -120,12 +158,16 @@ router.post('/callback', async (req, res) => {
         // Clear SAML relay state cookie
         res.clearCookie('samlRelayState');
 
-        console.log(`POST: /auth/saml/callback successful for user ${user.username} (${school})`);
+        console.log('🔧 Set authentication cookies');
+
+        console.log(`✅ POST: /auth/saml/callback successful for user ${user.username} (${school})`);
         
         // Redirect to frontend or return success response
         if (RelayState && RelayState.startsWith('/')) {
+            console.log(`🔄 Redirecting to: ${RelayState}`);
             res.redirect(RelayState);
         } else {
+            console.log('📤 Returning JSON response');
             res.status(200).json({
                 success: true,
                 message: 'SAML authentication successful',
@@ -133,7 +175,10 @@ router.post('/callback', async (req, res) => {
             });
         }
     } catch (error) {
-        console.error('SAML callback error:', error);
+        console.error('❌ SAML callback error:', error);
+        console.error('   Error stack:', error.stack);
+        console.error('   Request body:', req.body);
+        console.error('   Request headers:', req.headers);
         res.status(500).json({
             success: false,
             message: 'SAML authentication failed',
@@ -416,6 +461,50 @@ router.get('/debug', async (req, res) => {
             error: error.message
         });
     }
+});
+
+/**
+ * Test callback endpoint accessibility
+ * GET /auth/saml/callback-test
+ */
+router.get('/callback-test', async (req, res) => {
+    console.log('🔍 SAML Callback Test Endpoint Hit:');
+    console.log(`   Method: ${req.method}`);
+    console.log(`   URL: ${req.url}`);
+    console.log(`   Headers:`, req.headers);
+    console.log(`   Query params:`, req.query);
+    console.log(`   School: ${req.school}`);
+    
+    res.json({
+        success: true,
+        message: 'SAML callback endpoint is accessible',
+        school: req.school,
+        timestamp: new Date().toISOString(),
+        headers: req.headers,
+        query: req.query
+    });
+});
+
+/**
+ * Test callback endpoint with POST
+ * POST /auth/saml/callback-test
+ */
+router.post('/callback-test', async (req, res) => {
+    console.log('🔍 SAML Callback Test POST Endpoint Hit:');
+    console.log(`   Method: ${req.method}`);
+    console.log(`   URL: ${req.url}`);
+    console.log(`   Headers:`, req.headers);
+    console.log(`   Body:`, req.body);
+    console.log(`   School: ${req.school}`);
+    
+    res.json({
+        success: true,
+        message: 'SAML callback POST endpoint is accessible',
+        school: req.school,
+        timestamp: new Date().toISOString(),
+        headers: req.headers,
+        body: req.body
+    });
 });
 
 module.exports = router; 
