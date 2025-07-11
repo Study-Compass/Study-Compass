@@ -260,7 +260,8 @@ samlConfigSchema.methods.toSamlifyConfig = function() {
             Binding: 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect',
             Location: this.sp.singleLogoutService
         }] : [],
-        x509Cert: this.sp.x509Cert,
+        // Use signingCert instead of x509Cert to include certificate in metadata
+        signingCert: this.sp.x509Cert,
         privateKey: this.sp.privateKey
     };
 };

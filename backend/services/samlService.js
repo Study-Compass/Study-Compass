@@ -12,6 +12,32 @@ class SAMLService {
     }
 
     /**
+     * Get certificate content from file or environment variable
+     * @param {string} filePath - Path to certificate file
+     * @param {string} envVar - Environment variable name as fallback
+     * @returns {string} Certificate content
+     */
+    getCertificateContent(filePath, envVar) {
+        try {
+            // First try to read from file (for local development)
+            if (fs.existsSync(filePath)) {
+                return fs.readFileSync(filePath, 'utf8');
+            }
+        } catch (error) {
+            console.log(`Could not read certificate from file ${filePath}:`, error.message);
+        }
+
+        // Fallback to environment variable (for production/Heroku)
+        const envCert = process.env[envVar];
+        if (envCert) {
+            console.log(`Using certificate from environment variable ${envVar}`);
+            return envCert;
+        }
+
+        throw new Error(`Certificate not found in file ${filePath} or environment variable ${envVar}`);
+    }
+
+    /**
      * Get or create a ServiceProvider instance for a school
      */
     async getServiceProvider(school, req) {
@@ -25,6 +51,8 @@ class SAMLService {
         if (!config) {
             throw new Error(`No active SAML configuration found for school: ${school}`);
         }
+
+        console.log(`Configuring SP for school: ${school}`);
 
         const sp = ServiceProvider(config.toSamlifyConfig());
         this.spCache.set(school, sp);
@@ -406,4 +434,4 @@ class SAMLService {
     }
 }
 
-module.exports = new SAMLService(); 
+module.exports = new SAMLService();
