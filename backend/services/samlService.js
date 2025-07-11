@@ -73,9 +73,8 @@ class SAMLService {
      * Get or create an IdentityProvider instance for a school
      */
     async getIdentityProvider(school, req) {
-        if (this.idpCache.has(school)) {
-            return this.idpCache.get(school);
-        }
+        // Clear cache to ensure we get fresh configuration
+        this.idpCache.delete(school);
 
         const { SAMLConfig } = getModels(req, 'SAMLConfig');
         const config = await SAMLConfig.getActiveConfig(school);
@@ -87,6 +86,15 @@ class SAMLService {
         console.log(`Configuring IdP for school: ${school}`);
         console.log(`Original SSO URL: ${config.idp.ssoUrl}`);
         console.log(`Redirect SSO URL: ${config.idp.ssoUrl.replace('/POST/', '/Redirect/')}`);
+
+        // Ensure we have valid certificates for the IdP
+        const idpCerts = [config.idp.x509Cert];
+        if (config.idp.additionalCerts && Array.isArray(config.idp.additionalCerts)) {
+            idpCerts.push(...config.idp.additionalCerts);
+        }
+
+        console.log(`IdP certificates count: ${idpCerts.length}`);
+        console.log(`Primary IdP certificate length: ${config.idp.x509Cert ? config.idp.x509Cert.length : 0}`);
 
         const idp = IdentityProvider({
             entityID: config.idp.entityId,
@@ -101,7 +109,7 @@ class SAMLService {
                 Binding: 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect',
                 Location: config.idp.sloUrl
             }] : undefined,
-            x509Cert: [config.idp.x509Cert, ...config.idp.additionalCerts]
+            x509Cert: idpCerts
         });
 
         this.idpCache.set(school, idp);
