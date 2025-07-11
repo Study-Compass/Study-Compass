@@ -55,6 +55,140 @@ router.get('/login', async (req, res) => {
 
 /**
  * SAML callback endpoint
+ * GET /auth/saml/callback
+ */
+router.get('/callback', async (req, res) => {
+    try {
+        const school = req.school;
+        const { SAMLResponse, RelayState } = req.query; // Use query params for GET
+        
+        // Enhanced logging for debugging
+        console.log('🔍 SAML Callback GET Debug Information:');
+        console.log(`   School: ${school}`);
+        console.log(`   Method: ${req.method}`);
+        console.log(`   URL: ${req.url}`);
+        console.log(`   Headers:`, req.headers);
+        console.log(`   Query keys:`, Object.keys(req.query || {}));
+        console.log(`   SAMLResponse present: ${!!SAMLResponse}`);
+        console.log(`   SAMLResponse length: ${SAMLResponse ? SAMLResponse.length : 0}`);
+        console.log(`   RelayState: ${RelayState}`);
+        console.log(`   Cookies:`, req.cookies);
+        console.log(`   User-Agent: ${req.headers['user-agent']}`);
+        console.log(`   Referer: ${req.headers.referer}`);
+        console.log(`   Origin: ${req.headers.origin}`);
+        
+        if (!SAMLResponse) {
+            console.log('❌ SAML callback GET failed: No SAMLResponse in query');
+            console.log('   Available query fields:', Object.keys(req.query || {}));
+            console.log('   Query content:', req.query);
+            return res.status(400).json({
+                success: false,
+                message: 'SAML response is required'
+            });
+        }
+
+        // Log SAML response details
+        console.log('✅ SAML Response received via GET:');
+        console.log(`   Response length: ${SAMLResponse.length} characters`);
+        console.log(`   Response starts with: ${SAMLResponse.substring(0, 100)}...`);
+        console.log(`   Response ends with: ...${SAMLResponse.substring(SAMLResponse.length - 100)}`);
+
+        // Validate relay state if provided
+        if (RelayState && req.cookies.samlRelayState !== RelayState) {
+            console.log('❌ SAML relay state mismatch (GET):');
+            console.log(`   Expected: ${req.cookies.samlRelayState}`);
+            console.log(`   Received: ${RelayState}`);
+            return res.status(400).json({
+                success: false,
+                message: 'Invalid relay state'
+            });
+        }
+
+        console.log('🔧 Processing SAML response (GET)...');
+        
+        // Process SAML response
+        const { user } = await samlService.processResponse(school, SAMLResponse, req);
+        
+        console.log('✅ SAML response processed successfully (GET):');
+        console.log(`   User ID: ${user._id}`);
+        console.log(`   Username: ${user.username}`);
+        console.log(`   Email: ${user.email}`);
+        console.log(`   SAML Provider: ${user.samlProvider}`);
+        
+        // Generate JWT tokens
+        const accessToken = jwt.sign(
+            { userId: user._id, roles: user.roles }, 
+            process.env.JWT_SECRET, 
+            { expiresIn: ACCESS_TOKEN_EXPIRY }
+        );
+        
+        const refreshToken = jwt.sign(
+            { userId: user._id, type: 'refresh' }, 
+            process.env.JWT_REFRESH_SECRET || process.env.JWT_SECRET, 
+            { expiresIn: REFRESH_TOKEN_EXPIRY }
+        );
+
+        console.log('🔧 Generated JWT tokens (GET)');
+
+        // Store refresh token in database
+        const { User } = getModels(req, 'User');
+        await User.findByIdAndUpdate(user._id, { 
+            refreshToken: refreshToken 
+        });
+
+        console.log('🔧 Stored refresh token in database (GET)');
+
+        // Set cookies
+        res.cookie('accessToken', accessToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
+            maxAge: ACCESS_TOKEN_EXPIRY_MS,
+            path: '/'
+        });
+
+        res.cookie('refreshToken', refreshToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
+            maxAge: REFRESH_TOKEN_EXPIRY_MS,
+            path: '/'
+        });
+
+        // Clear SAML relay state cookie
+        res.clearCookie('samlRelayState');
+
+        console.log('🔧 Set authentication cookies (GET)');
+
+        console.log(`✅ GET: /auth/saml/callback successful for user ${user.username} (${school})`);
+        
+        // Redirect to frontend or return success response
+        if (RelayState && RelayState.startsWith('/')) {
+            console.log(`🔄 Redirecting to: ${RelayState} (GET)`);
+            res.redirect(RelayState);
+        } else {
+            console.log('📤 Returning JSON response (GET)');
+            res.status(200).json({
+                success: true,
+                message: 'SAML authentication successful',
+                data: { user }
+            });
+        }
+    } catch (error) {
+        console.error('❌ SAML callback GET error:', error);
+        console.error('   Error stack:', error.stack);
+        console.error('   Request query:', req.query);
+        console.error('   Request headers:', req.headers);
+        res.status(500).json({
+            success: false,
+            message: 'SAML authentication failed',
+            error: error.message
+        });
+    }
+});
+
+/**
+ * SAML callback endpoint
  * POST /auth/saml/callback
  */
 router.post('/callback', async (req, res) => {
