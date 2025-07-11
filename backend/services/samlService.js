@@ -41,9 +41,8 @@ class SAMLService {
      * Get or create a ServiceProvider instance for a school
      */
     async getServiceProvider(school, req) {
-        if (this.spCache.has(school)) {
-            return this.spCache.get(school);
-        }
+        // Clear cache to ensure we get fresh configuration with validation function
+        this.spCache.delete(school);
 
         const { SAMLConfig } = getModels(req, 'SAMLConfig');
         const config = await SAMLConfig.getActiveConfig(school);
