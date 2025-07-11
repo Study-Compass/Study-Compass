@@ -149,7 +149,16 @@ class SAMLService {
 
         try {
             console.log('🔧 SAML Service: Parsing login response...');
-            const { extract } = await sp.parseLoginResponse(idp, 'post', { SAMLResponse: samlResponse });
+            // samlify expects the response in a specific format
+            const responseData = { SAMLResponse: samlResponse };
+            console.log('🔧 SAML Service: Response data format:', Object.keys(responseData));
+            console.log('🔧 SAML Service: Response data type:', typeof responseData.SAMLResponse);
+            console.log('🔧 SAML Service: Response data length:', responseData.SAMLResponse.length);
+            
+            // Try the correct samlify format - it expects the request object
+            const mockRequest = { body: responseData };
+            console.log('🔧 SAML Service: Mock request body keys:', Object.keys(mockRequest.body));
+            const { extract } = await sp.parseLoginResponse(idp, 'post', mockRequest);
             
             console.log('🔧 SAML Service: Response parsed successfully');
             console.log(`   Extract success: ${extract.success}`);
