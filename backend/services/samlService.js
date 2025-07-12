@@ -291,7 +291,7 @@ class SAMLService {
                 }
                 
                 // Get the encrypted key data
-                const cipherValue = encryptedKey['xenc:CipherValue'];
+                const cipherValue = encryptedKey['xenc:CipherData']?.['xenc:CipherValue'];
                 if (!cipherValue) {
                     throw new Error('No CipherValue found in EncryptedKey');
                 }
@@ -307,10 +307,12 @@ class SAMLService {
                 }
                 
                 // Decrypt the session key using the private key
+                // The IdP is using RSA-OAEP-MGF1P, so we need to use OAEP padding
                 const sessionKey = crypto.privateDecrypt(
                     {
                         key: privateKey,
-                        padding: crypto.constants.RSA_PKCS1_PADDING
+                        padding: crypto.constants.RSA_PKCS1_OAEP_PADDING,
+                        oaepHash: 'sha1' // Based on the DigestMethod in the XML
                     },
                     encryptedKeyData
                 );
@@ -318,7 +320,7 @@ class SAMLService {
                 console.log('🔧 SAML Service: Session key decrypted, length:', sessionKey.length);
                 
                 // Get the encrypted assertion data
-                const assertionCipherValue = encryptedData['xenc:CipherValue'];
+                const assertionCipherValue = encryptedData['xenc:CipherData']?.['xenc:CipherValue'];
                 if (!assertionCipherValue) {
                     throw new Error('No CipherValue found in EncryptedData');
                 }
@@ -333,27 +335,52 @@ class SAMLService {
                 
                 // Determine the cipher algorithm
                 let cipherAlgorithm;
-                if (algorithm.includes('AES128')) {
+                let ivLength = 16;
+                
+                if (algorithm.includes('aes128-gcm')) {
+                    cipherAlgorithm = 'aes-128-gcm';
+                    ivLength = 12; // GCM uses 12-byte IV
+                } else if (algorithm.includes('aes256-gcm')) {
+                    cipherAlgorithm = 'aes-256-gcm';
+                    ivLength = 12;
+                } else if (algorithm.includes('AES128')) {
                     cipherAlgorithm = 'aes-128-cbc';
+                    ivLength = 16;
                 } else if (algorithm.includes('AES256')) {
                     cipherAlgorithm = 'aes-256-cbc';
+                    ivLength = 16;
                 } else if (algorithm.includes('AES192')) {
                     cipherAlgorithm = 'aes-192-cbc';
+                    ivLength = 16;
                 } else {
                     throw new Error(`Unsupported encryption algorithm: ${algorithm}`);
                 }
                 
-                // Extract IV from the encrypted data (first 16 bytes)
-                const iv = encryptedAssertionData.slice(0, 16);
-                const ciphertext = encryptedAssertionData.slice(16);
+                // Extract IV from the encrypted data
+                const iv = encryptedAssertionData.slice(0, ivLength);
+                const ciphertext = encryptedAssertionData.slice(ivLength);
                 
                 console.log('🔧 SAML Service: IV length:', iv.length);
                 console.log('🔧 SAML Service: Ciphertext length:', ciphertext.length);
                 
                 // Decrypt the assertion
                 const decipher = crypto.createDecipheriv(cipherAlgorithm, sessionKey, iv);
-                let decryptedAssertion = decipher.update(ciphertext, null, 'utf8');
-                decryptedAssertion += decipher.final('utf8');
+                let decryptedAssertion;
+                
+                // For GCM mode, we need to handle the auth tag
+                if (cipherAlgorithm.includes('gcm')) {
+                    // GCM mode - the last 16 bytes are the auth tag
+                    const authTag = ciphertext.slice(-16);
+                    const actualCiphertext = ciphertext.slice(0, -16);
+                    decipher.setAuthTag(authTag);
+                    
+                    decryptedAssertion = decipher.update(actualCiphertext, null, 'utf8');
+                    decryptedAssertion += decipher.final('utf8');
+                } else {
+                    // CBC mode
+                    decryptedAssertion = decipher.update(ciphertext, null, 'utf8');
+                    decryptedAssertion += decipher.final('utf8');
+                }
                 
                 console.log('🔧 SAML Service: Assertion decrypted successfully');
                 console.log('🔧 SAML Service: Decrypted assertion preview:', decryptedAssertion.substring(0, 200) + '...');
