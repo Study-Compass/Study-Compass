@@ -116,11 +116,15 @@ class SAMLService {
                 Location: config.idp.sloUrl
             }] : undefined,
                     // Configure IdP certificates for signature verification and encryption
-        signingCert: idpCerts[0],
-        encryptCert: idpCerts[0],
-        // Tell samlify that we expect encrypted assertions
-        wantAssertionsEncrypted: true
+            signingCert: idpCerts.filter(Boolean)[0],
+            encryptCert: idpCerts.filter(Boolean)[0],
+            isAssertionEncrypted: true,
+            // // Tell samlify that we expect encrypted assertions
+            // wantAssertionsEncrypted: true
         });
+
+        console.log('Loaded IdP signing cert length:', idp.entityMeta.getX509Certificate()?.length || 0);
+
 
         this.idpCache.set(school, idp);
         
@@ -202,6 +206,7 @@ class SAMLService {
             
             try {
                 console.log('🔧 SAML Service: Attempting samlify parsing...');
+                console.log('IdP cert length:', idp.entityMeta.getX509Certificate()?.length);
                 const response = await sp.parseLoginResponse(idp, 'post', mockRequest);
                 extract = response.extract;
                 console.log('🔧 SAML Service: samlify parsing successful');
