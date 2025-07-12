@@ -215,11 +215,28 @@ class SAMLService {
                 const parser = new xml2js.Parser({ explicitArray: false });
                 const result = await parser.parseStringPromise(decodedResponse);
                 
+                console.log('🔧 SAML Service: XML parsing result keys:', Object.keys(result));
+                
                 const response = result['saml2p:Response'];
+                console.log('🔧 SAML Service: Response keys:', Object.keys(response));
+                
                 const status = response?.Status?.StatusCode?.$?.Value;
+                console.log('🔧 SAML Service: Raw status:', status);
+                console.log('🔧 SAML Service: Status object:', response?.Status);
                 
                 if (status !== 'urn:oasis:names:tc:SAML:2.0:status:Success') {
-                    throw new Error(`SAML status is not Success: ${status}`);
+                    console.log('🔧 SAML Service: Status check failed, trying alternative path...');
+                    
+                    // Try alternative status paths
+                    const altStatus = response?.Status?.StatusCode?.Value || 
+                                    response?.Status?.StatusCode?.[0]?.Value ||
+                                    response?.Status?.StatusCode;
+                    
+                    console.log('🔧 SAML Service: Alternative status:', altStatus);
+                    
+                    if (altStatus !== 'urn:oasis:names:tc:SAML:2.0:status:Success') {
+                        throw new Error(`SAML status is not Success: ${status || altStatus}`);
+                    }
                 }
                 
                 console.log('🔧 SAML Service: SAML status is Success, attempting to decrypt assertion...');
@@ -289,9 +306,20 @@ class SAMLService {
                             
                             // Extract basic information from the parsed XML
                             const response = result['saml2p:Response'];
-                            const status = response?.Status?.StatusCode?.$?.Value;
+                            console.log('🔧 SAML Service: Fallback response keys:', Object.keys(response));
                             
-                            if (status === 'urn:oasis:names:tc:SAML:2.0:status:Success') {
+                            const status = response?.Status?.StatusCode?.$?.Value;
+                            console.log('🔧 SAML Service: Fallback raw status:', status);
+                            
+                            // Try alternative status paths
+                            const altStatus = response?.Status?.StatusCode?.Value || 
+                                            response?.Status?.StatusCode?.[0]?.Value ||
+                                            response?.Status?.StatusCode;
+                            
+                            console.log('🔧 SAML Service: Fallback alternative status:', altStatus);
+                            
+                            if (status === 'urn:oasis:names:tc:SAML:2.0:status:Success' || 
+                                altStatus === 'urn:oasis:names:tc:SAML:2.0:status:Success') {
                                 console.log('🔧 SAML Service: SAML status is Success');
                                 
                                 // Create a mock extract object for testing
@@ -305,7 +333,7 @@ class SAMLService {
                                     }
                                 };
                             } else {
-                                throw new Error(`SAML status is not Success: ${status}`);
+                                throw new Error(`SAML status is not Success: ${status || altStatus}`);
                             }
                         }
                     }
