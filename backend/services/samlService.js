@@ -291,9 +291,18 @@ class SAMLService {
                 }
                 
                 // Get the encrypted key data
-                const cipherValue = encryptedKey['xenc:CipherData']?.['xenc:CipherValue'];
+                const cipherData = encryptedKey['xenc:CipherData'];
+                if (!cipherData) {
+                    console.log('🔧 SAML Service: No CipherData found in EncryptedKey');
+                    console.log('🔧 SAML Service: EncryptedKey structure:', JSON.stringify(encryptedKey, null, 2));
+                    throw new Error('No CipherData found in EncryptedKey');
+                }
+                
+                const cipherValue = cipherData['xenc:CipherValue'];
                 if (!cipherValue) {
-                    throw new Error('No CipherValue found in EncryptedKey');
+                    console.log('🔧 SAML Service: No CipherValue found in CipherData');
+                    console.log('🔧 SAML Service: CipherData structure:', JSON.stringify(cipherData, null, 2));
+                    throw new Error('No CipherValue found in CipherData');
                 }
                 
                 // Decode the encrypted key
@@ -320,9 +329,18 @@ class SAMLService {
                 console.log('🔧 SAML Service: Session key decrypted, length:', sessionKey.length);
                 
                 // Get the encrypted assertion data
-                const assertionCipherValue = encryptedData['xenc:CipherData']?.['xenc:CipherValue'];
+                const assertionCipherData = encryptedData['xenc:CipherData'];
+                if (!assertionCipherData) {
+                    console.log('🔧 SAML Service: No CipherData found in EncryptedData');
+                    console.log('🔧 SAML Service: EncryptedData structure:', JSON.stringify(encryptedData, null, 2));
+                    throw new Error('No CipherData found in EncryptedData');
+                }
+                
+                const assertionCipherValue = assertionCipherData['xenc:CipherValue'];
                 if (!assertionCipherValue) {
-                    throw new Error('No CipherValue found in EncryptedData');
+                    console.log('🔧 SAML Service: No CipherValue found in assertion CipherData');
+                    console.log('🔧 SAML Service: Assertion CipherData structure:', JSON.stringify(assertionCipherData, null, 2));
+                    throw new Error('No CipherValue found in assertion CipherData');
                 }
                 
                 // Decode the encrypted assertion
