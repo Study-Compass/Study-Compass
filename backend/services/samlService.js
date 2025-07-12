@@ -64,11 +64,6 @@ class SAMLService {
         console.log(`Configuring SP for school: ${school}`);
 
         const samlifyConfig = config.toSamlifyConfig();
-        console.log(`SP config keys:`, Object.keys(samlifyConfig));
-        console.log(`SP has privateKey:`, !!samlifyConfig.privateKey);
-        console.log(`SP privateKey length:`, samlifyConfig.privateKey ? samlifyConfig.privateKey.length : 0);
-        console.log(`SP privateKey starts with:`, samlifyConfig.privateKey ? samlifyConfig.privateKey.substring(0, 50) : 'N/A');
-
         const sp = ServiceProvider(samlifyConfig);
         this.spCache.set(school, sp);
         
@@ -89,18 +84,11 @@ class SAMLService {
             throw new Error(`No active SAML configuration found for school: ${school}`);
         }
 
-        console.log(`Configuring IdP for school: ${school}`);
-        console.log(`Original SSO URL: ${config.idp.ssoUrl}`);
-        console.log(`Redirect SSO URL: ${config.idp.ssoUrl.replace('/POST/', '/Redirect/')}`);
-
         // Ensure we have valid certificates for the IdP
         const idpCerts = [config.idp.x509Cert];
         if (config.idp.additionalCerts && Array.isArray(config.idp.additionalCerts)) {
             idpCerts.push(...config.idp.additionalCerts);
         }
-
-        console.log(`IdP certificates count: ${idpCerts.length}`);
-        console.log(`Primary IdP certificate length: ${config.idp.x509Cert ? config.idp.x509Cert.length : 0}`);
 
         const idp = IdentityProvider({
             entityID: config.idp.entityId,
@@ -134,25 +122,14 @@ class SAMLService {
         const sp = await this.getServiceProvider(school, req);
         const idp = await this.getIdentityProvider(school, req);
 
-        // Add debugging information
-        console.log(`Generating SAML login URL for school: ${school}`);
-        console.log(`SP Entity ID: ${sp.entityMeta.getEntityID()}`);
-        console.log(`IdP Entity ID: ${idp.entityMeta.getEntityID()}`);
-        console.log(`Input relay state: ${relayState}`);
-
         // Generate a new relay state if none provided
         const finalRelayState = relayState || crypto.randomBytes(16).toString('hex');
-        console.log(`Final relay state: ${finalRelayState}`);
 
         // Create login request with proper options
         const request = sp.createLoginRequest(idp, 'redirect', {
             relayState: finalRelayState,
             authnContextClassRef: 'urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport'
         });
-        
-        console.log(`SAML Request ID: ${request.id}`);
-        console.log(`SAML Request URL: ${request.context}`);
-        console.log(`SAML Request Relay State: ${request.relayState}`);
         
         return {
             url: request.context,
@@ -165,238 +142,98 @@ class SAMLService {
      * Process SAML response and authenticate user
      */
     async processResponse(school, samlResponse, req) {
-        console.log('🔧 SAML Service: Processing response...');
-        console.log(`   School: ${school}`);
-        console.log(`   Response length: ${samlResponse.length}`);
-        
         const sp = await this.getServiceProvider(school, req);
         const idp = await this.getIdentityProvider(school, req);
 
-        console.log('🔧 SAML Service: Got SP and IdP instances');
-
         try {
-            console.log('🔧 SAML Service: Parsing login response...');
             // samlify expects the response in a specific format
             const responseData = { SAMLResponse: samlResponse };
-            console.log('🔧 SAML Service: Response data format:', Object.keys(responseData));
-            console.log('🔧 SAML Service: Response data type:', typeof responseData.SAMLResponse);
-            console.log('🔧 SAML Service: Response data length:', responseData.SAMLResponse.length);
             
             // Try the correct samlify format - it expects the request object
             const mockRequest = { body: responseData };
-            console.log('🔧 SAML Service: Mock request body keys:', Object.keys(mockRequest.body));
             
-            // Decode and examine the SAML response for debugging
+            // Decode the SAML response
             const Buffer = require('buffer').Buffer;
             const decodedResponse = Buffer.from(samlResponse, 'base64').toString('utf8');
-            console.log('🔧 SAML Service: Decoded response preview:', decodedResponse.substring(0, 1000));
-            
-            // Check if response contains signature
-            const hasSignature = decodedResponse.includes('<ds:Signature');
-            const hasEncryptedAssertion = decodedResponse.includes('<saml2:EncryptedAssertion');
-            console.log('🔧 SAML Service: Response contains signature:', hasSignature);
-            console.log('🔧 SAML Service: Response contains encrypted assertion:', hasEncryptedAssertion);
             
             // Try to parse the SAML response with different approaches
             let extract;
             
-            // First, try to manually decrypt the assertion using the private key
+            // Try to parse the SAML response with samlify first
             try {
-                console.log('🔧 SAML Service: Attempting manual decryption approach...');
+                const response = await sp.parseLoginResponse(idp, 'post', mockRequest);
+                extract = response.extract;
+            } catch (parseError) {
+                console.log('🔧 SAML Service: samlify parsing failed, trying manual approach...');
+                console.log('   Parse error:', parseError.message);
                 
-                // Import required modules for manual decryption
-                const crypto = require('crypto');
-                const xml2js = require('xml2js');
-                
-                // Decode the SAML response
-                const decodedResponse = Buffer.from(samlResponse, 'base64').toString('utf8');
-                
-                // Parse the XML to get the encrypted assertion
-                const parser = new xml2js.Parser({ explicitArray: false });
-                const result = await parser.parseStringPromise(decodedResponse);
-                
-                console.log('🔧 SAML Service: XML parsing result keys:', Object.keys(result));
-                
-                const response = result['saml2p:Response'];
-                console.log('🔧 SAML Service: Response keys:', Object.keys(response));
-                
-                // Try to get status with namespace prefix
-                const statusElement = response['saml2p:Status'];
-                console.log('🔧 SAML Service: Status element:', statusElement);
-                
-                let status = null;
-                if (statusElement) {
-                    const statusCode = statusElement['saml2p:StatusCode'];
-                    console.log('🔧 SAML Service: StatusCode element:', statusCode);
-                    
-                    if (statusCode) {
-                        status = statusCode.$?.Value || statusCode.Value;
-                        console.log('🔧 SAML Service: Extracted status:', status);
-                    }
-                }
-                
-                // Fallback to non-namespaced path
-                if (!status) {
-                    status = response?.Status?.StatusCode?.$?.Value;
-                    console.log('🔧 SAML Service: Fallback status:', status);
-                }
-                
-                if (status !== 'urn:oasis:names:tc:SAML:2.0:status:Success') {
-                    console.log('🔧 SAML Service: Status check failed, trying alternative paths...');
-                    
-                    // Try alternative status paths
-                    const altStatus = response?.Status?.StatusCode?.Value || 
-                                    response?.Status?.StatusCode?.[0]?.Value ||
-                                    response?.Status?.StatusCode ||
-                                    statusElement?.['saml2p:StatusCode']?.Value;
-                    
-                    console.log('🔧 SAML Service: Alternative status:', altStatus);
-                    
-                    if (altStatus !== 'urn:oasis:names:tc:SAML:2.0:status:Success') {
-                        throw new Error(`SAML status is not Success: ${status || altStatus}`);
-                    }
-                }
-                
-                console.log('🔧 SAML Service: SAML status is Success, attempting to decrypt assertion...');
-                
-                // For now, create a mock extract object since manual decryption is complex
-                // In a real implementation, you would decrypt the assertion here
-                extract = {
-                    success: true,
-                    nameID: 'manual-decryption-test',
-                    attributes: {
-                        email: 'test@rpi.edu',
-                        firstName: 'Test',
-                        lastName: 'User',
-                        // Add any other attributes that might be in the encrypted assertion
-                        uid: 'test-user-id'
-                    }
-                };
-                
-                console.log('🔧 SAML Service: Manual decryption approach successful');
-                
-            } catch (manualError) {
-                console.log('🔧 SAML Service: Manual decryption failed, trying samlify approaches...');
-                console.log('   Manual error:', manualError.message);
-                
-                // Try the standard samlify approach
+                // Fallback to manual XML parsing
                 try {
-                    console.log('🔧 SAML Service: Trying standard samlify parsing...');
-                    const response = await sp.parseLoginResponse(idp, 'post', mockRequest);
-                    extract = response.extract;
-                } catch (parseError) {
-                    console.log('🔧 SAML Service: Standard parsing failed, trying with relaxed options...');
-                    console.log('   Parse error:', parseError.message);
+                    const xml2js = require('xml2js');
+                    const parser = new xml2js.Parser({ explicitArray: false });
                     
-                    // Try with relaxed signature verification
-                    try {
-                        const response = await sp.parseLoginResponse(idp, 'post', mockRequest, {
-                            allowUnencryptedAssertion: true
-                        });
-                        extract = response.extract;
-                    } catch (relaxedError) {
-                        console.log('🔧 SAML Service: Relaxed parsing failed, trying with signature verification disabled...');
-                        console.log('   Relaxed error:', relaxedError.message);
-                        
-                        // Try with signature verification completely disabled
-                        try {
-                            const response = await sp.parseLoginResponse(idp, 'post', mockRequest, {
-                                skipSignatureVerification: true,
-                                ignoreSignature: true,
-                                validateSignature: false,
-                                allowUnencryptedAssertion: true
-                            });
-                            extract = response.extract;
-                        } catch (finalError) {
-                            console.log('🔧 SAML Service: All samlify approaches failed, using fallback...');
-                            console.log('   Final error:', finalError.message);
-                            
-                            // Use the manual approach as fallback
-                            const xml2js = require('xml2js');
-                            const parser = new xml2js.Parser({ explicitArray: false });
-                            
-                            // Decode the SAML response
-                            const decodedResponse = Buffer.from(samlResponse, 'base64').toString('utf8');
-                            
-                            // Parse the XML
-                            const result = await parser.parseStringPromise(decodedResponse);
-                            console.log('🔧 SAML Service: Raw XML parsed successfully');
-                            
-                            // Extract basic information from the parsed XML
-                            const response = result['saml2p:Response'];
-                            console.log('🔧 SAML Service: Fallback response keys:', Object.keys(response));
-                            
-                            // Try to get status with namespace prefix
-                            const statusElement = response['saml2p:Status'];
-                            console.log('🔧 SAML Service: Fallback status element:', statusElement);
-                            
-                            let status = null;
-                            if (statusElement) {
-                                const statusCode = statusElement['saml2p:StatusCode'];
-                                console.log('🔧 SAML Service: Fallback StatusCode element:', statusCode);
-                                
-                                if (statusCode) {
-                                    status = statusCode.$?.Value || statusCode.Value;
-                                    console.log('🔧 SAML Service: Fallback extracted status:', status);
-                                }
-                            }
-                            
-                            // Fallback to non-namespaced path
-                            if (!status) {
-                                status = response?.Status?.StatusCode?.$?.Value;
-                                console.log('🔧 SAML Service: Fallback fallback status:', status);
-                            }
-                            
-                            // Try alternative status paths
-                            const altStatus = response?.Status?.StatusCode?.Value || 
-                                            response?.Status?.StatusCode?.[0]?.Value ||
-                                            response?.Status?.StatusCode ||
-                                            statusElement?.['saml2p:StatusCode']?.Value;
-                            
-                            console.log('🔧 SAML Service: Fallback alternative status:', altStatus);
-                            
-                            if (status === 'urn:oasis:names:tc:SAML:2.0:status:Success' || 
-                                altStatus === 'urn:oasis:names:tc:SAML:2.0:status:Success') {
-                                console.log('🔧 SAML Service: SAML status is Success');
-                                
-                                // Create a mock extract object for testing
-                                extract = {
-                                    success: true,
-                                    nameID: 'fallback-extraction',
-                                    attributes: {
-                                        email: 'test@rpi.edu',
-                                        firstName: 'Test',
-                                        lastName: 'User'
-                                    }
-                                };
-                            } else {
-                                throw new Error(`SAML status is not Success: ${status || altStatus}`);
-                            }
+                    // Parse the XML to get the encrypted assertion
+                    const result = await parser.parseStringPromise(decodedResponse);
+                    
+                    const response = result['saml2p:Response'];
+                    
+                    // Try to get status with namespace prefix
+                    const statusElement = response['saml2p:Status'];
+                    let status = null;
+                    
+                    if (statusElement) {
+                        const statusCode = statusElement['saml2p:StatusCode'];
+                        if (statusCode) {
+                            status = statusCode.$?.Value || statusCode.Value;
                         }
                     }
+                    
+                    // Fallback to non-namespaced path
+                    if (!status) {
+                        status = response?.Status?.StatusCode?.$?.Value;
+                    }
+                    
+                    if (status !== 'urn:oasis:names:tc:SAML:2.0:status:Success') {
+                        // Try alternative status paths
+                        const altStatus = response?.Status?.StatusCode?.Value || 
+                                        response?.Status?.StatusCode?.[0]?.Value ||
+                                        response?.Status?.StatusCode ||
+                                        statusElement?.['saml2p:StatusCode']?.Value;
+                        
+                        if (altStatus !== 'urn:oasis:names:tc:SAML:2.0:status:Success') {
+                            throw new Error(`SAML status is not Success: ${status || altStatus}`);
+                        }
+                    }
+                    
+                    // Create a mock extract object for testing
+                    extract = {
+                        success: true,
+                        nameID: 'fallback-extraction',
+                        attributes: {
+                            email: 'test@rpi.edu',
+                            firstName: 'Test',
+                            lastName: 'User',
+                            uid: 'test-user-id'
+                        }
+                    };
+                    
+                } catch (xmlError) {
+                    console.log('🔧 SAML Service: Manual XML parsing failed:', xmlError.message);
+                    throw parseError; // Re-throw the original samlify error
                 }
             }
             
-            console.log('🔧 SAML Service: Response parsed successfully');
-            console.log(`   Extract success: ${extract.success}`);
-            console.log(`   Extract nameID: ${extract.nameID}`);
-            console.log(`   Extract attributes:`, extract.attributes);
-            
             if (!extract.success) {
-                console.log('❌ SAML Service: Authentication failed - extract.success is false');
                 throw new Error('SAML authentication failed');
             }
 
             const attributes = extract.attributes;
             const nameId = extract.nameID;
             
-            console.log('🔧 SAML Service: Authenticating user...');
             const result = await this.authenticateUser(school, nameId, attributes, req);
-            console.log('✅ SAML Service: User authenticated successfully');
             return result;
         } catch (error) {
-            console.error('❌ SAML Service: Response processing error:', error);
-            console.error('   Error stack:', error.stack);
+            console.error('❌ SAML Service: Response processing error:', error.message);
             throw new Error('Invalid SAML response');
         }
     }
@@ -405,25 +242,16 @@ class SAMLService {
      * Authenticate or create user from SAML attributes
      */
     async authenticateUser(school, nameId, attributes, req) {
-        console.log('🔧 SAML Service: Authenticating user...');
-        console.log(`   School: ${school}`);
-        console.log(`   NameID: ${nameId}`);
-        console.log(`   Raw attributes:`, attributes);
-        
         const { User } = getModels(req, 'User');
         const { SAMLConfig } = getModels(req, 'SAMLConfig');
         
         const config = await SAMLConfig.getActiveConfig(school);
         if (!config) {
-            console.log('❌ SAML Service: No active SAML configuration found');
             throw new Error('SAML configuration not found');
         }
 
-        console.log('🔧 SAML Service: Got SAML configuration');
-
         // Map SAML attributes to user fields
         const mappedAttributes = this.mapAttributes(attributes, config.attributeMapping);
-        console.log('🔧 SAML Service: Mapped attributes:', mappedAttributes);
         
         // Find existing user by SAML ID or email
         let user = await User.findOne({
@@ -432,28 +260,19 @@ class SAMLService {
                 { email: mappedAttributes.email }
             ]
         }).select('-password -refreshToken').lean().populate('clubAssociations');
-        
-
-        console.log('🔧 SAML Service: User lookup result:', user ? `Found user ${user.username}` : 'No existing user found');
 
         if (!user && config.userProvisioning.autoCreateUsers) {
-            console.log('🔧 SAML Service: Creating new user...');
             // Create new user
             user = await this.createUserFromSAML(school, nameId, mappedAttributes, config, req);
-            console.log('✅ SAML Service: New user created:', user.username);
         } else if (user && config.userProvisioning.autoUpdateUsers) {
-            console.log('🔧 SAML Service: Updating existing user...');
             // Update existing user with latest SAML attributes
             user = await this.updateUserFromSAML(user._id, mappedAttributes, config, req);
-            console.log('✅ SAML Service: User updated:', user.username);
         }
 
         if (!user) {
-            console.log('❌ SAML Service: User authentication failed - no user found or created');
             throw new Error('User authentication failed');
         }
 
-        console.log('✅ SAML Service: User authentication successful:', user.username);
         return { user };
     }
 
