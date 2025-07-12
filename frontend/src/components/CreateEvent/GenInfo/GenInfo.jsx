@@ -5,32 +5,39 @@ import Global from '../../../assets/Icons/Global.svg';
 import Internal from '../../../assets/Icons/Internal.svg';
 import ImageUpload from '../../ImageUpload/ImageUpload';
 
-function GenInfo({next, visible, setInfo}){
-    const [title, setTitle] = useState("");
-    const [description, setDescription] = useState("");
-    const [eventType, setEventType] = useState("");
-    const [visibility, setVisibility] = useState("");
-    const [expectedAttendance, setExpectedAttendance] = useState("");
-    const [selectedFile, setSelectedFile] = useState(null);
+function GenInfo({ formData, setFormData, onComplete }){
+    const [title, setTitle] = useState(formData.name || "");
+    const [description, setDescription] = useState(formData.description || "");
+    const [eventType, setEventType] = useState(formData.type || "");
+    const [visibility, setVisibility] = useState(formData.visibility || "");
+    const [expectedAttendance, setExpectedAttendance] = useState(formData.expectedAttendance || "");
+    const [selectedFile, setSelectedFile] = useState(formData.selectedFile || null);
     const [imagePreview, setImagePreview] = useState(null);
 
-    const [nextActive, setNextActive] = useState(false);
+    // Update local state when formData changes
+    useEffect(() => {
+        if (formData.name !== title) setTitle(formData.name || '');
+        if (formData.description !== description) setDescription(formData.description || '');
+        if (formData.type !== eventType) setEventType(formData.type || '');
+        if (formData.visibility !== visibility) setVisibility(formData.visibility || '');
+        if (formData.expectedAttendance !== expectedAttendance) setExpectedAttendance(formData.expectedAttendance || '');
+        if (formData.selectedFile !== selectedFile) setSelectedFile(formData.selectedFile || null);
+    }, [formData]);
 
-    useEffect(()=>{
-        if(title && eventType && description && visibility && expectedAttendance){
-            setNextActive(true);
-        }
-        setInfo(prev => ({
+    useEffect(() => {
+        const isValid = title && eventType && description && visibility && expectedAttendance;
+        onComplete(isValid);
+        
+        setFormData(prev => ({
             ...prev,
             name: title, 
             description, 
             type: eventType, 
             visibility, 
             expectedAttendance,
-            selectedFile // Store the selected file in the info object
+            selectedFile
         }));
-    }
-    ,[title, description, eventType, visibility, expectedAttendance, selectedFile]);
+    }, [title, description, eventType, visibility, expectedAttendance, selectedFile, onComplete, setFormData]);
 
     const handleChange = (e) => {
         const {name, value} = e.target;
@@ -45,7 +52,6 @@ function GenInfo({next, visible, setInfo}){
                 setEventType(value);
                 break;
             case "visibility":
-                console.log(value);
                 setVisibility(value);
                 break;
             case "expectedAttendance":
@@ -72,8 +78,7 @@ function GenInfo({next, visible, setInfo}){
     };
 
     return(
-        <div className={`gen-info create-component ${visible && "visible"}`}>
-            <h1>general information</h1>
+        <div className="gen-info create-component">
             <div className="col-container">
                 <div className="col input-col">
                     <div className="input-field mandatory title">
@@ -87,7 +92,7 @@ function GenInfo({next, visible, setInfo}){
                     <div className="input-field mandatory">
                         <p className="label">Event Type</p>
                         <select className="" name="eventType" onChange={handleChange} value={eventType}>
-                            <option value="" disabled selected></option>
+                            <option value="" disabled>Select event type</option>
                             <option value="study">study event</option>
                             <option value="workshop">workshop</option>
                             <option value="campus">campus event</option>
@@ -117,10 +122,6 @@ function GenInfo({next, visible, setInfo}){
                         <p className="label">Expected Attendance</p>
                         <input name="expectedAttendance" type="number" className="" value={expectedAttendance} onChange={handleChange} placeholder='about how many people are attending?'/>
                     </div>
-
-                    <button className={`next-button ${nextActive && "active"}`} onClick={next}>
-                        next
-                    </button>
                 </div>
                 <div className="col preview-col">
                     <div className="input-field">

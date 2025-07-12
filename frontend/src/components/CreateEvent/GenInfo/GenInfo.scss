@@ -1,148 +1,148 @@
 .gen-info {
-    gap: 20px;
     .col-container {
         display: flex;
-        gap: 30px;
+        gap: 40px;
         width: 100%;
-        flex-grow: 1;
+        min-height: 400px;
 
         .col {
+            flex: 1;
             display: flex;
             flex-direction: column;
+            gap: 20px;
 
-            .input-field {
-                display: flex;
-                flex-direction: column;
-                gap: 3px;
-
-                &.title{
-                    p{
-                        // font-weight:700;
-                        // font-size:16px;
-                    }
-
-                    input{
-                        font-size: 18px;
-                        font-weight: 600;
-                        padding: 5px 10px;
-                        border: 1px solid var(--lightborder);
-                        border-radius: 5px;
-                        color:var(--text);
-                        background-color: transparent;
-                        &:focus {
-                            outline: none;
-                        }
-                        color:var(--text);  
-                        
-                    }
-                }
-
-                &.mandatory > p{
-                    &::after{
-                        content: "*";
-                        color: var(--red);
-                        margin-left:2px;
-                    }
-                }
-
-                p {
-                    font-family: 'Inter';
-                    font-size: 14px;
-                    font-weight: 500;
-                }
-
-                input,
-                textarea,
-                select {
-                    box-sizing: border-box;
-                    padding: 3px 10px;
-                    border-radius: 5px;
-                    border: 1px solid var(--lightborder);
-                    font-family: 'Inter';
-                    font-size: 14px;
-                    font-weight: 500;
-                    width: 100%;
-                    color:var(--text);
-                    
-                    background-color: transparent;
-                    margin: 0;
-                    &:focus {
-                        outline: none;
-                    }
-
-                    &::placeholder {
-                        color: var(--darkborder);
-                        font-weight:400;
-                    }
-                }
-
-                textarea {
-                    resize: none;
-                    height:100px;
-                }
-
-                select option {
-                    font-family: 'Inter';
-                    font-size: 14px;
-                    font-weight: 500;
-                }
-
-                .visibility{
-                    display:flex;
-                    gap:10px;
-                    .option{
-                        height:100%;
-                        width:50%;
-                        display:flex;
-                        align-items:center;
-                        justify-content:center;
-                        border-radius:5px;
-                        flex-direction: column;
-                        gap:3px;
-                        box-sizing: border-box;
-                        padding-right: 5%;
-                        padding-left:5%;
-                        transition: all 0.3s;
-                        img{
-                            width:25px;
-                            height:25px;
-                        }
-                        h3{
-                            font-size:14px;
-                            font-weight:700;
-                            margin:0;
-                            color: var(--text)
-                        }
-                        p{
-                            font-size:12px;
-                            font-weight:500;
-                            margin:0;
-                            color: var(--text);
-                            text-align: center;
-                        }
-                        &.selected{
-                            border: 1px solid var(--red);
-                            background-color: var(--background);
-                        }
-                    }
-                }
-            }
             &.input-col {
-                width: 30%;
-                min-width: 250px;
-                gap: 20px;
-
+                flex: 2;
             }
 
             &.preview-col {
-                flex-grow: 1;
+                flex: 1;
+                min-width: 300px;
+            }
+        }
 
-                /* Add any preview-col specific styles here */
-                .file-upload{
-                    aspect-ratio: 8.5/11;
-                    width:80%;
-                    box-sizing: border-box;
-                    max-width:350px;
+        .input-field {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+
+            &.mandatory {
+                position: relative;
+            }
+
+            &.mandatory .label::after {
+                content: " *";
+                color: var(--red);
+            }
+
+            .label {
+                font-weight: 600;
+                color: var(--text);
+                font-size: 14px;
+            }
+
+            input, textarea, select {
+                padding: 12px;
+                border: 1px solid var(--lightborder);
+                border-radius: 8px;
+                font-size: 14px;
+                color: var(--text);
+                background-color: var(--background);
+                transition: border-color 0.2s ease;
+
+                &:focus {
+                    outline: none;
+                    border-color: var(--primary);
+                }
+
+                &::placeholder {
+                    color: var(--text-secondary);
+                }
+            }
+
+            textarea {
+                min-height: 100px;
+                resize: vertical;
+                font-family: inherit;
+            }
+
+            select {
+                cursor: pointer;
+                appearance: none;
+                background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+                background-position: right 12px center;
+                background-repeat: no-repeat;
+                background-size: 16px;
+                padding-right: 40px;
+            }
+        }
+
+        .visibility {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+
+            .option {
+                flex: 1;
+                min-width: 200px;
+                padding: 20px;
+                border: 2px solid var(--lightborder);
+                border-radius: 12px;
+                cursor: pointer;
+                transition: all 0.2s ease;
+                text-align: center;
+
+                &:hover {
+                    border-color: var(--primary-light);
+                    background-color: var(--primary-light);
+                }
+
+                &.selected {
+                    border-color: var(--primary);
+                    background-color: var(--primary-light);
+                }
+
+                img {
+                    width: 40px;
+                    height: 40px;
+                    margin-bottom: 12px;
+                }
+
+                h3 {
+                    margin: 0 0 8px 0;
+                    font-size: 16px;
+                    font-weight: 600;
+                    color: var(--text);
+                }
+
+                p {
+                    margin: 0;
+                    font-size: 14px;
+                    color: var(--text-secondary);
+                }
+            }
+        }
+    }
+}
+
+@media (max-width: 768px) {
+    .gen-info {
+        .col-container {
+            flex-direction: column;
+            gap: 20px;
+
+            .col {
+                &.preview-col {
+                    min-width: auto;
+                }
+            }
+
+            .visibility {
+                flex-direction: column;
+                gap: 15px;
+
+                .option {
+                    min-width: auto;
                 }
             }
         }

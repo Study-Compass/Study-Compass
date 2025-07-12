@@ -3,23 +3,26 @@ import '../CreateComponents.scss';
 import './Review.scss';
 import Event from '../../EventsViewer/EventsGrid/EventsColumn/Event/Event';
 import {Icon} from '@iconify-icon/react';
-import GradientButtonCover from '../../../assets/GradientButtonCover.png';
 import FullEvent from '../../EventsViewer/EventsGrid/EventsColumn/FullEvent/FullEvent';
 
-function Review({info, visible, setInfo, onSubmit}){
-
-    const [checked, setChecked] = useState([]);
-
-    const [pspeak, setPspeak]  = useState(false);
+function Review({ formData, setFormData, onComplete }){
+    const [pspeak, setPspeak] = useState(false);
     const [catering, setCatering] = useState(false);
     const [alumni, setAlumni] = useState(false);
     const [none, setNone] = useState(false);
-    
-    //criteria to be able to create event
-    const [selected, setSelected] = useState(false);
-    const [contact, setContact] = useState("");
+    const [contact, setContact] = useState(formData.contact || "");
 
-    const [complete, setComplete] = useState(false);
+    // Update local state when formData changes
+    useEffect(() => {
+        if (formData.contact !== contact) setContact(formData.contact || "");
+        if (formData.OIEAcknowledgementItems) {
+            const items = formData.OIEAcknowledgementItems;
+            setPspeak(items.includes('pspeak'));
+            setCatering(items.includes('catering'));
+            setAlumni(items.includes('alumni'));
+            setNone(items.includes('none'));
+        }
+    }, [formData]);
 
     const handleChange = (e) => {
         const {name} = e.target;
@@ -48,55 +51,71 @@ function Review({info, visible, setInfo, onSubmit}){
                 setPspeak(false);
                 setAlumni(false);
                 setNone(!none);
+                break;
             default:
                 break;
         }
     }
 
-    useEffect(()=>{
-        if(pspeak || catering || alumni || none){
-            setSelected(true);
-        } else {
-            setSelected(false);
-        }
-        setInfo(prev => ({
+    useEffect(() => {
+        const hasAcknowledgement = pspeak || catering || alumni || none;
+        const hasContact = contact && contact.trim() !== "";
+        const isValid = hasAcknowledgement && hasContact;
+        
+        onComplete(isValid);
+        
+        const acknowledgementItems = [];
+        if (pspeak) acknowledgementItems.push('pspeak');
+        if (catering) acknowledgementItems.push('catering');
+        if (alumni) acknowledgementItems.push('alumni');
+        if (none) acknowledgementItems.push('none');
+        
+        setFormData(prev => ({
             ...prev,
-            OIEAcknowledgementItems: pspeak ? catering ? ["pspeak", "catering"] : ["pspeak"] : catering ? ["catering"] : [],
+            OIEAcknowledgementItems: acknowledgementItems,
             contact: contact
         }));
-    },[pspeak, catering, contact, alumni, none, contact]);
+    }, [pspeak, catering, alumni, none, contact, onComplete, setFormData]);
 
-    useEffect(()=>{
-        if(selected && contact !== ""){
-            setComplete(true);
-        } else {
-            setComplete(false);
-        }
-        console.log(contact);
-    },[selected, contact]);
+    // Create a preview event object from formData
+    const previewEvent = {
+        name: formData.name,
+        description: formData.description,
+        type: formData.type,
+        start_time: formData.start_time,
+        end_time: formData.end_time,
+        location: formData.location,
+        visibility: formData.visibility,
+        expectedAttendance: formData.expectedAttendance,
+        image: formData.selectedFile ? URL.createObjectURL(formData.selectedFile) : null
+    };
 
     return(
-        <div className={`create-component review ${visible && "visible"}`}>
-            <h1>review</h1>
+        <div className="create-component review">
             <div className="review-content">
                 <div className="preview">
-                    {info.name && info.start_time && info.description ?
+                    {formData.name && formData.start_time && formData.description ?
                         <div className="event-preview">
-                            <FullEvent event={info}/>
+                            <FullEvent event={previewEvent}/>
                         </div>
                         :
                         <div className="no-preview">
-                            <p>please complete other steps to see the event preview</p>
+                            <p>Please complete previous steps to see the event preview</p>
                         </div>
                     }
                 </div>
                 <div className="col">
                     <div className="contact">
-                        <h4>email address for contact:</h4>
-                        <input type="email" value={contact} onChange={(e)=>setContact(e.target.value)}/>
+                        <h4>Email address for contact:</h4>
+                        <input 
+                            type="email" 
+                            value={contact} 
+                            onChange={(e) => setContact(e.target.value)}
+                            placeholder="Enter your contact email"
+                        />
                     </div>
                     <div className="oie-acknowledgement">
-                        <h4>before you submit, select at least one below:</h4>
+                        <h4>Before you submit, select at least one below:</h4>
                         <div className="acknowledgement">
                             <label className="check">
                                 <input type="checkbox" id="pspeak" name="pspeak" checked={pspeak} onChange={handleChange}/>
@@ -113,7 +132,7 @@ function Review({info, visible, setInfo, onSubmit}){
                                     <Icon icon="icon-park-solid:check-one" />
                                 </span>
                             </label>
-                            <label htmlFor="catering">This even requires catering</label>
+                            <label htmlFor="catering">This event requires catering</label>
                         </div>
                         <div className="acknowledgement">
                             <label className="check">
@@ -134,20 +153,15 @@ function Review({info, visible, setInfo, onSubmit}){
                             <label htmlFor="none">None of the above</label>
                         </div>
                     </div>
-                </div>
-
-            </div>
-            <div className="publish-container">
-                {visible && 
-                    <div className={`publish ${complete && 'active'}`} onClick={complete ? onSubmit : ()=>{}}>
-                        <div className="info">
-                            <h1>{pspeak || catering || info.expectedAttendance > 99 || alumni ? "request OIE approval" : "publish event"}</h1>
-                        </div>
-                        <div className="gradient-cover">
-                            <img src={GradientButtonCover} alt="" />
-                        </div>
+                    
+                    <div className="submission-info">
+                        <h4>Submission Type:</h4>
+                        <p>{pspeak || catering || formData.expectedAttendance > 99 || alumni ? 
+                            "This event will require OIE approval" : 
+                            "This event will be published immediately"
+                        }</p>
                     </div>
-                }
+                </div>
             </div>
         </div>
     );

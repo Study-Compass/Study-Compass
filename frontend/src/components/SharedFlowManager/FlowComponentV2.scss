@@ -1,0 +1,213 @@
+.shared-flow-manager {
+    display: flex;
+    width: 100%;
+    height: 100vh;
+    background-color: var(--background);
+
+    .setup-container {
+        display: flex;
+        width: 100%;
+        height: 100%;
+    }
+
+    .steps-sidebar {
+        width: 350px;
+        padding: 40px 30px;
+        background-color: var(--card-background);
+        border-right: 1px solid var(--lightborder);
+        overflow-y: auto;
+
+        .steps-header {
+            margin-bottom: 40px;
+
+            .row {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                margin-bottom: 10px;
+
+                h1 {
+                    font-size: 24px;
+                    font-weight: 600;
+                    color: var(--text);
+                    margin: 0;
+                }
+            }
+
+            p {
+                color: var(--text-secondary);
+                font-size: 14px;
+                margin: 0;
+            }
+        }
+
+        .steps-list {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+
+            .step-item {
+                display: flex;
+                align-items: flex-start;
+                gap: 15px;
+                padding: 15px;
+                border-radius: 8px;
+                cursor: pointer;
+                transition: all 0.2s ease;
+
+                &:hover {
+                    background-color: var(--hover-background);
+                }
+
+                &.active {
+                    background-color: var(--primary-light);
+                    border-left: 3px solid var(--primary);
+                }
+
+                &.completed {
+                    .step-number {
+                        background-color: var(--success);
+                        color: white;
+                    }
+                }
+
+                .step-number {
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    width: 30px;
+                    height: 30px;
+                    border-radius: 50%;
+                    background-color: var(--lightborder);
+                    color: var(--text-secondary);
+                    font-weight: 600;
+                    font-size: 14px;
+                    flex-shrink: 0;
+                }
+
+                .step-content {
+                    flex: 1;
+
+                    h3 {
+                        font-size: 16px;
+                        font-weight: 600;
+                        color: var(--text);
+                        margin: 0 0 5px 0;
+                    }
+
+                    p {
+                        font-size: 14px;
+                        color: var(--text-secondary);
+                        margin: 0;
+                    }
+                }
+            }
+        }
+    }
+
+    .content-area {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+
+        .content-header {
+            padding: 40px 50px 30px 50px;
+            border-bottom: 1px solid var(--lightborder);
+
+            h2 {
+                font-size: 28px;
+                font-weight: 600;
+                color: var(--text);
+                margin: 0 0 10px 0;
+            }
+
+            p {
+                color: var(--text-secondary);
+                font-size: 16px;
+                margin: 0;
+            }
+        }
+
+        .step-content {
+            flex: 1;
+            padding: 40px 50px;
+            overflow-y: auto;
+        }
+
+        .navigation-buttons {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 50px;
+            border-top: 1px solid var(--lightborder);
+            background-color: var(--card-background);
+
+            .right-buttons {
+                display: flex;
+                gap: 10px;
+            }
+
+            .btn-primary {
+                padding: 12px 24px;
+                background-color: var(--primary);
+                color: white;
+                border: none;
+                border-radius: 8px;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.2s ease;
+
+                &:hover:not(.disabled) {
+                    background-color: var(--primary-dark);
+                }
+
+                &.disabled {
+                    background-color: var(--disabled);
+                    cursor: not-allowed;
+                    opacity: 0.6;
+                }
+            }
+
+            .btn-secondary {
+                padding: 12px 24px;
+                background-color: transparent;
+                color: var(--text-secondary);
+                border: 1px solid var(--lightborder);
+                border-radius: 8px;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.2s ease;
+
+                &:hover:not(:disabled) {
+                    background-color: var(--hover-background);
+                    color: var(--text);
+                }
+
+                &:disabled {
+                    cursor: not-allowed;
+                    opacity: 0.6;
+                }
+            }
+        }
+    }
+}
+
+@media (max-width: 768px) {
+    .shared-flow-manager {
+        .steps-sidebar {
+            width: 100%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+            height: auto;
+            max-height: 40vh;
+            overflow-y: auto;
+        }
+
+        .content-area {
+            margin-top: 40vh;
+        }
+    }
+} 

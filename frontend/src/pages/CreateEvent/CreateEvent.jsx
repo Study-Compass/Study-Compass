@@ -1,50 +1,58 @@
 import React, { useState, useEffect } from 'react';
-import './CreateEvent.scss';
-import Header from '../../components/Header/Header';
-import EventInfo from '../../assets/Icons/EventInfo.svg';
-import Calendar from '../../assets/Icons/Calendar.svg';
-import CheckBlack from '../../assets/Icons/CheckBlack.svg';
-import EventDateTimeSelection from '../../components/CreateEvent/EventDateTimeSelection/EventDateTimeSelection';
-import GenInfo from '../../components/CreateEvent/GenInfo/GenInfo';
-import Review from '../../components/CreateEvent/Review/Review';
-import CustomFormFill from '../../components/CreateEvent/CustomFormFill/CustomFormFill';
-import { useNotification } from '../../NotificationContext';
-import { createEvent } from './CreateEventHelpers';
 import { useNavigate, useLocation } from 'react-router-dom';
+import FlowComponentV2 from '../../components/SharedFlowManager/FlowComponentV2';
+import { useNotification } from '../../NotificationContext';
 import useAuth from '../../hooks/useAuth';
-import { Icon } from '@iconify-icon/react/dist/iconify.mjs';
-import defaultAvatar from '../../assets/defaultAvatar.svg'
-import postRequest from '../../utils/postRequest';
+import { createEvent } from './CreateEventHelpers';
+import defaultAvatar from '../../assets/defaultAvatar.svg';
+
+// Step components
+import GenInfo from '../../components/CreateEvent/GenInfo/GenInfo';
+import EventDateTimeSelection from '../../components/CreateEvent/EventDateTimeSelection/EventDateTimeSelection';
+import CustomFormFill from '../../components/CreateEvent/CustomFormFill/CustomFormFill';
+import Review from '../../components/CreateEvent/Review/Review';
 
 function CreateEvent(){
     const location = useLocation();
-    const origin = location.state ? location.state.origin : "";
-    const [step, setStep] = useState(0);
-    const [info, setInfo] = useState({});
-    const [finishedStep, setFinishedStep] = useState(0);
-    const {isAuthenticated, isAuthenticating, user} = useAuth();
-    const [alias, setAlias] = useState(null);
     const navigate = useNavigate();
-    const [showDrop, setShowDrop] = useState(false);
+    const { addNotification } = useNotification();
+    const { isAuthenticated, isAuthenticating, user } = useAuth();
+    
+    const origin = location.state ? location.state.origin : "";
+    const [alias, setAlias] = useState(null);
 
-    const [showForm, setShowForm] = useState(false);
+    const [formData, setFormData] = useState({
+        name: '',
+        description: '',
+        type: '',
+        visibility: '',
+        expectedAttendance: '',
+        selectedFile: null,
+        dateTime: null,
+        location: '',
+        start_time: null,
+        end_time: null,
+        OIEAcknowledgementItems: [],
+        contact: '',
+        customFormData: null
+    });
 
-    useEffect(()=>{
-        if(isAuthenticating){
+    useEffect(() => {
+        if (isAuthenticating) {
             return;
         }
-        if(!isAuthenticated){
+        if (!isAuthenticated) {
             navigate('/');
         }
-        if(!user){
+        if (!user) {
             return;
         }
-        if(!(user.roles.includes('oie') || user.roles.includes('admin') || user.roles.includes('developer'))){
+        if (!(user.roles.includes('oie') || user.roles.includes('admin') || user.roles.includes('developer'))) {
             navigate('/');
         }
-        if(origin && origin !== ""){
-            const club = user.clubAssociations.find((org)=>org.org_name === origin);
-            if(club){
+        if (origin && origin !== "") {
+            const club = user.clubAssociations.find((org) => org.org_name === origin);
+            if (club) {
                 setAlias({
                     img: club.org_profile_image,
                     text: club.org_name,
@@ -62,172 +70,104 @@ function CreateEvent(){
                 type: 'user'
             });
         }
-    }, [isAuthenticating, isAuthenticated, user]);
+    }, [isAuthenticating, isAuthenticated, user, origin, navigate]);
 
-    const {addNotification} = useNotification();
-    
-    const nextStep = () => {
-            setStep(step+1);
-            setFinishedStep(step+1);
-    }
-
-    useEffect(()=>{
-        if(info.location === 'Darrin Communications Center 330'){
-            setShowForm(true);
-        } else {
-            setShowForm(false);
+    const steps = [
+        {
+            id: 0,
+            title: 'General Information',
+            description: 'Basic event details and description',
+            component: GenInfo,
+        },
+        {
+            id: 1,
+            title: 'Date & Time',
+            description: 'When and where your event will take place',
+            component: EventDateTimeSelection,
+        },
+        ...(formData.location === 'Darrin Communications Center 330' ? [{
+            id: 2,
+            title: 'Custom Form',
+            description: 'Additional form requirements',
+            component: CustomFormFill,
+        }] : []),
+        {
+            id: formData.location === 'Darrin Communications Center 330' ? 3 : 2,
+            title: 'Review & Submit',
+            description: 'Review your event details and submit',
+            component: Review,
         }
-    }, [info])
+    ];
 
-    const renderStep = () => {
-        switch(step){
-            case 0:
-                return <GenInfo next={nextStep}/>
-            case 1:
-                return <EventDateTimeSelection next={nextStep}/>
-            case 2:
-                return <EventDateTimeSelection next={nextStep}/>
-            case 3:
-                if(showForm){
-                    return <CustomFormFill next={nextStep}/>
-                } else {
-                    return <Review next={nextStep}/>
-                }
-            case 4:
-                return <Review next={nextStep}/>
-            default:
-                return <GenInfo next={nextStep}/>
-        }
-    }
-
-    const handleSwitch = (step) => {
-        if(finishedStep < step){
-            addNotification({title: "Please complete previous steps", message: "Please complete the previous steps before proceeding", type: "error"});
-        } else{
-            setStep(step);
-        }
-    }
-
-    const onSubmit = async () => {
-        const location1 = info.location;
-        console.log(location1);
+    const handleSubmit = async (formData) => {
         let formattedInfo = {
-            ...info
-        }
-        if (alias.text !== user.username){
+            ...formData
+        };
+
+        if (alias && alias.text !== user.username) {
             formattedInfo = {
                 ...formattedInfo,
                 orgId: alias.id,
-            }
+            };
         }
 
         // Create FormData if we have an image
-        const formData = new FormData();
-        if (info.selectedFile) {
+        const submitData = new FormData();
+        if (formData.selectedFile) {
             console.log('Uploading image');
-            formData.append('image', info.selectedFile);
+            submitData.append('image', formData.selectedFile);
         }
 
         // Append all other event data
         Object.keys(formattedInfo).forEach(key => {
             if (key !== 'selectedFile' && key !== 'image') {
-                formData.append(key, formattedInfo[key]);
+                if (typeof formattedInfo[key] === 'object' && formattedInfo[key] !== null) {
+                    submitData.append(key, JSON.stringify(formattedInfo[key]));
+                } else {
+                    submitData.append(key, formattedInfo[key]);
+                }
             }
         });
 
-        const response = await createEvent(formData);
+        const response = await createEvent(submitData);
 
-        if(response){
-            addNotification({title: "Event created", message: "Your event has been created successfully", type: "success"});
+        if (response) {
+            addNotification({
+                title: "Event created", 
+                message: "Your event has been created successfully", 
+                type: "success"
+            });
+            navigate('/events');
         } else {
-            addNotification({title: "Failed to create event", message: "An error occurred while creating your event", type: "error"});
+            throw new Error("Failed to create event");
         }
+    };
+
+    const handleError = (error) => {
+        addNotification({
+            title: "Failed to create event", 
+            message: error.message || "An error occurred while creating your event", 
+            type: "error"
+        });
+    };
+
+    if (!alias) {
+        return <div>Loading...</div>;
     }
 
-    const onSelectAlias = (alias) => {
-        setAlias(alias);
-        setShowDrop(false);
-    }
-
-    return(
-        <div className="create-event page">
-            <Header/>
-            <div className="content-container">
-                <div className="content">
-                    <div className="create-steps">
-                        <div className="create-header">
-                            <h1>create event</h1>
-                            <div className="alias">
-                                <p>as</p>
-                                <div className="choice-container">
-                                    <div className="choose" onClick={()=>setShowDrop(!showDrop)}>
-                                        {
-                                            alias && 
-                                            <div className="choice">
-                                                <img src={alias.img} alt="" />
-                                                <p>{alias.text}</p>
-                                            </div>
-                                        }
-                                        <Icon icon={`${showDrop ? "ic:round-keyboard-arrow-up" : "ic:round-keyboard-arrow-down"}`} width="24" height="24"  />
-                                    </div>
-                                    {
-                                        showDrop && 
-                                        <div className={`dropdown`} >
-                                            {user && 
-                                                <div className="drop-option" onClick={()=>onSelectAlias({img: user.pfp ? user.pfp : defaultAvatar, text: user.username, id: user._id, type: 'user'})}>
-                                                    <img src={user.pfp ? user.pfp : defaultAvatar} alt="" />
-                                                    <p>{user.username}</p>
-                                                </div>
-                                            }
-                                            {
-                                                user && user.clubAssociations && user.clubAssociations.map((org)=>{
-                                                    return(
-                                                        <div className="drop-option" key={org._id} onClick={()=>onSelectAlias({img: org.org_profile_image, text: org.org_name, id: org._id, type: "club"})}>
-                                                            <img src={org.org_profile_image} alt="" />
-                                                            <p>{org.org_name}</p>
-                                                        </div>
-                                                    )
-                                                })
-                                            }
-                                        </div>
-                                    }
-                                </div>
-                            </div>
-                        </div>
-                        <div className="steps">
-                            <div className={`step ${step === 0 && "selected"}`} onClick={()=>{handleSwitch(0)}}>
-                                <img src={EventInfo} alt="" />
-                                <p>information</p>
-                            </div>
-                            <div className={`step ${step === 1 && "selected"}`}  onClick={()=>{handleSwitch(1)}}>
-                                <img src={Calendar} alt="" />
-                                <p>when</p>
-                            </div>
-                            {
-                                showForm &&
-                                <div className={`step ${step === 2 && "selected"}`} onClick={()=>{handleSwitch(2)}}>
-                                    <Icon icon="mdi:form" />
-                                    <p>form</p> 
-                                </div>
-                            }
-                            <div className={`step ${(showForm ? step === 3 : step === 2 )&& "selected"}`}  onClick={()=>{handleSwitch(showForm ? 3 : 2)}}>
-                                <img src={CheckBlack} alt="" />
-                                <p>review</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="create-workspace">
-                        <GenInfo next={nextStep} visible={step === 0} setInfo={setInfo}/>
-                        <EventDateTimeSelection next={nextStep} visible={step === 1} setInfo={setInfo}/>
-                        {
-                            showForm &&
-                            <CustomFormFill next={nextStep} visible={step === 2} setInfo={setInfo}/>
-                        }
-                        <Review next={nextStep} visible={showForm ? step === 3 : step === 2} info={info} setInfo={setInfo} onSubmit={onSubmit}/>
-                    </div>
-                </div>
-            </div>
-        </div>
+    return (
+        <FlowComponentV2
+            steps={steps}
+            formData={formData}
+            setFormData={setFormData}
+            onSubmit={handleSubmit}
+            onError={handleError}
+            headerTitle="Create Event"
+            headerSubtitle={`Creating as ${alias.text}`}
+            submitButtonText="Create Event"
+            submittingButtonText="Creating..."
+            className="create-event-v2"
+        />
     );
 }
 
