@@ -197,439 +197,17 @@ class SAMLService {
             console.log('🔧 SAML Service: Response contains signature:', hasSignature);
             console.log('🔧 SAML Service: Response contains encrypted assertion:', hasEncryptedAssertion);
             
-            // Try to parse the SAML response with different approaches
+            // Try to parse the SAML response with samlify
             let extract;
             
-            // First, try to manually decrypt the assertion using the private key
             try {
-                console.log('🔧 SAML Service: Attempting manual decryption approach...');
-                
-                // Import required modules for manual decryption
-                const crypto = require('crypto');
-                const xml2js = require('xml2js');
-                
-                // Decode the SAML response
-                const decodedResponse = Buffer.from(samlResponse, 'base64').toString('utf8');
-                
-                // Parse the XML to get the encrypted assertion
-                const parser = new xml2js.Parser({ explicitArray: false });
-                const result = await parser.parseStringPromise(decodedResponse);
-                
-                console.log('🔧 SAML Service: XML parsing result keys:', Object.keys(result));
-                
-                const response = result['saml2p:Response'];
-                console.log('🔧 SAML Service: Response keys:', Object.keys(response));
-                
-                // Try to get status with namespace prefix
-                const statusElement = response['saml2p:Status'];
-                console.log('🔧 SAML Service: Status element:', statusElement);
-                
-                let status = null;
-                if (statusElement) {
-                    const statusCode = statusElement['saml2p:StatusCode'];
-                    console.log('🔧 SAML Service: StatusCode element:', statusCode);
-                    
-                    if (statusCode) {
-                        status = statusCode.$?.Value || statusCode.Value;
-                        console.log('🔧 SAML Service: Extracted status:', status);
-                    }
-                }
-                
-                // Fallback to non-namespaced path
-                if (!status) {
-                    status = response?.Status?.StatusCode?.$?.Value;
-                    console.log('🔧 SAML Service: Fallback status:', status);
-                }
-                
-                if (status !== 'urn:oasis:names:tc:SAML:2.0:status:Success') {
-                    console.log('🔧 SAML Service: Status check failed, trying alternative paths...');
-                    
-                    // Try alternative status paths
-                    const altStatus = response?.Status?.StatusCode?.Value || 
-                                    response?.Status?.StatusCode?.[0]?.Value ||
-                                    response?.Status?.StatusCode ||
-                                    statusElement?.['saml2p:StatusCode']?.Value;
-                    
-                    console.log('🔧 SAML Service: Alternative status:', altStatus);
-                    
-                    if (altStatus !== 'urn:oasis:names:tc:SAML:2.0:status:Success') {
-                        throw new Error(`SAML status is not Success: ${status || altStatus}`);
-                    }
-                }
-                
-                console.log('🔧 SAML Service: SAML status is Success, attempting to decrypt assertion...');
-                
-                // Get the encrypted assertion
-                const encryptedAssertion = response['saml2:EncryptedAssertion'];
-                if (!encryptedAssertion) {
-                    throw new Error('No encrypted assertion found in SAML response');
-                }
-                
-                console.log('🔧 SAML Service: Found encrypted assertion, attempting decryption...');
-                
-                // Extract the encrypted data
-                const encryptedData = encryptedAssertion['xenc:EncryptedData'];
-                if (!encryptedData) {
-                    throw new Error('No EncryptedData found in encrypted assertion');
-                }
-                
-                // Get the encryption method and key info
-                const encryptionMethod = encryptedData['xenc:EncryptionMethod'];
-                const keyInfo = encryptedData['ds:KeyInfo'];
-                
-                if (!encryptionMethod || !keyInfo) {
-                    throw new Error('Missing encryption method or key info');
-                }
-                
-                console.log('🔧 SAML Service: Encryption method:', encryptionMethod);
-                console.log('🔧 SAML Service: Key info present:', !!keyInfo);
-                
-                // Get the encrypted key - it's nested inside ds:KeyInfo
-                const encryptedKey = keyInfo['xenc:EncryptedKey'];
-                if (!encryptedKey) {
-                    console.log('🔧 SAML Service: No EncryptedKey found in KeyInfo');
-                    console.log('🔧 SAML Service: KeyInfo structure:', JSON.stringify(keyInfo, null, 2));
-                    throw new Error('No EncryptedKey found');
-                }
-                
-                // Get the encrypted key data
-                const cipherData = encryptedKey['xenc:CipherData'];
-                if (!cipherData) {
-                    console.log('🔧 SAML Service: No CipherData found in EncryptedKey');
-                    console.log('🔧 SAML Service: EncryptedKey structure:', JSON.stringify(encryptedKey, null, 2));
-                    throw new Error('No CipherData found in EncryptedKey');
-                }
-                
-                const cipherValue = cipherData['xenc:CipherValue'];
-                if (!cipherValue) {
-                    console.log('🔧 SAML Service: No CipherValue found in CipherData');
-                    console.log('🔧 SAML Service: CipherData structure:', JSON.stringify(cipherData, null, 2));
-                    throw new Error('No CipherValue found in CipherData');
-                }
-                
-                // Decode the encrypted key
-                const encryptedKeyData = Buffer.from(cipherValue, 'base64');
-                console.log('🔧 SAML Service: Encrypted key length:', encryptedKeyData.length);
-                
-                // Get the SP private key for decryption
-                const privateKey = spConfig.privateKey;
-                if (!privateKey) {
-                    throw new Error('No private key available for decryption');
-                }
-                
-                // Decrypt the session key using the private key
-                // The IdP is using RSA-OAEP-MGF1P, so we need to use OAEP padding
-                const sessionKey = crypto.privateDecrypt(
-                    {
-                        key: privateKey,
-                        padding: crypto.constants.RSA_PKCS1_OAEP_PADDING,
-                        oaepHash: 'sha1' // Based on the DigestMethod in the XML
-                    },
-                    encryptedKeyData
-                );
-                
-                console.log('🔧 SAML Service: Session key decrypted, length:', sessionKey.length);
-                
-                // Get the encrypted assertion data
-                const assertionCipherData = encryptedData['xenc:CipherData'];
-                if (!assertionCipherData) {
-                    console.log('🔧 SAML Service: No CipherData found in EncryptedData');
-                    console.log('🔧 SAML Service: EncryptedData structure:', JSON.stringify(encryptedData, null, 2));
-                    throw new Error('No CipherData found in EncryptedData');
-                }
-                
-                const assertionCipherValue = assertionCipherData['xenc:CipherValue'];
-                if (!assertionCipherValue) {
-                    console.log('🔧 SAML Service: No CipherValue found in assertion CipherData');
-                    console.log('🔧 SAML Service: Assertion CipherData structure:', JSON.stringify(assertionCipherData, null, 2));
-                    throw new Error('No CipherValue found in assertion CipherData');
-                }
-                
-                // Decode the encrypted assertion
-                const encryptedAssertionData = Buffer.from(assertionCipherValue, 'base64');
-                console.log('🔧 SAML Service: Encrypted assertion data length:', encryptedAssertionData.length);
-                
-                // Get the algorithm from encryption method
-                const algorithm = encryptionMethod.$.Algorithm;
-                console.log('🔧 SAML Service: Encryption algorithm:', algorithm);
-                
-                // Determine the cipher algorithm
-                let cipherAlgorithm;
-                let ivLength = 16;
-                
-                if (algorithm.includes('aes128-gcm')) {
-                    cipherAlgorithm = 'aes-128-gcm';
-                    ivLength = 12; // GCM uses 12-byte IV
-                } else if (algorithm.includes('aes256-gcm')) {
-                    cipherAlgorithm = 'aes-256-gcm';
-                    ivLength = 12;
-                } else if (algorithm.includes('AES128')) {
-                    cipherAlgorithm = 'aes-128-cbc';
-                    ivLength = 16;
-                } else if (algorithm.includes('AES256')) {
-                    cipherAlgorithm = 'aes-256-cbc';
-                    ivLength = 16;
-                } else if (algorithm.includes('AES192')) {
-                    cipherAlgorithm = 'aes-192-cbc';
-                    ivLength = 16;
-                } else {
-                    throw new Error(`Unsupported encryption algorithm: ${algorithm}`);
-                }
-                
-                // Extract IV from the encrypted data
-                const iv = encryptedAssertionData.slice(0, ivLength);
-                const ciphertext = encryptedAssertionData.slice(ivLength);
-                
-                console.log('🔧 SAML Service: IV length:', iv.length);
-                console.log('🔧 SAML Service: Ciphertext length:', ciphertext.length);
-                
-                // Decrypt the assertion
-                const decipher = crypto.createDecipheriv(cipherAlgorithm, sessionKey, iv);
-                let decryptedAssertion;
-                
-                // For GCM mode, we need to handle the auth tag
-                if (cipherAlgorithm.includes('gcm')) {
-                    // GCM mode - the last 16 bytes are the auth tag
-                    const authTag = ciphertext.slice(-16);
-                    const actualCiphertext = ciphertext.slice(0, -16);
-                    decipher.setAuthTag(authTag);
-                    
-                    decryptedAssertion = decipher.update(actualCiphertext, null, 'utf8');
-                    decryptedAssertion += decipher.final('utf8');
-                } else {
-                    // CBC mode
-                    decryptedAssertion = decipher.update(ciphertext, null, 'utf8');
-                    decryptedAssertion += decipher.final('utf8');
-                }
-                
-                console.log('🔧 SAML Service: Assertion decrypted successfully');
-                console.log('🔧 SAML Service: Decrypted assertion preview:', decryptedAssertion.substring(0, 200) + '...');
-                
-                // Parse the decrypted assertion
-                const assertionParser = new xml2js.Parser({ explicitArray: false });
-                const assertionResult = await assertionParser.parseStringPromise(decryptedAssertion);
-                
-                console.log('🔧 SAML Service: Assertion parsed, keys:', Object.keys(assertionResult));
-                
-                // Extract the assertion
-                const assertion = assertionResult['saml2:Assertion'];
-                if (!assertion) {
-                    throw new Error('No Assertion found in decrypted data');
-                }
-                
-                console.log('🔧 SAML Service: Assertion keys:', Object.keys(assertion));
-                
-                // Extract NameID
-                const subject = assertion['saml2:Subject'];
-                if (!subject) {
-                    throw new Error('No Subject found in assertion');
-                }
-                
-                const nameIdElement = subject['saml2:NameID'];
-                if (!nameIdElement) {
-                    throw new Error('No NameID found in subject');
-                }
-                
-                const nameId = nameIdElement._ || nameIdElement;
-                console.log('🔧 SAML Service: Extracted NameID:', nameId);
-                
-                // Extract attributes
-                const attributeStatement = assertion['saml2:AttributeStatement'];
-                if (!attributeStatement) {
-                    throw new Error('No AttributeStatement found in assertion');
-                }
-                
-                const attributes = {};
-                const attributeElements = attributeStatement['saml2:Attribute'];
-                
-                if (Array.isArray(attributeElements)) {
-                    attributeElements.forEach(attr => {
-                        const name = attr.$.Name;
-                        const values = attr['saml2:AttributeValue'];
-                        if (values && values.length > 0) {
-                            attributes[name] = values[0]._ || values[0];
-                        }
-                    });
-                } else if (attributeElements) {
-                    const name = attributeElements.$.Name;
-                    const values = attributeElements['saml2:AttributeValue'];
-                    if (values && values.length > 0) {
-                        attributes[name] = values[0]._ || values[0];
-                    }
-                }
-                
-                console.log('🔧 SAML Service: Extracted attributes:', attributes);
-                
-                // Create the extract object with real data
-                extract = {
-                    success: true,
-                    nameID: nameId,
-                    attributes: attributes
-                };
-                
-                console.log('🔧 SAML Service: Manual decryption approach successful');
-                
-            } catch (manualError) {
-                console.log('🔧 SAML Service: Manual decryption failed, trying samlify approaches...');
-                console.log('   Manual error:', manualError.message);
-                
-                // Try the standard samlify approach
-                try {
-                    console.log('🔧 SAML Service: Trying standard samlify parsing...');
-                    const response = await sp.parseLoginResponse(idp, 'post', mockRequest);
-                    extract = response.extract;
-                } catch (parseError) {
-                    console.log('🔧 SAML Service: Standard parsing failed, trying with relaxed options...');
-                    console.log('   Parse error:', parseError.message);
-                    
-                    // Try with relaxed signature verification
-                    try {
-                        const response = await sp.parseLoginResponse(idp, 'post', mockRequest, {
-                            allowUnencryptedAssertion: true
-                        });
-                        extract = response.extract;
-                    } catch (relaxedError) {
-                        console.log('🔧 SAML Service: Relaxed parsing failed, trying with signature verification disabled...');
-                        console.log('   Relaxed error:', relaxedError.message);
-                        
-                        // Try with signature verification completely disabled
-                        try {
-                            const response = await sp.parseLoginResponse(idp, 'post', mockRequest, {
-                                skipSignatureVerification: true,
-                                ignoreSignature: true,
-                                validateSignature: false,
-                                allowUnencryptedAssertion: true
-                            });
-                            extract = response.extract;
-                        } catch (finalError) {
-                            console.log('🔧 SAML Service: All samlify approaches failed, using fallback...');
-                            console.log('   Final error:', finalError.message);
-                            
-                            // Use the manual approach as fallback
-                            const xml2js = require('xml2js');
-                            const parser = new xml2js.Parser({ explicitArray: false });
-                            
-                            // Decode the SAML response
-                            const decodedResponse = Buffer.from(samlResponse, 'base64').toString('utf8');
-                            
-                            // Parse the XML
-                            const result = await parser.parseStringPromise(decodedResponse);
-                            console.log('🔧 SAML Service: Raw XML parsed successfully');
-                            
-                            // Extract basic information from the parsed XML
-                            const response = result['saml2p:Response'];
-                            console.log('🔧 SAML Service: Fallback response keys:', Object.keys(response));
-                            
-                            // Try to get status with namespace prefix
-                            const statusElement = response['saml2p:Status'];
-                            console.log('🔧 SAML Service: Fallback status element:', statusElement);
-                            
-                            let status = null;
-                            if (statusElement) {
-                                const statusCode = statusElement['saml2p:StatusCode'];
-                                console.log('🔧 SAML Service: Fallback StatusCode element:', statusCode);
-                                
-                                if (statusCode) {
-                                    status = statusCode.$?.Value || statusCode.Value;
-                                    console.log('🔧 SAML Service: Fallback extracted status:', status);
-                                }
-                            }
-                            
-                            // Fallback to non-namespaced path
-                            if (!status) {
-                                status = response?.Status?.StatusCode?.$?.Value;
-                                console.log('🔧 SAML Service: Fallback fallback status:', status);
-                            }
-                            
-                            // Try alternative status paths
-                            const altStatus = response?.Status?.StatusCode?.Value || 
-                                            response?.Status?.StatusCode?.[0]?.Value ||
-                                            response?.Status?.StatusCode ||
-                                            statusElement?.['saml2p:StatusCode']?.Value;
-                            
-                            console.log('🔧 SAML Service: Fallback alternative status:', altStatus);
-                            
-                            if (status === 'urn:oasis:names:tc:SAML:2.0:status:Success' || 
-                                altStatus === 'urn:oasis:names:tc:SAML:2.0:status:Success') {
-                                console.log('🔧 SAML Service: SAML status is Success');
-                                
-                                // Try to extract real data from the response if possible
-                                let realNameId = 'unknown';
-                                let realAttributes = {};
-                                
-                                // Look for NameID in the response - try multiple paths
-                                const issuer = response['saml2:Issuer'];
-                                if (issuer) {
-                                    realNameId = issuer._ || issuer;
-                                }
-                                
-                                // Try to find any unencrypted assertion or attributes
-                                const unencryptedAssertion = response['saml2:Assertion'];
-                                if (unencryptedAssertion) {
-                                    console.log('🔧 SAML Service: Found unencrypted assertion');
-                                    
-                                    // Extract NameID from unencrypted assertion
-                                    const subject = unencryptedAssertion['saml2:Subject'];
-                                    if (subject) {
-                                        const nameIdElement = subject['saml2:NameID'];
-                                        if (nameIdElement) {
-                                            realNameId = nameIdElement._ || nameIdElement;
-                                        }
-                                    }
-                                    
-                                    // Extract attributes from unencrypted assertion
-                                    const attributeStatement = unencryptedAssertion['saml2:AttributeStatement'];
-                                    if (attributeStatement) {
-                                        const attributeElements = attributeStatement['saml2:Attribute'];
-                                        if (Array.isArray(attributeElements)) {
-                                            attributeElements.forEach(attr => {
-                                                const name = attr.$.Name;
-                                                const values = attr['saml2:AttributeValue'];
-                                                if (values && values.length > 0) {
-                                                    realAttributes[name] = values[0]._ || values[0];
-                                                }
-                                            });
-                                        } else if (attributeElements) {
-                                            const name = attributeElements.$.Name;
-                                            const values = attributeElements['saml2:AttributeValue'];
-                                            if (values && values.length > 0) {
-                                                realAttributes[name] = values[0]._ || values[0];
-                                            }
-                                        }
-                                    }
-                                }
-                                
-                                // If we still don't have a proper NameID, try to extract from encrypted assertion metadata
-                                if (realNameId === 'unknown' || realNameId === issuer._ || realNameId === issuer) {
-                                    const encryptedAssertion = response['saml2:EncryptedAssertion'];
-                                    if (encryptedAssertion) {
-                                        // Try to get any metadata about the encrypted assertion
-                                        console.log('🔧 SAML Service: Found encrypted assertion, attempting to extract metadata...');
-                                        
-                                        // For now, use a placeholder that indicates we need to decrypt
-                                        realNameId = 'encrypted-assertion-needs-decryption';
-                                        realAttributes = {
-                                            _encrypted: true,
-                                            _message: 'Assertion is encrypted and decryption failed'
-                                        };
-                                    }
-                                }
-                                
-                                console.log('🔧 SAML Service: Extracted real data - NameID:', realNameId);
-                                console.log('🔧 SAML Service: Extracted real data - Attributes:', realAttributes);
-                                
-                                // Create extract object with available real data
-                                extract = {
-                                    success: true,
-                                    nameID: realNameId,
-                                    attributes: realAttributes
-                                };
-                            } else {
-                                throw new Error(`SAML status is not Success: ${status || altStatus}`);
-                            }
-                        }
-                    }
-                }
+                console.log('🔧 SAML Service: Attempting samlify parsing...');
+                const response = await sp.parseLoginResponse(idp, 'post', mockRequest);
+                extract = response.extract;
+                console.log('🔧 SAML Service: samlify parsing successful');
+            } catch (parseError) {
+                console.log('🔧 SAML Service: samlify parsing failed:', parseError.message);
+                throw new Error(`SAML parsing failed: ${parseError.message}`);
             }
             
             console.log('🔧 SAML Service: Response parsed successfully');
@@ -744,6 +322,40 @@ class SAMLService {
                            attributes.email?.split('@')[0] ||
                            username;
 
+        // Handle case where we don't have real user data yet (encrypted assertion)
+        if (nameId === 'encrypted-assertion-needs-decryption' || !attributes.email) {
+            console.log('🔧 SAML Service: No real user data available, creating placeholder user');
+            
+            // Create a placeholder user that can be updated later
+            const user = new User({
+                samlId: nameId,
+                samlProvider: school,
+                samlAttributes: attributes,
+                email: `placeholder-${Date.now()}@${school}.study-compass.com`, // Temporary placeholder
+                username: username,
+                name: displayName || 'SAML User (Pending)',
+                roles: config.userProvisioning.defaultRoles,
+                onboarded: false,
+                _needsUpdate: true // Flag to indicate this user needs real data
+            });
+            
+            await user.save();
+            
+            // Send notification about placeholder user
+            sendDiscordMessage(
+                `SAML placeholder user created`, 
+                `Placeholder user ${username} created via SAML (${school}) - needs decryption`, 
+                "warning"
+            );
+            
+            // Return populated user
+            return await User.findById(user._id)
+                .select('-password -refreshToken')
+                .lean()
+                .populate('clubAssociations');
+        }
+        
+        // Normal case with real user data
         const user = new User({
             samlId: nameId,
             samlProvider: school,

@@ -264,6 +264,8 @@ samlConfigSchema.methods.toSamlifyConfig = function() {
         signingCert: this.sp.x509Cert,
         encryptCert: this.sp.x509Cert, // Use same certificate for encryption
         privateKey: this.sp.privateKey,
+        encPrivateKey: this.sp.privateKey, // Use same private key for decryption
+        isAssertionEncrypted: this.settings.wantAssertionsEncrypted,
         // Note: Global validation is handled in samlService.js
     };
 };
