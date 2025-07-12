@@ -57,14 +57,37 @@ const samlConfigSchema = new mongoose.Schema({
             required: false,
             trim: true
         },
-        x509Cert: {
+        // Signing certificate and private key (for signing requests/responses)
+        signingCert: {
             type: String,
             required: true,
             trim: true
         },
-        privateKey: {
+        signingPrivateKey: {
             type: String,
             required: true,
+            trim: true
+        },
+        // Encryption certificate and private key (for decrypting assertions)
+        encryptCert: {
+            type: String,
+            required: true,
+            trim: true
+        },
+        encryptPrivateKey: {
+            type: String,
+            required: true,
+            trim: true
+        },
+        // Legacy fields for backward compatibility
+        x509Cert: {
+            type: String,
+            required: false,
+            trim: true
+        },
+        privateKey: {
+            type: String,
+            required: false,
             trim: true
         }
     },
@@ -260,12 +283,16 @@ samlConfigSchema.methods.toSamlifyConfig = function() {
             Binding: 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect',
             Location: this.sp.singleLogoutService
         }] : [],
-        // Use signingCert and encryptCert to include both certificates in metadata
-        signingCert: this.sp.x509Cert,
-        encryptCert: this.sp.x509Cert, // Use same certificate for encryption
-        privateKey: this.sp.privateKey,
-        encPrivateKey: this.sp.privateKey, // Use same private key for decryption
+        // Use separate certificates for signing and encryption
+        signingCert: this.sp.signingCert || this.sp.x509Cert,
+        encryptCert: this.sp.encryptCert || this.sp.x509Cert,
+        privateKey: this.sp.signingPrivateKey || this.sp.privateKey,
+        encPrivateKey: this.sp.encryptPrivateKey || this.sp.privateKey,
         isAssertionEncrypted: this.settings.wantAssertionsEncrypted,
+        // Specify NameID format to match IdP configuration
+        nameIDFormat: [
+            'urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress'
+        ],
         // Note: Global validation is handled in samlService.js
     };
 };

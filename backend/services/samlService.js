@@ -466,8 +466,12 @@ class SAMLService {
         if (!config.idp.ssoUrl) errors.push('IdP SSO URL is required');
         if (!config.idp.x509Cert) errors.push('IdP X509 Certificate is required');
         if (!config.sp.assertionConsumerService) errors.push('SP Assertion Consumer Service URL is required');
-        if (!config.sp.x509Cert) errors.push('SP X509 Certificate is required');
-        if (!config.sp.privateKey) errors.push('SP Private Key is required');
+        
+        // Validate SP certificates (support both new separate certs and legacy single cert)
+        if (!config.sp.signingCert && !config.sp.x509Cert) errors.push('SP Signing Certificate is required');
+        if (!config.sp.signingPrivateKey && !config.sp.privateKey) errors.push('SP Signing Private Key is required');
+        if (!config.sp.encryptCert && !config.sp.x509Cert) errors.push('SP Encryption Certificate is required');
+        if (!config.sp.encryptPrivateKey && !config.sp.privateKey) errors.push('SP Encryption Private Key is required');
 
         // Validate URL formats
         const urlFields = [
