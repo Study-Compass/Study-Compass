@@ -102,25 +102,42 @@ class SAMLService {
         console.log(`IdP certificates count: ${idpCerts.length}`);
         console.log(`Primary IdP certificate length: ${config.idp.x509Cert ? config.idp.x509Cert.length : 0}`);
 
+        // const idp = IdentityProvider({
+        //     entityID: config.idp.entityId,
+        //     singleSignOnService: [{
+        //         Binding: 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect',
+        //         Location: config.idp.ssoUrl.replace('/POST/', '/Redirect/')
+        //     }, {
+        //         Binding: 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST',
+        //         Location: config.idp.ssoUrl
+        //     }],
+        //     singleLogoutService: config.idp.sloUrl ? [{
+        //         Binding: 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect',
+        //         Location: config.idp.sloUrl
+        //     }] : undefined,
+        //             // Configure IdP certificates for signature verification and encryption
+        //     signingCert: idpCerts.filter(Boolean)[0],
+        //     encryptCert: idpCerts.filter(Boolean)[0],
+        //     isAssertionEncrypted: true,
+        //     // // Tell samlify that we expect encrypted assertions
+        //     // wantAssertionsEncrypted: true
+        // });
         const idp = IdentityProvider({
-            entityID: config.idp.entityId,
-            singleSignOnService: [{
-                Binding: 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect',
-                Location: config.idp.ssoUrl.replace('/POST/', '/Redirect/')
-            }, {
-                Binding: 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST',
-                Location: config.idp.ssoUrl
-            }],
-            singleLogoutService: config.idp.sloUrl ? [{
-                Binding: 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect',
-                Location: config.idp.sloUrl
-            }] : undefined,
-                    // Configure IdP certificates for signature verification and encryption
-            signingCert: idpCerts.filter(Boolean)[0],
-            encryptCert: idpCerts.filter(Boolean)[0],
-            isAssertionEncrypted: true,
-            // // Tell samlify that we expect encrypted assertions
-            // wantAssertionsEncrypted: true
+            metadata: `
+                <EntityDescriptor entityID="${config.idp.entityId}" xmlns="urn:oasis:names:tc:SAML:2.0:metadata">
+                    <IDPSSODescriptor WantAuthnRequestsSigned="false" protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
+                        <KeyDescriptor use="signing">
+                            <KeyInfo xmlns="http://www.w3.org/2000/09/xmldsig#">
+                                <X509Data>
+                                    <X509Certificate>${idpCerts[0].replace(/-----BEGIN CERTIFICATE-----|-----END CERTIFICATE-----|\n/g, '')}</X509Certificate>
+                                </X509Data>
+                            </KeyInfo>
+                        </KeyDescriptor>
+                        <SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="${config.idp.ssoUrl}"/>
+                        <SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="${config.idp.ssoUrl.replace('/POST/', '/Redirect/')}"/>
+                    </IDPSSODescriptor>
+                </EntityDescriptor>
+            `
         });
 
         console.log('Loaded IdP signing cert length:', idp.entityMeta.getX509Certificate()?.length || 0);
