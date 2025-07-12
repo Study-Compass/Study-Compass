@@ -220,17 +220,35 @@ class SAMLService {
                 const response = result['saml2p:Response'];
                 console.log('🔧 SAML Service: Response keys:', Object.keys(response));
                 
-                const status = response?.Status?.StatusCode?.$?.Value;
-                console.log('🔧 SAML Service: Raw status:', status);
-                console.log('🔧 SAML Service: Status object:', response?.Status);
+                // Try to get status with namespace prefix
+                const statusElement = response['saml2p:Status'];
+                console.log('🔧 SAML Service: Status element:', statusElement);
+                
+                let status = null;
+                if (statusElement) {
+                    const statusCode = statusElement['saml2p:StatusCode'];
+                    console.log('🔧 SAML Service: StatusCode element:', statusCode);
+                    
+                    if (statusCode) {
+                        status = statusCode.$?.Value || statusCode.Value;
+                        console.log('🔧 SAML Service: Extracted status:', status);
+                    }
+                }
+                
+                // Fallback to non-namespaced path
+                if (!status) {
+                    status = response?.Status?.StatusCode?.$?.Value;
+                    console.log('🔧 SAML Service: Fallback status:', status);
+                }
                 
                 if (status !== 'urn:oasis:names:tc:SAML:2.0:status:Success') {
-                    console.log('🔧 SAML Service: Status check failed, trying alternative path...');
+                    console.log('🔧 SAML Service: Status check failed, trying alternative paths...');
                     
                     // Try alternative status paths
                     const altStatus = response?.Status?.StatusCode?.Value || 
                                     response?.Status?.StatusCode?.[0]?.Value ||
-                                    response?.Status?.StatusCode;
+                                    response?.Status?.StatusCode ||
+                                    statusElement?.['saml2p:StatusCode']?.Value;
                     
                     console.log('🔧 SAML Service: Alternative status:', altStatus);
                     
@@ -308,13 +326,32 @@ class SAMLService {
                             const response = result['saml2p:Response'];
                             console.log('🔧 SAML Service: Fallback response keys:', Object.keys(response));
                             
-                            const status = response?.Status?.StatusCode?.$?.Value;
-                            console.log('🔧 SAML Service: Fallback raw status:', status);
+                            // Try to get status with namespace prefix
+                            const statusElement = response['saml2p:Status'];
+                            console.log('🔧 SAML Service: Fallback status element:', statusElement);
+                            
+                            let status = null;
+                            if (statusElement) {
+                                const statusCode = statusElement['saml2p:StatusCode'];
+                                console.log('🔧 SAML Service: Fallback StatusCode element:', statusCode);
+                                
+                                if (statusCode) {
+                                    status = statusCode.$?.Value || statusCode.Value;
+                                    console.log('🔧 SAML Service: Fallback extracted status:', status);
+                                }
+                            }
+                            
+                            // Fallback to non-namespaced path
+                            if (!status) {
+                                status = response?.Status?.StatusCode?.$?.Value;
+                                console.log('🔧 SAML Service: Fallback fallback status:', status);
+                            }
                             
                             // Try alternative status paths
                             const altStatus = response?.Status?.StatusCode?.Value || 
                                             response?.Status?.StatusCode?.[0]?.Value ||
-                                            response?.Status?.StatusCode;
+                                            response?.Status?.StatusCode ||
+                                            statusElement?.['saml2p:StatusCode']?.Value;
                             
                             console.log('🔧 SAML Service: Fallback alternative status:', altStatus);
                             
