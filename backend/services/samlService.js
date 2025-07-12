@@ -284,9 +284,11 @@ class SAMLService {
                 console.log('🔧 SAML Service: Encryption method:', encryptionMethod);
                 console.log('🔧 SAML Service: Key info present:', !!keyInfo);
                 
-                // Get the encrypted key
+                // Get the encrypted key - it's nested inside ds:KeyInfo
                 const encryptedKey = keyInfo['xenc:EncryptedKey'];
                 if (!encryptedKey) {
+                    console.log('🔧 SAML Service: No EncryptedKey found in KeyInfo');
+                    console.log('🔧 SAML Service: KeyInfo structure:', JSON.stringify(keyInfo, null, 2));
                     throw new Error('No EncryptedKey found');
                 }
                 
@@ -555,15 +557,66 @@ class SAMLService {
                                 let realNameId = 'unknown';
                                 let realAttributes = {};
                                 
-                                // Look for NameID in the response
+                                // Look for NameID in the response - try multiple paths
                                 const issuer = response['saml2:Issuer'];
                                 if (issuer) {
                                     realNameId = issuer._ || issuer;
                                 }
                                 
-                                // Look for any unencrypted attributes or other data
-                                console.log('🔧 SAML Service: Attempting to extract real data from response...');
-                                console.log('🔧 SAML Service: Full response structure:', JSON.stringify(response, null, 2));
+                                // Try to find any unencrypted assertion or attributes
+                                const unencryptedAssertion = response['saml2:Assertion'];
+                                if (unencryptedAssertion) {
+                                    console.log('🔧 SAML Service: Found unencrypted assertion');
+                                    
+                                    // Extract NameID from unencrypted assertion
+                                    const subject = unencryptedAssertion['saml2:Subject'];
+                                    if (subject) {
+                                        const nameIdElement = subject['saml2:NameID'];
+                                        if (nameIdElement) {
+                                            realNameId = nameIdElement._ || nameIdElement;
+                                        }
+                                    }
+                                    
+                                    // Extract attributes from unencrypted assertion
+                                    const attributeStatement = unencryptedAssertion['saml2:AttributeStatement'];
+                                    if (attributeStatement) {
+                                        const attributeElements = attributeStatement['saml2:Attribute'];
+                                        if (Array.isArray(attributeElements)) {
+                                            attributeElements.forEach(attr => {
+                                                const name = attr.$.Name;
+                                                const values = attr['saml2:AttributeValue'];
+                                                if (values && values.length > 0) {
+                                                    realAttributes[name] = values[0]._ || values[0];
+                                                }
+                                            });
+                                        } else if (attributeElements) {
+                                            const name = attributeElements.$.Name;
+                                            const values = attributeElements['saml2:AttributeValue'];
+                                            if (values && values.length > 0) {
+                                                realAttributes[name] = values[0]._ || values[0];
+                                            }
+                                        }
+                                    }
+                                }
+                                
+                                // If we still don't have a proper NameID, try to extract from encrypted assertion metadata
+                                if (realNameId === 'unknown' || realNameId === issuer._ || realNameId === issuer) {
+                                    const encryptedAssertion = response['saml2:EncryptedAssertion'];
+                                    if (encryptedAssertion) {
+                                        // Try to get any metadata about the encrypted assertion
+                                        console.log('🔧 SAML Service: Found encrypted assertion, attempting to extract metadata...');
+                                        
+                                        // For now, use a placeholder that indicates we need to decrypt
+                                        realNameId = 'encrypted-assertion-needs-decryption';
+                                        realAttributes = {
+                                            _encrypted: true,
+                                            _message: 'Assertion is encrypted and decryption failed'
+                                        };
+                                    }
+                                }
+                                
+                                console.log('🔧 SAML Service: Extracted real data - NameID:', realNameId);
+                                console.log('🔧 SAML Service: Extracted real data - Attributes:', realAttributes);
                                 
                                 // Create extract object with available real data
                                 extract = {
