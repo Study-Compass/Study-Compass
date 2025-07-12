@@ -291,7 +291,7 @@ samlConfigSchema.methods.toSamlifyConfig = function() {
         isAssertionEncrypted: this.settings.wantAssertionsEncrypted,
         // Specify NameID format to match IdP configuration
         nameIDFormat: [
-            'urn:oasis:names:tc:SAML:2.0:nameid-format:emailAddress'
+            'urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress'
         ],
         // Note: Global validation is handled in samlService.js
     };
