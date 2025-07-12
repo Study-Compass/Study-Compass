@@ -115,9 +115,11 @@ class SAMLService {
                 Binding: 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect',
                 Location: config.idp.sloUrl
             }] : undefined,
-            // Configure IdP certificates for signature verification
-            signingCert: idpCerts[0],
-            encryptCert: idpCerts[0]
+                    // Configure IdP certificates for signature verification and encryption
+        signingCert: idpCerts[0],
+        encryptCert: idpCerts[0],
+        // Tell samlify that we expect encrypted assertions
+        wantAssertionsEncrypted: true
         });
 
         this.idpCache.set(school, idp);
