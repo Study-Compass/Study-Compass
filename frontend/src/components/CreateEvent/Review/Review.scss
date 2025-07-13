@@ -1,4 +1,11 @@
 .review {
+    display: flex;
+    flex-direction: column;
+    padding: 25px 20px 20px 20px;
+    box-sizing: border-box;
+    flex-grow: 1;
+    height: 100%;
+
     .review-content {
         display: flex;
         gap: 40px;

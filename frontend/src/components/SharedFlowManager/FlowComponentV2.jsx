@@ -75,9 +75,7 @@ const FlowComponentV2 = ({
                             <h1>{headerTitle}</h1>
                         </div>
                         <p>{headerSubtitle}</p>
-                        
                     </div>
-                    
                     <div className="steps-list">
                         {steps.map((step, index) => (
                             <div 
@@ -99,6 +97,20 @@ const FlowComponentV2 = ({
                             </div>
                         ))}
                     </div>
+                </div>
+
+                {/* Horizontal step tracker for mobile */}
+                <div className="steps-horizontal-tracker">
+                    {steps.map((step, index) => (
+                        <div
+                            key={step.id}
+                            className={`step-dot ${currentStep === index ? 'active' : ''} ${stepValidation[index] ? 'completed' : ''}`}
+                            onClick={() => setCurrentStep(index)}
+                        >
+                            <span className="dot-number">{index + 1}</span>
+                            <span className="dot-title">{step.title}</span>
+                        </div>
+                    ))}
                 </div>
 
                 {/* Main content area */}
@@ -126,10 +138,8 @@ const FlowComponentV2 = ({
                                 {backButtonText}
                             </button>
                         )}
-                        
                         <div className="right-buttons">
                             {isLastStep ? (
-                                /* add validation check */
                                 <button 
                                     className={`btn-primary ${ !canSubmit() || isSubmitting ? 'disabled' : ''}`}
                                     onClick={handleSubmit}

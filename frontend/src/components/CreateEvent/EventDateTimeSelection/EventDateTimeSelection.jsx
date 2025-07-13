@@ -83,30 +83,32 @@ function EventDateTimeSelection({ formData, setFormData, onComplete }){
 
     return (
         <div className="event-date-time-selection">
-            <div className="time-options-sidebar">
-                <h2>Room Options</h2>
-                {data && data.data && data.data.map((option, index) => (
-                    <SelectedRoomsPreview 
-                        key={index}
-                        room={option.room} 
-                        selected={selectedRoom === option} 
-                        onSelect={() => handleRoomSelection(index)} 
-                        optionIndex={index}
-                    />
-                ))}
-            </div>
-            
-            <div className="calendar-section">
-                <h3>Select Date and Time</h3>
-                {selectedRoom && (
-                    <EventCalenderWrapper 
-                        classSchedule={selectedRoom} 
-                        start={TEMPDATE}
-                        onTimeSelect={handleTimeSelect}
-                        selectedDate={selectedDate}
-                        onDateSelect={handleDateSelect}
-                    />
-                )}
+            <div className="main-content">
+                <div className="time-options-sidebar">
+                    <h2>Room Options</h2>
+                    {data && data.data && data.data.map((option, index) => (
+                        <SelectedRoomsPreview 
+                            key={index}
+                            room={option.room} 
+                            selected={selectedRoom === option} 
+                            onSelect={() => handleRoomSelection(index)} 
+                            optionIndex={index}
+                        />
+                    ))}
+                </div>
+                
+                <div className="calendar-section">
+                    <h3>Select Date and Time</h3>
+                    {selectedRoom && (
+                        <EventCalenderWrapper 
+                            classSchedule={selectedRoom} 
+                            start={TEMPDATE}
+                            onTimeSelect={handleTimeSelect}
+                            selectedDate={selectedDate}
+                            onDateSelect={handleDateSelect}
+                        />
+                    )}
+                </div>
             </div>
             
             {selectedDate && startTime && endTime && (

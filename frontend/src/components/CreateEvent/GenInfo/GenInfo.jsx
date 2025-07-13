@@ -78,7 +78,7 @@ function GenInfo({ formData, setFormData, onComplete }){
     };
 
     return(
-        <div className="gen-info create-component">
+        <div className="gen-info">
             <div className="col-container">
                 <div className="col input-col">
                     <div className="input-field mandatory title">
@@ -103,6 +103,21 @@ function GenInfo({ formData, setFormData, onComplete }){
                         </select>
                     </div>
                     <div className="input-field mandatory">
+                        <p className="label">Expected Attendance</p>
+                        <input name="expectedAttendance" type="number" className="" value={expectedAttendance} onChange={handleChange} placeholder='about how many people are attending?'/>
+                    </div>
+                </div>
+                <div className="col preview-col">
+                    <div className="input-field">
+                        <p className="label">Flier</p>
+                        <ImageUpload 
+                            uploadText="Drag your image here" 
+                            onFileSelect={handleFileSelect}
+                            onFileClear={handleFileClear}
+                            showPrompt={false}
+                        />
+                    </div>
+                    <div className="input-field mandatory visibility-field">
                         <p className="label">Event Visibility</p>
                         <div className="visibility">
                             <div className={`option ${visibility === "public" && "selected"}`} onClick={()=>{setVisibility("public")}}>
@@ -116,22 +131,6 @@ function GenInfo({ formData, setFormData, onComplete }){
                                 <p>only visible to students part of your org</p>
                             </div>
                         </div>
-                    </div>
-
-                    <div className="input-field mandatory">
-                        <p className="label">Expected Attendance</p>
-                        <input name="expectedAttendance" type="number" className="" value={expectedAttendance} onChange={handleChange} placeholder='about how many people are attending?'/>
-                    </div>
-                </div>
-                <div className="col preview-col">
-                    <div className="input-field">
-                        <p>Flier</p>
-                        <ImageUpload 
-                            uploadText="Drag your image here" 
-                            onFileSelect={handleFileSelect}
-                            onFileClear={handleFileClear}
-                            showPrompt={false}
-                        />
                     </div>
                 </div>
             </div>

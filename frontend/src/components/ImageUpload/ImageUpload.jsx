@@ -76,12 +76,25 @@ const ImageUpload = ({
         }
     };
 
+    const handleRootClick = (e) => {
+        // Prevent if clicking on a button or the file input itself
+        if (
+            e.target.tagName === 'BUTTON' ||
+            e.target.tagName === 'LABEL' ||
+            e.target === fileInputRef.current
+        ) {
+            return;
+        }
+        fileInputRef.current?.click();
+    };
+
     return (
         <div
             className={`file-upload image-upload ${isDragging ? 'drag-over' : ''} ${selectedFile ? 'active' : ''} ${orientation === "horizontal" ? "horizontal" : ""}`}
             onDrop={handleDrop}
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
+            onClick={handleRootClick}
             style={{ '--text-size': `${fontSize}px` }}
         >   
             {image ? <img src={image} alt="preview" className="preview" /> : <Icon className={`upload-icon ${isDragging ? 'drag-over' : ''}`} icon="famicons:images" />}

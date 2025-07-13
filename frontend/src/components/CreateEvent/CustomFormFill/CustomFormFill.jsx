@@ -80,7 +80,7 @@ const CustomFormFill = ({ formData, setFormData, onComplete }) => {
     };
 
     return (
-        <div className="custom-form-fill create-component">
+        <div className="custom-form-fill">
             <div className="form-fill-header">
                 <div className="form-viewer">
                     <div className="form-header">

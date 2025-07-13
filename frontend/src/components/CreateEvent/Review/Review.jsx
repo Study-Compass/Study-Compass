@@ -91,7 +91,7 @@ function Review({ formData, setFormData, onComplete }){
     };
 
     return(
-        <div className="create-component review">
+        <div className="review">
             <div className="review-content">
                 <div className="preview">
                     {formData.name && formData.start_time && formData.description ?

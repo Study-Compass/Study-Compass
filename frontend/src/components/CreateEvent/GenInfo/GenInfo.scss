@@ -1,4 +1,19 @@
 .gen-info {
+    display: flex;
+    flex-direction: column;
+    padding: 25px 20px 20px 20px;
+    box-sizing: border-box;
+    flex-grow: 1;
+    height: 100%;
+
+    h2, .section-title {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 30px;
+        color: var(--text, #222);
+        text-transform: lowercase;
+    }
+
     .col-container {
         display: flex;
         gap: 40px;
@@ -9,7 +24,7 @@
             flex: 1;
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 24px;
 
             &.input-col {
                 flex: 2;
@@ -17,14 +32,21 @@
 
             &.preview-col {
                 flex: 1;
-                min-width: 300px;
+                min-width: 320px;
+                display: flex;
+                flex-direction: column;
+                justify-content: flex-start;
             }
+        }
+        .visibility-field {
+            margin-top: 32px;
         }
 
         .input-field {
             display: flex;
             flex-direction: column;
             gap: 8px;
+            width: 100%;
 
             &.mandatory {
                 position: relative;
@@ -32,36 +54,40 @@
 
             &.mandatory .label::after {
                 content: " *";
-                color: var(--red);
+                color: var(--red, #e74c3c);
+                font-weight: 700;
             }
 
             .label {
                 font-weight: 600;
-                color: var(--text);
-                font-size: 14px;
+                color: var(--text, #222);
+                font-size: 15px;
+                margin-bottom: 2px;
             }
 
             input, textarea, select {
-                padding: 12px;
-                border: 1px solid var(--lightborder);
+                width: 100%;
+                padding: 13px 14px;
+                border: 1.5px solid var(--lightborder, #e0e0e0);
                 border-radius: 8px;
-                font-size: 14px;
-                color: var(--text);
-                background-color: var(--background);
-                transition: border-color 0.2s ease;
+                font-size: 15px;
+                color: var(--text, #222);
+                background-color: var(--background, #fff);
+                transition: border-color 0.2s;
+                margin-top: 2px;
 
                 &:focus {
                     outline: none;
-                    border-color: var(--primary);
+                    border-color: var(--primary, #e74c3c);
                 }
 
                 &::placeholder {
-                    color: var(--text-secondary);
+                    color: var(--text-secondary, #aaa);
                 }
             }
 
             textarea {
-                min-height: 100px;
+                min-height: 90px;
                 resize: vertical;
                 font-family: inherit;
             }
@@ -79,72 +105,111 @@
 
         .visibility {
             display: flex;
-            gap: 20px;
+            gap: 16px;
             flex-wrap: wrap;
+            margin-top: 2px;
+            justify-content: flex-start;
 
             .option {
-                flex: 1;
-                min-width: 200px;
-                padding: 20px;
-                border: 2px solid var(--lightborder);
+                flex: 1 1 260px;
+                min-width: 220px;
+                max-width: 320px;
+                min-height: 120px;
+                padding: 22px 16px 18px 16px;
+                border: 2px solid var(--lightborder, #e0e0e0);
                 border-radius: 12px;
                 cursor: pointer;
-                transition: all 0.2s ease;
+                transition: border-color 0.2s, background 0.2s;
                 text-align: center;
+                background: #fff;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                box-sizing: border-box;
+                word-break: break-word;
 
                 &:hover {
-                    border-color: var(--primary-light);
-                    background-color: var(--primary-light);
+                    border-color: var(--primary, #e74c3c);
+                    background-color: #fff6f6;
                 }
 
                 &.selected {
-                    border-color: var(--primary);
-                    background-color: var(--primary-light);
+                    border-color: var(--primary, #e74c3c);
+                    background-color: #fff6f6;
                 }
 
                 img {
-                    width: 40px;
-                    height: 40px;
-                    margin-bottom: 12px;
+                    width: 28px;
+                    height: 28px;
+                    margin-bottom: 8px;
                 }
 
                 h3 {
-                    margin: 0 0 8px 0;
-                    font-size: 16px;
-                    font-weight: 600;
-                    color: var(--text);
+                    margin: 0 0 4px 0;
+                    font-size: 15px;
+                    font-weight: 700;
+                    color: var(--text, #222);
+                    text-transform: lowercase;
                 }
 
                 p {
                     margin: 0;
-                    font-size: 14px;
-                    color: var(--text-secondary);
+                    font-size: 12px;
+                    color: var(--text-secondary, #888);
+                    white-space: normal;
                 }
             }
         }
     }
-}
 
-@media (max-width: 768px) {
-    .gen-info {
+    .preview-col .input-field {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+    }
+    .preview-col .input-field > div {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 320px;
+        margin-top: 0;
+        margin-bottom: 0;
+        box-sizing: border-box;
+    }
+
+    @media (max-width: 900px) {
         .col-container {
             flex-direction: column;
-            gap: 20px;
-
-            .col {
-                &.preview-col {
-                    min-width: auto;
-                }
-            }
-
-            .visibility {
-                flex-direction: column;
-                gap: 15px;
-
-                .option {
-                    min-width: auto;
-                }
-            }
+            gap: 24px;
+            align-items: center;
+        }
+        .col,
+        .col.preview-col,
+        .col.input-col {
+            min-width: 0;
+            width: 100%;
+            align-items: center;
+        }
+        .input-field,
+        .preview-col .input-field {
+            width: 100%;
+            align-items: center;
+        }
+        .visibility-field {
+            margin-top: 24px;
+            width: 100%;
+            align-items: center;
+        }
+        .input-field input,
+        .input-field textarea,
+        .input-field select {
+            width: 95vw;
+            max-width: 500px;
+            min-width: 0;
+            margin: 0 auto;
         }
     }
 }
