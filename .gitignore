@@ -45,3 +45,4 @@ scripts/
 .flaskenv*
 !.env.project
 !.env.vault
+/backend/certs
