@@ -87,20 +87,59 @@ class SAMLService {
         const finalRelayState = relayState || crypto.randomBytes(16).toString('hex');
         console.log(`Final relay state: ${finalRelayState}`);
 
-        // Create login request using passport-saml's underlying SAML library
-        const loginUrl = strategy._saml.generateAuthorizeRequest(
-            { RelayState: finalRelayState },
-            'redirect'
-        );
+        // Get the strategy configuration
+        const config = strategy._saml.options;
+        console.log(`Strategy entry point: ${config.entryPoint}`);
+        console.log(`Strategy issuer: ${config.issuer}`);
 
-        console.log(`SAML Request URL: ${loginUrl}`);
-        console.log(`SAML Request Relay State: ${finalRelayState}`);
+        // Create login request using passport-saml's underlying SAML library
+        // passport-saml uses the saml2 library internally
+        const saml2 = require('saml2');
         
-        return {
-            url: loginUrl,
-            id: crypto.randomBytes(16).toString('hex'), // Generate a request ID
-            relayState: finalRelayState
-        };
+        // Create a service provider instance for generating the request
+        const sp = new saml2.ServiceProvider({
+            entity_id: config.issuer,
+            private_key: config.privateCert,
+            certificate: config.privateCert, // Use the same cert for signing
+            assert_endpoint: config.callbackUrl,
+            force_authn: false,
+            auth_context: {
+                comparison: 'exact',
+                class_refs: ['urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport']
+            },
+            nameid_format: 'urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress',
+            sign_get_request: false,
+            allow_unencrypted_assertion: true
+        });
+
+        // Create an identity provider instance
+        const idp = new saml2.IdentityProvider({
+            sso_login_url: config.entryPoint,
+            certificates: [config.cert]
+        });
+
+        // Generate the login request
+        return new Promise((resolve, reject) => {
+            sp.create_login_request_url(idp, {
+                RelayState: finalRelayState
+            }, (err, loginUrl, requestId) => {
+                if (err) {
+                    console.error('❌ Error generating login URL:', err);
+                    reject(err);
+                    return;
+                }
+
+                console.log(`SAML Request URL: ${loginUrl}`);
+                console.log(`SAML Request ID: ${requestId}`);
+                console.log(`SAML Request Relay State: ${finalRelayState}`);
+                
+                resolve({
+                    url: loginUrl,
+                    id: requestId,
+                    relayState: finalRelayState
+                });
+            });
+        });
     }
 
     /**
