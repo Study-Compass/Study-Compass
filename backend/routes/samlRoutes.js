@@ -588,6 +588,34 @@ router.get('/test-login', verifyToken, authorizeRoles('admin', 'root'), async (r
 });
 
 /**
+ * Test certificate loading
+ * GET /auth/saml/test-certificates
+ */
+router.get('/test-certificates', async (req, res) => {
+    try {
+        const school = req.school;
+        
+        console.log('🔍 SAML Certificate Test Request:');
+        console.log(`   School: ${school}`);
+        
+        const result = await samlService.testCertificateLoading(school, req);
+        
+        res.json({
+            success: true,
+            message: 'Certificate loading test completed',
+            data: result
+        });
+    } catch (error) {
+        console.error('SAML certificate test error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to test certificate loading',
+            error: error.message
+        });
+    }
+});
+
+/**
  * Debug SAML configuration
  * GET /auth/saml/debug
  */

@@ -118,28 +118,106 @@ class SAMLService {
         console.log(`Formatted certificate length: ${primaryCert.length}`);
         console.log(`Certificate preview: ${primaryCert.substring(0, 50)}...`);
 
-        // Use the direct configuration approach instead of metadata XML
-        const idp = IdentityProvider({
-            entityID: config.idp.entityId,
-            singleSignOnService: [{
-                Binding: 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST',
-                Location: config.idp.ssoUrl
-            }, {
-                Binding: 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect',
-                Location: config.idp.ssoUrl.replace('/POST/', '/Redirect/')
-            }],
-            singleLogoutService: config.idp.sloUrl ? [{
-                Binding: 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect',
-                Location: config.idp.sloUrl
-            }] : undefined,
-            // Configure IdP certificates for signature verification
-            signingCert: primaryCert,
-            encryptCert: primaryCert,
-            // Don't set isAssertionEncrypted here - let samlify detect it
-        });
+        // Test different approaches and use the best one
+        let idp;
+        let bestApproach = 'metadata'; // default
 
-        console.log('Loaded IdP signing cert length:', idp.entityMeta.getX509Certificate()?.length || 0);
-        console.log('IdP Entity ID:', idp.entityMeta.getEntityID());
+        // Approach 1: Metadata with formatted certificate
+        try {
+            idp = IdentityProvider({
+                metadata: `
+                    <EntityDescriptor entityID="${config.idp.entityId}" xmlns="urn:oasis:names:tc:SAML:2.0:metadata">
+                        <IDPSSODescriptor WantAuthnRequestsSigned="false" protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
+                            <KeyDescriptor use="signing">
+                                <KeyInfo xmlns="http://www.w3.org/2000/09/xmldsig#">
+                                    <X509Data>
+                                        <X509Certificate>${primaryCert}</X509Certificate>
+                                    </X509Data>
+                                </KeyInfo>
+                            </KeyDescriptor>
+                            <SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="${config.idp.ssoUrl}"/>
+                            <SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="${config.idp.ssoUrl.replace('/POST/', '/Redirect/')}"/>
+                            ${config.idp.sloUrl ? `<SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="${config.idp.sloUrl}"/>` : ''}
+                        </IDPSSODescriptor>
+                    </EntityDescriptor>
+                `
+            });
+            
+            const cert1 = idp.entityMeta.getX509Certificate();
+            if (cert1 && cert1.length > 0) {
+                console.log(`✅ Metadata approach successful: ${cert1.length} characters`);
+                bestApproach = 'metadata';
+            } else {
+                throw new Error('Certificate not loaded');
+            }
+        } catch (error) {
+            console.log('⚠️ Metadata approach failed, trying direct approach...');
+            
+            // Approach 2: Direct certificate assignment
+            try {
+                idp = IdentityProvider({
+                    entityID: config.idp.entityId,
+                    singleSignOnService: [{
+                        Binding: 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST',
+                        Location: config.idp.ssoUrl
+                    }, {
+                        Binding: 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect',
+                        Location: config.idp.ssoUrl.replace('/POST/', '/Redirect/')
+                    }],
+                    singleLogoutService: config.idp.sloUrl ? [{
+                        Binding: 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect',
+                        Location: config.idp.sloUrl
+                    }] : undefined,
+                    signingCert: primaryCert,
+                    encryptCert: primaryCert,
+                });
+                
+                const cert2 = idp.entityMeta.getX509Certificate();
+                if (cert2 && cert2.length > 0) {
+                    console.log(`✅ Direct approach successful: ${cert2.length} characters`);
+                    bestApproach = 'direct';
+                } else {
+                    throw new Error('Certificate not loaded');
+                }
+            } catch (error2) {
+                console.log('⚠️ Direct approach failed, trying raw certificate...');
+                
+                // Approach 3: Raw certificate (with headers)
+                try {
+                    idp = IdentityProvider({
+                        entityID: config.idp.entityId,
+                        singleSignOnService: [{
+                            Binding: 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST',
+                            Location: config.idp.ssoUrl
+                        }, {
+                            Binding: 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect',
+                            Location: config.idp.ssoUrl.replace('/POST/', '/Redirect/')
+                        }],
+                        singleLogoutService: config.idp.sloUrl ? [{
+                            Binding: 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect',
+                            Location: config.idp.sloUrl
+                        }] : undefined,
+                        signingCert: config.idp.x509Cert,
+                        encryptCert: config.idp.x509Cert,
+                    });
+                    
+                    const cert3 = idp.entityMeta.getX509Certificate();
+                    if (cert3 && cert3.length > 0) {
+                        console.log(`✅ Raw certificate approach successful: ${cert3.length} characters`);
+                        bestApproach = 'raw';
+                    } else {
+                        throw new Error('Certificate not loaded');
+                    }
+                } catch (error3) {
+                    console.error('❌ All certificate loading approaches failed');
+                    throw new Error('Failed to load IdP certificate with any approach');
+                }
+            }
+        }
+
+        console.log(`Loaded IdP signing cert length: ${idp.entityMeta.getX509Certificate()?.length || 0}`);
+        console.log(`IdP Entity ID: ${idp.entityMeta.getEntityID()}`);
+        console.log(`Used approach: ${bestApproach}`);
 
         this.idpCache.set(school, idp);
         
@@ -545,6 +623,134 @@ class SAMLService {
     }
 
     /**
+     * Test certificate loading and validation
+     */
+    async testCertificateLoading(school, req) {
+        console.log('🔧 SAML Service: Testing certificate loading...');
+        
+        try {
+            const { SAMLConfig } = getModels(req, 'SAMLConfig');
+            const config = await SAMLConfig.getActiveConfig(school);
+            
+            if (!config) {
+                throw new Error(`No active SAML configuration found for school: ${school}`);
+            }
+
+            // Test IdP certificate
+            console.log('🔧 Testing IdP certificate...');
+            const idpCert = config.idp.x509Cert;
+            console.log(`   Raw certificate length: ${idpCert ? idpCert.length : 0}`);
+            console.log(`   Certificate starts with: ${idpCert ? idpCert.substring(0, 50) : 'N/A'}`);
+            
+            // Format certificate
+            const formatCertificate = (cert) => {
+                if (!cert) return '';
+                return cert
+                    .replace(/-----BEGIN CERTIFICATE-----/g, '')
+                    .replace(/-----END CERTIFICATE-----/g, '')
+                    .replace(/-----BEGIN PUBLIC KEY-----/g, '')
+                    .replace(/-----END PUBLIC KEY-----/g, '')
+                    .replace(/\s+/g, '');
+            };
+            
+            const formattedCert = formatCertificate(idpCert);
+            console.log(`   Formatted certificate length: ${formattedCert.length}`);
+            console.log(`   Formatted certificate preview: ${formattedCert.substring(0, 50)}...`);
+            
+            // Test different IdP creation approaches
+            console.log('🔧 Testing IdP creation approaches...');
+            
+            // Approach 1: Metadata with formatted certificate
+            const idp1 = IdentityProvider({
+                metadata: `
+                    <EntityDescriptor entityID="${config.idp.entityId}" xmlns="urn:oasis:names:tc:SAML:2.0:metadata">
+                        <IDPSSODescriptor WantAuthnRequestsSigned="false" protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
+                            <KeyDescriptor use="signing">
+                                <KeyInfo xmlns="http://www.w3.org/2000/09/xmldsig#">
+                                    <X509Data>
+                                        <X509Certificate>${formattedCert}</X509Certificate>
+                                    </X509Data>
+                                </KeyInfo>
+                            </KeyDescriptor>
+                            <SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="${config.idp.ssoUrl}"/>
+                        </IDPSSODescriptor>
+                    </EntityDescriptor>
+                `
+            });
+            
+            const cert1 = idp1.entityMeta.getX509Certificate();
+            console.log(`   Approach 1 (metadata): ${cert1 ? cert1.length : 0} characters`);
+            
+            // Approach 2: Direct certificate assignment
+            const idp2 = IdentityProvider({
+                entityID: config.idp.entityId,
+                singleSignOnService: [{
+                    Binding: 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST',
+                    Location: config.idp.ssoUrl
+                }],
+                signingCert: formattedCert,
+                encryptCert: formattedCert,
+            });
+            
+            const cert2 = idp2.entityMeta.getX509Certificate();
+            console.log(`   Approach 2 (direct): ${cert2 ? cert2.length : 0} characters`);
+            
+            // Approach 3: Raw certificate (with headers)
+            const idp3 = IdentityProvider({
+                entityID: config.idp.entityId,
+                singleSignOnService: [{
+                    Binding: 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST',
+                    Location: config.idp.ssoUrl
+                }],
+                signingCert: idpCert,
+                encryptCert: idpCert,
+            });
+            
+            const cert3 = idp3.entityMeta.getX509Certificate();
+            console.log(`   Approach 3 (raw): ${cert3 ? cert3.length : 0} characters`);
+            
+            // Find the best approach
+            const approaches = [
+                { name: 'metadata', cert: cert1 },
+                { name: 'direct', cert: cert2 },
+                { name: 'raw', cert: cert3 }
+            ];
+            
+            const bestApproach = approaches.find(a => a.cert && a.cert.length > 0);
+            
+            if (bestApproach) {
+                console.log(`✅ Best approach: ${bestApproach.name} (${bestApproach.cert.length} characters)`);
+                return {
+                    success: true,
+                    bestApproach: bestApproach.name,
+                    certificateLength: bestApproach.cert.length,
+                    approaches: approaches.map(a => ({
+                        name: a.name,
+                        certificateLength: a.cert ? a.cert.length : 0
+                    }))
+                };
+            } else {
+                console.log('❌ No approach successfully loaded the certificate');
+                return {
+                    success: false,
+                    error: 'No approach successfully loaded the certificate',
+                    approaches: approaches.map(a => ({
+                        name: a.name,
+                        certificateLength: a.cert ? a.cert.length : 0
+                    }))
+                };
+            }
+            
+        } catch (error) {
+            console.error('❌ Certificate loading test failed:', error);
+            return {
+                success: false,
+                error: error.message
+            };
+        }
+    }
+
+    /**
      * Validate SAML configuration and certificates
      */
     async validateSAMLConfiguration(school, req) {
@@ -584,7 +790,15 @@ class SAMLService {
                 }
             }
 
-            // Test SP and IdP creation
+            // Test certificate loading first
+            const certTest = await this.testCertificateLoading(school, req);
+            if (!certTest.success) {
+                throw new Error(`Certificate loading failed: ${certTest.error}`);
+            }
+
+            console.log(`✅ Using certificate loading approach: ${certTest.bestApproach}`);
+
+            // Test SP and IdP creation using the best approach
             const sp = await this.getServiceProvider(school, req);
             const idp = await this.getIdentityProvider(school, req);
 
@@ -597,12 +811,13 @@ class SAMLService {
             console.log('🔧 SAML Service: SP certificate length:', spCert?.length || 0);
             console.log('🔧 SAML Service: IdP certificate length:', idpCert?.length || 0);
 
-            if (!idpCert) {
-                throw new Error('IdP certificate not loaded properly');
+            if (!idpCert || idpCert.length === 0) {
+                throw new Error('IdP certificate not loaded properly - signature verification will fail');
             }
 
             return {
                 isValid: true,
+                certificateLoading: certTest,
                 sp: {
                     entityId: sp.entityMeta.getEntityID(),
                     hasSigningCert: !!spCert,
