@@ -221,6 +221,19 @@ router.post('/callback', async (req, res) => {
             });
         }
 
+        // Validate SAML configuration before processing
+        const validation = await samlService.validateSAMLConfiguration(school, req);
+        if (!validation.isValid) {
+            console.log('❌ SAML configuration validation failed:', validation.error);
+            return res.status(500).json({
+                success: false,
+                message: 'SAML configuration error',
+                error: validation.error
+            });
+        }
+
+        console.log('✅ SAML configuration validation passed');
+
         // Log SAML response details
         console.log('✅ SAML Response received:');
         console.log(`   Response length: ${SAMLResponse.length} characters`);
@@ -581,11 +594,53 @@ router.get('/test-login', verifyToken, authorizeRoles('admin', 'root'), async (r
 router.get('/debug', async (req, res) => {
     try {
         const school = req.school;
-        await samlService.debugConfiguration(school, req);
+        
+        console.log('🔍 SAML Debug Request:');
+        console.log(`   School: ${school}`);
+        console.log(`   Headers:`, req.headers);
+        
+        // Validate configuration
+        const validation = await samlService.validateSAMLConfiguration(school, req);
+        
+        // Get configuration details
+        const { SAMLConfig } = getModels(req, 'SAMLConfig');
+        const config = await SAMLConfig.getActiveConfig(school);
+        
+        const debugInfo = {
+            school,
+            timestamp: new Date().toISOString(),
+            validation,
+            configuration: config ? {
+                entityId: config.entityId,
+                idp: {
+                    entityId: config.idp.entityId,
+                    ssoUrl: config.idp.ssoUrl,
+                    hasCertificate: !!config.idp.x509Cert,
+                    certificateLength: config.idp.x509Cert ? config.idp.x509Cert.length : 0
+                },
+                sp: {
+                    assertionConsumerService: config.sp.assertionConsumerService,
+                    hasSigningCert: !!(config.sp.signingCert || config.sp.x509Cert),
+                    hasSigningKey: !!(config.sp.signingPrivateKey || config.sp.privateKey),
+                    hasEncryptCert: !!(config.sp.encryptCert || config.sp.x509Cert),
+                    hasEncryptKey: !!(config.sp.encryptPrivateKey || config.sp.privateKey)
+                },
+                settings: config.settings,
+                isActive: config.isActive
+            } : null,
+            environment: {
+                nodeEnv: process.env.NODE_ENV,
+                hasJwtSecret: !!process.env.JWT_SECRET,
+                hasJwtRefreshSecret: !!process.env.JWT_REFRESH_SECRET
+            }
+        };
+        
+        console.log('🔍 SAML Debug Info:', JSON.stringify(debugInfo, null, 2));
         
         res.json({
             success: true,
-            message: 'Debug information logged to console'
+            message: 'SAML debug information',
+            data: debugInfo
         });
     } catch (error) {
         console.error('SAML debug error:', error);

@@ -265,6 +265,11 @@ samlConfigSchema.statics.getActiveConfig = function(school) {
 
 // Instance method to get samlify configuration
 samlConfigSchema.methods.toSamlifyConfig = function() {
+    // Determine if we should expect encrypted assertions based on IdP configuration
+    // If the IdP is configured with encryption certificates, we should expect encrypted assertions
+    const hasEncryptionCerts = this.sp.encryptCert && this.sp.encryptPrivateKey;
+    const expectEncryptedAssertions = hasEncryptionCerts || this.settings.wantAssertionsEncrypted;
+    
     return {
         entityID: this.entityId,
         authnRequestsSigned: false,
@@ -272,7 +277,7 @@ samlConfigSchema.methods.toSamlifyConfig = function() {
         wantMessageSigned: this.settings.wantMessageSigned,
         wantNameId: this.settings.wantNameId,
         wantNameIdEncrypted: this.settings.wantNameIdEncrypted,
-        wantAssertionsEncrypted: this.settings.wantAssertionsEncrypted,
+        wantAssertionsEncrypted: expectEncryptedAssertions,
         signatureAlgorithm: this.settings.signatureAlgorithm,
         digestAlgorithm: this.settings.digestAlgorithm,
         assertionConsumerService: [{
@@ -288,7 +293,8 @@ samlConfigSchema.methods.toSamlifyConfig = function() {
         encryptCert: this.sp.encryptCert || this.sp.x509Cert,
         privateKey: this.sp.signingPrivateKey || this.sp.privateKey,
         encPrivateKey: this.sp.encryptPrivateKey || this.sp.privateKey,
-        isAssertionEncrypted: this.settings.wantAssertionsEncrypted,
+        // Set isAssertionEncrypted based on whether we have decryption capabilities
+        isAssertionEncrypted: expectEncryptedAssertions,
         // Specify NameID format to match IdP configuration
         nameIDFormat: [
             'urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress'

@@ -102,46 +102,44 @@ class SAMLService {
         console.log(`IdP certificates count: ${idpCerts.length}`);
         console.log(`Primary IdP certificate length: ${config.idp.x509Cert ? config.idp.x509Cert.length : 0}`);
 
-        // const idp = IdentityProvider({
-        //     entityID: config.idp.entityId,
-        //     singleSignOnService: [{
-        //         Binding: 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect',
-        //         Location: config.idp.ssoUrl.replace('/POST/', '/Redirect/')
-        //     }, {
-        //         Binding: 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST',
-        //         Location: config.idp.ssoUrl
-        //     }],
-        //     singleLogoutService: config.idp.sloUrl ? [{
-        //         Binding: 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect',
-        //         Location: config.idp.sloUrl
-        //     }] : undefined,
-        //             // Configure IdP certificates for signature verification and encryption
-        //     signingCert: idpCerts.filter(Boolean)[0],
-        //     encryptCert: idpCerts.filter(Boolean)[0],
-        //     isAssertionEncrypted: true,
-        //     // // Tell samlify that we expect encrypted assertions
-        //     // wantAssertionsEncrypted: true
-        // });
+        // Properly format the certificate for XML embedding
+        const formatCertificate = (cert) => {
+            if (!cert) return '';
+            // Remove headers, footers, and all whitespace/newlines
+            return cert
+                .replace(/-----BEGIN CERTIFICATE-----/g, '')
+                .replace(/-----END CERTIFICATE-----/g, '')
+                .replace(/-----BEGIN PUBLIC KEY-----/g, '')
+                .replace(/-----END PUBLIC KEY-----/g, '')
+                .replace(/\s+/g, ''); // Remove all whitespace including newlines
+        };
+
+        const primaryCert = formatCertificate(idpCerts[0]);
+        console.log(`Formatted certificate length: ${primaryCert.length}`);
+        console.log(`Certificate preview: ${primaryCert.substring(0, 50)}...`);
+
+        // Use the direct configuration approach instead of metadata XML
         const idp = IdentityProvider({
-            metadata: `
-                <EntityDescriptor entityID="${config.idp.entityId}" xmlns="urn:oasis:names:tc:SAML:2.0:metadata">
-                    <IDPSSODescriptor WantAuthnRequestsSigned="false" protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
-                        <KeyDescriptor use="signing">
-                            <KeyInfo xmlns="http://www.w3.org/2000/09/xmldsig#">
-                                <X509Data>
-                                    <X509Certificate>${idpCerts[0].replace(/-----BEGIN CERTIFICATE-----|-----END CERTIFICATE-----|\n/g, '')}</X509Certificate>
-                                </X509Data>
-                            </KeyInfo>
-                        </KeyDescriptor>
-                        <SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="${config.idp.ssoUrl}"/>
-                        <SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="${config.idp.ssoUrl.replace('/POST/', '/Redirect/')}"/>
-                    </IDPSSODescriptor>
-                </EntityDescriptor>
-            `
+            entityID: config.idp.entityId,
+            singleSignOnService: [{
+                Binding: 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST',
+                Location: config.idp.ssoUrl
+            }, {
+                Binding: 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect',
+                Location: config.idp.ssoUrl.replace('/POST/', '/Redirect/')
+            }],
+            singleLogoutService: config.idp.sloUrl ? [{
+                Binding: 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect',
+                Location: config.idp.sloUrl
+            }] : undefined,
+            // Configure IdP certificates for signature verification
+            signingCert: primaryCert,
+            encryptCert: primaryCert,
+            // Don't set isAssertionEncrypted here - let samlify detect it
         });
 
         console.log('Loaded IdP signing cert length:', idp.entityMeta.getX509Certificate()?.length || 0);
-
+        console.log('IdP Entity ID:', idp.entityMeta.getEntityID());
 
         this.idpCache.set(school, idp);
         
@@ -194,6 +192,8 @@ class SAMLService {
         const idp = await this.getIdentityProvider(school, req);
 
         console.log('🔧 SAML Service: Got SP and IdP instances');
+        console.log('🔧 SAML Service: SP Entity ID:', sp.entityMeta.getEntityID());
+        console.log('🔧 SAML Service: IdP Entity ID:', idp.entityMeta.getEntityID());
 
         try {
             console.log('🔧 SAML Service: Parsing login response...');
@@ -212,11 +212,18 @@ class SAMLService {
             const decodedResponse = Buffer.from(samlResponse, 'base64').toString('utf8');
             console.log('🔧 SAML Service: Decoded response preview:', decodedResponse.substring(0, 1000));
             
-            // Check if response contains signature
+            // Check if response contains signature and encryption
             const hasSignature = decodedResponse.includes('<ds:Signature');
             const hasEncryptedAssertion = decodedResponse.includes('<saml2:EncryptedAssertion');
+            const hasEncryptedNameId = decodedResponse.includes('<saml2:EncryptedID');
             console.log('🔧 SAML Service: Response contains signature:', hasSignature);
             console.log('🔧 SAML Service: Response contains encrypted assertion:', hasEncryptedAssertion);
+            console.log('🔧 SAML Service: Response contains encrypted NameID:', hasEncryptedNameId);
+            
+            // Check SP configuration for encryption capabilities
+            const spConfig = sp.entityMeta.getMetadata();
+            console.log('🔧 SAML Service: SP has encryption cert:', !!spConfig.encryptCert);
+            console.log('🔧 SAML Service: SP has encryption private key:', !!spConfig.encPrivateKey);
             
             // Try to parse the SAML response with samlify
             let extract;
@@ -229,6 +236,21 @@ class SAMLService {
                 console.log('🔧 SAML Service: samlify parsing successful');
             } catch (parseError) {
                 console.log('🔧 SAML Service: samlify parsing failed:', parseError.message);
+                console.log('🔧 SAML Service: Parse error stack:', parseError.stack);
+                
+                // Provide more specific error information
+                if (parseError.message.includes('ERR_ZERO_SIGNATURE')) {
+                    console.log('🔧 SAML Service: Signature verification failed - checking certificate configuration');
+                    console.log('🔧 SAML Service: IdP certificate available:', !!idp.entityMeta.getX509Certificate());
+                    console.log('🔧 SAML Service: IdP certificate length:', idp.entityMeta.getX509Certificate()?.length || 0);
+                }
+                
+                if (parseError.message.includes('decrypt')) {
+                    console.log('🔧 SAML Service: Decryption failed - checking encryption configuration');
+                    console.log('🔧 SAML Service: SP encryption cert available:', !!sp.entityMeta.getMetadata().encryptCert);
+                    console.log('🔧 SAML Service: SP encryption private key available:', !!sp.entityMeta.getMetadata().encPrivateKey);
+                }
+                
                 throw new Error(`SAML parsing failed: ${parseError.message}`);
             }
             
@@ -520,6 +542,92 @@ class SAMLService {
             isValid: errors.length === 0,
             errors
         };
+    }
+
+    /**
+     * Validate SAML configuration and certificates
+     */
+    async validateSAMLConfiguration(school, req) {
+        console.log('🔧 SAML Service: Validating configuration...');
+        
+        try {
+            const { SAMLConfig } = getModels(req, 'SAMLConfig');
+            const config = await SAMLConfig.getActiveConfig(school);
+            
+            if (!config) {
+                throw new Error(`No active SAML configuration found for school: ${school}`);
+            }
+
+            // Validate IdP certificate
+            if (!config.idp.x509Cert) {
+                throw new Error('IdP X509 certificate is missing');
+            }
+
+            // Validate SP certificates
+            if (!config.sp.signingCert && !config.sp.x509Cert) {
+                throw new Error('SP signing certificate is missing');
+            }
+            if (!config.sp.signingPrivateKey && !config.sp.privateKey) {
+                throw new Error('SP signing private key is missing');
+            }
+
+            // Check if we need encryption certificates
+            const needsEncryption = config.settings.wantAssertionsEncrypted || 
+                                  config.settings.wantNameIdEncrypted;
+            
+            if (needsEncryption) {
+                if (!config.sp.encryptCert && !config.sp.x509Cert) {
+                    throw new Error('SP encryption certificate is missing (required for encrypted assertions)');
+                }
+                if (!config.sp.encryptPrivateKey && !config.sp.privateKey) {
+                    throw new Error('SP encryption private key is missing (required for encrypted assertions)');
+                }
+            }
+
+            // Test SP and IdP creation
+            const sp = await this.getServiceProvider(school, req);
+            const idp = await this.getIdentityProvider(school, req);
+
+            // Validate certificates are loaded
+            const spCert = sp.entityMeta.getX509Certificate();
+            const idpCert = idp.entityMeta.getX509Certificate();
+
+            console.log('🔧 SAML Service: SP certificate loaded:', !!spCert);
+            console.log('🔧 SAML Service: IdP certificate loaded:', !!idpCert);
+            console.log('🔧 SAML Service: SP certificate length:', spCert?.length || 0);
+            console.log('🔧 SAML Service: IdP certificate length:', idpCert?.length || 0);
+
+            if (!idpCert) {
+                throw new Error('IdP certificate not loaded properly');
+            }
+
+            return {
+                isValid: true,
+                sp: {
+                    entityId: sp.entityMeta.getEntityID(),
+                    hasSigningCert: !!spCert,
+                    hasEncryptionCert: !!sp.entityMeta.getMetadata().encryptCert,
+                    hasEncryptionKey: !!sp.entityMeta.getMetadata().encPrivateKey
+                },
+                idp: {
+                    entityId: idp.entityMeta.getEntityID(),
+                    hasSigningCert: !!idpCert,
+                    ssoUrls: config.idp.ssoUrl
+                },
+                settings: {
+                    wantAssertionsSigned: config.settings.wantAssertionsSigned,
+                    wantAssertionsEncrypted: config.settings.wantAssertionsEncrypted,
+                    wantNameIdEncrypted: config.settings.wantNameIdEncrypted
+                }
+            };
+
+        } catch (error) {
+            console.error('❌ SAML Service: Configuration validation failed:', error.message);
+            return {
+                isValid: false,
+                error: error.message
+            };
+        }
     }
 
     /**
