@@ -48,6 +48,7 @@ const memberSchema = new Schema({
         },
         reason: String
     }],
+
     // Custom permissions that override role permissions
     customPermissions: {
         type: [String],

@@ -1,28 +1,65 @@
-import React from 'react';
+import React, {useState} from 'react';
 import rpiLogo from "../../assets/Icons/rpiLogo.svg";
 import person from "../../assets/Icons/Profile.svg";
 import calendar from "../../assets/Icons/Calendar.svg";
 import locate from "../../assets/Icons/Locate.svg";
 import profile from "../../assets/Icons/Profile2.svg";
-
+import FormViewer from '../../components/FormViewer/FormViewer';
 import Header from '../../components/Header/Header';
+import Popup from '../../components/Popup/Popup';
+import apiRequest from '../../utils/postRequest';
 
 
 import './Org.scss';
 
-const Org = ({ org }) => {
-    // const { overview, members, followers } = org;
+const Org = ({ orgData }) => {
+
+
+    const [isMember, setIsMember] = useState(false);
+    const { overview, members, followers } = orgData.org;
+    const [showForm, setShowForm] = useState(false);
+
+    console.log(orgData);
+
+    const handleApply = async (formAnswers) => {
+        const response = await apiRequest(`/${overview._id}/apply-to-org`, {
+            formResponse: formAnswers
+        });
+        console.log(response);
+    }
     
-    console.log(org);
+
+    const initiateApply = () => {
+        if(overview.requireApprovalForJoin) {
+            if(overview.memberForm) {
+                setShowForm(true);
+            } else {
+                // setIsMember(true);
+                //pending approval
+                handleApply();
+
+            }
+        } else {
+            setIsMember(true);
+        }
+    }
+
+    const handleFormSubmit = (answers) => {
+        handleApply(answers);
+    }
+    
     return (
         <div className="org-page page">
+            <Popup isOpen={showForm} onClose={() => setShowForm(false)}>
+                <FormViewer form={overview.memberForm} onSubmit={handleFormSubmit} /> 
+            </Popup>
             <Header />
             <div className='org-content'>
 
                 <div className="top-header-box">
                     <div className="org-logo">
                         <div className="img-container">
-                            <img src={org.overview.org_profile_image ? org.overview.org_profile_image : rpiLogo} alt=""/>
+                            <img src={overview.org_profile_image ? overview.org_profile_image : rpiLogo} alt=""/>
                         </div>
                     </div>
                 </div>
@@ -30,13 +67,13 @@ const Org = ({ org }) => {
                 <div className="org-info">
                     <div className="col">
                         <div className="org-header">
-                            <h2 className="name">{org.overview.org_name}</h2>
+                            <h2 className="name">{overview.org_name}</h2>
                             {/* <h2 className="name"> Name </h2> */}
                             <div className="status">Union Recognized</div>
                         </div>
 
                         <p className="description">
-                            {org.overview.org_description}
+                            {overview.org_description}
                         </p>
                     </div>
                     
@@ -48,9 +85,26 @@ const Org = ({ org }) => {
                         <img src = {profile} alt =""/>
                         Friend and 1 other are members
                     </p>
-                    
+                    {/* 2 base states: joined, not joined */}
                     <div className="actions">
-                        <button>Join</button>
+                        {/* {
+                            overview.requireApprovalForJoin ? (
+                                <button onClick={initiateApply}>Apply</button>
+                            ) : (
+                                <button>Join</button>
+                            )
+                        } */}
+                        {
+                            orgData.org.isMember ? (
+                                <button>Leave</button>
+                            ) : orgData.org.isPending ? (
+                                <button disabled={true}>Pending...</button>
+                            ) : overview.requireApprovalForJoin ? (
+                                <button onClick={initiateApply}>Apply</button>
+                            ) : (
+                                <button onClick={initiateApply}>Join</button>
+                            )
+                        }
                         <button>Follow</button>
                     </div>
 

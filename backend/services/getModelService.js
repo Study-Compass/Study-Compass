@@ -18,12 +18,16 @@ const studyHistorySchema = require('../schemas/studyHistory');
 const userSchema = require('../schemas/user');
 const visitSchema = require('../schemas/visit');
 const samlConfigSchema = require('../schemas/samlConfig');
+const orgMemberApplicationSchema = require('../schemas/orgMemberApplication');
 
 //events
 const rssFeedSchema = require('../events/schemas/rssFeed');
 const approvalFlowDefinition = require('../events/schemas/approvalFlowDefinition');
 const approvalFlowInstance = require('../events/schemas/approvalInstance');
 const eventSchema = require('../events/schemas/event');
+const formSchema = require('../events/schemas/form');
+const formResponseSchema = require('../events/schemas/formResponse');
+
 
 const getModels = (req, ...names) => {
     const models = {
@@ -50,7 +54,10 @@ const getModels = (req, ...names) => {
         Visit: req.db.model('Visit', visitSchema, 'visits'),
         ApprovalFlow: req.db.model('ApprovalFlow', approvalFlowDefinition, 'approvalFlows'),
         ApprovalInstance: req.db.model('ApprovalInstance', approvalFlowInstance, 'approvalInstances'),
-        RssFeed: req.db.model('RssFeed', rssFeedSchema, 'rssFeeds')
+        RssFeed: req.db.model('RssFeed', rssFeedSchema, 'rssFeeds'),
+        Form: req.db.model('Form', formSchema, 'forms'),    
+        FormResponse: req.db.model('FormResponse', formResponseSchema, 'formResponses'),
+        OrgMemberApplication: req.db.model('OrgMemberApplication', orgMemberApplicationSchema, 'orgMemberApplications')
     };
 
     return names.reduce((acc, name) => {

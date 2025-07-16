@@ -43,13 +43,13 @@ import SlideSwitch from '../SlideSwitch/SlideSwitch';
  * }
  */
 
-const FormBuilder = ({ initialForm = { title: '', description: '', questions: [] }, onSave }) => {
+const FormBuilder = ({ initialForm = { title: '', description: '', questions: [] }, onSave, handleClose = null }) => {
     const [form, setForm] = useState(initialForm);
     const [editingQuestion, setEditingQuestion] = useState(null);
 
     const addQuestion = (type) => {
         const newQuestion = {
-            id: Date.now().toString(),
+            _id: `NEW_QUESTION_${Date.now().toString()}`,
             type,
             question: '',
             required: false,
@@ -60,14 +60,14 @@ const FormBuilder = ({ initialForm = { title: '', description: '', questions: []
             ...prev,
             questions: [...prev.questions, newQuestion]
         }));
-        setEditingQuestion(newQuestion.id);
+        setEditingQuestion(newQuestion._id);
     };
 
     const updateQuestion = (id, updates) => {
         setForm(prev => ({
             ...prev,
             questions: prev.questions.map(q =>
-                q.id === id ? { ...q, ...updates } : q
+                q._id === id ? { ...q, ...updates } : q
             )
         }));
     };
@@ -75,7 +75,7 @@ const FormBuilder = ({ initialForm = { title: '', description: '', questions: []
     const deleteQuestion = (id) => {
         setForm(prev => ({
             ...prev,
-            questions: prev.questions.filter(q => q.id !== id)
+            questions: prev.questions.filter(q => q._id !== id)
         }));
     };
 
@@ -83,7 +83,7 @@ const FormBuilder = ({ initialForm = { title: '', description: '', questions: []
         setForm(prev => ({
             ...prev,
             questions: prev.questions.map(q =>
-                q.id === questionId
+                q._id === questionId
                     ? { ...q, options: [...(q.options || []), ''] }
                     : q
             )
@@ -94,7 +94,7 @@ const FormBuilder = ({ initialForm = { title: '', description: '', questions: []
         setForm(prev => ({
             ...prev,
             questions: prev.questions.map(q =>
-                q.id === questionId
+                q._id === questionId
                     ? {
                         ...q,
                         options: q.options.map((opt, idx) =>
@@ -110,7 +110,7 @@ const FormBuilder = ({ initialForm = { title: '', description: '', questions: []
         setForm(prev => ({
             ...prev,
             questions: prev.questions.map(q =>
-                q.id === questionId
+                q._id === questionId
                     ? {
                         ...q,
                         options: q.options.filter((_, idx) => idx !== optionIndex)
@@ -147,7 +147,7 @@ const FormBuilder = ({ initialForm = { title: '', description: '', questions: []
                   <label key={index} className="option-label">
                     <input
                       type="radio"
-                      name={question.id}
+                      name={question._id}
                       value={null}
                       checked={false}
                       required={question.required}
@@ -181,7 +181,7 @@ const FormBuilder = ({ initialForm = { title: '', description: '', questions: []
 
     const renderQuestion = (question) =>{
         return(
-            <div key={question.id} className="question-container">
+            <div key={question._id} className="question-container">
             <div className="question-header">
                 <h3>{question.question}</h3>
                 {question.required && <span className="required">*</span>}
@@ -191,13 +191,20 @@ const FormBuilder = ({ initialForm = { title: '', description: '', questions: []
         );
     }
 
+    const handleSave = () => {
+        onSave(form);
+        if(handleClose){
+            handleClose();
+        }
+    }
+
     const renderQuestionEditor = (question) => {
         return (
             <div className="question-editor">
                 <input
                     type="text"
                     value={question.question}
-                    onChange={(e) => updateQuestion(question.id, { question: e.target.value })}
+                    onChange={(e) => updateQuestion(question._id, { question: e.target.value })}
                     placeholder="Question"
                 />
 
@@ -208,15 +215,15 @@ const FormBuilder = ({ initialForm = { title: '', description: '', questions: []
                                 <input
                                     type="text"
                                     value={option}
-                                    onChange={(e) => updateOption(question.id, index, e.target.value)}
+                                    onChange={(e) => updateOption(question._id, index, e.target.value)}
                                     placeholder={`Option ${index + 1}`}
                                 />
-                                <button onClick={() => deleteOption(question.id, index)}>
+                                <button onClick={() => deleteOption(question._id, index)}>
                                     <Icon icon="iconamoon:trash-fill" />
                                 </button>
                             </div>
                         ))}
-                        <button onClick={() => addOption(question.id)}>Add Option</button>
+                        <button onClick={() => addOption(question._id)}>Add Option</button>
                     </div>
                 )}
             </div>
@@ -241,7 +248,7 @@ const FormBuilder = ({ initialForm = { title: '', description: '', questions: []
 
             <div className="questions-list">
                 {form.questions.map((question) => (
-                    <div key={question.id} className={`question-item ${editingQuestion === question.id && "editing"}`}>
+                    <div key={question._id} className={`question-item ${editingQuestion === question._id && "editing"}`}>
                         <div className="edit-header">
                             <span className="question-type">
                                 {question.type === 'short' && 'Short Answer'}
@@ -253,25 +260,25 @@ const FormBuilder = ({ initialForm = { title: '', description: '', questions: []
                                 {/* required  toggle switch */}
                                 <div className="toggle-switch">
                                     required
-                                    <SlideSwitch checked={question.required} onChange={(e) => updateQuestion(question.id, { required: e.target.checked })} />
+                                    <SlideSwitch checked={question.required} onChange={(e) => updateQuestion(question._id, { required: e.target.checked })} />
                                 </div>
                                 
                                 <button onClick={() => {
-                                    if(editingQuestion === question.id){
+                                    if(editingQuestion === question._id){
                                         setEditingQuestion(null);
                                     } else {
-                                        setEditingQuestion(question.id)
+                                        setEditingQuestion(question._id)
                                     }
 
                                 }}>
                                     <Icon icon="fluent:edit-48-filled" />
                                 </button>
-                                <button onClick={() => deleteQuestion(question.id)}>
+                                <button onClick={() => deleteQuestion(question._id)}>
                                     <Icon icon="iconamoon:trash-fill" />
                                 </button>
                             </div>
                         </div>
-                        {editingQuestion === question.id ?
+                        {editingQuestion === question._id ?
                             renderQuestionEditor(question)
                             :
                             renderQuestion(question)
@@ -287,7 +294,7 @@ const FormBuilder = ({ initialForm = { title: '', description: '', questions: []
                 <button onClick={() => addQuestion('select_multiple')}>Add Select Multiple</button>
             </div>
 
-            <button className="save-button" onClick={() => onSave(form)}>Save Form</button>
+            <button className="save-button" onClick={handleSave}>Save Form</button>
         </div>
     );
 };

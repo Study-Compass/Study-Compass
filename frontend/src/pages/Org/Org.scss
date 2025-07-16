@@ -43,14 +43,16 @@
         background-color: var(---background);
         .img-container{
             margin-top: 250px;
+            height:100%;
             width:100%;
             background-color: var(--background);
             border-radius: 50%;
             img{
                 width: 100%;
-                // height: 100px;
+                height:100%;
                 background-color: var(---background);
                 border-radius: 50%;
+                object-fit: cover;
             }
         }
         

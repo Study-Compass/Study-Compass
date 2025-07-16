@@ -10,6 +10,7 @@ import Popup from '../../../components/Popup/Popup';
 import AddMemberForm from '../../../components/AddMemberForm';
 import { getOrgRoleColor } from '../../../utils/orgUtils';
 import Select from '../../../components/Select/Select'; 
+import MemberApplicationsViewer from './MemberApplicationsViewer/MemberApplicationsViewer';
 
 function Members({ expandedClass, org }) {
     const { user } = useAuth();
@@ -26,6 +27,8 @@ function Members({ expandedClass, org }) {
     const [selectedMember, setSelectedMember] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [filterRole, setFilterRole] = useState('all');
+    const [applications, setApplications] = useState([]);
+    const [showApplicationsViewer, setShowApplicationsViewer] = useState(false);
 
     useEffect(() => {
         if (org && !permissionsChecked) {
@@ -106,6 +109,7 @@ function Members({ expandedClass, org }) {
             console.log('Members API response:', response);
             if (response.success) {
                 setMembers(response.members || []);
+                setApplications(response.applications || []);
             } else {
                 console.error('Failed to fetch members:', response.message);
                 addNotification({
@@ -264,6 +268,15 @@ function Members({ expandedClass, org }) {
 
     return (
         <div className={`dash ${expandedClass}`}>
+            <Popup 
+                isOpen={showApplicationsViewer} 
+                onClose={() => setShowApplicationsViewer(false)}
+                customClassName="wide-content"
+                defaultStyling={false}
+                popout={false}
+            >
+                <MemberApplicationsViewer applications={applications} />
+            </Popup>
             <div className="members">
                 <header className="header">
                     <h1>Member Management</h1>
@@ -302,6 +315,13 @@ function Members({ expandedClass, org }) {
                                     defaultValue="All Roles"
                                 />
                             </div>
+                            {
+                                applications.length > 0 && (
+                                    <button className="view-applications-btn" onClick={() => setShowApplicationsViewer(true)}>
+                                        View Applications <b>{applications.length}</b>
+                                    </button>
+                                )
+                            }
                         </div>
                         
                         {canManageMembers && (
@@ -316,6 +336,21 @@ function Members({ expandedClass, org }) {
                     </div>
 
                     <div className="members-list">
+                        {
+                            filteredMembers.length > 0 ? (
+                                <div className="members-list-header">
+                                    <h3>Name</h3>
+                                    <h3></h3>
+                                    <h3>Joined</h3>
+                                    <h3>Role</h3>
+                                    <h3>Actions</h3>
+                                </div>
+                            ) : (
+                                <div className="members-list-header">
+
+                                </div>
+                            )
+                        }
                         {filteredMembers.length === 0 ? (
                             <div className="no-members">
                                 <Icon icon="mdi:account-group-outline" className="no-members-icon" />
@@ -335,7 +370,7 @@ function Members({ expandedClass, org }) {
                         ) : (
                             filteredMembers.map(member => (
                                 <div key={member._id} className="member-card">
-                                    <div className="member-info">
+                                    {/* <div className="member-info"> */}
                                         <div className="member-avatar">
                                             {member.user_id?.picture ? (
                                                 <img src={member.user_id.picture} alt={member.user_id.name} />
@@ -346,25 +381,23 @@ function Members({ expandedClass, org }) {
                                             )}
                                         </div>
                                         <div className="member-details">
-                                            <div className="row">
-                                                <h4>{member.user_id?.name || 'Unknown User'}</h4>
-                                                <div className="member-meta">
-                                                    <span className="joined-date">
-                                                        Joined {new Date(member.joinedAt).toLocaleDateString()}
-                                                    </span>
-                                                    {member.assignedBy && (
-                                                        <span className="assigned-by">
-                                                            Assigned by {member.assignedBy?.name || 'Unknown'}
-                                                        </span>
-                                                    )}
-                                                </div>
-                                            </div>
-                                            <p className="username">@{member.user_id?.username || 'unknown'}</p>
+                                            <h4>{member.user_id?.name || 'Unknown User'}</h4>
+                                            {/* <p className="username">@{member.user_id?.username || 'unknown'}</p> */}
                                             <p className="email">{member.user_id?.email || 'No email'}</p>
                                         </div>
-                                    </div>
+                                        <div className="member-meta">
+                                            <span className="joined-date">
+                                                Joined {new Date(member.joinedAt).toLocaleDateString()}
+                                            </span>
+                                            {member.assignedBy && (
+                                                <span className="assigned-by">
+                                                    Assigned by {member.assignedBy?.name || 'Unknown'}
+                                                </span>
+                                            )}
+                                        </div>
+                                    {/* </div> */}
                                     
-                                    <div className="member-actions">
+                                    {/* <div className="member-actions"> */}
                                         <div className="role-badge" style={{ backgroundColor: getOrgRoleColor(member.role, 0.1), color: getOrgRoleColor(member.role, 1) }}>
                                             {getRoleDisplayName(member.role)}
                                         </div>
@@ -394,7 +427,7 @@ function Members({ expandedClass, org }) {
                                             </div>
                                         )}
                                     </div>
-                                </div>
+                                // </div>
                             ))
                         )}
                     </div>

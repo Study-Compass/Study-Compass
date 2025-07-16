@@ -329,49 +329,18 @@ router.post('/:orgId/members/:userId/role', verifyToken, requireMemberManagement
 
 // Get all members of an organization
 router.get('/:orgId/members', verifyToken, async (req, res) => {
-    const { OrgMember, User } = getModels(req, 'OrgMember', 'User');
+    const { OrgMember, OrgMemberApplication } = getModels(req, 'OrgMember', 'OrgMemberApplication');
     const { orgId } = req.params;
 
     try {
         const members = await OrgMember.getActiveMembers(orgId);
-                        // //for testing, run once only
-        const allMembers = await OrgMember.find({});
-        
-        // Use Promise.all with map instead of forEach for proper async handling
-        const migrationPromises = allMembers.map(async member => {
-            if(member.status == 0){
-                try {
-                    //create new member record
-                    const newMember = new OrgMember({
-                        org_id: member.org_id,
-                        user_id: member.user_id,
-                        role: "owner",
-                        assignedBy: req.user.userId,
-                        status: 'active'
-                    });
-                    await member.deleteOne();
-                    await newMember.save();
-                    //delete old member record
-                    return { success: true, memberId: member._id };
-                } catch (error) {
-                    console.error(`Failed to migrate member ${member._id}:`, error);
-                    return { success: false, memberId: member._id, error: error.message };
-                }
-            }
-            return { skipped: true, memberId: member._id };
-        });
-        
-        const results = await Promise.all(migrationPromises);
-        const successful = results.filter(r => r.success).length;
-        const failed = results.filter(r => !r.success && !r.skipped).length;
-        const skipped = results.filter(r => r.skipped).length;
-        
-        console.log(`Migration completed: ${successful} successful, ${failed} failed, ${skipped} skipped`);
+        const applications = await OrgMemberApplication.find({ org_id: orgId, status: 'pending' }).populate('user_id formResponse');
         console.log('GET /org-roles/members', orgId, members);
         res.status(200).json({
             success: true,
             members,
-            count: members.length
+            applications,
+            count: members.length + applications.length
         });
     } catch (error) {
         console.error('Error fetching members:', error);

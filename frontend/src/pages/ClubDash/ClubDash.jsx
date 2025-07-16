@@ -23,7 +23,8 @@ import {
     GeneralSettings, 
     AppearanceSettings, 
     RolesSettings, 
-    DangerZone 
+    DangerZone,
+    MemberSettings
 } from './OrgSettings/components';
 
 function ClubDash(){
@@ -233,6 +234,11 @@ function ClubDash(){
                     label: 'Roles & Permissions',
                     icon: 'mdi:shield-account',
                     element:  <Roles expandedClass={expandedClass} org={orgData.data?.org?.overview}/>
+                },
+                {
+                    label: 'Members',
+                    icon: 'mdi:account-group',
+                    element: <MemberSettings org={orgData.data?.org?.overview} expandedClass={expandedClass} />
                 },
                 {
                     label: 'Danger Zone',
