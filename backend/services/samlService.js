@@ -87,8 +87,8 @@ class SAMLService {
         const finalRelayState = relayState || crypto.randomBytes(16).toString('hex');
         console.log(`Final relay state: ${finalRelayState}`);
 
-        // Create login request using passport-saml
-        const loginUrl = strategy.generateAuthorizeRequest(
+        // Create login request using passport-saml's underlying SAML library
+        const loginUrl = strategy._saml.generateAuthorizeRequest(
             { RelayState: finalRelayState },
             'redirect'
         );
