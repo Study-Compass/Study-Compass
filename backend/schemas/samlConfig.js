@@ -263,43 +263,37 @@ samlConfigSchema.statics.getActiveConfig = function(school) {
     return this.findOne({ school, isActive: true });
 };
 
-// Instance method to get samlify configuration
-samlConfigSchema.methods.toSamlifyConfig = function() {
+// Instance method to get passport-saml configuration
+samlConfigSchema.methods.toPassportSamlConfig = function() {
     // Determine if we should expect encrypted assertions based on IdP configuration
-    // If the IdP is configured with encryption certificates, we should expect encrypted assertions
     const hasEncryptionCerts = this.sp.encryptCert && this.sp.encryptPrivateKey;
     const expectEncryptedAssertions = hasEncryptionCerts || this.settings.wantAssertionsEncrypted;
     
     return {
-        entityID: this.entityId,
-        authnRequestsSigned: false,
-        wantAssertionsSigned: this.settings.wantAssertionsSigned,
-        wantMessageSigned: this.settings.wantMessageSigned,
-        wantNameId: this.settings.wantNameId,
-        wantNameIdEncrypted: this.settings.wantNameIdEncrypted,
+        entryPoint: this.idp.ssoUrl,
+        issuer: this.entityId,
+        callbackUrl: this.sp.assertionConsumerService,
+        cert: this.idp.x509Cert,
+        // Optional SLO - passport-saml handles missing SLO gracefully
+        logoutUrl: this.idp.sloUrl || null,
+        logoutCallbackUrl: this.sp.singleLogoutService || null,
+        // Certificate and key configuration
+        privateCert: this.sp.signingPrivateKey || this.sp.privateKey,
+        decryptionPvk: this.sp.encryptPrivateKey || this.sp.privateKey,
+        // Signature settings
+        signatureAlgorithm: this.settings.signatureAlgorithm || 'sha256',
+        digestAlgorithm: this.settings.digestAlgorithm || 'sha256',
+        // Additional settings
+        wantAssertionsSigned: this.settings.wantAssertionsSigned !== false,
+        wantMessageSigned: this.settings.wantMessageSigned || false,
+        wantNameId: this.settings.wantNameId !== false,
+        wantNameIdEncrypted: this.settings.wantNameIdEncrypted || false,
         wantAssertionsEncrypted: expectEncryptedAssertions,
-        signatureAlgorithm: this.settings.signatureAlgorithm,
-        digestAlgorithm: this.settings.digestAlgorithm,
-        assertionConsumerService: [{
-            Binding: 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST',
-            Location: this.sp.assertionConsumerService
-        }],
-        singleLogoutService: this.sp.singleLogoutService ? [{
-            Binding: 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect',
-            Location: this.sp.singleLogoutService
-        }] : [],
-        // Use separate certificates for signing and encryption
-        signingCert: this.sp.signingCert || this.sp.x509Cert,
-        encryptCert: this.sp.encryptCert || this.sp.x509Cert,
-        privateKey: this.sp.signingPrivateKey || this.sp.privateKey,
-        encPrivateKey: this.sp.encryptPrivateKey || this.sp.privateKey,
-        // Set isAssertionEncrypted based on whether we have decryption capabilities
-        isAssertionEncrypted: expectEncryptedAssertions,
-        // Specify NameID format to match IdP configuration
-        nameIDFormat: [
-            'urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress'
-        ],
-        // Note: Global validation is handled in samlService.js
+        // Custom function to handle user authentication
+        passReqToCallback: true,
+        validateInResponseTo: false, // Disable for simplicity
+        requestIdExpirationPeriodMs: 28800000, // 8 hours
+        acceptedClockSkewMs: -1, // Disable clock skew validation
     };
 };
 
