@@ -92,6 +92,7 @@ class SAMLService {
         console.log(`Configuring IdP for school: ${school}`);
         console.log(`Original SSO URL: ${config.idp.ssoUrl}`);
         console.log(`Redirect SSO URL: ${config.idp.ssoUrl.replace('/POST/', '/Redirect/')}`);
+        console.log(`SLO URL: ${config.idp.sloUrl || 'Not configured'}`);
 
         // Ensure we have valid certificates for the IdP
         const idpCerts = [config.idp.x509Cert];
@@ -120,9 +121,9 @@ class SAMLService {
 
         // Test different approaches and use the best one
         let idp;
-        let bestApproach = 'metadata'; // default
+        let bestApproach = 'metadata_no_slo'; // default
 
-        // Approach 1: Metadata with formatted certificate
+        // Approach 1: Metadata with formatted certificate (no SLO)
         try {
             idp = IdentityProvider({
                 metadata: `
@@ -137,7 +138,6 @@ class SAMLService {
                             </KeyDescriptor>
                             <SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="${config.idp.ssoUrl}"/>
                             <SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="${config.idp.ssoUrl.replace('/POST/', '/Redirect/')}"/>
-                            ${config.idp.sloUrl ? `<SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="${config.idp.sloUrl}"/>` : ''}
                         </IDPSSODescriptor>
                     </EntityDescriptor>
                 `
@@ -145,15 +145,15 @@ class SAMLService {
             
             const cert1 = idp.entityMeta.getX509Certificate();
             if (cert1 && cert1.length > 0) {
-                console.log(`✅ Metadata approach successful: ${cert1.length} characters`);
-                bestApproach = 'metadata';
+                console.log(`✅ Metadata approach (no SLO) successful: ${cert1.length} characters`);
+                bestApproach = 'metadata_no_slo';
             } else {
                 throw new Error('Certificate not loaded');
             }
         } catch (error) {
-            console.log('⚠️ Metadata approach failed, trying direct approach...');
+            console.log('⚠️ Metadata approach (no SLO) failed, trying direct approach...');
             
-            // Approach 2: Direct certificate assignment
+            // Approach 2: Direct certificate assignment (no SLO)
             try {
                 idp = IdentityProvider({
                     entityID: config.idp.entityId,
@@ -164,25 +164,21 @@ class SAMLService {
                         Binding: 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect',
                         Location: config.idp.ssoUrl.replace('/POST/', '/Redirect/')
                     }],
-                    singleLogoutService: config.idp.sloUrl ? [{
-                        Binding: 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect',
-                        Location: config.idp.sloUrl
-                    }] : undefined,
                     signingCert: primaryCert,
                     encryptCert: primaryCert,
                 });
                 
                 const cert2 = idp.entityMeta.getX509Certificate();
                 if (cert2 && cert2.length > 0) {
-                    console.log(`✅ Direct approach successful: ${cert2.length} characters`);
-                    bestApproach = 'direct';
+                    console.log(`✅ Direct approach (no SLO) successful: ${cert2.length} characters`);
+                    bestApproach = 'direct_no_slo';
                 } else {
                     throw new Error('Certificate not loaded');
                 }
             } catch (error2) {
-                console.log('⚠️ Direct approach failed, trying raw certificate...');
+                console.log('⚠️ Direct approach (no SLO) failed, trying raw certificate...');
                 
-                // Approach 3: Raw certificate (with headers)
+                // Approach 3: Raw certificate (no SLO)
                 try {
                     idp = IdentityProvider({
                         entityID: config.idp.entityId,
@@ -193,18 +189,14 @@ class SAMLService {
                             Binding: 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect',
                             Location: config.idp.ssoUrl.replace('/POST/', '/Redirect/')
                         }],
-                        singleLogoutService: config.idp.sloUrl ? [{
-                            Binding: 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect',
-                            Location: config.idp.sloUrl
-                        }] : undefined,
                         signingCert: config.idp.x509Cert,
                         encryptCert: config.idp.x509Cert,
                     });
                     
                     const cert3 = idp.entityMeta.getX509Certificate();
                     if (cert3 && cert3.length > 0) {
-                        console.log(`✅ Raw certificate approach successful: ${cert3.length} characters`);
-                        bestApproach = 'raw';
+                        console.log(`✅ Raw certificate approach (no SLO) successful: ${cert3.length} characters`);
+                        bestApproach = 'raw_no_slo';
                     } else {
                         throw new Error('Certificate not loaded');
                     }
@@ -623,6 +615,64 @@ class SAMLService {
     }
 
     /**
+     * Validate certificate format and content
+     */
+    validateCertificate(cert) {
+        if (!cert) {
+            return { isValid: false, error: 'Certificate is null or undefined' };
+        }
+
+        const certStr = cert.toString();
+        
+        // Check if it's a PEM certificate
+        if (certStr.includes('-----BEGIN CERTIFICATE-----')) {
+            // Validate PEM format
+            const lines = certStr.split('\n');
+            const beginIndex = lines.findIndex(line => line.includes('-----BEGIN CERTIFICATE-----'));
+            const endIndex = lines.findIndex(line => line.includes('-----END CERTIFICATE-----'));
+            
+            if (beginIndex === -1 || endIndex === -1) {
+                return { isValid: false, error: 'Invalid PEM format - missing BEGIN or END markers' };
+            }
+            
+            if (endIndex <= beginIndex) {
+                return { isValid: false, error: 'Invalid PEM format - END marker before BEGIN marker' };
+            }
+            
+            // Extract the certificate content
+            const certContent = lines.slice(beginIndex + 1, endIndex).join('');
+            if (certContent.length < 100) {
+                return { isValid: false, error: 'Certificate content too short' };
+            }
+            
+            return { 
+                isValid: true, 
+                format: 'PEM',
+                contentLength: certContent.length,
+                preview: certContent.substring(0, 50)
+            };
+        } else {
+            // Assume it's already formatted (base64 without headers)
+            if (certStr.length < 100) {
+                return { isValid: false, error: 'Certificate content too short' };
+            }
+            
+            // Check if it looks like base64
+            const base64Regex = /^[A-Za-z0-9+/]*={0,2}$/;
+            if (!base64Regex.test(certStr)) {
+                return { isValid: false, error: 'Certificate content does not appear to be valid base64' };
+            }
+            
+            return { 
+                isValid: true, 
+                format: 'base64',
+                contentLength: certStr.length,
+                preview: certStr.substring(0, 50)
+            };
+        }
+    }
+
+    /**
      * Test certificate loading and validation
      */
     async testCertificateLoading(school, req) {
@@ -642,6 +692,18 @@ class SAMLService {
             console.log(`   Raw certificate length: ${idpCert ? idpCert.length : 0}`);
             console.log(`   Certificate starts with: ${idpCert ? idpCert.substring(0, 50) : 'N/A'}`);
             
+            // Validate certificate format
+            const certValidation = this.validateCertificate(idpCert);
+            console.log(`   Certificate validation:`, certValidation);
+            
+            if (!certValidation.isValid) {
+                return {
+                    success: false,
+                    error: `Certificate validation failed: ${certValidation.error}`,
+                    certificateValidation: certValidation
+                };
+            }
+            
             // Format certificate
             const formatCertificate = (cert) => {
                 if (!cert) return '';
@@ -660,7 +722,21 @@ class SAMLService {
             // Test different IdP creation approaches
             console.log('🔧 Testing IdP creation approaches...');
             
-            // Approach 1: Metadata with formatted certificate
+            // Test 0: Basic IdP without certificate (to see if configuration works)
+            try {
+                const idp0 = IdentityProvider({
+                    entityID: config.idp.entityId,
+                    singleSignOnService: [{
+                        Binding: 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST',
+                        Location: config.idp.ssoUrl
+                    }]
+                });
+                console.log(`   Approach 0 (basic, no cert): Entity ID = ${idp0.entityMeta.getEntityID()}`);
+            } catch (error) {
+                console.log(`   Approach 0 (basic, no cert): failed - ${error.message}`);
+            }
+            
+            // Approach 1: Metadata with formatted certificate (no SLO)
             const idp1 = IdentityProvider({
                 metadata: `
                     <EntityDescriptor entityID="${config.idp.entityId}" xmlns="urn:oasis:names:tc:SAML:2.0:metadata">
@@ -679,9 +755,9 @@ class SAMLService {
             });
             
             const cert1 = idp1.entityMeta.getX509Certificate();
-            console.log(`   Approach 1 (metadata): ${cert1 ? cert1.length : 0} characters`);
+            console.log(`   Approach 1 (metadata, no SLO): ${cert1 ? cert1.length : 0} characters`);
             
-            // Approach 2: Direct certificate assignment
+            // Approach 2: Direct certificate assignment (no SLO)
             const idp2 = IdentityProvider({
                 entityID: config.idp.entityId,
                 singleSignOnService: [{
@@ -693,9 +769,9 @@ class SAMLService {
             });
             
             const cert2 = idp2.entityMeta.getX509Certificate();
-            console.log(`   Approach 2 (direct): ${cert2 ? cert2.length : 0} characters`);
+            console.log(`   Approach 2 (direct, no SLO): ${cert2 ? cert2.length : 0} characters`);
             
-            // Approach 3: Raw certificate (with headers)
+            // Approach 3: Raw certificate (no SLO)
             const idp3 = IdentityProvider({
                 entityID: config.idp.entityId,
                 singleSignOnService: [{
@@ -707,13 +783,43 @@ class SAMLService {
             });
             
             const cert3 = idp3.entityMeta.getX509Certificate();
-            console.log(`   Approach 3 (raw): ${cert3 ? cert3.length : 0} characters`);
+            console.log(`   Approach 3 (raw, no SLO): ${cert3 ? cert3.length : 0} characters`);
+            
+            // Approach 4: Metadata with SLO (if available)
+            let cert4 = 0;
+            if (config.idp.sloUrl) {
+                try {
+                    const idp4 = IdentityProvider({
+                        metadata: `
+                            <EntityDescriptor entityID="${config.idp.entityId}" xmlns="urn:oasis:names:tc:SAML:2.0:metadata">
+                                <IDPSSODescriptor WantAuthnRequestsSigned="false" protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
+                                    <KeyDescriptor use="signing">
+                                        <KeyInfo xmlns="http://www.w3.org/2000/09/xmldsig#">
+                                            <X509Data>
+                                                <X509Certificate>${formattedCert}</X509Certificate>
+                                            </X509Data>
+                                        </KeyInfo>
+                                    </KeyDescriptor>
+                                    <SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="${config.idp.ssoUrl}"/>
+                                    <SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="${config.idp.sloUrl}"/>
+                                </IDPSSODescriptor>
+                            </EntityDescriptor>
+                        `
+                    });
+                    
+                    cert4 = idp4.entityMeta.getX509Certificate()?.length || 0;
+                    console.log(`   Approach 4 (metadata with SLO): ${cert4} characters`);
+                } catch (error) {
+                    console.log(`   Approach 4 (metadata with SLO): failed - ${error.message}`);
+                }
+            }
             
             // Find the best approach
             const approaches = [
-                { name: 'metadata', cert: cert1 },
-                { name: 'direct', cert: cert2 },
-                { name: 'raw', cert: cert3 }
+                { name: 'metadata_no_slo', cert: cert1 },
+                { name: 'direct_no_slo', cert: cert2 },
+                { name: 'raw_no_slo', cert: cert3 },
+                { name: 'metadata_with_slo', cert: cert4 }
             ];
             
             const bestApproach = approaches.find(a => a.cert && a.cert.length > 0);
@@ -724,6 +830,7 @@ class SAMLService {
                     success: true,
                     bestApproach: bestApproach.name,
                     certificateLength: bestApproach.cert.length,
+                    certificateValidation: certValidation,
                     approaches: approaches.map(a => ({
                         name: a.name,
                         certificateLength: a.cert ? a.cert.length : 0
@@ -734,6 +841,7 @@ class SAMLService {
                 return {
                     success: false,
                     error: 'No approach successfully loaded the certificate',
+                    certificateValidation: certValidation,
                     approaches: approaches.map(a => ({
                         name: a.name,
                         certificateLength: a.cert ? a.cert.length : 0
