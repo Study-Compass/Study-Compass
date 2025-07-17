@@ -92,7 +92,33 @@ class SAMLService {
         console.log(`Strategy entry point: ${config.entryPoint}`);
         console.log(`Strategy issuer: ${config.issuer}`);
 
-        // Generate a simple SAML AuthnRequest manually
+        // For RPI, try a simpler approach without SAML request
+        // Some Shibboleth IdPs can handle direct redirects
+        if (config.entryPoint.includes('shib.auth.rpi.edu')) {
+            console.log('🔍 Using RPI-specific approach: direct redirect to discovery service');
+            
+            // Try the discovery service first
+            let discoveryUrl = 'https://shib.auth.rpi.edu/idp/profile/SAML2/Redirect/SSO';
+            
+            // Add entity ID as a parameter to help the IdP identify us
+            const discoveryUrlObj = new URL(discoveryUrl);
+            discoveryUrlObj.searchParams.append('entityID', config.issuer);
+            discoveryUrlObj.searchParams.append('RelayState', finalRelayState);
+            
+            const requestId = crypto.randomBytes(16).toString('hex');
+            
+            console.log(`RPI Discovery URL: ${discoveryUrlObj.toString()}`);
+            console.log(`RPI Request ID: ${requestId}`);
+            console.log(`RPI Relay State: ${finalRelayState}`);
+            
+            return {
+                url: discoveryUrlObj.toString(),
+                id: requestId,
+                relayState: finalRelayState
+            };
+        }
+        
+        // For other IdPs, try generating a SAML request
         try {
             const samlRequest = this.generateSAMLRequest(config);
             
@@ -125,28 +151,17 @@ class SAMLService {
         } catch (error) {
             console.error('❌ Error generating SAML request:', error);
             
-            // Try alternative approach: redirect to IdP without SAML request
-            // Some IdPs can handle this automatically
-            console.log('🔍 Trying alternative approach: direct redirect to IdP');
-            
-            // For RPI, try the discovery service or a different entry point
-            let alternativeUrl = config.entryPoint;
-            
-            // If it's RPI's Shibboleth, try a different approach
-            if (config.entryPoint.includes('shib.auth.rpi.edu')) {
-                // Try the discovery service or a simpler entry point
-                alternativeUrl = 'https://shib.auth.rpi.edu/idp/profile/SAML2/Redirect/SSO';
-                console.log(`🔍 Using alternative RPI URL: ${alternativeUrl}`);
-            }
+            // Fallback: direct redirect to IdP
+            console.log('🔍 Using fallback: direct redirect to IdP');
             
             const requestId = crypto.randomBytes(16).toString('hex');
             
-            console.log(`Alternative SAML Request URL: ${alternativeUrl}`);
-            console.log(`Alternative SAML Request ID: ${requestId}`);
-            console.log(`Alternative SAML Request Relay State: ${finalRelayState}`);
+            console.log(`Fallback URL: ${config.entryPoint}`);
+            console.log(`Fallback Request ID: ${requestId}`);
+            console.log(`Fallback Relay State: ${finalRelayState}`);
             
             return {
-                url: alternativeUrl,
+                url: config.entryPoint,
                 id: requestId,
                 relayState: finalRelayState
             };
@@ -161,13 +176,14 @@ class SAMLService {
         const requestId = `_${crypto.randomBytes(16).toString('hex')}`;
         const now = new Date().toISOString();
         
+        // Use Redirect binding instead of POST binding for RPI
         const samlRequest = `<?xml version="1.0"?>
 <samlp:AuthnRequest xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" 
                     xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion"
                     ID="${requestId}"
                     Version="2.0"
                     IssueInstant="${now}"
-                    ProtocolBinding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
+                    ProtocolBinding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
                     AssertionConsumerServiceURL="${config.callbackUrl}"
                     Destination="${config.entryPoint}">
     <saml:Issuer>${config.issuer}</saml:Issuer>
