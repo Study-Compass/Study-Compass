@@ -92,57 +92,29 @@ class SAMLService {
         console.log(`Strategy entry point: ${config.entryPoint}`);
         console.log(`Strategy issuer: ${config.issuer}`);
 
-        // Create login request using passport-saml's underlying SAML library
-        // passport-saml uses the saml2 library internally
-        const saml2 = require('saml2');
+        // Use passport-saml's built-in login URL generation
+        // Create a mock request object
+        const mockReq = {
+            body: {},
+            query: { RelayState: finalRelayState },
+            cookies: {}
+        };
+
+        // Generate login URL using passport-saml's internal method
+        const loginUrl = strategy._saml.getAuthorizeUrl(mockReq, finalRelayState);
         
-        // Create a service provider instance for generating the request
-        const sp = new saml2.ServiceProvider({
-            entity_id: config.issuer,
-            private_key: config.privateCert,
-            certificate: config.privateCert, // Use the same cert for signing
-            assert_endpoint: config.callbackUrl,
-            force_authn: false,
-            auth_context: {
-                comparison: 'exact',
-                class_refs: ['urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport']
-            },
-            nameid_format: 'urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress',
-            sign_get_request: false,
-            allow_unencrypted_assertion: true
-        });
+        // Generate a request ID for tracking
+        const requestId = crypto.randomBytes(16).toString('hex');
 
-        // Create an identity provider instance
-        const idp = new saml2.IdentityProvider({
-            singleSignOnService: {
-                url: config.entryPoint,
-                binding: 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST'
-            },
-            certificates: [config.cert]
-        });
-
-        // Generate the login request
-        return new Promise((resolve, reject) => {
-            sp.create_login_request_url(idp, {
-                RelayState: finalRelayState
-            }, (err, loginUrl, requestId) => {
-                if (err) {
-                    console.error('❌ Error generating login URL:', err);
-                    reject(err);
-                    return;
-                }
-
-                console.log(`SAML Request URL: ${loginUrl}`);
-                console.log(`SAML Request ID: ${requestId}`);
-                console.log(`SAML Request Relay State: ${finalRelayState}`);
-                
-                resolve({
-                    url: loginUrl,
-                    id: requestId,
-                    relayState: finalRelayState
-                });
-            });
-        });
+        console.log(`SAML Request URL: ${loginUrl}`);
+        console.log(`SAML Request ID: ${requestId}`);
+        console.log(`SAML Request Relay State: ${finalRelayState}`);
+        
+        return {
+            url: loginUrl,
+            id: requestId,
+            relayState: finalRelayState
+        };
     }
 
     /**
