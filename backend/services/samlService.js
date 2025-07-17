@@ -114,7 +114,10 @@ class SAMLService {
 
         // Create an identity provider instance
         const idp = new saml2.IdentityProvider({
-            sso_login_url: config.entryPoint,
+            singleSignOnService: {
+                url: config.entryPoint,
+                binding: 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST'
+            },
             certificates: [config.cert]
         });
 
