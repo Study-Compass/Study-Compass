@@ -45,7 +45,7 @@ router.get('/login', async (req, res) => {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
             sameSite: 'strict',
-            maxAge: 3 * 60 * 1000 // 3 minutes - shorter to prevent stale requests
+            maxAge: 5 * 60 * 1000 // 5 minutes - back to original value
         });
         
         console.log(`Redirecting to: ${url}`);
