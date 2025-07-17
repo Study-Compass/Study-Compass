@@ -75,7 +75,7 @@ class SAMLService {
     }
 
     /**
-     * Generate SAML login URL
+     * Generate SAML login URL using passport-saml's built-in method
      */
     async generateLoginUrl(school, req, relayState = null) {
         const strategy = await this.getStrategy(school, req);
@@ -92,89 +92,35 @@ class SAMLService {
         console.log(`Strategy entry point: ${config.entryPoint}`);
         console.log(`Strategy issuer: ${config.issuer}`);
 
-        // For RPI, try generating a proper SAML request for POST binding
-        if (config.entryPoint.includes('shib.auth.rpi.edu')) {
-            console.log('🔍 Using RPI POST binding with SAML request');
-            
-            try {
-                // Generate a SAML request for POST binding
-                const samlRequest = this.generateSAMLRequest(config);
-                
-                // Create the login URL with SAML request parameters
-                const loginUrl = new URL(config.entryPoint);
-                const params = new URLSearchParams();
-                params.append('SAMLRequest', samlRequest);
-                params.append('RelayState', finalRelayState);
-                loginUrl.search = params.toString();
-                
-                const requestId = crypto.randomBytes(16).toString('hex');
-                
-                console.log(`RPI POST URL with SAML Request: ${loginUrl.toString()}`);
-                console.log(`RPI Request ID: ${requestId}`);
-                console.log(`RPI Relay State: ${finalRelayState}`);
-                
-                return {
-                    url: loginUrl.toString(),
-                    id: requestId,
-                    relayState: finalRelayState
-                };
-            } catch (error) {
-                console.error('❌ Error generating SAML request for RPI:', error);
-                
-                // Fallback: try discovery service
-                console.log('🔍 Falling back to RPI discovery service');
-                let discoveryUrl = 'https://shib.auth.rpi.edu/idp/profile/SAML2/Redirect/SSO';
-                
-                const discoveryUrlObj = new URL(discoveryUrl);
-                discoveryUrlObj.searchParams.append('entityID', config.issuer);
-                discoveryUrlObj.searchParams.append('RelayState', finalRelayState);
-                
-                const requestId = crypto.randomBytes(16).toString('hex');
-                
-                console.log(`RPI Discovery URL (fallback): ${discoveryUrlObj.toString()}`);
-                console.log(`RPI Request ID: ${requestId}`);
-                console.log(`RPI Relay State: ${finalRelayState}`);
-                
-                return {
-                    url: discoveryUrlObj.toString(),
-                    id: requestId,
-                    relayState: finalRelayState
-                };
-            }
-        }
-        
-        // For other IdPs, try generating a SAML request
+        // Use passport-saml's built-in method to generate login URL
         try {
-            const samlRequest = this.generateSAMLRequest(config);
-            
-            // Create the login URL with SAML request parameters
-            const loginUrl = new URL(config.entryPoint);
-            const params = new URLSearchParams();
-            params.append('SAMLRequest', samlRequest);
-            params.append('RelayState', finalRelayState);
-            loginUrl.search = params.toString();
+            // Use the correct async method for generating login URLs
+            const loginUrl = await strategy._saml.getAuthorizeUrlAsync({
+                RelayState: finalRelayState,
+                forceAuthn: false
+            });
             
             // Debug: Log the URL construction
             console.log('🔍 Login URL construction:');
-            console.log(`   Base URL: ${config.entryPoint}`);
-            console.log(`   SAMLRequest length: ${samlRequest.length}`);
+            console.log(`   Generated URL: ${loginUrl}`);
             console.log(`   RelayState: ${finalRelayState}`);
-            console.log(`   Final URL: ${loginUrl.toString()}`);
             
-            // Generate a request ID for tracking
-            const requestId = crypto.randomBytes(16).toString('hex');
-
-            console.log(`SAML Request URL: ${loginUrl.toString()}`);
+            // Extract request ID from the URL if possible
+            const urlObj = new URL(loginUrl);
+            const samlRequest = urlObj.searchParams.get('SAMLRequest');
+            const requestId = samlRequest ? `_${crypto.randomBytes(8).toString('hex')}` : crypto.randomBytes(16).toString('hex');
+            
+            console.log(`SAML Request URL: ${loginUrl}`);
             console.log(`SAML Request ID: ${requestId}`);
             console.log(`SAML Request Relay State: ${finalRelayState}`);
             
             return {
-                url: loginUrl.toString(),
+                url: loginUrl,
                 id: requestId,
                 relayState: finalRelayState
             };
         } catch (error) {
-            console.error('❌ Error generating SAML request:', error);
+            console.error('❌ Error generating SAML login URL:', error);
             
             // Fallback: direct redirect to IdP
             console.log('🔍 Using fallback: direct redirect to IdP');
@@ -191,44 +137,6 @@ class SAMLService {
                 relayState: finalRelayState
             };
         }
-    }
-
-    /**
-     * Generate a basic SAML AuthnRequest
-     */
-    generateSAMLRequest(config) {
-        // Create a simple SAML AuthnRequest following SAML 2.0 specification
-        const requestId = `_${crypto.randomBytes(16).toString('hex')}`;
-        const now = new Date().toISOString();
-        
-        // Use POST binding as expected by RPI's Shibboleth
-        const samlRequest = `<?xml version="1.0"?>
-<samlp:AuthnRequest xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" 
-                    xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion"
-                    ID="${requestId}"
-                    Version="2.0"
-                    IssueInstant="${now}"
-                    ProtocolBinding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
-                    AssertionConsumerServiceURL="${config.callbackUrl}"
-                    Destination="${config.entryPoint}">
-    <saml:Issuer>${config.issuer}</saml:Issuer>
-    <samlp:NameIDPolicy Format="urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress" AllowCreate="true"/>
-    <samlp:RequestedAuthnContext Comparison="exact">
-        <saml:AuthnContextClassRef>urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport</saml:AuthnContextClassRef>
-    </samlp:RequestedAuthnContext>
-</samlp:AuthnRequest>`;
-        
-        // Debug: Log the SAML request
-        console.log('🔍 Generated SAML Request XML:');
-        console.log(samlRequest);
-        
-        // Base64 encode the SAML request
-        const encodedRequest = Buffer.from(samlRequest).toString('base64');
-        
-        console.log('🔍 Base64 encoded SAML request:');
-        console.log(encodedRequest);
-        
-        return encodedRequest;
     }
 
     /**

@@ -279,7 +279,11 @@ samlConfigSchema.methods.toPassportSamlConfig = function() {
         logoutCallbackUrl: this.sp.singleLogoutService || null,
         // Certificate and key configuration
         privateCert: this.sp.signingPrivateKey || this.sp.privateKey,
-        decryptionPvk: this.sp.encryptPrivateKey || this.sp.privateKey,
+        // Only include decryption fields if we're actually using encrypted assertions
+        ...(expectEncryptedAssertions ? {
+            decryptionPvk: this.sp.encryptPrivateKey || this.sp.privateKey,
+            decryptionCert: this.sp.encryptCert || this.sp.signingCert || this.sp.x509Cert,
+        } : {}),
         // Signature settings
         signatureAlgorithm: this.settings.signatureAlgorithm || 'sha256',
         digestAlgorithm: this.settings.digestAlgorithm || 'sha256',
@@ -288,12 +292,19 @@ samlConfigSchema.methods.toPassportSamlConfig = function() {
         wantMessageSigned: this.settings.wantMessageSigned || false,
         wantNameId: this.settings.wantNameId !== false,
         wantNameIdEncrypted: this.settings.wantNameIdEncrypted || false,
-        wantAssertionsEncrypted: expectEncryptedAssertions,
+        wantAssertionsEncrypted: false, // Force to false to avoid metadata encryption requirements
         // Custom function to handle user authentication
         passReqToCallback: true,
         validateInResponseTo: false, // Disable for simplicity
         requestIdExpirationPeriodMs: 28800000, // 8 hours
-        acceptedClockSkewMs: -1, // Disable clock skew validation
+        acceptedClockSkewMs: -1, // Disable clock skew validation,
+        // Additional passport-saml settings for better compatibility
+        forceAuthn: false,
+        authnContext: 'urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport',
+        nameIDFormat: 'urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress',
+        // Disable strict validation for better compatibility
+        disableRequestedAuthnContext: true,
+        allowCreate: true
     };
 };
 

@@ -5,7 +5,7 @@ const samlConfigSchema = require('./schemas/samlConfig');
 const userSchema = require('./schemas/user');
 const samlService = require('./services/samlService');
 
-async function debugMetadata() {
+async function debugStrategy() {
     try {
         await mongoose.connect(process.env.MONGO_URL_LOCAL || 'mongodb://localhost:27017/studycompass');
         console.log('✅ Connected to database');
@@ -27,20 +27,14 @@ async function debugMetadata() {
         
         const strategy = await samlService.getStrategy('rpi', mockReq);
         
-        console.log('Strategy config for metadata:');
-        console.log('decryptionCert:', !!strategy._saml.options.decryptionCert);
-        console.log('decryptionCert length:', strategy._saml.options.decryptionCert ? strategy._saml.options.decryptionCert.length : 0);
-        console.log('decryptionCert preview:', strategy._saml.options.decryptionCert ? strategy._saml.options.decryptionCert.substring(0, 50) : 'N/A');
+        console.log('Strategy methods:');
+        console.log(Object.getOwnPropertyNames(strategy));
         
-        console.log('\nAll strategy options:');
-        Object.keys(strategy._saml.options).forEach(key => {
-            const value = strategy._saml.options[key];
-            if (typeof value === 'string' && value.length > 100) {
-                console.log(`${key}: [string, length: ${value.length}]`);
-            } else {
-                console.log(`${key}:`, value);
-            }
-        });
+        console.log('\nStrategy._saml methods:');
+        console.log(Object.getOwnPropertyNames(strategy._saml));
+        
+        console.log('\nStrategy._saml prototype methods:');
+        console.log(Object.getOwnPropertyNames(Object.getPrototypeOf(strategy._saml)));
         
     } catch (error) {
         console.error('❌ Error:', error);
@@ -50,4 +44,4 @@ async function debugMetadata() {
     }
 }
 
-debugMetadata(); 
+debugStrategy(); 
