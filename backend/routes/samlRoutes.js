@@ -150,7 +150,7 @@ router.get('/login', async (req, res) => {
 });
 
 // SAML Callback endpoint
-router.post('/callback', async (req, res) => {
+router.get('/callback', async (req, res) => {
     try {
         const school = req.school || 'rpi';
         const strategy = await configureSAMLStrategy(school, req);
@@ -292,7 +292,7 @@ router.get('/metadata', async (req, res) => {
                 </ds:X509Data>
             </ds:KeyInfo>
         </md:KeyDescriptor>
-        <md:AssertionConsumerService Binding="${config.callbackUrl.includes('POST') ? 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST' : 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect'}" Location="${config.callbackUrl}" index="0"/>
+        <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="${config.callbackUrl}" index="0"/>
         <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="${config.logoutUrl || config.callbackUrl.replace('/callback', '/logout')}"/>
         <md:NameIDFormat>${config.identifierFormat}</md:NameIDFormat>
     </md:SPSSODescriptor>

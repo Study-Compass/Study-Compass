@@ -37,7 +37,8 @@
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "setup-saml": "node scripts/setupSAML.js"
+    "setup-saml": "node scripts/setupSAML.js",
+    "setup-https": "node scripts/setupHTTPS.js"
   },
   "keywords": [],
   "author": "",
