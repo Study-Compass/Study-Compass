@@ -123,17 +123,17 @@ async function testSAMLFixes() {
         
         // Test 2: Verify request cache is working
         console.log('\n2️⃣ Testing request cache...');
-        console.log(`   Cache size: ${samlService.requestCache.size}`);
+        console.log(`   Cache size: ${samlService.strategies.size} (strategy cache)`);
         
-        // Test 3: Test cache cleanup
-        console.log('\n3️⃣ Testing cache cleanup...');
-        samlService.cleanupOldRequests();
-        console.log(`   Cache size after cleanup: ${samlService.requestCache.size}`);
+        // Test 3: Test cache clearing
+        console.log('\n3️⃣ Testing cache clearing...');
+        samlService.clearCache('rpi');
+        console.log(`   Cache size after clearing: ${samlService.strategies.size}`);
         
         // Test 4: Test cache clearing
         console.log('\n4️⃣ Testing cache clearing...');
         samlService.clearCache('rpi');
-        console.log(`   Cache size after clearing: ${samlService.requestCache.size}`);
+        console.log(`   Cache size after clearing: ${samlService.strategies.size}`);
         
         // Test 5: Verify strategy configuration
         console.log('\n5️⃣ Testing strategy configuration...');
