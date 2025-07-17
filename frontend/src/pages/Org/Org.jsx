@@ -26,6 +26,7 @@ const Org = ({ orgData }) => {
             formResponse: formAnswers
         });
         console.log(response);
+        orgData.refetch();
     }
     
 

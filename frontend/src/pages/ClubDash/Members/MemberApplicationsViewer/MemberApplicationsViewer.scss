@@ -3,6 +3,7 @@
     height:80vh;
     min-height: 80vh;
     .header-container{
+        overflow:hidden;
         height:100%;
         width:100%;
         .member-applications-content{
@@ -24,6 +25,9 @@
                     cursor: pointer;
                     &:first-child{
                         border-top:none;
+                    }
+                    &.selected{
+                        background-color: var(--lighter);
                     }
                     .row{
                         align-items: center;
@@ -70,12 +74,142 @@
                         }
                     }
                 }
+                .no-applications{
+                    padding: 30px;
+                    color: var(--lighter-text);
+                    display: flex;
+                    flex-direction: column;
+                    text-align: center;
+                    align-items: center;
+                    gap:5px;
+                    p{
+                        font-size: 15px;
+                        font-family:'Inter';
+                        font-weight: 500;
+                        color: var(--lighter-text);
+                        
+                    }
+                    &:hover{
+                        background-color: var(--background);
+                    }
+                }
                 :hover{
                     background-color: var(--lighter);
                 }
             }
             .workspace{
-                flex-grow:1;
+                flex-grow: 1;
+                background-color: var(--background);
+                overflow-y:auto;
+                .application-viewer{
+                    padding: 20px;
+                    height: 100%;
+                    overflow-y: auto;
+                    
+                    .application-header {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        margin-bottom: 20px;
+                        padding-bottom: 15px;
+                        border-bottom: 1px solid var(--lighterborder);
+                        
+                        .status-badge {
+                            font-weight: 500;
+                            
+                            .status {
+                                padding: 4px 8px;
+                                border-radius: 4px;
+                                font-size: 12px;
+                                font-weight: 600;
+                                text-transform: uppercase;
+                                
+                                &.pending {
+                                    background-color: #fff3cd;
+                                    color: #856404;
+                                }
+                                
+                                &.approved {
+                                    background-color: #d4edda;
+                                    color: #155724;
+                                }
+                                
+                                &.rejected {
+                                    background-color: #f8d7da;
+                                    color: #721c24;
+                                }
+                            }
+                        }
+                        
+                        .application-date {
+                            color: var(--text-secondary);
+                            font-size: 14px;
+                        }
+                    }
+                    
+                    .form-response-section {
+                        h3 {
+                            margin-bottom: 15px;
+                            color: var(--text);
+                            font-size: 18px;
+                            font-weight: 600;
+                        }
+                    }
+                    
+                    .no-form-message {
+                        text-align: center;
+                        padding: 40px 20px;
+                        color: var(--text-secondary);
+                        
+                        p {
+                            font-size: 16px;
+                            margin: 0;
+                        }
+                    }
+                    .action-buttons {
+                        display: flex;
+                        gap: 16px;
+                        margin-bottom: 20px;
+                        
+                        button {
+                            padding: 8px 18px;
+                            border: none;
+                            border-radius: 4px;
+                            font-size: 15px;
+                            font-weight: 600;
+                            cursor: pointer;
+                            transition: background 0.2s, color 0.2s;
+                        }
+                        .approve-btn {
+                            background: var(--green);
+                            color: #fff;
+                        }
+                        .approve-btn:disabled {
+                            background: #b7e1cd;
+                            color: #fff;
+                            cursor: not-allowed;
+                        }
+                        .reject-btn {
+                            background: var(--red);
+                            color: #fff;
+                        }
+                        .reject-btn:disabled {
+                            background: #f5b7b1;
+                            color: #fff;
+                            cursor: not-allowed;
+                        }
+                    }
+                    .error-message {
+                        color: #e74c3c;
+                        background: #fbeeea;
+                        border: 1px solid #e74c3c;
+                        border-radius: 4px;
+                        padding: 8px 12px;
+                        margin-bottom: 16px;
+                        font-size: 15px;
+                        text-align: center;
+                    }
+                }
             }
         }
     }

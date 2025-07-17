@@ -27,6 +27,7 @@ const FormViewer = ({ form, onSubmit, handleClose}) => {
     if(handleClose) {
       handleClose();
     }
+    // Create response in the format expected by the backend
     const response = Object.keys(responses).map(key => ({
       question: form.questions.find(q => q._id === key).question,
       referenceId: key,

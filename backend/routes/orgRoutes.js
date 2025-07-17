@@ -100,10 +100,10 @@ router.get("/get-org-by-name/:name", verifyToken, async (req, res) => {
         );
         //check if the user has applied to the org
         const user = await User.findById(req.user.userId);
-        const existingApplication = await OrgMemberApplication.findOne({org_id: org._id, user_id: user._id});
+        const existingApplication = await OrgMemberApplication.findOne({org_id: org._id, user_id: user._id, status: "pending"});
         const isMember = orgMembers.some(member => member.user_id._id.toString() === user._id.toString());
         const isFollower = orgFollowers.some(follower => follower.user_id._id.toString() === user._id.toString());
-        const isPending = existingApplication?.status === "pending" ? true : false;
+        const isPending = existingApplication ? true : false;
 
         // If the org exists, return it
         console.log(`GET: /get-org-by-name/${orgName}`);
@@ -656,7 +656,7 @@ router.post("/:orgId/apply-to-org", verifyToken, async (req, res) => {
         if(!org) return res.status(404).json({success: false, message: "Org not found"});
 
         if(org.requireApprovalForJoin) {
-            const existingApplication = await OrgMemberApplication.findOne({org_id: orgId, user_id: userId});
+            const existingApplication = await OrgMemberApplication.findOne({org_id: orgId, user_id: userId, status: "pending"});
             if(existingApplication) return res.status(400).json({success: false, message: "You have already applied to this org"});
         } else {
             const newMember = new OrgMember({
@@ -672,10 +672,18 @@ router.post("/:orgId/apply-to-org", verifyToken, async (req, res) => {
         if(org.memberForm) {
             const form = await Form.findById(org.memberForm);
             if(!form) return res.status(404).json({success: false, message: "Form not found"});
+            
+            // Create answers array in the same order as questions
+            const answers = form.questions.map(question => {
+                const response = formResponse.find(r => r.referenceId === question._id.toString());
+                return response ? response.answer : null;
+            });
+            
             const formResponseObject = await FormResponse.create({
                 form: form._id,
+                formSnapshot: form.toObject(), // Store the complete form object
                 submittedBy: userId,
-                answers: formResponse,
+                answers: answers,
                 submittedAt: new Date(),
                 lastModifiedAt: new Date(),
             });

@@ -377,8 +377,9 @@ router.delete('/:orgId/members/:userId', verifyToken, requireMemberManagement(),
         }
 
         // Soft delete by setting status to inactive
-        member.status = 'inactive';
-        await member.save();
+        // member.status = 'inactive';
+        // await member.save();
+        await OrgMember.deleteOne({ _id: member._id });
 
         res.status(200).json({
             success: true,
@@ -432,6 +433,182 @@ router.get('/:orgId/roles/:roleName/permissions', verifyToken, requireOrgPermiss
         res.status(500).json({
             success: false,
             message: 'Error fetching role permissions'
+        });
+    }
+});
+
+// Approve a member application
+router.post('/:orgId/applications/:applicationId/approve', verifyToken, requireMemberManagement(), async (req, res) => {
+    const { OrgMember, OrgMemberApplication, User } = getModels(req, 'OrgMember', 'OrgMemberApplication', 'User');
+    const { orgId, applicationId } = req.params;
+    const { role = 'member', reason = '' } = req.body;
+    const userId = req.user.userId;
+
+    try {
+        // Find the application
+        const application = await OrgMemberApplication.findById(applicationId)
+            .populate('user_id')
+            .populate('formResponse');
+        if (!application) {
+            return res.status(404).json({
+                success: false,
+                message: 'Application not found'
+            });
+        }
+
+        // Verify the application belongs to this org
+        if (application.org_id.toString() !== orgId) {
+            return res.status(400).json({
+                success: false,
+                message: 'Application does not belong to this organization'
+            });
+        }
+
+        // Check if application is still pending
+        if (application.status !== 'pending') {
+            return res.status(400).json({
+                success: false,
+                message: 'Application has already been processed'
+            });
+        }
+
+        // Check if user is already a member
+        const existingMember = await OrgMember.findOne({
+            org_id: orgId,
+            user_id: application.user_id._id,
+            status: 'active'
+        });
+
+        if (existingMember) {
+            return res.status(400).json({
+                success: false,
+                message: 'User is already a member of this organization'
+            });
+        }
+
+        // Create new member
+        const newMember = new OrgMember({
+            org_id: orgId,
+            user_id: application.user_id._id,
+            role: role,
+            status: 'active',
+            assignedBy: userId,
+            assignedAt: new Date()
+        });
+
+        await newMember.save();
+
+        // Update application status
+        application.status = 'approved';
+        application.approvedBy = userId;
+        application.approvedAt = new Date();
+        application.reason = reason;
+        await application.save();
+
+        console.log(`POST /org-roles/${orgId}/applications/${applicationId}/approve successful`);
+        res.status(200).json({
+            success: true,
+            message: 'Application approved successfully',
+            member: newMember
+        });
+
+    } catch (error) {
+        console.error('Error approving application:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error approving application'
+        });
+    }
+});
+
+// Reject a member application
+router.post('/:orgId/applications/:applicationId/reject', verifyToken, requireMemberManagement(), async (req, res) => {
+    const { OrgMemberApplication } = getModels(req, 'OrgMemberApplication');
+    const { orgId, applicationId } = req.params;
+    const { reason = '' } = req.body;
+    const userId = req.user.userId;
+
+    try {
+        // Find the application
+        const application = await OrgMemberApplication.findById(applicationId)
+            .populate('user_id')
+            .populate('formResponse');
+        if (!application) {
+            return res.status(404).json({
+                success: false,
+                message: 'Application not found'
+            });
+        }
+
+        // Verify the application belongs to this org
+        if (application.org_id.toString() !== orgId) {
+            return res.status(400).json({
+                success: false,
+                message: 'Application does not belong to this organization'
+            });
+        }
+
+        // Check if application is still pending
+        if (application.status !== 'pending') {
+            return res.status(400).json({
+                success: false,
+                message: 'Application has already been processed'
+            });
+        }
+
+        // Update application status
+        application.status = 'rejected';
+        application.approvedBy = userId;
+        application.approvedAt = new Date();
+        application.reason = reason;
+        await application.save();
+
+        console.log(`POST /org-roles/${orgId}/applications/${applicationId}/reject successful`);
+        res.status(200).json({
+            success: true,
+            message: 'Application rejected successfully'
+        });
+
+    } catch (error) {
+        console.error('Error rejecting application:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error rejecting application'
+        });
+    }
+});
+
+// Get all applications for an organization (including approved/rejected)
+router.get('/:orgId/applications', verifyToken, requireMemberManagement(), async (req, res) => {
+    const { OrgMemberApplication } = getModels(req, 'OrgMemberApplication');
+    const { orgId } = req.params;
+    const { status } = req.query;
+
+    try {
+        let query = { org_id: orgId };
+        
+        // Filter by status if provided
+        if (status && ['pending', 'approved', 'rejected'].includes(status)) {
+            query.status = status;
+        }
+
+        const applications = await OrgMemberApplication.find(query)
+            .populate('user_id', 'username name email picture')
+            .populate('formResponse')
+            .populate('approvedBy', 'username name')
+            .sort({ createdAt: -1 });
+
+        console.log(`GET /org-roles/${orgId}/applications successful`);
+        res.status(200).json({
+            success: true,
+            applications
+        });
+
+    } catch (error) {
+        console.error('Error fetching applications:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error fetching applications'
         });
     }
 });
