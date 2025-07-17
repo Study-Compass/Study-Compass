@@ -36,7 +36,8 @@ import { ProfileCreationProvider } from './ProfileCreationContext';
 import { WebSocketProvider } from './WebSocketContext';
 import Layout from './pages/Layout/Layout';
 import axios from 'axios';
-import CreateEvent from './pages/CreateEvent/CreateEvent';
+// import CreateEvent from './pages/CreateEvent/CreateEvent';
+import CreateEvent from './components/CreateEventV2/CreateEventV2';
 import EventsDash from './pages/EventsDash/EventsDash';
 
 function App() {

@@ -1,0 +1,156 @@
+.title-desc-step {
+    max-width: 600px;
+    width: 100%;
+
+    .form-section {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+        margin-bottom: 32px;
+    }
+
+    .input-group {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+
+        label {
+            font-family: 'GeneralSans-SemiBold', sans-serif;
+            font-size: 14px;
+            color: var(--text-color);
+            margin: 0;
+        }
+
+        input {
+            padding: 12px 16px;
+            border: 1px solid var(--light-bounding-color);
+            border-radius: 8px;
+            font-family: 'GeneralSans-Regular', sans-serif;
+            font-size: 14px;
+            color: var(--text-color);
+            background-color: var(--light-bounding-color);
+            transition: all 0.2s ease;
+
+
+            &::placeholder {
+                color: #9ca3af;
+            }
+
+            &:focus {
+                outline: none;
+                border-color: var(--accent-color);
+                box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+            }
+
+            &.error {
+                border-color: var(--accent-color);
+                box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+
+                &:focus {
+                    border-color: var(--accent-color);
+                    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+                }
+            }
+        }
+
+        .editor-container {
+            border: 1px solid var(--light-bounding-color);
+            border-radius: 11px;
+            overflow: hidden;
+            transition: all 0.2s ease;
+            p {
+                font-family: 'GeneralSans-Regular', sans-serif !important;
+            }
+            &:focus-within {
+                border-color: var(--accent-color);
+                box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+            }
+
+            &.error {
+                border-color: var(--accent-color);
+                box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+
+                &:focus-within {
+                    border-color: var(--accent-color);
+                    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+                }
+            }
+
+            .text-editor {
+                .ql-container {
+                    border: none;
+                    font-family: 'GeneralSans-Regular', sans-serif;
+                    font-size: 14px;
+                    color: var(--text-color);
+                    min-height: 120px;
+                }
+
+                .ql-toolbar {
+                    border: none;
+                    border-bottom: 1px solid #e5e7eb;
+                    background: #f9fafb;
+                }
+
+                .ql-editor {
+                    padding: 16px;
+                    line-height: 1.6;
+
+                    &::placeholder {
+                        color: #9ca3af;
+                    }
+                }
+            }
+        }
+
+        .error-message {
+            font-family: 'GeneralSans-Regular', sans-serif;
+            font-size: 12px;
+            color: var(--accent-color);
+            margin: 0;
+        }
+
+        .help-text {
+            font-family: 'GeneralSans-Regular', sans-serif;
+            font-size: 12px;
+            color: var(--text-color-secondary);
+            margin: 0;
+            line-height: 1.4;
+        }
+    }
+
+    .tips-section {
+        background: var(--lighter-bounding-color);
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 20px;
+
+        h4 {
+            font-family: 'GeneralSans-SemiBold', sans-serif;
+            font-size: 14px;
+            color: #374151;
+            margin: 0 0 12px 0;
+        }
+
+        p {
+            font-family: 'GeneralSans-Regular', sans-serif;
+            font-size: 13px;
+            color: var(--text-color-secondary);
+            margin: 0;
+            line-height: 1.4;
+
+            kbd {
+                background: #f3f4f6;
+                border: 1px solid #d1d5db;
+                border-radius: 4px;
+                padding: 2px 6px;
+                font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+                font-size: 11px;
+                color: #374151;
+            }
+
+            strong {
+                font-family: 'GeneralSans-SemiBold', sans-serif;
+            }
+        }
+    }
+} 

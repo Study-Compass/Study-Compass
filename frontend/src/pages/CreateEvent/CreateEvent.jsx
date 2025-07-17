@@ -4,9 +4,11 @@ import Header from '../../components/Header/Header';
 import EventInfo from '../../assets/Icons/EventInfo.svg';
 import Calendar from '../../assets/Icons/Calendar.svg';
 import CheckBlack from '../../assets/Icons/CheckBlack.svg';
+
 import WhenWhere from '../../components/CreateEvent/WhenWhere/WhenWhere';
 import GenInfo from '../../components/CreateEvent/GenInfo/GenInfo';
 import Review from '../../components/CreateEvent/Review/Review';
+
 import { useNotification } from '../../NotificationContext';
 import { createEvent } from './CreateEventHelpers';
 import { useNavigate, useLocation } from 'react-router-dom';
