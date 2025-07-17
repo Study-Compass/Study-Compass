@@ -92,56 +92,57 @@ class SAMLService {
         console.log(`Strategy entry point: ${config.entryPoint}`);
         console.log(`Strategy issuer: ${config.issuer}`);
 
-        // Generate a proper SAML AuthnRequest
-        const samlRequest = this.generateSAMLRequest(config);
+        // Use passport-saml's internal SAML library to generate the request
+        // passport-saml uses the saml2 library internally
+        const saml2 = require('saml2');
         
-        // Create the login URL with SAML request parameters
-        const loginUrl = new URL(config.entryPoint);
-        const params = new URLSearchParams();
-        params.append('SAMLRequest', samlRequest);
-        params.append('RelayState', finalRelayState);
-        loginUrl.search = params.toString();
-        
-        // Generate a request ID for tracking
-        const requestId = crypto.randomBytes(16).toString('hex');
+        // Create a service provider instance for generating the request
+        const sp = new saml2.ServiceProvider({
+            entity_id: config.issuer,
+            private_key: config.privateCert,
+            certificate: config.privateCert, // Use the same cert for signing
+            assert_endpoint: config.callbackUrl,
+            force_authn: false,
+            auth_context: {
+                comparison: 'exact',
+                class_refs: ['urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport']
+            },
+            nameid_format: 'urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress',
+            sign_get_request: false,
+            allow_unencrypted_assertion: true
+        });
 
-        console.log(`SAML Request URL: ${loginUrl.toString()}`);
-        console.log(`SAML Request ID: ${requestId}`);
-        console.log(`SAML Request Relay State: ${finalRelayState}`);
-        
-        return {
-            url: loginUrl.toString(),
-            id: requestId,
-            relayState: finalRelayState
-        };
-    }
+        // Create an identity provider instance
+        const idp = new saml2.IdentityProvider({
+            singleSignOnService: {
+                url: config.entryPoint,
+                binding: 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST'
+            },
+            certificates: [config.cert]
+        });
 
-    /**
-     * Generate a proper SAML AuthnRequest
-     */
-    generateSAMLRequest(config) {
-        // Create a proper SAML AuthnRequest following SAML 2.0 specification
-        const requestId = `_${crypto.randomBytes(16).toString('hex')}`;
-        const now = new Date().toISOString();
-        
-        const samlRequest = `<?xml version="1.0"?>
-<samlp:AuthnRequest xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" 
-                    xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion"
-                    ID="${requestId}"
-                    Version="2.0"
-                    IssueInstant="${now}"
-                    ProtocolBinding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
-                    AssertionConsumerServiceURL="${config.callbackUrl}"
-                    Destination="${config.entryPoint}">
-    <saml:Issuer>${config.issuer}</saml:Issuer>
-    <samlp:NameIDPolicy Format="urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress" AllowCreate="true"/>
-    <samlp:RequestedAuthnContext Comparison="exact">
-        <saml:AuthnContextClassRef>urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport</saml:AuthnContextClassRef>
-    </samlp:RequestedAuthnContext>
-</samlp:AuthnRequest>`;
-        
-        // Base64 encode the SAML request
-        return Buffer.from(samlRequest).toString('base64');
+        // Generate the login request using saml2 library
+        return new Promise((resolve, reject) => {
+            sp.create_login_request_url(idp, {
+                RelayState: finalRelayState
+            }, (err, loginUrl, requestId) => {
+                if (err) {
+                    console.error('❌ Error generating login URL:', err);
+                    reject(err);
+                    return;
+                }
+
+                console.log(`SAML Request URL: ${loginUrl}`);
+                console.log(`SAML Request ID: ${requestId}`);
+                console.log(`SAML Request Relay State: ${finalRelayState}`);
+                
+                resolve({
+                    url: loginUrl,
+                    id: requestId,
+                    relayState: finalRelayState
+                });
+            });
+        });
     }
 
     /**
