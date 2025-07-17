@@ -92,92 +92,39 @@ class SAMLService {
         console.log(`Strategy entry point: ${config.entryPoint}`);
         console.log(`Strategy issuer: ${config.issuer}`);
 
-        // Use passport-saml's internal SAML library to generate the login URL
-        // This avoids the bug in passport-saml's authenticate method
+        // Generate a simple SAML AuthnRequest manually
         try {
-            // Access the internal SAML library that passport-saml uses
-            const saml2 = require('saml2');
+            const samlRequest = this.generateSAMLRequest(config);
             
-            // Create a service provider instance using the same config as passport-saml
-            const sp = new saml2.ServiceProvider({
-                entity_id: config.issuer,
-                private_key: config.privateCert,
-                certificate: config.privateCert,
-                assert_endpoint: config.callbackUrl,
-                force_authn: false,
-                auth_context: {
-                    comparison: 'exact',
-                    class_refs: ['urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport']
-                },
-                nameid_format: 'urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress',
-                sign_get_request: false,
-                allow_unencrypted_assertion: true
-            });
-
-            // Create an identity provider instance
-            const idp = new saml2.IdentityProvider({
-                singleSignOnService: {
-                    url: config.entryPoint,
-                    binding: 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST'
-                },
-                certificates: [config.cert]
-            });
-
-            // Generate the login request using the saml2 library directly
-            // Check what methods are available on the sp object
-            console.log('🔍 Debugging saml2 SP object:');
-            console.log('   SP methods:', Object.getOwnPropertyNames(Object.getPrototypeOf(sp)));
-            console.log('   SP create_login_request_url exists:', typeof sp.create_login_request_url);
-            console.log('   SP createLoginRequest exists:', typeof sp.createLoginRequest);
+            // Create the login URL with SAML request parameters
+            const loginUrl = new URL(config.entryPoint);
+            const params = new URLSearchParams();
+            params.append('SAMLRequest', samlRequest);
+            params.append('RelayState', finalRelayState);
+            loginUrl.search = params.toString();
             
-            // Try the correct method name
-            if (typeof sp.createLoginRequest === 'function') {
-                return new Promise((resolve, reject) => {
-                    sp.createLoginRequest(idp, {
-                        RelayState: finalRelayState
-                    }, (err, loginUrl, requestId) => {
-                        if (err) {
-                            console.error('❌ Error generating login URL with saml2:', err);
-                            // Fallback to direct redirect
-                            const fallbackUrl = config.entryPoint;
-                            const fallbackId = crypto.randomBytes(16).toString('hex');
-                            
-                            console.log(`Fallback SAML Request URL: ${fallbackUrl}`);
-                            console.log(`Fallback SAML Request ID: ${fallbackId}`);
-                            console.log(`Fallback SAML Request Relay State: ${finalRelayState}`);
-                            
-                            resolve({
-                                url: fallbackUrl,
-                                id: fallbackId,
-                                relayState: finalRelayState
-                            });
-                            return;
-                        }
+            // Generate a request ID for tracking
+            const requestId = crypto.randomBytes(16).toString('hex');
 
-                        console.log(`SAML Request URL: ${loginUrl}`);
-                        console.log(`SAML Request ID: ${requestId}`);
-                        console.log(`SAML Request Relay State: ${finalRelayState}`);
-                        
-                        resolve({
-                            url: loginUrl,
-                            id: requestId,
-                            relayState: finalRelayState
-                        });
-                    });
-                });
-            } else {
-                throw new Error('createLoginRequest method not found on saml2 ServiceProvider');
-            }
+            console.log(`SAML Request URL: ${loginUrl.toString()}`);
+            console.log(`SAML Request ID: ${requestId}`);
+            console.log(`SAML Request Relay State: ${finalRelayState}`);
+            
+            return {
+                url: loginUrl.toString(),
+                id: requestId,
+                relayState: finalRelayState
+            };
         } catch (error) {
-            console.error('❌ Error with saml2 library:', error);
+            console.error('❌ Error generating SAML request:', error);
             
-            // Final fallback: direct redirect to entry point
+            // Fallback: direct redirect to entry point
             const loginUrl = config.entryPoint;
             const requestId = crypto.randomBytes(16).toString('hex');
             
-            console.log(`Final Fallback SAML Request URL: ${loginUrl}`);
-            console.log(`Final Fallback SAML Request ID: ${requestId}`);
-            console.log(`Final Fallback SAML Request Relay State: ${finalRelayState}`);
+            console.log(`Fallback SAML Request URL: ${loginUrl}`);
+            console.log(`Fallback SAML Request ID: ${requestId}`);
+            console.log(`Fallback SAML Request Relay State: ${finalRelayState}`);
             
             return {
                 url: loginUrl,
@@ -185,6 +132,34 @@ class SAMLService {
                 relayState: finalRelayState
             };
         }
+    }
+
+    /**
+     * Generate a basic SAML AuthnRequest
+     */
+    generateSAMLRequest(config) {
+        // Create a simple SAML AuthnRequest following SAML 2.0 specification
+        const requestId = `_${crypto.randomBytes(16).toString('hex')}`;
+        const now = new Date().toISOString();
+        
+        const samlRequest = `<?xml version="1.0"?>
+<samlp:AuthnRequest xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" 
+                    xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion"
+                    ID="${requestId}"
+                    Version="2.0"
+                    IssueInstant="${now}"
+                    ProtocolBinding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
+                    AssertionConsumerServiceURL="${config.callbackUrl}"
+                    Destination="${config.entryPoint}">
+    <saml:Issuer>${config.issuer}</saml:Issuer>
+    <samlp:NameIDPolicy Format="urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress" AllowCreate="true"/>
+    <samlp:RequestedAuthnContext Comparison="exact">
+        <saml:AuthnContextClassRef>urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport</saml:AuthnContextClassRef>
+    </samlp:RequestedAuthnContext>
+</samlp:AuthnRequest>`;
+        
+        // Base64 encode the SAML request
+        return Buffer.from(samlRequest).toString('base64');
     }
 
     /**
