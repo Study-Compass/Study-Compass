@@ -92,54 +92,20 @@ class SAMLService {
         console.log(`Strategy entry point: ${config.entryPoint}`);
         console.log(`Strategy issuer: ${config.issuer}`);
 
-        // Generate login URL manually using the strategy configuration
-        // passport-saml doesn't expose a direct method for this, so we construct it
-        const loginUrl = new URL(config.entryPoint);
-        
-        // Add SAML parameters
-        const params = new URLSearchParams();
-        params.append('SAMLRequest', this.generateSAMLRequest(config));
-        params.append('RelayState', finalRelayState);
-        
-        // For GET binding, append parameters to URL
-        loginUrl.search = params.toString();
-        
-        // Generate a request ID for tracking
+        // Simply redirect to the IdP entry point
+        // The IdP will handle the SAML request generation
+        const loginUrl = config.entryPoint;
         const requestId = crypto.randomBytes(16).toString('hex');
 
-        console.log(`SAML Request URL: ${loginUrl.toString()}`);
+        console.log(`SAML Request URL: ${loginUrl}`);
         console.log(`SAML Request ID: ${requestId}`);
         console.log(`SAML Request Relay State: ${finalRelayState}`);
         
         return {
-            url: loginUrl.toString(),
+            url: loginUrl,
             id: requestId,
             relayState: finalRelayState
         };
-    }
-
-    /**
-     * Generate a basic SAML AuthnRequest
-     */
-    generateSAMLRequest(config) {
-        // Create a simple SAML AuthnRequest
-        const requestId = `_${crypto.randomBytes(16).toString('hex')}`;
-        const now = new Date().toISOString();
-        
-        const samlRequest = `<?xml version="1.0"?>
-<samlp:AuthnRequest xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" 
-                    xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion"
-                    ID="${requestId}"
-                    Version="2.0"
-                    IssueInstant="${now}"
-                    ProtocolBinding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
-                    AssertionConsumerServiceURL="${config.callbackUrl}">
-    <saml:Issuer>${config.issuer}</saml:Issuer>
-    <samlp:NameIDPolicy Format="urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress" AllowCreate="true"/>
-</samlp:AuthnRequest>`;
-        
-        // Base64 encode and compress
-        return Buffer.from(samlRequest).toString('base64');
     }
 
     /**
