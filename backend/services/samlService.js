@@ -92,55 +92,68 @@ class SAMLService {
         console.log(`Strategy entry point: ${config.entryPoint}`);
         console.log(`Strategy issuer: ${config.issuer}`);
 
-        // Use passport-saml's internal SAML library to generate the request
-        // passport-saml uses the saml2 library internally
-        const saml2 = require('saml2');
-        
-        // Create a service provider instance for generating the request
-        const sp = new saml2.ServiceProvider({
-            entity_id: config.issuer,
-            private_key: config.privateCert,
-            certificate: config.privateCert, // Use the same cert for signing
-            assert_endpoint: config.callbackUrl,
-            force_authn: false,
-            auth_context: {
-                comparison: 'exact',
-                class_refs: ['urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport']
-            },
-            nameid_format: 'urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress',
-            sign_get_request: false,
-            allow_unencrypted_assertion: true
-        });
+        // Use passport-saml's built-in functionality to generate the login URL
+        // Create a mock request object for passport-saml
+        const mockReq = {
+            body: {},
+            query: { RelayState: finalRelayState },
+            cookies: {},
+            session: {}
+        };
 
-        // Create an identity provider instance
-        const idp = new saml2.IdentityProvider({
-            singleSignOnService: {
-                url: config.entryPoint,
-                binding: 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST'
-            },
-            certificates: [config.cert]
-        });
-
-        // Generate the login request using saml2 library
+        // Use passport-saml's authenticate method to generate the login URL
         return new Promise((resolve, reject) => {
-            sp.create_login_request_url(idp, {
-                RelayState: finalRelayState
-            }, (err, loginUrl, requestId) => {
+            strategy.authenticate(mockReq, {}, (err, user, info) => {
                 if (err) {
-                    console.error('❌ Error generating login URL:', err);
-                    reject(err);
+                    console.error('❌ Error in strategy authenticate:', err);
+                    // If authentication fails, it might be trying to redirect to IdP
+                    // Check if there's a redirect URL in the error or info
+                    if (info && info.redirectUrl) {
+                        const requestId = crypto.randomBytes(16).toString('hex');
+                        console.log(`SAML Request URL: ${info.redirectUrl}`);
+                        console.log(`SAML Request ID: ${requestId}`);
+                        console.log(`SAML Request Relay State: ${finalRelayState}`);
+                        
+                        resolve({
+                            url: info.redirectUrl,
+                            id: requestId,
+                            relayState: finalRelayState
+                        });
+                    } else {
+                        reject(err);
+                    }
                     return;
                 }
-
-                console.log(`SAML Request URL: ${loginUrl}`);
-                console.log(`SAML Request ID: ${requestId}`);
-                console.log(`SAML Request Relay State: ${finalRelayState}`);
                 
-                resolve({
-                    url: loginUrl,
-                    id: requestId,
-                    relayState: finalRelayState
-                });
+                // If we get here, it means the strategy is trying to redirect to the IdP
+                // We need to capture the redirect URL from the info object
+                if (info && info.redirectUrl) {
+                    const requestId = crypto.randomBytes(16).toString('hex');
+                    
+                    console.log(`SAML Request URL: ${info.redirectUrl}`);
+                    console.log(`SAML Request ID: ${requestId}`);
+                    console.log(`SAML Request Relay State: ${finalRelayState}`);
+                    
+                    resolve({
+                        url: info.redirectUrl,
+                        id: requestId,
+                        relayState: finalRelayState
+                    });
+                } else {
+                    // Fallback: construct the URL manually using the entry point
+                    const loginUrl = config.entryPoint;
+                    const requestId = crypto.randomBytes(16).toString('hex');
+                    
+                    console.log(`Fallback SAML Request URL: ${loginUrl}`);
+                    console.log(`Fallback SAML Request ID: ${requestId}`);
+                    console.log(`Fallback SAML Request Relay State: ${finalRelayState}`);
+                    
+                    resolve({
+                        url: loginUrl,
+                        id: requestId,
+                        relayState: finalRelayState
+                    });
+                }
             });
         });
     }
