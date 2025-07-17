@@ -103,6 +103,13 @@ class SAMLService {
             params.append('RelayState', finalRelayState);
             loginUrl.search = params.toString();
             
+            // Debug: Log the URL construction
+            console.log('🔍 Login URL construction:');
+            console.log(`   Base URL: ${config.entryPoint}`);
+            console.log(`   SAMLRequest length: ${samlRequest.length}`);
+            console.log(`   RelayState: ${finalRelayState}`);
+            console.log(`   Final URL: ${loginUrl.toString()}`);
+            
             // Generate a request ID for tracking
             const requestId = crypto.randomBytes(16).toString('hex');
 
@@ -118,16 +125,28 @@ class SAMLService {
         } catch (error) {
             console.error('❌ Error generating SAML request:', error);
             
-            // Fallback: direct redirect to entry point
-            const loginUrl = config.entryPoint;
+            // Try alternative approach: redirect to IdP without SAML request
+            // Some IdPs can handle this automatically
+            console.log('🔍 Trying alternative approach: direct redirect to IdP');
+            
+            // For RPI, try the discovery service or a different entry point
+            let alternativeUrl = config.entryPoint;
+            
+            // If it's RPI's Shibboleth, try a different approach
+            if (config.entryPoint.includes('shib.auth.rpi.edu')) {
+                // Try the discovery service or a simpler entry point
+                alternativeUrl = 'https://shib.auth.rpi.edu/idp/profile/SAML2/Redirect/SSO';
+                console.log(`🔍 Using alternative RPI URL: ${alternativeUrl}`);
+            }
+            
             const requestId = crypto.randomBytes(16).toString('hex');
             
-            console.log(`Fallback SAML Request URL: ${loginUrl}`);
-            console.log(`Fallback SAML Request ID: ${requestId}`);
-            console.log(`Fallback SAML Request Relay State: ${finalRelayState}`);
+            console.log(`Alternative SAML Request URL: ${alternativeUrl}`);
+            console.log(`Alternative SAML Request ID: ${requestId}`);
+            console.log(`Alternative SAML Request Relay State: ${finalRelayState}`);
             
             return {
-                url: loginUrl,
+                url: alternativeUrl,
                 id: requestId,
                 relayState: finalRelayState
             };
@@ -158,8 +177,17 @@ class SAMLService {
     </samlp:RequestedAuthnContext>
 </samlp:AuthnRequest>`;
         
+        // Debug: Log the SAML request
+        console.log('🔍 Generated SAML Request XML:');
+        console.log(samlRequest);
+        
         // Base64 encode the SAML request
-        return Buffer.from(samlRequest).toString('base64');
+        const encodedRequest = Buffer.from(samlRequest).toString('base64');
+        
+        console.log('🔍 Base64 encoded SAML request:');
+        console.log(encodedRequest);
+        
+        return encodedRequest;
     }
 
     /**
