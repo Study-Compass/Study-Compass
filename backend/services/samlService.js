@@ -36,17 +36,17 @@ class SAMLService {
             signatureAlgorithm: config.settings.signatureAlgorithm || 'sha256',
             digestAlgorithm: config.settings.digestAlgorithm || 'sha256',
             wantAssertionsSigned: config.settings.wantAssertionsSigned !== false,
-            wantMessageSigned: config.settings.wantMessageSigned || false,
+            wantMessageSigned: config.settings.wantMessageSigned !== false, // Enable message signing
             wantNameId: config.settings.wantNameId !== false,
-            wantNameIdEncrypted: config.settings.wantNameIdEncrypted || false,
-            wantAssertionsEncrypted: false,
+            wantNameIdEncrypted: config.settings.wantNameIdEncrypted !== false, // Enable NameID encryption
+            wantAssertionsEncrypted: config.settings.wantAssertionsEncrypted !== false, // Enable assertion encryption
             passReqToCallback: true,
             validateInResponseTo: false,
             requestIdExpirationPeriodMs: 900000, // 15 minutes
             acceptedClockSkewMs: 300000, // 5 minutes
             forceAuthn: false,
             authnContext: 'urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport',
-            nameIDFormat: 'urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress',
+            nameIDFormat: 'urn:oasis:names:tc:SAML:1.1:nameid-format:persistent', // Use persistent instead of transient
             disableRequestedAuthnContext: true,
             allowCreate: true,
             attributeMap: this.createAttributeMap(config.attributeMapping)
@@ -56,6 +56,14 @@ class SAMLService {
         if (config.sp.encryptCert && config.sp.encryptPrivateKey) {
             samlConfig.decryptionPvk = config.sp.encryptPrivateKey;
             samlConfig.decryptionCert = config.sp.encryptCert;
+        } else if (config.sp.signingCert && config.sp.signingPrivateKey) {
+            // Fallback to signing cert/key for encryption if separate encryption certs not available
+            samlConfig.decryptionPvk = config.sp.signingPrivateKey;
+            samlConfig.decryptionCert = config.sp.signingCert;
+            console.log('⚠️ Using signing certificate for encryption (fallback)');
+        } else {
+            console.error('❌ No encryption certificates available - RPI requires encryption');
+            throw new Error('Encryption certificates required for RPI Shibboleth IdP');
         }
 
         // Add logout settings if available
@@ -345,6 +353,14 @@ class SAMLService {
         // Validate SP certificates
         if (!config.sp.signingCert && !config.sp.x509Cert) errors.push('SP Signing Certificate is required');
         if (!config.sp.signingPrivateKey && !config.sp.privateKey) errors.push('SP Signing Private Key is required');
+        
+        // Validate encryption certificates (required for RPI)
+        if (!config.sp.encryptCert && !config.sp.signingCert && !config.sp.x509Cert) {
+            errors.push('SP Encryption Certificate is required for RPI Shibboleth IdP');
+        }
+        if (!config.sp.encryptPrivateKey && !config.sp.signingPrivateKey && !config.sp.privateKey) {
+            errors.push('SP Encryption Private Key is required for RPI Shibboleth IdP');
+        }
 
         // Validate URL formats
         const urlFields = [
@@ -394,6 +410,14 @@ class SAMLService {
             }
             if (!config.sp.signingPrivateKey && !config.sp.privateKey) {
                 throw new Error('SP signing private key is missing');
+            }
+            
+            // Validate encryption certificates (required for RPI)
+            if (!config.sp.encryptCert && !config.sp.signingCert && !config.sp.x509Cert) {
+                throw new Error('SP encryption certificate is missing - required for RPI Shibboleth IdP');
+            }
+            if (!config.sp.encryptPrivateKey && !config.sp.signingPrivateKey && !config.sp.privateKey) {
+                throw new Error('SP encryption private key is missing - required for RPI Shibboleth IdP');
             }
 
             // Test strategy creation
