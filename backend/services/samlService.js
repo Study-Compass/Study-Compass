@@ -124,39 +124,50 @@ class SAMLService {
             });
 
             // Generate the login request using the saml2 library directly
-            return new Promise((resolve, reject) => {
-                sp.create_login_request_url(idp, {
-                    RelayState: finalRelayState
-                }, (err, loginUrl, requestId) => {
-                    if (err) {
-                        console.error('❌ Error generating login URL with saml2:', err);
-                        // Fallback to direct redirect
-                        const fallbackUrl = config.entryPoint;
-                        const fallbackId = crypto.randomBytes(16).toString('hex');
-                        
-                        console.log(`Fallback SAML Request URL: ${fallbackUrl}`);
-                        console.log(`Fallback SAML Request ID: ${fallbackId}`);
-                        console.log(`Fallback SAML Request Relay State: ${finalRelayState}`);
+            // Check what methods are available on the sp object
+            console.log('🔍 Debugging saml2 SP object:');
+            console.log('   SP methods:', Object.getOwnPropertyNames(Object.getPrototypeOf(sp)));
+            console.log('   SP create_login_request_url exists:', typeof sp.create_login_request_url);
+            console.log('   SP createLoginRequest exists:', typeof sp.createLoginRequest);
+            
+            // Try the correct method name
+            if (typeof sp.createLoginRequest === 'function') {
+                return new Promise((resolve, reject) => {
+                    sp.createLoginRequest(idp, {
+                        RelayState: finalRelayState
+                    }, (err, loginUrl, requestId) => {
+                        if (err) {
+                            console.error('❌ Error generating login URL with saml2:', err);
+                            // Fallback to direct redirect
+                            const fallbackUrl = config.entryPoint;
+                            const fallbackId = crypto.randomBytes(16).toString('hex');
+                            
+                            console.log(`Fallback SAML Request URL: ${fallbackUrl}`);
+                            console.log(`Fallback SAML Request ID: ${fallbackId}`);
+                            console.log(`Fallback SAML Request Relay State: ${finalRelayState}`);
+                            
+                            resolve({
+                                url: fallbackUrl,
+                                id: fallbackId,
+                                relayState: finalRelayState
+                            });
+                            return;
+                        }
+
+                        console.log(`SAML Request URL: ${loginUrl}`);
+                        console.log(`SAML Request ID: ${requestId}`);
+                        console.log(`SAML Request Relay State: ${finalRelayState}`);
                         
                         resolve({
-                            url: fallbackUrl,
-                            id: fallbackId,
+                            url: loginUrl,
+                            id: requestId,
                             relayState: finalRelayState
                         });
-                        return;
-                    }
-
-                    console.log(`SAML Request URL: ${loginUrl}`);
-                    console.log(`SAML Request ID: ${requestId}`);
-                    console.log(`SAML Request Relay State: ${finalRelayState}`);
-                    
-                    resolve({
-                        url: loginUrl,
-                        id: requestId,
-                        relayState: finalRelayState
                     });
                 });
-            });
+            } else {
+                throw new Error('createLoginRequest method not found on saml2 ServiceProvider');
+            }
         } catch (error) {
             console.error('❌ Error with saml2 library:', error);
             
