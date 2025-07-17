@@ -25,20 +25,27 @@ router.get('/login', async (req, res) => {
         console.log(`Original relay state: ${relayState}`);
         console.log(`Request headers:`, req.headers);
         
-        // Clear cache to ensure fresh configuration
+        // Clear cache to ensure fresh configuration and prevent stale requests
         samlService.clearCache(school);
+        
+        // Add cache control headers to prevent browser caching
+        res.set({
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+            'Expires': '0'
+        });
         
         const { url, id, relayState: generatedRelayState } = await samlService.generateLoginUrl(school, req, relayState);
         
         console.log(`Generated SAML URL: ${url}`);
         console.log(`Generated relay state: ${generatedRelayState}`);
         
-        // Store relay state in session or cookie for validation
+        // Store relay state in session or cookie for validation with shorter expiry
         res.cookie('samlRelayState', generatedRelayState, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
             sameSite: 'strict',
-            maxAge: 5 * 60 * 1000 // 5 minutes
+            maxAge: 3 * 60 * 1000 // 3 minutes - shorter to prevent stale requests
         });
         
         console.log(`Redirecting to: ${url}`);

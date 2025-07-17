@@ -7,6 +7,7 @@ const getModels = require('./getModelService');
 class SAMLService {
     constructor() {
         this.strategies = new Map(); // Cache for passport strategies
+        this.requestCache = new Map(); // Cache for tracking active requests
     }
 
     /**
@@ -75,6 +76,15 @@ class SAMLService {
     }
 
     /**
+     * Generate unique request ID to prevent conflicts
+     */
+    generateUniqueRequestId() {
+        const timestamp = Date.now();
+        const random = crypto.randomBytes(8).toString('hex');
+        return `_${timestamp}_${random}`;
+    }
+
+    /**
      * Generate SAML login URL using passport-saml's built-in method
      */
     async generateLoginUrl(school, req, relayState = null) {
@@ -92,6 +102,10 @@ class SAMLService {
         console.log(`Strategy entry point: ${config.entryPoint}`);
         console.log(`Strategy issuer: ${config.issuer}`);
 
+        // Generate unique request ID
+        const requestId = this.generateUniqueRequestId();
+        console.log(`Generated unique request ID: ${requestId}`);
+
         // Use passport-saml's built-in method to generate login URL
         try {
             // Use the correct async method for generating login URLs
@@ -104,11 +118,18 @@ class SAMLService {
             console.log('🔍 Login URL construction:');
             console.log(`   Generated URL: ${loginUrl}`);
             console.log(`   RelayState: ${finalRelayState}`);
+            console.log(`   Request ID: ${requestId}`);
             
-            // Extract request ID from the URL if possible
-            const urlObj = new URL(loginUrl);
-            const samlRequest = urlObj.searchParams.get('SAMLRequest');
-            const requestId = samlRequest ? `_${crypto.randomBytes(8).toString('hex')}` : crypto.randomBytes(16).toString('hex');
+            // Store request in cache for tracking
+            this.requestCache.set(requestId, {
+                school,
+                relayState: finalRelayState,
+                timestamp: Date.now(),
+                url: loginUrl
+            });
+            
+            // Clean up old requests (older than 10 minutes)
+            this.cleanupOldRequests();
             
             console.log(`SAML Request URL: ${loginUrl}`);
             console.log(`SAML Request ID: ${requestId}`);
@@ -125,8 +146,6 @@ class SAMLService {
             // Fallback: direct redirect to IdP
             console.log('🔍 Using fallback: direct redirect to IdP');
             
-            const requestId = crypto.randomBytes(16).toString('hex');
-            
             console.log(`Fallback URL: ${config.entryPoint}`);
             console.log(`Fallback Request ID: ${requestId}`);
             console.log(`Fallback Relay State: ${finalRelayState}`);
@@ -136,6 +155,21 @@ class SAMLService {
                 id: requestId,
                 relayState: finalRelayState
             };
+        }
+    }
+
+    /**
+     * Clean up old requests from cache
+     */
+    cleanupOldRequests() {
+        const now = Date.now();
+        const maxAge = 10 * 60 * 1000; // 10 minutes
+        
+        for (const [requestId, request] of this.requestCache.entries()) {
+            if (now - request.timestamp > maxAge) {
+                this.requestCache.delete(requestId);
+                console.log(`Cleaned up old request: ${requestId}`);
+            }
         }
     }
 
@@ -633,8 +667,17 @@ class SAMLService {
     clearCache(school = null) {
         if (school) {
             this.strategies.delete(school);
+            // Clear any requests for this school
+            for (const [requestId, request] of this.requestCache.entries()) {
+                if (request.school === school) {
+                    this.requestCache.delete(requestId);
+                    console.log(`Cleared cached request for ${school}: ${requestId}`);
+                }
+            }
         } else {
             this.strategies.clear();
+            this.requestCache.clear();
+            console.log('Cleared all SAML caches');
         }
     }
 }

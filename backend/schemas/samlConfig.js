@@ -296,15 +296,17 @@ samlConfigSchema.methods.toPassportSamlConfig = function() {
         // Custom function to handle user authentication
         passReqToCallback: true,
         validateInResponseTo: false, // Disable for simplicity
-        requestIdExpirationPeriodMs: 28800000, // 8 hours
-        acceptedClockSkewMs: -1, // Disable clock skew validation,
+        requestIdExpirationPeriodMs: 300000, // 5 minutes - much shorter to prevent stale requests
+        acceptedClockSkewMs: 300000, // 5 minutes clock skew tolerance
         // Additional passport-saml settings for better compatibility
         forceAuthn: false,
         authnContext: 'urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport',
         nameIDFormat: 'urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress',
         // Disable strict validation for better compatibility
         disableRequestedAuthnContext: true,
-        allowCreate: true
+        allowCreate: true,
+        // Add unique request ID generation to prevent conflicts
+        generateUniqueRequestId: true
     };
 };
 
