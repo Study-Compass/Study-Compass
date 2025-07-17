@@ -92,20 +92,56 @@ class SAMLService {
         console.log(`Strategy entry point: ${config.entryPoint}`);
         console.log(`Strategy issuer: ${config.issuer}`);
 
-        // Simply redirect to the IdP entry point
-        // The IdP will handle the SAML request generation
-        const loginUrl = config.entryPoint;
+        // Generate a proper SAML AuthnRequest
+        const samlRequest = this.generateSAMLRequest(config);
+        
+        // Create the login URL with SAML request parameters
+        const loginUrl = new URL(config.entryPoint);
+        const params = new URLSearchParams();
+        params.append('SAMLRequest', samlRequest);
+        params.append('RelayState', finalRelayState);
+        loginUrl.search = params.toString();
+        
+        // Generate a request ID for tracking
         const requestId = crypto.randomBytes(16).toString('hex');
 
-        console.log(`SAML Request URL: ${loginUrl}`);
+        console.log(`SAML Request URL: ${loginUrl.toString()}`);
         console.log(`SAML Request ID: ${requestId}`);
         console.log(`SAML Request Relay State: ${finalRelayState}`);
         
         return {
-            url: loginUrl,
+            url: loginUrl.toString(),
             id: requestId,
             relayState: finalRelayState
         };
+    }
+
+    /**
+     * Generate a proper SAML AuthnRequest
+     */
+    generateSAMLRequest(config) {
+        // Create a proper SAML AuthnRequest following SAML 2.0 specification
+        const requestId = `_${crypto.randomBytes(16).toString('hex')}`;
+        const now = new Date().toISOString();
+        
+        const samlRequest = `<?xml version="1.0"?>
+<samlp:AuthnRequest xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" 
+                    xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion"
+                    ID="${requestId}"
+                    Version="2.0"
+                    IssueInstant="${now}"
+                    ProtocolBinding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
+                    AssertionConsumerServiceURL="${config.callbackUrl}"
+                    Destination="${config.entryPoint}">
+    <saml:Issuer>${config.issuer}</saml:Issuer>
+    <samlp:NameIDPolicy Format="urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress" AllowCreate="true"/>
+    <samlp:RequestedAuthnContext Comparison="exact">
+        <saml:AuthnContextClassRef>urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport</saml:AuthnContextClassRef>
+    </samlp:RequestedAuthnContext>
+</samlp:AuthnRequest>`;
+        
+        // Base64 encode the SAML request
+        return Buffer.from(samlRequest).toString('base64');
     }
 
     /**
