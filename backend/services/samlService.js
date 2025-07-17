@@ -92,30 +92,55 @@ class SAMLService {
         console.log(`Strategy entry point: ${config.entryPoint}`);
         console.log(`Strategy issuer: ${config.issuer}`);
 
-        // For RPI, try a simpler approach without SAML request
-        // Some Shibboleth IdPs can handle direct redirects
+        // For RPI, try generating a proper SAML request for POST binding
         if (config.entryPoint.includes('shib.auth.rpi.edu')) {
-            console.log('🔍 Using RPI-specific approach: direct redirect to discovery service');
+            console.log('🔍 Using RPI POST binding with SAML request');
             
-            // Try the discovery service first
-            let discoveryUrl = 'https://shib.auth.rpi.edu/idp/profile/SAML2/Redirect/SSO';
-            
-            // Add entity ID as a parameter to help the IdP identify us
-            const discoveryUrlObj = new URL(discoveryUrl);
-            discoveryUrlObj.searchParams.append('entityID', config.issuer);
-            discoveryUrlObj.searchParams.append('RelayState', finalRelayState);
-            
-            const requestId = crypto.randomBytes(16).toString('hex');
-            
-            console.log(`RPI Discovery URL: ${discoveryUrlObj.toString()}`);
-            console.log(`RPI Request ID: ${requestId}`);
-            console.log(`RPI Relay State: ${finalRelayState}`);
-            
-            return {
-                url: discoveryUrlObj.toString(),
-                id: requestId,
-                relayState: finalRelayState
-            };
+            try {
+                // Generate a SAML request for POST binding
+                const samlRequest = this.generateSAMLRequest(config);
+                
+                // Create the login URL with SAML request parameters
+                const loginUrl = new URL(config.entryPoint);
+                const params = new URLSearchParams();
+                params.append('SAMLRequest', samlRequest);
+                params.append('RelayState', finalRelayState);
+                loginUrl.search = params.toString();
+                
+                const requestId = crypto.randomBytes(16).toString('hex');
+                
+                console.log(`RPI POST URL with SAML Request: ${loginUrl.toString()}`);
+                console.log(`RPI Request ID: ${requestId}`);
+                console.log(`RPI Relay State: ${finalRelayState}`);
+                
+                return {
+                    url: loginUrl.toString(),
+                    id: requestId,
+                    relayState: finalRelayState
+                };
+            } catch (error) {
+                console.error('❌ Error generating SAML request for RPI:', error);
+                
+                // Fallback: try discovery service
+                console.log('🔍 Falling back to RPI discovery service');
+                let discoveryUrl = 'https://shib.auth.rpi.edu/idp/profile/SAML2/Redirect/SSO';
+                
+                const discoveryUrlObj = new URL(discoveryUrl);
+                discoveryUrlObj.searchParams.append('entityID', config.issuer);
+                discoveryUrlObj.searchParams.append('RelayState', finalRelayState);
+                
+                const requestId = crypto.randomBytes(16).toString('hex');
+                
+                console.log(`RPI Discovery URL (fallback): ${discoveryUrlObj.toString()}`);
+                console.log(`RPI Request ID: ${requestId}`);
+                console.log(`RPI Relay State: ${finalRelayState}`);
+                
+                return {
+                    url: discoveryUrlObj.toString(),
+                    id: requestId,
+                    relayState: finalRelayState
+                };
+            }
         }
         
         // For other IdPs, try generating a SAML request
@@ -176,14 +201,14 @@ class SAMLService {
         const requestId = `_${crypto.randomBytes(16).toString('hex')}`;
         const now = new Date().toISOString();
         
-        // Use Redirect binding instead of POST binding for RPI
+        // Use POST binding as expected by RPI's Shibboleth
         const samlRequest = `<?xml version="1.0"?>
 <samlp:AuthnRequest xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" 
                     xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion"
                     ID="${requestId}"
                     Version="2.0"
                     IssueInstant="${now}"
-                    ProtocolBinding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
+                    ProtocolBinding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
                     AssertionConsumerServiceURL="${config.callbackUrl}"
                     Destination="${config.entryPoint}">
     <saml:Issuer>${config.issuer}</saml:Issuer>
