@@ -263,49 +263,4 @@ samlConfigSchema.statics.getActiveConfig = function(school) {
     return this.findOne({ school, isActive: true });
 };
 
-// Instance method to get passport-saml configuration
-samlConfigSchema.methods.toPassportSamlConfig = function() {
-    // Determine if we should expect encrypted assertions based on IdP configuration
-    const hasEncryptionCerts = this.sp.encryptCert && this.sp.encryptPrivateKey;
-    const expectEncryptedAssertions = hasEncryptionCerts || this.settings.wantAssertionsEncrypted;
-    
-    return {
-        entryPoint: this.idp.ssoUrl,
-        issuer: this.entityId,
-        callbackUrl: this.sp.assertionConsumerService,
-        cert: this.idp.x509Cert,
-        // Optional SLO - passport-saml handles missing SLO gracefully
-        logoutUrl: this.idp.sloUrl || null,
-        logoutCallbackUrl: this.sp.singleLogoutService || null,
-        // Certificate and key configuration
-        privateCert: this.sp.signingPrivateKey || this.sp.privateKey,
-        // Only include decryption fields if we're actually using encrypted assertions
-        ...(expectEncryptedAssertions ? {
-            decryptionPvk: this.sp.encryptPrivateKey || this.sp.privateKey,
-            decryptionCert: this.sp.encryptCert || this.sp.signingCert || this.sp.x509Cert,
-        } : {}),
-        // Signature settings
-        signatureAlgorithm: this.settings.signatureAlgorithm || 'sha256',
-        digestAlgorithm: this.settings.digestAlgorithm || 'sha256',
-        // Additional settings
-        wantAssertionsSigned: this.settings.wantAssertionsSigned !== false,
-        wantMessageSigned: this.settings.wantMessageSigned || false,
-        wantNameId: this.settings.wantNameId !== false,
-        wantNameIdEncrypted: this.settings.wantNameIdEncrypted || false,
-        wantAssertionsEncrypted: false, // Force to false to avoid metadata encryption requirements
-        // Custom function to handle user authentication
-        passReqToCallback: true,
-        validateInResponseTo: false, // Disable for simplicity
-        requestIdExpirationPeriodMs: 900000, // 15 minutes - standard SAML timeout
-        acceptedClockSkewMs: 300000, // 5 minutes clock skew tolerance
-        // Additional passport-saml settings for better compatibility
-        forceAuthn: false,
-        authnContext: 'urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport',
-        nameIDFormat: 'urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress',
-        // Disable strict validation for better compatibility
-        disableRequestedAuthnContext: true,
-        allowCreate: true
-    };
-};
-
 module.exports = samlConfigSchema; 
