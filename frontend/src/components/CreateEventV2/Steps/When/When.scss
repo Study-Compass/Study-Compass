@@ -1,112 +1,136 @@
 .when-where{
     padding: 25px 40px 60px 25px;
-    overflow-y:auto;
+    overflow-y: auto;
     position: relative;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
 
-    .time-select{
-        display:flex;
+    h1 {
+        margin: 0 0 20px 0;
+        font-size: 24px;
+        font-weight: 700;
+        color: var(--text);
+    }
+
+    .calendar-layout {
+        display: flex;
+        flex: 1;
+        gap: 20px;
+        min-height: 0; // Important for flex child to shrink
+    }
+
+    .room-sidebar {
+        width: 10%;
+        min-width: 150px;
+        background: var(--light);
+        border-radius: 10px;
+        padding: 20px;
+        display: flex;
         flex-direction: column;
-        gap:20px;
-        align-items: center;
+        height: 100%;
 
-        select{
-            width:60%;
-            padding:5px 10px;
-            font-size:18px;
-            margin:0;
-            font-family: 'Inter';
-            font-weight: 700;
-            option.disabled{
-                color: var(--border);
+        h3 {
+            margin: 0 0 15px 0;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .room-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .room-option {
+            cursor: pointer;
+            transition: all 0.2s ease;
+
+            &:hover {
+                transform: translateY(-2px);
+            }
+
+            &.selected .room-box {
+                background: var(--red);
+                color: white;
+                border-color: var(--red);
             }
         }
-        .row{
+
+        .room-box {
+            background: white;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            padding: 12px 8px;
+            text-align: center;
+            transition: all 0.2s ease;
+            min-height: 60px;
             display: flex;
-            max-width: 100%;
-            & > .DayColumn > .TimeLabelColumn{
-                margin-top:58px;
-                left:50px;
-            }
-
-            .left-arrow, .right-arrow{
-                position: absolute;
-                left:0;
-                top:50%;
-                transform: translateY(-50%);
-                cursor: pointer;
-                z-index: 1;
-                font-size:25px;
-                color:var(--text);
-                transition: all 0.3s;
-
-                &:hover{
-                    color:var(--red);
-                    transform: translateX(-5px) translateY(-50%);
-                }
-                &:active{
-                    transform: translateX(0) translateY(-50%);
-                }
-            }
-
-            .right-arrow{
-                right:20px;
-                left:auto;
-                &:hover{
-                    color:var(--red);
-                    transform: translateX(5px) translateY(-50%);
-                }
-                &:active{
-                    transform: translateX(0) translateY(-50%);
-                }
-
-            }
-        }
-        .calendar-wrapper{
-            max-width: calc(100% - 80px);
-            height: -moz-fit-content;
-            height: fit-content;
-            display: flex;
-            justify-content: flex-start;
-            position: relative;
-            box-sizing: border-box;
-            margin:0 30px 0 50px;
             align-items: center;
+            justify-content: center;
 
-            & > div{
-                max-width: 100%;
-                width:100%;  
-                overflow-y: auto;
-                overflow-x: auto;
-                display:flex;
+            &:hover {
+                border-color: var(--red);
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            }
+        }
 
-                &::-webkit-scrollbar {
-                    width: 10px;
-                    height: 10px;
+        .room-name {
+            font-size: 12px;
+            font-weight: 500;
+            word-break: break-word;
+            line-height: 1.2;
+        }
+    }
+
+    .calendar-container {
+        flex: 1;
+        min-width: 0; // Important for flex child to shrink
+        height: 100%;
+
+        .events-calendar {
+            height: 100%;
+            
+            &.create-event-calendar {
+                padding: 0;
+                
+                .top-bar {
+                    margin-bottom: 15px;
                 }
             }
+        }
+    }
 
-            .scroll-border-l, .scroll-border-r{
-                content: '';
-                position: absolute;
-                width: 10px;
-                height: 85%;
-                transform: translateY(-50%);
-                top: 50%;
-                opacity: 0;
-                transition: opacity 0.3s;
-            }
-            
-            &.right-scroll .scroll-border-r{
-                right:0;               
-                opacity: 1;
-                background: linear-gradient(to right, rgba(255, 255, 255, 0), var(--border));
-            }
+    .next-button {
+        margin-top: 20px;
+        padding: 12px 24px;
+        background: var(--border);
+        color: var(--text);
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        align-self: flex-end;
 
-            &.left-scroll .scroll-border-l{
-                opacity: 1;
-                left:0;
-                background: linear-gradient(to left, rgba(255, 255, 255, 0), var(--border));
+        &.active {
+            background: var(--red);
+            color: white;
+            cursor: pointer;
+
+            &:hover {
+                background: var(--red-dark);
+                transform: translateY(-2px);
             }
+        }
+
+        &:not(.active) {
+            cursor: not-allowed;
+            opacity: 0.6;
         }
     }
 }
