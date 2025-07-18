@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import './FlowComponentV2.scss';
-// import Logo from '../../assets/Brand Image/EventsLogo.svg';
+import Logo from '../../assets/Brand Image/EventsLogo.svg';
 // import { Icon } from '@iconify/react/dist/iconify.js';
 // import Icon from '../../assets/Icons/Bookmark.svg';
 
@@ -75,6 +75,7 @@ const FlowComponentV2 = ({
                     <div className="steps-header">
                         <div className="row">
                             {/* <Logo size={25} /> */}
+                            {/* Error: won't let me use any of hte logos for some reason so leavin this as a place holder for now */}
                             <div className="testLogoTwo">(Z)</div>
                             <h1>{headerTitle}</h1>
                         </div>

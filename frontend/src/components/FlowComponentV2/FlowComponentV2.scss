@@ -67,14 +67,14 @@
             }
 
             h1 {
-                font-family: 'GeneralSans-Semibold', sans-serif;
                 font-size: 24px;
                 color: var(--text-color);
                 line-height: 1.2;
             }
 
             p {
-                font-family: 'GeneralSans-Regular', sans-serif;
+                font-family: 'Inter';
+                font-weight: 400;
                 font-size: 14px;
                 color: var(--text-color-secondary);
                 margin: 0;
@@ -106,29 +106,29 @@
                     background: transparent;
                     color: white;
                     svg{
-                        color: var(--accent-color);
+                        color: var(--red);
                     }
                 }
             }
             &:hover {
-                background: var(--lighter-bounding-color);
+                background: var(--red-transparent);
             }
 
             &.active {
-                background: var(--transparent-accent-color);
-                border-color: var(--accent-color);
+                background-color: var(--red-transparent);
+                border: 1px solid var(--red);
             }
 
             .step-number {
                 width: 24px;
                 height: 24px;
                 border-radius: 50%;
-                background: var(--light-bounding-color);
+                background: var(--off-white);
                 color: var(--text-color-secondary);
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                font-family: 'GeneralSans-Medium', sans-serif;
+                font-family: 'Satoshi';
                 font-size: 12px;
                 flex-shrink: 0;
                 transition: all 0.2s ease;
@@ -145,16 +145,18 @@
                 min-width: 0;
 
                 h3 {
-                    font-family: 'GeneralSans-Medium', sans-serif;
+                    font-family: 'Inter';
                     font-size: 14px;
+                    font-weight: 600;
                     color: var(--text-color);
                     margin: 0 0 2px 0;
                     line-height: 1.3;
                 }
-
+                //  CHECK: James can i add font weights here or does that break some system you have?
                 p {
-                    font-family: 'GeneralSans-Regular', sans-serif;
+                    font-family: 'Inter';
                     font-size: 12px;
+                    font-weight: 300;
                     color: var(--text-color-secondary);
                     margin: 0;
                     line-height: 1.4;
@@ -179,7 +181,7 @@
             margin-bottom: 32px;
 
             h2 {
-                font-family: 'GeneralSans-Semibold', sans-serif;
+                font-family: 'Satoshi';
                 font-size: 28px;
                 color: var(--text-color);
                 margin: 0 0 8px 0;
@@ -191,7 +193,7 @@
             }
 
             p {
-                font-family: 'GeneralSans-Regular', sans-serif;
+                font-family: 'Satoshi';
                 font-size: 16px;
                 color: var(--text-color-secondary);
                 margin: 0;
@@ -222,7 +224,7 @@
             .btn-primary, .btn-secondary {
                 padding: 12px 24px;
                 border-radius: 8px;
-                font-family: 'GeneralSans-Medium', sans-serif;
+                font-family: 'Satoshi';
                 font-size: 14px;
                 border: none;
                 cursor: pointer;
