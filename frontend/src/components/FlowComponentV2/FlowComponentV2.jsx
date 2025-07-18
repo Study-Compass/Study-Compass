@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import './FlowComponentV2.scss';
 // import Logo from '../../assets/Brand Image/EventsLogo.svg';
 // import { Icon } from '@iconify/react/dist/iconify.js';
-import Icon from '../../assets/Icons/Bookmark.svg';
+// import Icon from '../../assets/Icons/Bookmark.svg';
 
 const FlowComponentV2 = ({
     steps, // array of objects with id, title, description, component
