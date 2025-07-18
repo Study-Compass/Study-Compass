@@ -13,37 +13,13 @@ const { Server } = require('socket.io');
 const enforce = require('express-sslify');
 const { connectToDatabase } = require('./connectionsManager');
 const fs = require('fs');
-const path = require('path');
 
 const s3 = require('./aws-config');
 
 const app = express();
 const port = process.env.PORT || 5001;
 
-// Create server based on environment
-let server;
-if (process.env.NODE_ENV === 'production') {
-    server = createServer(app);
-} else {
-    // Use HTTPS for development to meet SAML requirements
-    try {
-        const certsDir = path.join(__dirname, 'certs');
-        const privateKey = fs.readFileSync(path.join(certsDir, 'localhost-key.pem'), 'utf8');
-        const certificate = fs.readFileSync(path.join(certsDir, 'localhost-cert.pem'), 'utf8');
-        
-        const httpsOptions = {
-            key: privateKey,
-            cert: certificate
-        };
-        
-        server = createHttpsServer(httpsOptions, app);
-        console.log('HTTPS server created for development');
-    } catch (error) {
-        console.warn('HTTPS certificates not found, falling back to HTTP');
-        console.warn('Run: npm run setup-https to generate certificates');
-        server = createServer(app);
-    }
-}
+const server = createServer(app);
 const io = new Server(server, {
     transports: ['websocket', 'polling'], // WebSocket first, fallback to polling if necessary
     cors: {
