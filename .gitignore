@@ -46,4 +46,4 @@ scripts/
 !.env.project
 !.env.vault
 
-/dump/
+dump/
