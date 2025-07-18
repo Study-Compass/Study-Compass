@@ -1,24 +1,39 @@
 import React, { useState, useEffect } from 'react';
 import './GenInfo.scss';
 
+import ImageUpload from '../../../ImageUpload/ImageUpload';
+
 const GenInfo = ({ formData, setFormData, onComplete }) => {
     console.log('GenInfo formData:', formData);
-    const [title, setTitle] = useState(formData.title || '');
-    const [description, setDescription] = useState(formData.description || '');
-    const [tagline, setTagline] = useState(formData.tagline || '');
+    const [nextActive, setNextActive] = useState(false);
     const [errors, setErrors] = useState({});
 
+    // content updated on this page
+    const [title, setTitle] = useState(formData.title || '');
+    const [description, setDescription] = useState(formData.description || '');
+    const [eventType, setEventType] = useState(formData.Type || "");
+    const [visibility, setVisibility] = useState(formData.visibility || "");
+    const [expectedAttendance, setExpectedAttendance] = useState(formData.expectedAttendance || "");
+    
+    // r these depricated now?
+    const [selectedFile, setSelectedFile] = useState(null);
+    const [imagePreview, setImagePreview] = useState(null);
+    
+
     // Update local state when formData changes (for edit mode)
+    // Do we still want local storage?
     useEffect(() => {
         if (formData.title !== title) setTitle(formData.title || '');
         if (formData.description !== description) setDescription(formData.description || '');
         if (formData.tagline !== tagline) setTagline(formData.tagline || '');
     }, [formData.title, formData.description, formData.tagline]);
 
+    // add all vars that need to be changed here
     useEffect(() => {
         validateForm();
     }, [title, description]);
 
+    // TODO: Update form Validation logic
     const validateForm = () => {
         const newErrors = {};
 
@@ -53,8 +68,8 @@ const GenInfo = ({ formData, setFormData, onComplete }) => {
 
     const handleTaglineChange = (e) => {
         const value = e.target.value;
-        setTagline(value);
-        setFormData(prev => ({ ...prev, tagline: value }));
+        setDescription(value);
+        // setFormData(prev => ({ ...prev, tagline: value }));
     };
 
     const handleDescriptionChange = (content) => {
@@ -108,7 +123,7 @@ const GenInfo = ({ formData, setFormData, onComplete }) => {
                              <input
                         id="title"
                         type="text"
-                        value={tagline}
+                        value={description}
                         onChange={handleDescriptionChange}
                         placeholder="Enter your tagline"
                         className={errors.tagline ? 'error' : ''}
