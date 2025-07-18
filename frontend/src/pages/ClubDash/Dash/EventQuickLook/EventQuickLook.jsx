@@ -72,7 +72,7 @@ const EventQuickLook = ({org}) => {
                                 </div>
                             </div>
                         } 
-                        loading={upcomingEvents.loading}
+                        loading={true}
                     />
                 }
             </div>
