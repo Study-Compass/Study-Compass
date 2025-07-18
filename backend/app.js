@@ -8,11 +8,9 @@ const session = require('express-session');
 const passport = require('passport');
 require('dotenv').config();
 const { createServer } = require('http');
-const { createServer: createHttpsServer } = require('https');
 const { Server } = require('socket.io');
 const enforce = require('express-sslify');
 const { connectToDatabase } = require('./connectionsManager');
-const fs = require('fs');
 
 const s3 = require('./aws-config');
 
