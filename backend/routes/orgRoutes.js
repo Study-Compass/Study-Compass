@@ -973,6 +973,55 @@ router.get('/get-orgs', async (req, res) => {
     }
 });
 
+router.get('/:orgId/events', verifyToken, async (req, res) => {
+    const { Event } = getModels(req, 'Event');
+    try {
+        const { orgId } = req.params;
+        const { page = 1, limit = 15 } = req.query;
+        
+        const skip = (page - 1) * limit;
+        
+        // Find events hosted by this organization
+        const events = await Event.find({
+            hostingId: orgId,
+            hostingType: 'Org',
+            start_time: { $gte: new Date() },
+            status: { $in: ['approved', 'not-applicable'] },
+            isDeleted: false
+        })
+        .sort({ start_time: 1 })
+        .skip(skip)
+        .limit(parseInt(limit))
+        .populate('hostingId');
+
+        console.log(events);
+        
+        const totalEvents = await Event.countDocuments({
+            hostingId: orgId,
+            hostingType: 'Org',
+            start_time: { $gte: new Date() },
+            status: { $in: ['approved', 'not-applicable'] },
+            isDeleted: false
+        });
+        
+        console.log(`GET: /${orgId}/events`);
+        res.json({
+            success: true,
+            message: "Org events retrieved successfully",
+            events,
+            hasMore: events.length === parseInt(limit),
+            total: totalEvents
+        });
+    } catch (error) {
+        console.log(`GET: /${req.params.orgId}/events failed`, error);
+        return res.status(500).json({
+            success: false,
+            message: "Error retrieving org events",
+            error: error.message,
+        });
+    }
+});
+
 router.post('/:orgId/create-member-form', verifyToken, requireMemberManagement(), async (req, res) => {
     const { Org, Form } = getModels(req, 'Org', 'Form');
     const { form, orgId } = req.body;

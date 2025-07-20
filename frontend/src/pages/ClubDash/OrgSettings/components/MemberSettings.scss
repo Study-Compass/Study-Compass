@@ -22,9 +22,6 @@
         padding: 10px 20px;
         box-sizing: border-box;
         gap: 30px;
-        &:last-child{
-            border-bottom:1px solid var(--lighterborder);
-        }
         .content{
             display: flex;
             flex-direction: column;

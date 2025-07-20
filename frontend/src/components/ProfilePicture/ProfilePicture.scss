@@ -12,6 +12,7 @@
     margin:5px;
     border-radius: 50%;
     background-color: white;
+    object-fit: cover;
 }
 
 .profile-picture:hover{
@@ -90,7 +91,10 @@
 .popup-content .profile{
     height:40px;
     width:40px;
+    min-width: 40px;
+    min-height: 40px;
     z-index: 1000;
+    object-fit: cover;
 }
 
 .popup p.section{

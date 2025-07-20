@@ -27,9 +27,9 @@ const ApplicationCard = ({ application, isSelected, onSelect }) => {
                     <p>{user.email}</p>
                 </div>
             </div>
-            <div className="row apply-info">
+            {/* <div className="row apply-info">
                 <p>Applied on {formatDate(new Date(createdAt))}</p>
-            </div>
+            </div> */}
         </div>
     );
 };
@@ -94,8 +94,8 @@ const ApplicationViewer = ({ application, onAction, loading, error }) => {
 const EmptyState = () => (
     <div className="empty-state">
         <div className="empty-content">
-            <h3>No Applications</h3>
-            <p>There are currently no member applications to review.</p>
+                <Icon icon="mingcute:inbox-fill" />
+                <p>There are currently no member applications to review.<br></br>Get recruiting!</p>
         </div>
     </div>
 );

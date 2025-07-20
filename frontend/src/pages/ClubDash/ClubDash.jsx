@@ -236,7 +236,7 @@ function ClubDash(){
                     element:  <Roles expandedClass={expandedClass} org={orgData.data?.org?.overview}/>
                 },
                 {
-                    label: 'Members',
+                    label: 'Membership',
                     icon: 'mdi:account-group',
                     element: <MemberSettings org={orgData.data?.org?.overview} expandedClass={expandedClass} />
                 },

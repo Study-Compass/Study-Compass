@@ -1,13 +1,53 @@
+.form-builder-header{
+    overflow:hidden;
+    height:90vh;
+    .header-container-content{
+        overflow:hidden;
+        display: flex;
+    }
+}
 .form-builder {
-    padding: 20px;
-    max-width: 800px;
-    margin: 0 auto;
+    max-width: 1000px;
+    // margin: 0 auto;
     background-color: var(--background);
     display: flex;
-    flex-direction: column;
-    gap: 20px;
+    max-height:100%;
+
+
     // border-radius: 15px;
     // box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+    .workspace{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        flex-grow: 1;
+        padding: 30px;
+        background-image: radial-gradient(#d4d4d4 1px, #0000 0);
+        background-size: 15px 15px;
+        background-color: var(--lightest);
+        overflow-y: auto;
+        overflow-x: hidden;
+
+        .form-container{
+            display: flex;
+            flex-direction: column;
+            gap:20px;
+            max-width:600px;
+            padding: 20px;
+            box-sizing: border-box;
+            background-color: var(--background);
+            border-radius: 10px;
+            border:1px solid var(--lighterborder);
+    
+        }
+    }
+
+    .form-actions{
+        max-width:200px;
+        padding:20px;   
+        border-left:1px solid var(--lighterborder);
+    }
 
     .form-header {
         border: 1px solid var(--lightborder);
@@ -65,6 +105,9 @@
         border: 1px solid var(--lightborder);
         overflow:hidden;
         transition: all 0.5s ease;
+        &.editing{
+            border-left: 4px solid var(--red);
+        }
         .edit-header {
             display: flex;
             justify-content: space-between;
@@ -111,6 +154,23 @@
             border-radius: 0;
         }
 
+        // Make the clickable question area have a pointer cursor
+        > div:last-child {
+            cursor: pointer;
+            padding: 15px;
+            
+            // Prevent click events from bubbling up when interacting with form elements
+            input, textarea, button, label {
+                cursor: default;
+                pointer-events: auto;
+            }
+            
+            // Stop propagation for form elements to prevent toggling edit mode
+            input:focus, textarea:focus, button:active {
+                pointer-events: auto;
+            }
+        }
+
         &.editing{
             // border:1px solid var(--red-transparent);
             box-shadow: 0px 0px 28px 0px var(--red-transparent);
@@ -122,7 +182,16 @@
     .question-editor {
         background-color: var(--background);
         padding: 15px;
-        border-radius: 8px;
+        // border-radius: 8px;
+        cursor:pointer;
+        // border-left: 4px solid var(--red);
+
+        p{
+            font-size: 14px;
+            color: var(--lighter-text);
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
         
         input[type="text"] {
             width: 100%;
@@ -149,6 +218,7 @@
 
         .options-editor {
             .option-row {
+                margin-left:20px;
                 display: flex;
                 gap: 10px;
                 margin-bottom: 8px;
@@ -190,15 +260,24 @@
 
         button {
             padding: 10px 20px;
-            background-color: var(--red);
-            color: white;
-            border: none;
-            border-radius: 4px;
+            width:100%;
+            background-color: var(--background);
+            color: var(--lighter-text);
+            border: 1px solid var(--lighterborder);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
             cursor: pointer;
-            transition: opacity 0.2s;
+            transition: all 0.2s;
 
             &:hover {
                 opacity: 0.9;
+                background-color: var(--lighter);
+            }
+            iconify-icon{
+                color: var(--lighter-text);
+                font-size: 14px;
             }
         }
     }

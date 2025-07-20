@@ -93,13 +93,14 @@ select{
 
 
 ::-webkit-scrollbar {
-    width: 10px; /* or height for horizontal scrollbars */
+    width: 9px; /* or height for horizontal scrollbars */
   }
   
   /* This styles the scrollbar thumb (the moving part) */
 ::-webkit-scrollbar-thumb {
     background: var(--lightborder); /* Thumb color */
     border-radius: 10px; /* Roundness of the thumb */
+    border:2px solid var(--background);
 }
   
   /* This styles the scrollbar thumb on hover */

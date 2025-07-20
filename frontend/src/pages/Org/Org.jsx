@@ -7,8 +7,9 @@ import profile from "../../assets/Icons/Profile2.svg";
 import FormViewer from '../../components/FormViewer/FormViewer';
 import Header from '../../components/Header/Header';
 import Popup from '../../components/Popup/Popup';
+import OrgEvents from '../../components/OrgEvents/OrgEvents';
 import apiRequest from '../../utils/postRequest';
-
+import { Icon } from '@iconify-icon/react/dist/iconify.mjs';
 
 import './Org.scss';
 
@@ -18,6 +19,8 @@ const Org = ({ orgData }) => {
     const [isMember, setIsMember] = useState(false);
     const { overview, members, followers } = orgData.org;
     const [showForm, setShowForm] = useState(false);
+
+    const [activeTab, setActiveTab] = useState('home');
 
     console.log(orgData);
 
@@ -56,7 +59,6 @@ const Org = ({ orgData }) => {
             </Popup>
             <Header />
             <div className='org-content'>
-
                 <div className="top-header-box">
                     <div className="org-logo">
                         <div className="img-container">
@@ -70,7 +72,10 @@ const Org = ({ orgData }) => {
                         <div className="org-header">
                             <h2 className="name">{overview.org_name}</h2>
                             {/* <h2 className="name"> Name </h2> */}
-                            <div className="status">Union Recognized</div>
+                            <div className="verification-badge">
+                                <Icon icon="material-symbols:verified-rounded" />
+                                <p>Union Recognized</p>
+                            </div>
                         </div>
 
                         <p className="description">
@@ -80,8 +85,13 @@ const Org = ({ orgData }) => {
                     
                     <p className="stats">
                         <img src = {person} alt =""/>
-                        250 followers • 50 members
+                        <p>
+                            {orgData?.org?.followers?.length} {orgData?.org?.followers?.length === 1 ? "follower" : "followers"} • {orgData?.org?.members?.length} {orgData?.org?.members?.length === 1 ? "member" : "members"}
+                        </p>
                         
+                        {
+
+                        }
                         <img src = {profile} className='mutuals' alt =""/>
                         <img src = {profile} alt =""/>
                         Friend and 1 other are members
@@ -97,7 +107,7 @@ const Org = ({ orgData }) => {
                         } */}
                         {
                             orgData.org.isMember ? (
-                                <button>Leave</button>
+                                <button className="no-action"><Icon icon="material-symbols:check-rounded" />Joined</button>
                             ) : orgData.org.isPending ? (
                                 <button disabled={true}>Pending...</button>
                             ) : overview.requireApprovalForJoin ? (
@@ -111,23 +121,35 @@ const Org = ({ orgData }) => {
 
                 </div>
 
-                <div className='event-info'>
-                    <div className='upcoming'> 
-
+                <div className="org-dashboard">
+                    <div className="org-content-header">
+                        <div className="header-option">
+                            <h2 className={activeTab === 'home' ? 'active' : ''} onClick={() => setActiveTab('home')}>Home</h2>
+                        </div>
+                        <div className="header-option">
+                            <h2 className={activeTab === 'events' ? 'active' : ''} onClick={() => setActiveTab('events')}>Events</h2>
+                        </div>
+                        <div className="header-option">
+                            <h2 className={activeTab === 'members' ? 'active' : ''} onClick={() => setActiveTab('members')}>Members</h2>
+                        </div>
                     </div>
-                    
                 </div>
-
-                {/* <div className='meeting-schedule'>
-                    <h1>meetings schedule</h1>
-                    <div className='meetings'>
-                        <p>YDSA Weekly GBM</p>
-
-                    </div>
-
-                </div> */}
-
-                <div className="meeting-schedule">
+                {
+                    activeTab === 'home' ? (
+                        <div className="home-content">
+                        </div>
+                    ) : activeTab === 'events' ? (
+                        <div className="events-content">
+                            <h1>Upcoming Events for {overview.org_name}</h1>
+                            <OrgEvents orgId={overview?._id} />
+                        </div>
+                    ) : activeTab === 'members' ? (
+                        <div className="members-content">
+                            <h1>Members</h1>
+                        </div>
+                    ) : null
+                }
+                {/* <div className="meeting-schedule">
                     <h3>meetings schedule</h3>
                     <div className="meeting-card">
                         <div className='title'>
@@ -141,11 +163,10 @@ const Org = ({ orgData }) => {
                                 <img src={locate} alt="" />
                                 <p>Phalanx</p>
                             </div>
-                            {/* <p>Next Meeting: Thursday 10/24</p> */}
 
                         </div>
                     </div>
-                </div>
+                </div> */}
             </div>
         </div>
     );
