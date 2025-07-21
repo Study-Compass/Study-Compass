@@ -21,6 +21,34 @@
         }
     }
 
+    .actions{
+        .action{
+            display: flex;
+            border: 1px solid var(--lighterborder);
+            border-radius: 7px;
+            padding: 4px 15px;
+            box-sizing: border-box;
+            box-shadow: var(--shadow);
+            cursor: pointer;
+            transition: all 0.3s;
+            align-items: center;
+            gap: 5px;
+            p{
+                font-size: 14px;
+                font-weight: 600;
+                font-family: 'Inter';
+                color: var(--lighter-text);
+            }
+            iconify-icon{
+                font-size:13px;
+                color: var(--lighter-text);
+            }
+            &:hover{
+                background-color: var(--light);
+            }
+        }
+    }
+
     header.header{
         position: relative;
         overflow: hidden;

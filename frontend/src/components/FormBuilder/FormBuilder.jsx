@@ -3,6 +3,8 @@ import { Icon } from '@iconify-icon/react';
 import './FormBuilder.scss';
 import '../FormViewer/Question.scss'
 import SlideSwitch from '../SlideSwitch/SlideSwitch';
+import Background from './assets/background1.svg';
+import HeaderContainer from '../HeaderContainer/HeaderContainer';
 /**
  * FormBuilder Component Specification
  * 
@@ -43,13 +45,13 @@ import SlideSwitch from '../SlideSwitch/SlideSwitch';
  * }
  */
 
-const FormBuilder = ({ initialForm = { title: '', description: '', questions: [] }, onSave }) => {
+const FormBuilder = ({ initialForm = { title: '', description: '', questions: [] }, onSave, handleClose = null }) => {
     const [form, setForm] = useState(initialForm);
     const [editingQuestion, setEditingQuestion] = useState(null);
 
     const addQuestion = (type) => {
         const newQuestion = {
-            id: Date.now().toString(),
+            _id: `NEW_QUESTION_${Date.now().toString()}`,
             type,
             question: '',
             required: false,
@@ -60,14 +62,14 @@ const FormBuilder = ({ initialForm = { title: '', description: '', questions: []
             ...prev,
             questions: [...prev.questions, newQuestion]
         }));
-        setEditingQuestion(newQuestion.id);
+        setEditingQuestion(newQuestion._id);
     };
 
     const updateQuestion = (id, updates) => {
         setForm(prev => ({
             ...prev,
             questions: prev.questions.map(q =>
-                q.id === id ? { ...q, ...updates } : q
+                q._id === id ? { ...q, ...updates } : q
             )
         }));
     };
@@ -75,7 +77,7 @@ const FormBuilder = ({ initialForm = { title: '', description: '', questions: []
     const deleteQuestion = (id) => {
         setForm(prev => ({
             ...prev,
-            questions: prev.questions.filter(q => q.id !== id)
+            questions: prev.questions.filter(q => q._id !== id)
         }));
     };
 
@@ -83,7 +85,7 @@ const FormBuilder = ({ initialForm = { title: '', description: '', questions: []
         setForm(prev => ({
             ...prev,
             questions: prev.questions.map(q =>
-                q.id === questionId
+                q._id === questionId
                     ? { ...q, options: [...(q.options || []), ''] }
                     : q
             )
@@ -94,7 +96,7 @@ const FormBuilder = ({ initialForm = { title: '', description: '', questions: []
         setForm(prev => ({
             ...prev,
             questions: prev.questions.map(q =>
-                q.id === questionId
+                q._id === questionId
                     ? {
                         ...q,
                         options: q.options.map((opt, idx) =>
@@ -110,7 +112,7 @@ const FormBuilder = ({ initialForm = { title: '', description: '', questions: []
         setForm(prev => ({
             ...prev,
             questions: prev.questions.map(q =>
-                q.id === questionId
+                q._id === questionId
                     ? {
                         ...q,
                         options: q.options.filter((_, idx) => idx !== optionIndex)
@@ -130,6 +132,7 @@ const FormBuilder = ({ initialForm = { title: '', description: '', questions: []
                 required={question.required}
                 value={null}
                 disabled={true}
+                style={{ pointerEvents: 'none' }}
               />
             );
           case 'long':
@@ -138,6 +141,7 @@ const FormBuilder = ({ initialForm = { title: '', description: '', questions: []
                 placeholder="Your answer"
                 required={question.required}
                 disabled={true}
+                style={{ pointerEvents: 'none' }}
               />
             );
           case 'multiple_choice':
@@ -147,7 +151,7 @@ const FormBuilder = ({ initialForm = { title: '', description: '', questions: []
                   <label key={index} className="option-label">
                     <input
                       type="radio"
-                      name={question.id}
+                      name={question._id}
                       value={null}
                       checked={false}
                       required={question.required}
@@ -181,7 +185,7 @@ const FormBuilder = ({ initialForm = { title: '', description: '', questions: []
 
     const renderQuestion = (question) =>{
         return(
-            <div key={question.id} className="question-container">
+            <div key={question._id} className="question-container">
             <div className="question-header">
                 <h3>{question.question}</h3>
                 {question.required && <span className="required">*</span>}
@@ -191,13 +195,21 @@ const FormBuilder = ({ initialForm = { title: '', description: '', questions: []
         );
     }
 
+    const handleSave = () => {
+        onSave(form);
+        if(handleClose){
+            handleClose();
+        }
+    }
+
     const renderQuestionEditor = (question) => {
         return (
-            <div className="question-editor">
+            <div className="question-editor" onClick={(e) => e.stopPropagation()}>
+                {/* <p>Question:</p> */}
                 <input
                     type="text"
                     value={question.question}
-                    onChange={(e) => updateQuestion(question.id, { question: e.target.value })}
+                    onChange={(e) => updateQuestion(question._id, { question: e.target.value })}
                     placeholder="Question"
                 />
 
@@ -208,15 +220,15 @@ const FormBuilder = ({ initialForm = { title: '', description: '', questions: []
                                 <input
                                     type="text"
                                     value={option}
-                                    onChange={(e) => updateOption(question.id, index, e.target.value)}
+                                    onChange={(e) => updateOption(question._id, index, e.target.value)}
                                     placeholder={`Option ${index + 1}`}
                                 />
-                                <button onClick={() => deleteOption(question.id, index)}>
+                                <button onClick={() => deleteOption(question._id, index)}>
                                     <Icon icon="iconamoon:trash-fill" />
                                 </button>
                             </div>
                         ))}
-                        <button onClick={() => addOption(question.id)}>Add Option</button>
+                        <button onClick={() => addOption(question._id)}>Add Option</button>
                     </div>
                 )}
             </div>
@@ -224,71 +236,74 @@ const FormBuilder = ({ initialForm = { title: '', description: '', questions: []
     };
 
     return (
+        <HeaderContainer header="Form Builder" classN="form-builder-header">
         <div className="form-builder">
-            <div className="form-header">
-                <input
-                    type="text"
-                    value={form.title}
-                    onChange={(e) => setForm(prev => ({ ...prev, title: e.target.value }))}
-                    placeholder="Form Title"
-                />
-                <textarea
-                    value={form.description}
-                    onChange={(e) => setForm(prev => ({ ...prev, description: e.target.value }))}
-                    placeholder="Form Description"
-                />
-            </div>
-
-            <div className="questions-list">
-                {form.questions.map((question) => (
-                    <div key={question.id} className={`question-item ${editingQuestion === question.id && "editing"}`}>
-                        <div className="edit-header">
-                            <span className="question-type">
-                                {question.type === 'short' && 'Short Answer'}
-                                {question.type === 'long' && 'Long Answer'}
-                                {question.type === 'multiple_choice' && 'Multiple Choice'}
-                                {question.type === 'select_multiple' && 'Select Multiple'}
-                            </span>
-                            <div className="question-actions">
-                                {/* required  toggle switch */}
-                                <div className="toggle-switch">
-                                    required
-                                    <SlideSwitch checked={question.required} onChange={(e) => updateQuestion(question.id, { required: e.target.checked })} />
-                                </div>
-                                
-                                <button onClick={() => {
-                                    if(editingQuestion === question.id){
-                                        setEditingQuestion(null);
-                                    } else {
-                                        setEditingQuestion(question.id)
-                                    }
-
-                                }}>
-                                    <Icon icon="fluent:edit-48-filled" />
-                                </button>
-                                <button onClick={() => deleteQuestion(question.id)}>
-                                    <Icon icon="iconamoon:trash-fill" />
-                                </button>
-                            </div>
-                        </div>
-                        {editingQuestion === question.id ?
-                            renderQuestionEditor(question)
-                            :
-                            renderQuestion(question)
-                        }
+            <div className="workspace">
+                <div className="form-container">
+                    <div className="form-header">
+                        <input
+                            type="text"
+                            value={form.title}
+                            onChange={(e) => setForm(prev => ({ ...prev, title: e.target.value }))}
+                            placeholder="Form Title"
+                        />
+                        <textarea
+                            value={form.description}
+                            onChange={(e) => setForm(prev => ({ ...prev, description: e.target.value }))}
+                            placeholder="Form Description"
+                        />
                     </div>
-                ))}
-            </div>
 
-            <div className="add-question-buttons">
-                <button onClick={() => addQuestion('short')}>Add Short Answer</button>
-                <button onClick={() => addQuestion('long')}>Add Long Answer</button>
-                <button onClick={() => addQuestion('multiple_choice')}>Add Multiple Choice</button>
-                <button onClick={() => addQuestion('select_multiple')}>Add Select Multiple</button>
+                    <div className="questions-list">
+                        {form.questions.map((question) => (
+                            <div key={question._id} className={`question-item ${editingQuestion === question._id && "editing"}`} onClick={() => {
+                                if(editingQuestion === question._id){
+                                    setEditingQuestion(null);
+                                } else {
+                                    setEditingQuestion(question._id)
+                                }
+                            }}>
+                                <div className="edit-header">
+                                    <span className="question-type">
+                                        {question.type === 'short' && 'Short Answer'}
+                                        {question.type === 'long' && 'Long Answer'}
+                                        {question.type === 'multiple_choice' && 'Multiple Choice'}
+                                        {question.type === 'select_multiple' && 'Select Multiple'}
+                                    </span>
+                                    <div className="question-actions">
+                                        {/* required  toggle switch */}
+                                        <div className="toggle-switch">
+                                            required
+                                            <SlideSwitch checked={question.required} onChange={(e) => updateQuestion(question._id, { required: e.target.checked })} />
+                                        </div>
+                                        
+                                        <button onClick={() => deleteQuestion(question._id)}>
+                                            <Icon icon="iconamoon:trash-fill" />
+                                        </button>
+                                    </div>
+                                </div>
+                                {editingQuestion === question._id ?
+                                    renderQuestionEditor(question)
+                                    :
+                                    renderQuestion(question)
+                                }
+                            </div>
+                        ))}
+                    </div>
+                </div>
             </div>
+            <div className="form-actions">
+                <div className="add-question-buttons">
+                    <button onClick={() => addQuestion('short')}><Icon icon="cuida:short-text-outline" /> Add Short Answer</button>
+                    <button onClick={() => addQuestion('long')}><Icon icon="cuida:long-text-outline" /> Add Long Answer</button>
+                    <button onClick={() => addQuestion('multiple_choice')}><Icon icon="cuida:check-circle-outline" /> Add Multiple Choice</button>
+                    <button onClick={() => addQuestion('select_multiple')}><Icon icon="cuida:checkbox-checked-outlined" /> Add Select Multiple</button>
+                </div>
 
-            <button className="save-button" onClick={() => onSave(form)}>Save Form</button>
+                <button className="save-button" onClick={handleSave}>Save Form</button>
+            </div>
         </div>
+        </HeaderContainer>
     );
 };
 

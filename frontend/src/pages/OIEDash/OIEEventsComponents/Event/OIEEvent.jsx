@@ -8,6 +8,7 @@ import FullEvent from '../../../../components/EventsViewer/EventsGrid/EventsColu
 import { useNotification } from '../../../../NotificationContext';
 import defaultAvatar from '../../../../assets/defaultAvatar.svg';
 import deleteRequest from '../../../../utils/deleteRequest';
+import apiRequest from '../../../../utils/postRequest';
 
 function OIEEvent({event, showStatus=false, refetch, showOIE=false, index, showExpand=true, manage=false, viewingRole, showHosting=true, extraInfo, showHostingType=true}){
     const [popupOpen, setPopupOpen] = useState(false);
@@ -72,7 +73,7 @@ function OIEEvent({event, showStatus=false, refetch, showOIE=false, index, showE
     }
 
     const onArchiveEvent = async () => {
-        const response = await deleteRequest(`/delete-event/${event._id}`);
+        const response = await apiRequest(`/delete-event/${event._id}`, {}, {method: 'DELETE'});
         console.log(response);
         if(response.success){
             setArchived(true);

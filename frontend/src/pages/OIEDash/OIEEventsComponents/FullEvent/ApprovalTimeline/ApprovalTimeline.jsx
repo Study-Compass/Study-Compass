@@ -32,12 +32,14 @@ const EventTimeline = ({ event, showApproval=false, viewingRole }) => {
     // Refs for each timeline step
     const timelineRefs = useRef([]);
 
+    console.log(event);
+
     // Build timeline steps
     const [timelineSteps, setSteps] = useState([
         {
             title: "Event Created",
             date: new Date(event?.createdAt || Date.now()),
-            subText: `created by ${event.hostingId?.name || "someone"}`,
+            subText: `created by ${event.hostingType === 'Org' ? event.hostingId?.org_name : event.hostingId?.name || "someone"}`,
             status: "completed",
             approval:false
         },
@@ -62,6 +64,7 @@ const EventTimeline = ({ event, showApproval=false, viewingRole }) => {
             approval:false
         },
     ]);
+
 
     console.log(event);
 

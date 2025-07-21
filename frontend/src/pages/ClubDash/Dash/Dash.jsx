@@ -10,6 +10,7 @@ import OIEEventSkeleton from '../../OIEDash/OIEEventsComponents/Event/OIEEventSk
 import PulseDot from '../../../components/Interface/PulseDot/PulseDot';
 import DashStatus from '../../../components/Dashboard/DashStatus/DashStatus';
 import EventQuickLook from './EventQuickLook/EventQuickLook';
+import { useNavigate } from 'react-router-dom';
 
 
 function Dash({ expandedClass, openMembers, clubName, meetings, org}) {
@@ -21,6 +22,7 @@ function Dash({ expandedClass, openMembers, clubName, meetings, org}) {
     const [height, setHeight] = useState(0);
     const { user } = useAuth();
     const [selectedTab, setSelectedTab] = useState("upcoming");
+    const navigate = useNavigate();
 
 
 
@@ -44,6 +46,7 @@ function Dash({ expandedClass, openMembers, clubName, meetings, org}) {
 
     const handleEventClick = () => {
         console.log("create event");
+        navigate("/create-event");
     }
 
     return (
@@ -54,7 +57,16 @@ function Dash({ expandedClass, openMembers, clubName, meetings, org}) {
                 <img src={OrgGrad} alt="" />
             </header>
             <div className="org-content">
-                <DashStatus status="You have 4 unreviewed officer and member applications" action="view all" actionText="view all" color="var(--green)" />
+                <div className="actions row">
+                    <div className="action" onClick={handleEventClick}>
+                        <iconify-icon icon="mingcute:add-circle-fill" />
+                        <p>Plan an Event</p>
+                    </div>
+                    <div className="action">
+                        <p>Manage Members</p>
+                    </div>
+                </div>
+                <DashStatus status="You have 4 unreviewed officer and member applications" action={console.log} actionText="view all" color="var(--green)" />
                 <EventQuickLook org={org} />
                 {/* <div className="row stats">
                     <div className="column">

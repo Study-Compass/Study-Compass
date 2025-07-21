@@ -38,6 +38,18 @@
         }
     }
 
+    .default-roles{
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        .default-roles-header{
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+    }
+
+
     .permission-warning {
         background: rgba(220, 38, 38, 0.1);
         border: 1px solid rgba(220, 38, 38, 0.2);
@@ -93,6 +105,32 @@
 
         // Customize RoleManager styles to match ClubDash theme
         .role-manager {
+            .default-roles{
+                
+                border-top: 1px solid var(--lighterborder);
+                padding: 10px 20px;
+                box-sizing: border-box;
+            }
+            .default-roles-header{
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
+                align-items: flex-start;
+                h4{
+                    font-family: 'Inter';
+                    font-size: 16px;
+                    font-weight: 700;
+                    color: var(--text);
+                    margin: 0;
+                }
+                p{
+                    font-family: 'Inter';
+                    font-size: 0.85rem;
+                    font-weight: 400;
+                    color: var(--lighter-text);
+                    margin: 0;
+                }
+            }
             .role-manager-header {
                 h3 {
                     color: var(--text);
@@ -100,15 +138,6 @@
                 
                 p {
                     color: var(--light-text);
-                }
-            }
-
-            .default-roles,
-            .custom-roles {
-                h4 {
-                    color: var(--text);
-                    font-family: 'Satoshi';
-                    padding-left: 10px;
                 }
             }
 
@@ -138,6 +167,35 @@
 
                 p {
                     color: var(--light-text);
+                }
+            }
+
+            .custom-roles{
+                border-top: 1px solid var(--lighterborder);
+                padding: 10px 20px;
+                box-sizing: border-box;
+                .custom-roles-header{
+                    display: flex;
+                    justify-content: space-between;
+                    .custom-roles-header-text{
+                        display: flex;
+                        flex-direction: column;
+                        gap: 4px;
+                        h4{
+                            font-family: 'Inter';
+                            font-size: 16px;
+                            font-weight: 700;
+                            color: var(--text);
+                            margin: 0;
+                        }
+                        p{
+                            font-family: 'Inter';
+                            font-size: 0.85rem;
+                            font-weight: 400;
+                            color: var(--lighter-text);
+                            margin: 0;
+                        }
+                    }
                 }
             }
 

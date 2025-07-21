@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useOrgPermissions, useOrgSave } from './settingsHelpers';
 import OrgGrad from '../../../../assets/Gradients/OrgGrad.png';
-
+import UnsavedChangesBanner from '../../../../components/UnsavedChangesBanner/UnsavedChangesBanner';
+import useUnsavedChanges from '../../../../hooks/useUnsavedChanges';
 
 const GeneralSettings = ({ org, expandedClass }) => {
     const [formData, setFormData] = useState({
@@ -11,7 +12,6 @@ const GeneralSettings = ({ org, expandedClass }) => {
         weekly_meeting: '',
         positions: []
     });
-    const [saving, setSaving] = useState(false);
     const [permissionsChecked, setPermissionsChecked] = useState(false);
     const [canManageSettings, setCanManageSettings] = useState(false);
     const [hasAccess, setHasAccess] = useState(false);
@@ -45,6 +45,15 @@ const GeneralSettings = ({ org, expandedClass }) => {
         }
     };
 
+    // Original data for comparison
+    const originalData = {
+        org_name: org?.org_name || '',
+        org_description: org?.org_description || '',
+        org_profile_image: org?.org_profile_image || '',
+        weekly_meeting: org?.weekly_meeting || '',
+        positions: org?.positions || []
+    };
+
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({
@@ -55,20 +64,34 @@ const GeneralSettings = ({ org, expandedClass }) => {
 
     const handleSave = async () => {
         if (!canManageSettings) {
-            return;
+            return false;
         }
 
-        setSaving(true);
-        try {
-            const success = await saveOrgSettings(formData);
-            if (success) {
-                // Optionally refresh the org data or update local state
-                initializeFormData();
-            }
-        } finally {
-            setSaving(false);
+        const success = await saveOrgSettings(formData);
+        if (success) {
+            // Optionally refresh the org data or update local state
+            initializeFormData();
         }
+        return success;
     };
+
+    const handleDiscard = () => {
+        // Reset to original values
+        setFormData({
+            org_name: org?.org_name || '',
+            org_description: org?.org_description || '',
+            org_profile_image: org?.org_profile_image || '',
+            weekly_meeting: org?.weekly_meeting || '',
+            positions: org?.positions || []
+        });
+    };
+
+    const { hasChanges, saving, handleSave: saveChanges, handleDiscard: discardChanges } = useUnsavedChanges(
+        originalData,
+        formData,
+        handleSave,
+        handleDiscard
+    );
 
     if (!hasAccess) {
         return (
@@ -86,6 +109,13 @@ const GeneralSettings = ({ org, expandedClass }) => {
 
     return (
         <div className="dash settings-section">
+            <UnsavedChangesBanner
+                hasChanges={hasChanges}
+                onSave={saveChanges}
+                onDiscard={discardChanges}
+                saving={saving}
+            />
+            
             <header className="header">
                 <h1>General Settings</h1>
                 <p>Manage basic organization information</p>
@@ -93,8 +123,11 @@ const GeneralSettings = ({ org, expandedClass }) => {
             </header>
             <div className="settings-content">
                 
-                <div className="form-group">
-                    <label htmlFor="org_name">Organization Name</label>
+                <div className="settings-child">
+                    <label htmlFor="org_name">
+                        <h4>Organization Name</h4>
+                        <p>The name of your organization</p>
+                    </label>
                     <input
                         type="text"
                         id="org_name"
@@ -106,8 +139,11 @@ const GeneralSettings = ({ org, expandedClass }) => {
                     />
                 </div>
 
-                <div className="form-group">
-                    <label htmlFor="org_description">Description</label>
+                <div className="form-group settings-child">
+                    <label htmlFor="org_description">
+                        <h4>Description</h4>
+                        <p>A brief description of your organization</p>
+                    </label>
                     <textarea
                         id="org_description"
                         name="org_description"
@@ -121,8 +157,11 @@ const GeneralSettings = ({ org, expandedClass }) => {
                     <span className="char-count">{formData.org_description.length}/500</span>
                 </div>
 
-                <div className="form-group">
-                    <label htmlFor="weekly_meeting">Weekly Meeting Time</label>
+                <div className="settings-child">
+                    <label htmlFor="weekly_meeting">
+                        <h4>Weekly Meeting Time</h4>
+                        <p>The time of your weekly meeting</p>
+                    </label>
                     <input
                         type="text"
                         id="weekly_meeting"
@@ -133,18 +172,7 @@ const GeneralSettings = ({ org, expandedClass }) => {
                         placeholder="e.g., Every Monday at 6 PM"
                     />
                 </div>
-
-                {canManageSettings && (
-                    <button 
-                        className="save-button" 
-                        onClick={handleSave}
-                        disabled={saving}
-                    >
-                        {saving ? 'Saving...' : 'Save Changes'}
-                    </button>
-                )}
             </div>
-
         </div>
     );
 };

@@ -209,7 +209,7 @@
     pointer-events: none;
     
     h2, p {
-        background: linear-gradient(90deg, var(--lightborder) 25%, var(--lighterborder) 50%, var(--lightborder) 75%);
+        background: linear-gradient(90deg, var(--light) 25%, var(--lighterborder) 50%, var(--light) 100%);
         background-size: 200% 100%;
         animation: skeleton-loading 1.5s infinite;
         border-radius: 4px;

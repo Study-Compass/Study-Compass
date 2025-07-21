@@ -45,3 +45,5 @@ scripts/
 .flaskenv*
 !.env.project
 !.env.vault
+
+dump/

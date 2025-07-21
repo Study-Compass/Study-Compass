@@ -58,11 +58,17 @@ export const useOrgSave = (org) => {
     const saveOrgSettings = async (formData, selectedFile = null) => {
         try {
             const formDataToSend = new FormData();
+            // formDataToSend.append('orgId', org._id);
+            // formDataToSend.append('org_name', formData.org_name);
+            // formDataToSend.append('org_description', formData.org_description);
+            // formDataToSend.append('weekly_meeting', formData.weekly_meeting);
+            // formDataToSend.append('positions', JSON.stringify(formData.positions));
             formDataToSend.append('orgId', org._id);
-            formDataToSend.append('org_name', formData.org_name);
-            formDataToSend.append('org_description', formData.org_description);
-            formDataToSend.append('weekly_meeting', formData.weekly_meeting);
-            formDataToSend.append('positions', JSON.stringify(formData.positions));
+            Object.entries(formData).forEach(([key, value]) => {
+                if(value) {
+                    formDataToSend.append(key, JSON.stringify(value));
+                }
+            });
 
             if (selectedFile) {
                 formDataToSend.append('image', selectedFile);
@@ -136,3 +142,4 @@ export const useOrgDelete = () => {
 
     return { deleteOrganization };
 }; 
+

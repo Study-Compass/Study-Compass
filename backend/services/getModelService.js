@@ -17,6 +17,7 @@ const searchSchema = require('../schemas/search');
 const studyHistorySchema = require('../schemas/studyHistory');
 const userSchema = require('../schemas/user');
 const visitSchema = require('../schemas/visit');
+const orgMemberApplicationSchema = require('../schemas/orgMemberApplication');
 const samlConfigSchema = require('../schemas/samlConfig');
 
 //events
@@ -24,6 +25,9 @@ const rssFeedSchema = require('../events/schemas/rssFeed');
 const approvalFlowDefinition = require('../events/schemas/approvalFlowDefinition');
 const approvalFlowInstance = require('../events/schemas/approvalInstance');
 const eventSchema = require('../events/schemas/event');
+const formSchema = require('../events/schemas/form');
+const formResponseSchema = require('../events/schemas/formResponse');
+
 
 const getModels = (req, ...names) => {
     const models = {
@@ -42,7 +46,6 @@ const getModels = (req, ...names) => {
         Rating: req.db.model('Rating', ratingSchema, 'ratings'),
         RepeatedVisit: req.db.model('RepeatedVisit', repeatedVisitSchema, 'repeatedVisits'),
         Report: req.db.model('Report', reportSchema, 'reports'),
-        SAMLConfig: req.db.model('SAMLConfig', samlConfigSchema, 'samlConfigs'),
         Schedule: req.db.model('Schedule', scheduleSchema, 'schedules'),
         Search: req.db.model('Search', searchSchema, 'searches'),
         StudyHistory: req.db.model('StudyHistory', studyHistorySchema, 'studyHistories'),
@@ -50,7 +53,11 @@ const getModels = (req, ...names) => {
         Visit: req.db.model('Visit', visitSchema, 'visits'),
         ApprovalFlow: req.db.model('ApprovalFlow', approvalFlowDefinition, 'approvalFlows'),
         ApprovalInstance: req.db.model('ApprovalInstance', approvalFlowInstance, 'approvalInstances'),
-        RssFeed: req.db.model('RssFeed', rssFeedSchema, 'rssFeeds')
+        RssFeed: req.db.model('RssFeed', rssFeedSchema, 'rssFeeds'),
+        Form: req.db.model('Form', formSchema, 'forms'),    
+        FormResponse: req.db.model('FormResponse', formResponseSchema, 'formResponses'),
+        OrgMemberApplication: req.db.model('OrgMemberApplication', orgMemberApplicationSchema, 'orgMemberApplications'),
+        SAMLConfig: req.db.model('SAMLConfig', samlConfigSchema, 'samlConfigs')
     };
 
     return names.reduce((acc, name) => {

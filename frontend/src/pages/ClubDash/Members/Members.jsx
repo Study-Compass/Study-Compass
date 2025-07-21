@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './Members.scss';
 import { useNotification } from '../../../NotificationContext';
 import useAuth from '../../../hooks/useAuth';
-import axios from 'axios';
+import { useFetch } from '../../../hooks/useFetch';
 import apiRequest from '../../../utils/postRequest';
 import OrgGrad from '../../../assets/Gradients/OrgGrad.png';
 import { Icon } from '@iconify-icon/react';
@@ -10,13 +10,12 @@ import Popup from '../../../components/Popup/Popup';
 import AddMemberForm from '../../../components/AddMemberForm';
 import { getOrgRoleColor } from '../../../utils/orgUtils';
 import Select from '../../../components/Select/Select'; 
+import MemberApplicationsViewer from './MemberApplicationsViewer/MemberApplicationsViewer';
 
 function Members({ expandedClass, org }) {
     const { user } = useAuth();
     const { addNotification } = useNotification();
-    const [members, setMembers] = useState([]);
     const [roles, setRoles] = useState([]);
-    const [loading, setLoading] = useState(true);
     const [canManageMembers, setCanManageMembers] = useState(false);
     const [userRole, setUserRole] = useState(null);
     const [hasAccess, setHasAccess] = useState(false);
@@ -26,6 +25,16 @@ function Members({ expandedClass, org }) {
     const [selectedMember, setSelectedMember] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [filterRole, setFilterRole] = useState('all');
+    const [showApplicationsViewer, setShowApplicationsViewer] = useState(false);
+
+    // Use useFetch for members data
+    const { data: membersData, loading: membersLoading, error: membersError, refetch: refetchMembers } = useFetch(
+        org ? `/org-roles/${org._id}/members` : null,
+    );
+
+    // Extract members and applications from the fetched data
+    const members = membersData?.members || [];
+    const applications = membersData?.applications || [];
 
     useEffect(() => {
         if (org && !permissionsChecked) {
@@ -35,6 +44,18 @@ function Members({ expandedClass, org }) {
             checkUserPermissions();
         }
     }, [org, user, permissionsChecked]);
+
+    useEffect(() => {
+        // Handle members fetch error
+        if (membersError) {
+            console.error('Error fetching members:', membersError);
+            addNotification({
+                title: 'Error',
+                message: 'Failed to fetch members',
+                type: 'error'
+            });
+        }
+    }, [membersError, addNotification]);
 
     const checkUserPermissions = async () => {
         if (!org || !user || permissionsChecked) return;
@@ -48,7 +69,6 @@ function Members({ expandedClass, org }) {
                 setCanManageMembers(true);
                 setHasAccess(true);
                 setPermissionsChecked(true);
-                fetchMembers();
                 return;
             }
 
@@ -92,35 +112,6 @@ function Members({ expandedClass, org }) {
             setCanManageMembers(false);
         } finally {
             setPermissionsChecked(true);
-            setLoading(false);
-        }
-    };
-
-    const fetchMembers = async () => {
-        try {
-            console.log('Fetching members for org:', org._id);
-            const response = await apiRequest(`/org-roles/${org._id}/members`, {}, {
-                method: 'GET'
-            });
-
-            console.log('Members API response:', response);
-            if (response.success) {
-                setMembers(response.members || []);
-            } else {
-                console.error('Failed to fetch members:', response.message);
-                addNotification({
-                    title: 'Error',
-                    message: response.message || 'Failed to fetch members',
-                    type: 'error'
-                });
-            }
-        } catch (error) {
-            console.error('Error fetching members:', error);
-            addNotification({
-                title: 'Error',
-                message: 'Failed to fetch members',
-                type: 'error'
-            });
         }
     };
 
@@ -148,7 +139,7 @@ function Members({ expandedClass, org }) {
                     message: 'Role assigned successfully',
                     type: 'success'
                 });
-                fetchMembers(); // Refresh member list
+                refetchMembers(); // Refresh member list using useFetch refetch
                 setShowRoleAssignment(false);
                 setSelectedMember(null);
             }
@@ -187,7 +178,7 @@ function Members({ expandedClass, org }) {
                     message: 'Member removed successfully',
                     type: 'success'
                 });
-                fetchMembers(); // Refresh member list
+                refetchMembers(); // Refresh member list using useFetch refetch
             }
         } catch (error) {
             console.error('Error removing member:', error);
@@ -200,7 +191,7 @@ function Members({ expandedClass, org }) {
     };
 
     const handleMemberAdded = () => {
-        fetchMembers(); // Refresh member list
+        refetchMembers(); // Refresh member list using useFetch refetch
     };
 
     const handleCloseAddMember = () => {
@@ -232,7 +223,7 @@ function Members({ expandedClass, org }) {
         return roleColors[roleName] || '#6b7280';
     };
 
-    if (loading) {
+    if (membersLoading) {
         return (
             <div className={`dash ${expandedClass}`}>
                 <div className="members loading">
@@ -264,6 +255,15 @@ function Members({ expandedClass, org }) {
 
     return (
         <div className={`dash ${expandedClass}`}>
+            <Popup 
+                isOpen={showApplicationsViewer} 
+                onClose={() => {refetchMembers(); setShowApplicationsViewer(false)}}
+                customClassName="wide-content"
+                defaultStyling={false}
+                popout={false}
+            >
+                <MemberApplicationsViewer org={org} />
+            </Popup>
             <div className="members">
                 <header className="header">
                     <h1>Member Management</h1>
@@ -302,6 +302,10 @@ function Members({ expandedClass, org }) {
                                     defaultValue="All Roles"
                                 />
                             </div>
+                            <button className="view-applications-btn" onClick={() => setShowApplicationsViewer(true)}>
+                                View Applications <b>{applications.length}</b>
+                            </button>
+                                
                         </div>
                         
                         {canManageMembers && (
@@ -316,6 +320,21 @@ function Members({ expandedClass, org }) {
                     </div>
 
                     <div className="members-list">
+                        {
+                            filteredMembers.length > 0 ? (
+                                <div className="members-list-header">
+                                    <h3>Name</h3>
+                                    <h3></h3>
+                                    <h3>Joined</h3>
+                                    <h3>Role</h3>
+                                    <h3>Actions</h3>
+                                </div>
+                            ) : (
+                                <div className="members-list-header">
+
+                                </div>
+                            )
+                        }
                         {filteredMembers.length === 0 ? (
                             <div className="no-members">
                                 <Icon icon="mdi:account-group-outline" className="no-members-icon" />
@@ -335,7 +354,7 @@ function Members({ expandedClass, org }) {
                         ) : (
                             filteredMembers.map(member => (
                                 <div key={member._id} className="member-card">
-                                    <div className="member-info">
+                                    {/* <div className="member-info"> */}
                                         <div className="member-avatar">
                                             {member.user_id?.picture ? (
                                                 <img src={member.user_id.picture} alt={member.user_id.name} />
@@ -346,25 +365,23 @@ function Members({ expandedClass, org }) {
                                             )}
                                         </div>
                                         <div className="member-details">
-                                            <div className="row">
-                                                <h4>{member.user_id?.name || 'Unknown User'}</h4>
-                                                <div className="member-meta">
-                                                    <span className="joined-date">
-                                                        Joined {new Date(member.joinedAt).toLocaleDateString()}
-                                                    </span>
-                                                    {member.assignedBy && (
-                                                        <span className="assigned-by">
-                                                            Assigned by {member.assignedBy?.name || 'Unknown'}
-                                                        </span>
-                                                    )}
-                                                </div>
-                                            </div>
-                                            <p className="username">@{member.user_id?.username || 'unknown'}</p>
+                                            <h4>{member.user_id?.name || 'Unknown User'}</h4>
+                                            {/* <p className="username">@{member.user_id?.username || 'unknown'}</p> */}
                                             <p className="email">{member.user_id?.email || 'No email'}</p>
                                         </div>
-                                    </div>
+                                        <div className="member-meta">
+                                            <span className="joined-date">
+                                                Joined {new Date(member.joinedAt).toLocaleDateString()}
+                                            </span>
+                                            {member.assignedBy && (
+                                                <span className="assigned-by">
+                                                    Assigned by {member.assignedBy?.name || 'Unknown'}
+                                                </span>
+                                            )}
+                                        </div>
+                                    {/* </div> */}
                                     
-                                    <div className="member-actions">
+                                    {/* <div className="member-actions"> */}
                                         <div className="role-badge" style={{ backgroundColor: getOrgRoleColor(member.role, 0.1), color: getOrgRoleColor(member.role, 1) }}>
                                             {getRoleDisplayName(member.role)}
                                         </div>
@@ -394,7 +411,7 @@ function Members({ expandedClass, org }) {
                                             </div>
                                         )}
                                     </div>
-                                </div>
+                                // </div>
                             ))
                         )}
                     </div>

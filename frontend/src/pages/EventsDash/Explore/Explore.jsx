@@ -5,7 +5,7 @@ import {useFetch} from '../../../hooks/useFetch';
 import RPIlogo from '../../../assets/Rpi.png';
 import compass from '../../../assets/Brand Image/discover.svg';
 import FilterPanel from '../../../components/FilterPanel/FilterPanel';
-import Event from '../../../components/EventsViewer/EventsGrid/EventsColumn/Event/Event';
+import EventsList from '../../../components/EventsList/EventsList';
 import Switch from '../../../components/Switch/Switch';
 import Month from '../../../pages/OIEDash/EventsCalendar/Month/Month';
 import Week from '../../../pages/OIEDash/EventsCalendar/Week/Week';
@@ -32,8 +32,6 @@ function Explore(){
     const [hasMore, setHasMore] = useState(true);
     const [events, setEvents] = useState([]);
     const limit = 15;
-    const observer = useRef();
-    const loadingRef = useRef(null);
 
     const [view, setView] = useState(0);
     const [viewType, setViewType] = useState(0);
@@ -89,19 +87,10 @@ function Explore(){
 
     const { data, loading, error } = useFetch(`/get-future-events?roles=${roles}&page=${page}&limit=${limit}&filter=${JSON.stringify(filterParam)}`);
 
-    // Handle intersection observer for infinite scroll
-    const lastEventElementRef = useCallback(node => {
-        if (loading) return;
-        if (observer.current) observer.current.disconnect();
-        observer.current = new IntersectionObserver(entries => {
-            if (entries[0].isIntersecting && hasMore) {
-                setTimeout(() => {
-                    setPage(prevPage => prevPage + 1);
-                }, 500);
-            }
-        });
-        if (node) observer.current.observe(node);
-    }, [loading, hasMore]);
+    // Handle load more for infinite scroll
+    const handleLoadMore = useCallback(() => {
+        setPage(prevPage => prevPage + 1);
+    }, []);
 
     // Update events when new data arrives
     useEffect(() => {
@@ -291,36 +280,14 @@ function Explore(){
                     ) : error ? (
                         <div className="error" role="alert">Error loading events</div>
                     ) : viewType === 0 ? (
-                        events.length > 0 ? (
-                            <div className="events-list" role="list" aria-label="Events list">
-                                {groupedEvents.map(({ date, events }, groupIndex) => (
-                                    <div key={date.toISOString()} className="date-group" role="group" aria-label={`Events on ${formatDate(date)}`}>
-                                        <div className="date-separator" role="heading" aria-level="2">{formatDate(date)}</div>
-                                        {events.map((event, eventIndex) => {
-                                            const isLastElement = groupIndex === groupedEvents.length - 1 && 
-                                                               eventIndex === events.length - 1;
-                                            return (
-                                                <div 
-                                                    key={`${event._id}-${eventIndex}`}
-                                                    ref={isLastElement ? lastEventElementRef : null}
-                                                    role="listitem"
-                                                >
-                                                    <Event event={event} />
-                                                </div>
-                                            );
-                                        })}
-                                    </div>
-                                ))}
-                                <Loader />
-                                {loading && page > 1 && (
-                                    <div ref={loadingRef} className="loading-more" role="status" aria-live="polite">
-                                        Loading more events...
-                                    </div>
-                                )}
-                            </div>
-                        ) : (
-                            <div className="no-events" role="status">No events found</div>
-                        )
+                        <EventsList 
+                            groupedEvents={groupedEvents}
+                            loading={loading}
+                            page={page}
+                            hasMore={hasMore}
+                            onLoadMore={handleLoadMore}
+                            formatDate={formatDate}
+                        />
                     ) : (
                         view === 0 ?
                         <Month 

@@ -95,26 +95,26 @@ const ApprovalConfig = ({ approvalId }) => {
         description: "The space you requested requires additional information, please fill out the form below.",
         questions: [
             {
-                id: "1",
+                _id: "1",
                 type: "short",
                 question: "Will you require catering?",
                 required: true
             },
             {
-                id: "2",
+                _id: "2",
                 type: "multiple_choice",
                 question: "example multiple choice question",
                 required: true,
                 options: ["Approve", "Reject", "Request Changes"]
             },
             {
-                id: "3",
+                _id: "3",
                 type: "long",
                 question: "Please provide any additional comments or feedback",
                 required: false
             },
             {
-                id: "5",
+                _id: "5",
                 type: "select_multiple",
                 question: "example select all choice question",
                 required: true,

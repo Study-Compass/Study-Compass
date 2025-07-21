@@ -4,6 +4,8 @@ const cors = require('cors');
 const path = require('path'); 
 const cookieParser = require('cookie-parser');
 const multer = require('multer');
+const session = require('express-session');
+const passport = require('passport');
 require('dotenv').config();
 const { createServer } = require('http');
 const { Server } = require('socket.io');
@@ -48,6 +50,22 @@ if (process.env.NODE_ENV === 'production') {
 app.use(express.json());
 app.use(express.urlencoded({ extended: true })); // Add this for form-encoded data
 app.use(cookieParser());
+
+// Session middleware for SAML
+app.use(session({
+    secret: process.env.SESSION_SECRET || 'your-secret-key',
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+        secure: process.env.NODE_ENV === 'production',
+        httpOnly: true,
+        maxAge: 24 * 60 * 60 * 1000 // 24 hours
+    }
+}));
+
+// Initialize Passport
+app.use(passport.initialize());
+app.use(passport.session());
 
 // if (process.env.NODE_ENV === 'production') {
 //     mongoose.connect(process.env.MONGO_URL);

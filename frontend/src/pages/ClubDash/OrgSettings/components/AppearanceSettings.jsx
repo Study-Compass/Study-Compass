@@ -3,6 +3,8 @@ import ImageUpload from '../../../../components/ImageUpload/ImageUpload';
 import { useOrgPermissions, useOrgSave } from './settingsHelpers';
 import './AppearanceSettings.scss';
 import OrgGrad from '../../../../assets/Gradients/OrgGrad.png';
+import UnsavedChangesBanner from '../../../../components/UnsavedChangesBanner/UnsavedChangesBanner';
+import useUnsavedChanges from '../../../../hooks/useUnsavedChanges';
 
 const AppearanceSettings = ({ org, expandedClass }) => {
     const [formData, setFormData] = useState({
@@ -14,7 +16,6 @@ const AppearanceSettings = ({ org, expandedClass }) => {
     });
     const [selectedFile, setSelectedFile] = useState(null);
     const [imagePreview, setImagePreview] = useState('');
-    const [saving, setSaving] = useState(false);
     const [permissionsChecked, setPermissionsChecked] = useState(false);
     const [canManageSettings, setCanManageSettings] = useState(false);
     const [hasAccess, setHasAccess] = useState(false);
@@ -49,6 +50,15 @@ const AppearanceSettings = ({ org, expandedClass }) => {
         }
     };
 
+    // Original data for comparison
+    const originalData = {
+        org_name: org?.org_name || '',
+        org_description: org?.org_description || '',
+        org_profile_image: org?.org_profile_image || '',
+        weekly_meeting: org?.weekly_meeting || '',
+        positions: org?.positions || []
+    };
+
     const handleFileSelect = (file) => {
         setSelectedFile(file);
         const reader = new FileReader();
@@ -60,21 +70,37 @@ const AppearanceSettings = ({ org, expandedClass }) => {
 
     const handleSave = async () => {
         if (!canManageSettings) {
-            return;
+            return false;
         }
 
-        setSaving(true);
-        try {
-            const success = await saveOrgSettings(formData, selectedFile);
-            if (success) {
-                setSelectedFile(null);
-                // Optionally refresh the org data or update local state
-                initializeFormData();
-            }
-        } finally {
-            setSaving(false);
+        const success = await saveOrgSettings(formData, selectedFile);
+        if (success) {
+            setSelectedFile(null);
+            // Optionally refresh the org data or update local state
+            initializeFormData();
         }
+        return success;
     };
+
+    const handleDiscard = () => {
+        // Reset to original values
+        setFormData({
+            org_name: org?.org_name || '',
+            org_description: org?.org_description || '',
+            org_profile_image: org?.org_profile_image || '',
+            weekly_meeting: org?.weekly_meeting || '',
+            positions: org?.positions || []
+        });
+        setSelectedFile(null);
+        setImagePreview(org?.org_profile_image || '');
+    };
+
+    const { hasChanges, saving, handleSave: saveChanges, handleDiscard: discardChanges } = useUnsavedChanges(
+        originalData,
+        formData,
+        handleSave,
+        handleDiscard
+    );
 
     if (!hasAccess) {
         return (
@@ -92,6 +118,13 @@ const AppearanceSettings = ({ org, expandedClass }) => {
 
     return (
         <div className="dash settings-section">
+            <UnsavedChangesBanner
+                hasChanges={hasChanges}
+                onSave={saveChanges}
+                onDiscard={discardChanges}
+                saving={saving}
+            />
+            
             <header className="header">
                 <h1>Appearance</h1>
                 <p>Customize your organization's visual identity</p>
@@ -113,16 +146,6 @@ const AppearanceSettings = ({ org, expandedClass }) => {
                         showPrompt={true}
                     />
                 </div>
-
-                {canManageSettings && (
-                    <button 
-                        className="save-button" 
-                        onClick={handleSave}
-                        disabled={saving}
-                    >
-                        {saving ? 'Saving...' : 'Save Changes'}
-                    </button>
-                )}
             </div>
         </div>
     );

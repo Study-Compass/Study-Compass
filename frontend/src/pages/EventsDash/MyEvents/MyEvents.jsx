@@ -14,15 +14,15 @@ function MyEvents(){
 
     const selectorItems = [
         {
-            label: 'upcoming',
+            label: 'Upcoming',
             value: 'future'
         },
         {
-            label: 'past',
+            label: 'Past',
             value: 'past'
         },
         {
-            label: 'archived',
+            label: 'Archived',
             value: 'archived'
         }
     ]

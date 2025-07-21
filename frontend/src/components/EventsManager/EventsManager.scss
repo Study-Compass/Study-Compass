@@ -34,6 +34,13 @@
                 padding: 8px 0px;
                 transition: all 0.2s ease-in-out;
                 position: relative;
+                h3{
+                    font-size:14px;
+                    font-weight:600;
+                    font-family: 'Inter';
+                    margin: 0;
+                    color: var(--lighter-text);
+                }
                 &.selected{
                     h3{
                         color: var(--red);

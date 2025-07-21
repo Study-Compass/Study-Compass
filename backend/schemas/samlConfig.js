@@ -1,271 +1,167 @@
 const mongoose = require('mongoose');
 
 const samlConfigSchema = new mongoose.Schema({
-    // Tenant identification
     school: {
         type: String,
         required: true,
         unique: true,
         trim: true
     },
-    
-    // SAML Configuration
-    entityId: {
-        type: String,
-        required: true,
-        trim: true
-    },
-    
-    // IdP Configuration
+    // Identity Provider configuration
     idp: {
-        entityId: {
+        entityID: {
             type: String,
-            required: true,
-            trim: true
+            required: true
         },
-        ssoUrl: {
-            type: String,
-            required: true,
-            trim: true
-        },
-        sloUrl: {
-            type: String,
-            required: false,
-            trim: true
-        },
-        x509Cert: {
-            type: String,
-            required: true,
-            trim: true
-        },
-        // Additional IdP certificates for certificate rotation
-        additionalCerts: [{
-            type: String,
-            trim: true
-        }]
-    },
-    
-    // SP Configuration
-    sp: {
-        assertionConsumerService: {
-            type: String,
-            required: true,
-            trim: true
+        singleSignOnService: {
+            binding: {
+                type: String,
+                default: 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect'
+            },
+            location: {
+                type: String,
+                required: true
+            }
         },
         singleLogoutService: {
-            type: String,
-            required: false,
-            trim: true
+            binding: {
+                type: String,
+                default: 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect'
+            },
+            location: {
+                type: String,
+                required: false
+            }
         },
         x509Cert: {
             type: String,
-            required: true,
-            trim: true
-        },
-        privateKey: {
-            type: String,
-            required: true,
-            trim: true
+            required: true
         }
     },
-    
-    // Attribute mapping configuration
-    attributeMapping: {
-        email: {
+    // Service Provider configuration
+    sp: {
+        entityID: {
             type: String,
-            default: 'email',
-            trim: true
+            required: true
         },
-        username: {
-            type: String,
-            default: 'username',
-            trim: true
+        assertionConsumerService: {
+            binding: {
+                type: String,
+                default: 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST'
+            },
+            location: {
+                type: String,
+                required: true
+            }
         },
-        firstName: {
-            type: String,
-            default: 'firstName',
-            trim: true
+        singleLogoutService: {
+            binding: {
+                type: String,
+                default: 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect'
+            },
+            location: {
+                type: String,
+                required: false
+            }
         },
-        lastName: {
+        signingCert: {
             type: String,
-            default: 'lastName',
-            trim: true
+            required: true
         },
-        displayName: {
+        signingKey: {
             type: String,
-            default: 'displayName',
-            trim: true
+            required: true
         },
-        studentId: {
+        encryptCert: {
             type: String,
-            default: 'studentId',
-            trim: true
+            required: true
         },
-        department: {
+        encryptKey: {
             type: String,
-            default: 'department',
-            trim: true
-        },
-        role: {
-            type: String,
-            default: 'role',
-            trim: true
+            required: true
         }
     },
-    
-    // SAML Settings
+    // SAML settings
     settings: {
+        authnRequestsSigned: {
+            type: Boolean,
+            default: true
+        },
         wantAssertionsSigned: {
             type: Boolean,
             default: true
         },
         wantMessageSigned: {
             type: Boolean,
-            default: false
+            default: true
         },
-        wantNameId: {
+        wantLogoutRequestSigned: {
             type: Boolean,
             default: true
         },
-        wantNameIdEncrypted: {
+        wantLogoutResponseSigned: {
             type: Boolean,
-            default: false
+            default: true
         },
-        wantAssertionsEncrypted: {
+        isAssertionEncrypted: {
             type: Boolean,
-            default: false
+            default: true
         },
-        signatureAlgorithm: {
+        messageSigningOrder: {
             type: String,
-            default: 'sha256',
-            enum: ['sha1', 'sha256', 'sha512']
-        },
-        digestAlgorithm: {
-            type: String,
-            default: 'sha256',
-            enum: ['sha1', 'sha256', 'sha512']
-        },
-        authnContextClassRef: {
-            type: String,
-            default: 'urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport'
+            default: 'encrypt-then-sign'
         }
     },
-    
-    // User provisioning settings
-    userProvisioning: {
-        autoCreateUsers: {
-            type: Boolean,
-            default: true
-        },
-        autoUpdateUsers: {
-            type: Boolean,
-            default: true
-        },
-        defaultRoles: {
-            type: [String],
-            default: ['user']
-        },
-        usernameGeneration: {
-            type: String,
-            enum: ['email_prefix', 'student_id', 'custom'],
-            default: 'email_prefix'
-        },
-        customUsernameField: {
-            type: String,
-            default: null
-        }
+    // Attribute mapping
+    attributeMapping: {
+        type: Object,
+        default: {}
     },
-    
-    // Status and metadata
-    isActive: {
+    // Additional settings
+    nameIDFormat: {
+        type: String,
+        default: 'urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified'
+    },
+    relayState: {
+        type: String,
+        default: '/room/none'
+    },
+    active: {
         type: Boolean,
         default: true
-    },
-    
-    lastMetadataRefresh: {
-        type: Date,
-        default: Date.now
-    },
-    
-    metadataUrl: {
-        type: String,
-        required: false,
-        trim: true
-    },
-    
-    // Audit fields
-    createdBy: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-        required: false
-    },
-    
-    notes: {
-        type: String,
-        trim: true
     }
 }, {
     timestamps: true
 });
 
-// Indexes for efficient queries
-samlConfigSchema.index({ school: 1 });
-samlConfigSchema.index({ isActive: 1 });
-
-// Pre-save hook to validate configuration
-samlConfigSchema.pre('save', function(next) {
-    // Validate that required URLs are properly formatted
-    const urlFields = ['idp.ssoUrl', 'sp.assertionConsumerService'];
-    for (const field of urlFields) {
-        const value = this.get(field);
-        if (value && !isValidUrl(value)) {
-            return next(new Error(`Invalid URL format for ${field}: ${value}`));
-        }
-    }
-    next();
-});
-
-// Helper function to validate URLs
-function isValidUrl(string) {
-    try {
-        new URL(string);
-        return true;
-    } catch (_) {
-        return false;
-    }
-}
-
-// Static method to get active SAML config for a school
-samlConfigSchema.statics.getActiveConfig = function(school) {
-    return this.findOne({ school, isActive: true });
-};
-
-// Instance method to get samlify configuration
-samlConfigSchema.methods.toSamlifyConfig = function() {
-    return {
-        entityID: this.entityId,
-        authnRequestsSigned: false,
-        wantAssertionsSigned: this.settings.wantAssertionsSigned,
-        wantMessageSigned: this.settings.wantMessageSigned,
-        wantNameId: this.settings.wantNameId,
-        wantNameIdEncrypted: this.settings.wantNameIdEncrypted,
-        wantAssertionsEncrypted: this.settings.wantAssertionsEncrypted,
-        signatureAlgorithm: this.settings.signatureAlgorithm,
-        digestAlgorithm: this.settings.digestAlgorithm,
-        assertionConsumerService: [{
-            Binding: 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST',
-            Location: this.sp.assertionConsumerService
-        }],
-        singleLogoutService: this.sp.singleLogoutService ? [{
-            Binding: 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect',
-            Location: this.sp.singleLogoutService
-        }] : [],
-        // Use signingCert and encryptCert to include both certificates in metadata
-        signingCert: this.sp.x509Cert,
-        encryptCert: this.sp.x509Cert, // Use same certificate for encryption
-        privateKey: this.sp.privateKey,
-        // Note: Global validation is handled in samlService.js
+    // Method to convert to Passport SAML configuration
+    samlConfigSchema.methods.toPassportSamlConfig = function() {
+        return {
+            entryPoint: this.idp.singleSignOnService.location,
+            issuer: this.sp.entityID,
+            callbackUrl: this.sp.assertionConsumerService.location,
+            cert: this.idp.x509Cert,
+            privateCert: this.sp.signingCert,
+            privateKey: this.sp.signingKey,
+            decryptionPvk: this.sp.encryptKey,
+            signatureAlgorithm: 'sha256',
+            acceptedClockSkewMs: -1,
+            identifierFormat: this.nameIDFormat,
+            authnContext: 'urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport',
+            validateInResponseTo: false,
+            disableRequestedAuthnContext: true,
+            wantAssertionsSigned: this.settings.wantAssertionsSigned,
+            wantMessageSigned: this.settings.wantMessageSigned,
+            wantLogoutRequestSigned: this.settings.wantLogoutRequestSigned,
+            wantLogoutResponseSigned: this.settings.wantLogoutResponseSigned,
+            wantNameId: true,
+            wantNameIdFormat: true,
+            wantAttributeStatement: true,
+            attributeMapping: this.attributeMapping,
+            // Additional fields for metadata generation
+            signingCert: this.sp.signingCert,
+            encryptCert: this.sp.encryptCert
+        };
     };
-};
 
 module.exports = samlConfigSchema; 

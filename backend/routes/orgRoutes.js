@@ -15,6 +15,7 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 const multer = require('multer');
 const path = require('path');
 const { uploadImageToS3, upload } = require('../services/imageUploadService');
+const { requireMemberManagement } = require('../middlewares/orgPermissions');
 
 // Error handling middleware for multer
 const handleMulterError = (err, req, res, next) => {
@@ -67,14 +68,14 @@ router.get("/get-org/:id", verifyToken, async (req, res) => {
 });
 
 router.get("/get-org-by-name/:name", verifyToken, async (req, res) => {
-    const { Org, OrgMember, OrgFollower, Event } = getModels(req, "Org", "OrgMember", "OrgFollower", "Event");
+    const { Org, OrgMember, OrgFollower, Event, User, OrgMemberApplication } = getModels(req, "Org", "OrgMember", "OrgFollower", "Event", "User", "OrgMemberApplication");
     const { exhaustive } = req.query;
     console.log(exhaustive);
 
     try {
         const orgName = req.params.name;
 
-        const org = await Org.findOne({ org_name: orgName });
+        const org = await Org.findOne({ org_name: orgName }).populate('memberForm');
 
         if (!org) {
             return res.status(404).json({ success: false, message: "Org not found" });
@@ -97,6 +98,12 @@ router.get("/get-org-by-name/:name", verifyToken, async (req, res) => {
         const orgFollowers = await OrgFollower.find({ org_id: org._id }).populate(
             "user_id"
         );
+        //check if the user has applied to the org
+        const user = await User.findById(req.user.userId);
+        const existingApplication = await OrgMemberApplication.findOne({org_id: org._id, user_id: user._id, status: "pending"});
+        const isMember = orgMembers.some(member => member.user_id._id.toString() === user._id.toString());
+        const isFollower = orgFollowers.some(follower => follower.user_id._id.toString() === user._id.toString());
+        const isPending = existingApplication ? true : false;
 
         // If the org exists, return it
         console.log(`GET: /get-org-by-name/${orgName}`);
@@ -107,6 +114,9 @@ router.get("/get-org-by-name/:name", verifyToken, async (req, res) => {
                 overview: org,
                 members: orgMembers,
                 followers: orgFollowers,
+                isMember: isMember,
+                isFollower: isFollower,
+                isPending: isPending,
             },
             exhaustive: exhaustive ? exhaustiveData : null
         }); 
@@ -301,9 +311,9 @@ router.post("/create-org", verifyToken, upload.single('image'), handleMulterErro
             });
     }
 });
-
+//add org perms
 router.post("/edit-org", verifyToken, upload.single('image'), handleMulterError, async (req, res) => {
-    const { Org } = getModels(req, "Org");
+    const { Org, Form } = getModels(req, "Org", "Form");
     try {
         const {
             orgId,
@@ -312,6 +322,8 @@ router.post("/edit-org", verifyToken, upload.single('image'), handleMulterError,
             positions,
             weekly_meeting,
             org_name,
+            requireApprovalForJoin,
+            memberForm,
         } = req.body;
         const userId = req.user?.userId;
         const file = req.file;
@@ -404,6 +416,22 @@ router.post("/edit-org", verifyToken, upload.single('image'), handleMulterError,
                     success: false,
                     message: "Invalid positions data format"
                 });
+            }
+        }
+        if (requireApprovalForJoin) {
+            org.requireApprovalForJoin = requireApprovalForJoin;
+        }
+        if (memberForm) {
+            console.log(memberForm);
+            if(org.memberForm) {
+                const formObject = JSON.parse(memberForm);
+                await Form.findByIdAndUpdate(org.memberForm, formObject);
+            } else {
+                const formObject = JSON.parse(memberForm);
+                formObject.createdBy = userId;
+                const newForm = new Form(formObject);
+                await newForm.save();
+                org.memberForm = newForm._id;
             }
         }
         if (weekly_meeting) {
@@ -612,6 +640,79 @@ router.get("/get-org-members/:orgId", verifyToken, async (req, res) => {
             .json({
                 success: false,
                 message: "Error retrieving org members",
+                error: error.message,
+            });
+    }
+});
+
+router.post("/:orgId/apply-to-org", verifyToken, async (req, res) => {
+    const { Org, OrgMemberApplication, FormResponse, Form } = getModels(req, "Org", "OrgMemberApplication", "FormResponse", "Form");
+    try {
+        const { orgId } = req.params;
+        const userId = req.user.userId;
+        const { formResponse } = req.body;
+
+        const org = await Org.findById(orgId);
+        if(!org) return res.status(404).json({success: false, message: "Org not found"});
+
+        if(org.requireApprovalForJoin) {
+            const existingApplication = await OrgMemberApplication.findOne({org_id: orgId, user_id: userId, status: "pending"});
+            if(existingApplication) return res.status(400).json({success: false, message: "You have already applied to this org"});
+        } else {
+            const newMember = new OrgMember({
+                org_id: orgId,
+                user_id: userId,
+                role: 'member',
+            });
+            await newMember.save();
+            res.status(200).json({success: true, message: "You are now a member of this org"});
+            return;
+        };
+        
+        if(org.memberForm) {
+            const form = await Form.findById(org.memberForm);
+            if(!form) return res.status(404).json({success: false, message: "Form not found"});
+            
+            // Create answers array in the same order as questions
+            const answers = form.questions.map(question => {
+                const response = formResponse.find(r => r.referenceId === question._id.toString());
+                return response ? response.answer : null;
+            });
+            
+            const formResponseObject = await FormResponse.create({
+                form: form._id,
+                formSnapshot: form.toObject(), // Store the complete form object
+                submittedBy: userId,
+                answers: answers,
+                submittedAt: new Date(),
+                lastModifiedAt: new Date(),
+            });
+            if(!formResponseObject) return res.status(400).json({success: false, message: "Error submitting form"});
+            //check if the user has already applied to the org
+            //create a new application
+            const newApplication = new OrgMemberApplication({
+                org_id: orgId,
+                user_id: userId,
+                formResponse: formResponseObject._id,
+            });
+            await newApplication.save();
+            res.status(200).json({success: true, message: "Application submitted successfully"});
+            return;
+        }
+
+        const newApplication = new OrgMemberApplication({
+            org_id: orgId,
+            user_id: userId,
+        });
+        await newApplication.save();
+        res.status(200).json({success: true, message: "Application submitted successfully"});
+    } catch (error) {
+        console.log(`POST: /apply-to-org failed`, error);
+        return res
+            .status(500)
+            .json({
+                success: false,
+                message: "Error applying to org",
                 error: error.message,
             });
     }
@@ -872,6 +973,90 @@ router.get('/get-orgs', async (req, res) => {
     }
 });
 
+router.get('/:orgId/events', verifyToken, async (req, res) => {
+    const { Event } = getModels(req, 'Event');
+    try {
+        const { orgId } = req.params;
+        const { page = 1, limit = 15 } = req.query;
+        
+        const skip = (page - 1) * limit;
+        
+        // Find events hosted by this organization
+        const events = await Event.find({
+            hostingId: orgId,
+            hostingType: 'Org',
+            start_time: { $gte: new Date() },
+            status: { $in: ['approved', 'not-applicable'] },
+            isDeleted: false
+        })
+        .sort({ start_time: 1 })
+        .skip(skip)
+        .limit(parseInt(limit))
+        .populate('hostingId');
+
+        console.log(events);
+        
+        const totalEvents = await Event.countDocuments({
+            hostingId: orgId,
+            hostingType: 'Org',
+            start_time: { $gte: new Date() },
+            status: { $in: ['approved', 'not-applicable'] },
+            isDeleted: false
+        });
+        
+        console.log(`GET: /${orgId}/events`);
+        res.json({
+            success: true,
+            message: "Org events retrieved successfully",
+            events,
+            hasMore: events.length === parseInt(limit),
+            total: totalEvents
+        });
+    } catch (error) {
+        console.log(`GET: /${req.params.orgId}/events failed`, error);
+        return res.status(500).json({
+            success: false,
+            message: "Error retrieving org events",
+            error: error.message,
+        });
+    }
+});
+
+router.post('/:orgId/create-member-form', verifyToken, requireMemberManagement(), async (req, res) => {
+    const { Org, Form } = getModels(req, 'Org', 'Form');
+    const { form, orgId } = req.body;
+    try{
+        const newForm = new Form(form);
+        await newForm.save();
+        const org = await Org.findOneAndUpdate({_id: orgId}, {$set: {memberForm: newForm._id}});
+        if(!org) return res.status(404);
+        console.log('POST: /create-member-form successful');
+        return res.status(200).json({success:true, message: "Form created"});
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+});
+
+router.post('/:orgId/edit-member-form', verifyToken, requireMemberManagement(), async (req, res) => {
+    const { Org, Form } = getModels(req, 'Org', 'Form');
+    const { formId, form } = req.body;
+    try{
+        const form = await Form.findByIdAndUpdate(formId, form);
+        if(!form) return res.status(404);      
+        console.log('POST: /edit-member-form successful');
+        return res.status(200).json({success:true, message: "Form updated"});
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+})
 
 
 

@@ -30,7 +30,7 @@ function timeUntil(date) {
 
 const EventQuickLook = ({org}) => {
     const [selectedTab, setSelectedTab] = useState("upcoming");
-    const upcomingEvents = useFetch(`/get-my-events?orgId=${org.org.overview._id}&type=future&sort=asc&limit=5`);
+    const upcomingEvents = useFetch(`/get-my-events?orgId=${org.org.overview._id}&type=${selectedTab === "upcoming" ? "future" : "pending"}&sort=asc&limit=5`);
 
 
     return(

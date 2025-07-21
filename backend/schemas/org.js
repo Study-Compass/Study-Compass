@@ -110,6 +110,16 @@ const OrgSchema= new Schema({
         required: true,
         ref: 'User'
     },
+    memberForm: {
+        type: Schema.Types.ObjectId,
+        ref: 'Form',
+        required: false
+    },
+    requireApprovalForJoin: {
+        type: Boolean,
+        default: false,
+        required: false
+    },
     // Add metadata for role management
     roleManagement: {
         allowCustomRoles: {
