@@ -1,5 +1,6 @@
 import React from 'react';
 import './UnsavedChangesBanner.scss';
+import { Icon } from '@iconify-icon/react/dist/iconify.mjs';
 
 const UnsavedChangesBanner = ({ 
     hasChanges, 
@@ -17,7 +18,7 @@ const UnsavedChangesBanner = ({
         <div className="unsaved-changes-banner">
             <div className="banner-content">
                 <div className="banner-text">
-                    <span className="banner-icon">⚠️</span>
+                    <Icon icon="mingcute:alert-fill" className="banner-icon" />
                     <span>You have unsaved changes</span>
                 </div>
                 <div className="banner-actions">

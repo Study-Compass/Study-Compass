@@ -123,8 +123,11 @@ const GeneralSettings = ({ org, expandedClass }) => {
             </header>
             <div className="settings-content">
                 
-                <div className="form-group">
-                    <label htmlFor="org_name">Organization Name</label>
+                <div className="settings-child">
+                    <label htmlFor="org_name">
+                        <h4>Organization Name</h4>
+                        <p>The name of your organization</p>
+                    </label>
                     <input
                         type="text"
                         id="org_name"
@@ -136,8 +139,11 @@ const GeneralSettings = ({ org, expandedClass }) => {
                     />
                 </div>
 
-                <div className="form-group">
-                    <label htmlFor="org_description">Description</label>
+                <div className="form-group settings-child">
+                    <label htmlFor="org_description">
+                        <h4>Description</h4>
+                        <p>A brief description of your organization</p>
+                    </label>
                     <textarea
                         id="org_description"
                         name="org_description"
@@ -151,8 +157,11 @@ const GeneralSettings = ({ org, expandedClass }) => {
                     <span className="char-count">{formData.org_description.length}/500</span>
                 </div>
 
-                <div className="form-group">
-                    <label htmlFor="weekly_meeting">Weekly Meeting Time</label>
+                <div className="settings-child">
+                    <label htmlFor="weekly_meeting">
+                        <h4>Weekly Meeting Time</h4>
+                        <p>The time of your weekly meeting</p>
+                    </label>
                     <input
                         type="text"
                         id="weekly_meeting"

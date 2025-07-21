@@ -19,8 +19,8 @@ const deleteRequest = async (url, body, options = {}) => {
       method: 'DELETE',
       url,
       headers,
-      withCredentials: true, // Enable cookie sending
       ...options,
+      withCredentials: true, // Ensure withCredentials is not overridden by options
     };
 
     // Add body if provided
@@ -47,6 +47,7 @@ const deleteRequest = async (url, body, options = {}) => {
           },
           withCredentials: true,
           ...options,
+          withCredentials: true, // Ensure withCredentials is not overridden by options
         };
 
         if (body) {

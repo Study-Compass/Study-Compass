@@ -9,9 +9,11 @@
     background-color: var(--background);
     border: 1px solid var(--lighterborder);
     animation: slideUp 0.3s ease-out;
+    box-shadow: 0px 7px 29px 0px rgba(100, 171, 108, 0.3);
+
     margin: 20px;
     border-radius: 10px;
-    
+
     .banner-content {
         display: flex;
         justify-content: space-between;
@@ -27,10 +29,14 @@
             color: var(--text);
             font-family: 'Inter';
             font-size: 14px;
-            font-weight: 500;
+            font-weight: 600;
             
             .banner-icon {
-                font-size: 16px;
+                font-size: 18px;
+                color: var(--org-primary);
+            }
+            b{
+                font-weight: 800;
             }
         }
         
@@ -50,7 +56,7 @@
                 min-width: 70px;
                 
                 &.btn-secondary {
-                    background-color: rgba(255, 255, 255, 0.2);
+                    background-color: var(--light);
                     color: var(--text);
                     border: 1px solid rgba(255, 255, 255, 0.3);
                     
@@ -65,11 +71,15 @@
                 }
                 
                 &.btn-primary {
-                    background-color: white;
-                    color: #ff6b6b;
+                    background-color: var(--org-primary);
+                    color: white;
+                    box-shadow: 0px 7px 29px 0px rgba(100, 171, 108, 0.1);
+                    transition: all 0.2s ease;
                     
                     &:hover:not(:disabled) {
-                        background-color: #f8f9fa;
+                        background-color: var(--org-primary);
+                        box-shadow: 0px 7px 29px 0px rgba(100, 171, 108, 0.6);
+
                     }
                     
                     &:disabled {

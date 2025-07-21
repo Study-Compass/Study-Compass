@@ -147,7 +147,10 @@ const RoleManager = ({ roles, onRolesChange, isEditable = true, roleHighlight = 
 
             {/* default roles, need to make this dynamic at some point */}
             <div className="default-roles">
-                <h4>Default Roles</h4>
+                <div className="default-roles-header">
+                    <h4>Default Roles</h4>
+                    <p>These roles are automatically created when you create your organization</p>
+                </div>
                 <div className="roles-grid">
                     <div className="role-card default">
                         <div className="role-header">
@@ -201,7 +204,10 @@ const RoleManager = ({ roles, onRolesChange, isEditable = true, roleHighlight = 
             {/* Custom Roles */}
             <div className="custom-roles">
                 <div className="custom-roles-header">
-                    <h4>Custom Roles</h4>
+                    <div className="custom-roles-header-text">
+                        <h4>Custom Roles</h4>
+                        <p>Create custom roles for your organization</p>
+                    </div>
                     {isEditable && (
                         <button 
                             className="add-role-btn"
