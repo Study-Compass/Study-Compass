@@ -113,6 +113,7 @@ const orgRoutes = require('./routes/orgRoutes.js');
 const orgRoleRoutes = require('./routes/orgRoleRoutes.js');
 const adminRoutes = require('./routes/adminRoutes.js');
 const eventsRoutes = require('./events/index.js');
+const notificationRoutes = require('./routes/notificationRoutes.js');
 
 app.use(authRoutes);
 app.use('/auth/saml', samlRoutes);
@@ -129,6 +130,8 @@ app.use(searchRoutes);
 app.use(orgRoutes);
 app.use('/org-roles', orgRoleRoutes);
 app.use(adminRoutes);
+
+app.use('/notifications', notificationRoutes);
 
 app.use(eventsRoutes);
 // Serve static files from the React app in production

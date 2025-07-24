@@ -14,7 +14,7 @@ const OrgDisplay = () => {
             }  */}
 
             {
-                !orgData.loading && orgData.data && <Org orgData={orgData.data}/>
+                !orgData.loading && orgData.data && <Org orgData={orgData.data} refetch={orgData.refetch}/>
             }
         </>
     );

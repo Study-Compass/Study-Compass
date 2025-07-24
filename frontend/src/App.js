@@ -162,7 +162,6 @@ function App() {
                                                 <Route path="/oie-dashboard" element={<AnimatedPageWrapper><OIEDash/></AnimatedPageWrapper>}/>
                                                 <Route path="/create-event" element={<AnimatedPageWrapper><CreateEvent/></AnimatedPageWrapper   >}/>
                                             </Route>
-
                                         </Route>
                                     </Routes>
                                     </ProfileCreationProvider>

@@ -16,6 +16,7 @@ const multer = require('multer');
 const path = require('path');
 const { uploadImageToS3, upload } = require('../services/imageUploadService');
 const { requireMemberManagement } = require('../middlewares/orgPermissions');
+const NotificationService = require('../services/notificationService');
 
 // Error handling middleware for multer
 const handleMulterError = (err, req, res, next) => {
@@ -646,7 +647,7 @@ router.get("/get-org-members/:orgId", verifyToken, async (req, res) => {
 });
 
 router.post("/:orgId/apply-to-org", verifyToken, async (req, res) => {
-    const { Org, OrgMemberApplication, FormResponse, Form } = getModels(req, "Org", "OrgMemberApplication", "FormResponse", "Form");
+    const { Org, OrgMemberApplication, FormResponse, Form, User, Notification, OrgMember } = getModels(req, "Org", "OrgMemberApplication", "FormResponse", "Form", "User", "Notification", "OrgMember");
     try {
         const { orgId } = req.params;
         const userId = req.user.userId;
@@ -654,7 +655,7 @@ router.post("/:orgId/apply-to-org", verifyToken, async (req, res) => {
 
         const org = await Org.findById(orgId);
         if(!org) return res.status(404).json({success: false, message: "Org not found"});
-
+        
         if(org.requireApprovalForJoin) {
             const existingApplication = await OrgMemberApplication.findOne({org_id: orgId, user_id: userId, status: "pending"});
             if(existingApplication) return res.status(400).json({success: false, message: "You have already applied to this org"});
@@ -696,15 +697,50 @@ router.post("/:orgId/apply-to-org", verifyToken, async (req, res) => {
                 formResponse: formResponseObject._id,
             });
             await newApplication.save();
-            res.status(200).json({success: true, message: "Application submitted successfully"});
-            return;
+        } else {
+            const newApplication = new OrgMemberApplication({
+                org_id: orgId,
+                user_id: userId,
+            });
+            await newApplication.save();
         }
 
-        const newApplication = new OrgMemberApplication({
-            org_id: orgId,
-            user_id: userId,
+        // Send notification to org admins about the new member
+        const orgAdmins = await OrgMember.find({ 
+            org_id: orgId, 
+            role: { $in: ['owner', 'admin'] } 
         });
-        await newApplication.save();
+        console.log('orgAdmins', orgAdmins);
+
+        const user = await User.findById(userId);
+        
+        if (orgAdmins.length > 0) {
+            const notificationService = NotificationService.withModels({ Notification });
+            const recipients = orgAdmins.map(admin => ({
+                id: admin.user_id,
+                model: 'User'
+            }));
+            
+            // const notificationData = {
+            //     title: `New member joined ${org.org_name}`,
+            //     message: `${user.firstName || user.username} has joined ${org.org_name}.`,
+            //     type: 'membership',
+            //     priority: 'normal',
+            //     channels: ['in_app'],
+            //     metadata: {
+            //         orgId: org._id,
+            //         orgName: org.org_name,
+            //         newMemberId: userId,
+            //         newMemberName: user.firstName || user.username
+            //     }
+            // };
+            await notificationService.createBatchTemplateNotification(recipients, 'org_member_applied', {
+                senderName: user.name || user.username,
+                orgName: org.org_name,
+            });
+            
+            await notificationService.sendToMultipleRecipients(recipients, notificationData);
+        }
         res.status(200).json({success: true, message: "Application submitted successfully"});
     } catch (error) {
         console.log(`POST: /apply-to-org failed`, error);

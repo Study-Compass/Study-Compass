@@ -13,8 +13,7 @@ import { Icon } from '@iconify-icon/react/dist/iconify.mjs';
 
 import './Org.scss';
 
-const Org = ({ orgData }) => {
-
+const Org = ({ orgData, refetch }) => {
 
     const [isMember, setIsMember] = useState(false);
     const { overview, members, followers } = orgData.org;
@@ -29,7 +28,7 @@ const Org = ({ orgData }) => {
             formResponse: formAnswers
         });
         console.log(response);
-        orgData.refetch();
+        refetch();
     }
     
 

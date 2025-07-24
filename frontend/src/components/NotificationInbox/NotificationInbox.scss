@@ -1,0 +1,134 @@
+.notification-inbox {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .bell-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    position: relative;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height:50px;
+    iconify-icon {
+      font-size: 20px;
+      color: var(--text);
+    }
+    
+    .badge {
+      position: absolute;
+      top: -2px;
+      right: -2px;
+      background: #e74c3c;
+      color: #fff;
+      border-radius: 50%;
+      font-size: 10px;
+      padding: 2px 0px;
+      min-width: 18px;
+      text-align: center;
+      font-weight: bold;
+    }
+    &:hover{
+        box-shadow:none;
+    }
+  }
+
+  .dropdown {
+    position: absolute;
+    right: 0;
+    top: 50px;
+    width: 400px;
+    background: #fff;
+    border: 1px solid #eee;
+    border-radius: 15px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    z-index: 100;
+    padding: 0.5rem 0;
+
+    .dropdown-header {
+      font-weight: bold;
+      padding: 0.5rem 1rem;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    .empty {
+      padding: 1rem;
+      color: #888;
+      text-align: center;
+    }
+
+    ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      max-height: 320px;
+      overflow-y: auto;
+
+      li {
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid #f6f6f6;
+        cursor: pointer;
+        transition: background 0.15s;
+
+        &.unread {
+          background: #f5faff;
+          font-weight: bold;
+        }
+
+        &:last-child {
+          border-bottom: none;
+        }
+
+        .message {
+          font-size: 1rem;
+          margin-bottom: 0.2rem;
+          color: #444;
+          margin-top: 0;
+        }
+        .meta {
+          font-size: 0.8rem;
+          color: #aaa;
+          margin-top: 0.2rem;
+        }
+        .actions {
+          margin-top: 0.5rem;
+          display: flex;
+          gap: 0.5rem;
+
+          .notif-action-btn {
+            padding: 0.3rem 0.8rem;
+            border-radius: 4px;
+            border: none;
+            font-size: 0.95rem;
+            cursor: pointer;
+            background: #f0f0f0;
+            color: #222;
+            transition: background 0.15s;
+
+            &.success {
+              background: #27ae60;
+              color: #fff;
+            }
+            &.danger {
+              background: #e74c3c;
+              color: #fff;
+            }
+            &:disabled {
+              opacity: 0.6;
+              cursor: not-allowed;
+            }
+          }
+        }
+        .action-result {
+          margin-top: 0.4rem;
+          font-size: 0.92rem;
+          color: #2d7a2d;
+        }
+      }
+    }
+  }
+}
