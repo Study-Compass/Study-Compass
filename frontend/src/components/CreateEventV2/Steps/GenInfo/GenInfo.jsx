@@ -8,14 +8,17 @@ import ImageUpload from '../../../ImageUpload/ImageUpload';
 const GenInfo = ({ formData, setFormData, onComplete }) => {
     console.log('GenInfo formData:', formData);
     const [errors, setErrors] = useState({});
+    // update this to have max passed in
+    const [maxAttendance, setMaxAttendance] = useState(10000);
 
     // content updated on this page
     const [title, setTitle] = useState(formData.name || '');
     const [description, setDescription] = useState(formData.description || '');
     const [eventType, setEventType] = useState(formData.type || "");
     const [visibility, setVisibility] = useState(formData.visibility || "");
-    const [expectedAttendance, setExpectedAttendance] = useState(formData.expectedAttendance || "");
+    const [expectedAttendance, setExpectedAttendance] = useState(formData.expectedAttendance || 1);
     
+
     // Image upload state
     const [selectedFile, setSelectedFile] = useState(null);
     const [imagePreview, setImagePreview] = useState(null);
@@ -87,8 +90,7 @@ const GenInfo = ({ formData, setFormData, onComplete }) => {
         setFormData(prev => ({ ...prev, description: value }));
     };
 
-    const handleEventTypeChange = (e) => {
-        const value = e.target.value;
+    const handleEventTypeChange = (value) => {
         setEventType(value);
         setFormData(prev => ({ ...prev, type: value }));
     };
@@ -99,9 +101,17 @@ const GenInfo = ({ formData, setFormData, onComplete }) => {
     };
 
     const handleExpectedAttendanceChange = (e) => {
-        const value = parseInt(e.target.value) || 0;
-        setExpectedAttendance(value);
-        setFormData(prev => ({ ...prev, expectedAttendance: value }));
+        if(parseInt(e.target.value) <= maxAttendance+1){
+            const value = parseInt(e.target.value) || 0;
+            setExpectedAttendance(value);
+            setFormData(prev => ({ ...prev, expectedAttendance: value }));
+        } else {
+            const value = maxAttendance;
+            setExpectedAttendance(value);
+            setFormData(prev => ({ ...prev, expectedAttendance: value }));
+            // ERROR: give an error saying you're at max
+        }
+
     };
 
     const handleFileSelect = (file) => {
@@ -162,22 +172,51 @@ const GenInfo = ({ formData, setFormData, onComplete }) => {
                 </div>
 
                 <div className="input-group">
-                    <label htmlFor="eventType">Event Type</label>
-                    <select
-                        id="eventType"
-                        value={eventType}
-                        onChange={handleEventTypeChange}
-                        className={errors.eventType ? 'error' : ''}
-                    >
-                        <option value="" disabled>Select event type</option>
-                        <option value="study">Study Event</option>
-                        <option value="workshop">Workshop</option>
-                        <option value="campus">Campus Event</option>
-                        <option value="social">Social Event</option>
-                        <option value="club">Club Event</option>
-                        <option value="meeting">Club Meeting</option>
-                        <option value="sports">Sports Event</option>
-                    </select>
+                    <label>Event Type</label>
+                    <div className="event-type-options">
+                        <div 
+                            className={`event-type-option ${eventType === "study" ? "selected" : ""}`} 
+                            onClick={() => handleEventTypeChange("study")}
+                        >
+                            Study Event
+                        </div>
+                        <div 
+                            className={`event-type-option ${eventType === "workshop" ? "selected" : ""}`} 
+                            onClick={() => handleEventTypeChange("workshop")}
+                        >
+                            Workshop
+                        </div>
+                        <div 
+                            className={`event-type-option ${eventType === "campus" ? "selected" : ""}`} 
+                            onClick={() => handleEventTypeChange("campus")}
+                        >
+                            Campus Event
+                        </div>
+                        <div 
+                            className={`event-type-option ${eventType === "social" ? "selected" : ""}`} 
+                            onClick={() => handleEventTypeChange("social")}
+                        >
+                            Social Event
+                        </div>
+                        <div 
+                            className={`event-type-option ${eventType === "club" ? "selected" : ""}`} 
+                            onClick={() => handleEventTypeChange("club")}
+                        >
+                            Club Event
+                        </div>
+                        <div 
+                            className={`event-type-option ${eventType === "meeting" ? "selected" : ""}`} 
+                            onClick={() => handleEventTypeChange("meeting")}
+                        >
+                            Club Meeting
+                        </div>
+                        <div 
+                            className={`event-type-option ${eventType === "sports" ? "selected" : ""}`} 
+                            onClick={() => handleEventTypeChange("sports")}
+                        >
+                            Sports Event
+                        </div>
+                    </div>
                     {errors.eventType && (
                         <span className="error-message">{errors.eventType}</span>
                     )}
@@ -230,15 +269,39 @@ const GenInfo = ({ formData, setFormData, onComplete }) => {
 
                 <div className="input-group">
                     <label htmlFor="expectedAttendance">Expected Attendance</label>
-                    <input
-                        id="expectedAttendance"
-                        type="number"
-                        value={expectedAttendance}
-                        onChange={handleExpectedAttendanceChange}
-                        placeholder="About how many people are attending?"
-                        className={errors.expectedAttendance ? 'error' : ''}
-                        min="1"
-                    />
+                    <div className="slider-container">
+                        <div className="slider-value">
+                            <input
+                                id="sliderPreview"
+                                type="text"
+                                value={expectedAttendance}
+                                onChange={handleExpectedAttendanceChange}
+                                className="slider-preview"
+                                style={{
+                                    position: 'absolute',
+                                    left: `${((expectedAttendance - 1) / (maxAttendance - 1)) * 100}%`,
+                                    transform: 'translateX(-50%)',
+                                    transition: 'none',
+                                }}
+                            />
+                        </div>
+                        <input
+                            id="expectedAttendance"
+                            type="range"
+                            min="1"
+                            max={maxAttendance}
+                            value={expectedAttendance}
+                            onChange={handleExpectedAttendanceChange}
+                            className={errors.expectedAttendance ? 'error' : ''}
+                        />
+                        <div className="slider-labels">
+                            <span>1</span>
+                            <span>10,000+</span>
+                        </div>
+                        {/* <div className="slider-value">
+                            {expectedAttendance === 10000 ? '10,000+' : expectedAttendance.toLocaleString()} people
+                        </div> */}
+                    </div>
                     {errors.expectedAttendance && (
                         <span className="error-message">{errors.expectedAttendance}</span>
                     )}
