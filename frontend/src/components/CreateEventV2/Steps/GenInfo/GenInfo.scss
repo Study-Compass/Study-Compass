@@ -93,6 +93,8 @@
                 transition: all 0.3s;
                 border: 1px solid var(--lightborder);
                 cursor: pointer;
+                padding-top: 5px;
+                padding-bottom: 5px;
 
                 img {
                     width: 25px;
@@ -124,7 +126,7 @@
                 }
 
                 &:hover {
-                    border-color: var(--lightborder);
+                    border-color: var(--dark-red-transparent);
                 }
             }
         }

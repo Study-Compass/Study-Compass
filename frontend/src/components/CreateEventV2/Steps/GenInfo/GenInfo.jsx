@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './GenInfo.scss';
 import Global from '../../../../assets/Icons/Global.svg';
 import Internal from '../../../../assets/Icons/Internal.svg';
+import InviteOnly from '../../../../assets/Icons/InviteOnly.svg';
 import ImageUpload from '../../../ImageUpload/ImageUpload';
 
 const GenInfo = ({ formData, setFormData, onComplete }) => {
@@ -205,7 +206,17 @@ const GenInfo = ({ formData, setFormData, onComplete }) => {
                             <img src={Internal} alt="Internal" />
                             <div className="option-content">
                                 <h3>Internal</h3>
-                                <p>Only visible to students part of your org</p>
+                                <p>Only visible to members of your org</p>
+                            </div>
+                        </div>
+                        <div 
+                            className={`visibility-option ${visibility === "inviteOnly" ? "selected" : ""}`} 
+                            onClick={() => handleVisibilityChange("inviteOnly")}
+                        >
+                            <img src={InviteOnly} alt="Invite Only" />
+                            <div className="option-content">
+                                <h3>Invite Only</h3>
+                                <p>Only visible to invited students</p>
                             </div>
                         </div>
                     </div>
