@@ -11,6 +11,7 @@ const { createServer } = require('http');
 const { Server } = require('socket.io');
 const enforce = require('express-sslify');
 const { connectToDatabase } = require('./connectionsManager');
+const { sendDiscordMessage } = require('./services/discordWebookService');
 
 const s3 = require('./aws-config');
 
@@ -246,7 +247,7 @@ app.set('io', io);
 // Start the server
 server.listen(port, () => {
     if(process.env.NODE_ENV === 'production'){
-        sendDiscordMessage('Deploy to Production Successful', `Backend server is running on port ${port}`, 'success');
+        sendDiscordMessage('Deploy to Production Successful', `Backend server is running on port ${port}`, 'normal');
     }
     console.log(`Backend server is running on http://localhost:${port}`);
 });
