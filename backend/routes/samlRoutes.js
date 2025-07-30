@@ -149,8 +149,8 @@ router.get('/login', async (req, res) => {
     }
 });
 
-// SAML Callback endpoint
-router.get('/callback', async (req, res) => {
+// SAML Callback endpoint - handle both GET and POST
+const handleCallback = async (req, res) => {
     try {
         const school = req.school || 'rpi';
         const strategy = await configureSAMLStrategy(school, req);
@@ -232,7 +232,11 @@ router.get('/callback', async (req, res) => {
         console.error('SAML callback error:', error);
         res.redirect('/login?error=saml_configuration_error');
     }
-});
+};
+
+// Register callback for both GET and POST
+router.get('/callback', handleCallback);
+router.post('/callback', handleCallback);
 
 // SAML Logout endpoint
 router.post('/logout', verifyToken, async (req, res) => {
@@ -267,12 +271,23 @@ router.post('/logout', verifyToken, async (req, res) => {
 router.get('/metadata', async (req, res) => {
     try {
         const school = req.school || 'rpi';
-        const config = await getSAMLConfig(school, req);
+        const { SAMLConfig } = getModels(req, 'SAMLConfig');
+        const dbConfig = await SAMLConfig.findOne({ school, active: true });
+        
+        if (!dbConfig) {
+            return res.status(404).json({ success: false, message: 'SAML configuration not found' });
+        }
+        
+        const config = dbConfig.toPassportSamlConfig();
         
         // Helper function to clean certificate
         const cleanCertificate = (cert) => {
             return cert.replace(/-----BEGIN CERTIFICATE-----|-----END CERTIFICATE-----|\s/g, '');
         };
+
+        // Get the actual binding from database configuration
+        const acsBinding = dbConfig.sp.assertionConsumerService.binding;
+        const sloBinding = dbConfig.sp.singleLogoutService?.binding || 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect';
 
         // Generate SP metadata
         const metadata = `<?xml version="1.0"?>
@@ -292,8 +307,8 @@ router.get('/metadata', async (req, res) => {
                 </ds:X509Data>
             </ds:KeyInfo>
         </md:KeyDescriptor>
-        <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="${config.callbackUrl}" index="0"/>
-        <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="${config.logoutUrl || config.callbackUrl.replace('/callback', '/logout')}"/>
+        <md:AssertionConsumerService Binding="${acsBinding}" Location="${config.callbackUrl}" index="0"/>
+        <md:SingleLogoutService Binding="${sloBinding}" Location="${config.logoutUrl || config.callbackUrl.replace('/callback', '/logout')}"/>
         <md:NameIDFormat>${config.identifierFormat}</md:NameIDFormat>
     </md:SPSSODescriptor>
 </md:EntityDescriptor>`;
