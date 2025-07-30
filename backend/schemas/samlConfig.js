@@ -159,6 +159,9 @@ const samlConfigSchema = new mongoose.Schema({
             wantAttributeStatement: true,
             attributeMapping: this.attributeMapping,
             authnRequestBinding: 'HTTP-REDIRECT',
+            authnResponseBinding: 'HTTP-REDIRECT',
+            forceAuthn: false,
+            passive: false,
             // Additional fields for metadata generation
             signingCert: this.sp.signingCert,
             encryptCert: this.sp.encryptCert

@@ -103,6 +103,14 @@ function configureSAMLStrategy(school, req) {
         try {
             const config = await getSAMLConfig(school, req);
             
+            console.log('SAML Strategy Config:', {
+                entryPoint: config.entryPoint,
+                issuer: config.issuer,
+                callbackUrl: config.callbackUrl,
+                authnRequestBinding: config.authnRequestBinding,
+                authnResponseBinding: config.authnResponseBinding
+            });
+            
             const strategy = new SamlStrategy(config, async (profile, done) => {
                 try {
                     const user = await createOrUpdateUserFromSAML(profile, school);
@@ -134,6 +142,8 @@ router.get('/login', async (req, res) => {
             req.session = req.session || {};
             req.session.relayState = relayState;
         }
+        
+        console.log('Starting SAML authentication with strategy...');
         
         passport.authenticate(strategy, { 
             failureRedirect: '/login',

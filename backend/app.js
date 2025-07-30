@@ -245,5 +245,8 @@ app.set('io', io);
 
 // Start the server
 server.listen(port, () => {
+    if(process.env.NODE_ENV === 'production'){
+        sendDiscordMessage('Deploy to Production Successful', `Backend server is running on port ${port}`, 'success');
+    }
     console.log(`Backend server is running on http://localhost:${port}`);
 });
