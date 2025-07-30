@@ -50,11 +50,12 @@ router.post('/friend-request/:friendUsername', verifyToken, async (req, res) => 
         const requesterUser = await User.findById(requester);
         const newFriendship = await new Friendship({ requester, recipient: friendId, status: 'pending' }).save();
         const notificationService = NotificationService.withModels({ Notification });
+        console.log(requesterUser._id);
         await notificationService.createSystemNotification(
             friendId,
             'User',
             'friend_request',
-            {senderName: requesterUser.username, friendshipId: newFriendship._id}
+            {senderName: requesterUser.username, friendshipId: newFriendship._id, sender: requester}
         );
         console.log('Friend request sent to', friendId);
         res.status(201).json({ success: true, message: 'Friend request sent' });

@@ -130,6 +130,10 @@ const notificationSchema = new Schema({
         order: {
             type: Number,
             default: 0
+        }, 
+        icon: {
+            type: String,
+            default: null
         }
     }],
 
@@ -308,7 +312,8 @@ notificationSchema.statics.findByRecipient = function(recipientId, recipientMode
     return this.find(query)
         .sort({ createdAt: -1 })
         .limit(options.limit || 50)
-        .skip(options.skip || 0);
+        .skip(options.skip || 0)
+        .populate('sender');
 };
 
 notificationSchema.statics.createBatch = function(notifications) {

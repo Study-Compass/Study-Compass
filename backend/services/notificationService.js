@@ -485,6 +485,14 @@ class NotificationService {
                 channels: template.channels || ['in_app']
             };
             
+            // Add sender fields if they exist in the template
+            if (template.sender) {
+                notificationData.sender = this.interpolateTemplate(template.sender, variables);
+            }
+            if (template.senderModel) {
+                notificationData.senderModel = template.senderModel;
+            }
+            
             return await this.createNotification(notificationData);
         } catch (error) {
             throw new Error(`Failed to create system notification: ${error.message}`);
@@ -499,7 +507,7 @@ class NotificationService {
         const templates = {
             'welcome': {
                 title: 'Welcome to Study Compass!',
-                message: 'Hi {{name}}, welcome to Study Compass! We\'re excited to have you on board.',
+                message: 'Hi {{name|capitalize}}, welcome to Study Compass! We\'re excited to have you on board.',
                 version: '1.0',
                 priority: 'normal',
                 channels: ['in_app', 'email'],
@@ -515,7 +523,7 @@ class NotificationService {
             },
             'org_invitation': {
                 title: 'Organization Invitation',
-                message: 'You have been invited to join {{orgName}} as {{role}}.',
+                message: 'You have been invited to join <strong>{{orgName}}</strong> as <em>{{role|capitalize}}</em>.',
                 version: '1.0',
                 priority: 'high',
                 channels: ['in_app', 'email'],
@@ -542,10 +550,12 @@ class NotificationService {
             },
             'friend_request': {
                 title: 'New Friend Request',
-                message: '{{senderName}} has sent you a friend request.',
+                message: '<strong>{{senderName|capitalize}}</strong> has sent you a friend request.',
                 version: '1.0',
                 priority: 'normal',
                 channels: ['in_app'],
+                sender: '{{sender}}',
+                senderModel: 'User',
                 actions: [
                     {
                         id: 'accept_friend_request',
@@ -553,7 +563,8 @@ class NotificationService {
                         type: 'api_call',
                         url: '/friend-request/accept/{{friendshipId}}',
                         method: 'POST',
-                        style: 'success'
+                        style: 'success',
+                        icon: 'material-symbols:person-check-rounded'
                     },
                     {
                         id: 'reject_friend_request',
@@ -561,16 +572,19 @@ class NotificationService {
                         type: 'api_call',
                         url: '/friend-request/reject/{{friendshipId}}',
                         method: 'POST',
-                        style: 'danger'
+                        style: 'danger',
+                        icon: 'material-symbols:person-cancel-rounded'
                     }
                 ]
             },
             'org_member_applied': {
                 title: 'New Member Applied',
-                message: '{{senderName}} has applied to join {{orgName}}.',
+                message: '<strong>{{senderName|capitalize}}</strong> has applied to join <strong>{{orgName}}</strong>.',
                 version: '1.0',
                 priority: 'normal',
                 channels: ['in_app'],
+                sender: '{{sender}}',
+                senderModel: 'User',
                 actions: [
                     {
                         id: 'go_to_application',
@@ -580,6 +594,70 @@ class NotificationService {
                         style: 'primary'
                     }   
                 ]
+            },
+            'event_reminder': {
+                title: 'Event Reminder',
+                message: 'Your event <strong>{{eventName}}</strong> starts in <em>{{timeUntil}}</em> at {{startTime|time}}.',
+                version: '1.0',
+                priority: 'high',
+                channels: ['in_app', 'push'],
+                actions: [
+                    {
+                        id: 'view_event',
+                        label: 'View Event',
+                        type: 'link',
+                        url: '/events/{{eventId}}',
+                        style: 'primary'
+                    },
+                    {
+                        id: 'join_now',
+                        label: 'Join Now',
+                        type: 'link',
+                        url: '/events/{{eventId}}/join',
+                        style: 'success'
+                    }
+                ]
+            },
+            'achievement_unlocked': {
+                title: 'Achievement Unlocked! 🏆',
+                message: 'Congratulations! You\'ve earned the <strong>{{badgeName}}</strong> badge for {{achievementDescription|short}}.',
+                version: '1.0',
+                priority: 'normal',
+                channels: ['in_app', 'email'],
+                actions: [
+                    {
+                        id: 'view_badge',
+                        label: 'View Badge',
+                        type: 'link',
+                        url: '/badges/{{badgeId}}',
+                        style: 'success'
+                    },
+                    {
+                        id: 'share_achievement',
+                        label: 'Share',
+                        type: 'api_call',
+                        url: '/api/achievements/share',
+                        method: 'POST',
+                        payload: { badgeId: '{{badgeId}}' },
+                        style: 'info'
+                    }
+                ]
+            },
+            'payment_received': {
+                title: 'Payment Received',
+                message: 'You received <strong>{{amount|currency}}</strong> from <em>{{senderName|capitalize}}</em> on {{paymentDate|date}}.',
+                version: '1.0',
+                priority: 'normal',
+                channels: ['in_app', 'email'],
+                actions: [
+                    {
+                        id: 'view_transaction',
+                        label: 'View Details',
+                        type: 'link',
+                        url: '/transactions/{{transactionId}}',
+                        style: 'primary'
+                    }
+                ]
             }
         };
         
@@ -587,16 +665,58 @@ class NotificationService {
     }
 
     /**
-     * Interpolate template variables
+     * Interpolate template variables with validation and formatting
      */
     interpolateTemplate(template, variables) {
-        //log all matchs
-        console.log('template', template);
-        console.log('variables', variables);
-        console.log('matches', template.match(/\{\{(\w+)\}\}/g));
-        return template.replace(/\{\{(\w+)\}\}/g, (match, key) => {
-            return variables[key] || match;
+        if (!template || typeof template !== 'string') {
+            return template;
+        }
+
+        // Remove console.log statements
+        return template.replace(/\{\{(\w+)(?:\|(\w+))?\}\}/g, (match, key, format) => {
+            const value = variables[key];
+            
+            // Handle missing variables
+            if (value === undefined || value === null) {
+                console.warn(`Missing template variable: ${key}`);
+                return `[${key}]`; // Show placeholder instead of raw {{key}}
+            }
+            
+            // Apply formatting if specified
+            if (format) {
+                return this.formatValue(value, format);
+            }
+            
+            return value;
         });
+    }
+
+    /**
+     * Format values based on type
+     */
+    formatValue(value, format) {
+        switch (format) {
+            case 'date':
+                return new Date(value).toLocaleDateString();
+            case 'time':
+                return new Date(value).toLocaleTimeString();
+            case 'datetime':
+                return new Date(value).toLocaleString();
+            case 'capitalize':
+                return typeof value === 'string' ? value.charAt(0).toUpperCase() + value.slice(1) : value;
+            case 'uppercase':
+                return typeof value === 'string' ? value.toUpperCase() : value;
+            case 'lowercase':
+                return typeof value === 'string' ? value.toLowerCase() : value;
+            case 'number':
+                return typeof value === 'number' ? value.toLocaleString() : value;
+            case 'currency':
+                return typeof value === 'number' ? `$${value.toFixed(2)}` : value;
+            case 'short':
+                return typeof value === 'string' && value.length > 50 ? value.substring(0, 50) + '...' : value;
+            default:
+                return value;
+        }
     }
 
     /**
@@ -653,24 +773,293 @@ class NotificationService {
     //batch template notification
     async createBatchTemplateNotification(recipients, templateName, variables = {}) {
         const template = await this.loadTemplate(templateName);
-        const notifications = recipients.map(recipient => ({
-            recipient: recipient.id,
-            recipientModel: recipient.model,
-            type: 'system',
-            title: this.interpolateTemplate(template.title, variables),
-            message: this.interpolateTemplate(template.message, variables),
-            template: {
-                name: templateName,
-                version: template.version,
-                variables: variables
-            },
-            actions: template.actions ? this.interpolateObject(template.actions, variables) : [],
-            priority: template.priority || 'normal',
-            channels: template.channels || ['in_app']
-        }));
+        const notifications = recipients.map(recipient => {
+            const notificationData = {
+                recipient: recipient.id,
+                recipientModel: recipient.model,
+                type: 'system',
+                title: this.interpolateTemplate(template.title, variables),
+                message: this.interpolateTemplate(template.message, variables),
+                template: {
+                    name: templateName,
+                    version: template.version,
+                    variables: variables
+                },
+                actions: template.actions ? this.interpolateObject(template.actions, variables) : [],
+                priority: template.priority || 'normal',
+                channels: template.channels || ['in_app']
+            };
+            
+            // Add sender fields if they exist in the template
+            if (template.sender) {
+                console.log("sender", template.sender);
+                notificationData.sender = this.interpolateTemplate(template.sender, variables);
+            }
+            if (template.senderModel) {
+                notificationData.senderModel = template.senderModel;
+            }
+            
+            return notificationData;
+        });
         return await this.createBatchNotifications(notifications);
     }
     
+    /**
+     * Create system notification with advanced template support
+     */
+    async createAdvancedSystemNotification(recipientId, recipientModel, templateName, variables = {}) {
+        try {
+            const template = await this.loadAdvancedTemplate(templateName);
+            
+            // Process template with conditional logic
+            const processedTemplate = this.processAdvancedTemplate(template, variables);
+            
+            const notificationData = {
+                recipient: recipientId,
+                recipientModel: recipientModel,
+                type: 'system',
+                title: processedTemplate.title,
+                message: processedTemplate.message,
+                template: {
+                    name: templateName,
+                    version: template.version,
+                    variables: variables,
+                    processed: true
+                },
+                actions: processedTemplate.actions || [],
+                priority: processedTemplate.priority || 'normal',
+                channels: processedTemplate.channels || ['in_app'],
+                metadata: {
+                    ...processedTemplate.metadata,
+                    templateType: 'advanced'
+                }
+            };
+            
+            // Add sender fields if they exist in the template
+            if (processedTemplate.sender) {
+                notificationData.sender = processedTemplate.sender;
+            }
+            if (processedTemplate.senderModel) {
+                notificationData.senderModel = processedTemplate.senderModel;
+            }
+            
+            return await this.createNotification(notificationData);
+        } catch (error) {
+            throw new Error(`Failed to create advanced system notification: ${error.message}`);
+        }
+    }
+
+    /**
+     * Load advanced notification template with conditional logic
+     */
+    async loadAdvancedTemplate(templateName) {
+        const advancedTemplates = {
+            'dynamic_welcome': {
+                title: 'Welcome to Study Compass!',
+                message: {
+                    type: 'conditional',
+                    conditions: [
+                        {
+                            if: '{{hasProfile}}',
+                            then: 'Welcome back, {{name|capitalize}}! Your profile is complete.',
+                            else: 'Hi {{name|capitalize}}, welcome to Study Compass! Please complete your profile.'
+                        }
+                    ],
+                    default: 'Welcome to Study Compass!'
+                },
+                version: '2.0',
+                priority: 'normal',
+                channels: ['in_app', 'email'],
+                actions: {
+                    type: 'conditional',
+                    conditions: [
+                        {
+                            if: '!{{hasProfile}}',
+                            then: [
+                                {
+                                    id: 'complete_profile',
+                                    label: 'Complete Profile',
+                                    type: 'link',
+                                    url: '/profile/complete',
+                                    style: 'primary'
+                                }
+                            ]
+                        }
+                    ],
+                    default: [
+                        {
+                            id: 'explore',
+                            label: 'Explore',
+                            type: 'link',
+                            url: '/dashboard',
+                            style: 'secondary'
+                        }
+                    ]
+                }
+            },
+            'smart_event_reminder': {
+                title: 'Event Reminder',
+                message: {
+                    type: 'conditional',
+                    conditions: [
+                        {
+                            if: '{{isUrgent}}',
+                            then: '🚨 URGENT: Your event <strong>{{eventName}}</strong> starts in <em>{{timeUntil}}</em>!',
+                            else: 'Your event <strong>{{eventName}}</strong> starts in <em>{{timeUntil}}</em> at {{startTime|time}}.'
+                        }
+                    ]
+                },
+                version: '2.0',
+                priority: {
+                    type: 'conditional',
+                    conditions: [
+                        { if: '{{isUrgent}}', then: 'urgent' },
+                        { if: '{{isToday}}', then: 'high' }
+                    ],
+                    default: 'normal'
+                },
+                channels: {
+                    type: 'conditional',
+                    conditions: [
+                        { if: '{{isUrgent}}', then: ['in_app', 'push', 'email'] },
+                        { if: '{{isToday}}', then: ['in_app', 'push'] }
+                    ],
+                    default: ['in_app']
+                },
+                actions: [
+                    {
+                        id: 'view_event',
+                        label: 'View Event',
+                        type: 'link',
+                        url: '/events/{{eventId}}',
+                        style: 'primary'
+                    },
+                    {
+                        id: 'join_now',
+                        label: 'Join Now',
+                        type: 'link',
+                        url: '/events/{{eventId}}/join',
+                        style: 'success',
+                        condition: '{{canJoin}}'
+                    }
+                ]
+            }
+        };
+        
+        return advancedTemplates[templateName] || advancedTemplates['dynamic_welcome'];
+    }
+
+    /**
+     * Process advanced template with conditional logic
+     */
+    processAdvancedTemplate(template, variables) {
+        const result = { ...template };
+        
+        // Process title
+        if (typeof result.title === 'object' && result.title.type === 'conditional') {
+            result.title = this.processConditionalField(result.title, variables);
+        } else if (typeof result.title === 'string') {
+            result.title = this.interpolateTemplate(result.title, variables);
+        }
+        
+        // Process message
+        if (typeof result.message === 'object' && result.message.type === 'conditional') {
+            result.message = this.processConditionalField(result.message, variables);
+        } else if (typeof result.message === 'string') {
+            result.message = this.interpolateTemplate(result.message, variables);
+        }
+        
+        // Process priority
+        if (typeof result.priority === 'object' && result.priority.type === 'conditional') {
+            result.priority = this.processConditionalField(result.priority, variables);
+        }
+        
+        // Process channels
+        if (typeof result.channels === 'object' && result.channels.type === 'conditional') {
+            result.channels = this.processConditionalField(result.channels, variables);
+        }
+        
+        // Process actions
+        if (typeof result.actions === 'object' && result.actions.type === 'conditional') {
+            result.actions = this.processConditionalField(result.actions, variables);
+        } else if (Array.isArray(result.actions)) {
+            result.actions = result.actions.filter(action => {
+                if (action.condition) {
+                    return this.evaluateCondition(action.condition, variables);
+                }
+                return true;
+            }).map(action => {
+                const processedAction = { ...action };
+                if (action.url) {
+                    processedAction.url = this.interpolateTemplate(action.url, variables);
+                }
+                if (action.payload) {
+                    processedAction.payload = this.interpolateObject(action.payload, variables);
+                }
+                return processedAction;
+            });
+        }
+        
+        // Process sender fields
+        if (result.sender) {
+            result.sender = this.interpolateTemplate(result.sender, variables);
+        }
+        if (result.senderModel) {
+            // senderModel is typically static, but could be conditional in the future
+            result.senderModel = result.senderModel;
+        }
+        
+        return result;
+    }
+
+    /**
+     * Process conditional field
+     */
+    processConditionalField(field, variables) {
+        if (!field.conditions || !Array.isArray(field.conditions)) {
+            return field.default || '';
+        }
+        
+        for (const condition of field.conditions) {
+            if (this.evaluateCondition(condition.if, variables)) {
+                if (typeof condition.then === 'string') {
+                    return this.interpolateTemplate(condition.then, variables);
+                }
+                return condition.then;
+            }
+        }
+        
+        if (typeof field.default === 'string') {
+            return this.interpolateTemplate(field.default, variables);
+        }
+        return field.default || '';
+    }
+
+    /**
+     * Evaluate condition string
+     */
+    evaluateCondition(condition, variables) {
+        // Simple condition evaluation
+        // Supports: {{variable}}, !{{variable}}, {{variable}} == value, etc.
+        
+        // Handle negation
+        if (condition.startsWith('!')) {
+            const varName = condition.substring(2, condition.length - 2);
+            return !variables[varName];
+        }
+        
+        // Handle equality
+        if (condition.includes(' == ')) {
+            const [varPart, valuePart] = condition.split(' == ');
+            const varName = varPart.replace(/\{\{|\}\}/g, '');
+            const value = valuePart.replace(/['"]/g, '');
+            return variables[varName] == value;
+        }
+        
+        // Handle simple variable existence
+        const varName = condition.replace(/\{\{|\}\}/g, '');
+        return Boolean(variables[varName]);
+    }
     
 }
 

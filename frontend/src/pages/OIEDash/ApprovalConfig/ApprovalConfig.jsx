@@ -217,7 +217,7 @@ const ApprovalConfig = ({ approvalId }) => {
                     <div className="approval-container">
                         <HeaderContainer 
                             icon="mage:wrench-fill" 
-                            header="approval conditions" 
+                            header="Approval Conditions" 
                             subheader="Configure the approval process for your organization" 
                             right={
                                 <div className="header-actions">

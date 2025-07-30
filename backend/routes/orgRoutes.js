@@ -737,6 +737,7 @@ router.post("/:orgId/apply-to-org", verifyToken, async (req, res) => {
             await notificationService.createBatchTemplateNotification(recipients, 'org_member_applied', {
                 senderName: user.name || user.username,
                 orgName: org.org_name,
+                sender: user._id,
             });
             
             await notificationService.sendToMultipleRecipients(recipients, notificationData);

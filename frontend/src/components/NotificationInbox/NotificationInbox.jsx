@@ -3,6 +3,7 @@ import apiRequest from '../../utils/postRequest';
 import { Icon } from '@iconify-icon/react/dist/iconify.mjs';
 import './NotificationInbox.scss';
 import { useNavigate } from 'react-router-dom';
+import HeaderContainer from '../HeaderContainer/HeaderContainer';
 
 const NotificationInbox = () => {
   const [notifications, setNotifications] = useState([]);
@@ -84,39 +85,60 @@ const NotificationInbox = () => {
       </button>
       {open && (
         <div className="dropdown">
-          <div className="dropdown-header">Notifications</div>
-          {notifications.length === 0 ? (
-            <div className="empty">No notifications</div>
-          ) : (
-            <ul>
-              {notifications.slice(0, 10).map((n) => (
-                <li key={n._id} className={n.status === 'unread' ? 'unread' : ''} onClick={() => handleNotificationClick(n._id, n.status)}>
-                  {/* <div className="title">{n.title}</div> */}
-                  <div className="message">{n.message}</div>
-                  <div className="meta">{new Date(n.createdAt).toLocaleString()}</div>
-                  {/* Render action buttons if present */}
-                  {Array.isArray(n.actions) && n.actions.length > 0 && n.actionResult?.success !== true && (
-                    <div className="actions">
-                      {n.actions.map((action) => (
-                        <button
-                          key={action.id}
-                          className={`notif-action-btn ${action.style || ''}`}
-                          disabled={actionLoading[`${n._id}_${action.id}`]}
-                          onClick={() => handleAction(n._id, action)}
-                        >
-                          {actionLoading[`${n._id}_${action.id}`] ? '...' : action.label}
-                        </button>
-                      ))}
+          <HeaderContainer 
+            icon="ion:notifications" 
+            header="Notifications"
+            classN="notification-header"
+          >
+            {notifications.length === 0 ? (
+              <div className="empty">No notifications</div>
+            ) : (
+              <ul>
+                {notifications.slice(0, 10).map((n) => (
+                  <li key={n._id} className={n.status === 'unread' ? 'unread' : ''} onClick={() => handleNotificationClick(n._id, n.status)}>
+                    {
+                        n.sender &&
+                        <div className="image">
+                            <img src={n.sender.picture} alt={n.sender.name} />
+                            {
+                                n.status === 'unread' &&
+                                <div className="unread-badge">
+                                    <div className="status-dot"></div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    <div className="notif-content">
+                        {/* <div className="title">{n.title}</div> */}
+                        <div className="message" dangerouslySetInnerHTML={{ __html: n.message }}></div>
+                        <div className="meta">{new Date(n.createdAt).toLocaleString()}</div>
+                        {/* Render action buttons if present */}
+                        {Array.isArray(n.actions) && n.actions.length > 0 && n.actionResult?.success !== true && (
+                        <div className="actions">
+                            {n.actions.map((action) => (
+                            <button
+                                key={action.id}
+                                className={`notif-action-btn ${action.style || ''}`}
+                                disabled={actionLoading[`${n._id}_${action.id}`]}
+                                onClick={() => handleAction(n._id, action)}
+                            >
+                                {action.icon && <Icon icon={action.icon} />}
+                                {actionLoading[`${n._id}_${action.id}`] ? '...' : action.label}
+                            </button>
+                            ))}
+                        </div>
+                        )}
+                        {/* Optionally show result of action */}
+                        {n.actionResult && (
+                        <div className="action-result">{typeof n.actionResult === 'string' ? n.actionResult : n.actionResult?.message}</div>
+                        )}
                     </div>
-                  )}
-                  {/* Optionally show result of action */}
-                  {n.actionResult && (
-                    <div className="action-result">{typeof n.actionResult === 'string' ? n.actionResult : n.actionResult?.message}</div>
-                  )}
-                </li>
-              ))}
-            </ul>
-          )}
+
+                  </li>
+                ))}
+              </ul>
+            )}
+          </HeaderContainer>
         </div>
       )}
     </div>
