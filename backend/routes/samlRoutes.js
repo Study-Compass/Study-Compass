@@ -2,8 +2,6 @@ const express = require('express');
 const passport = require('passport');
 const SamlStrategy = require('passport-saml').Strategy;
 const jwt = require('jsonwebtoken');
-const fs = require('fs');
-const path = require('path');
 require('dotenv').config();
 
 const router = express.Router();
@@ -18,33 +16,169 @@ const REFRESH_TOKEN_EXPIRY = `${REFRESH_TOKEN_EXPIRY_DAYS}d`;
 const ACCESS_TOKEN_EXPIRY_MS = ACCESS_TOKEN_EXPIRY_MINUTES * 60 * 1000;
 const REFRESH_TOKEN_EXPIRY_MS = REFRESH_TOKEN_EXPIRY_DAYS * 24 * 60 * 60 * 1000;
 
-// Function to get SAML configuration for a school
-async function getSAMLConfig(school, req) {
-    try {
-        const { SAMLConfig } = getModels(req, 'SAMLConfig');
-        const config = await SAMLConfig.findOne({ school, active: true });
-        if (!config) {
-            throw new Error(`No active SAML configuration found for school: ${school}`);
-        }
-        return config.toPassportSamlConfig();
-    } catch (error) {
-        console.error('Error getting SAML config:', error);
-        throw error;
-    }
-}
+// HARDCODED RPI SAML CONFIGURATION
+const RPI_SAML_CONFIG = {
+    // RPI Identity Provider settings
+    entryPoint: 'https://shib.auth.rpi.edu/idp/profile/SAML2/Redirect/SSO',
+    issuer: 'https://rpi.study-compass.com/saml/metadata', // Our SP entity ID
+    idpIssuer: 'https://shib-idp.rpi.edu/idp/shibboleth', // RPI's entity ID
+    callbackUrl: 'https://rpi.study-compass.com/saml/callback', // Our callback URL
+    logoutUrl: 'https://rpi.study-compass.com/saml/logout', // Our logout URL
+    
+    // RPI's certificate (from their metadata) - for verifying RPI's responses
+    cert: `MIIEMDCCApigAwIBAgIVAOvUt0sLWDqk2hPD+NTZqEnSih5cMA0GCSqGSIb3DQEB
+CwUAMBwxGjAYBgNVBAMMEXNoaWIuYXV0aC5ycGkuZWR1MB4XDTIxMDQyMDE0NDUw
+OVoXDTQxMDQyMDE0NDUwOVowHDEaMBgGA1UEAwwRc2hpYi5hdXRoLnJwaS5lZHUw
+ggGiMA0GCSqGSIb3DQEBAQUAA4IBjwAwggGKAoIBgQDfOJZAJSTwyAb6ZFCagDGZ
+z0N3R0DyJVWu1kLKAIuZjKnMctCUKZdfEQtg8o6Bf1cjkpMgiAyy5umrQiOXwGEz
+5hcde4WI6XWd1tmt1Tj/9zXJHsoi8nMtsRvdRVZXN45EYAnGfuTMfiLXcYYBp0Gg
+WYtUttiLjr7aYgHla+4U8ssydXt/Qce8sB5l5yNxe1Sq9Wlrhg3UkR9Tcy2zaqlF
+JHPTzzfsTipqW1nSOf73FkDPhDyZdw20dMdQB4SdNlHbjYsyPegyMqmRCQLUjRG9
+CaXwDygcMtkQfho4F+ZvONu5N20SueHaIjyLkGT4V9c0pbH4lJAbzc0xok0feL10
+mjbgsmC8nY3BK+/V/a6ODit5QlbVQSnTqMDaOaAGiB4maynfw4+PnByMjVOBrcpr
+BAxaOoYm+l51nkAZ6WyXjrv9mHQ9TTLFBqv8MFExouGFXAhuYFta5eaOTsud2PcD
++fYRPkYM+7jUll32Qyd2bzte4Z+d5DYC6Lw8D7pE95cCAwEAAaNpMGcwHQYDVR0O
+BBYEFKw8+/mNy/thAjR1K79TVCERg9O9MEYGA1UdEQQ/MD2CEXNoaWIuYXV0aC5y
+cGkuZWR1hihodHRwczovL3NoaWIuYXV0aC5ycGkuZWR1L2lkcC9zaGliYm9sZXRo
+MA0GCSqGSIb3DQEBCwUAA4IBgQAMEQ+3OEMfzmXXWOaVZZ3SrdH1TuuIvhMuMGS2
+QdzohWhqdVoBPrywHqb/0sY6V37z/arWDRDvxzO+/H3zXv2kMbRVlHT2UmQCLeNB
+eD8xVPWuhhVdqV5R/A89at2jY3VjnsRMEY3aq0s8h+Gfvs6IIE74ksRKZbochVfW
+r29vpMhl3yArwJueqzmuQaHplHVk/8mrtQluHMb0lzV7IKZzbl2pgoZxOUUgf3Un
+qKcd2fA1lQ3E8zHsSv1d2NZFWtPRlTFXU7pu6NFCJfHNTwu+eZK0+xb6diJ8MEYT
+5dFVC4pJ1Z9T5pWAdmSPhBNswm+2Rx5EwEWZXo562zXdbK6S7FaCvS0ve5Spw7mm
+cbczV4jCUltCbWuFVQQ6Yv4iCxWzJeZi2xielQJETpnps24f3M7klOECld3dNsbQ
+TehZ1SKG8oAEmJsY70uULCUQxb8SHM3gYBhEbkqeuE89ijbpLu9FmmUBp5Hw5Ffv
+8xJpJfXx4GiTZwa6dvS8TJfXiVY=`,
+    
+    // Our Service Provider certificates (for signing our requests)
+    privateCert: `-----BEGIN CERTIFICATE-----
+MIIDvTCCAqWgAwIBAgIUOpNTR3E+WpN8YeCg35dbhjjxZaAwDQYJKoZIhvcNAQEL
+BQAwbjELMAkGA1UEBhMCVVMxCzAJBgNVBAgMAk5ZMQ0wCwYDVQQHDARUcm95MRYw
+FAYDVQQKDA1TdHVkeSBDb21wYXNzMQswCQYDVQQLDAJJVDEeMBwGA1UEAwwVcnBp
+LnN0dWR5LWNvbXBhc3MuY29tMB4XDTI1MDczMDIzMTMzNVoXDTM1MDcyODIzMTMz
+NVowbjELMAkGA1UEBhMCVVMxCzAJBgNVBAgMAk5ZMQ0wCwYDVQQHDARUcm95MRYw
+FAYDVQQKDA1TdHVkeSBDb21wYXNzMQswCQYDVQQLDAJJVDEeMBwGA1UEAwwVcnBp
+LnN0dWR5LWNvbXBhc3MuY29tMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
+AQEAr6BLw6gXrDNEsO9UkPY9vWn3HCzAis9I6IPa7VrkFRScqr3OlRkHiUDezpYJ
+jGC8Nxe64Kt+rtoE8IjH1D/Z0TabbtuAeYqpxkSjJPgeTR9u1NPEKYeBYBhtmJea
+WWM/gngaWieQPKqZ+dDnlhJn7AJ6YBDbmcTbNmB7JYdg1Ui0phZU3/Rc3ex5UJI2
+ced9gRfMdtcrNx+KbYNYst26tw9oD+AARXIEDD3q/nenW4pvlpXH74tSNqNPvQc2
+1AUFLSU41fJjQSvRilqQEta22J7vjAlszwNdKU8tQfX53GF2ARL1uCTOrtvliuR6
+4rlwNf/kFPt7TqGM0g9oUfVF7QIDAQABo1MwUTAdBgNVHQ4EFgQUqBbT8KvFY3IV
++pXJzOnAiYnoGV0wHwYDVR0jBBgwFoAUqBbT8KvFY3IV+pXJzOnAiYnoGV0wDwYD
+VR0TAQH/BAUwAwEB/zANBgkqhkiG9w0BAQsFAAOCAQEAHgT2uT5FdtnceDtz5EDU
+V6qeqjQNrShifDf/YCOnXrzSgm+KUi+zpI/yf+8IBilz6TXWvUbKuaGn1tQVexHK
+LivwspOvadRDWs/NbofK0PRXSjdl/fLM91lpRe3Clu2HYGdbIXM3GxCr53RumEXv
+mxkpdho9YMIS+WLiOKA2lpkTTAbAnucF56YmH1/U8SSVxxDEUyZskzjHpNEBgSgB
+8SlLUOkCvDKmCeHiiCI+S2JcNjBeoC41qX5RaSwFUm58ApNfaPcdXduNWx2mQa0G
+anEebK75B+bcZTjGHlBgRdGJwOd915khrf9zq1bKUuCmegn4dNXQ0gyxzgDJ79DI
+1w==
+-----END CERTIFICATE-----`,
+    
+    privateKey: `-----BEGIN PRIVATE KEY-----
+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
+95c=
+-----END PRIVATE KEY-----`,
+    
+    // SAML settings
+    signatureAlgorithm: 'sha256',
+    acceptedClockSkewMs: 300000, // 5 minutes
+    identifierFormat: 'urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress',
+    authnContext: 'urn:oasis:names:tc:SAML:2.0:ac:classes:InternetProtocol',
+    validateInResponseTo: false,
+    disableRequestedAuthnContext: true,
+    skipRequestCompression: true,
+    requestIdExpirationPeriodMs: 300000, // 5 minutes
+    allowUnsolicited: true,
+    wantAssertionsSigned: true,
+    wantMessageSigned: true,
+    wantLogoutRequestSigned: true,
+    wantLogoutResponseSigned: true,
+    wantNameId: true,
+    wantNameIdFormat: true,
+    wantAttributeStatement: true,
+    authnRequestBinding: 'HTTP-REDIRECT',
+    authnResponseBinding: 'HTTP-POST',
+    forceAuthn: false,
+    passive: false,
+    digestAlgorithm: 'sha256'
+};
 
 // Function to create or update user from SAML attributes
-async function createOrUpdateUserFromSAML(profile, school) {
+async function createOrUpdateUserFromSAML(profile) {
     try {
-        const { User } = getModels({ school }, 'User');
+        console.log('=== SAML PROFILE DEBUG ===');
+        console.log('Full profile:', JSON.stringify(profile, null, 2));
+        
+        const { User } = getModels({ school: 'rpi' }, 'User');
         
         // Extract user information from SAML profile
+        // RPI uses standard eduPerson attributes
         const email = profile['urn:oid:1.3.6.1.4.1.5923.1.1.1.6'] || profile.email || profile.mail;
         const givenName = profile['urn:oid:2.5.4.42'] || profile.givenName || profile.firstName;
         const surname = profile['urn:oid:2.5.4.4'] || profile.sn || profile.lastName;
         const displayName = profile['urn:oid:2.16.840.1.113730.3.1.241'] || profile.displayName;
         const uid = profile['urn:oid:0.9.2342.19200300.100.1.1'] || profile.uid;
         const affiliation = profile['urn:oid:1.3.6.1.4.1.5923.1.1.1.9'] || profile.eduPersonAffiliation;
+
+        console.log('Extracted attributes:');
+        console.log('- Email:', email);
+        console.log('- Given Name:', givenName);
+        console.log('- Surname:', surname);
+        console.log('- Display Name:', displayName);
+        console.log('- UID:', uid);
+        console.log('- Affiliation:', affiliation);
 
         if (!email) {
             throw new Error('Email is required for SAML authentication');
@@ -59,6 +193,7 @@ async function createOrUpdateUserFromSAML(profile, school) {
         });
 
         if (user) {
+            console.log('Updating existing user:', user.email);
             // Update existing user with SAML information
             user.samlId = uid;
             user.samlProvider = 'rpi';
@@ -74,6 +209,7 @@ async function createOrUpdateUserFromSAML(profile, school) {
             
             await user.save();
         } else {
+            console.log('Creating new user with email:', email);
             // Create new user
             const username = uid || email.split('@')[0];
             
@@ -90,6 +226,7 @@ async function createOrUpdateUserFromSAML(profile, school) {
             await user.save();
         }
 
+        console.log('User processed successfully:', user.email);
         return user;
     } catch (error) {
         console.error('Error creating/updating user from SAML:', error);
@@ -97,47 +234,40 @@ async function createOrUpdateUserFromSAML(profile, school) {
     }
 }
 
-// Configure Passport SAML strategy
-function configureSAMLStrategy(school, req) {
-    return new Promise(async (resolve, reject) => {
+// Configure Passport SAML strategy for RPI
+function configureRPISAMLStrategy() {
+    console.log('=== CONFIGURING RPI SAML STRATEGY ===');
+    console.log('Entry Point:', RPI_SAML_CONFIG.entryPoint);
+    console.log('Issuer:', RPI_SAML_CONFIG.issuer);
+    console.log('Callback URL:', RPI_SAML_CONFIG.callbackUrl);
+    
+    const strategy = new SamlStrategy(RPI_SAML_CONFIG, async (profile, done) => {
         try {
-            const config = await getSAMLConfig(school, req);
-            
-            console.log('SAML Strategy Config:', {
-                entryPoint: config.entryPoint,
-                issuer: config.issuer,
-                callbackUrl: config.callbackUrl,
-                authnRequestBinding: config.authnRequestBinding,
-                authnResponseBinding: config.authnResponseBinding
-            });
-            
-            const strategy = new SamlStrategy(config, async (profile, done) => {
-                try {
-                    const user = await createOrUpdateUserFromSAML(profile, school);
-                    return done(null, user);
-                } catch (error) {
-                    return done(error, null);
-                }
-            });
-
-            resolve(strategy);
+            console.log('=== SAML AUTHENTICATION CALLBACK ===');
+            const user = await createOrUpdateUserFromSAML(profile);
+            return done(null, user);
         } catch (error) {
-            reject(error);
+            console.error('SAML authentication error:', error);
+            return done(error, null);
         }
     });
+
+    return strategy;
 }
 
 // SAML Login endpoint
 router.get('/login', async (req, res) => {
     try {
         const { relayState } = req.query;
-        const school = req.school || 'rpi';
         
-        console.log(`SAML login initiated for school: ${school}, relayState: ${relayState}`);
+        console.log('=== SAML LOGIN INITIATED ===');
+        console.log('Relay State:', relayState);
+        console.log('Session ID:', req.sessionID);
+        console.log('Session data:', req.session);
         
-        const strategy = await configureSAMLStrategy(school, req);
+        const strategy = configureRPISAMLStrategy();
         
-        // Store relay state in session or pass it through
+        // Store relay state in session
         if (relayState) {
             req.session = req.session || {};
             req.session.relayState = relayState;
@@ -155,9 +285,7 @@ router.get('/login', async (req, res) => {
             });
         }
         
-        console.log('Starting SAML authentication with strategy...');
-        console.log('Session ID:', req.sessionID);
-        console.log('Session data:', req.session);
+        console.log('Starting SAML authentication...');
         
         passport.authenticate(strategy, { 
             failureRedirect: '/login',
@@ -169,7 +297,8 @@ router.get('/login', async (req, res) => {
         console.error('SAML login error:', error);
         res.status(500).json({ 
             success: false, 
-            message: 'SAML authentication not configured for this school' 
+            message: 'SAML authentication failed',
+            error: error.message
         });
     }
 });
@@ -177,21 +306,22 @@ router.get('/login', async (req, res) => {
 // SAML Callback endpoint - handle both GET and POST
 const handleCallback = async (req, res) => {
     try {
-        const school = req.school || 'rpi';
-        console.log('SAML callback received - Method:', req.method);
-        console.log('SAML callback received - Session ID:', req.sessionID);
-        console.log('SAML callback received - Session data:', req.session);
-        console.log('SAML callback received - Query params:', req.query);
-        console.log('SAML callback received - Body:', req.body);
+        console.log('=== SAML CALLBACK RECEIVED ===');
+        console.log('Method:', req.method);
+        console.log('Session ID:', req.sessionID);
+        console.log('Session data:', req.session);
+        console.log('Query params:', req.query);
+        console.log('Body:', req.body);
+        console.log('Headers:', req.headers);
         
-        const strategy = await configureSAMLStrategy(school, req);
+        const strategy = configureRPISAMLStrategy();
         
         passport.authenticate(strategy, { 
             failureRedirect: '/login',
             failureFlash: true,
             session: true
         }, async (err, user) => {
-            console.log('SAML callback authentication completed');
+            console.log('=== SAML CALLBACK AUTHENTICATION COMPLETED ===');
             console.log('Error:', err);
             console.log('User:', user ? user.email : 'No user');
             
@@ -219,7 +349,7 @@ const handleCallback = async (req, res) => {
                 );
 
                 // Store refresh token in database
-                const { User } = getModels({ school }, 'User');
+                const { User } = getModels({ school: 'rpi' }, 'User');
                 await User.findByIdAndUpdate(user._id, { 
                     refreshToken: refreshToken 
                 });
@@ -250,10 +380,11 @@ const handleCallback = async (req, res) => {
                 }
 
                 console.log(`SAML authentication successful for user: ${user.email}`);
+                console.log('Redirecting to relay state:', relayState);
                 
                 // Redirect to frontend callback page
                 const frontendUrl = process.env.NODE_ENV === 'production'
-                    ? 'https://study-compass.com'
+                    ? 'https://rpi.study-compass.com'
                     : 'http://localhost:3000';
                 
                 res.redirect(`${frontendUrl}/auth/saml/callback?relayState=${encodeURIComponent(relayState)}`);
@@ -274,28 +405,37 @@ const handleCallback = async (req, res) => {
 router.get('/callback', handleCallback);
 router.post('/callback', handleCallback);
 
+// Test endpoint to verify callback URL is reachable
+router.get('/test-callback', (req, res) => {
+    console.log('=== TEST CALLBACK ENDPOINT REACHED ===');
+    console.log('Headers:', req.headers);
+    console.log('Query:', req.query);
+    res.json({ 
+        success: true, 
+        message: 'Callback endpoint is reachable',
+        timestamp: new Date().toISOString(),
+        headers: req.headers,
+        query: req.query
+    });
+});
+
 // SAML Logout endpoint
 router.post('/logout', verifyToken, async (req, res) => {
     try {
-        const school = req.school || 'rpi';
-        const config = await getSAMLConfig(school);
+        console.log('=== SAML LOGOUT INITIATED ===');
         
         // Clear cookies
         res.clearCookie('accessToken');
         res.clearCookie('refreshToken');
         
         // Clear refresh token from database
-        const { User } = getModels({ school }, 'User');
+        const { User } = getModels({ school: 'rpi' }, 'User');
         await User.findByIdAndUpdate(req.user.userId, { 
             refreshToken: null 
         });
         
-        // If SAML logout URL is configured, redirect to it
-        if (config.logoutUrl) {
-            res.redirect(config.logoutUrl);
-        } else {
-            res.json({ success: true, message: 'Logged out successfully' });
-        }
+        console.log('Logout successful');
+        res.json({ success: true, message: 'Logged out successfully' });
         
     } catch (error) {
         console.error('SAML logout error:', error);
@@ -303,60 +443,131 @@ router.post('/logout', verifyToken, async (req, res) => {
     }
 });
 
-// SAML Metadata endpoint
-router.get('/metadata', async (req, res) => {
-    try {
-        const school = req.school || 'rpi';
-        const { SAMLConfig } = getModels(req, 'SAMLConfig');
-        const dbConfig = await SAMLConfig.findOne({ school, active: true });
-        
-        if (!dbConfig) {
-            return res.status(404).json({ success: false, message: 'SAML configuration not found' });
-        }
-        
-        const config = dbConfig.toPassportSamlConfig();
-        
-        // Helper function to clean certificate
-        const cleanCertificate = (cert) => {
-            return cert.replace(/-----BEGIN CERTIFICATE-----|-----END CERTIFICATE-----|\s/g, '');
-        };
+// STATIC SAML METADATA for RPI
+router.get('/metadata', (req, res) => {
+    console.log('=== SAML METADATA REQUESTED ===');
+    
+    // Helper function to clean certificate
+    const cleanCertificate = (cert) => {
+        return cert.replace(/-----BEGIN CERTIFICATE-----|-----END CERTIFICATE-----|\s/g, '');
+    };
 
-        // Get the actual binding from database configuration
-        // Force HTTP-POST for AssertionConsumerService as most IDPs expect this
-        const acsBinding = 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST';
-        const sloBinding = dbConfig.sp.singleLogoutService?.binding || 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect';
-
-        // Generate SP metadata
-        const metadata = `<?xml version="1.0"?>
-<md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" entityID="${config.issuer}">
-    <md:SPSSODescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
+    // Generate SP metadata for RPI with comprehensive information
+    const metadata = `<?xml version="1.0"?>
+<md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:shibmd="urn:mace:shibboleth:metadata:1.0" xmlns:mdui="urn:oasis:names:tc:SAML:metadata:ui" validUntil="2030-12-31T23:59:59Z" entityID="https://rpi.study-compass.com/saml/metadata">
+    <md:SPSSODescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol" AuthnRequestsSigned="true" WantAssertionsSigned="true">
+        <md:Extensions>
+            <shibmd:Scope regexp="false">rpi.study-compass.com</shibmd:Scope>
+            <mdui:UIInfo>
+                <mdui:DisplayName xml:lang="en">Study Compass</mdui:DisplayName>
+                <mdui:Description xml:lang="en">Study Compass - Find and reserve study spaces at RPI</mdui:Description>
+                <mdui:InformationURL xml:lang="en">https://rpi.study-compass.com</mdui:InformationURL>
+                <mdui:PrivacyStatementURL xml:lang="en">https://rpi.study-compass.com/privacy</mdui:PrivacyStatementURL>
+            </mdui:UIInfo>
+        </md:Extensions>
         <md:KeyDescriptor use="signing">
             <ds:KeyInfo>
                 <ds:X509Data>
-                    <ds:X509Certificate>${cleanCertificate(config.signingCert)}</ds:X509Certificate>
+                    <ds:X509Certificate>MIIDvTCCAqWgAwIBAgIUOpNTR3E+WpN8YeCg35dbhjjxZaAwDQYJKoZIhvcNAQEL
+BQAwbjELMAkGA1UEBhMCVVMxCzAJBgNVBAgMAk5ZMQ0wCwYDVQQHDARUcm95MRYw
+FAYDVQQKDA1TdHVkeSBDb21wYXNzMQswCQYDVQQLDAJJVDEeMBwGA1UEAwwVcnBp
+LnN0dWR5LWNvbXBhc3MuY29tMB4XDTI1MDczMDIzMTMzNVoXDTM1MDcyODIzMTMz
+NVowbjELMAkGA1UEBhMCVVMxCzAJBgNVBAgMAk5ZMQ0wCwYDVQQHDARUcm95MRYw
+FAYDVQQKDA1TdHVkeSBDb21wYXNzMQswCQYDVQQLDAJJVDEeMBwGA1UEAwwVcnBp
+LnN0dWR5LWNvbXBhc3MuY29tMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
+AQEAr6BLw6gXrDNEsO9UkPY9vWn3HCzAis9I6IPa7VrkFRScqr3OlRkHiUDezpYJ
+jGC8Nxe64Kt+rtoE8IjH1D/Z0TabbtuAeYqpxkSjJPgeTR9u1NPEKYeBYBhtmJea
+WWM/gngaWieQPKqZ+dDnlhJn7AJ6YBDbmcTbNmB7JYdg1Ui0phZU3/Rc3ex5UJI2
+ced9gRfMdtcrNx+KbYNYst26tw9oD+AARXIEDD3q/nenW4pvlpXH74tSNqNPvQc2
+1AUFLSU41fJjQSvRilqQEta22J7vjAlszwNdKU8tQfX53GF2ARL1uCTOrtvliuR6
+4rlwNf/kFPt7TqGM0g9oUfVF7QIDAQABo1MwUTAdBgNVHQ4EFgQUqBbT8KvFY3IV
++pXJzOnAiYnoGV0wHwYDVR0jBBgwFoAUqBbT8KvFY3IV+pXJzOnAiYnoGV0wDwYD
+VR0TAQH/BAUwAwEB/zANBgkqhkiG9w0BAQsFAAOCAQEAHgT2uT5FdtnceDtz5EDU
+V6qeqjQNrShifDf/YCOnXrzSgm+KUi+zpI/yf+8IBilz6TXWvUbKuaGn1tQVexHK
+LivwspOvadRDWs/NbofK0PRXSjdl/fLM91lpRe3Clu2HYGdbIXM3GxCr53RumEXv
+mxkpdho9YMIS+WLiOKA2lpkTTAbAnucF56YmH1/U8SSVxxDEUyZskzjHpNEBgSgB
+8SlLUOkCvDKmCeHiiCI+S2JcNjBeoC41qX5RaSwFUm58ApNfaPcdXduNWx2mQa0G
+anEebK75B+bcZTjGHlBgRdGJwOd915khrf9zq1bKUuCmegn4dNXQ0gyxzgDJ79DI
+1w==</ds:X509Certificate>
                 </ds:X509Data>
             </ds:KeyInfo>
         </md:KeyDescriptor>
         <md:KeyDescriptor use="encryption">
             <ds:KeyInfo>
                 <ds:X509Data>
-                    <ds:X509Certificate>${cleanCertificate(config.encryptCert)}</ds:X509Certificate>
+                    <ds:X509Certificate>MIIDvTCCAqWgAwIBAgIUFyiL3QCKi6bM9jzahZxvKQa8Z10wDQYJKoZIhvcNAQEL
+BQAwbjELMAkGA1UEBhMCVVMxCzAJBgNVBAgMAk5ZMQ0wCwYDVQQHDARUcm95MRYw
+FAYDVQQKDA1TdHVkeSBDb21wYXNzMQswCQYDVQQLDAJJVDEeMBwGA1UEAwwVcnBp
+LnN0dWR5LWNvbXBhc3MuY29tMB4XDTI1MDczMDIzMTMzOFoXDTM1MDcyODIzMTMz
+OFowbjELMAkGA1UEBhMCVVMxCzAJBgNVBAgMAk5ZMQ0wCwYDVQQHDARUcm95MRYw
+FAYDVQQKDA1TdHVkeSBDb21wYXNzMQswCQYDVQQLDAJJVDEeMBwGA1UEAwwVcnBp
+LnN0dWR5LWNvbXBhc3MuY29tMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
+AQEA0OWRsrJnwOAZh96HduBx0v0lnTNK8+Y65W2SnHt8avu6+Buy9RdqcDAeg3oS
+soeO7GI6+lhPwzhbGNiasnXWSn+4uwuwyIrGvG96SMCt7ycOcSSSCL0xPC8MFx0H
+QiolcfcxxgpGaA8gPLEcYXVMbPhKw1+4typIt9GFVajdztmW2XKW7NaigUySrJMI
+Uuh3G9nyhEEi59mYjHInEM8azbNEhBttP1ddLLc34W822ELr9qhNtT5a9MWlXVDd
+tCqXfCJkrYUQwys6PeKZ/l6VAzfCHloZomhbaUYtN19w+2GJOoT0owQbw3FopbZcS
+SMcG/Ev6N9RWRnGf7ehTr0LHwIDAQABo1MwUTAdBgNVHQ4EFgQUbUlknR4p3kIwM
+ukeFW71S6PMn2kwHwYDVR0jBBgwFoAUbUlknR4p3kIwMukeFW71S6PMn2kwDwYD
+VR0TAQH/BAUwAwEB/zANBgkqhkiG9w0BAQsFAAOCAQEAyU5dBBQNLmM6Syj3Q3b5
+eM+B4VVPBJ+cBrwLhJQsy0Xv9k3BL9JDNsc1NQROiFEAZ/FF/erHVG2UZMtEv2lyq
+2ASQG56QXju2f4pcld6fKZp9ThQVYs1HejE5vfsfpqfaZZSToOvOZLsI9wtsyMuE
+0Jlym03NAmR4jx0gJMvsibLfHKPK+JFrk+oXjdyRxoKPYeEe/qDkD9u3e049XPaQo
+Z03SoHvUZlfx/f+6SpoQj/Ul9PqmIbYkgbUDgpTqlIlSUhSu7KPVrZt8QDJgPdA+F
+FOf0YWdpEfs70lCMTb1o0VbqPpHAIWD9iqmGTtBLIBIvACbRuADujQK5rVZUkeg==</ds:X509Certificate>
                 </ds:X509Data>
             </ds:KeyInfo>
         </md:KeyDescriptor>
-        <md:AssertionConsumerService Binding="${acsBinding}" Location="${config.callbackUrl}" index="0"/>
-        <md:SingleLogoutService Binding="${sloBinding}" Location="${config.logoutUrl || config.callbackUrl.replace('/callback', '/logout')}"/>
-        <md:NameIDFormat>${config.identifierFormat}</md:NameIDFormat>
+        <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://rpi.study-compass.com/saml/callback" index="0"/>
+        <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://rpi.study-compass.com/saml/callback" index="1"/>
+        <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://rpi.study-compass.com/saml/logout"/>
+        <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://rpi.study-compass.com/saml/logout"/>
+        <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress</md:NameIDFormat>
+        <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:persistent</md:NameIDFormat>
+        <md:NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:transient</md:NameIDFormat>
     </md:SPSSODescriptor>
+    <md:Organization>
+        <md:OrganizationName xml:lang="en">Study Compass</md:OrganizationName>
+        <md:OrganizationDisplayName xml:lang="en">Study Compass</md:OrganizationDisplayName>
+        <md:OrganizationURL xml:lang="en">https://rpi.study-compass.com</md:OrganizationURL>
+    </md:Organization>
+    <md:ContactPerson contactType="technical">
+        <md:GivenName>Study Compass</md:GivenName>
+        <md:EmailAddress>mailto:support@rpi.study-compass.com</md:EmailAddress>
+    </md:ContactPerson>
+    <md:ContactPerson contactType="support">
+        <md:GivenName>Study Compass Support</md:GivenName>
+        <md:EmailAddress>mailto:support@rpi.study-compass.com</md:EmailAddress>
+    </md:ContactPerson>
 </md:EntityDescriptor>`;
-        
-        res.set('Content-Type', 'application/xml');
-        res.send(metadata);
-        
-    } catch (error) {
-        console.error('SAML metadata error:', error);
-        res.status(500).json({ success: false, message: 'Failed to generate metadata' });
-    }
+    
+    console.log('Serving comprehensive SAML metadata');
+    res.set('Content-Type', 'application/xml');
+    res.send(metadata);
+});
+
+// Debug endpoint to show current configuration
+router.get('/debug', (req, res) => {
+    console.log('=== SAML DEBUG ENDPOINT REQUESTED ===');
+    
+    res.json({
+        success: true,
+        message: 'SAML Debug Information',
+        timestamp: new Date().toISOString(),
+        config: {
+            entryPoint: RPI_SAML_CONFIG.entryPoint,
+            issuer: RPI_SAML_CONFIG.issuer,
+            callbackUrl: RPI_SAML_CONFIG.callbackUrl,
+            idpIssuer: RPI_SAML_CONFIG.idpIssuer,
+            hasCert: !!RPI_SAML_CONFIG.cert,
+            certLength: RPI_SAML_CONFIG.cert ? RPI_SAML_CONFIG.cert.length : 0
+        },
+        environment: {
+            nodeEnv: process.env.NODE_ENV,
+            hasJwtSecret: !!process.env.JWT_SECRET,
+            hasJwtRefreshSecret: !!process.env.JWT_REFRESH_SECRET
+        }
+    });
 });
 
 module.exports = router; 

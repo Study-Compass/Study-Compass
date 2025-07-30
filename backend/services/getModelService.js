@@ -18,8 +18,6 @@ const studyHistorySchema = require('../schemas/studyHistory');
 const userSchema = require('../schemas/user');
 const visitSchema = require('../schemas/visit');
 const orgMemberApplicationSchema = require('../schemas/orgMemberApplication');
-const samlConfigSchema = require('../schemas/samlConfig');
-
 //events
 const rssFeedSchema = require('../events/schemas/rssFeed');
 const approvalFlowDefinition = require('../events/schemas/approvalFlowDefinition');
@@ -56,8 +54,7 @@ const getModels = (req, ...names) => {
         RssFeed: req.db.model('RssFeed', rssFeedSchema, 'rssFeeds'),
         Form: req.db.model('Form', formSchema, 'forms'),    
         FormResponse: req.db.model('FormResponse', formResponseSchema, 'formResponses'),
-        OrgMemberApplication: req.db.model('OrgMemberApplication', orgMemberApplicationSchema, 'orgMemberApplications'),
-        SAMLConfig: req.db.model('SAMLConfig', samlConfigSchema, 'samlConfigs')
+        OrgMemberApplication: req.db.model('OrgMemberApplication', orgMemberApplicationSchema, 'orgMemberApplications')
     };
 
     return names.reduce((acc, name) => {
