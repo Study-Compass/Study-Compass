@@ -141,9 +141,23 @@ router.get('/login', async (req, res) => {
         if (relayState) {
             req.session = req.session || {};
             req.session.relayState = relayState;
+            console.log('Stored relay state in session:', relayState);
+        }
+        
+        // Ensure session is saved
+        if (req.session) {
+            req.session.save((err) => {
+                if (err) {
+                    console.error('Error saving session:', err);
+                } else {
+                    console.log('Session saved successfully');
+                }
+            });
         }
         
         console.log('Starting SAML authentication with strategy...');
+        console.log('Session ID:', req.sessionID);
+        console.log('Session data:', req.session);
         
         passport.authenticate(strategy, { 
             failureRedirect: '/login',
@@ -163,6 +177,12 @@ router.get('/login', async (req, res) => {
 const handleCallback = async (req, res) => {
     try {
         const school = req.school || 'rpi';
+        console.log('SAML callback received - Method:', req.method);
+        console.log('SAML callback received - Session ID:', req.sessionID);
+        console.log('SAML callback received - Session data:', req.session);
+        console.log('SAML callback received - Query params:', req.query);
+        console.log('SAML callback received - Body:', req.body);
+        
         const strategy = await configureSAMLStrategy(school, req);
         
         passport.authenticate(strategy, { 

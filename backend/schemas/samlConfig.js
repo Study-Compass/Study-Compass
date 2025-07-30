@@ -146,12 +146,13 @@ const samlConfigSchema = new mongoose.Schema({
             privateKey: this.sp.signingKey,
             decryptionPvk: this.sp.encryptKey,
             signatureAlgorithm: 'sha256',
-            acceptedClockSkewMs: -1,
+            acceptedClockSkewMs: 300000, // 5 minutes in milliseconds
             identifierFormat: this.nameIDFormat,
             authnContext: 'urn:oasis:names:tc:SAML:2.0:ac:classes:InternetProtocol',
             validateInResponseTo: false,
             disableRequestedAuthnContext: true,
             skipRequestCompression: true,
+            requestIdExpirationPeriodMs: 300000, // 5 minutes
             wantAssertionsSigned: this.settings.wantAssertionsSigned,
             wantMessageSigned: this.settings.wantMessageSigned,
             wantLogoutRequestSigned: this.settings.wantLogoutRequestSigned,
