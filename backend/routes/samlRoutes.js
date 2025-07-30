@@ -107,7 +107,7 @@ vpxmarAUE1re9VCT+ww3+5TY
     // SAML settings
     signatureAlgorithm: 'sha256',
     acceptedClockSkewMs: 300000, // 5 minutes
-    identifierFormat: 'urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress',
+    identifierFormat: 'urn:oasis:names:tc:SAML:2.0:nameid-format:transient', // Use transient as required
     authnContext: 'urn:oasis:names:tc:SAML:2.0:ac:classes:InternetProtocol',
     validateInResponseTo: false,
     disableRequestedAuthnContext: true,
@@ -125,7 +125,59 @@ vpxmarAUE1re9VCT+ww3+5TY
     authnResponseBinding: 'HTTP-POST',
     forceAuthn: false,
     passive: false,
-    digestAlgorithm: 'sha256'
+    digestAlgorithm: 'sha256',
+    // Add encryption settings
+    decryptionPvk: `-----BEGIN PRIVATE KEY-----
+MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCvoEvDqBesM0Sw
+71SQ9j29afccLMCKz0jog9rtWuQVFJyqvc6VGQeJQN7OlgmMYLw3F7rgq36u2gTw
+iMfUP9nRNptu24B5iqnGRKMk+B5NH27U08Qph4FgGG2Yl5pZYz+CeBpaJ5A8qpn5
+0OeWEmfsAnpgENuZxNs2YHslh2DVSLSmFlTf9Fzd7HlQkjZx532BF8x21ys3H4pt
+g1iy3bq3D2gP4ABFcgQMPer+d6dbim+Wlcfvi1I2o0+9BzbUBQUtJTjV8mNBK9GK
+WpAS1rbYnu+MCWzPA10pTy1B9fncYXYBEvW4JM6u2+WK5HriuXA1/+QU+3tOoYzS
+D2hR9UXtAgMBAAECggEAJ8KdhHUortaIhZoZRhxJS/mSdTF4gbR96A354WSDYHZj
+JZCFFWIuP5eNGa4ECWDZG4vmxfhtXL6FAcOlodq2wFOhis5s3pdS6k0dtj/p9EHa
+gJpUvaYs1wmQvkwMKJJ8jVgNdz2fvOxOoaz20RXnqxnAhMEsRjq3+i6Lkqp8dKx5
+VxoyHpCvn4ItpAeI31jACYaods5+dhD0mcaxxOBsN4oM+PufwHGR23gH9gSKgBiC
+WVCl7xPgJss9D4WtsXgShm+BYVA2lOhtPUaO2/lxD+Px5JQ3DQQJUIG6Mva726GP
+rODhM5otIVsN4bFjTTEgfy3qO+UJ9YSndM92Ll1q7QKBgQDw34W+NwN21J2tG6sV
+lW6eV5S4EApxUrhS1maAf/qiBb4x39DaqjowjEfB/snacS2i+3cG+W7H3tPMkqeD
+Ztur24eE9nA2HoT0QVvwCwpLkQc8GWmFUQP+nRpGexF/w5M8f2xfE1qeLU+8q6wo
+CyxjDU90JZ0BwL3Vvf/ghb+DdwKBgQC6p88Cn5NKn/CoCdDw8s44sHHgoY0E51RH
+H6gybZ3wrk91zaGR/uygmXKopOnRmP3gXW/B++3u1kJ2TEzNyckxCfET8oeUI/9b
+w2YuqVOoE91O2NG0xzkCgS42QUKZ+e4+OfwQbrnaufcmC/AqsuVP0uCNTg4f7TDg
+TsuVbnUyuwKBgQCE3HYT/ppNkGdMlcdfh2ZVtq9Ue5yW926uWo59cJoZhptrPS4h
+fuXL44StL9G9SNJIZPY5hZoiavlejMITS8f9WoC8yYYJg/oIFIkWtbA/EEbyUn4O
+yCow5g0ZNUbot0LeitaG9tD0EMA7rGGwUMFx/WSHBzw8PEk5vayG9p81bwKBgH/P
+oISfWHBlDJlD/3q+CE/xIkk61iFhdegt2TKOtPO1qFt2LwiVktp1uHmaUzFenZkg
+4gHmzIoa1O/EV2MipU2bDSUnkYbzD0x6hGG3OL2CvKvc89vh/zuj0Uz9aumcpnKd
+qehmqYUIih/XVOEoFrWOJI0dwbZC6JDv45+zPzU5AoGBAIKEKDLOgqxZeTyPP8s7
+96MmFqGlADfFV93mR6N+bPqXaiWv67wBn17dT/vvMl8dYGDEHWqkrnBzykDiFZxM
+5y4f0JoHwn3sartNwn65qDGUkdzCmFrTDUwWQT4Lv7KgH2m/q1o2YgSL5tBDla/V
+vpxmarAUE1re9VCT+ww3+5TY
+-----END PRIVATE KEY-----`,
+    // Add encryption certificate
+    decryptionCert: `-----BEGIN CERTIFICATE-----
+MIIDvTCCAqWgAwIBAgIUFyiL3QCKi6bM9jzahZxvKQa8Z10wDQYJKoZIhvcNAQEL
+BQAwbjELMAkGA1UEBhMCVVMxCzAJBgNVBAgMAk5ZMQ0wCwYDVQQHDARUcm95MRYw
+FAYDVQQKDA1TdHVkeSBDb21wYXNzMQswCQYDVQQLDAJJVDEeMBwGA1UEAwwVcnBp
+LnN0dWR5LWNvbXBhc3MuY29tMB4XDTI1MDczMDIzMTMzOFoXDTM1MDcyODIzMTMz
+OFowbjELMAkGA1UEBhMCVVMxCzAJBgNVBAgMAk5ZMQ0wCwYDVQQHDARUcm95MRYw
+FAYDVQQKDA1TdHVkeSBDb21wYXNzMQswCQYDVQQLDAJJVDEeMBwGA1UEAwwVcnBp
+LnN0dWR5LWNvbXBhc3MuY29tMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
+AQEA0OWRsrJnwOAZh96HduBx0v0lnTNK8+Y65W2SnHt8avu6+Buy9RdqcDAeg3oS
+soeO7GI6+lhPwzhbGNiasnXWSn+4uwuwyIrGvG96SMCt7ycOcSSSCL0xPC8MFx0H
+QiolcfcxxgpGaA8gPLEcYXVMbPhKw1+4typIt9GFVajdztmW2XKW7NaigUySrJMI
+Uuh3G9nyhEEi59mYjHInEM8azbNEhBttP1ddLLc34W822ELr9qhNtT5a9MWlXVDd
+tCqXfCJkrYUQwys6PeKZ/l6VAzfCHloZomhbaUYtN19w+2GJOoT0owQbw3FopbZcS
+SMcG/Ev6N9RWRnGf7ehTr0LHwIDAQABo1MwUTAdBgNVHQ4EFgQUbUlknR4p3kIwM
+ukeFW71S6PMn2kwHwYDVR0jBBgwFoAUbUlknR4p3kIwMukeFW71S6PMn2kwDwYD
+VR0TAQH/BAUwAwEB/zANBgkqhkiG9w0BAQsFAAOCAQEAyU5dBBQNLmM6Syj3Q3b5
+eM+B4VVPBJ+cBrwLhJQsy0Xv9k3BL9JDNsc1NQROiFEAZ/FF/erHVG2UZMtEv2lyq
+2ASQG56QXju2f4pcld6fKZp9ThQVYs1HejE5vfsfpqfaZZSToOvOZLsI9wtsyMuE
+0Jlym03NAmR4jx0gJMvsibLfHKPK+JFrk+oXjdyRxoKPYeEe/qDkD9u3e049XPaQo
+Z03SoHvUZlfx/f+6SpoQj/Ul9PqmIbYkgbUDgpTqlIlSUhSu7KPVrZt8QDJgPdA+F
+FOf0YWdpEfs70lCMTb1o0VbqPpHAIWD9iqmGTtBLIBIvACbRuADujQK5rVZUkeg==
+-----END CERTIFICATE-----`
 };
 
 // Function to create or update user from SAML attributes
@@ -144,6 +196,7 @@ async function createOrUpdateUserFromSAML(profile) {
         const displayName = profile['urn:oid:2.16.840.1.113730.3.1.241'] || profile.displayName;
         const uid = profile['urn:oid:0.9.2342.19200300.100.1.1'] || profile.uid;
         const affiliation = profile['urn:oid:1.3.6.1.4.1.5923.1.1.1.9'] || profile.eduPersonAffiliation;
+        const nameID = profile.nameID || profile['urn:oasis:names:tc:SAML:2.0:nameid-format:transient'];
 
         console.log('Extracted attributes:');
         console.log('- Email:', email);
@@ -152,6 +205,7 @@ async function createOrUpdateUserFromSAML(profile) {
         console.log('- Display Name:', displayName);
         console.log('- UID:', uid);
         console.log('- Affiliation:', affiliation);
+        console.log('- NameID:', nameID);
 
         if (!email) {
             throw new Error('Email is required for SAML authentication');
@@ -161,14 +215,15 @@ async function createOrUpdateUserFromSAML(profile) {
         let user = await User.findOne({ 
             $or: [
                 { email: email },
-                { samlId: uid }
+                { samlId: uid },
+                { samlId: nameID }
             ]
         });
 
         if (user) {
             console.log('Updating existing user:', user.email);
             // Update existing user with SAML information
-            user.samlId = uid;
+            user.samlId = nameID || uid; // Use transient NameID if available
             user.samlProvider = 'rpi';
             user.name = displayName || `${givenName} ${surname}`.trim();
             user.samlAttributes = profile;
@@ -190,7 +245,7 @@ async function createOrUpdateUserFromSAML(profile) {
                 email: email,
                 username: username,
                 name: displayName || `${givenName} ${surname}`.trim(),
-                samlId: uid,
+                samlId: nameID || uid, // Use transient NameID if available
                 samlProvider: 'rpi',
                 samlAttributes: profile,
                 roles: affiliation && affiliation.includes('faculty') ? ['user', 'admin'] : ['user']
@@ -500,9 +555,9 @@ FOf0YWdpEfs70lCMTb1o0VbqPpHAIWD9iqmGTtBLIBIvACbRuADujQK5rVZUkeg==</ds:X509Certif
         <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://rpi.study-compass.com/saml/callback" index="1"/>
         <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://rpi.study-compass.com/saml/logout"/>
         <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://rpi.study-compass.com/saml/logout"/>
+        <md:NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:transient</md:NameIDFormat>
         <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress</md:NameIDFormat>
         <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:persistent</md:NameIDFormat>
-        <md:NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:transient</md:NameIDFormat>
     </md:SPSSODescriptor>
     <md:Organization>
         <md:OrganizationName xml:lang="en">Study Compass</md:OrganizationName>
