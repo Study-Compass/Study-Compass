@@ -141,6 +141,7 @@ const samlConfigSchema = new mongoose.Schema({
             issuer: this.sp.entityID,
             idpIssuer: this.idp.entityID,
             callbackUrl: this.sp.assertionConsumerService.location,
+            logoutUrl: this.sp.singleLogoutService?.location,
             cert: this.idp.x509Cert,
             privateCert: this.sp.signingCert,
             privateKey: this.sp.signingKey,
@@ -153,6 +154,7 @@ const samlConfigSchema = new mongoose.Schema({
             disableRequestedAuthnContext: true,
             skipRequestCompression: true,
             requestIdExpirationPeriodMs: 300000, // 5 minutes
+            allowUnsolicited: true,
             wantAssertionsSigned: this.settings.wantAssertionsSigned,
             wantMessageSigned: this.settings.wantMessageSigned,
             wantLogoutRequestSigned: this.settings.wantLogoutRequestSigned,

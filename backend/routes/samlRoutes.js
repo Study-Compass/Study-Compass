@@ -161,7 +161,8 @@ router.get('/login', async (req, res) => {
         
         passport.authenticate(strategy, { 
             failureRedirect: '/login',
-            failureFlash: true 
+            failureFlash: true,
+            session: true
         })(req, res);
         
     } catch (error) {
@@ -187,8 +188,13 @@ const handleCallback = async (req, res) => {
         
         passport.authenticate(strategy, { 
             failureRedirect: '/login',
-            failureFlash: true 
+            failureFlash: true,
+            session: true
         }, async (err, user) => {
+            console.log('SAML callback authentication completed');
+            console.log('Error:', err);
+            console.log('User:', user ? user.email : 'No user');
+            
             if (err) {
                 console.error('SAML callback error:', err);
                 return res.redirect('/login?error=saml_authentication_failed');
