@@ -76,59 +76,32 @@ anEebK75B+bcZTjGHlBgRdGJwOd915khrf9zq1bKUuCmegn4dNXQ0gyxzgDJ79DI
 -----END CERTIFICATE-----`,
     
     privateKey: `-----BEGIN PRIVATE KEY-----
-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
-95c=
+MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCvoEvDqBesM0Sw
+71SQ9j29afccLMCKz0jog9rtWuQVFJyqvc6VGQeJQN7OlgmMYLw3F7rgq36u2gTw
+iMfUP9nRNptu24B5iqnGRKMk+B5NH27U08Qph4FgGG2Yl5pZYz+CeBpaJ5A8qpn5
+0OeWEmfsAnpgENuZxNs2YHslh2DVSLSmFlTf9Fzd7HlQkjZx532BF8x21ys3H4pt
+g1iy3bq3D2gP4ABFcgQMPer+d6dbim+Wlcfvi1I2o0+9BzbUBQUtJTjV8mNBK9GK
+WpAS1rbYnu+MCWzPA10pTy1B9fncYXYBEvW4JM6u2+WK5HriuXA1/+QU+3tOoYzS
+D2hR9UXtAgMBAAECggEAJ8KdhHUortaIhZoZRhxJS/mSdTF4gbR96A354WSDYHZj
+JZCFFWIuP5eNGa4ECWDZG4vmxfhtXL6FAcOlodq2wFOhis5s3pdS6k0dtj/p9EHa
+gJpUvaYs1wmQvkwMKJJ8jVgNdz2fvOxOoaz20RXnqxnAhMEsRjq3+i6Lkqp8dKx5
+VxoyHpCvn4ItpAeI31jACYaods5+dhD0mcaxxOBsN4oM+PufwHGR23gH9gSKgBiC
+WVCl7xPgJss9D4WtsXgShm+BYVA2lOhtPUaO2/lxD+Px5JQ3DQQJUIG6Mva726GP
+rODhM5otIVsN4bFjTTEgfy3qO+UJ9YSndM92Ll1q7QKBgQDw34W+NwN21J2tG6sV
+lW6eV5S4EApxUrhS1maAf/qiBb4x39DaqjowjEfB/snacS2i+3cG+W7H3tPMkqeD
+Ztur24eE9nA2HoT0QVvwCwpLkQc8GWmFUQP+nRpGexF/w5M8f2xfE1qeLU+8q6wo
+CyxjDU90JZ0BwL3Vvf/ghb+DdwKBgQC6p88Cn5NKn/CoCdDw8s44sHHgoY0E51RH
+H6gybZ3wrk91zaGR/uygmXKopOnRmP3gXW/B++3u1kJ2TEzNyckxCfET8oeUI/9b
+w2YuqVOoE91O2NG0xzkCgS42QUKZ+e4+OfwQbrnaufcmC/AqsuVP0uCNTg4f7TDg
+TsuVbnUyuwKBgQCE3HYT/ppNkGdMlcdfh2ZVtq9Ue5yW926uWo59cJoZhptrPS4h
+fuXL44StL9G9SNJIZPY5hZoiavlejMITS8f9WoC8yYYJg/oIFIkWtbA/EEbyUn4O
+yCow5g0ZNUbot0LeitaG9tD0EMA7rGGwUMFx/WSHBzw8PEk5vayG9p81bwKBgH/P
+oISfWHBlDJlD/3q+CE/xIkk61iFhdegt2TKOtPO1qFt2LwiVktp1uHmaUzFenZkg
+4gHmzIoa1O/EV2MipU2bDSUnkYbzD0x6hGG3OL2CvKvc89vh/zuj0Uz9aumcpnKd
+qehmqYUIih/XVOEoFrWOJI0dwbZC6JDv45+zPzU5AoGBAIKEKDLOgqxZeTyPP8s7
+96MmFqGlADfFV93mR6N+bPqXaiWv67wBn17dT/vvMl8dYGDEHWqkrnBzykDiFZxM
+5y4f0JoHwn3sartNwn65qDGUkdzCmFrTDUwWQT4Lv7KgH2m/q1o2YgSL5tBDla/V
+vpxmarAUE1re9VCT+ww3+5TY
 -----END PRIVATE KEY-----`,
     
     // SAML settings
@@ -252,6 +225,9 @@ function configureRPISAMLStrategy() {
         }
     });
 
+    // Register the strategy with Passport
+    passport.use('rpi-saml', strategy);
+    
     return strategy;
 }
 
@@ -265,7 +241,8 @@ router.get('/login', async (req, res) => {
         console.log('Session ID:', req.sessionID);
         console.log('Session data:', req.session);
         
-        const strategy = configureRPISAMLStrategy();
+        // Configure and register the strategy
+        configureRPISAMLStrategy();
         
         // Store relay state in session
         if (relayState) {
@@ -287,7 +264,7 @@ router.get('/login', async (req, res) => {
         
         console.log('Starting SAML authentication...');
         
-        passport.authenticate(strategy, { 
+        passport.authenticate('rpi-saml', { 
             failureRedirect: '/login',
             failureFlash: true,
             session: true
@@ -314,9 +291,10 @@ const handleCallback = async (req, res) => {
         console.log('Body:', req.body);
         console.log('Headers:', req.headers);
         
-        const strategy = configureRPISAMLStrategy();
+        // Configure and register the strategy
+        configureRPISAMLStrategy();
         
-        passport.authenticate(strategy, { 
+        passport.authenticate('rpi-saml', { 
             failureRedirect: '/login',
             failureFlash: true,
             session: true
