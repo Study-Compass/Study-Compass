@@ -296,7 +296,8 @@ router.get('/metadata', async (req, res) => {
         };
 
         // Get the actual binding from database configuration
-        const acsBinding = dbConfig.sp.assertionConsumerService.binding;
+        // Force HTTP-POST for AssertionConsumerService as most IDPs expect this
+        const acsBinding = 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST';
         const sloBinding = dbConfig.sp.singleLogoutService?.binding || 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect';
 
         // Generate SP metadata

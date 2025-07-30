@@ -120,7 +120,7 @@ const samlConfigSchema = new mongoose.Schema({
     // Additional settings
     nameIDFormat: {
         type: String,
-        default: 'urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified'
+        default: 'urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress'
     },
     relayState: {
         type: String,
@@ -139,6 +139,7 @@ const samlConfigSchema = new mongoose.Schema({
         return {
             entryPoint: this.idp.singleSignOnService.location,
             issuer: this.sp.entityID,
+            idpIssuer: this.idp.entityID,
             callbackUrl: this.sp.assertionConsumerService.location,
             cert: this.idp.x509Cert,
             privateCert: this.sp.signingCert,
@@ -147,9 +148,10 @@ const samlConfigSchema = new mongoose.Schema({
             signatureAlgorithm: 'sha256',
             acceptedClockSkewMs: -1,
             identifierFormat: this.nameIDFormat,
-            authnContext: 'urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport',
+            authnContext: 'urn:oasis:names:tc:SAML:2.0:ac:classes:InternetProtocol',
             validateInResponseTo: false,
             disableRequestedAuthnContext: true,
+            skipRequestCompression: true,
             wantAssertionsSigned: this.settings.wantAssertionsSigned,
             wantMessageSigned: this.settings.wantMessageSigned,
             wantLogoutRequestSigned: this.settings.wantLogoutRequestSigned,
@@ -159,7 +161,7 @@ const samlConfigSchema = new mongoose.Schema({
             wantAttributeStatement: true,
             attributeMapping: this.attributeMapping,
             authnRequestBinding: 'HTTP-REDIRECT',
-            authnResponseBinding: 'HTTP-REDIRECT',
+            authnResponseBinding: 'HTTP-POST',
             forceAuthn: false,
             passive: false,
             // Additional fields for metadata generation
