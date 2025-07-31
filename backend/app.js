@@ -52,16 +52,18 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true })); // Add this for form-encoded data
 app.use(cookieParser());
 
-// Session middleware for SAML
+// Session middleware for SAML - Fixed for Stale Request issues
 app.use(session({
     secret: process.env.SESSION_SECRET || 'your-secret-key',
-    resave: false,
-    saveUninitialized: false,
+    resave: true, // Changed to true to prevent session loss
+    saveUninitialized: true, // Changed to true to ensure session is created
     cookie: {
         secure: process.env.NODE_ENV === 'production',
         httpOnly: true,
-        maxAge: 24 * 60 * 60 * 1000 // 24 hours
-    }
+        maxAge: 30 * 60 * 1000, // 30 minutes - shorter for SAML
+        sameSite: 'lax' // Added for better compatibility
+    },
+    name: 'sid' // Explicit session name
 }));
 
 // Initialize Passport

@@ -104,15 +104,15 @@ pIF31eb6ObCUsaUh2U46eTz1iHsmwFAuX0CVyfl3+y8qO3d/tUFjqlWTiUak6ij8
 Ac+2GkbdEJTSU6QMwqZqA6we
 -----END PRIVATE KEY-----`,
     
-    // SAML settings
+    // SAML settings - Fixed for Stale Request
     signatureAlgorithm: 'sha256',
-    acceptedClockSkewMs: 300000, // 5 minutes
+    acceptedClockSkewMs: 600000, // 10 minutes - increased for stale request prevention
     identifierFormat: 'urn:oasis:names:tc:SAML:2.0:nameid-format:transient', // Use transient as required
     authnContext: 'urn:oasis:names:tc:SAML:2.0:ac:classes:InternetProtocol',
-    validateInResponseTo: false,
+    validateInResponseTo: false, // Keep false to prevent stale request issues
     disableRequestedAuthnContext: true,
     skipRequestCompression: true,
-    requestIdExpirationPeriodMs: 300000, // 5 minutes
+    requestIdExpirationPeriodMs: 600000, // 10 minutes - increased
     allowUnsolicited: true,
     wantAssertionsSigned: true,
     wantMessageSigned: true,
@@ -126,6 +126,9 @@ Ac+2GkbdEJTSU6QMwqZqA6we
     forceAuthn: false,
     passive: false,
     digestAlgorithm: 'sha256',
+    // Additional settings to prevent stale requests
+    cacheProvider: null, // Disable caching that might cause stale requests
+    maxAssertionAgeMs: 300000, // 5 minutes max age for assertions
     // Add encryption settings - 10 YEAR VALIDITY
     decryptionPvk: `-----BEGIN PRIVATE KEY-----
 MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDdoUMGuh4cg0cA
@@ -263,14 +266,22 @@ async function createOrUpdateUserFromSAML(profile) {
     }
 }
 
-// Configure Passport SAML strategy for RPI
+// Configure Passport SAML strategy for RPI - Fixed for Stale Request
+let rpiSamlStrategy = null;
+
 function configureRPISAMLStrategy() {
+    // Only create strategy once to prevent re-registration issues
+    if (rpiSamlStrategy) {
+        console.log('=== REUSING EXISTING RPI SAML STRATEGY ===');
+        return rpiSamlStrategy;
+    }
+    
     console.log('=== CONFIGURING RPI SAML STRATEGY ===');
     console.log('Entry Point:', RPI_SAML_CONFIG.entryPoint);
     console.log('Issuer:', RPI_SAML_CONFIG.issuer);
     console.log('Callback URL:', RPI_SAML_CONFIG.callbackUrl);
     
-    const strategy = new SamlStrategy(RPI_SAML_CONFIG, async (profile, done) => {
+    rpiSamlStrategy = new SamlStrategy(RPI_SAML_CONFIG, async (profile, done) => {
         try {
             console.log('=== SAML AUTHENTICATION CALLBACK ===');
             const user = await createOrUpdateUserFromSAML(profile);
@@ -282,12 +293,12 @@ function configureRPISAMLStrategy() {
     });
 
     // Register the strategy with Passport
-    passport.use('rpi-saml', strategy);
+    passport.use('rpi-saml', rpiSamlStrategy);
     
-    return strategy;
+    return rpiSamlStrategy;
 }
 
-// SAML Login endpoint
+// SAML Login endpoint - Fixed for Stale Request
 router.get('/login', async (req, res) => {
     try {
         const { relayState } = req.query;
@@ -297,33 +308,40 @@ router.get('/login', async (req, res) => {
         console.log('Session ID:', req.sessionID);
         console.log('Session data:', req.session);
         
-        // Configure and register the strategy
+        // Configure and register the strategy (only once)
         configureRPISAMLStrategy();
         
-        // Store relay state in session
+        // Ensure session exists and store relay state
+        if (!req.session) {
+            req.session = {};
+        }
+        
         if (relayState) {
-            req.session = req.session || {};
             req.session.relayState = relayState;
             console.log('Stored relay state in session:', relayState);
         }
         
-        // Ensure session is saved
-        if (req.session) {
+        // Save session immediately to prevent stale request
+        await new Promise((resolve, reject) => {
             req.session.save((err) => {
                 if (err) {
                     console.error('Error saving session:', err);
+                    reject(err);
                 } else {
                     console.log('Session saved successfully');
+                    resolve();
                 }
             });
-        }
+        });
         
         console.log('Starting SAML authentication...');
         
+        // Use a more robust authentication approach
         passport.authenticate('rpi-saml', { 
-            failureRedirect: '/login',
+            failureRedirect: '/login?error=auth_failed',
             failureFlash: true,
-            session: true
+            session: true,
+            passReqToCallback: false
         })(req, res);
         
     } catch (error) {
@@ -336,7 +354,7 @@ router.get('/login', async (req, res) => {
     }
 });
 
-// SAML Callback endpoint - handle both GET and POST
+// SAML Callback endpoint - Fixed for Stale Request
 const handleCallback = async (req, res) => {
     try {
         console.log('=== SAML CALLBACK RECEIVED ===');
@@ -347,13 +365,20 @@ const handleCallback = async (req, res) => {
         console.log('Body:', req.body);
         console.log('Headers:', req.headers);
         
-        // Configure and register the strategy
+        // Configure and register the strategy (only once)
         configureRPISAMLStrategy();
         
+        // Ensure session exists
+        if (!req.session) {
+            console.error('No session found in callback');
+            return res.redirect('/login?error=no_session');
+        }
+        
         passport.authenticate('rpi-saml', { 
-            failureRedirect: '/login',
+            failureRedirect: '/login?error=auth_failed',
             failureFlash: true,
-            session: true
+            session: true,
+            passReqToCallback: false
         }, async (err, user) => {
             console.log('=== SAML CALLBACK AUTHENTICATION COMPLETED ===');
             console.log('Error:', err);
