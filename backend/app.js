@@ -5,6 +5,7 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 const multer = require('multer');
 const session = require('express-session');
+const MongoStore = require('connect-mongo'); // Add MongoDB session store
 const passport = require('passport');
 require('dotenv').config();
 const { createServer } = require('http');
@@ -52,18 +53,27 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true })); // Add this for form-encoded data
 app.use(cookieParser());
 
-// Session middleware for SAML - Fixed for Stale Request issues
+// Session middleware for SAML - AGGRESSIVE FIX for Stale Request issues
 app.use(session({
     secret: process.env.SESSION_SECRET || 'your-secret-key',
     resave: true, // Changed to true to prevent session loss
     saveUninitialized: true, // Changed to true to ensure session is created
+    store: MongoStore.create({
+        mongoUrl: process.env.NODE_ENV === 'production' ? process.env.MONGO_URL : process.env.MONGO_URL_LOCAL,
+        collectionName: 'sessions',
+        ttl: 30 * 60, // 30 minutes
+        autoRemove: 'native'
+    }),
     cookie: {
         secure: process.env.NODE_ENV === 'production',
         httpOnly: true,
         maxAge: 30 * 60 * 1000, // 30 minutes - shorter for SAML
-        sameSite: 'lax' // Added for better compatibility
+        sameSite: 'lax', // Added for better compatibility
+        domain: process.env.NODE_ENV === 'production' ? '.study-compass.com' : undefined
     },
-    name: 'sid' // Explicit session name
+    name: 'sid', // Explicit session name
+    rolling: true, // Extend session on each request
+    unset: 'destroy' // Remove session when unset
 }));
 
 // Initialize Passport

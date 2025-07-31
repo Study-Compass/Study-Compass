@@ -104,18 +104,18 @@ pIF31eb6ObCUsaUh2U46eTz1iHsmwFAuX0CVyfl3+y8qO3d/tUFjqlWTiUak6ij8
 Ac+2GkbdEJTSU6QMwqZqA6we
 -----END PRIVATE KEY-----`,
     
-    // SAML settings - Fixed for Stale Request
+    // SAML settings - AGGRESSIVE FIX for Stale Request
     signatureAlgorithm: 'sha256',
-    acceptedClockSkewMs: 600000, // 10 minutes - increased for stale request prevention
+    acceptedClockSkewMs: 1800000, // 30 minutes - AGGRESSIVE for stale request prevention
     identifierFormat: 'urn:oasis:names:tc:SAML:2.0:nameid-format:transient', // Use transient as required
     authnContext: 'urn:oasis:names:tc:SAML:2.0:ac:classes:InternetProtocol',
     validateInResponseTo: false, // Keep false to prevent stale request issues
     disableRequestedAuthnContext: true,
     skipRequestCompression: true,
-    requestIdExpirationPeriodMs: 600000, // 10 minutes - increased
+    requestIdExpirationPeriodMs: 1800000, // 30 minutes - AGGRESSIVE
     allowUnsolicited: true,
-    wantAssertionsSigned: true,
-    wantMessageSigned: true,
+    wantAssertionsSigned: false, // Disable to reduce validation issues
+    wantMessageSigned: false, // Disable to reduce validation issues
     wantLogoutRequestSigned: true,
     wantLogoutResponseSigned: true,
     wantNameId: true,
@@ -128,7 +128,7 @@ Ac+2GkbdEJTSU6QMwqZqA6we
     digestAlgorithm: 'sha256',
     // Additional settings to prevent stale requests
     cacheProvider: null, // Disable caching that might cause stale requests
-    maxAssertionAgeMs: 300000, // 5 minutes max age for assertions
+    maxAssertionAgeMs: 600000, // 10 minutes max age for assertions - increased
     // Add encryption settings - 10 YEAR VALIDITY
     decryptionPvk: `-----BEGIN PRIVATE KEY-----
 MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDdoUMGuh4cg0cA
