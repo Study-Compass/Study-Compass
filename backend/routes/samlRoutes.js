@@ -20,10 +20,10 @@ const REFRESH_TOKEN_EXPIRY_MS = REFRESH_TOKEN_EXPIRY_DAYS * 24 * 60 * 60 * 1000;
 const RPI_SAML_CONFIG = {
     // RPI Identity Provider settings
     entryPoint: 'https://shib.auth.rpi.edu/idp/profile/SAML2/Redirect/SSO',
-    issuer: 'https://rpi.study-compass.com/saml/metadata', // Our SP entity ID
+    issuer: 'https://rpi.study-compass.com/auth/saml/metadata', // Our SP entity ID - FIXED
     idpIssuer: 'https://shib-idp.rpi.edu/idp/shibboleth', // RPI's entity ID
-    callbackUrl: 'https://rpi.study-compass.com/saml/callback', // Our callback URL
-    logoutUrl: 'https://rpi.study-compass.com/saml/logout', // Our logout URL
+    callbackUrl: 'https://rpi.study-compass.com/auth/saml/callback', // Our callback URL - FIXED
+    logoutUrl: 'https://rpi.study-compass.com/auth/saml/logout', // Our logout URL - FIXED
     
     // RPI's certificate (from their metadata) - for verifying RPI's responses
     cert: `MIIEMDCCApigAwIBAgIVAOvUt0sLWDqk2hPD+NTZqEnSih5cMA0GCSqGSIb3DQEB
@@ -513,7 +513,7 @@ router.get('/metadata', (req, res) => {
 
     // Generate SP metadata for RPI with comprehensive information
     const metadata = `<?xml version="1.0"?>
-<md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:shibmd="urn:mace:shibboleth:metadata:1.0" xmlns:mdui="urn:oasis:names:tc:SAML:metadata:ui" validUntil="2030-12-31T23:59:59Z" entityID="https://rpi.study-compass.com/saml/metadata">
+<md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:shibmd="urn:mace:shibboleth:metadata:1.0" xmlns:mdui="urn:oasis:names:tc:SAML:metadata:ui" validUntil="2030-12-31T23:59:59Z" entityID="https://rpi.study-compass.com/auth/saml/metadata">
     <md:SPSSODescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol" AuthnRequestsSigned="true" WantAssertionsSigned="true">
         <md:Extensions>
             <shibmd:Scope regexp="false">rpi.study-compass.com</shibmd:Scope>
@@ -578,10 +578,10 @@ oLd6a7pjApbX8ft0ElXMbbZ6hAif8w4DL2PYEh0qu/wnqvJtn46ZWJPLWWWq85/8
                 </ds:X509Data>
             </ds:KeyInfo>
         </md:KeyDescriptor>
-        <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://rpi.study-compass.com/saml/callback" index="0"/>
-        <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://rpi.study-compass.com/saml/callback" index="1"/>
-        <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://rpi.study-compass.com/saml/logout"/>
-        <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://rpi.study-compass.com/saml/logout"/>
+                            <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://rpi.study-compass.com/auth/saml/callback" index="0"/>
+                    <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://rpi.study-compass.com/auth/saml/callback" index="1"/>
+                    <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://rpi.study-compass.com/auth/saml/logout"/>
+                    <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://rpi.study-compass.com/auth/saml/logout"/>
         <md:NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:transient</md:NameIDFormat>
         <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress</md:NameIDFormat>
         <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:persistent</md:NameIDFormat>
