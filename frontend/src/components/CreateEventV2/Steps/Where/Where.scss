@@ -24,7 +24,7 @@
 
     // Selected Section
     .selected-section {
-        margin-bottom: 32px;
+        margin-bottom: 10px;
         
         h2 {
             font-family: 'Satoshi';
@@ -245,7 +245,7 @@
 
     // Recommended Section
     .recommended-section {
-        margin-bottom: 32px;
+        margin-bottom: 10px;
         
         h2 {
             font-family: 'Satoshi';
@@ -645,7 +645,7 @@
                 &.selected {
                     background-color: var(--red);
                     border: none;
-
+                   
                     p {
                         color: white;
                     }
@@ -908,7 +908,7 @@
                     background: var(--offwhite);
                     color: var(--light-text);
                     border: none;
-                    border-radius: 0 12px 12px 0;
+                    border-radius: 0px;
                     font-family: 'Inter';
                     font-size: 14px;
                     font-weight: 500;
@@ -924,9 +924,6 @@
                         background: var(--red);
                         color: white;
                         
-                        &:hover {
-                            background: #dc2626;
-                        }
                     }
                 }
             }
@@ -945,7 +942,7 @@
         
         .selected-section,
         .recommended-section {
-            margin-bottom: 24px;
+            margin-bottom: 10px;
             
             .selected-grid,
             .recommended-grid {
@@ -1070,7 +1067,7 @@
                         font-size: 12px;
                         height: 100px;
                         width: 100%;
-                        border-radius: 0 12px 12px 0;
+                        border-radius: 0px;
                     }
                 }
             }

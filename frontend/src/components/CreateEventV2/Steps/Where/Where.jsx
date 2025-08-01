@@ -347,7 +347,6 @@ function Where({ formData, setFormData, onComplete }){
             {/* Selected Section (shows when rooms are selected) */}
             {selectedRooms.length > 0 && (
                 <div className="selected-section">
-                    <h2>selected ({selectedRooms.length})</h2>
                     <div className={`selected-grid ${selectedRooms.length > 3 ? 'scrollable' : ''}`}>
                         {selectedRooms.map((room) => {
                             const availability = getAvailabilityStatus();
@@ -448,14 +447,17 @@ function Where({ formData, setFormData, onComplete }){
                             );
                         })}
                     </div>
+
+                    <h2 style={{marginTop: '10px',
+                        marginBottom: '0px',
+                    }}>selected ({selectedRooms.length})</h2>
                 </div>
             )}
 
             {/* Recommended Section (shows when no rooms are selected) */}
             {selectedRooms.length === 0 && (
-                <div className="recommended-section">
-                    <h2>recommended</h2>
-                    <div className="recommended-grid">
+                <div className="selected-section">
+                    <div className="selected-grid">
                         {recommendedRooms.map((room) => {
                             const availability = getAvailabilityStatus();
                             const roomNumber = getRoomNumber(room.name);
@@ -471,7 +473,11 @@ function Where({ formData, setFormData, onComplete }){
                             return (
                                 <div 
                                     key={`recommended-${room.id}`}
-                                    className="room-card recommended"
+                                    className="room-card selected"
+                                    style={{
+                                        border: '1px solid var(--lightborder)',
+                                        boxShadow: 'none'
+                                    }}
                                     onClick={() => handleRoomToggle(room)}
                                 >
                                     <div className="room-image">
@@ -520,7 +526,7 @@ function Where({ formData, setFormData, onComplete }){
                                                     }
                                                     
                                                     return (
-                                                        <span key={`recommended-attr-${index}`} className="attribute">
+                                                        <span key={`selected-attr-${index}`} className="attribute">
                                                             {iconSrc && (
                                                                 <img 
                                                                     src={iconSrc} 
@@ -547,6 +553,9 @@ function Where({ formData, setFormData, onComplete }){
                             );
                         })}
                     </div>
+                        <h2 style={{marginTop: '10px',
+                        marginBottom: '0px',
+                    }}>recommended</h2>
                 </div>
             )}
 
