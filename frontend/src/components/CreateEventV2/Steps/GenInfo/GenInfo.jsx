@@ -75,6 +75,7 @@ const GenInfo = ({ formData, setFormData, onComplete }) => {
                        visibility &&
                        expectedAttendance > 0;
 
+        console.log('GenInfo validation result:', isValid);
         onComplete(isValid);
     };
 

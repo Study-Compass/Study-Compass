@@ -8,7 +8,7 @@ import DayColumn from '../../../CalendarComponents/DayColumn/DayColumn';
 import { useNotification } from '../../../../NotificationContext';
 import { Icon } from '@iconify-icon/react/dist/iconify.mjs';
 
-function Where({next, visible, setInfo}){
+function Where({ formData, setFormData, onComplete }){
     const {addNotification} = useNotification();
     const {getRoom, getRooms} = useCache();
     const [roomIds, setRoomIds] = useState({});
@@ -18,7 +18,6 @@ function Where({next, visible, setInfo}){
     const [data, setData] = useState({});
     const [loading, setLoading] = useState(true);
     const [query, setQuery] = useState({'S': [],'M': [],'T': [],'W': [],'R': [],'F': [], "H": []});
-    const [nextActive, setNextActive] = useState(false);    
     const [dateRange, setDateRange] = useState(getCurrentWeek());
     
     const days = ["S", "M", "T", "W", "R", "F", "H"];
@@ -47,32 +46,43 @@ function Where({next, visible, setInfo}){
         getData("none");
     }, []);
 
+    // Check if step is already completed on mount
+    useEffect(() => {
+        if (formData.start_time && formData.end_time) {
+            console.log('Where component validation: true (already completed)');
+            onComplete(true);
+        }
+    }, [formData.start_time, formData.end_time, onComplete]);
+
     useEffect(() => {
         if(Object.values(query).flat().length > 0){
             if(empty){
                 addNotification({ title: "No room selected", message: "please select a room before selecting a timeslot", type: "error" });
                 setQuery({'S': [],'M': [],'T': [],'W': [],'R': [],'F': [], "H": []});
+                console.log('Where component validation: false (no room selected)');
+                onComplete(false);
             } else {
-                setNextActive(true);
                 const singleQuery = Object.values(query).flat()[0];
                 const index = days.indexOf(Object.keys(query).find(key => query[key].includes(singleQuery)));
                 console.log(getDateTime(dateRange[index][1], singleQuery.start_time));
-                setInfo(prev => ({
+                setFormData(prev => ({
                     ...prev,
                     start_time: getDateTime(dateRange[index][1], singleQuery.start_time),
                     end_time: getDateTime(dateRange[index][1], singleQuery.end_time),
                 }));
-
+                console.log('Where component validation: true (time slot selected)');
+                onComplete(true);
             }
         } else {
-            setNextActive(false);
+            console.log('Where component validation: false (no time slot selected)');
+            onComplete(false);
         }
-    },[query]);
+    },[query, empty, dateRange, setFormData, onComplete]);
 
     const handleRoomSelect = (e) => {
         const id = roomIds[e.target.value];
         setSelectedRoom(e.target.value);
-        setInfo(prev => ({
+        setFormData(prev => ({
             ...prev,
             location: e.target.value,
             classroomId: id
@@ -114,7 +124,7 @@ function Where({next, visible, setInfo}){
         container.addEventListener('scroll', handleScroll);
         return () => container.removeEventListener('scroll', handleScroll);
       }
-    }, [visible]);
+    }, []);
 
     // ================================================================================================================
     
@@ -122,7 +132,7 @@ function Where({next, visible, setInfo}){
 
 
     return(
-        <div className={`when-where create-component ${visible && "visible"}`}>
+        <div className="when-where create-component">
             <h1>when & where</h1>
             <div className="time-select">
                 <select name="select" id="" onChange={handleRoomSelect}>
@@ -144,9 +154,6 @@ function Where({next, visible, setInfo}){
                     <div className="right-arrow" onClick={()=>setDateRange(getNextWeek(dateRange))}><Icon icon="charm:chevron-right" /></div>
                 </div>
             </div>
-            <button className={`next-button ${nextActive && "active"}`} onClick={next}>
-                next
-            </button>
         </div>
     );
 }

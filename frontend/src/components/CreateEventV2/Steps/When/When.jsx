@@ -5,13 +5,12 @@ import EventsCalendar from '../../../../pages/OIEDash/EventsCalendar/EventsCalen
 import { useCache } from '../../../../CacheContext';
 import { useNotification } from '../../../../NotificationContext';
 
-function When({next, visible, setInfo}){
+function When({ formData, setFormData, onComplete }){
     const {addNotification} = useNotification();
     const {getRooms} = useCache();
     const [roomIds, setRoomIds] = useState({});
     const [rooms, setRooms] = useState([]);
     const [selectedRoom, setSelectedRoom] = useState(null);
-    const [nextActive, setNextActive] = useState(false);
 
     const getRoomsData = async () => {
         try {
@@ -32,25 +31,35 @@ function When({next, visible, setInfo}){
         getRoomsData();
     }, []);
 
+    // Check if step is already completed on mount
+    useEffect(() => {
+        if (formData.location) {
+            console.log('When component validation: true (already completed)');
+            onComplete(true);
+        }
+    }, [formData.location, onComplete]);
+
     useEffect(() => {
         if (selectedRoom) {
-            setNextActive(true);
-            setInfo(prev => ({
+            setFormData(prev => ({
                 ...prev,
                 location: selectedRoom,
                 classroomId: roomIds[selectedRoom]
             }));
+            console.log('When component validation: true (room selected)');
+            onComplete(true);
         } else {
-            setNextActive(false);
+            console.log('When component validation: false (no room selected)');
+            onComplete(false);
         }
-    }, [selectedRoom, roomIds]);
+    }, [selectedRoom, roomIds, setFormData, onComplete]);
 
     const handleRoomSelect = (roomName) => {
         setSelectedRoom(roomName);
     }
 
     return(
-        <div className={`when-where create-component ${visible && "visible"}`}>
+        <div className="when-where create-component">
             <h1>when & where</h1>
             <div className="calendar-layout">
                 <div className="room-sidebar">
@@ -73,9 +82,6 @@ function When({next, visible, setInfo}){
                     <EventsCalendar expandedClass="create-event-calendar" />
                 </div>
             </div>
-            <button className={`next-button ${nextActive && "active"}`} onClick={next}>
-                next
-            </button>
         </div>
     );
 }

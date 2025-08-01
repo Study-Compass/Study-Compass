@@ -6,7 +6,7 @@ import {Icon} from '@iconify-icon/react';
 import GradientButtonCover from '../../../../assets/GradientButtonCover.png';
 import FullEvent from '../../../EventsViewer/EventsGrid/EventsColumn/FullEvent/FullEvent';
 
-function Review({info, visible, setInfo, onSubmit}){
+function Review({ formData, setFormData, onComplete }){
 
     const [checked, setChecked] = useState([]);
 
@@ -18,8 +18,6 @@ function Review({info, visible, setInfo, onSubmit}){
     //criteria to be able to create event
     const [selected, setSelected] = useState(false);
     const [contact, setContact] = useState("");
-
-    const [complete, setComplete] = useState(false);
 
     const handleChange = (e) => {
         const {name} = e.target;
@@ -59,30 +57,38 @@ function Review({info, visible, setInfo, onSubmit}){
         } else {
             setSelected(false);
         }
-        setInfo(prev => ({
+        setFormData(prev => ({
             ...prev,
             OIEAcknowledgementItems: pspeak ? catering ? ["pspeak", "catering"] : ["pspeak"] : catering ? ["catering"] : [],
             contact: contact
         }));
-    },[pspeak, catering, contact, alumni, none, contact]);
+    },[pspeak, catering, contact, alumni, none, setFormData]);
 
     useEffect(()=>{
         if(selected && contact !== ""){
-            setComplete(true);
+            onComplete(true);
         } else {
-            setComplete(false);
+            onComplete(false);
         }
-        console.log(contact);
-    },[selected, contact]);
+        console.log('Review component validation:', selected && contact !== "");
+    },[selected, contact, onComplete]);
+
+    // Check if step is already completed on mount
+    useEffect(() => {
+        if (formData.contact && formData.OIEAcknowledgementItems && formData.OIEAcknowledgementItems.length > 0) {
+            console.log('Review component validation: true (already completed)');
+            onComplete(true);
+        }
+    }, [formData.contact, formData.OIEAcknowledgementItems, onComplete]);
 
     return(
-        <div className={`create-component review ${visible && "visible"}`}>
+        <div className="create-component review">
             <h1>review</h1>
             <div className="review-content">
                 <div className="preview">
-                    {info.name && info.start_time && info.description ?
+                    {formData.name && formData.start_time && formData.description ?
                         <div className="event-preview">
-                            <FullEvent event={info}/>
+                            <FullEvent event={formData}/>
                         </div>
                         :
                         <div className="no-preview">
@@ -136,18 +142,6 @@ function Review({info, visible, setInfo, onSubmit}){
                     </div>
                 </div>
 
-            </div>
-            <div className="publish-container">
-                {visible && 
-                    <div className={`publish ${complete && 'active'}`} onClick={complete ? onSubmit : ()=>{}}>
-                        <div className="info">
-                            <h1>{pspeak || catering || info.expectedAttendance > 99 || alumni ? "request OIE approval" : "publish event"}</h1>
-                        </div>
-                        <div className="gradient-cover">
-                            <img src={GradientButtonCover} alt="" />
-                        </div>
-                    </div>
-                }
             </div>
         </div>
     );

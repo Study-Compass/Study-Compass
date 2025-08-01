@@ -94,14 +94,14 @@ const CreateEventV2 = () => {
         {
             id: 1,
             title: 'Location',
-            description: 'Select prefered locations to compare avaliable timeslots',
-            component: Where,
+            description: 'Select a room for your event',
+            component: When,
         },
         {
             id: 2,
             title: 'Date & Time',
-            description: 'Compare avaliable timeslots to find the best fit',
-            component: When,
+            description: 'Choose your preferred time slot',
+            component: Where,
         },
         {
             id: 3,

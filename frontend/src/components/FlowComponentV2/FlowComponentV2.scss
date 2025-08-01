@@ -68,7 +68,7 @@
 
             h1 {
                 font-size: 24px;
-                color: var(--text-color);
+                color: var(--text);
                 line-height: 1.2;
             }
 
@@ -76,7 +76,7 @@
                 font-family: 'Inter';
                 font-weight: 400;
                 font-size: 14px;
-                color: var(--text-color-secondary);
+                color: var(--light-text);
                 margin: 0;
                 line-height: 1.5;
             }
@@ -104,8 +104,9 @@
                 
                 .step-number {
                     background: transparent;
-                    color: white;
-                    svg{
+                    color: var(--red);
+                    
+                    .completed-icon {
                         color: var(--red);
                     }
                 }
@@ -123,8 +124,8 @@
                 width: 24px;
                 height: 24px;
                 border-radius: 50%;
-                background: var(--off-white);
-                color: var(--text-color-secondary);
+                background: var(--offwhite);
+                color: var(--light-text);
                 display: flex;
                 align-items: center;
                 justify-content: center;
@@ -138,6 +139,12 @@
                     // height: 25px;
                     font-size:25px;
                 }
+
+                .completed-icon {
+                    color: var(--red);
+                    font-weight: bold;
+                    font-size: 14px;
+                }
             }
 
             .step-content {
@@ -148,7 +155,7 @@
                     font-family: 'Inter';
                     font-size: 14px;
                     font-weight: 600;
-                    color: var(--text-color);
+                    color: var(--text);
                     margin: 0 0 2px 0;
                     line-height: 1.3;
                 }
@@ -157,7 +164,7 @@
                     font-family: 'Inter';
                     font-size: 12px;
                     font-weight: 300;
-                    color: var(--text-color-secondary);
+                    color: var(--light-text);
                     margin: 0;
                     line-height: 1.4;
                 }
@@ -183,7 +190,7 @@
             h2 {
                 font-family: 'Satoshi';
                 font-size: 28px;
-                color: var(--text-color);
+                color: var(--text);
                 margin: 0 0 8px 0;
                 line-height: 1.2;
 
@@ -195,7 +202,7 @@
             p {
                 font-family: 'Satoshi';
                 font-size: 16px;
-                color: var(--text-color-secondary);
+                color: var(--light-text);
                 margin: 0;
                 line-height: 1.5;
             }
@@ -238,22 +245,22 @@
             }
 
             .btn-primary {
-                background: var(--accent-color);
+                background: var(--red);
                 color: white;
 
                 &:hover:not(:disabled) {
-                    background: var(--accent-color);
+                    background: var(--red);
                     transform: translateY(-1px);
                 }
 
                 &.disabled {
-                    background: var(--dark-bounding-color);
+                    background: var(--lightborder);
                 }
             }
 
             .btn-secondary {
-                background: var(--light-bounding-color);
-                color: var(--text-color);
+                background: var(--light);
+                color: var(--text);
 
                 &:hover:not(:disabled) {
                     background: #e2e8f0;

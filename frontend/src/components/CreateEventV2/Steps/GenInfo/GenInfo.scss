@@ -229,7 +229,7 @@
                 font-family: 'Inter';
                 font-size: 12px;
                 font-weight: 400;
-                color: var(--text-color-secondary);
+                color: var(--light-text);
             }
 
             .slider-value {   
@@ -253,7 +253,7 @@
             font-family: 'Inter';
             font-size: 12px;
             font-weight: 200;
-            color: var(--text-color-secondary);
+            color: var(--light-text);
             margin: 0;
 
         }
@@ -262,14 +262,14 @@
             font-family: 'Inter';
             font-size: 12px;
             font-weight: 400;
-            color: var(--text-color);
+            color: var(--text);
             margin: 0;
             line-height: 1.4;
         }
     }
 
     .tips-section {
-        background: var(--lighter-bounding-color);
+        background: var(--lighter);
         border: 1px solid #e2e8f0;
         border-radius: 8px;
         padding: 20px;
@@ -285,7 +285,7 @@
         p {
             font-family: 'Inter';
             font-size: 13px;
-            color: var(--text-color-secondary);
+            color: var(--light-text);
             margin: 0;
             line-height: 1.4;
 
