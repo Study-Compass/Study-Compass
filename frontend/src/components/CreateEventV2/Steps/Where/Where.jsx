@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import './Where.scss'
 
 import { useCache } from '../../../../CacheContext';
@@ -25,6 +25,13 @@ function Where({ formData, setFormData, onComplete }){
     const [isInitialized, setIsInitialized] = useState(false);
     const [selectedTags, setSelectedTags] = useState([]);
     const [sortBy, setSortBy] = useState('name');
+    
+    // Temporary state for pending changes (not applied until user clicks apply)
+    const [tempSelectedTags, setTempSelectedTags] = useState([]);
+    const [tempSortBy, setTempSortBy] = useState('name');
+    
+    // Ref for click outside detection
+    const popupRef = useRef(null);
 
     // Available tags with their icons
     const availableTags = ["windows", "outlets", "printer", "small desks", "tables"];
@@ -86,6 +93,26 @@ function Where({ formData, setFormData, onComplete }){
     useEffect(() => {
         fetchRoomsData();
     }, []);
+
+    // Click outside detection to close popup and reset temporary state
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (popupRef.current && !popupRef.current.contains(event.target)) {
+                // Reset temporary state to current applied state
+                setTempSelectedTags(selectedTags);
+                setTempSortBy(sortBy);
+                setSelectedFilter(null);
+            }
+        };
+
+        if (selectedFilter) {
+            document.addEventListener('mousedown', handleClickOutside);
+        }
+
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [selectedFilter, selectedTags, sortBy]);
 
     // Initialize selected rooms from formData ONLY ONCE when component mounts
     useEffect(() => {
@@ -163,13 +190,16 @@ function Where({ formData, setFormData, onComplete }){
         if(selectedFilter === filter){
             setSelectedFilter(null);
         } else {
+            // Initialize temporary state with current applied state when opening popup
+            setTempSelectedTags(selectedTags);
+            setTempSortBy(sortBy);
             setSelectedFilter(filter);
         }
     };
 
-    // Handle tag selection
-    const handleTagSelect = (tag) => {
-        setSelectedTags(prev => {
+    // Handle temporary tag selection (not applied until user clicks apply)
+    const handleTempTagSelect = (tag) => {
+        setTempSelectedTags(prev => {
             if (prev.includes(tag)) {
                 return prev.filter(t => t !== tag);
             } else {
@@ -178,33 +208,74 @@ function Where({ formData, setFormData, onComplete }){
         });
     };
 
-    // Handle sort selection
-    const handleSortSelect = (sortType) => {
-        setSortBy(sortType);
-        setSelectedFilter(null);
+    // Handle temporary sort selection (not applied until user clicks apply)
+    const handleTempSortSelect = (sortType) => {
+        setTempSortBy(sortType);
     };
 
-    // Apply filters
+    // Apply filters - commit temporary state to actual state
     const applyFilters = () => {
+        setSelectedTags(tempSelectedTags);
+        setSortBy(tempSortBy);
         setSelectedFilter(null);
     };
 
     // Clear all filters
     const clearFilters = () => {
-        setSelectedTags([]);
-        setSortBy('name');
+        setTempSelectedTags([]);
+        setTempSortBy('name');
     };
+
+    // Check if there are pending changes for apply button state
+    const hasChanges = useMemo(() => {
+        const tagsChanged = JSON.stringify(tempSelectedTags.sort()) !== JSON.stringify(selectedTags.sort());
+        const sortChanged = tempSortBy !== sortBy;
+        return tagsChanged || sortChanged;
+    }, [tempSelectedTags, selectedTags, tempSortBy, sortBy]);
+
+    // Enhanced search functionality based on SearchBar component
+    const searchResults = useMemo(() => {
+        if (!searchQuery.trim()) return [];
+        
+        const query = searchQuery.toLowerCase().trim();
+        
+        // First get exact matches (startsWith)
+        const exactMatches = roomData.filter(room => 
+            room.name.toLowerCase().startsWith(query)
+        );
+        
+        // Then get partial matches (contains but doesn't start with)
+        const partialMatches = roomData.filter(room => {
+            const name = room.name.toLowerCase();
+            return name.includes(query) && !name.startsWith(query);
+        });
+        
+        // Also search in attributes
+        const attributeMatches = roomData.filter(room => {
+            if (!room.roomInfo.attributes) return false;
+            const nameMatch = room.name.toLowerCase().includes(query);
+            if (nameMatch) return false; // Already included above
+            
+            return room.roomInfo.attributes.some(attr => 
+                attr.toLowerCase().includes(query)
+            );
+        });
+        
+        // Combine and limit results
+        const allMatches = [...exactMatches, ...partialMatches, ...attributeMatches];
+        const uniqueMatches = allMatches.filter((room, index, self) => 
+            index === self.findIndex(r => r.id === room.id)
+        );
+        
+        return uniqueMatches.slice(0, 10);
+    }, [roomData, searchQuery]);
 
     // Filter rooms based on search query and selected tags
     const filteredRooms = useMemo(() => {
         if (!roomData.length) return [];
         
-        let filtered = roomData.filter(room => 
-            room.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            (room.roomInfo.attributes && room.roomInfo.attributes.some(attr => 
-                attr.toLowerCase().includes(searchQuery.toLowerCase())
-            ))
-        );
+        // If there's a search query, use search results as base
+        let filtered = searchQuery.trim() ? searchResults : roomData;
 
         // Apply tag filters
         if (selectedTags.length > 0) {
@@ -231,9 +302,9 @@ function Where({ formData, setFormData, onComplete }){
             }
         });
 
-        // Cap at 10 items to reduce lag
-        return filtered.slice(0, 10);
-    }, [roomData, searchQuery, selectedTags, sortBy]);
+        // Cap at 10 items to reduce lag (only if not using search)
+        return searchQuery.trim() ? filtered : filtered.slice(0, 10);
+    }, [roomData, searchQuery, searchResults, selectedTags, sortBy]);
 
     // Get recommended rooms (first 3, excluding already selected ones)
     const recommendedRooms = useMemo(() => {
@@ -484,9 +555,10 @@ function Where({ formData, setFormData, onComplete }){
                 <div className="search-bar">
                     <input 
                         type="text" 
-                        placeholder="search..." 
+                        placeholder="search rooms..." 
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
+                        spellCheck="false"
                     />
                     {searchQuery && (
                         <Icon 
@@ -500,7 +572,7 @@ function Where({ formData, setFormData, onComplete }){
                 {/* Sort Row - using Sort component styling */}
                 <div className="sort-row">
                     {selectedFilter === "tags" && (
-                        <div className="sort-popup">
+                        <div className="sort-popup" ref={popupRef}>
                             <div className="heading">
                                 <h1>Tags</h1>
                                 <p onClick={clearFilters} className="clear">clear</p>
@@ -511,12 +583,12 @@ function Where({ formData, setFormData, onComplete }){
                                         {availableTags.map((tag, index) => (
                                             <div 
                                                 key={index} 
-                                                className={`option ${selectedTags.includes(tag) ? "selected" : ""}`} 
-                                                onClick={() => handleTagSelect(tag)}
+                                                className={`option ${tempSelectedTags.includes(tag) ? "selected" : ""}`} 
+                                                onClick={() => handleTempTagSelect(tag)}
                                             >
                                                 {attributeIcons && Object.keys(attributeIcons).includes(tag) && (
                                                     <img 
-                                                        src={selectedTags.includes(tag) ? selectedAttributeIcons?.[tag] : attributeIcons[tag]} 
+                                                        src={tempSelectedTags.includes(tag) ? selectedAttributeIcons?.[tag] : attributeIcons[tag]} 
                                                         alt={tag}
                                                     />
                                                 )}
@@ -527,9 +599,9 @@ function Where({ formData, setFormData, onComplete }){
                                 </div>
                             </div>
                             <button 
-                                className={`button ${selectedTags.length > 0 ? "active" : ""}`} 
-                                style={{height:'40px'}} 
+                                className={`button ${hasChanges ? 'active' : ''}`} 
                                 onClick={applyFilters}
+                                disabled={!hasChanges}
                             >
                                 apply
                             </button>
@@ -537,30 +609,30 @@ function Where({ formData, setFormData, onComplete }){
                     )}
                     
                     {selectedFilter === "sort" && (
-                        <div className="sort-popup">
+                        <div className="sort-popup" ref={popupRef}>
                             <div className="heading">
                                 <h1>Sort by</h1>
                             </div>
                             <div className="sort-options">
                                 <div 
-                                    className={sortBy === "name" ? "option selected" : "option"} 
-                                    onClick={() => handleSortSelect("name")}
+                                    className={tempSortBy === "name" ? "option selected" : "option"} 
+                                    onClick={() => handleTempSortSelect("name")}
                                 >
                                     <Icon icon="material-symbols:sort-by-alpha" />
                                     <p>Name</p>
                                 </div>
                                 <div 
-                                    className={sortBy === "availability" ? "option selected" : "option"} 
-                                    onClick={() => handleSortSelect("availability")}
+                                    className={tempSortBy === "availability" ? "option selected" : "option"} 
+                                    onClick={() => handleTempSortSelect("availability")}
                                 >
                                     <Icon icon="material-symbols:schedule" />
                                     <p>Availability</p>
                                 </div>
                             </div>
                             <button 
-                                className="button active" 
-                                style={{height:'40px'}} 
+                                className={`button ${hasChanges ? 'active' : ''}`} 
                                 onClick={applyFilters}
+                                disabled={!hasChanges}
                             >
                                 apply
                             </button>
@@ -568,19 +640,19 @@ function Where({ formData, setFormData, onComplete }){
                     )}
                     
                     <div 
-                        className={`tags ${selectedFilter === 'tags' ? "selected": ""}`} 
+                        className={`tags ${selectedFilter === 'tags' ? "selected": ""} ${selectedTags.length > 0 ? "has-filters" : ""}`} 
                         onClick={() => handleFilterSelect('tags')}
                     >
                         <img src={selectedFilter === 'tags' ? TagsSelected : Tags} alt="" />
-                        <p>Tags</p>
+                        <p>Tags {selectedTags.length > 0 && `(${selectedTags.length})`}</p>
                         <img src={selectedFilter === 'tags' ? ChevronUp : ChevronDown} alt="" />
                     </div>
                     <div 
-                        className={`sort-by ${selectedFilter === 'sort' ? "selected" : ""}`} 
+                        className={`sort-by ${selectedFilter === 'sort' ? "selected" : ""} ${sortBy !== 'name' ? "has-filters" : ""}`} 
                         onClick={() => handleFilterSelect('sort')}
                     >
                         <img src={selectedFilter === 'sort' ? SortBySelected : SortBy} alt="" />
-                        <p>Sort</p>
+                        <p>Sort {sortBy !== 'name' && `(${sortBy})`}</p>
                         <img src={selectedFilter === 'sort' ? ChevronUp : ChevronDown} alt="" />
                     </div>
                 </div>
@@ -588,6 +660,12 @@ function Where({ formData, setFormData, onComplete }){
 
             {/* Room List Section */}
             <div className="room-list-section">
+                {filteredRooms.length === 0 && searchQuery.trim() && (
+                    <div className="no-results">
+                        <p>No rooms found matching "{searchQuery}"</p>
+                        <p className="suggestion">Try adjusting your search terms or clearing filters</p>
+                    </div>
+                )}
                 {filteredRooms.map((room) => {
                     const availability = getAvailabilityStatus();
                     const isSelected = selectedRoomIds.has(room.id);
