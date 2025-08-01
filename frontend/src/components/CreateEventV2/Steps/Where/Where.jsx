@@ -231,7 +231,8 @@ function Where({ formData, setFormData, onComplete }){
             }
         });
 
-        return filtered;
+        // Cap at 10 items to reduce lag
+        return filtered.slice(0, 10);
     }, [roomData, searchQuery, selectedTags, sortBy]);
 
     // Get recommended rooms (first 3, excluding already selected ones)
@@ -631,7 +632,7 @@ function Where({ formData, setFormData, onComplete }){
                                 {/* ALWAYS show room attributes - SIMPLIFIED AND DEFENSIVE */}
                                 {room.roomInfo.attributes && Array.isArray(room.roomInfo.attributes) && room.roomInfo.attributes.length > 0 ? (
                                     <div className="attributes">
-                                        {room.roomInfo.attributes.slice(0, 4).map((attr, index) => {
+                                        {room.roomInfo.attributes.map((attr, index) => {
                                             console.log(`Processing list room attribute: "${attr}"`);
                                             
                                             // Safely check for icons - don't let icon failures prevent attribute display
@@ -676,9 +677,9 @@ function Where({ formData, setFormData, onComplete }){
                                 )}
                             </div>
                             <div className="room-actions">
-                                <button className={`add-btn ${isSelected ? 'selected' : ''}`}>
+                                <div className={`add-btn ${isSelected ? 'selected' : ''}`}>
                                     {isSelected ? 'remove' : 'add'}
-                                </button>
+                                </div>
                             </div>
                         </div>
                     );

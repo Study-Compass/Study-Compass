@@ -680,20 +680,28 @@
         }
 
         .room-list-item {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            padding: 16px;
+            display: grid;
+            grid-template-columns: 200px 1fr 1fr 1fr 100px;
+            grid-template-rows: 1fr;
+            gap: 0;
+            padding: 0;
             background: white;
             border: 2px solid var(--lightborder);
             border-radius: 12px;
             cursor: pointer;
             transition: all 0.2s ease;
+            min-height: 120px;
+            overflow: hidden;
             
             &:hover {
-                border-color: var(--red);
+                border-color: var(--dark-red-transparent);
                 transform: translateY(-1px);
                 box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+
+                .room-actions .add-btn {
+                    background-color: var(--red-transparent);
+                    color: var(--dark-red-transparent);
+                }
             }
             
             &.selected {
@@ -703,12 +711,14 @@
             }
 
             .room-thumbnail {
-                width: 120px;
-                height: 90px;
+                grid-column: 1;
+                grid-row: 1;
+                width: 100%;
+                height: 100%;
                 background: var(--offwhite);
-                border-radius: 8px;
-                overflow: hidden;
-                flex-shrink: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
                 
                 img {
                     width: 100%;
@@ -717,10 +727,6 @@
                 }
                 
                 .no-image {
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    height: 100%;
                     color: var(--light-text);
                     font-family: 'Inter';
                     font-size: 12px;
@@ -728,18 +734,21 @@
             }
 
             .room-details {
-                flex: 1;
-                min-width: 0;
+                grid-column: 2 / 5;
+                grid-row: 1;
+                display: grid;
+                grid-template-rows: auto auto 1fr;
+                padding: 16px;
+                gap: 8px;
                 
                 .room-title {
                     display: flex;
                     align-items: center;
                     gap: 8px;
-                    margin-bottom: 4px;
                     
                     h3 {
                         font-family: 'Satoshi';
-                        font-size: 16px;
+                        font-size: 18px;
                         font-weight: 600;
                         color: var(--text);
                         margin: 0;
@@ -750,11 +759,11 @@
                         background: var(--red);
                         color: white;
                         font-family: 'Inter';
-                        font-size: 10px;
+                        font-size: 12px;
                         font-weight: 600;
-                        padding: 2px 4px;
+                        padding: 4px 8px;
                         border-radius: 6px;
-                        min-width: 16px;
+                        min-width: 20px;
                         text-align: center;
                     }
                 }
@@ -762,8 +771,7 @@
                 .rating-availability {
                     display: flex;
                     align-items: center;
-                    gap: 12px;
-                    margin-bottom: 6px;
+                    gap: 16px;
 
                     .rating {
                         display: flex;
@@ -771,13 +779,13 @@
                         gap: 4px;
                         
                         img {
-                            width: 14px;
-                            height: 14px;
+                            width: 16px;
+                            height: 16px;
                         }
                         
                         span {
                             font-family: 'Inter';
-                            font-size: 12px;
+                            font-size: 14px;
                             color: var(--text);
                             font-weight: 500;
                         }
@@ -786,11 +794,11 @@
                     .availability {
                         display: flex;
                         align-items: center;
-                        gap: 4px;
+                        gap: 6px;
                         
                         .availability-dot {
-                            width: 6px;
-                            height: 6px;
+                            width: 8px;
+                            height: 8px;
                             border-radius: 50%;
                             
                             &.green {
@@ -804,7 +812,7 @@
                         
                         span {
                             font-family: 'Inter';
-                            font-size: 11px;
+                            font-size: 12px;
                             color: var(--light-text);
                             font-weight: 400;
                         }
@@ -814,24 +822,25 @@
                 .attributes {
                     display: flex;
                     flex-wrap: wrap;
-                    gap: 4px;
+                    gap: 6px;
+                    align-self: start;
                     
                     .attribute {
                         background: var(--offwhite);
                         color: var(--light-text);
                         font-family: 'Inter';
-                        font-size: 10px;
+                        font-size: 11px;
                         font-weight: 500;
-                        padding: 2px 6px;
+                        padding: 4px 8px;
                         border-radius: 8px;
                         border: 1px solid var(--lightborder);
                         display: flex;
                         align-items: center;
-                        gap: 3px;
+                        gap: 4px;
                         
                         .attribute-icon {
-                            width: 12px;
-                            height: 12px;
+                            width: 14px;
+                            height: 14px;
                             flex-shrink: 0;
                         }
                     }
@@ -839,29 +848,27 @@
             }
 
             .room-actions {
+                grid-column: 5;
+                grid-row: 1;
                 display: flex;
-                flex-direction: column;
                 align-items: center;
-                gap: 8px;
-                flex-shrink: 0;
+                justify-content: center;
                 
                 .add-btn {
-                    background: var(--lightborder);
-                    color: var(--text);
+                    background: var(--offwhite);
+                    color: var(--light-text);
                     border: none;
-                    border-radius: 6px;
-                    padding: 8px 16px;
                     font-family: 'Inter';
-                    font-size: 12px;
+                    font-size: 14px;
                     font-weight: 500;
                     cursor: pointer;
                     transition: all 0.2s ease;
-                    min-width: 60px;
+                    width: 100%;
+                    height: 100%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
                     
-                    &:hover {
-                        background: var(--light-text);
-                        color: white;
-                    }
                     
                     &.selected {
                         background: var(--red);
@@ -934,26 +941,82 @@
         
         .room-list-section {
             .room-list-item {
-                padding: 12px;
-                gap: 12px;
+                grid-template-columns: 150px 1fr 80px;
+                gap: 0;
+                padding: 0;
+                min-height: 100px;
                 
                 .room-thumbnail {
-                    width: 60px;
-                    height: 45px;
+                    grid-column: 1;
+                    grid-row: 1;
                 }
                 
                 .room-details {
+                    grid-column: 2;
+                    grid-row: 1;
+                    padding: 12px;
+                    gap: 6px;
+                    
                     .room-title {
                         h3 {
-                            font-size: 14px;
+                            font-size: 16px;
+                        }
+                        
+                        .room-number {
+                            font-size: 10px;
+                            padding: 2px 6px;
+                        }
+                    }
+                    
+                    .rating-availability {
+                        gap: 12px;
+                        
+                        .rating {
+                            img {
+                                width: 14px;
+                                height: 14px;
+                            }
+                            
+                            span {
+                                font-size: 12px;
+                            }
+                        }
+                        
+                        .availability {
+                            .availability-dot {
+                                width: 6px;
+                                height: 6px;
+                            }
+                            
+                            span {
+                                font-size: 10px;
+                            }
+                        }
+                    }
+                    
+                    .attributes {
+                        gap: 4px;
+                        
+                        .attribute {
+                            font-size: 10px;
+                            padding: 3px 6px;
+                            
+                            .attribute-icon {
+                                width: 12px;
+                                height: 12px;
+                            }
                         }
                     }
                 }
                 
                 .room-actions {
+                    grid-column: 3;
+                    grid-row: 1;
+                    
                     .add-btn {
-                        font-size: 10px;
-                        padding: 4px 8px;
+                        font-size: 12px;
+                        height: 100%;
+                        width: 100%;
                     }
                 }
             }
