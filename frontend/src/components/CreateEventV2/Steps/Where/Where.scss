@@ -1,6 +1,12 @@
 .where {
     padding: 20px;
     
+    // Ensure no bullet points anywhere in this component only
+    ul, li {
+        list-style: none !important;
+        list-style-type: none !important;
+    }
+    
     h1 {
         font-family: 'Satoshi';
         font-size: 28px;
@@ -413,70 +419,20 @@
         }
     }
 
-    // Search and Filter Section
+    // Search and Filter Section - Removed original styling to avoid conflicts  
     .search-filter-section {
         margin-bottom: 24px;
-        
-        .search-bar {
-            border: none;
-            display: flex;
-            padding-left: 0px;
-            padding-right: 0px;
-            position: relative;
-            
-            input {
-                width: 100%;
-                padding: 12px 40px 12px 16px;
-                border: 2px solid var(--lightborder);
-                border-radius: 8px;
-                font-family: 'Inter';
-                font-size: 16px;
-                color: var(--text);
-                background: white;
-                text-align: left;
-                transition: all 0.3s ease;
-                box-sizing: border-box;
-                
-                &:focus {
-                    outline: none;
-                    border-color: var(--red);
-                    text-align: left;
-                 }
-                
-                &::placeholder {
-                    color: var(--light-text);
-                    text-align: center;
-                }
-            }
-            
-            .clear-search {
-                position: absolute;
-                right: 12px;
-                top: 50%;
-                transform: translateY(-50%);
-                cursor: pointer;
-                color: var(--light-text);
-                font-size: 18px;
-                transition: all 0.2s ease;
-                z-index: 10;
-                
-                &:hover {
-                    color: var(--text);
-                    transform: translateY(-50%) scale(1.1);
-                }
-            }
-        }
     }
 
     // Sort Row - using Sort component styling
     .sort-row {
         display: flex;
-        justify-content: flex-start;
+        justify-content: center;
         align-items: center;
         gap: 5px;
         width: 100%;
         padding: 0px;
-        margin-top: 0px;
+        margin-top: 5px;
         box-sizing: border-box;
         position: relative;
 
@@ -979,6 +935,7 @@
             flex-direction: column;
             gap: 5px;
             padding: 0 10px;
+            margin-top: 5px;
             
             .sort-popup {
                 left: 10px;
@@ -1072,6 +1029,180 @@
                 }
             }
         }
+    }
+
+    // Search Container - Exact copy from SearchBar.scss
+    .search-filter-section {
+        .search-container {
+            width: 100%;
+            position: relative;
+            margin: 0;
+            height: fit-content;
+            z-index: 2;
+
+            ul {
+                list-style-type: none;
+                margin: 0;
+                padding: 0;
+                width: 100%;
+                max-height: 200px;
+                position: absolute;
+                border: 1px solid var(--border);
+                z-index: 8;
+                transform: translateY(-15px);
+                box-sizing: border-box;
+                border-radius: 10px;
+                background-color: #FBFBFB;
+                overflow: scroll;
+            }
+
+            li {
+                background-color: #FBFBFB;
+                font-family: 'Inter';
+                font-size: 17px;
+                font-weight: 450;
+                color: #414141;
+                padding: 5px 20px;
+                box-sizing: border-box;
+                outline: none;
+                text-align: left;
+                border-radius: 10px;
+                position: relative;
+                transition: all 0.5s;
+                width: 100%;
+                cursor: pointer;
+
+                &:hover {
+                    background-color: #f0f0f0;
+                }
+
+                &.chosen {
+                    background-color: #F7F7F7;
+                    border-radius: 5px;
+
+                    &::before {
+                        content: "";
+                        background-color: #FA756D;
+                        position: absolute;
+                        left: 0px;
+                        top: 0px;
+                        height: 100%;
+                        width: 6px;
+                        border-radius: 0 5px 5px 0;
+                    }
+                }
+
+                &.no-results {
+                    &:hover {
+                        background-color: white !important;
+                    }
+                }
+            }
+
+            .search-bar {
+                width: 100%;
+                background-color: transparent;
+                border-radius: 10px;
+                border: 1px solid #B0AFAF;
+                font-family: 'Inter';
+                font-size: 17px;
+                font-weight: 450;
+                color: #414141;
+                padding: 7px 40px 7px 20px;
+                box-sizing: border-box;
+                outline: none;
+                text-align: left !important;
+                z-index: 10;
+                position: relative;
+                transition: all 0.3s;
+                white-space: nowrap;
+                overflow: hidden;
+            }
+
+            .non-match {
+                color: #929292;
+            }
+
+            .spacer {
+                height: 15px;
+            }
+
+            .x-container {
+                height: 100%;
+                position: absolute;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                right: 15px;
+                top: 0;
+            }
+
+            .x {
+                height: 12px;
+                width: 12px;
+                z-index: 11;
+                transform: scale(1.1);
+                padding: 4.2% 0 0 0;
+                cursor: pointer;
+
+                &:hover {
+                    transform: scale(1.2);
+                }
+            }
+
+            .result {
+                pointer-events: none;
+            }
+
+
+
+            .shadow {
+                position: absolute;
+                top: 0;
+                left: 0;
+                z-index: 9;
+                pointer-events: none;
+                background-color: white;
+                color: #6C6C6C;
+                width: 100%;
+                border-radius: 10px;
+                border: 1px solid #B0AFAF;
+                font-family: 'Inter';
+                font-size: 17px;
+                font-weight: 450;
+                padding: 7px 40px 7px 20px;
+                box-sizing: border-box;
+                outline: none;
+                text-align: left !important;
+                display: flex;
+                align-items: center;
+                justify-content: left;
+                white-space: nowrap;
+                overflow: hidden;
+
+                &.white {
+                    color: white;
+                }
+            }
+
+            .tab {
+                transform: translateY(1px);
+                margin-left: 10px;
+
+                &.disappear {
+                    display: none;
+                }
+            }
+        }
+    }
+    
+    // Loader Container for Lazy Loading
+    .loader-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+        margin: 10px 0;
     }
 }
 
