@@ -22,35 +22,14 @@ const FlowComponentV2 = ({
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [stepValidation, setStepValidation] = useState(new Array(steps.length).fill(false));
 
-    // Initialize validation state based on existing form data
-    useEffect(() => {
-        const initialValidation = steps.map((step, index) => {
-            // Check if step has required data
-            switch(index) {
-                case 0: // GenInfo
-                    return !!(formData.name && formData.description && formData.type && formData.visibility && formData.expectedAttendance > 0);
-                case 1: // When (room selection)
-                    return !!formData.location;
-                case 2: // Where (time selection)
-                    return !!(formData.start_time && formData.end_time);
-                case 3: // Review
-                    return !!(formData.contact && formData.OIEAcknowledgementItems && formData.OIEAcknowledgementItems.length > 0);
-                default:
-                    return false;
-            }
-        });
-        console.log('Initial validation state:', initialValidation);
-        setStepValidation(initialValidation);
-    }, [formData, steps.length]);
-
     // Function to check if a step is completed based on form data
     const isStepCompleted = (stepIndex) => {
         switch(stepIndex) {
             case 0: // GenInfo
                 return !!(formData.name && formData.description && formData.type && formData.visibility && formData.expectedAttendance > 0);
-            case 1: // When (room selection)
-                return !!formData.location;
-            case 2: // Where (time selection)
+            case 1: // Where (room selection) - FIXED: Check selectedRoomIds instead of location
+                return !!(formData.selectedRoomIds && formData.selectedRoomIds.length > 0);
+            case 2: // When (time selection)
                 return !!(formData.start_time && formData.end_time);
             case 3: // Review
                 return !!(formData.contact && formData.OIEAcknowledgementItems && formData.OIEAcknowledgementItems.length > 0);
@@ -58,6 +37,19 @@ const FlowComponentV2 = ({
                 return false;
         }
     };
+
+    // Initialize validation state based on existing form data
+    useEffect(() => {
+        const initialValidation = steps.map((step, index) => isStepCompleted(index));
+        console.log('Initial validation state:', initialValidation);
+        setStepValidation(initialValidation);
+    }, [formData, steps.length]);
+
+    // Update validation when formData changes
+    useEffect(() => {
+        const newValidation = steps.map((step, index) => isStepCompleted(index));
+        setStepValidation(newValidation);
+    }, [formData, steps.length]);
 
     const handleStepComplete = (stepIndex, isValid) => {
         console.log(`Step ${stepIndex} validation:`, isValid);
@@ -201,4 +193,4 @@ const FlowComponentV2 = ({
     );
 };
 
-export default FlowComponentV2; 
+export default FlowComponentV2;

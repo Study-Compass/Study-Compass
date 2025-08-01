@@ -1,0 +1,646 @@
+.where {
+    padding: 20px;
+    
+    h1 {
+        font-family: 'Satoshi';
+        font-size: 28px;
+        color: var(--text);
+        margin: 0 0 32px 0;
+        line-height: 1.2;
+    }
+
+    .loading {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 200px;
+        
+        p {
+            font-family: 'Inter';
+            font-size: 16px;
+            color: var(--light-text);
+        }
+    }
+
+    // Selected Section
+    .selected-section {
+        margin-bottom: 32px;
+        
+        h2 {
+            font-family: 'Satoshi';
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text);
+            margin: 0 0 20px 0;
+            text-align: center;
+            text-transform: lowercase;
+        }
+
+        .selected-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+
+            .room-card.selected {
+                background: var(--red-transparent);
+                border: 2px solid var(--red);
+                border-radius: 12px;
+                overflow: hidden;
+                transition: all 0.2s ease;
+                box-shadow: 0 4px 20px rgba(220, 38, 38, 0.15);
+
+                .room-image {
+                    width: 100%;
+                    height: 160px;
+                    background: var(--offwhite);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    overflow: hidden;
+                    position: relative;
+                    
+                    img {
+                        width: 100%;
+                        height: 100%;
+                        object-fit: cover;
+                    }
+                    
+                    .no-image {
+                        color: var(--light-text);
+                        font-family: 'Inter';
+                        font-size: 14px;
+                    }
+
+                    .remove-btn {
+                        position: absolute;
+                        top: 8px;
+                        right: 8px;
+                        width: 24px;
+                        height: 24px;
+                        border-radius: 50%;
+                        background: rgba(0, 0, 0, 0.7);
+                        border: none;
+                        color: white;
+                        cursor: pointer;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        transition: all 0.2s ease;
+                        
+                        &:hover {
+                            background: rgba(0, 0, 0, 0.9);
+                            transform: scale(1.1);
+                        }
+                        
+                        svg {
+                            font-size: 14px;
+                        }
+                    }
+                }
+
+                .room-info {
+                    padding: 16px;
+                    
+                    h3 {
+                        font-family: 'Satoshi';
+                        font-size: 16px;
+                        font-weight: 600;
+                        color: var(--text);
+                        margin: 0 0 8px 0;
+                        line-height: 1.3;
+                    }
+
+                    .rating-availability {
+                        display: flex;
+                        align-items: center;
+                        gap: 12px;
+
+                        .rating {
+                            display: flex;
+                            align-items: center;
+                            gap: 4px;
+                            
+                            svg {
+                                color: #fbbf24;
+                                font-size: 16px;
+                            }
+                            
+                            span {
+                                font-family: 'Inter';
+                                font-size: 14px;
+                                color: var(--text);
+                                font-weight: 500;
+                            }
+                        }
+
+                        .availability {
+                            display: flex;
+                            align-items: center;
+                            gap: 6px;
+                            
+                            .availability-dot {
+                                width: 8px;
+                                height: 8px;
+                                border-radius: 50%;
+                                
+                                &.green {
+                                    background: #10b981;
+                                }
+                                
+                                &.red {
+                                    background: #ef4444;
+                                }
+                            }
+                            
+                            span {
+                                font-family: 'Inter';
+                                font-size: 12px;
+                                color: var(--light-text);
+                                font-weight: 400;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // Recommended Section
+    .recommended-section {
+        margin-bottom: 32px;
+        
+        h2 {
+            font-family: 'Satoshi';
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text);
+            margin: 0 0 20px 0;
+            text-align: center;
+            text-transform: lowercase;
+        }
+
+        .recommended-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+
+            .room-card.recommended {
+                background: white;
+                border: 2px solid var(--lightborder);
+                border-radius: 12px;
+                overflow: hidden;
+                cursor: pointer;
+                transition: all 0.2s ease;
+                
+                &:hover {
+                    border-color: var(--red);
+                    transform: translateY(-2px);
+                    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+                }
+
+                .room-image {
+                    width: 100%;
+                    height: 160px;
+                    background: var(--offwhite);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    overflow: hidden;
+                    
+                    img {
+                        width: 100%;
+                        height: 100%;
+                        object-fit: cover;
+                    }
+                    
+                    .no-image {
+                        color: var(--light-text);
+                        font-family: 'Inter';
+                        font-size: 14px;
+                    }
+                }
+
+                .room-info {
+                    padding: 16px;
+                    
+                    h3 {
+                        font-family: 'Satoshi';
+                        font-size: 16px;
+                        font-weight: 600;
+                        color: var(--text);
+                        margin: 0 0 8px 0;
+                        line-height: 1.3;
+                    }
+
+                    .rating-availability {
+                        display: flex;
+                        align-items: center;
+                        gap: 12px;
+
+                        .rating {
+                            display: flex;
+                            align-items: center;
+                            gap: 4px;
+                            
+                            svg {
+                                color: #fbbf24;
+                                font-size: 16px;
+                            }
+                            
+                            span {
+                                font-family: 'Inter';
+                                font-size: 14px;
+                                color: var(--text);
+                                font-weight: 500;
+                            }
+                        }
+
+                        .availability {
+                            display: flex;
+                            align-items: center;
+                            gap: 6px;
+                            
+                            .availability-dot {
+                                width: 8px;
+                                height: 8px;
+                                border-radius: 50%;
+                                
+                                &.green {
+                                    background: #10b981;
+                                }
+                                
+                                &.red {
+                                    background: #ef4444;
+                                }
+                            }
+                            
+                            span {
+                                font-family: 'Inter';
+                                font-size: 12px;
+                                color: var(--light-text);
+                                font-weight: 400;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // Search and Filter Section
+    .search-filter-section {
+        margin-bottom: 24px;
+        
+        .search-bar {
+            position: relative;
+            margin-bottom: 12px;
+            
+            input {
+                width: 100%;
+                padding: 12px 40px 12px 16px;
+                border: 2px solid var(--lightborder);
+                border-radius: 8px;
+                font-family: 'Inter';
+                font-size: 14px;
+                color: var(--text);
+                background: white;
+                
+                &:focus {
+                    outline: none;
+                    border-color: var(--red);
+                }
+                
+                &::placeholder {
+                    color: var(--light-text);
+                }
+            }
+            
+            .clear-search {
+                position: absolute;
+                right: 12px;
+                top: 50%;
+                transform: translateY(-50%);
+                cursor: pointer;
+                color: var(--light-text);
+                font-size: 18px;
+                
+                &:hover {
+                    color: var(--text);
+                }
+            }
+        }
+        
+        .filter-buttons {
+            display: flex;
+            gap: 12px;
+            
+            .filter-btn {
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                padding: 8px 12px;
+                border: 2px solid var(--lightborder);
+                border-radius: 6px;
+                background: white;
+                cursor: pointer;
+                transition: all 0.2s ease;
+                font-family: 'Inter';
+                font-size: 12px;
+                color: var(--text);
+                
+                &:hover {
+                    border-color: var(--red);
+                }
+                
+                svg {
+                    font-size: 14px;
+                }
+            }
+        }
+    }
+
+    // Room List Section
+    .room-list-section {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        max-height: 50vh;
+        overflow-y: auto;
+        padding-right: 10px;
+
+        &::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        &::-webkit-scrollbar-track {
+            background: var(--offwhite);
+            border-radius: 3px;
+        }
+
+        &::-webkit-scrollbar-thumb {
+            background: var(--lightborder);
+            border-radius: 3px;
+            
+            &:hover {
+                background: var(--light-text);
+            }
+        }
+
+        .room-list-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px;
+            background: white;
+            border: 2px solid var(--lightborder);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            
+            &:hover {
+                border-color: var(--red);
+                transform: translateY(-1px);
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            }
+            
+            &.selected {
+                border-color: var(--red);
+                background: var(--red-transparent);
+                box-shadow: 0 4px 20px rgba(220, 38, 38, 0.15);
+            }
+
+            .room-thumbnail {
+                width: 80px;
+                height: 60px;
+                background: var(--offwhite);
+                border-radius: 8px;
+                overflow: hidden;
+                flex-shrink: 0;
+                
+                img {
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+                }
+                
+                .no-image {
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    height: 100%;
+                    color: var(--light-text);
+                    font-family: 'Inter';
+                    font-size: 12px;
+                }
+            }
+
+            .room-details {
+                flex: 1;
+                min-width: 0;
+                
+                h3 {
+                    font-family: 'Satoshi';
+                    font-size: 16px;
+                    font-weight: 600;
+                    color: var(--text);
+                    margin: 0 0 4px 0;
+                    line-height: 1.3;
+                }
+
+                .rating-availability {
+                    display: flex;
+                    align-items: center;
+                    gap: 12px;
+                    margin-bottom: 6px;
+
+                    .rating {
+                        display: flex;
+                        align-items: center;
+                        gap: 4px;
+                        
+                        svg {
+                            color: #fbbf24;
+                            font-size: 14px;
+                        }
+                        
+                        span {
+                            font-family: 'Inter';
+                            font-size: 12px;
+                            color: var(--text);
+                            font-weight: 500;
+                        }
+                    }
+
+                    .availability {
+                        display: flex;
+                        align-items: center;
+                        gap: 4px;
+                        
+                        .availability-dot {
+                            width: 6px;
+                            height: 6px;
+                            border-radius: 50%;
+                            
+                            &.green {
+                                background: #10b981;
+                            }
+                            
+                            &.red {
+                                background: #ef4444;
+                            }
+                        }
+                        
+                        span {
+                            font-family: 'Inter';
+                            font-size: 11px;
+                            color: var(--light-text);
+                            font-weight: 400;
+                        }
+                    }
+                }
+
+                .attributes {
+                    display: flex;
+                    flex-wrap: wrap;
+                    gap: 4px;
+                    
+                    .attribute {
+                        background: var(--offwhite);
+                        color: var(--light-text);
+                        font-family: 'Inter';
+                        font-size: 10px;
+                        font-weight: 500;
+                        padding: 2px 6px;
+                        border-radius: 8px;
+                        border: 1px solid var(--lightborder);
+                    }
+                }
+            }
+
+            .room-actions {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 8px;
+                flex-shrink: 0;
+                
+                .room-badge {
+                    background: var(--red);
+                    color: white;
+                    font-family: 'Inter';
+                    font-size: 12px;
+                    font-weight: 600;
+                    padding: 4px 8px;
+                    border-radius: 12px;
+                    min-width: 40px;
+                    text-align: center;
+                }
+                
+                .add-btn {
+                    background: var(--lightborder);
+                    color: var(--text);
+                    border: none;
+                    border-radius: 6px;
+                    padding: 6px 12px;
+                    font-family: 'Inter';
+                    font-size: 11px;
+                    font-weight: 500;
+                    cursor: pointer;
+                    transition: all 0.2s ease;
+                    
+                    &:hover {
+                        background: var(--light-text);
+                        color: white;
+                    }
+                    
+                    &.selected {
+                        background: var(--red);
+                        color: white;
+                        
+                        &:hover {
+                            background: #dc2626;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@media (max-width: 768px) {
+    .where {
+        padding: 16px;
+        
+        h1 {
+            font-size: 24px;
+            margin-bottom: 24px;
+        }
+        
+        .selected-section,
+        .recommended-section {
+            margin-bottom: 24px;
+            
+            .selected-grid,
+            .recommended-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+                
+                .room-card.selected,
+                .room-card.recommended {
+                    .room-image {
+                        height: 140px;
+                    }
+                    
+                    .room-info {
+                        padding: 12px;
+                        
+                        h3 {
+                            font-size: 14px;
+                        }
+                    }
+                }
+            }
+        }
+        
+        .search-filter-section {
+            .filter-buttons {
+                flex-direction: column;
+                gap: 8px;
+            }
+        }
+        
+        .room-list-section {
+            .room-list-item {
+                padding: 12px;
+                gap: 12px;
+                
+                .room-thumbnail {
+                    width: 60px;
+                    height: 45px;
+                }
+                
+                .room-details {
+                    h3 {
+                        font-size: 14px;
+                    }
+                }
+                
+                .room-actions {
+                    .room-badge {
+                        font-size: 10px;
+                        padding: 2px 6px;
+                    }
+                    
+                    .add-btn {
+                        font-size: 10px;
+                        padding: 4px 8px;
+                    }
+                }
+            }
+        }
+    }
+}

@@ -95,13 +95,13 @@ const CreateEventV2 = () => {
             id: 1,
             title: 'Location',
             description: 'Select a room for your event',
-            component: When,
+            component: Where,
         },
         {
             id: 2,
             title: 'Date & Time',
             description: 'Choose your preferred time slot',
-            component: Where,
+            component: When,
         },
         {
             id: 3,
