@@ -4,6 +4,7 @@ import './Where.scss'
 import { useCache } from '../../../../CacheContext';
 import { useNotification } from '../../../../NotificationContext';
 import { Icon } from '@iconify-icon/react/dist/iconify.mjs';
+import FilledStar from '../../../../assets/Icons/FilledStar.svg';
 
 function Where({ formData, setFormData, onComplete }){
     const { addNotification } = useNotification();
@@ -80,12 +81,17 @@ function Where({ formData, setFormData, onComplete }){
         }
     }, [formData.selectedRoomIds, isInitialized, onComplete]);
 
-    // Get selected room objects from canonical roomData
+    // Get selected room objects from canonical roomData - maintain selection order
     const selectedRooms = useMemo(() => {
         if (roomData.length === 0 || selectedRoomIds.size === 0) {
             return [];
         }
-        return roomData.filter(room => selectedRoomIds.has(room.id));
+        // Create a map for quick room lookup
+        const roomMap = new Map(roomData.map(room => [room.id, room]));
+        // Return rooms in the order they were selected (order of selectedRoomIds)
+        return Array.from(selectedRoomIds)
+            .map(id => roomMap.get(id))
+            .filter(Boolean); // Filter out any undefined rooms
     }, [roomData, selectedRoomIds]);
 
     // Update form data when selection changes - but ONLY after initialization
@@ -158,6 +164,17 @@ function Where({ formData, setFormData, onComplete }){
         return { status: 'high availability', color: 'green' };
     }, []);
 
+    // Extract room number from room name if it ends with a number
+    const getRoomNumber = useCallback((roomName) => {
+        const match = roomName.match(/(\d+)$/);
+        return match ? match[1] : null;
+    }, []);
+
+    // Get room name without number
+    const getRoomNameWithoutNumber = useCallback((roomName) => {
+        return roomName.replace(/\s+\d+$/, '');
+    }, []);
+
     if (loading) {
         return (
             <div className="where create-component">
@@ -175,9 +192,11 @@ function Where({ formData, setFormData, onComplete }){
             {selectedRooms.length > 0 && (
                 <div className="selected-section">
                     <h2>selected ({selectedRooms.length})</h2>
-                    <div className="selected-grid">
+                    <div className={`selected-grid ${selectedRooms.length > 3 ? 'scrollable' : ''}`}>
                         {selectedRooms.map((room) => {
                             const availability = getAvailabilityStatus();
+                            const roomNumber = getRoomNumber(room.name);
+                            const roomNameWithoutNumber = getRoomNameWithoutNumber(room.name);
                             return (
                                 <div 
                                     key={`selected-${room.id}`}
@@ -200,10 +219,13 @@ function Where({ formData, setFormData, onComplete }){
                                         </button>
                                     </div>
                                     <div className="room-info">
-                                        <h3>{room.name}</h3>
+                                        <div className="room-title">
+                                            <h3>{roomNameWithoutNumber}</h3>
+                                            {roomNumber && <span className="room-number">{roomNumber}</span>}
+                                        </div>
                                         <div className="rating-availability">
                                             <div className="rating">
-                                                <Icon icon="material-symbols:star" />
+                                                <img src={FilledStar} alt="star" />
                                                 <span>{room.roomInfo.average_rating ? room.roomInfo.average_rating.toFixed(1) : '4.7'}</span>
                                             </div>
                                             <div className="availability">
@@ -226,6 +248,8 @@ function Where({ formData, setFormData, onComplete }){
                     <div className="recommended-grid">
                         {recommendedRooms.map((room) => {
                             const availability = getAvailabilityStatus();
+                            const roomNumber = getRoomNumber(room.name);
+                            const roomNameWithoutNumber = getRoomNameWithoutNumber(room.name);
                             return (
                                 <div 
                                     key={`recommended-${room.id}`}
@@ -240,10 +264,13 @@ function Where({ formData, setFormData, onComplete }){
                                         )}
                                     </div>
                                     <div className="room-info">
-                                        <h3>{room.name}</h3>
+                                        <div className="room-title">
+                                            <h3>{roomNameWithoutNumber}</h3>
+                                            {roomNumber && <span className="room-number">{roomNumber}</span>}
+                                        </div>
                                         <div className="rating-availability">
                                             <div className="rating">
-                                                <Icon icon="material-symbols:star" />
+                                                <img src={FilledStar} alt="star" />
                                                 <span>{room.roomInfo.average_rating ? room.roomInfo.average_rating.toFixed(1) : '4.7'}</span>
                                             </div>
                                             <div className="availability">
@@ -300,6 +327,8 @@ function Where({ formData, setFormData, onComplete }){
                 {filteredRooms.map((room) => {
                     const availability = getAvailabilityStatus();
                     const isSelected = selectedRoomIds.has(room.id);
+                    const roomNumber = getRoomNumber(room.name);
+                    const roomNameWithoutNumber = getRoomNameWithoutNumber(room.name);
                     return (
                         <div 
                             key={`list-${room.id}`}
@@ -314,10 +343,13 @@ function Where({ formData, setFormData, onComplete }){
                                 )}
                             </div>
                             <div className="room-details">
-                                <h3>{room.name}</h3>
+                                <div className="room-title">
+                                    <h3>{roomNameWithoutNumber}</h3>
+                                    {roomNumber && <span className="room-number">{roomNumber}</span>}
+                                </div>
                                 <div className="rating-availability">
                                     <div className="rating">
-                                        <Icon icon="material-symbols:star" />
+                                        <img src={FilledStar} alt="star" />
                                         <span>{room.roomInfo.average_rating ? room.roomInfo.average_rating.toFixed(1) : '4.7'}</span>
                                     </div>
                                     <div className="availability">
@@ -334,7 +366,6 @@ function Where({ formData, setFormData, onComplete }){
                                 )}
                             </div>
                             <div className="room-actions">
-                                <div className="room-badge">330</div>
                                 <button className={`add-btn ${isSelected ? 'selected' : ''}`}>
                                     {isSelected ? 'remove' : 'add'}
                                 </button>
