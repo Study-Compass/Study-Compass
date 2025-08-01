@@ -142,10 +142,11 @@ const FlowComponentV2 = ({
 
                 {/* Main content area */}
                 <div className="content-area">
-                    <div className="content-header">
+                    {/* @james I think content header here is just cluter, same info is directly to the left and it reduces how much of the page the use can see by a deceant amount */}
+                    {/* <div className="content-header">
                         <h2>{steps[currentStep].title}</h2>
                         <p>{steps[currentStep].description}</p>
-                    </div>
+                    </div> */}
 
                     <div className="step-content">
                         <CurrentStepComponent

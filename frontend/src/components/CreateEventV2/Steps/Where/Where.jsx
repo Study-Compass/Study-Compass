@@ -5,6 +5,13 @@ import { useCache } from '../../../../CacheContext';
 import { useNotification } from '../../../../NotificationContext';
 import { Icon } from '@iconify-icon/react/dist/iconify.mjs';
 import FilledStar from '../../../../assets/Icons/FilledStar.svg';
+import Tags from '../../../../assets/Icons/sort/Tags.svg';
+import SortBy from '../../../../assets/Icons/sort/SortBy.svg';
+import TagsSelected from '../../../../assets/Icons/sort/TagsSelected.svg';
+import SortBySelected from '../../../../assets/Icons/sort/SortBySelected.svg';
+import ChevronDown from '../../../../assets/Icons/sort/ChevronDown.svg';
+import ChevronUp from '../../../../assets/Icons/sort/ChevronUp.svg';
+import { attributeIcons, selectedAttributeIcons } from '../../../../Icons';
 
 function Where({ formData, setFormData, onComplete }){
     const { addNotification } = useNotification();
@@ -14,9 +21,20 @@ function Where({ formData, setFormData, onComplete }){
     const [loading, setLoading] = useState(true);
     const [selectedRoomIds, setSelectedRoomIds] = useState(new Set());
     const [searchQuery, setSearchQuery] = useState('');
-    const [showTagsFilter, setShowTagsFilter] = useState(false);
-    const [showSortFilter, setShowSortFilter] = useState(false);
+    const [selectedFilter, setSelectedFilter] = useState(null);
     const [isInitialized, setIsInitialized] = useState(false);
+    const [selectedTags, setSelectedTags] = useState([]);
+    const [sortBy, setSortBy] = useState('name');
+
+    // Available tags with their icons
+    const availableTags = ["windows", "outlets", "printer", "small desks", "tables"];
+
+    // Debug attributeIcons import
+    useEffect(() => {
+        console.log('attributeIcons imported as:', attributeIcons);
+        console.log('selectedAttributeIcons imported as:', selectedAttributeIcons);
+        console.log('attributeIcons keys:', attributeIcons ? Object.keys(attributeIcons) : 'undefined');
+    }, []);
 
     // Fetch all rooms and their data (only once)
     const fetchRoomsData = async () => {
@@ -51,6 +69,7 @@ function Where({ formData, setFormData, onComplete }){
             });
 
             const roomsWithData = await Promise.all(roomPromises);
+            console.log('Sample room data:', roomsWithData[0]); // Debug room data structure
             setRoomData(roomsWithData);
             setLoading(false);
         } catch (error) {
@@ -139,16 +158,81 @@ function Where({ formData, setFormData, onComplete }){
         });
     }, []);
 
-    // Filter rooms based on search query
+    // Handle filter selection
+    const handleFilterSelect = (filter) => {
+        if(selectedFilter === filter){
+            setSelectedFilter(null);
+        } else {
+            setSelectedFilter(filter);
+        }
+    };
+
+    // Handle tag selection
+    const handleTagSelect = (tag) => {
+        setSelectedTags(prev => {
+            if (prev.includes(tag)) {
+                return prev.filter(t => t !== tag);
+            } else {
+                return [...prev, tag];
+            }
+        });
+    };
+
+    // Handle sort selection
+    const handleSortSelect = (sortType) => {
+        setSortBy(sortType);
+        setSelectedFilter(null);
+    };
+
+    // Apply filters
+    const applyFilters = () => {
+        setSelectedFilter(null);
+    };
+
+    // Clear all filters
+    const clearFilters = () => {
+        setSelectedTags([]);
+        setSortBy('name');
+    };
+
+    // Filter rooms based on search query and selected tags
     const filteredRooms = useMemo(() => {
         if (!roomData.length) return [];
-        return roomData.filter(room => 
+        
+        let filtered = roomData.filter(room => 
             room.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
             (room.roomInfo.attributes && room.roomInfo.attributes.some(attr => 
                 attr.toLowerCase().includes(searchQuery.toLowerCase())
             ))
         );
-    }, [roomData, searchQuery]);
+
+        // Apply tag filters
+        if (selectedTags.length > 0) {
+            filtered = filtered.filter(room => 
+                room.roomInfo.attributes && 
+                selectedTags.some(tag => 
+                    room.roomInfo.attributes.some(attr => 
+                        attr.toLowerCase().includes(tag.toLowerCase())
+                    )
+                )
+            );
+        }
+
+        // Apply sorting
+        filtered.sort((a, b) => {
+            switch (sortBy) {
+                case 'name':
+                    return a.name.localeCompare(b.name);
+                case 'availability':
+                    // For now, just sort by name since availability is fixed
+                    return a.name.localeCompare(b.name);
+                default:
+                    return 0;
+            }
+        });
+
+        return filtered;
+    }, [roomData, searchQuery, selectedTags, sortBy]);
 
     // Get recommended rooms (first 3, excluding already selected ones)
     const recommendedRooms = useMemo(() => {
@@ -197,6 +281,14 @@ function Where({ formData, setFormData, onComplete }){
                             const availability = getAvailabilityStatus();
                             const roomNumber = getRoomNumber(room.name);
                             const roomNameWithoutNumber = getRoomNameWithoutNumber(room.name);
+                            
+                            console.log('Selected room attributes check:', {
+                                roomName: room.name,
+                                attributes: room.roomInfo.attributes,
+                                attributesType: typeof room.roomInfo.attributes,
+                                attributesLength: room.roomInfo.attributes?.length
+                            });
+                            
                             return (
                                 <div 
                                     key={`selected-${room.id}`}
@@ -233,6 +325,52 @@ function Where({ formData, setFormData, onComplete }){
                                                 <span>{availability.status}</span>
                                             </div>
                                         </div>
+                                        {/* ALWAYS show room attributes - SIMPLIFIED AND DEFENSIVE */}
+                                        {room.roomInfo.attributes && Array.isArray(room.roomInfo.attributes) && room.roomInfo.attributes.length > 0 ? (
+                                            <div className="attributes">
+                                                {room.roomInfo.attributes.slice(0, 4).map((attr, index) => {
+                                                    console.log(`Processing selected room attribute: "${attr}"`);
+                                                    
+                                                    // Safely check for icons - don't let icon failures prevent attribute display
+                                                    let iconSrc = null;
+                                                    try {
+                                                        if (attributeIcons && typeof attributeIcons === 'object') {
+                                                            const attrLower = attr.toLowerCase().trim();
+                                                            const iconKey = Object.keys(attributeIcons).find(key => 
+                                                                attrLower.includes(key.toLowerCase()) || 
+                                                                key.toLowerCase().includes(attrLower)
+                                                            );
+                                                            if (iconKey && attributeIcons[iconKey]) {
+                                                                iconSrc = attributeIcons[iconKey];
+                                                            }
+                                                        }
+                                                    } catch (e) {
+                                                        console.error('Error processing icon for attribute:', attr, e);
+                                                    }
+                                                    
+                                                    return (
+                                                        <span key={`selected-attr-${index}`} className="attribute">
+                                                            {iconSrc && (
+                                                                <img 
+                                                                    src={iconSrc} 
+                                                                    alt={attr}
+                                                                    className="attribute-icon"
+                                                                    onError={(e) => {
+                                                                        console.error(`Failed to load icon for ${attr}`);
+                                                                        e.target.style.display = 'none';
+                                                                    }}
+                                                                />
+                                                            )}
+                                                            {attr}
+                                                        </span>
+                                                    );
+                                                })}
+                                            </div>
+                                        ) : (
+                                            <div className="attributes">
+                                                <span className="attribute">No attributes available</span>
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                             );
@@ -250,6 +388,14 @@ function Where({ formData, setFormData, onComplete }){
                             const availability = getAvailabilityStatus();
                             const roomNumber = getRoomNumber(room.name);
                             const roomNameWithoutNumber = getRoomNameWithoutNumber(room.name);
+                            
+                            console.log('Recommended room attributes check:', {
+                                roomName: room.name,
+                                attributes: room.roomInfo.attributes,
+                                attributesType: typeof room.roomInfo.attributes,
+                                attributesLength: room.roomInfo.attributes?.length
+                            });
+                            
                             return (
                                 <div 
                                     key={`recommended-${room.id}`}
@@ -278,6 +424,52 @@ function Where({ formData, setFormData, onComplete }){
                                                 <span>{availability.status}</span>
                                             </div>
                                         </div>
+                                        {/* ALWAYS show room attributes - SIMPLIFIED AND DEFENSIVE */}
+                                        {room.roomInfo.attributes && Array.isArray(room.roomInfo.attributes) && room.roomInfo.attributes.length > 0 ? (
+                                            <div className="attributes">
+                                                {room.roomInfo.attributes.slice(0, 4).map((attr, index) => {
+                                                    console.log(`Processing recommended room attribute: "${attr}"`);
+                                                    
+                                                    // Safely check for icons - don't let icon failures prevent attribute display
+                                                    let iconSrc = null;
+                                                    try {
+                                                        if (attributeIcons && typeof attributeIcons === 'object') {
+                                                            const attrLower = attr.toLowerCase().trim();
+                                                            const iconKey = Object.keys(attributeIcons).find(key => 
+                                                                attrLower.includes(key.toLowerCase()) || 
+                                                                key.toLowerCase().includes(attrLower)
+                                                            );
+                                                            if (iconKey && attributeIcons[iconKey]) {
+                                                                iconSrc = attributeIcons[iconKey];
+                                                            }
+                                                        }
+                                                    } catch (e) {
+                                                        console.error('Error processing icon for attribute:', attr, e);
+                                                    }
+                                                    
+                                                    return (
+                                                        <span key={`recommended-attr-${index}`} className="attribute">
+                                                            {iconSrc && (
+                                                                <img 
+                                                                    src={iconSrc} 
+                                                                    alt={attr}
+                                                                    className="attribute-icon"
+                                                                    onError={(e) => {
+                                                                        console.error(`Failed to load icon for ${attr}`);
+                                                                        e.target.style.display = 'none';
+                                                                    }}
+                                                                />
+                                                            )}
+                                                            {attr}
+                                                        </span>
+                                                    );
+                                                })}
+                                            </div>
+                                        ) : (
+                                            <div className="attributes">
+                                                <span className="attribute">No attributes available</span>
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                             );
@@ -303,22 +495,93 @@ function Where({ formData, setFormData, onComplete }){
                         />
                     )}
                 </div>
-                <div className="filter-buttons">
-                    <button 
-                        className="filter-btn"
-                        onClick={() => setShowTagsFilter(!showTagsFilter)}
+                
+                {/* Sort Row - using Sort component styling */}
+                <div className="sort-row">
+                    {selectedFilter === "tags" && (
+                        <div className="sort-popup">
+                            <div className="heading">
+                                <h1>Tags</h1>
+                                <p onClick={clearFilters} className="clear">clear</p>
+                            </div>
+                            <div className="tags-container">
+                                <div className="tags-content">
+                                    <div className="include">
+                                        {availableTags.map((tag, index) => (
+                                            <div 
+                                                key={index} 
+                                                className={`option ${selectedTags.includes(tag) ? "selected" : ""}`} 
+                                                onClick={() => handleTagSelect(tag)}
+                                            >
+                                                {attributeIcons && Object.keys(attributeIcons).includes(tag) && (
+                                                    <img 
+                                                        src={selectedTags.includes(tag) ? selectedAttributeIcons?.[tag] : attributeIcons[tag]} 
+                                                        alt={tag}
+                                                    />
+                                                )}
+                                                <p>{tag}</p>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                            <button 
+                                className={`button ${selectedTags.length > 0 ? "active" : ""}`} 
+                                style={{height:'40px'}} 
+                                onClick={applyFilters}
+                            >
+                                apply
+                            </button>
+                        </div>
+                    )}
+                    
+                    {selectedFilter === "sort" && (
+                        <div className="sort-popup">
+                            <div className="heading">
+                                <h1>Sort by</h1>
+                            </div>
+                            <div className="sort-options">
+                                <div 
+                                    className={sortBy === "name" ? "option selected" : "option"} 
+                                    onClick={() => handleSortSelect("name")}
+                                >
+                                    <Icon icon="material-symbols:sort-by-alpha" />
+                                    <p>Name</p>
+                                </div>
+                                <div 
+                                    className={sortBy === "availability" ? "option selected" : "option"} 
+                                    onClick={() => handleSortSelect("availability")}
+                                >
+                                    <Icon icon="material-symbols:schedule" />
+                                    <p>Availability</p>
+                                </div>
+                            </div>
+                            <button 
+                                className="button active" 
+                                style={{height:'40px'}} 
+                                onClick={applyFilters}
+                            >
+                                apply
+                            </button>
+                        </div>
+                    )}
+                    
+                    <div 
+                        className={`tags ${selectedFilter === 'tags' ? "selected": ""}`} 
+                        onClick={() => handleFilterSelect('tags')}
                     >
-                        <span>tags</span>
-                        <Icon icon="material-symbols:keyboard-arrow-down" />
-                    </button>
-                    <button 
-                        className="filter-btn"
-                        onClick={() => setShowSortFilter(!showSortFilter)}
+                        <img src={selectedFilter === 'tags' ? TagsSelected : Tags} alt="" />
+                        <p>Tags</p>
+                        <img src={selectedFilter === 'tags' ? ChevronUp : ChevronDown} alt="" />
+                    </div>
+                    <div 
+                        className={`sort-by ${selectedFilter === 'sort' ? "selected" : ""}`} 
+                        onClick={() => handleFilterSelect('sort')}
                     >
-                        <Icon icon="material-symbols:sort" />
-                        <span>sort</span>
-                        <Icon icon="material-symbols:keyboard-arrow-down" />
-                    </button>
+                        <img src={selectedFilter === 'sort' ? SortBySelected : SortBy} alt="" />
+                        <p>Sort</p>
+                        <img src={selectedFilter === 'sort' ? ChevronUp : ChevronDown} alt="" />
+                    </div>
                 </div>
             </div>
 
@@ -329,6 +592,14 @@ function Where({ formData, setFormData, onComplete }){
                     const isSelected = selectedRoomIds.has(room.id);
                     const roomNumber = getRoomNumber(room.name);
                     const roomNameWithoutNumber = getRoomNameWithoutNumber(room.name);
+                    
+                    console.log('List room attributes check:', {
+                        roomName: room.name,
+                        attributes: room.roomInfo.attributes,
+                        attributesType: typeof room.roomInfo.attributes,
+                        attributesLength: room.roomInfo.attributes?.length
+                    });
+                    
                     return (
                         <div 
                             key={`list-${room.id}`}
@@ -357,11 +628,50 @@ function Where({ formData, setFormData, onComplete }){
                                         <span>{availability.status}</span>
                                     </div>
                                 </div>
-                                {room.roomInfo.attributes && room.roomInfo.attributes.length > 0 && (
+                                {/* ALWAYS show room attributes - SIMPLIFIED AND DEFENSIVE */}
+                                {room.roomInfo.attributes && Array.isArray(room.roomInfo.attributes) && room.roomInfo.attributes.length > 0 ? (
                                     <div className="attributes">
-                                        {room.roomInfo.attributes.slice(0, 5).map((attr, index) => (
-                                            <span key={index} className="attribute">{attr}</span>
-                                        ))}
+                                        {room.roomInfo.attributes.slice(0, 4).map((attr, index) => {
+                                            console.log(`Processing list room attribute: "${attr}"`);
+                                            
+                                            // Safely check for icons - don't let icon failures prevent attribute display
+                                            let iconSrc = null;
+                                            try {
+                                                if (attributeIcons && typeof attributeIcons === 'object') {
+                                                    const attrLower = attr.toLowerCase().trim();
+                                                    const iconKey = Object.keys(attributeIcons).find(key => 
+                                                        attrLower.includes(key.toLowerCase()) || 
+                                                        key.toLowerCase().includes(attrLower)
+                                                    );
+                                                    if (iconKey && attributeIcons[iconKey]) {
+                                                        iconSrc = attributeIcons[iconKey];
+                                                    }
+                                                }
+                                            } catch (e) {
+                                                console.error('Error processing icon for attribute:', attr, e);
+                                            }
+                                            
+                                            return (
+                                                <span key={`list-attr-${index}`} className="attribute">
+                                                    {iconSrc && (
+                                                        <img 
+                                                            src={iconSrc} 
+                                                            alt={attr}
+                                                            className="attribute-icon"
+                                                            onError={(e) => {
+                                                                console.error(`Failed to load icon for ${attr}`);
+                                                                e.target.style.display = 'none';
+                                                            }}
+                                                        />
+                                                    )}
+                                                    {attr}
+                                                </span>
+                                            );
+                                        })}
+                                    </div>
+                                ) : (
+                                    <div className="attributes">
+                                        <span className="attribute">No attributes available</span>
                                     </div>
                                 )}
                             </div>
