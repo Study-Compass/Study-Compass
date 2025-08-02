@@ -34,7 +34,7 @@ const EventQuickLook = ({org}) => {
 
 
     return(
-        <HeaderContainer icon="mingcute:calendar-fill" className="event-quick-look" header="Quick Look" scroll={true} subheaderRow={
+        <HeaderContainer icon="mingcute:calendar-fill" classN="event-quick-look" header="Quick Look" scroll={true} subheaderRow={
             <div className="row subheader">
                 <div className={`column ${selectedTab === "upcoming" ? "selected" : ""}`}>
                     <p onClick={() => setSelectedTab("upcoming")}>Upcoming Events</p>
