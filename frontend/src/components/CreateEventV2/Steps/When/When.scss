@@ -18,6 +18,7 @@
         flex: 1;
         gap: 20px;
         min-height: 0; // Important for flex child to shrink
+        align-items: flex-start;
     }
 
     .room-sidebar {
@@ -28,7 +29,8 @@
         padding: 20px;
         display: flex;
         flex-direction: column;
-        height: 100%;
+        height: fit-content;
+        margin-top: 0;
 
         h3 {
             margin: 0 0 15px 0;
@@ -41,7 +43,7 @@
             display: flex;
             flex-direction: column;
             gap: 10px;
-            overflow-y: auto;
+            overflow-y: display;
             flex: 1;
         }
 
@@ -51,6 +53,10 @@
 
             &:hover {
                 transform: translateY(-2px);
+            }
+
+            &:hover .room-box {
+                background: var(--dark-red-transparent);
             }
 
             &.selected .room-box {
@@ -71,11 +77,6 @@
             display: flex;
             align-items: center;
             justify-content: center;
-
-            &:hover {
-                border-color: var(--red);
-                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            }
         }
 
         .room-name {
@@ -131,6 +132,37 @@
         &:not(.active) {
             cursor: not-allowed;
             opacity: 0.6;
+        }
+    }
+
+    .loading {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 200px;
+        
+        p {
+            font-family: 'Inter';
+            font-size: 16px;
+            color: var(--light-text);
+        }
+    }
+
+    .no-rooms {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 200px;
+        text-align: center;
+        
+        p {
+            font-family: 'Inter';
+            font-size: 16px;
+            color: var(--light-text);
+            background: var(--light);
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid var(--border);
         }
     }
 }
