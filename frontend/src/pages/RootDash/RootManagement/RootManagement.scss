@@ -2,4 +2,18 @@
     position: relative;
     z-index: 0;
     width:100%;
+    .general-content{
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        padding: 25px 30px;
+        box-sizing: border-box;
+    }
+    .analytics-container{
+        display: flex;
+        gap: 20px;
+        padding: 10px;
+        box-sizing: border-box;
+        flex-wrap: wrap;
+    }
 }
