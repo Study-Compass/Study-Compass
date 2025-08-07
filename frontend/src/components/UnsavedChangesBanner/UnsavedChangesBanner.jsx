@@ -18,7 +18,7 @@ const UnsavedChangesBanner = ({
         <div className="unsaved-changes-banner">
             <div className="banner-content">
                 <div className="banner-text">
-                    <Icon icon="mingcute:alert-fill" className="banner-icon" />
+                    <Icon icon="mingcute:alert-fill" className="banner-icon"/>
                     <span>You have unsaved changes</span>
                 </div>
                 <div className="banner-actions">

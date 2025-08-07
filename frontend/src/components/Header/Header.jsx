@@ -8,6 +8,7 @@ import MobileLogo from '../../assets/MobileLogo.svg';
 import { useWebSocket } from '../../WebSocketContext';
 import RpiLogo from '../../assets/Brand Image/RpiLogo.svg';
 import BerkeleyLogo from '../../assets/Brand Image/BerkeleyLogo.svg';
+import NotificationInbox from '../NotificationInbox/NotificationInbox';
 
 function getLogo() {
     const hostname = window.location.hostname;
@@ -105,6 +106,7 @@ const Header = React.memo(()=>{
 
                 {page === "/login" || page === "/register" ? "" :
                     <div className="header-right">
+                        {isAuthenticated ? <NotificationInbox/> : ""}
                         {isAuthenticated ? <ProfilePicture/> : ""}
                         {!isAuthenticated ? <button onClick={goToLogin}>login</button> : ""}
                     </div>    

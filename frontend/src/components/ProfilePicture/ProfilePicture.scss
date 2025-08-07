@@ -1,7 +1,9 @@
 .profile-picture{
     height:50px;
     position: relative;
-    
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .profile-picture .profile{
@@ -127,6 +129,7 @@ hr{
     background-color: var(--lighterborder);
     height:1px;
     border:none;
+    min-height:1px;
     width:100%;
 }
 

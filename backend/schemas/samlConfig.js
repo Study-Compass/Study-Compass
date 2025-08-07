@@ -158,6 +158,7 @@ const samlConfigSchema = new mongoose.Schema({
             wantNameIdFormat: true,
             wantAttributeStatement: true,
             attributeMapping: this.attributeMapping,
+            authnRequestBinding: 'HTTP-REDIRECT',
             // Additional fields for metadata generation
             signingCert: this.sp.signingCert,
             encryptCert: this.sp.encryptCert
