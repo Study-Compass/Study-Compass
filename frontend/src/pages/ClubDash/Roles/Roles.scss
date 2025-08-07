@@ -145,7 +145,7 @@
                 background: var(--red);
                 
                 &:hover:not(:disabled) {
-                    background: var(--red-dark);
+                    background: var(--dark-red);
                 }
             }
 
@@ -215,7 +215,7 @@
                     background: var(--red);
                     
                     &:hover {
-                        background: var(--red-dark);
+                        background: var(--dark-red);
                     }
                 }
             }
@@ -322,7 +322,7 @@
                         background: var(--red);
 
                         &:hover:not(:disabled) {
-                            background: var(--red-dark);
+                            background: var(--dark-red);
                         }
                     }
                 }

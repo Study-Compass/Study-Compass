@@ -62,7 +62,7 @@ function Dash({ expandedClass, openMembers, clubName, meetings, org}) {
                         <iconify-icon icon="mingcute:add-circle-fill" />
                         <p>Plan an Event</p>
                     </div>
-                    <div className="action">
+                    <div className="action" onClick={openMembers}>
                         <p>Manage Members</p>
                     </div>
                 </div>

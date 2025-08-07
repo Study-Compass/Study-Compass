@@ -234,7 +234,7 @@ function ClubDash(){
                 {
                     label: 'Roles & Permissions',
                     icon: 'mdi:shield-account',
-                    element:  <Roles expandedClass={expandedClass} org={orgData.data?.org?.overview}/>
+                    element:  <Roles expandedClass={expandedClass} org={orgData.data?.org?.overview} refetch={orgData.refetch}/>
                 },
                 {
                     label: 'Membership',

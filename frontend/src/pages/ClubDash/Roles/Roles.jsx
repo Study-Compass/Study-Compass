@@ -7,7 +7,7 @@ import axios from 'axios';
 import apiRequest from '../../../utils/postRequest';
 import OrgGrad from '../../../assets/Gradients/OrgGrad.png';
 
-function Roles({ expandedClass, org }) {
+function Roles({ expandedClass, org, refetch }) {
     const { user } = useAuth();
     const { addNotification } = useNotification();
     const [roles, setRoles] = useState([]);
@@ -109,6 +109,7 @@ function Roles({ expandedClass, org }) {
                     message: 'Roles updated successfully',
                     type: 'success'
                 });
+                refetch();
             }
         } catch (error) {
             console.error('Error updating roles:', error);
