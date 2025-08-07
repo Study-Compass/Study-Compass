@@ -35,6 +35,7 @@
         border-radius: 16px;
         overflow: hidden;
         min-height: 600px;
+        max-height: calc(100vh - 80px); // Ensure it doesn't overflow viewport
 
         @media (max-width: 768px) {
             flex-direction: column;
@@ -177,8 +178,8 @@
         padding: 32px;
         display: flex;
         flex-direction: column;
-        max-height: calc(100vh - 40px);
-        overflow-y: auto;
+        min-height: 0; // Important for flex child to shrink
+        height: 100%; // Use full available height
 
         @media (max-width: 768px) {
             padding: 24px 20px 100px 20px;
@@ -213,15 +214,18 @@
             display: flex;
             flex-direction: column;
             justify-content: flex-start;
+            min-height: 0; // Important for flex child to shrink
+            overflow: hidden; // Prevent overflow from breaking layout
         }
 
         .navigation-buttons {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-top: 32px;
-            padding-top: 24px;
+            margin-top: 24px; // Reduced from 32px to give more space to content
+            padding-top: 20px; // Reduced from 24px
             border-top: 1px solid #e2e8f0;
+            flex-shrink: 0; // Don't let navigation buttons shrink
 
             .right-buttons {
                 display: flex;

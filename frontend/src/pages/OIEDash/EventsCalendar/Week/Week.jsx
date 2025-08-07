@@ -5,7 +5,7 @@ import './Week.scss';
 import WeeklyCalendar from './WeeklyCalendar/WeeklyCalendar';
 import Switch from '../../../../components/Switch/Switch';
 
-function Week({ height, changeToDay, start = new Date(new Date().setDate(new Date().getDate() - new Date().getDay())), startingText = "", nav=true , filter, setView = () => {}, view = 1, showSwitch = true }) {
+function Week({ height, changeToDay, start = new Date(new Date().setDate(new Date().getDate() - new Date().getDay())), startingText = "", nav=true , filter, setView = () => {}, view = 1, showSwitch = true, blockedEvents = [] }) {
     const initialStartDate = typeof start === 'string' ? new Date(start) : start;
     const initialEndDate = new Date(initialStartDate);
     initialEndDate.setDate(initialEndDate.getDate() + 6);
@@ -38,7 +38,17 @@ function Week({ height, changeToDay, start = new Date(new Date().setDate(new Dat
     const url = `/get-events-by-range?start=${encodeURIComponent(startOfWeek.toISOString())}&end=${encodeURIComponent(endOfWeek.toISOString())}&filter=${filterParam}`;
     const events = useFetch(url);
 
+    // Filter blocked events to only show those within the current week
+    const weekBlockedEvents = blockedEvents.filter(event => {
+        const eventStart = new Date(event.start_time);
+        return eventStart >= startOfWeek && eventStart <= endOfWeek;
+    });
 
+    // Combine regular events with blocked events
+    const combinedEvents = [
+        ...(events.data ? events.data.events : []),
+        ...weekBlockedEvents
+    ];
 
     return (
         <>
@@ -56,7 +66,7 @@ function Week({ height, changeToDay, start = new Date(new Date().setDate(new Dat
             </div>
             <div className="week" style={{ height: `${height}` }}>
                 <WeeklyCalendar 
-                    events={events.data ? events.data.events : []} 
+                    events={combinedEvents} 
                     startOfWeek={startOfWeek} 
                     height={"100%"} 
                     dayClick={changeToDay} 

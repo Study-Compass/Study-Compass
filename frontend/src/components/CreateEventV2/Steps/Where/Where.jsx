@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import './Where.scss'
 
+// swap from useCache to useFetch or post request
 import { useCache } from '../../../../CacheContext';
 import { useNotification } from '../../../../NotificationContext';
 import { Icon } from '@iconify-icon/react/dist/iconify.mjs';
@@ -140,6 +141,7 @@ function Where({ formData, setFormData, onComplete }){
     }, [roomData]);
 
     // Fetch all rooms and their data (only once)
+    // SWAP TO GET BATCH INSTEAD OF GETROOM
     const fetchRoomsData = async () => {
         try {
             setLoading(true);
