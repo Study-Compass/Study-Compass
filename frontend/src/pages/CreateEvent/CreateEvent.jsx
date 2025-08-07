@@ -72,7 +72,7 @@ function CreateEvent(){
     }
 
     useEffect(()=>{
-        if(info.location === 'Darrin Communications Center 330'){
+        if(info.location === 'Darrin Communications Center 174'){
             setShowForm(true);
         } else {
             setShowForm(false);
