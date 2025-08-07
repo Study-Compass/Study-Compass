@@ -179,8 +179,9 @@ function ClubDash(){
         }
     }
 
-    function openMembers  (){
-        setCurrentPage('members');
+    function openMembers(){
+        const newPath = `/club-dashboard/${clubId}?page=2`;
+        navigate(newPath);
     }
 
     const onOrgChange = (org) => {
@@ -247,12 +248,12 @@ function ClubDash(){
                 },
             ]
         },
-        { 
-            label: 'Testing', 
-            icon: 'mdi:test-tube', 
-            key: 'testing',
-            element: <Testing expandedClass={expandedClass} org={orgData.data?.org?.overview}/>
-        },
+        // { 
+        //     label: 'Testing', 
+        //     icon: 'mdi:test-tube', 
+        //     key: 'testing',
+        //     element: <Testing expandedClass={expandedClass} org={orgData.data?.org?.overview}/>
+        // },
     ];
     // Filter menu items based on user permissions
     const menuItems = baseMenuItems.filter(item => {
