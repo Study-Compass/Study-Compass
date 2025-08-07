@@ -139,6 +139,7 @@ function CreateEvent(){
 
         if(response){
             addNotification({title: "Event created", message: "Your event has been created successfully", type: "success"});
+            navigate('/events-dashboard');
         } else {
             addNotification({title: "Failed to create event", message: "An error occurred while creating your event", type: "error"});
         }

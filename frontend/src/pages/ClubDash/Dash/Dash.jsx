@@ -62,11 +62,16 @@ function Dash({ expandedClass, openMembers, clubName, meetings, org}) {
                         <iconify-icon icon="mingcute:add-circle-fill" />
                         <p>Plan an Event</p>
                     </div>
-                    <div className="action">
+                    <div className="action" onClick={openMembers}>
                         <p>Manage Members</p>
                     </div>
                 </div>
-                <DashStatus status="You have 4 unreviewed officer and member applications" action={console.log} actionText="view all" color="var(--green)" />
+                <DashStatus 
+                    orgId={org.org.overview._id} 
+                    action={openMembers} 
+                    actionText="view all" 
+                    color="var(--green)" 
+                />
                 <EventQuickLook org={org} />
                 {/* <div className="row stats">
                     <div className="column">
