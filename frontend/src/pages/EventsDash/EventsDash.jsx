@@ -23,11 +23,11 @@ function EventsDash({  }){
         //     icon: 'mingcute:calendar-fill',
         //     element: <MyEvents />
         // },
-        { 
-            label: 'Organizations',  
-            icon: 'mingcute:calendar-fill',
-            element: <Orgs/>
-        }
+        // { 
+        //     label: 'Organizations',  
+        //     icon: 'mingcute:calendar-fill',
+        //     element: <Orgs/>
+        // }
     ];
 
     useEffect(() => {

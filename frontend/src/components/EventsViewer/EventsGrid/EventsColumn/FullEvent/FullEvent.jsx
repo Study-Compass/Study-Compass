@@ -40,7 +40,7 @@ function FullEvent({ event }){
             level = "Organization";
         }
         return (
-            <div className={`row hosting ${level.toLowerCase()}`}>
+            <div className={`row hosting ${level.toLowerCase()}`} onClick={()=>{level === "Organization" && navigate(`/org/${hostingName}`)}}>
                 <img src={hostingImage} alt="" />
                 <p className="user-name">{hostingName}</p>
                 <div className={`level ${level.toLowerCase()}`}>
