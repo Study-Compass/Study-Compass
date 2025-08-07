@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import rpiLogo from "../../assets/Icons/rpiLogo.svg";
 import person from "../../assets/Icons/Profile.svg";
 import calendar from "../../assets/Icons/Calendar.svg";
@@ -10,17 +10,18 @@ import Popup from '../../components/Popup/Popup';
 import OrgEvents from '../../components/OrgEvents/OrgEvents';
 import apiRequest from '../../utils/postRequest';
 import { Icon } from '@iconify-icon/react/dist/iconify.mjs';
-
+import useAuth from '../../hooks/useAuth';
 import './Org.scss';
+import { useNavigate } from 'react-router-dom';
 
 const Org = ({ orgData, refetch }) => {
 
     const [isMember, setIsMember] = useState(false);
     const { overview, members, followers } = orgData.org;
     const [showForm, setShowForm] = useState(false);
-
+    const {user} = useAuth();
     const [activeTab, setActiveTab] = useState('home');
-
+    const navigate = useNavigate();
     console.log(orgData);
 
     const handleApply = async (formAnswers) => {
@@ -31,6 +32,10 @@ const Org = ({ orgData, refetch }) => {
         refetch();
     }
     
+    useEffect(()=>{
+        console.log(user.clubAssociations);
+        console.log(overview.org_name);
+    }, [user]);
 
     const initiateApply = () => {
         if(overview.requireApprovalForJoin) {
@@ -116,6 +121,13 @@ const Org = ({ orgData, refetch }) => {
                             )
                         }
                         <button>Follow</button>
+                        {
+                            user.clubAssociations.find(club => club.org_name === overview.org_name) && (
+                                <button onClick={()=>{
+                                    navigate(`/club-dashboard/${overview.org_name}`);
+                                }}>To Dashboard</button>
+                            ) 
+                        }
                     </div>
 
                 </div>

@@ -33,15 +33,15 @@ function CreateEvent(){
         if(isAuthenticating){
             return;
         }
-        if(!isAuthenticated){
-            navigate('/');
-        }
+        // if(!isAuthenticated){
+        //     navigate('/');
+        // }
         if(!user){
             return;
         }
-        if(!(user.roles.includes('oie') || user.roles.includes('admin') || user.roles.includes('developer'))){
-            navigate('/');
-        }
+        // if(!(user.roles.includes('oie') || user.roles.includes('admin') || user.roles.includes('developer'))){
+        //     navigate('/');
+        // }
         if(origin && origin !== ""){
             const club = user.clubAssociations.find((org)=>org.org_name === origin);
             if(club){

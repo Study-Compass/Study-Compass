@@ -160,8 +160,8 @@ function App() {
                                             {/* oie routes */}
                                             <Route element={ <ProtectedRoute authorizedRoles={['admin', 'developer', 'oie']}/> }>
                                                 <Route path="/oie-dashboard" element={<AnimatedPageWrapper><OIEDash/></AnimatedPageWrapper>}/>
-                                                <Route path="/create-event" element={<AnimatedPageWrapper><CreateEvent/></AnimatedPageWrapper   >}/>
                                             </Route>
+                                            <Route path="/create-event" element={<AnimatedPageWrapper><CreateEvent/></AnimatedPageWrapper   >}/>
                                         </Route>
                                     </Routes>
                                     </ProfileCreationProvider>
