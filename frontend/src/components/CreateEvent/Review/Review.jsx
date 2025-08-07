@@ -141,7 +141,7 @@ function Review({info, visible, setInfo, onSubmit}){
                 {visible && 
                     <div className={`publish ${complete && 'active'}`} onClick={complete ? onSubmit : ()=>{}}>
                         <div className="info">
-                            <h1>{pspeak || catering || info.expectedAttendance > 99 || alumni ? "request OIE approval" : "publish event"}</h1>
+                            <h1>{pspeak || catering || info.expectedAttendance > 99 || alumni ? "request approval" : "publish event"}</h1>
                         </div>
                         <div className="gradient-cover">
                             <img src={GradientButtonCover} alt="" />
