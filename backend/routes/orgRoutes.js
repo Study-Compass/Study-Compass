@@ -458,6 +458,7 @@ router.post("/edit-org", verifyToken, upload.single('image'), handleMulterError,
     }
 });
 
+// Candidate: no direct frontend references found; verify before deprecating
 router.delete("/delete-org/:orgId", verifyToken, async (req, res) => {
     const { Org, Follower, OrgMember } = getModels(req, "Org", "Follower", "OrgMember");
     try {
@@ -498,6 +499,7 @@ router.delete("/delete-org/:orgId", verifyToken, async (req, res) => {
     }
 });
 
+// UNUSED: No current frontend references; consider deprecating in favor of a future follow system
 router.post("/follow-org/:orgId", verifyToken, async (req, res) => {
     const { Org, Follower } = getModels(req, "Org", "Follower");
     try {
@@ -544,6 +546,7 @@ router.post("/follow-org/:orgId", verifyToken, async (req, res) => {
     }
 });
 
+// UNUSED: No current frontend references; consider deprecating in favor of a future follow system
 router.post("/unfollow-org/:orgId", verifyToken, async (req, res) => {
     const { Org, Follower } = getModels(req, "Org", "Follower");
     try {
@@ -606,6 +609,7 @@ router.get("/get-followed-orgs", verifyToken, async (req, res) => {
     }
 });
 
+// UNUSED: Replaced by /org-roles/:orgId/members
 router.get("/get-org-members/:orgId", verifyToken, async (req, res) => {
     const { Org, OrgMember } = getModels(req, "Org", "OrgMember");
     try {
@@ -646,6 +650,7 @@ router.get("/get-org-members/:orgId", verifyToken, async (req, res) => {
     }
 });
 
+// Candidate: No direct frontend references found; verify if still needed with new membership flows
 router.post("/:orgId/apply-to-org", verifyToken, async (req, res) => {
     const { Org, OrgMemberApplication, FormResponse, Form, User, Notification, OrgMember } = getModels(req, "Org", "OrgMemberApplication", "FormResponse", "Form", "User", "Notification", "OrgMember");
     try {
@@ -721,26 +726,13 @@ router.post("/:orgId/apply-to-org", verifyToken, async (req, res) => {
                 model: 'User'
             }));
             
-            // const notificationData = {
-            //     title: `New member joined ${org.org_name}`,
-            //     message: `${user.firstName || user.username} has joined ${org.org_name}.`,
-            //     type: 'membership',
-            //     priority: 'normal',
-            //     channels: ['in_app'],
-            //     metadata: {
-            //         orgId: org._id,
-            //         orgName: org.org_name,
-            //         newMemberId: userId,
-            //         newMemberName: user.firstName || user.username
-            //     }
-            // };
             await notificationService.createBatchTemplateNotification(recipients, 'org_member_applied', {
                 senderName: user.name || user.username,
                 orgName: org.org_name,
                 sender: user._id,
             });
             
-            await notificationService.sendToMultipleRecipients(recipients, notificationData);
+            // Legacy direct notification path removed; handled via template above
         }
         res.status(200).json({success: true, message: "Application submitted successfully"});
     } catch (error) {
@@ -755,158 +747,9 @@ router.post("/:orgId/apply-to-org", verifyToken, async (req, res) => {
     }
 });
 
-router.post("/add-org-member/:orgId", verifyToken, async (req, res) => {
-    const { Org, OrgMember } = getModels(req, "Org", "OrgMember");
-    try {
-        const { orgId } = req.params;
-        const userId = req.user.userId;
-        const { user_id, role } = req.body;
 
-        const org = await Org.findById(orgId);
+// UNUSED: Superseded by DELETE /org-roles/:orgId/members/:userId
 
-        //Check if the org exists
-        if (!org) {
-            return res.status(404).json({ success: false, message: "Org not found" });
-        }
-
-        // Check if the user is the owner of the org
-        if (org.owner.toString() !== userId) {
-            return res
-                .status(400)
-                .json({
-                    success: false,
-                    message: "You are not authorized to add members to this org",
-                });
-        }
-
-        // Check if the user to be added is already a member
-        const member = await OrgMember.findOne({ org_id: orgId, user_id: user_id });
-        if (member) {
-            return res
-                .status(400)
-                .json({
-                    success: false,
-                    message: "User is already a member of this org",
-                });
-        }
-
-        const newMember = new OrgMember({
-            org_id: orgId,
-            user_id,
-            role,
-        });
-        await newMember.save();
-
-        console.log(`POST: /add-org-member`);
-        res.json({ success: true, message: "Member added successfully" });
-    } catch (error) {
-        console.log(`POST: /add-org-member failed`, error);
-        return res
-            .status(500)
-            .json({
-                success: false,
-                message: "Error adding member",
-                error: error.message,
-            });
-    }
-});
-
-router.delete("/remove-org-member/:orgId", verifyToken, async (req, res) => {
-    const { Org, OrgMember } = getModels(req, "Org", "OrgMember");
-    try {
-        const { orgId } = req.params;
-        const userId = req.user.userId;
-        const { user_id } = req.body;
-
-        const org = await Org.findById(orgId);
-
-        //Check if the org exists
-        if (!org) {
-            return res.status(404).json({ success: false, message: "Org not found" });
-        }
-
-        // Check if the user is the owner of the org
-        if (org.owner.toString() !== userId) {
-            return res
-                .status(400)
-                .json({
-                    success: false,
-                    message: "You are not authorized to remove members from this org",
-                });
-        }
-
-        // Check if the user to be removed is a member
-        const member = await OrgMember.findOne({ org_id: orgId, user_id });
-        if (!member) {
-            return res
-                .status(400)
-                .json({ success: false, message: "User is not a member of this org" });
-        }
-
-        await OrgMember.findByIdAndDelete(member._id);
-
-        console.log(`DELETE: /remove-org-member`);
-        res.json({ success: true, message: "Member removed successfully" });
-    } catch (error) {
-        console.log(`DELETE: /remove-org-member failed`, error);
-        return res
-            .status(500)
-            .json({
-                success: false,
-                message: "Error removing member",
-                error: error.message,
-            });
-    }
-});
-
-router.post("/update-org-member/:orgId", verifyToken, async (req, res) => {
-    const { Org, OrgMember } = getModels(req, "Org", "Member");
-    try {
-        const { orgId } = req.params;
-        const userId = req.user.userId;
-        const { user_id, role } = req.body;
-
-        const org = await Org.findById(orgId);
-
-        //Check if the org exists
-        if (!org) {
-            return res.status(404).json({ success: false, message: "Org not found" });
-        }
-
-        // Check if the user is the owner of the org
-        if (org.owner.toString() !== userId) {
-            return res
-                .status(400)
-                .json({
-                    success: false,
-                    message: "You are not authorized to update members of this org",
-                });
-        }
-
-        // Check if the user to be updated is a member
-        const member = await OrgMember.findOne({ org_id: orgId, user_id });
-        if (!member) {
-            return res
-                .status(400)
-                .json({ success: false, message: "User is not a member of this org" });
-        }
-
-        member.role = role;
-        await member.save();
-
-        console.log(`POST: /update-org-member`);
-        res.json({ success: true, message: "Member updated successfully" });
-    } catch (error) {
-        console.log(`POST: /update-org-member failed`, error);
-        return res
-            .status(500)
-            .json({
-                success: false,
-                message: "Error updating member",
-                error: error.message,
-            });
-    }
-});
 
 router.post("/check-org-name", verifyToken, async (req, res) => {
     const { Org } = getModels(req, "Org");
@@ -950,8 +793,9 @@ router.get('/get-meetings/:name', verifyToken, async(req,res)=>{
     const { Org, Event } = getModels(req, "Org", "Event");
     const name = req.params.name;
     try {
-        const org = await Org.find({name:name});
-        const events = await Event.find({hosting: org._id, type: "meeting"});
+        const org = await Org.findOne({ org_name: name });
+        if(!org) return res.status(404).json({ success: false, message: 'Org not found' });
+        const events = await Event.find({ hostingId: org._id, hostingType: 'Org', type: "meeting" });
         console.log(`GET: /get-meetings`);
         res.json({
             success: true,
@@ -970,6 +814,7 @@ router.get('/get-meetings/:name', verifyToken, async(req,res)=>{
     }
 });
 
+// UNUSED/DEV: Sample email sender route
 router.post('/send-email', async (req,res) => {
     try{
         

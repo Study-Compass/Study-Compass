@@ -111,6 +111,7 @@ const ratingRoutes = require('./routes/ratingRoutes.js');
 const searchRoutes = require('./routes/searchRoutes.js');
 const orgRoutes = require('./routes/orgRoutes.js');
 const orgRoleRoutes = require('./routes/orgRoleRoutes.js');
+const roomRoutes = require('./routes/roomRoutes.js');
 const adminRoutes = require('./routes/adminRoutes.js');
 const eventsRoutes = require('./events/index.js');
 const notificationRoutes = require('./routes/notificationRoutes.js');
@@ -129,6 +130,7 @@ app.use(searchRoutes);
 
 app.use(orgRoutes);
 app.use('/org-roles', orgRoleRoutes);
+app.use('/admin', roomRoutes);
 app.use(adminRoutes);
 
 app.use('/notifications', notificationRoutes);

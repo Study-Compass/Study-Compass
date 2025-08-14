@@ -64,31 +64,6 @@ function OIEFullEvent({ event, eventId = null, setEdited, viewingRole }){
         }
     }, [fullEventRef]);
 
-    const handleCheck = async (index) => {
-        console.log(index);
-        const newChecked = {...checked};
-        newChecked[index] = !newChecked[index];
-        setChecked(newChecked);
-        let newOIE = {...fullEvent.data.event.OIE};
-        const checkedItems = [];
-        console.log(data.config);
-        for(const key in newChecked){
-            if(newChecked[key]){
-                checkedItems.push(data.config.checklist[key].title);
-            }
-        }
-        newOIE.checkListItems = checkedItems;
-        changeOIE(newOIE);
-    }
-
-
-    const handleApproved = async (status) => {
-        const newApproval = {...fullEvent.data.event.approvalInstance};
-        newApproval.status = status ? "Approved" : "Rejected";
-        changeOIE(newApproval);
-        fullEvent.refetch();
-    }
-
     const renderHostingStatus = () => {
         let hostingImage = '';
         let hostingName = '';
@@ -122,18 +97,7 @@ function OIEFullEvent({ event, eventId = null, setEdited, viewingRole }){
         );
     }
 
-    const changeOIE = async (newOIE) => {
-        try{
-            const auth = {headers: {"Authorization": `Bearer ${localStorage.getItem("token")}`}};
-            const response = await axios.post(`/oie-status`, newOIE, auth);
-            console.log(response);
-            setEdited(true);
-            return response.data;
-        } catch(err){
-            console.log(err);
-            addNotification({title: "Internal Error", content: "Failed to update checklist", type: "error"});
-        }
-    }
+
 
     useEffect(() => {
         if(fullEvent.data){

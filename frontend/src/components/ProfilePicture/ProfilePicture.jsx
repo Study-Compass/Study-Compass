@@ -129,10 +129,10 @@ function ProfilePicture(){
                             <hr/>
                             <p className="section">ORGS</p>
                             {user.clubAssociations.map(
-                                (org)=>{
+                                (org, index)=>{
                                     const url = `/club-dashboard/${org.org_name}`
                                     return(
-                                        <Link to={`${url}`} key={org.org_name}>
+                                        <Link to={`${url}`} key={`${org.org_name}-${index}`}>
                                             <div className="menu-item">
                                                 <img className="icon org-icon" src={org.org_profile_image} alt="" />
                                                 <p>{org.org_name}</p>
