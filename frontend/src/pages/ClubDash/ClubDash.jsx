@@ -26,6 +26,7 @@ import {
     DangerZone,
     MemberSettings
 } from './OrgSettings/components';
+import VerificationRequest from './Settings/VerificationRequest/VerificationRequest';
 
 function ClubDash(){
     const [clubId, setClubId] = useState(useParams().id);
@@ -240,6 +241,11 @@ function ClubDash(){
                     label: 'Membership',
                     icon: 'mdi:account-group',
                     element: <MemberSettings org={orgData.data?.org?.overview} expandedClass={expandedClass} />
+                },
+                {
+                    label: 'Verification Requests',
+                    icon: 'mdi:shield-check',
+                    element: <VerificationRequest org={orgData.data?.org?.overview} expandedClass={expandedClass} />
                 },
                 {
                     label: 'Danger Zone',

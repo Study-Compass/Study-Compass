@@ -26,6 +26,7 @@ import CreateOrg from './pages/CreateOrg/CreateOrg';
 import ClubDash from './pages/ClubDash/ClubDash';
 import OrgDisplay from './pages/Org/OrgDisplay';
 import RootDash from './pages/RootDash/RootDash';
+import OrgManagement from './pages/RootDash/OrgManagement/OrgManagement';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 import SAMLCallback from './components/SAMLCallback/SAMLCallback';
@@ -153,6 +154,7 @@ function App() {
                                                 <Route path="/club-dashboard/:id" element={<AnimatedPageWrapper><ClubDash/></AnimatedPageWrapper>}/>
                                                 <Route path='/create-org' element={<AnimatedPageWrapper><CreateOrg/></AnimatedPageWrapper>}/>
                                                 <Route path="/root-dashboard" element={<AnimatedPageWrapper><RootDash/></AnimatedPageWrapper>}/>
+                                            <Route path="/org-management" element={<AnimatedPageWrapper><OrgManagement/></AnimatedPageWrapper>}/>
                                                 <Route path="/approval-dashboard/:id" element={<AnimatedPageWrapper><OIEDash/></AnimatedPageWrapper>}/>
                                             </Route>
                                             <Route path="/events-dashboard" element={<AnimatedPageWrapper><EventsDash/></AnimatedPageWrapper>}/>

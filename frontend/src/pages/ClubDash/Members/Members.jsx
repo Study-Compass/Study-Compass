@@ -7,6 +7,7 @@ import apiRequest from '../../../utils/postRequest';
 import OrgGrad from '../../../assets/Gradients/OrgGrad.png';
 import { Icon } from '@iconify-icon/react';
 import Popup from '../../../components/Popup/Popup';
+import Modal from '../../../components/Modal/Modal';
 import AddMemberForm from '../../../components/AddMemberForm';
 import { getOrgRoleColor } from '../../../utils/orgUtils';
 import Select from '../../../components/Select/Select'; 
@@ -434,56 +435,49 @@ function Members({ expandedClass, org }) {
                 </Popup>
 
                 {/* Role Assignment Modal */}
-                {showRoleAssignment && selectedMember && (
-                    <div className="modal-overlay">
-                        <div className="role-assignment-modal">
-                            <div className="modal-header">
-                                <h3>Assign Role</h3>
-                                <button 
-                                    className="close-btn"
-                                    onClick={() => {
-                                        setShowRoleAssignment(false);
-                                        setSelectedMember(null);
-                                    }}
-                                >
-                                    <Icon icon="ic:round-close" />
-                                </button>
+                <Modal 
+                    isOpen={showRoleAssignment} 
+                    onClose={() => {
+                        setShowRoleAssignment(false);
+                        setSelectedMember(null);
+                    }}
+                    title="Assign Role"
+                    size="medium"
+                >
+                    {selectedMember && (
+                        <>
+                            <div className="member-summary">
+                                <h4>Assigning role for:</h4>
+                                <p>{selectedMember.user_id?.name} (@{selectedMember.user_id?.username})</p>
+                                <p>Current role: <span style={{ color: getRoleColor(selectedMember.role) }}>
+                                    {getRoleDisplayName(selectedMember.role)}
+                                </span></p>
                             </div>
                             
-                            <div className="modal-content">
-                                <div className="member-summary">
-                                    <h4>Assigning role for:</h4>
-                                    <p>{selectedMember.user_id?.name} (@{selectedMember.user_id?.username})</p>
-                                    <p>Current role: <span style={{ color: getRoleColor(selectedMember.role) }}>
-                                        {getRoleDisplayName(selectedMember.role)}
-                                    </span></p>
-                                </div>
-                                
-                                <div className="role-selection">
-                                    <h4>Select New Role:</h4>
-                                    <div className="role-options">
-                                        {roles.map(role => (
-                                            <button
-                                                key={role.name}
-                                                className={`role-option ${selectedMember.role === role.name ? 'current' : ''}`}
-                                                onClick={() => handleRoleAssignment(selectedMember.user_id._id, role.name)}
-                                                disabled={role.name === 'owner' && selectedMember.role !== 'owner'}
-                                            >
-                                                <div className="role-info">
-                                                    <h5>{role.displayName}</h5>
-                                                    <p>{role.permissions.join(', ') || 'No specific permissions'}</p>
-                                                </div>
-                                                {selectedMember.role === role.name && (
-                                                    <Icon icon="ic:round-check" className="current-indicator" />
-                                                )}
-                                            </button>
-                                        ))}
-                                    </div>
+                            <div className="role-selection">
+                                <h4>Select New Role:</h4>
+                                <div className="role-options">
+                                    {roles.map(role => (
+                                        <button
+                                            key={role.name}
+                                            className={`role-option ${selectedMember.role === role.name ? 'current' : ''}`}
+                                            onClick={() => handleRoleAssignment(selectedMember.user_id._id, role.name)}
+                                            disabled={role.name === 'owner' && selectedMember.role !== 'owner'}
+                                        >
+                                            <div className="role-info">
+                                                <h5>{role.displayName}</h5>
+                                                <p>{role.permissions.join(', ') || 'No specific permissions'}</p>
+                                            </div>
+                                            {selectedMember.role === role.name && (
+                                                <Icon icon="ic:round-check" className="current-indicator" />
+                                            )}
+                                        </button>
+                                    ))}
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                )}
+                        </>
+                    )}
+                </Modal>
             </div>
         </div>
     );
