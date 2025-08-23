@@ -2,7 +2,7 @@ import React, {useState, useEffect, useRef, useCallback} from 'react';
 import './Explore.scss';
 import { Icon } from '@iconify-icon/react/dist/iconify.mjs';
 import {useFetch} from '../../../hooks/useFetch';
-import RPIlogo from '../../../assets/Rpi.png';
+import RPIlogo from '../../../assets/Schools/RPI.svg';
 import compass from '../../../assets/Brand Image/discover.svg';
 import FilterPanel from '../../../components/FilterPanel/FilterPanel';
 import EventsList from '../../../components/EventsList/EventsList';
@@ -61,13 +61,20 @@ function Explore(){
             options: ["student", "administration", "organization"],
             optionValues: ["User", "Admin", "Org"],
             field: 'hostingType'
+        },
+        friendsEvents: {
+            label: "friends events",
+            options: ["friends going"],
+            optionValues: ["friends"],
+            field: 'friendsFilter'
         }
     };
 
     // Store raw selected filter values
     const [filters, setFilters] = useState({
         type: [],
-        hostingType: []
+        hostingType: [],
+        friendsFilter: []
     });
 
     // Build the API filters object
@@ -75,6 +82,10 @@ function Explore(){
         const apiFilters = {};
         Object.keys(filters).forEach((field) => {
             if (filters[field].length) {
+                if (field === 'friendsFilter') {
+                    // Handle friends filter separately
+                    return;
+                }
                 apiFilters[field] = { "$in": filters[field] };
             }
         });
@@ -85,7 +96,14 @@ function Explore(){
     const apiFilters = buildApiFilters();
     const filterParam = apiFilters;
 
-    const { data, loading, error } = useFetch(`/get-future-events?roles=${roles}&page=${page}&limit=${limit}&filter=${JSON.stringify(filterParam)}`);
+    // Determine which endpoint to use based on filters
+    const hasFriendsFilter = filters.friendsFilter.includes('friends');
+    const endpoint = hasFriendsFilter ? '/friends-events' : '/get-future-events';
+    const queryParams = hasFriendsFilter 
+        ? `?page=${page}&limit=${limit}`
+        : `?roles=${roles}&page=${page}&limit=${limit}&filter=${JSON.stringify(filterParam)}`;
+
+    const { data, loading, error } = useFetch(`${endpoint}${queryParams}`);
 
     // Handle load more for infinite scroll
     const handleLoadMore = useCallback(() => {
@@ -188,23 +206,31 @@ function Explore(){
         })).sort((a, b) => a.date - b.date);
     };
 
-
+    // Helper function to check if friends are going to an event
+    const hasFriendsGoing = (event) => {
+        if (!event.attendees || !user) return false;
+        // This would need to be implemented based on your friendship system
+        // For now, we'll show the indicator if there are any attendees
+        return event.attendees.some(attendee => 
+            attendee.status === 'going' && attendee.userId !== user._id
+        );
+    };
 
     const groupedEvents = groupEventsByDate(events);
 
     return(
         <main className="explore" role="main" aria-label="Explore events">
-            <header className="heading">
-                <h1>Explore Events at </h1>
+            {/* <header className="heading">
                 <img src={RPIlogo} alt="RPI Logo" />
-            </header>
+                <h1>Explore Events</h1>
+            </header> */}
             <div className="explore-content">
                 {
                     width > 768 ? (
                         <aside className="sidebar" role="complementary" aria-label="Event filters and view options">
                             <div className="sidebar-header">
-                                <img src={compass} alt="Compass icon" />
-                                <h2>explore</h2>
+                                <h2>Events at</h2>
+                                <img src={RPIlogo} alt="RPI Logo" />
                             </div>
                             <Switch
                                 options={['list', 'calendar']}
@@ -287,6 +313,7 @@ function Explore(){
                             hasMore={hasMore}
                             onLoadMore={handleLoadMore}
                             formatDate={formatDate}
+                            hasFriendsFilter={hasFriendsFilter}
                         />
                     ) : (
                         view === 0 ?

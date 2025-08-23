@@ -5,8 +5,35 @@ import Popup from '../../../../Popup/Popup';
 import FullEvent from '../FullEvent/FullEvent';
 import { Icon } from '@iconify-icon/react/dist/iconify.mjs';
 import defaultAvatar from '../../../../../assets/defaultAvatar.svg'
+import useAuth from '../../../../../hooks/useAuth';
+import RSVPButton from '../../../../RSVPButton/RSVPButton';
+import { useFetch } from '../../../../../hooks/useFetch';
 
-function Event({event}){
+function Event({event, hasFriendsFilter = false}){
+    const [optimisticEvent, setOptimisticEvent] = useState(event);
+    const { user } = useAuth();
+    
+    // Use useFetch to get friends data
+    const { data: friendsData } = useFetch(
+        user ? '/getFriends' : null
+    );
+
+    const [friendsGoing, setFriendsGoing] = useState(0);
+
+    useEffect(() => {
+        if (event.attendees && user && friendsData?.success) {
+            const friendIds = friendsData.data.map(friend => friend._id);
+            // Count friends going to the event
+            const friendsCount = event.attendees.filter(attendee => 
+                attendee.status === 'going' && 
+                attendee.userId !== user._id &&
+                friendIds.includes(attendee.userId)
+            ).length;
+            setFriendsGoing(friendsCount);
+            
+        }
+    }, [event.attendees, user, friendsData]);
+
     const renderHostingStatus = () => {
         let hostingImage = '';
         let hostingName = '';
@@ -51,6 +78,17 @@ function Event({event}){
             event.preventDefault();
             handleEventClick(event);
         }
+    }
+
+    const handleRSVPUpdate = (status) => {
+        setOptimisticEvent(prevEvent => ({
+            ...prevEvent,
+            rsvpStats: {
+                ...prevEvent.rsvpStats,
+                [status]: prevEvent.rsvpStats[status] + 1
+            }
+        }));
+        console.log(optimisticEvent);
     }
 
     const onPopupClose = () => {
@@ -120,6 +158,33 @@ function Event({event}){
                     <Icon icon="fluent:location-28-filled" aria-hidden="true" />
                     <address>{event.location}</address>
                 </div>
+                
+                {/* Friends going indicator */}
+                {friendsGoing > 0 && (
+                    <div className="friends-indicator">
+                        <Icon icon="mdi:account-group" />
+                        <span>{friendsGoing} friend{friendsGoing !== 1 ? 's' : ''} going</span>
+                    </div>
+                )}
+                
+                {/* RSVP stats if available */}
+                {optimisticEvent.rsvpStats && (
+                    <div className="rsvp-preview">
+                        <div className="rsvp-stat">
+                            <span className="count">{optimisticEvent.rsvpStats.going}</span>
+                            <span className="label">going</span>
+                        </div>
+                        {optimisticEvent.rsvpStats.maybe > 0 && (
+                            <div className="rsvp-stat">
+                                <span className="count">{optimisticEvent.rsvpStats.maybe}</span>
+                                <span className="label">maybe</span>
+                            </div>
+                        )}
+                    </div>
+                )}
+                
+                {/* RSVP Button */}
+                <RSVPButton event={optimisticEvent} onRSVPUpdate={handleRSVPUpdate} />
             </div>
         </article>
     );

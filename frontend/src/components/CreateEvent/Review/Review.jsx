@@ -134,6 +134,31 @@ function Review({info, visible, setInfo, onSubmit}){
                             <label htmlFor="none">None of the above</label>
                         </div>
                     </div>
+
+                    {/* RSVP Configuration Review */}
+                    {info.rsvpEnabled && (
+                        <div className="rsvp-review">
+                            <h4>RSVP Configuration:</h4>
+                            <div className="rsvp-settings-review">
+                                <div className="rsvp-setting">
+                                    <span className="label">RSVP Required:</span>
+                                    <span className="value">{info.rsvpRequired ? 'Yes' : 'No'}</span>
+                                </div>
+                                {info.rsvpDeadline && (
+                                    <div className="rsvp-setting">
+                                        <span className="label">RSVP Deadline:</span>
+                                        <span className="value">{new Date(info.rsvpDeadline).toLocaleString()}</span>
+                                    </div>
+                                )}
+                                {info.maxAttendees && (
+                                    <div className="rsvp-setting">
+                                        <span className="label">Maximum Attendees:</span>
+                                        <span className="value">{info.maxAttendees}</span>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    )}
                 </div>
 
             </div>

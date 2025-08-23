@@ -1,6 +1,8 @@
 import React, { useEffect } from 'react';
 import './App.scss';
 import './assets/fonts.css';
+import './assets/Fonts/Montserrat/Montserrat.css';
+import './assets/Fonts/OpenSauce/OpenSauce.css';
 import AnimatedPageWrapper from './components/AnimatedPageWrapper/AnimatedPageWrapper';
 
 import Room from './pages/Room/Room';

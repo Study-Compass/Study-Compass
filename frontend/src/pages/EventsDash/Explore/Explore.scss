@@ -1,7 +1,7 @@
 .explore{
     z-index: 1;
     height:100vh;
-    padding:20px 30px;
+    padding:20px 20px;
     display: flex;
     flex-direction: column;
     box-sizing: border-box; 
@@ -16,36 +16,39 @@
         height:36px;
         h1{
             margin: 0;
+            font-family: 'OpenSauce';
+            font-weight: 900;
         }
         img{
-            height:30px;
-            padding:3px 10px;
-            border:1px solid var(--lighterborder);
-            border-radius: 10px;
-            background-color: var(--background);
+            height:22px;
+            padding:10px 15px;
+            border-radius: 8px;
+            background-color: #DB0220;
         }
         .explore-background-gradient{
             display: none;
         }
     }
     .explore-content{
-        height: calc(100% - 36px - 20px);
+        height: 100%;
         display: flex;
-        border:1px solid var(--lighterborder);
-        border-radius: 20px;
+        // border:1px solid var(--lighterborder);
         width:100%;
+        gap: 10px;
         overflow: hidden;
         padding-right:8px;
         box-sizing: border-box;
         background-color: var(--background);
         .sidebar{
             width:180px;
-            border-right: 1px solid var(--lighterborder);
             padding:10px;
-            background-color: var(--lighter);
+            background-color: var(--lightest);
             display: flex;
             flex-direction: column;
+            border-radius: 15px;
+            border:1px solid var(--lighterborder);
             gap: 20px;
+            box-shadow: var(--shadow);
             .switch{
                 width:fit-content;
             }
@@ -53,8 +56,12 @@
                 display: flex;
                 align-items: center;
                 gap: 6px;
+                padding: 0 5px;
                 img{
-                    height:30px;
+                    height:15px;
+                    border-radius: 4px;
+                    background-color: #DB0220;
+                    padding: 5px 10px;
                 }
                 h2{
                     margin:0;
