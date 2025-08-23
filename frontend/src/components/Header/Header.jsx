@@ -1,6 +1,6 @@
 import React,{ useEffect, useState, useRef } from 'react'
 import { useNavigate,useLocation, Link } from 'react-router-dom';
-import logo from '../../assets/Brand Image/Logo.svg';
+import logo from '../../assets/Brand Image/COMPASS.svg';
 import './Header.scss';
 import ProfilePicture from '../ProfilePicture/ProfilePicture';
 import useAuth from '../../hooks/useAuth';

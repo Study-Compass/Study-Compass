@@ -11,6 +11,7 @@
     position: relative;
     cursor:pointer;
     animation: event-load-in 1s ease-in-out;
+    overflow: hidden;
     
     /* Focus styles for accessibility */
     &:focus {
@@ -48,6 +49,7 @@
         display: flex;
         gap: 5px;
         flex-direction: column;
+        max-width:100%;
         h2{
             font-size: 18px;
             font-weight: 600;
@@ -158,6 +160,49 @@
         
         &.ongoing::after {
             transition: none;
+        }
+    }
+}
+
+.friends-indicator {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 8px;
+    padding: 4px 8px;
+    background: rgba(76, 175, 80, 0.1);
+    border-radius: 12px;
+    color: #4CAF50;
+    font-size: 12px;
+    font-weight: 500;
+    
+    svg {
+        width: 14px;
+        height: 14px;
+    }
+}
+
+.rsvp-preview {
+    display: flex;
+    gap: 12px;
+    margin-top: 8px;
+    
+    .rsvp-stat {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        
+        .count {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text);
+        }
+        
+        .label {
+            font-size: 10px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
     }
 }
