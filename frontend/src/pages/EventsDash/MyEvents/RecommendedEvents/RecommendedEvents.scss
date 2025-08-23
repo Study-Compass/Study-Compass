@@ -12,7 +12,6 @@
       padding: 6px 16px;
       font-family: 'Satoshi';
       font-size: 14px;
-      font-weight: 600;
       cursor: pointer;
       display: flex;
       align-items: center;
@@ -21,9 +20,6 @@
       transition: background-color 0.3s ease;
 
       &:hover {
-        background-color: var(--beacon-accent);
-        filter: brightness(0.9);
-        
         iconify-icon {
           transform: translateX(4px);
         }
@@ -31,7 +27,7 @@
 
       iconify-icon {
         font-size: 16px;
-        color: white;
+        color: white !important;
         transition: transform 0.3s ease;
       }
     }
