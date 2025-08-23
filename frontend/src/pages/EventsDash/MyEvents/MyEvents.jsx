@@ -1,12 +1,16 @@
 import './MyEvents.scss';
-import CreateEventButton from '../../../components/EventsViewer/EventsGrid/EventsColumn/CreateEventButton/CreateEvent';
 import { useFetch } from '../../../hooks/useFetch';
 import { useState, useEffect } from 'react';
-import OIEEvent from '../../OIEDash/OIEEventsComponents/Event/OIEEvent';
 import { Icon } from '@iconify-icon/react/dist/iconify.mjs';
-import EventsManager from '../../../components/EventsManager/EventsManager';
+import AdminGradient from '../../../assets/Gradients/AdminGrad.png';
+import useAuth from '../../../hooks/useAuth';
+
+import RecommendedEvents from './RecommendedEvents/RecommendedEvents';
 
 function MyEvents(){
+    //define welcometext to be either good morning, good afternoon, or good evening, in one line
+    const welcomeText = `Good ${new Date().getHours() < 12 ? "Morning" : new Date().getHours() < 18 ? "Afternoon" : "Evening"}`;
+    const { user } = useAuth();
 
     const [fetchType, setFetchType] = useState('future');
     const [sort, setSort] = useState('desc');
@@ -34,15 +38,23 @@ function MyEvents(){
 
 
     return(
-        <div className="my-events">
-            <div className="heading">
-                <h1>My Events</h1>
+        <div className="my-events dash">
+            <header className="header">
+                <img src={AdminGradient} alt="" />
+                <h1>{welcomeText}, {user?.first_name || 'User'}</h1>
+                <p>Check out your upcoming events and see top picks for you</p>
+            </header>
+            <div className="my-events-container">
+                <RecommendedEvents />
+                <div className='my-events-content'>
+                    <div className="event-filters-bar">
+                         <div className="event-filters">upcoming</div>
+                         <div className="event-filters">hosting</div>
+                         <div className="event-filters">past</div>
+                         </div>
+                </div>
             </div>
-            <div className="event-button-container">
-                <CreateEventButton row={true} color="red"/>
             </div>
-            <EventsManager events={myEvents.data?.events} refetch={myEvents.refetch} selectorItems={selectorItems} handleTabChange={handleFetchTypeChange} fetchType={fetchType} />
-        </div>
     )
 }
 
