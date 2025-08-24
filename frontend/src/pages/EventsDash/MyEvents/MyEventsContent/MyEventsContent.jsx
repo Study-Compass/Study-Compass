@@ -5,7 +5,8 @@ import MyEventCard from '../MyEventCard/MyEventCard';
 
 const MyEventsContent = () => {
     const [selectedFilter, setSelectedFilter] = useState('upcoming');
-    
+    const [emptyCase, setEmptyCase] = useState('No Upcoming Events');
+
     // Fetch events you're attending (going to)
     const { data: goingEventsData, loading: goingLoading, error: goingError } = useFetch('/going-events?limit=100');
     
@@ -48,14 +49,16 @@ const MyEventsContent = () => {
     }, [goingEventsData, hostingEventsData]);
 
     const filterButtons = [
-        { key: 'upcoming', label: 'Upcoming', count: processedEvents.upcoming.length },
-        { key: 'hosting', label: 'Hosting', count: processedEvents.hosting.length },
-        { key: 'past', label: 'Past', count: processedEvents.past.length }
+        { key: 'upcoming', label: 'Upcoming', emptyCase: 'No Upcoming Events', count: processedEvents.upcoming.length },
+        { key: 'hosting', label: 'Hosting', emptyCase: 'Coming Soon', count: processedEvents.hosting.length },
+        { key: 'past', label: 'Past', emptyCase: 'No Past Events', count: processedEvents.past.length }
     ];
 
     const events = processedEvents[selectedFilter] || [];
     const loading = goingLoading || hostingLoading;
     const error = goingError || hostingError;
+
+
 
     return (
         <div className="my-events-content">
@@ -67,7 +70,10 @@ const MyEventsContent = () => {
                         <button
                             key={filter.key}
                             className={`filter-button ${selectedFilter === filter.key ? 'active' : ''}`}
-                            onClick={() => setSelectedFilter(filter.key)}
+                            onClick={() => {
+                                setSelectedFilter(filter.key);
+                                setEmptyCase(filter.emptyCase);
+                            }}
                         >
                             {filter.label}
                             {filter.count > 0 && <span className="count">{filter.count}</span>}
@@ -89,7 +95,7 @@ const MyEventsContent = () => {
                         </div>
                     ) : (
                         <div className="empty-state">
-                            <p>No {selectedFilter} events found</p>
+                            <p>{emptyCase}</p>
                         </div>
                     )}
                 </div>
