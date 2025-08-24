@@ -2,6 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import './RecommendedRoomCard.scss';
 import { Icon } from '@iconify-icon/react/dist/iconify.mjs';
+import FilledStar from '../../assets/Icons/FilledStar.svg';
 
 const RecommendedRoomCard = ({ room }) => {
     const navigate = useNavigate();
@@ -31,28 +32,48 @@ const RecommendedRoomCard = ({ room }) => {
     return (
         <div className="recommended-room-card" onClick={handleClick}>
             <div className="card-header">
-                <Icon icon="material-symbols:door-open" />
-                <span>Recommended Room</span>
+                <img src={room.image} alt={room.name} />
             </div>
             <div className="card-content">
-                <h3 className="room-name">{room.name}</h3>
-                {room.attributes && room.attributes.length > 0 && (
-                    <div className="room-attributes">
-                        {room.attributes.slice(0, 2).map((attribute, index) => (
-                            <span key={index} className="attribute-tag">
-                                {attribute}
-                            </span>
-                        ))}
-                        {room.attributes.length > 2 && (
-                            <span className="attribute-tag more">
-                                +{room.attributes.length - 2}
-                            </span>
-                        )}
+                <div className="content-top">   
+                        <h3 className="room-name">
+                            {room.name}
+                        
+                        </h3>
+                                    
+                    {/* Available Status */}
+                    <div className="room-stats-row">
+                    <div className="room-rating">
+                                <img src={FilledStar} alt="star" className="star-icon" />
+                                <span className="rating-text">{room.rating || 4.2}</span>
+                            </div>
+                    <div className="free-until">
+                        <div className="dot">
+                            <div className="outer-dot"></div>
+                            <div className="inner-dot"></div>
+                        </div>
+                            Available Now
+                        </div>
                     </div>
-                )}
+                    {room.attributes && room.attributes.length > 0 && (
+                        <div className="room-attributes">
+                            {room.attributes.slice(0, 2).map((attribute, index) => (
+                                <span key={index} className="attribute-tag">
+                                    {attribute}
+                                </span>
+                            ))}
+                            {room.attributes.length > 2 && (
+                                <span className="attribute-tag more">
+                                    +{room.attributes.length - 2}
+                                </span>
+                            )}
+                        </div>
+                    )}
+                </div>
+                
                 <div className="card-footer">
                     <span className="view-details">View Details</span>
-                    <Icon icon="mingcute:arrow-right-line" />
+                    <Icon icon="mingcute:arrow-right-line" className="arrow-icon" />
                 </div>
             </div>
         </div>

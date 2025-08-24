@@ -5,7 +5,7 @@
 
   .content-row {
     display: flex;
-    gap: 20px;
+    gap: 10px;
     width: 100%;
     align-items: flex-start;
   }
@@ -70,8 +70,9 @@
 
   .recommended-room {
     display: flex;
-    width: 20%;
-    min-width: 200px;
+    width: 25%;
+    height: 100%;
+    min-height: 300px;
     justify-content: flex-start;
   }
 }
