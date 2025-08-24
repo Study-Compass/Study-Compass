@@ -20,39 +20,47 @@
 
     .filter-buttons {
       display: flex;
-      gap: 5px;
+      gap: 4px;
       flex-wrap: wrap;
 
       .filter-button {
         display: flex;
-        border: 1px solid var(--lighterborder);
         border-radius: 7px;
         padding: 4px 8px;
         box-sizing: border-box;
-        box-shadow: var(--shadow);
+        // box-shadow: var(--shadow);
         cursor: pointer;
         transition: all 0.3s;
         align-items: center;
-        gap: 8px;
-        background-color: var(--background);
+        gap: 5px;
+        background-color: transparent;
         
         font-size: 14px;
-        font-weight: 600;
+        font-weight: 500;
         font-family: 'Inter';
         color: var(--lighter-text);
+        transition: all 0.3s ease;
+
+        .count {
+          transition: all 0.3s ease;
+         }
 
         &:hover {
-          background-color: var(--lighter);
+          color: var(--primary);
+
+          .count {
+            transition: all 0.3s ease;
+            background-color: var(--secondary-color);
+          }
         }
 
         &.active {
-          background-color: var(--primary);
-          color: white;
-          border-color: var(--primary);
+          background-color: var(--secondary-color);
+          color: var(--primary);
           
           .count {
-            background-color: rgba(255, 255, 255, 0.2);
-            color: white;
+            background-color: var(--primary);
+            color: var(--secondary-color);
           }
         }
 
