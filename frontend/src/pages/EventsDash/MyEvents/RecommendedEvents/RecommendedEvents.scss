@@ -3,9 +3,17 @@
   padding: 0px 20px;
   box-sizing: border-box;
 
+  .content-row {
+    display: flex;
+    gap: 20px;
+    width: 100%;
+    align-items: flex-start;
+  }
+
   .recommended-events-container {
+    flex: 1;
     .explore-events-button {
-      background-color: var(--beacon-accent);
+      background-color: var(--primary);
       color: white;
       border: none;
       border-radius: 8px;
@@ -57,6 +65,27 @@
       &::-webkit-scrollbar-thumb:hover {
         background: var(--darkborder);
       }
+    }
+  }
+
+  .recommended-room {
+    display: flex;
+    width: 20%;
+    min-width: 200px;
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 768px) {
+  .recommended-events {
+    .content-row {
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .recommended-room {
+      width: 100%;
+      min-width: unset;
     }
   }
 }

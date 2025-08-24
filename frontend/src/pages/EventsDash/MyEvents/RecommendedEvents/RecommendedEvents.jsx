@@ -8,10 +8,12 @@ import { useNavigate } from "react-router-dom";
 
 import HeaderContainer from "../../../../components/HeaderContainer/HeaderContainer";
 import EventCard from "./RecommendedEventPreviewCard/RecommendedEventPreviewCard";
+import RecommendedRoomCard from "../../../../components/RecommendedRoomCard/RecommendedRoomCard";
 
 const RecommendedEvents = () => {
     // need to add more stuff to this algo, ensure control on how many we can fetch and add other ways to grab if no friend events are found
     const { data: eventsData, loading, error } = useFetch('/friends-events');
+    const { data: roomData, loading: roomLoading, error: roomError } = useFetch('/get-recommendation');
     const navigate = useNavigate();
 
     if (loading) {
@@ -26,6 +28,8 @@ const RecommendedEvents = () => {
                    eventsData?.events ? eventsData.events : 
                    eventsData?.data ? eventsData.data : [];
 
+    const recommendedRoom = roomData?.data || null;
+
 
   const exploreButton = (
     <div className="explore-events-button" onClick={() => navigate('/events-dashboard?page=0')}>
@@ -35,23 +39,28 @@ const RecommendedEvents = () => {
 
   return (
     <div className="recommended-events">
-      <HeaderContainer
-        icon="streamline:target-remix"
-        header="Top Picks for You"
-        right={exploreButton}
-        size="16px"
-        classN="recommended-events-container"
-      >
-        <div className="top-picks-content">
-            {events && events.length > 0 ? (
-                events.map((event) => (
-                    <EventCard key={event.id || event._id} event={event} />
-                ))
-            ) : (
-                <div>No recommended events available</div>
-            )}
+      <div className="content-row">
+        <HeaderContainer
+          icon="streamline:target-remix"
+          header="Top Picks for You"
+          right={exploreButton}
+          size="16px"
+          classN="recommended-events-container"
+        >
+          <div className="top-picks-content">
+              {events && events.length > 0 ? (
+                  events.map((event) => (
+                      <EventCard key={event.id || event._id} event={event} />
+                  ))
+              ) : (
+                  <div>No recommended events available</div>
+              )}
+          </div>
+        </HeaderContainer>
+        <div className="recommended-room"> 
+          <RecommendedRoomCard room={recommendedRoom} />
         </div>
-      </HeaderContainer>
+      </div>
     </div>
   );
 };

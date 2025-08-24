@@ -46,9 +46,9 @@
         }
 
         &.active {
-          background-color: var(--beacon-accent);
+          background-color: var(--primary);
           color: white;
-          border-color: var(--beacon-accent);
+          border-color: var(--primary);
           
           .count {
             background-color: rgba(255, 255, 255, 0.2);

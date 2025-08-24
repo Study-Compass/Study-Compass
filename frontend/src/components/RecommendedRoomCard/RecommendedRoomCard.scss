@@ -1,0 +1,96 @@
+.recommended-room-card {
+    width: 100%;
+    background-color: var(--offwhite);
+    border-radius: 15px;
+    border: 1px solid var(--lightborder);
+    padding: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    box-shadow: var(--shadow);
+
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        border-color: var(--border);
+    }
+
+    .card-header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--darkborder);
+        font-size: 14px;
+        font-weight: 500;
+        font-family: 'Inter', sans-serif;
+
+        svg {
+            font-size: 16px;
+        }
+    }
+
+    .card-content {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+
+        .room-name {
+            font-family: 'Satoshi', sans-serif;
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text);
+            margin: 0;
+            line-height: 1.2;
+        }
+
+        .room-attributes {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+
+            .attribute-tag {
+                background-color: var(--background);
+                color: var(--text);
+                font-size: 11px;
+                font-weight: 500;
+                padding: 2px 6px;
+                border-radius: 6px;
+                border: 1px solid var(--lightborder);
+                font-family: 'Inter', sans-serif;
+
+                &.more {
+                    background-color: var(--lightborder);
+                    color: var(--darkborder);
+                }
+            }
+        }
+
+        .card-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 4px;
+
+            .view-details {
+                font-size: 12px;
+                color: var(--darkborder);
+                font-weight: 500;
+                font-family: 'Inter', sans-serif;
+            }
+
+            svg {
+                font-size: 14px;
+                color: var(--darkborder);
+            }
+        }
+    }
+}
+
+@media (max-width: 768px) {
+    .recommended-room-card {
+        width: 100%;
+        min-width: unset;
+    }
+}
