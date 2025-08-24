@@ -5,4 +5,10 @@
     overflow-y: hidden;
     display: flex;
     flex-direction: column;
+
+    .my-events-container{
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
 }

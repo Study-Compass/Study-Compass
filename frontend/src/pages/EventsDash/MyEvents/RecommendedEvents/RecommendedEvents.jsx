@@ -36,7 +36,7 @@ const RecommendedEvents = () => {
   return (
     <div className="recommended-events">
       <HeaderContainer
-        icon="mingcute:star-fill"
+        icon="streamline:target-remix"
         header="Top Picks for You"
         right={exploreButton}
         size="16px"
