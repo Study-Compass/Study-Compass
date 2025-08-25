@@ -58,6 +58,9 @@ const RecommendedEvents = () => {
           </div>
         </HeaderContainer>
         <div className="recommended-room"> 
+          <div className="recommended-room-header">
+            <p className="recommended-room-title">Recommended Room</p>
+          </div>
           <RecommendedRoomCard room={recommendedRoom} />
         </div>
       </div>

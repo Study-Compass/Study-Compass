@@ -15,7 +15,7 @@ function MyEvents(){
         <div className="my-events dash">
             <header className="header">
                 <img src={AdminGradient} alt="" />
-                <h1>{welcomeText}, {user?.first_name || 'User'}</h1>
+                <h1>{welcomeText}, {user?.username || 'User'}</h1>
                 <p>Check out your upcoming events and see top picks for you</p>
             </header>
             <div className="my-events-container">
