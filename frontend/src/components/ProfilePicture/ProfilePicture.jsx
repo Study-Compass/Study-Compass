@@ -78,7 +78,7 @@ function ProfilePicture(){
                     {user && user.roles && (user.roles.includes('admin')) && 
                         <Link  to="/create-org">
                             <div className="menu-item" >
-                                <img className="icon" src={Settings} alt="settings" />
+                                <Icon icon="mdi:account-group" />
                                 <p>Create an Org</p>
                             </div>
                         </Link>
@@ -95,19 +95,30 @@ function ProfilePicture(){
                         <>
                             <Link to="/admin">
                                 <div className="menu-item">
-                                    <Icon icon="bx:stats" />
-                                    <p>Analytics</p>
+                                    <Icon icon="mdi:shield-account" />
+                                    <p>Admin Dashboard</p>
                                 </div>
                             </Link>
                         </>
                     }
-                    {
+                    {/* {
                         user && user.roles && user.roles.includes('oie') && 
                         <>
                             <Link to="/oie-dashboard">
                                 <div className="menu-item">
                                     <img className="icon" src={RPI} alt="log out" />
                                     <p>OIE Admin</p>
+                                </div>
+                            </Link>
+                        </>
+                    } */}
+                    {
+                        user && user.roles && user.approvalRoles.includes('root') && 
+                        <>
+                            <Link to="/root-dashboard">
+                                <div className="menu-item">
+                                    <Icon icon="streamline-plump:wrench-circle-solid" />
+                                    <p>Root Dashboard</p>
                                 </div>
                             </Link>
                         </>
@@ -118,10 +129,10 @@ function ProfilePicture(){
                             <hr/>
                             <p className="section">ORGS</p>
                             {user.clubAssociations.map(
-                                (org)=>{
+                                (org, index)=>{
                                     const url = `/club-dashboard/${org.org_name}`
                                     return(
-                                        <Link to={`${url}`} key={org.org_name}>
+                                        <Link to={`${url}`} key={`${org.org_name}-${index}`}>
                                             <div className="menu-item">
                                                 <img className="icon org-icon" src={org.org_profile_image} alt="" />
                                                 <p>{org.org_name}</p>
@@ -141,10 +152,13 @@ function ProfilePicture(){
                             {user.approvalRoles.map(
                                 (role)=>{
                                     const url = role === 'root' ? '/root-dashboard' : `/approval-dashboard/${role}` 
+                                    if(role === 'root'){
+                                        return null;
+                                    }
                                     return(
                                         <Link to={`${url}`} key={role}>
                                             <div className="menu-item">
-                                                <img className="icon" src={Stats} alt="" />
+                                                <Icon icon="fluent:flowchart-24-filled" />
                                                 <p>{role}</p>
                                             </div>
                                         </Link>
@@ -153,6 +167,7 @@ function ProfilePicture(){
                             )}
                         </>
                     }
+
                     <hr />
                     <Link to="">
                         <div className="menu-item" onClick={logout}>

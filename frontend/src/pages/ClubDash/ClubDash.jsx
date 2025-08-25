@@ -26,6 +26,7 @@ import {
     DangerZone,
     MemberSettings
 } from './OrgSettings/components';
+import VerificationRequest from './Settings/VerificationRequest/VerificationRequest';
 
 function ClubDash(){
     const [clubId, setClubId] = useState(useParams().id);
@@ -179,8 +180,9 @@ function ClubDash(){
         }
     }
 
-    function openMembers  (){
-        setCurrentPage('members');
+    function openMembers(){
+        const newPath = `/club-dashboard/${clubId}?page=2`;
+        navigate(newPath);
     }
 
     const onOrgChange = (org) => {
@@ -233,12 +235,17 @@ function ClubDash(){
                 {
                     label: 'Roles & Permissions',
                     icon: 'mdi:shield-account',
-                    element:  <Roles expandedClass={expandedClass} org={orgData.data?.org?.overview}/>
+                    element:  <Roles expandedClass={expandedClass} org={orgData.data?.org?.overview} refetch={orgData.refetch}/>
                 },
                 {
                     label: 'Membership',
                     icon: 'mdi:account-group',
                     element: <MemberSettings org={orgData.data?.org?.overview} expandedClass={expandedClass} />
+                },
+                {
+                    label: 'Verification Requests',
+                    icon: 'mdi:shield-check',
+                    element: <VerificationRequest org={orgData.data?.org?.overview} expandedClass={expandedClass} />
                 },
                 {
                     label: 'Danger Zone',
@@ -247,12 +254,12 @@ function ClubDash(){
                 },
             ]
         },
-        { 
-            label: 'Testing', 
-            icon: 'mdi:test-tube', 
-            key: 'testing',
-            element: <Testing expandedClass={expandedClass} org={orgData.data?.org?.overview}/>
-        },
+        // { 
+        //     label: 'Testing', 
+        //     icon: 'mdi:test-tube', 
+        //     key: 'testing',
+        //     element: <Testing expandedClass={expandedClass} org={orgData.data?.org?.overview}/>
+        // },
     ];
     // Filter menu items based on user permissions
     const menuItems = baseMenuItems.filter(item => {

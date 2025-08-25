@@ -5,7 +5,7 @@
     gap:20px;
     position: relative;
     background-color: var(--background);
-    border-radius: 20px;
+    border-radius: 10px;
     overflow:hidden;
     padding:20px;
     box-sizing: border-box;
@@ -29,14 +29,15 @@
     }
     .event-content{
         flex-grow: 1;
-        padding-top:5px;
         box-sizing: border-box;
-        gap:10px;
+        gap:15px;
         display:flex;
         flex-direction: column;
         h1{
-            font-size: 25px;
-            margin-bottom:0;
+            font-size: 28px;
+            font-family: 'OpenSauce';
+            font-weight: 900;
+            margin: 0;
         }
         p{
             font-size: 15px;
@@ -46,12 +47,30 @@
 
         .event-detail{
             border-radius: 10px;
-            border: 1px solid var(--lighterborder);
-            padding:3px 10px;
             align-items: center;
             cursor: pointer;
+            &.date{
+                p{
+                    font-size:20px;
+                    font-weight: 600;
+                }
+            }
+            &.time{
+                p{
+                    font-size:16px;
+                    font-weight: 600;
+                    color: var(--lighter-text);
+                }
+                margin-bottom: 10px;
+            }
+            &.location{
+                p{
+                    font-size:18px;
+                    font-weight: 600;
+                }
+            }
             p{
-                font-size:14px;
+                font-size:16px;
             }
             iconify-icon{
                 font-size:15px;
@@ -80,11 +99,11 @@
     .row.hosting{
         display: flex;
         align-items: center;
+        cursor: pointer;
         img{
             width:25px;
             height:25px;
             border-radius: 50%;
-            margin-right:5px;
         }
         .user-name{
             font-weight: 700;
@@ -112,3 +131,4 @@
         }
     }
 }
+

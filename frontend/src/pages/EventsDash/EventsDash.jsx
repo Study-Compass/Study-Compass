@@ -7,7 +7,7 @@ import Explore from './Explore/Explore';
 import MyEvents from './MyEvents/MyEvents';
 import Loader from '../../components/Loader/Loader';
 import Orgs from './Orgs/Orgs';
-import eventsLogo from '../../assets/Brand Image/EventsLogo.svg';
+import eventsLogo from '../../assets/Brand Image/BEACON.svg';
 
 
 function EventsDash({  }){
@@ -18,16 +18,16 @@ function EventsDash({  }){
             icon: 'mingcute:compass-fill',
             element: <Explore />
         },
-        // { 
-        //     label: 'My Events', 
-        //     icon: 'mingcute:calendar-fill',
-        //     element: <MyEvents />
-        // },
         { 
-            label: 'Organizations',  
+            label: 'My Events', 
             icon: 'mingcute:calendar-fill',
-            element: <Orgs/>
-        }
+            element: <MyEvents />
+        },
+        // { 
+        //     label: 'Organizations',  
+        //     icon: 'mingcute:calendar-fill',
+        //     element: <Orgs/>
+        // }
     ];
 
     useEffect(() => {
@@ -53,7 +53,7 @@ function EventsDash({  }){
                     </div>
                 </div>
             )}
-            <Dashboard menuItems={menuItems} additionalClass='events-dash' logo={eventsLogo}>
+            <Dashboard menuItems={menuItems} additionalClass='events-dash' logo={eventsLogo} primaryColor='#6D8EFA' secondaryColor='rgba(109, 142, 250, 0.15)' >
             </Dashboard>
         </>
     )

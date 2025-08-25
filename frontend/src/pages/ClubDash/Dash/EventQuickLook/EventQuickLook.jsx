@@ -54,7 +54,7 @@ const EventQuickLook = ({org}) => {
                                 </div>
                                 <div>
                                     <p className="time-until">In {timeUntil(new Date(event.start_time))}</p>
-                                    <p className="rsvps">10 rsvps</p>
+                                    <p className="rsvps">0 rsvps</p>
                                 </div>
                             </div>
                         }/>

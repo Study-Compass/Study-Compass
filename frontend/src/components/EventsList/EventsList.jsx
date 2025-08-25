@@ -9,7 +9,8 @@ const EventsList = ({
     page, 
     hasMore, 
     onLoadMore, 
-    formatDate 
+    formatDate,
+    hasFriendsFilter = false
 }) => {
     const observerRef = useRef();
     const lastEventElementRef = useRef();
@@ -39,6 +40,8 @@ const EventsList = ({
             observer.observe(lastEventElementRef.current);
         }
 
+        console.log(groupedEvents);
+
         return () => {
             if (observerRef.current) {
                 observerRef.current.disconnect();
@@ -60,12 +63,22 @@ const EventsList = ({
 
     if (groupedEvents.length === 0) {
         return (
-            <div className="no-events" role="status">No events found</div>
+            <div className="no-events" role="status">
+                {hasFriendsFilter ? 'No events where friends are going' : 'No events found'}
+            </div>
         );
     }
 
     return (
         <div className="events-list" role="list" aria-label="Events list">
+            {hasFriendsFilter && (
+                <div className="friends-filter-indicator">
+                    <div className="indicator-content">
+                        <span className="icon">👥</span>
+                        <span className="text">Showing events where your friends are going</span>
+                    </div>
+                </div>
+            )}
             {groupedEvents.map(({ date, events }, groupIndex) => (
                 <div key={date.toISOString()} className="date-group" role="group" aria-label={`Events on ${formatDate(date)}`}>
                     <div className="date-separator" role="heading" aria-level="2">{formatDate(date)}</div>
@@ -78,7 +91,7 @@ const EventsList = ({
                                 ref={isLastElement ? setLastEventElementRef : null}
                                 role="listitem"
                             >
-                                <Event event={event} />
+                                <Event event={event} hasFriendsFilter={hasFriendsFilter} />
                             </div>
                         );
                     })}

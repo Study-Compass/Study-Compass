@@ -4,6 +4,7 @@ import Dashboard from '../../components/Dashboard/Dashboard';
 import RootManagement from './RootManagement/RootManagement';
 import ManageFlow from './ManageFlow/ManageFlow';
 import RSSManagement from './RSSManagement/RSSManagement';
+import RoomManager from './RoomManager/RoomManager';
 // import BadgeManager from './BadgeManager/BadgeManager';
 import eventsLogo from '../../assets/Brand Image/EventsLogo.svg';
 
@@ -23,6 +24,11 @@ function RootDash(){
             label: 'RSS Management', 
             icon: 'mdi:rss',
             element: <RSSManagement/>
+        },
+        { 
+            label: 'Room Manager', 
+            icon: 'mdi:home-city',
+            element: <RoomManager/>
         },
     ];
 

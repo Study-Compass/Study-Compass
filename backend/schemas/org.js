@@ -120,6 +120,28 @@ const OrgSchema= new Schema({
         default: false,
         required: false
     },
+    // Verification fields
+    verified: {
+        type: Boolean,
+        default: false
+    },
+    verifiedAt: {
+        type: Date
+    },
+    verifiedBy: {
+        type: Schema.Types.ObjectId,
+        ref: 'User'
+    },
+    verificationType: {
+        type: String,
+        enum: ['basic', 'premium', 'gold', 'platinum', 'official', 'academic', 'cultural', 'sports', 'professional'],
+        default: 'basic'
+    },
+    verificationStatus: {
+        type: String,
+        enum: ['pending', 'approved', 'rejected', 'conditionally_approved', 'under_review', 'escalated'],
+        default: 'pending'
+    },
     // Add metadata for role management
     roleManagement: {
         allowCustomRoles: {

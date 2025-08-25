@@ -64,9 +64,32 @@ const apiRequest = async (url, body = null, options = {}) => {
         }
 
         console.log('🔄 Retrying original request...');
-        const retryResponse = await axios(retryConfig);
-        console.log('✅ Retry successful');
-        return retryResponse.data;
+        try {
+          const retryResponse = await axios(retryConfig);
+          console.log('✅ Retry successful');
+          return retryResponse.data;
+        } catch (retryError) {
+          console.log('❌ Retry request failed:', retryError.response?.status, retryError.response?.data);
+          
+          // Handle retry errors the same way as original errors
+          if (retryError.response) {
+            console.log(retryError.response);
+            const errorData = retryError.response.data;
+            const errorCode = retryError.response.status;
+            
+            if (errorData.error) {
+              return { error: errorData.error, code: errorCode };
+            } else if (errorData.message) {
+              return { error: errorData.message, code: errorCode };
+            } else {
+              return { error: 'An error occurred', code: errorCode };
+            }
+          } else if (retryError.request) {
+            return { error: 'No response received from server', code: 'NETWORK_ERROR' };
+          } else {
+            return { error: retryError.message, code: 'REQUEST_ERROR' };
+          }
+        }
       } catch (refreshError) {
         console.log('❌ Token refresh failed:', refreshError.response?.data || refreshError.message);
         
@@ -89,11 +112,22 @@ const apiRequest = async (url, body = null, options = {}) => {
     console.error('API request error:', error.message);
 
     if (error.response) {
-      return { error: error.response.data.error };
+        console.log(error.response);
+        // Handle different error response formats from backend
+        const errorData = error.response.data;
+        const errorCode = error.response.status;
+        
+        if (errorData.error) {
+          return { error: errorData.error, code: errorCode };
+        } else if (errorData.message) {
+          return { error: errorData.message, code: errorCode };
+        } else {
+          return { error: 'An error occurred', code: errorCode };
+        }
     } else if (error.request) {
-      return { error: 'No response received from server' };
+      return { error: 'No response received from server', code: 'NETWORK_ERROR' };
     } else {
-      return { error: error.message };
+      return { error: error.message, code: 'REQUEST_ERROR' };
     }
   }
 };

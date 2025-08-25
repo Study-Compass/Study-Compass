@@ -1,0 +1,144 @@
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import './EventPage.scss';
+import { Icon } from '@iconify-icon/react';
+import StarGradient from '../../assets/StarGradient.png';
+import defaultAvatar from '../../assets/defaultAvatar.svg';
+import useAuth from '../../hooks/useAuth';
+import { useNotification } from '../../NotificationContext';
+import { useFetch } from '../../hooks/useFetch';
+import Loader from '../../components/Loader/Loader';
+import Header from '../../components/Header/Header';
+import RSVPSection from '../../components/RSVPSection/RSVPSection';
+
+function EventPage() {
+    const { eventId } = useParams();
+    const navigate = useNavigate();
+    const { user } = useAuth();
+    const { addNotification } = useNotification();
+    
+    // Fetch event data
+    const { data: eventData, loading: eventLoading, error: eventError } = useFetch(
+        eventId ? `/get-event/${eventId}` : null
+    );
+
+    // RSVP functionality now handled by RSVPSection component
+
+    const renderHostingStatus = () => {
+        if (!eventData?.event?.hostingType) return null;
+
+        let hostingImage = '';
+        let hostingName = '';
+        let level = '';
+
+        if (eventData.event.hostingType === "User") {
+            hostingImage = eventData.event.hostingId.image ? eventData.event.hostingId.image : defaultAvatar;
+            hostingName = eventData.event.hostingId.name;
+            if (eventData.event.hostingId.roles.includes("developer")) {
+                level = "Developer";
+            } else if (eventData.event.hostingId.roles.includes("oie")) {
+                level = "Faculty";
+            } else {
+                level = "Student";
+            }
+        } else {
+            hostingImage = eventData.event.hostingId.org_profile_image;
+            hostingName = eventData.event.hostingId.org_name;
+            level = "Organization";
+        }
+
+        return (
+            <div className={`row hosting ${level.toLowerCase()}`} onClick={() => {
+                if (level === "Organization") {
+                    navigate(`/org/${hostingName}`);
+                }
+            }}>
+                <p>Hosted by</p>
+                <img src={hostingImage} alt="" />
+                <p className="user-name">{hostingName}</p>
+                <div className={`level ${level.toLowerCase()}`}>
+                    {level}
+                </div>
+            </div>
+        );
+    };
+
+    // RSVP section now handled by RSVPSection component
+
+    if (eventLoading) {
+        return (
+            <div className="event-page">
+                <Header />
+                <div className="loading-container">
+                    <Loader />
+                    <p>Loading event...</p>
+                </div>
+            </div>
+        );
+    }
+
+    if (eventError || !eventData?.event) {
+        return (
+            <div className="event-page">
+                <Header />
+                <div className="error-container">
+                    <Icon icon="mdi:alert-circle" className="error-icon" />
+                    <h2>Event Not Found</h2>
+                    <p>The event you're looking for doesn't exist or has been removed.</p>
+                    <button onClick={() => navigate('/events-dashboard')} className="back-button">
+                        <Icon icon="mdi:arrow-left" />
+                        Back to Events
+                    </button>
+                </div>
+            </div>
+        );
+    }
+
+    const event = eventData.event;
+    const date = new Date(event.start_time);
+    const dateEnd = new Date(event.end_time);
+
+    return (
+        <div className="event-page">
+            <Header />
+            <div className="event-content">
+                {event.image && (
+                    <div className="image-container">
+                        <img src={event.image} alt={`Event image for ${event.name}`} className="event-image" />
+                    </div>
+                )}
+                <div className="event-details">
+                    <h1>{event.name}</h1>
+                    <div className="col">
+                        <div className="row event-detail date">
+                            <p>{date.toLocaleString('default', {weekday: 'long'})}, {date.toLocaleString('default', {month: 'long'})} {date.getDate()}</p>
+                        </div>
+                        <div className="row event-detail time">
+                            <p>{date.toLocaleString('default', {hour: 'numeric', minute: 'numeric', hour12: true})} - {dateEnd.toLocaleString('default', {hour: 'numeric', minute: 'numeric', hour12: true})}</p>
+                        </div>
+                        <div className="row event-detail location">
+                            <Icon icon="fluent:location-28-filled" />
+                            <p>{event.location}</p>
+                        </div>
+                    </div>
+                    {renderHostingStatus()}
+
+                    <div className="row event-description">
+                        <p>{event.description}</p>
+                    </div>
+                    {event.externalLink && (
+                        <div className="row external-link">
+                            <a href={event.externalLink} target="_blank" rel="noopener noreferrer">
+                                <Icon icon="heroicons:arrow-top-right-on-square-20-solid" />
+                                <p>View Event External Link</p>
+                            </a>
+                        </div>
+                    )}
+                    <RSVPSection event={eventData.event} />
+                </div>
+            </div>
+        </div>
+    );
+}
+
+export default EventPage;

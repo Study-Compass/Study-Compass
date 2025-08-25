@@ -33,15 +33,15 @@ function CreateEvent(){
         if(isAuthenticating){
             return;
         }
-        if(!isAuthenticated){
-            navigate('/');
-        }
+        // if(!isAuthenticated){
+        //     navigate('/');
+        // }
         if(!user){
             return;
         }
-        if(!(user.roles.includes('oie') || user.roles.includes('admin') || user.roles.includes('developer'))){
-            navigate('/');
-        }
+        // if(!(user.roles.includes('oie') || user.roles.includes('admin') || user.roles.includes('developer'))){
+        //     navigate('/');
+        // }
         if(origin && origin !== ""){
             const club = user.clubAssociations.find((org)=>org.org_name === origin);
             if(club){
@@ -139,6 +139,7 @@ function CreateEvent(){
 
         if(response){
             addNotification({title: "Event created", message: "Your event has been created successfully", type: "success"});
+            navigate('/events-dashboard');
         } else {
             addNotification({title: "Failed to create event", message: "An error occurred while creating your event", type: "error"});
         }

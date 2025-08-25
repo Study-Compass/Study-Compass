@@ -25,7 +25,7 @@
                 display: block;
                 width: 100%;
                 height: 2px;
-                background-color: var(--red);
+                background-color: var(--primary);
                 top:0;
                 left:0;
                 position: absolute;
@@ -76,4 +76,30 @@
     height: 100%;
     font-size: 1.2em;
     color: var(--text);
+}
+
+.friends-filter-indicator {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    
+    .indicator-content {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        
+        .icon {
+            font-size: 20px;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+        }
+        
+        .text {
+            color: white;
+            font-weight: 600;
+            font-size: 16px;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+    }
 }

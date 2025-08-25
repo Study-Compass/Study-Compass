@@ -200,3 +200,43 @@
         }
       }
 }
+
+.rsvp-review {
+    margin-top: 20px;
+    padding: 15px;
+    background: rgba(0, 123, 255, 0.1);
+    border-radius: 8px;
+    border-left: 4px solid #007bff;
+    
+    h4 {
+        margin: 0 0 10px 0;
+        color: #007bff;
+        font-size: 14px;
+        font-weight: 600;
+    }
+    
+    .rsvp-settings-review {
+        .rsvp-setting {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            
+            &:last-child {
+                margin-bottom: 0;
+            }
+            
+            .label {
+                font-size: 13px;
+                color: #666;
+                font-weight: 500;
+            }
+            
+            .value {
+                font-size: 13px;
+                color: #333;
+                font-weight: 600;
+            }
+        }
+    }
+}

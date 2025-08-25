@@ -54,7 +54,7 @@ const SiteHealth = ({}) => {
                             <PulseDot color="var(--green)" size="10px" pulse={true}/>   
                         </div>
                         <h2>
-                            {health.data.subDomain}.study-compass.com
+                            {health.data.subDomain}.meridian.study
                         </h2>
                         <div className="tag">
                             <Icon icon="icon-park-solid:check-one" />
@@ -67,7 +67,7 @@ const SiteHealth = ({}) => {
                             <PulseDot color="var(--red)" size="10px" pulse={true}/>   
                         </div>
                         <h2>
-                            {health.data.subDomain}.study-compass.com
+                            {health.data.subDomain}.meridian.study
                         </h2>
                     </div>
                 }

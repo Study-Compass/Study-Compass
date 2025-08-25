@@ -186,7 +186,7 @@
                 transition: background-color 0.2s ease;
 
                 &:hover {
-                    background: var(--red-dark);
+                    background: var(--dark-red);
                 }
 
                 svg {
@@ -254,7 +254,7 @@
                     transition: background-color 0.2s ease;
 
                     &:hover {
-                        background: var(--red-dark);
+                        background: var(--dark-red);
                     }
                 }
             }
@@ -411,167 +411,7 @@
         }
     }
 
-    // Modal Styles
-    .modal-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(0, 0, 0, 0.5);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 1000;
-        padding: 1rem;
 
-        .role-assignment-modal {
-            background: var(--background);
-            border-radius: 12px;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 500px;
-            max-height: 80vh;
-            overflow-y: auto;
-
-            .modal-header {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                padding: 1.5rem;
-                border-bottom: 1px solid var(--lighterborder);
-
-                h3 {
-                    font-family: 'Satoshi', sans-serif;
-                    font-size: 1.25rem;
-                    font-weight: 600;
-                    color: var(--text);
-                    margin: 0;
-                }
-
-                .close-btn {
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    width: 32px;
-                    height: 32px;
-                    border: none;
-                    background: transparent;
-                    color: var(--light-text);
-                    cursor: pointer;
-                    border-radius: 6px;
-                    transition: background-color 0.2s ease;
-
-                    &:hover {
-                        background: var(--club-dark);
-                    }
-
-                    svg {
-                        font-size: 1.2rem;
-                    }
-                }
-            }
-
-            .modal-content {
-                padding: 1.5rem;
-
-                .member-summary {
-                    margin-bottom: 2rem;
-                    padding: 1rem;
-                    background: rgba(220, 38, 38, 0.05);
-                    border-radius: 8px;
-                    border: 1px solid rgba(220, 38, 38, 0.1);
-
-                    h4 {
-                        font-family: 'Satoshi', sans-serif;
-                        font-size: 1rem;
-                        font-weight: 600;
-                        color: var(--text);
-                        margin: 0 0 0.5rem 0;
-                    }
-
-                    p {
-                        font-size: 0.9rem;
-                        color: var(--light-text);
-                        margin: 0 0 0.25rem 0;
-                        font-family: 'Inter', sans-serif;
-
-                        &:last-child {
-                            margin-bottom: 0;
-                        }
-                    }
-                }
-
-                .role-selection {
-                    h4 {
-                        font-family: 'Satoshi', sans-serif;
-                        font-size: 1rem;
-                        font-weight: 600;
-                        color: var(--text);
-                        margin: 0 0 1rem 0;
-                    }
-
-                    .role-options {
-                        display: flex;
-                        flex-direction: column;
-                        gap: 0.75rem;
-
-                        .role-option {
-                            display: flex;
-                            justify-content: space-between;
-                            align-items: center;
-                            padding: 1rem;
-                            border: 1px solid var(--lighterborder);
-                            border-radius: 8px;
-                            background: var(--background);
-                            cursor: pointer;
-                            transition: all 0.2s ease;
-                            text-align: left;
-
-                            &:hover:not(:disabled) {
-                                border-color: var(--red);
-                                background: rgba(220, 38, 38, 0.02);
-                            }
-
-                            &:disabled {
-                                opacity: 0.5;
-                                cursor: not-allowed;
-                            }
-
-                            &.current {
-                                border-color: var(--red);
-                                background: rgba(220, 38, 38, 0.05);
-                            }
-
-                            .role-info {
-                                flex: 1;
-
-                                h5 {
-                                    font-family: 'Satoshi', sans-serif;
-                                    font-size: 1rem;
-                                    font-weight: 600;
-                                    color: var(--text);
-                                    margin: 0 0 0.25rem 0;
-                                }
-
-                                p {
-                                    font-size: 0.85rem;
-                                    color: var(--light-text);
-                                    margin: 0;
-                                    font-family: 'Inter', sans-serif;
-                                }
-                            }
-
-                            .current-indicator {
-                                color: var(--red);
-                                font-size: 1.2rem;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
 }
 
 // Add Member Popup Styles
@@ -639,13 +479,6 @@
             }
         }
 
-        .modal-overlay {
-            padding: 0.5rem;
 
-            .role-assignment-modal {
-                max-width: none;
-                margin: 0;
-            }
-        }
     }
 }

@@ -1,12 +1,12 @@
 .explore{
     z-index: 1;
     height:100vh;
-    padding:20px 30px;
     display: flex;
     flex-direction: column;
     box-sizing: border-box; 
     gap: 20px;
     flex:1;
+    max-height:100%;
     width:100%;
     .heading{
         display: flex;
@@ -16,36 +16,41 @@
         height:36px;
         h1{
             margin: 0;
+            font-family: 'OpenSauce';
+            font-weight: 900;
         }
         img{
-            height:30px;
-            padding:3px 10px;
-            border:1px solid var(--lighterborder);
-            border-radius: 10px;
-            background-color: var(--background);
+            height:22px;
+            padding:10px 15px;
+            border-radius: 8px;
+            background-color: #DB0220;
         }
         .explore-background-gradient{
             display: none;
         }
     }
     .explore-content{
-        height: calc(100% - 36px - 20px);
+        height: 100%;
         display: flex;
-        border:1px solid var(--lighterborder);
-        border-radius: 20px;
+        // border:1px solid var(--lighterborder);
         width:100%;
+        gap: 10px;
         overflow: hidden;
         padding-right:8px;
         box-sizing: border-box;
         background-color: var(--background);
         .sidebar{
             width:180px;
-            border-right: 1px solid var(--lighterborder);
             padding:10px;
-            background-color: var(--lighter);
+            margin:20px;
+            margin-right:0;
+            background-color: var(--background);
             display: flex;
             flex-direction: column;
+            border-radius: 15px;
+            border:1px solid var(--lighterborder);
             gap: 20px;
+            box-shadow: var(--shadow);
             .switch{
                 width:fit-content;
             }
@@ -53,14 +58,18 @@
                 display: flex;
                 align-items: center;
                 gap: 6px;
+                padding: 0 5px;
                 img{
-                    height:30px;
+                    height:15px;
+                    border-radius: 4px;
+                    background-color: #DB0220;
+                    padding: 5px 10px;
                 }
                 h2{
                     margin:0;
-                    font-size: 19px;
+                    font-size: 22px;
                     font-weight: 600;
-                    font-family: 'Satoshi';
+                    font-family: 'OpenSauce';
                     font-weight:900;
                 }
             }
@@ -225,9 +234,11 @@
         }
         .explore-content{
             flex-direction: column;
+            padding: 0;
             .explore-events{
-                height: 80%;
-                max-height: 80%;
+                flex-grow:1;
+                padding:10px;
+                
             }
             .mobile-sidebar{
                 width:100%;
@@ -235,9 +246,14 @@
                 box-shadow: none;
                 background-color: transparent;
                 box-sizing: border-box;
+                margin:0;
+                padding-bottom:0;
                 .sidebar-header{
                     justify-content: space-between;
                     width:100%;
+                    padding:0 10px;
+                    box-sizing: border-box;
+                    
                     .logo{
                         display: flex;
                         align-items: center;

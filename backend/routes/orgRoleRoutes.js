@@ -301,7 +301,9 @@ router.post('/:orgId/members/:userId/role', verifyToken, requireMemberManagement
         await member.save();   
 
         //for testing
-        if(!user.clubAssociations.find(club => club.org_name === orgId)){
+        if(!user.clubAssociations.find(club => club.toString() === orgId)){
+            console.log('adding org to user', orgId);
+            console.log(user.clubAssociations);
             user.clubAssociations.push(orgId);
         }
 

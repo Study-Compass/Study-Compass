@@ -22,7 +22,7 @@ const io = new Server(server, {
     transports: ['websocket', 'polling'], // WebSocket first, fallback to polling if necessary
     cors: {
         origin: process.env.NODE_ENV === 'production'
-            ? ['https://www.study-compass.com', 'https://studycompass.com']
+            ? ['https://www.meridian.study', 'https://meridian.study']
             : 'http://localhost:3000',  // Allow localhost during development
         methods: ['GET', 'POST'],
         allowedHeaders: ['Content-Type'],
@@ -33,7 +33,7 @@ const io = new Server(server, {
 // Configure CORS for cookie-based authentication
 const corsOptions = {
     origin: process.env.NODE_ENV === 'production'
-        ? ['https://www.study-compass.com', 'https://studycompass.com']
+        ? ['https://www.meridian.study', 'https://meridian.study']
         : 'http://localhost:3000',
     credentials: true, // This is crucial for cookies
     optionsSuccessStatus: 200 // for legacy browser support
@@ -111,6 +111,8 @@ const ratingRoutes = require('./routes/ratingRoutes.js');
 const searchRoutes = require('./routes/searchRoutes.js');
 const orgRoutes = require('./routes/orgRoutes.js');
 const orgRoleRoutes = require('./routes/orgRoleRoutes.js');
+const orgManagementRoutes = require('./routes/orgManagementRoutes.js');
+const roomRoutes = require('./routes/roomRoutes.js');
 const adminRoutes = require('./routes/adminRoutes.js');
 const eventsRoutes = require('./events/index.js');
 const notificationRoutes = require('./routes/notificationRoutes.js');
@@ -129,6 +131,8 @@ app.use(searchRoutes);
 
 app.use(orgRoutes);
 app.use('/org-roles', orgRoleRoutes);
+app.use('/org-management', orgManagementRoutes);
+app.use('/admin', roomRoutes);
 app.use(adminRoutes);
 
 app.use('/notifications', notificationRoutes);

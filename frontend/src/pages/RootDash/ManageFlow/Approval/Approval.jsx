@@ -4,6 +4,7 @@ import './Approval.scss';
 import { Icon } from '@iconify-icon/react/dist/iconify.mjs';
 
 function Approval({approval}){
+    const navigate = useNavigate();
     const icons = {
         'location' : 'fluent:location-28-filled',
         'minAttendees' : 'bi:people-fill',
@@ -19,25 +20,17 @@ function Approval({approval}){
                 </div>
             </div>
             <div className="row info">
-                <div className="col criteria">
+                {/* <div className="col criteria">
                     <div className="header">
                         <p>Approval Criteria</p>
                     </div>
                     <div className="content">
-                        {/* {
-                            Object.keys(approval.criteria).map((criteria)=>{
-                                return (
-                                    <div className="criteria-item">
-                                        <Icon icon={icons[criteria]} />
-                                        <p>{approval.criteria[criteria]}</p>
-                                    </div>
-                                )
-                            })
-                        } */}
                     </div>
-                </div>
+                </div> */}
                 <div className="col actions">
-                    <button className="button"> 
+                    <button className="button" onClick={()=>{
+                        navigate(`/approval-dashboard/${approval.role   }`);
+                    }}> 
                         <Icon icon="material-symbols:arrow-outward-rounded"/>
                         <p>dashboard</p>
                     </button>
