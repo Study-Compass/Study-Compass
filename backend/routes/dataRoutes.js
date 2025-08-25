@@ -275,9 +275,11 @@ router.get('/get-recommendation', verifyTokenOptional, async (req, res) => {
         console.log(`day: ${day}`);
         let query;
         if (userId) {
+            console.log(`userId: ${userId}`);
             user = await User.findOne({ _id: userId });
             const savedClassrooms = user.saved.map(id => new mongoose.Types.ObjectId(id)); // Ensure ObjectId for classroom IDs
             // const savedClassrooms = user.saved; 
+            console.log(`savedClassrooms: ${savedClassrooms}`);
             if (day === 'X') {
                 query = {
                     classroom_id: { $in: savedClassrooms }
