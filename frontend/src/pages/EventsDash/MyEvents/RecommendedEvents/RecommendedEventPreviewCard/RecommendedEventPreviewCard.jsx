@@ -8,7 +8,7 @@ const RecommendedEventPreviewCard = ({ event }) => {
   // Color mapping based on event type (from Explore.jsx color legend)
   const getEventTypeColor = (eventType) => {
     const colorMap = {
-      'campus': 'rgba(250, 117, 109, 1)',
+      'campus': '#6D8EFA',
       'alumni': '#5C5C5C',
       'sports': '#6EB25F', // athletics in legend
       'arts': '#FBEBBB',   // arts/EMPAC in legend

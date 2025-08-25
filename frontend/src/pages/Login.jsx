@@ -3,7 +3,7 @@ import React from 'react';
 import LoginForm from '../components/Forms/LoginForm/LoginForm';
 import Header from '../components/Header/Header';
 import './Login.scss';
-import logo from '../assets/red_logo.svg'
+import logo from '../assets/Brand Image/BEACON.svg'
 import OrgTeaser from '../assets/OrgTeaser.png';
 import OrgTeaserGrad from '../assets/OrgTeaserGrad.png';
 

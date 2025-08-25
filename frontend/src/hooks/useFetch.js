@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import axios from "axios";
 
 export const useFetch = (url, options = { method: "GET", data: null }) => {
@@ -6,17 +6,25 @@ export const useFetch = (url, options = { method: "GET", data: null }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // Memoize the options to prevent unnecessary re-renders
+  const memoizedOptions = useMemo(() => ({
+    method: options.method || "GET",
+    data: options.data || null,
+    headers: options.headers || {},
+    params: options.params || {},
+  }), [options.method, options.data, options.headers, options.params]);
+
   const fetchData = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
       const response = await axios({
         url,
-        method: options.method || "GET",
-        data: options.data || null,
-        headers: options.headers || {},
+        method: memoizedOptions.method,
+        data: memoizedOptions.data,
+        headers: memoizedOptions.headers,
         withCredentials: true,
-        params: options.params || {},
+        params: memoizedOptions.params,
       });
       setData(response.data);
     } catch (err) {
@@ -27,11 +35,11 @@ export const useFetch = (url, options = { method: "GET", data: null }) => {
           
           const retryResponse = await axios({
             url,
-            method: options.method || "GET",
-            data: options.data || null,
-            headers: options.headers || {},
+            method: memoizedOptions.method,
+            data: memoizedOptions.data,
+            headers: memoizedOptions.headers,
             withCredentials: true,
-            params: options.params || {},
+            params: memoizedOptions.params,
           });
           setData(retryResponse.data);
         } catch (refreshError) {
@@ -54,7 +62,7 @@ export const useFetch = (url, options = { method: "GET", data: null }) => {
     } finally {
       setLoading(false);
     }
-  }, [url, options.method, options.data, options.headers, options.params]);
+  }, [url, memoizedOptions]);
 
   useEffect(() => {
     fetchData();

@@ -116,6 +116,7 @@ const roomRoutes = require('./routes/roomRoutes.js');
 const adminRoutes = require('./routes/adminRoutes.js');
 const eventsRoutes = require('./events/index.js');
 const notificationRoutes = require('./routes/notificationRoutes.js');
+const qrRoutes = require('./routes/qrRoutes.js');
 
 app.use(authRoutes);
 app.use('/auth/saml', samlRoutes);
@@ -136,6 +137,7 @@ app.use('/admin', roomRoutes);
 app.use(adminRoutes);
 
 app.use('/notifications', notificationRoutes);
+app.use('/qr', qrRoutes);
 
 app.use(eventsRoutes);
 // Serve static files from the React app in production

@@ -1,19 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { Icon } from '@iconify-icon/react';
-import defaultAvatar from '../../assets/defaultAvatar.svg';
 import useAuth from '../../hooks/useAuth';
 import { useFetch } from '../../hooks/useFetch';
 import RSVPButton from '../RSVPButton/RSVPButton';
+import defaultAvatar from '../../assets/defaultAvatar.svg';
 import './RSVPSection.scss';
 
 const RSVPSection = ({ event }) => {
     const { user } = useAuth();
     const [rsvpStatus, setRsvpStatus] = useState(null);
-    const [rsvpStats, setRsvpStats] = useState(null);
     const [attendees, setAttendees] = useState({ going: [], maybe: [], notGoing: [] });
-    const [friendsGoing, setFriendsGoing] = useState(event.friendsGoing || 0);
+    const [rsvpStats, setRsvpStats] = useState(null);
+    const [friendsGoing, setFriendsGoing] = useState(0);
 
-    // Use useFetch for RSVP data
+    // Fetch RSVP data for this specific event
     const { data: rsvpData } = useFetch(
         event.rsvpEnabled && user ? `/my-rsvp/${event._id}` : null
     );
@@ -40,6 +40,10 @@ const RSVPSection = ({ event }) => {
     const handleRSVPUpdate = (rsvpData) => {
         // Refresh attendees data when RSVP is updated
         window.location.reload();
+    };
+
+    const handleRSVPStatusUpdate = (eventId, newRSVPStatus) => {
+        setRsvpStatus(newRSVPStatus);
     };
 
     if (!event.rsvpEnabled) return null;
@@ -108,7 +112,12 @@ const RSVPSection = ({ event }) => {
                 )}
 
             {/* Use the RSVPButton component */}
-            <RSVPButton event={event} onRSVPUpdate={handleRSVPUpdate} />
+            <RSVPButton 
+                event={event} 
+                onRSVPUpdate={handleRSVPUpdate} 
+                rsvpStatus={rsvpStatus}
+                onRSVPStatusUpdate={handleRSVPStatusUpdate}
+            />
         </div>
     );
 };

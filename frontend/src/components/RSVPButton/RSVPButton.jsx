@@ -1,28 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Icon } from '@iconify-icon/react';
 import useAuth from '../../hooks/useAuth';
 import { useNotification } from '../../NotificationContext';
 import postRequest from '../../utils/postRequest';
-import { useFetch } from '../../hooks/useFetch';
 import './RSVPButton.scss';
 
-const RSVPButton = ({ event, onRSVPUpdate }) => {
+const RSVPButton = ({ event, onRSVPUpdate, rsvpStatus, onRSVPStatusUpdate }) => {
     const { user } = useAuth();
     const { addNotification } = useNotification();
     const [loading, setLoading] = useState(false);
-    const [rsvpStatus, setRsvpStatus] = useState(null);
-    
-
-    // Use useFetch for RSVP data
-    const { data: rsvpData } = useFetch(
-        event.rsvpEnabled && user ? `/my-rsvp/${event._id}` : null
-    );
-
-    useEffect(() => {
-        if (rsvpData?.success) {
-            setRsvpStatus(rsvpData.rsvp);
-        }
-    }, [rsvpData]);
 
     const handleRSVP = async (status, domEvent) => {
         // Prevent event propagation to avoid triggering parent click handlers
@@ -47,10 +33,17 @@ const RSVPButton = ({ event, onRSVPUpdate }) => {
             });
 
             if (response.success) {
+                const newRSVPStatus = { status: status };
+                
+                // Update parent component's RSVP data
+                if (onRSVPStatusUpdate) {
+                    onRSVPStatusUpdate(event._id, newRSVPStatus);
+                }
+                
                 if (onRSVPUpdate) {
                     onRSVPUpdate({status});
                 }
-                setRsvpStatus({status: status});
+                
                 addNotification({
                     title: "RSVP Updated",
                     message: `You are now ${status === 'going' ? 'going' : status === 'maybe' ? 'maybe going' : 'not going'} to this event`,

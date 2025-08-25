@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import defaultAvatar from '../../assets/defaultAvatar.svg';
 import useAuth from '../../hooks/useAuth';
 import { Icon } from '@iconify-icon/react';
+import ProfilePopup from '../ProfilePopup/ProfilePopup';
 import './Dashboard.scss'
 
-function Dashboard({ menuItems, children, additionalClass = '', middleItem=null, logo, primaryColor, secondaryColor, enableSubSidebar = false} ) {
+function Dashboard({ menuItems, children, additionalClass = '', middleItem=null, logo, primaryColor, secondaryColor, enableSubSidebar = false, defaultPage = 0} ) {
     const [expanded, setExpanded] = useState(false);
     const [expandedClass, setExpandedClass] = useState("");
     const [currentDisplay, setCurrentDisplay] = useState(0);
@@ -16,6 +17,7 @@ function Dashboard({ menuItems, children, additionalClass = '', middleItem=null,
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
+    const location = useLocation();
     const [transitionDirection, setTransitionDirection] = useState('right');
     const [showBackButton, setShowBackButton] = useState(false);
     const [pendingNavigation, setPendingNavigation] = useState(null);
@@ -62,8 +64,8 @@ function Dashboard({ menuItems, children, additionalClass = '', middleItem=null,
     };
 
     useEffect(() => {
-        // Get the page from URL parameters, default to 0 if not specified
-        const page = parseInt(searchParams.get('page') || '0');
+        // Get the page from URL parameters, default to defaultPage if not specified
+        const page = parseInt(searchParams.get('page') || defaultPage.toString());
         const sub = searchParams.get('sub');
         
         if (sub !== null) {
@@ -76,7 +78,14 @@ function Dashboard({ menuItems, children, additionalClass = '', middleItem=null,
             // We're in the main menu
             setCurrentDisplay(page);
         }
-    }, [searchParams, menuItems.length]);
+    }, [searchParams, menuItems.length, defaultPage]);
+
+    // Set initial URL if no page parameter is present
+    useEffect(() => {
+        if (!searchParams.get('page') && !searchParams.get('sub') && defaultPage !== 0) {
+            navigate(`?page=${defaultPage}`, { replace: true });
+        }
+    }, [searchParams, navigate, defaultPage]);
 
     // Handle pending navigation after animation completes
     useEffect(() => {
@@ -96,8 +105,8 @@ function Dashboard({ menuItems, children, additionalClass = '', middleItem=null,
             } else if (action === 'backToMain') {
                 setNavigationStack([]);
                 setCurrentSubItems(null);
-                setCurrentDisplay(0);
-                navigate(`?page=0`, { replace: true });
+                setCurrentDisplay(defaultPage);
+                navigate(`?page=${defaultPage}`, { replace: true });
             } else if (action === 'backStep') {
                 const newStack = [...navigationStack];
                 newStack.pop();
@@ -362,10 +371,24 @@ function Dashboard({ menuItems, children, additionalClass = '', middleItem=null,
                 width < 768 && 
                 (
                     <div className="mobile-heading">
-                        <div className="mobile-hamburger" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
-                            <Icon icon="material-symbols:menu" />
-                        </div>
+                        {user && (
+                            <div className="mobile-hamburger" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
+                                <Icon icon="material-symbols:menu-rounded" />
+                            </div>
+                        )}
                         <img src={logo} alt="Logo" />
+                        {user ? 
+                            <div className="mobile-justifier">
+                                {/* just to balance the space-between */}
+                            </div>
+                                                         : (
+                                 <button className="mobile-login-btn" onClick={() => {
+                                     navigate('/login', { state: { from: { pathname: location.pathname } } });
+                                 }}>
+                                     Login
+                                 </button>
+                             )
+                        }
                     </div>
                 )
             }
@@ -412,21 +435,42 @@ function Dashboard({ menuItems, children, additionalClass = '', middleItem=null,
                 <div className="bottom">
                     {
                         user && (
-                        <div className="user">
-                            <div className="avatar">
-                                <img src={user?.pfp || defaultAvatar} alt="User Avatar" />
-                            </div>
-                            <div className="user-info">
-                                <p className="username">{user.name}</p>
-                                <p className="email">@{user.username}</p>
-                            </div>
-                        </div>
+                        <ProfilePopup 
+                            position="top-right"
+                            className="dashboard-profile-popup"
+                            sidebarOpen={!expanded}
+                            mobileMenuOpen={isMobileMenuOpen}
+                            trigger={
+                                <div 
+                                    className="user clickable"
+                                    onMouseDown={(e) => console.log('Dashboard user div clicked!')}
+                                >
+                                    <div className="avatar">
+                                        <img src={user?.picture || defaultAvatar} alt="User Avatar" />
+                                    </div>
+                                    <div className="user-info">
+                                        <p className="username">{user.name}</p>
+                                        <p className="email">@{user.username}</p>
+                                    </div>
+                                </div>
+                            }
+                        />
                         )
                     }
                     {/* <div className="back" onClick={() => navigate('/room/none')}>
                         <Icon icon="ep:back" />
                         <p>Back to Meridian</p>
                     </div> */}
+                    {
+                        width > 768 && !user && (
+                            //login
+                            <button className="login-btn" onClick={() => {
+                                navigate('/login', { state: { from: { pathname: location.pathname } } });
+                            }}>
+                                Login
+                            </button>
+                        )
+                    }
                 </div>
             </div>
             <div className={`dash-right ${expandedClass}`}>

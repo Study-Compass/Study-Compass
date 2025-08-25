@@ -102,7 +102,8 @@ function RegisterForm() {
             console.log(response.data);
             // Handle success (e.g., redirect to login page or auto-login)
             await login(formData);
-            navigate('/onboard', { state: {from:location.state?.from} });
+            // navigate('/onboard', { state: {from:location.state?.from} });
+            navigate('/events-dashboard');
         } catch (error) {
             if(error.response.status === 400){
                 setErrorText("Username or Email already exists");

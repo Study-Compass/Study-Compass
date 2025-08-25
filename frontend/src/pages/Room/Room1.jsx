@@ -198,7 +198,7 @@ function Room() {
         }
         if(isAuthenticated){
             if(user.onboarded === false){
-                navigate('/onboard');
+                navigate('/events-dashboard');
             }
         }
         if(!roomIds){

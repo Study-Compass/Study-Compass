@@ -42,15 +42,22 @@
         transition: all 0.3s ease;
 
         .count {
+          background-color: var(--lighter);
+          color: var(--text);
+          font-size: 12px;
+          font-weight: 600;
+          padding: 2px 6px;
+          border-radius: 10px;
+          min-width: 16px;
+          text-align: center;
           transition: all 0.3s ease;
-         }
+        }
 
         &:hover {
           color: var(--primary);
 
           .count {
-            transition: all 0.3s ease;
-            background-color: var(--secondary-color);
+            background-color: #d3ddfd;
           }
         }
 
@@ -60,19 +67,8 @@
           
           .count {
             background-color: var(--primary);
-            color: var(--secondary-color);
+            color: #d3ddfd;
           }
-        }
-
-        .count {
-          background-color: var(--lighter);
-          color: var(--text);
-          font-size: 12px;
-          font-weight: 600;
-          padding: 2px 6px;
-          border-radius: 10px;
-          min-width: 16px;
-          text-align: center;
         }
       }
     }
@@ -95,8 +91,9 @@
       }
 
       .events-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-start;
         gap: 20px;
         width: 100%;
       }
@@ -107,7 +104,7 @@
 // Responsive design
 @media (max-width: 768px) {
   .my-events-content {
-    padding: 10px;
+    padding: 10px 20px;
 
     .my-events-content-container {
       .content-wrapper {
@@ -125,7 +122,7 @@
 
         .events-list {
           .events-grid {
-            grid-template-columns: 1fr;
+            flex-direction: column;
             gap: 15px;
           }
         }
@@ -140,7 +137,7 @@
       .content-wrapper {
         .events-list {
           .events-grid {
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 15px;
           }
         }
       }

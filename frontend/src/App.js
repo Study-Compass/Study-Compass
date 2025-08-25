@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import './App.scss';
 import './assets/fonts.css';
 import './assets/Fonts/Montserrat/Montserrat.css';
-import './assets/Fonts/OpenSauce/OpenSauce.css';
+import './assets/Fonts/OpenSauce/OpenSauce.css';    
 import AnimatedPageWrapper from './components/AnimatedPageWrapper/AnimatedPageWrapper';
 
 import Room from './pages/Room/Room';
@@ -140,7 +140,7 @@ function App() {
                                             <Route element={ <ProtectedRoute/> }>
                                                 <Route path="/profile" element={<AnimatedPageWrapper><Profile/></AnimatedPageWrapper>}/>
                                                 <Route path="/onboard" element={<AnimatedPageWrapper><Onboard /></AnimatedPageWrapper>}/>
-                                                <Route path="/friends" element={<AnimatedPageWrapper><Friends/></AnimatedPageWrapper>}/>
+                                                {/* <Route path="/friends" element={<AnimatedPageWrapper><Friends/></AnimatedPageWrapper>}/> */}
                                                 <Route path="/settings" element={<AnimatedPageWrapper><Settings/></AnimatedPageWrapper>}/>
                                                 <Route path="/developer-onboarding" element={<AnimatedPageWrapper><DeveloperOnboard/></AnimatedPageWrapper>}/>
                                             </Route>

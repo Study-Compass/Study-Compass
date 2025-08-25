@@ -10,6 +10,7 @@ import Dashboard from '../../components/Dashboard/Dashboard';
 import General from './General/General'
 import BadgeManager from './BadgeManager/BadgeManager';
 import ManageUsers from './ManageUsers/ManageUsers';
+import QRManager from './QRManager/QRManager';
 
 import eventsLogo from '../../assets/Brand Image/EventsLogo.svg';
 
@@ -57,6 +58,11 @@ function Admin(){
             label: 'Badge Grants', 
             icon: 'bx:stats',
             element: <BadgeManager/>
+        },
+        { 
+            label: 'QR Codes', 
+            icon: 'material-symbols:qr-code',
+            element: <QRManager/>
         }
     ]
 

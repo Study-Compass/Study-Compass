@@ -1,6 +1,7 @@
 import React, { useCallback, useRef, useEffect } from 'react';
 import Event from '../EventsViewer/EventsGrid/EventsColumn/Event/Event';
 import Loader from '../Loader/Loader';
+import useBulkRSVP from '../../hooks/useBulkRSVP';
 import './EventsList.scss';
 
 const EventsList = ({ 
@@ -14,6 +15,12 @@ const EventsList = ({
 }) => {
     const observerRef = useRef();
     const lastEventElementRef = useRef();
+
+    // Extract all events from grouped events for bulk RSVP fetching
+    const allEvents = groupedEvents.flatMap(group => group.events);
+
+    // Use bulk RSVP hook to fetch RSVP data for all events at once
+    const { getRSVPStatus, updateRSVPStatus } = useBulkRSVP(allEvents);
 
     // Handle intersection observer for infinite scroll
     useEffect(() => {
@@ -91,7 +98,12 @@ const EventsList = ({
                                 ref={isLastElement ? setLastEventElementRef : null}
                                 role="listitem"
                             >
-                                <Event event={event} hasFriendsFilter={hasFriendsFilter} />
+                                <Event 
+                                    event={event} 
+                                    hasFriendsFilter={hasFriendsFilter}
+                                    rsvpStatus={getRSVPStatus(event._id)}
+                                    onRSVPStatusUpdate={updateRSVPStatus}
+                                />
                             </div>
                         );
                     })}

@@ -9,7 +9,7 @@ import useAuth from '../../../../../hooks/useAuth';
 import RSVPButton from '../../../../RSVPButton/RSVPButton';
 import { useFetch } from '../../../../../hooks/useFetch';
 
-function Event({event, hasFriendsFilter = false}){
+function Event({event, hasFriendsFilter = false, rsvpStatus, onRSVPStatusUpdate}){
     const [optimisticEvent, setOptimisticEvent] = useState(event);
     const { user } = useAuth();
     
@@ -223,7 +223,12 @@ function Event({event, hasFriendsFilter = false}){
                 )}
                 
                 {/* RSVP Button */}
-                <RSVPButton event={optimisticEvent} onRSVPUpdate={handleRSVPUpdate} />
+                <RSVPButton 
+                    event={optimisticEvent} 
+                    onRSVPUpdate={handleRSVPUpdate} 
+                    rsvpStatus={rsvpStatus}
+                    onRSVPStatusUpdate={onRSVPStatusUpdate}
+                />
                 
                 {/* Quick Look Button */}
 

@@ -11,9 +11,9 @@
   }
 
   .recommended-events-container {
-    flex: 1;
     display: flex;
     flex-direction: column;
+    width:75%;
     .explore-events-button {
       background-color: var(--background);
       color: var(--text);
@@ -102,6 +102,9 @@
 
 @media (max-width: 768px) {
   .recommended-events {
+    .recommended-events-container {
+      width: 100%;
+    }
     .content-row {
       flex-direction: column;
       gap: 15px;
@@ -110,6 +113,9 @@
     .recommended-room {
       width: 100%;
       min-width: unset;
+      .recommended-room-header{
+        display:none;
+      }
     }
   }
 }

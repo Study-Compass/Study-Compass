@@ -2,9 +2,56 @@
     z-index: 2;
     overflow-x: hidden;
     width:100%;
-    overflow-y: hidden;
+    overflow-y: auto;
     display: flex;
     flex-direction: column;
+
+    .friends-notice{
+        --color: var(--blue);
+        --background-color: rgba(59, 130, 246, 0.1);
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 10px;
+        width: calc(100% - 30px);
+        margin: 0 20px 20px 20px;
+        padding: 6px 6px 6px 20px;
+        border-radius: 10px;
+        background-color: var(--background-color);
+        color: var(--color);
+        font-size: 14px;
+        font-weight: 600;
+        border: 1px solid var(--color);
+        box-sizing: border-box;
+        justify-content: space-between;
+        
+        .notice-container{
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            iconify-icon{
+                font-size: 18px;
+            }
+        }
+        
+        button{
+            background-color: var(--color);
+            color: white;
+            border: none;
+            padding: 6px 10px;
+            border-radius: 10px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            
+            &:hover{
+                opacity: 0.9;
+            }
+        }
+    }
 
     .my-events-container{
         display: flex;
