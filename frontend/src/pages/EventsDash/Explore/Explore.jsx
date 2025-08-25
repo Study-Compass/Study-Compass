@@ -302,7 +302,10 @@ function Explore(){
                 }
                 <section className="explore-events" role="region" aria-label="Events display">
                     {loading && page === 1 ? (
-                        <div className="loading" role="status" aria-live="polite">Loading events...</div>
+                        <div className="loading" role="status" aria-live="polite">
+                            <Icon icon="mdi:loading" />
+                            <p>Loading events...</p>
+                        </div>
                     ) : error ? (
                         <div className="error" role="alert">Error loading events</div>
                     ) : viewType === 0 ? (

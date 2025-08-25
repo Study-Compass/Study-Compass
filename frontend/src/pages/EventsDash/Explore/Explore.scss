@@ -134,6 +134,32 @@
             max-height:100%;
             height:100%;
             box-sizing: border-box;
+
+            .loading{
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                width:100%;
+                iconify-icon{
+                    animation: spin 1s linear infinite;
+                    color: var(--primary);
+                }
+                p{
+                    font-size: 16px;
+                    font-family: 'OpenSauce';
+                    font-weight: 500;
+                    color: var(--text);
+                }
+                @keyframes spin {
+                    from {
+                        transform: rotate(0deg);
+                    }
+                    to {
+                        transform: rotate(360deg);
+                    }
+                }
+            }
             
             
             .header{
