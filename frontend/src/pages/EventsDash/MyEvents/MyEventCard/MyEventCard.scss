@@ -90,6 +90,12 @@
   }
 }
 
+@media (max-width: 768px) {
+  .my-event-card {
+    width: 100%;
+  }
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;

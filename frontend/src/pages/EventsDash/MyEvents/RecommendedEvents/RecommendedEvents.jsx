@@ -36,7 +36,8 @@ const RecommendedEvents = () => {
         try {
             setLoading(true);
             const response = await axios({
-                url: '/friends-events',
+                url: '/event-recommendation',
+                params: { limit: 5 },
                 method: 'GET',
                 withCredentials: true,
             });
