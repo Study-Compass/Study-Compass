@@ -1,0 +1,148 @@
+.rsvp-section {
+    padding-top: 2rem;
+
+    .rsvp-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        flex-direction: column;
+
+        h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text);
+            margin: 0;
+        }
+
+        .rsvp-stats-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+
+            .rsvp-stats {
+                display: flex;
+                gap: 0.5rem;
+
+
+                .stat {
+                    text-align: center;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap:5px;
+                    
+
+                    .count {
+                        display: block;
+                        font-size: 1rem;
+                        font-weight: 700;
+                        color: var(--text);
+                    }
+
+                    .label {
+                        font-size: 0.8rem;
+                        color: var(--text-secondary);
+                        text-transform: uppercase;
+                        letter-spacing: 0.5px;
+                    }
+                }
+            }
+
+            .friends-going {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                padding: 0.5rem 1rem;
+                background: rgba(255, 255, 255, 0.1);
+                border-radius: 20px;
+                color: var(--text);
+                font-size: 0.9rem;
+                font-weight: 500;
+            }
+        }
+    }
+
+    .rsvp-deadline-passed,
+    .rsvp-capacity-reached {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px;
+        border-radius: 8px;
+        margin-bottom: 15px;
+        font-size: 14px;
+        font-weight: 500;
+        
+        svg {
+            width: 16px;
+            height: 16px;
+        }
+    }
+    
+    .rsvp-deadline-passed {
+        background: rgba(255, 152, 0, 0.2);
+        color: #FF9800;
+    }
+    
+    .rsvp-capacity-reached {
+        background: rgba(244, 67, 54, 0.2);
+        color: #F44336;
+    }
+
+    .attendees-section {
+        h4 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text);
+            margin: 0;
+        }
+        
+        .attendees-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: -5px;
+            margin-bottom: 10px;
+            
+            .attendee {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                padding: 10px 0;
+                background: rgba(255, 255, 255, 0.1);
+                border-radius: 20px;
+                margin-right: -5px;
+                
+                img {
+                    width: 24px;
+                    height: 24px;
+                    border-radius: 50%;
+                    object-fit: cover;
+                }
+                
+                span {
+                    font-size: 14px;
+                    color: var(--text);
+                    font-weight: 500;
+                }
+            }
+            
+            .more-attendees {
+                display: flex;
+                align-items: center;
+                padding: 8px 12px;
+                background: rgba(255, 255, 255, 0.1);
+                border-radius: 20px;
+                font-size: 14px;
+                color: rgba(255, 255, 255, 0.7);
+                font-weight: 500;
+            }
+        }
+    }
+    .rsvp-button-container {
+        .rsvp-btn {
+            max-width: 200px;
+            font-size: 13px;
+            padding: 10px 10px;
+        }
+    }
+}

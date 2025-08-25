@@ -13,26 +13,21 @@ function Event({event, hasFriendsFilter = false}){
     const [optimisticEvent, setOptimisticEvent] = useState(event);
     const { user } = useAuth();
     
-    // Use useFetch to get friends data
-    const { data: friendsData } = useFetch(
-        user ? '/getFriends' : null
-    );
+    // Use pre-computed friends data from backend
+    const friendsGoing = event.friendsGoing || 0;
 
-    const [friendsGoing, setFriendsGoing] = useState(0);
-
-    useEffect(() => {
-        if (event.attendees && user && friendsData?.success) {
-            const friendIds = friendsData.data.map(friend => friend._id);
-            // Count friends going to the event
-            const friendsCount = event.attendees.filter(attendee => 
-                attendee.status === 'going' && 
-                attendee.userId !== user._id &&
-                friendIds.includes(attendee.userId)
-            ).length;
-            setFriendsGoing(friendsCount);
-            
-        }
-    }, [event.attendees, user, friendsData]);
+    // Debug logging to see what's happening with friendsGoing
+    console.log('Event component debug:', {
+        eventId: event._id,
+        eventName: event.name,
+        friendsGoing: event.friendsGoing,
+        friendsGoingCalculated: friendsGoing,
+        user: user ? 'authenticated' : 'not authenticated',
+        hasFriendsFilter,
+        rsvpEnabled: event.rsvpEnabled,
+        rsvpStats: event.rsvpStats,
+        attendees: event.attendees ? event.attendees.length : 0
+    });
 
     const renderHostingStatus = () => {
         let hostingImage = '';
@@ -70,12 +65,21 @@ function Event({event, hasFriendsFilter = false}){
     const navigate = useNavigate();
 
     const handleEventClick = (event) => {
+        // Don't navigate if popup is open
+        if (popupOpen) return;
+        navigate(`/event/${event._id}`);
+    }
+
+    const handleQuickLook = (event) => {
+        event.stopPropagation();
         setPopupOpen(true);
     }
 
     const handleKeyDown = (event) => {
         if (event.key === 'Enter' || event.key === ' ') {
             event.preventDefault();
+            // Don't navigate if popup is open
+            if (popupOpen) return;
             handleEventClick(event);
         }
     }
@@ -139,18 +143,35 @@ function Event({event, hasFriendsFilter = false}){
             aria-describedby={`event-description-${event._id}`}
         >
             <Popup isOpen={popupOpen} onClose={onPopupClose} customClassName={"wide-content no-styling no-padding"}>
-                <FullEvent event={event}/>
+                <div onClick={(e) => e.stopPropagation()}>
+                    <FullEvent event={event}/>
+                </div>  
             </Popup>
             {event.image && <img src={event.image} alt={`Event image for ${event.name}`} />}
             <div className="info">
-                <div className="row">
-                    <Icon icon="heroicons:calendar-16-solid" aria-hidden="true" />
-                    <time dateTime={date.toISOString()}>
-                        <strong>{formatTime(date)}</strong> {formatDate(date)}
-                    </time>
+                <div className="row event-header">
+                    <div className="col">
+                        <div className="row">
+                            <Icon icon="heroicons:calendar-16-solid" aria-hidden="true" />
+                            <time dateTime={date.toISOString()}>
+                                <strong>{formatTime(date)}</strong> {formatDate(date)}
+                            </time>
+                        </div>
+                        <h2>{event.name}</h2>
+                        {renderHostingStatus()}
+                    </div>
+                    <div className="col">
+                        <button 
+                            className="quick-look-btn"
+                            onClick={handleQuickLook}
+                            aria-label="Quick look at event details"
+                        >
+                            <Icon icon="mdi:eye" />
+                            Quick Look
+                        </button>
+                    </div>
                 </div>
-                <h2>{event.name}</h2>
-                {renderHostingStatus()}
+
                 <div className="row event-description" id={`event-description-${event._id}`}>
                     <p>{event.description}</p>
                 </div>
@@ -162,8 +183,26 @@ function Event({event, hasFriendsFilter = false}){
                 {/* Friends going indicator */}
                 {friendsGoing > 0 && (
                     <div className="friends-indicator">
-                        <Icon icon="mdi:account-group" />
+                        <div className="friends-indicator-pictures">
+                        {event.friendsGoingProfilePictures.map(picture => <img src={picture} alt="Friend profile picture" />)}
+                        </div>
                         <span>{friendsGoing} friend{friendsGoing !== 1 ? 's' : ''} going</span>
+                    </div>
+                )}
+                
+                {/* Show login prompt if user is not authenticated and hasFriendsFilter is true */}
+                {!user && hasFriendsFilter && (
+                    <div className="friends-indicator login-prompt">
+                        <Icon icon="mdi:account-group" />
+                        <span>Login to see friends going</span>
+                    </div>
+                )}
+                
+                {/* Show message when user is authenticated but no friends are going */}
+                {user && hasFriendsFilter && friendsGoing === 0 && event.rsvpStats && event.rsvpStats.going > 0 && (
+                    <div className="friends-indicator no-friends">
+                        <Icon icon="mdi:account-group" />
+                        <span>No friends going yet</span>
                     </div>
                 )}
                 
@@ -185,6 +224,9 @@ function Event({event, hasFriendsFilter = false}){
                 
                 {/* RSVP Button */}
                 <RSVPButton event={optimisticEvent} onRSVPUpdate={handleRSVPUpdate} />
+                
+                {/* Quick Look Button */}
+
             </div>
         </article>
     );

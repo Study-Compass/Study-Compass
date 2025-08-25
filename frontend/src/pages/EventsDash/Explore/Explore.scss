@@ -1,12 +1,12 @@
 .explore{
     z-index: 1;
     height:100vh;
-    padding:20px 20px;
     display: flex;
     flex-direction: column;
     box-sizing: border-box; 
     gap: 20px;
     flex:1;
+    max-height:100%;
     width:100%;
     .heading{
         display: flex;
@@ -42,7 +42,9 @@
         .sidebar{
             width:180px;
             padding:10px;
-            background-color: var(--lightest);
+            margin:20px;
+            margin-right:0;
+            background-color: var(--background);
             display: flex;
             flex-direction: column;
             border-radius: 15px;
@@ -65,9 +67,9 @@
                 }
                 h2{
                     margin:0;
-                    font-size: 19px;
+                    font-size: 22px;
                     font-weight: 600;
-                    font-family: 'Satoshi';
+                    font-family: 'OpenSauce';
                     font-weight:900;
                 }
             }
@@ -232,9 +234,11 @@
         }
         .explore-content{
             flex-direction: column;
+            padding: 0;
             .explore-events{
-                height: 80%;
-                max-height: 80%;
+                flex-grow:1;
+                padding:10px;
+                
             }
             .mobile-sidebar{
                 width:100%;
@@ -242,9 +246,14 @@
                 box-shadow: none;
                 background-color: transparent;
                 box-sizing: border-box;
+                margin:0;
+                padding-bottom:0;
                 .sidebar-header{
                     justify-content: space-between;
                     width:100%;
+                    padding:0 10px;
+                    box-sizing: border-box;
+                    
                     .logo{
                         display: flex;
                         align-items: center;

@@ -144,4 +144,13 @@ userSchema.pre('save', async function (next) {
   });
 
 
+// Indexes for performance optimization
+userSchema.index({ email: 1 }); // For email lookups
+userSchema.index({ googleId: 1 }); // For Google OAuth
+userSchema.index({ samlId: 1, samlProvider: 1 }); // For SAML authentication
+userSchema.index({ username: 1 }); // For username lookups
+userSchema.index({ roles: 1 }); // For role-based queries
+userSchema.index({ approvalRoles: 1 }); // For approval role queries
+userSchema.index({ admin: 1 }); // For admin queries
+
 module.exports = userSchema;

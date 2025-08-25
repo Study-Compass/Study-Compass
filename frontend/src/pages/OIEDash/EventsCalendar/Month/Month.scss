@@ -245,6 +245,21 @@
     }
 }
 
+@media (max-width: 768px) {
+    .month{
+        .calendar{
+            &__day{
+                padding-right:0;
+                .day-header{
+                    .day-number{
+                        font-size: 13px;
+                    }
+                }
+            }
+        }
+    }
+}
+
 /* High contrast mode support */
 @media (prefers-contrast: high) {
     .monthly-header .arrows .left-arrow,
