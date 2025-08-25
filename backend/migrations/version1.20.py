@@ -38,12 +38,19 @@ print(f"Found {len(all_events)} events to migrate")
 
 # Track statistics
 updated_events = 0
+skipped_events = 0
 errors = 0
 
 for event in all_events:
     try:
         event_id = event['_id']
         event_name = event.get('name', 'Unknown Event')
+        
+        # Check if RSVP is already enabled for this event
+        if event.get('rsvpEnabled', False):
+            print(f"Skipping event: {event_name} (ID: {event_id}) - RSVP already enabled")
+            skipped_events += 1
+            continue
         
         print(f"Processing event: {event_name} (ID: {event_id})")
         
@@ -81,6 +88,7 @@ for event in all_events:
 
 print(f"\nMigration completed!")
 print(f"Events updated: {updated_events}")
+print(f"Events skipped (already had RSVP enabled): {skipped_events}")
 print(f"Errors encountered: {errors}")
 
 # Verify the migration
