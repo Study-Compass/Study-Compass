@@ -19,7 +19,7 @@ const AnalyticsModal = ({ qrCode, onClose }) => {
             setError(null);
             
             try {
-                const response = await apiRequest(`/qr/${qrCode.name}/analytics`, null, { method: 'GET' });
+                const response = await apiRequest(`/api/qr/${qrCode.name}/analytics`, null, { method: 'GET' });
                 if (response.error) {
                     setError(response.error);
                 } else {

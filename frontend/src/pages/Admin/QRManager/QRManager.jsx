@@ -44,10 +44,10 @@ const QRManager = () => {
     if (activeFilter !== 'all') qrParams.append('isActive', activeFilter === 'active');
 
     // Use useFetch for QR codes data
-    const { data: qrData, loading: qrLoading, error: qrError, refetch: refetchQRCodes } = useFetch(`/qr?${qrParams}`);
+    const { data: qrData, loading: qrLoading, error: qrError, refetch: refetchQRCodes } = useFetch(`/api/qr?${qrParams}`);
 
     // Use useFetch for overview data
-    const { data: overviewData, loading: overviewLoading } = useFetch('/qr/analytics/overview');
+    const { data: overviewData, loading: overviewLoading } = useFetch('/api/qr/analytics/overview');
 
     // Update data when useFetch returns results
     useEffect(() => {
@@ -59,7 +59,7 @@ const QRManager = () => {
     const handleDeleteQR = async (qrName) => {
         if (window.confirm('Are you sure you want to delete this QR code?')) {
             try {
-                const response = await apiRequest(`/qr/${qrName}`, null, { method: 'DELETE' });
+                const response = await apiRequest(`/api/qr/${qrName}`, null, { method: 'DELETE' });
                 if (response.error) {
                     console.error('Failed to delete QR code:', response.error);
                 } else {

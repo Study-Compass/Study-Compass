@@ -18,7 +18,7 @@ function QR(){
                 const isRepeat = !!visited;
                 
                 // Log the QR scan
-                const response = await axios.post('/qr-scan', {
+                const response = await axios.post('api/qr-scan', {
                     name: id, 
                     repeat: isRepeat
                 });
