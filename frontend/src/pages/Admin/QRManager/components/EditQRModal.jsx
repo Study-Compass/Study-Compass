@@ -36,7 +36,7 @@ const EditQRModal = ({ qrCode, onClose, onSuccess }) => {
         setError(null);
 
         try {
-            const response = await apiRequest(`/qr/${qrCode.name}`, formData, { method: 'PUT' });
+            const response = await apiRequest(`/api/qr/${qrCode.name}`, formData, { method: 'PUT' });
             if (response.error) {
                 setError(response.error);
             } else {

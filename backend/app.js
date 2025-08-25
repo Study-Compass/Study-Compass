@@ -137,7 +137,7 @@ app.use('/admin', roomRoutes);
 app.use(adminRoutes);
 
 app.use('/notifications', notificationRoutes);
-app.use('/qr', qrRoutes);
+app.use('/api/qr', qrRoutes);
 
 app.use(eventsRoutes);
 // Serve static files from the React app in production

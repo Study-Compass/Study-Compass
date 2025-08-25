@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import apiRequest from '../../../../utils/postRequest';
 import './ModalContent.scss';
 
-const CreateQRModal = ({ onClose, onSuccess }) => {
+const CreateQRModal = ({ onClose, onSuccess, handleClose }) => {
     const [formData, setFormData] = useState({
         name: '',
         description: '',
@@ -21,7 +21,7 @@ const CreateQRModal = ({ onClose, onSuccess }) => {
         setError(null);
 
         try {
-            const response = await apiRequest('/qr', formData, { method: 'POST' });
+            const response = await apiRequest('/api/qr', formData, { method: 'POST' });
             if (response.error) {
                 setError(response.error);
             } else {
@@ -35,7 +35,8 @@ const CreateQRModal = ({ onClose, onSuccess }) => {
         }
     };
 
-    const handleClose = () => {
+    const onCloseClick = () => {
+        handleClose();
         if (!loading) {
             onClose();
         }
@@ -113,7 +114,7 @@ const CreateQRModal = ({ onClose, onSuccess }) => {
                     </label>
                 </div>
                 <div className="modal-actions">
-                    <button type="button" onClick={handleClose} disabled={loading}>
+                    <button type="button" onClick={onCloseClick} disabled={loading}>
                         Cancel
                     </button>
                     <button type="submit" disabled={loading}>
