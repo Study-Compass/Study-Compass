@@ -33,11 +33,21 @@
         min-height: 60vh;
         text-align: center;
         color: white;
+        padding: 2rem;
 
         p {
             margin-top: 1rem;
             font-size: 1.1rem;
         }
+    }
+    
+    .loading-container {
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+        border-radius: 16px;
+        margin: 2rem;
+        -webkit-backdrop-filter: blur(10px);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
     }
 
     .error-container {

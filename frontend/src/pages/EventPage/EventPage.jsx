@@ -8,6 +8,7 @@ import useAuth from '../../hooks/useAuth';
 import { useNotification } from '../../NotificationContext';
 import { useFetch } from '../../hooks/useFetch';
 import Loader from '../../components/Loader/Loader';
+import EnhancedLoader from '../../components/Loader/EnhancedLoader';
 import Header from '../../components/Header/Header';
 import RSVPSection from '../../components/RSVPSection/RSVPSection';
 import EventsByCreator from '../../components/EventsByCreator/EventsByCreator';
@@ -70,10 +71,15 @@ function EventPage() {
     if (eventLoading) {
         return (
             <div className="event-page">
-                <Header />
+                <div className="header">
+                    <img src={Logo} alt="Logo" className="logo" />
+                </div>
                 <div className="loading-container">
-                    <Loader />
-                    <p>Loading event...</p>
+                    <EnhancedLoader 
+                        type="events" 
+                        message="Loading event details..." 
+                        size="large"
+                    />
                 </div>
             </div>
         );
@@ -82,7 +88,9 @@ function EventPage() {
     if (eventError || !eventData?.event) {
         return (
             <div className="event-page">
-                <Header />
+                            <div className="header">
+                <img src={Logo} alt="Logo" className="logo" />
+            </div>
                 <div className="error-container">
                     <Icon icon="mdi:alert-circle" className="error-icon" />
                     <h2>Event Not Found</h2>

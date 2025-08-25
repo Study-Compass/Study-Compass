@@ -4,6 +4,8 @@ import { Icon } from '@iconify-icon/react';
 import { useFetch } from '../../hooks/useFetch';
 import './EventsByCreator.scss';
 import Event from '../EventsViewer/EventsGrid/EventsColumn/Event/Event';
+import EnhancedLoader from '../Loader/EnhancedLoader';
+import EventSkeleton from '../EventsList/EventSkeleton';
 
 function EventsByCreator({ eventId, creatorName, creatorType }) {
     const navigate = useNavigate();
@@ -14,8 +16,12 @@ function EventsByCreator({ eventId, creatorName, creatorType }) {
     if (loading) {
         return (
             <div className="events-by-creator">
-                <div className="loading">
-                    <p>Loading more events...</p>
+                <div className="section-header">
+                    <h3>More Events by {creatorName}</h3>
+                    <p className="creator-type">{creatorType}</p>
+                </div>
+                <div className="events-grid">
+                    <EventSkeleton count={3} />
                 </div>
             </div>
         );
