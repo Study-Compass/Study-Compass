@@ -113,6 +113,9 @@
     .recommended-room {
       width: 100%;
       min-width: unset;
+      .recommended-room-header{
+        display:none;
+      }
     }
   }
 }

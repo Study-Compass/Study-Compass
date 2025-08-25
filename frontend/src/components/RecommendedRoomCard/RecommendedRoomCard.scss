@@ -239,6 +239,7 @@
 
 @media (max-width: 768px) {
     .recommended-room-card {
+        display:none;
         width: 100%;
         min-width: unset;
     }

@@ -6,7 +6,7 @@ import { Icon } from '@iconify-icon/react';
 import ProfilePopup from '../ProfilePopup/ProfilePopup';
 import './Dashboard.scss'
 
-function Dashboard({ menuItems, children, additionalClass = '', middleItem=null, logo, primaryColor, secondaryColor, enableSubSidebar = false} ) {
+function Dashboard({ menuItems, children, additionalClass = '', middleItem=null, logo, primaryColor, secondaryColor, enableSubSidebar = false, defaultPage = 0} ) {
     const [expanded, setExpanded] = useState(false);
     const [expandedClass, setExpandedClass] = useState("");
     const [currentDisplay, setCurrentDisplay] = useState(0);
@@ -64,8 +64,8 @@ function Dashboard({ menuItems, children, additionalClass = '', middleItem=null,
     };
 
     useEffect(() => {
-        // Get the page from URL parameters, default to 0 if not specified
-        const page = parseInt(searchParams.get('page') || '0');
+        // Get the page from URL parameters, default to defaultPage if not specified
+        const page = parseInt(searchParams.get('page') || defaultPage.toString());
         const sub = searchParams.get('sub');
         
         if (sub !== null) {
@@ -78,7 +78,14 @@ function Dashboard({ menuItems, children, additionalClass = '', middleItem=null,
             // We're in the main menu
             setCurrentDisplay(page);
         }
-    }, [searchParams, menuItems.length]);
+    }, [searchParams, menuItems.length, defaultPage]);
+
+    // Set initial URL if no page parameter is present
+    useEffect(() => {
+        if (!searchParams.get('page') && !searchParams.get('sub') && defaultPage !== 0) {
+            navigate(`?page=${defaultPage}`, { replace: true });
+        }
+    }, [searchParams, navigate, defaultPage]);
 
     // Handle pending navigation after animation completes
     useEffect(() => {
@@ -98,8 +105,8 @@ function Dashboard({ menuItems, children, additionalClass = '', middleItem=null,
             } else if (action === 'backToMain') {
                 setNavigationStack([]);
                 setCurrentSubItems(null);
-                setCurrentDisplay(0);
-                navigate(`?page=0`, { replace: true });
+                setCurrentDisplay(defaultPage);
+                navigate(`?page=${defaultPage}`, { replace: true });
             } else if (action === 'backStep') {
                 const newStack = [...navigationStack];
                 newStack.pop();
@@ -454,6 +461,16 @@ function Dashboard({ menuItems, children, additionalClass = '', middleItem=null,
                         <Icon icon="ep:back" />
                         <p>Back to Meridian</p>
                     </div> */}
+                    {
+                        width > 768 && !user && (
+                            //login
+                            <button className="login-btn" onClick={() => {
+                                navigate('/login', { state: { from: { pathname: location.pathname } } });
+                            }}>
+                                Login
+                            </button>
+                        )
+                    }
                 </div>
             </div>
             <div className={`dash-right ${expandedClass}`}>

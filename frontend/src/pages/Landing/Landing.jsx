@@ -20,14 +20,15 @@ function Landing() {
     const location = useLocation();
 
     useEffect(() => {
-        setViewport((window.innerHeight) + 'px');
-        //add listener
-        setTimeout(() => {
-            setButtonActive(true);
-        }, 500);
-        setTimeout(() => {
-            setButtonActive(false);
-        }, 1400);
+        // setViewport((window.innerHeight) + 'px');
+        // //add listener
+        // setTimeout(() => {
+        //     setButtonActive(true);
+        // }, 500);
+        // setTimeout(() => {
+        //     setButtonActive(false);
+        // }, 1400);
+        navigate('/events-dashboard');
     },[]);
 
     useEffect(() => {

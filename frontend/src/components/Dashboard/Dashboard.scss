@@ -223,6 +223,17 @@
             }
         }
 
+        .login-btn{
+            padding: 6px 15px;
+            background-color: var(--primary-color);
+            color: white;
+            font-family: 'OpenSauce';
+            font-weight: 600;
+            margin-bottom: 10px;
+            width:calc(100% - 20px);
+            margin: 30px 10px;
+        }
+
         .breadcrumb-nav{
             width: 100%;
             display: flex;
@@ -493,6 +504,16 @@
         .dash-right{
             width:100%;
             z-index: 1;
+            .dash{
+                header.header{
+                    h1{
+                        font-size: 24px;
+                    }
+                    p{
+                        font-size: 16px;
+                    }
+                }
+            }
         }
         .dash-left{
             .logo{
