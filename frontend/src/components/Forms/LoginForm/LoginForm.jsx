@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import '../Forms.scss';
 import { generalIcons } from '../../../Icons';
@@ -23,10 +23,22 @@ function LoginForm() {
     const [email, setEmail] = useState(false);
     
     const location = useLocation();
+    const redirectPathRef = useRef(null);
+    const [isGoogleLoginInProgress, setIsGoogleLoginInProgress] = useState(false);
     
     const googleLogo = generalIcons.google;
-    const from = location.state?.from?.pathname || '/room/none';
-    console.log(from);
+    
+    // Store the redirect path when component mounts or location changes
+    useEffect(() => {
+        if (location.state?.from?.pathname) {
+            redirectPathRef.current = location.state.from.pathname;
+            console.log('LoginForm - stored redirect path:', redirectPathRef.current);
+        }
+    }, [location.state]);
+    
+    const from = redirectPathRef.current || location.state?.from?.pathname || '/events-dashboard';
+    console.log('LoginForm - location.state:', location.state);
+    console.log('LoginForm - from pathname:', from);
 
     // Get university info for SAML
     const universityName = getUniversityDisplayName();
@@ -35,11 +47,12 @@ function LoginForm() {
     const samlEnabled = isSAMLEnabled();
 
     useEffect(() => {
-      if (isAuthenticated){
+      if (isAuthenticated && !isGoogleLoginInProgress){
         console.log("logged in already");
-        navigate('/room/none')
+        console.log("auto-redirecting to:", from);
+        navigate(from, { replace: true })
       }
-    },[isAuthenticated, navigate]);
+    },[isAuthenticated, navigate, from, isGoogleLoginInProgress]);
 
     useEffect(() => {
         // const token = localStorage.getItem('token'); // or sessionStorage
@@ -61,6 +74,7 @@ function LoginForm() {
       try {
         await login(formData);
         console.log("logged in");
+        console.log("redirecting to:", from);
         navigate(from,{ replace: true })
         // Handle success (e.g., store the token and redirect to a protected page)
       } catch (error) {
@@ -86,9 +100,14 @@ function LoginForm() {
     useEffect(() => {
         async function googleLog(code) {
             try{
+                setIsGoogleLoginInProgress(true);
                 const codeResponse = await googleLogin(code, false);
                 console.log("codeResponse: " + codeResponse);
+                console.log("Google login successful, redirecting to:", redirectPathRef.current || from);
+                // Navigate after successful Google login
+                navigate(redirectPathRef.current || from, { replace: true });
             } catch (error){
+                setIsGoogleLoginInProgress(false);
                 if(error.response.status  === 409){
                     failed("Email already exists");
                 } else {
@@ -110,7 +129,7 @@ function LoginForm() {
             setLoadContent(true);
         }
 
-    }, [location]);
+    }, [location, navigate, from]);
 
     const google = useGoogleLogin({
         onSuccess: () => { console.log("succeeded") },

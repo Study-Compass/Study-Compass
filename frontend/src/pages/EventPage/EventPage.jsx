@@ -10,6 +10,8 @@ import { useFetch } from '../../hooks/useFetch';
 import Loader from '../../components/Loader/Loader';
 import Header from '../../components/Header/Header';
 import RSVPSection from '../../components/RSVPSection/RSVPSection';
+import EventsByCreator from '../../components/EventsByCreator/EventsByCreator';
+import Logo from '../../assets/Brand Image/BEACON.svg';
 
 function EventPage() {
     const { eventId } = useParams();
@@ -100,7 +102,9 @@ function EventPage() {
 
     return (
         <div className="event-page">
-            <Header />
+            <div className="header">
+                <img src={Logo} alt="Logo" className="logo" />
+            </div>
             <div className="event-content">
                 {event.image && (
                     <div className="image-container">
@@ -108,6 +112,10 @@ function EventPage() {
                     </div>
                 )}
                 <div className="event-details">
+                    <div className="back" onClick={() => navigate('/events-dashboard')}>
+                        <Icon icon="mdi:arrow-left" />
+                        <p>Back to Events</p>
+                    </div>
                     <h1>{event.name}</h1>
                     <div className="col">
                         <div className="row event-detail date">
@@ -135,7 +143,26 @@ function EventPage() {
                         </div>
                     )}
                     <RSVPSection event={eventData.event} />
+                    
+                    {/* More Events by This Creator Section */}
                 </div>
+                    {eventData.event && (
+                        <EventsByCreator 
+                            eventId={eventId}
+                            creatorName={eventData.event.hostingType === "User" 
+                                ? eventData.event.hostingId.name 
+                                : eventData.event.hostingId.org_name
+                            }
+                            creatorType={eventData.event.hostingType === "User" 
+                                ? (eventData.event.hostingId.roles.includes("developer") 
+                                    ? "Developer" 
+                                    : eventData.event.hostingId.roles.includes("oie") 
+                                        ? "Faculty" 
+                                        : "Student")
+                                : "Organization"
+                            }
+                        />
+                    )}
             </div>
         </div>
     );

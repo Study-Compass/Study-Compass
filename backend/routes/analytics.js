@@ -472,34 +472,54 @@ router.get('/users-by-all', async (req, res) => {
     }
 });
 
-router.post('/qr', async (req, res) => {
+router.post('/qr-scan', async (req, res) => {
     const { QR } = getModels(req, 'QR');
 
     try {
         const { name, repeat } = req.body;
         const qr = await QR.findOne({ name: name });
-        if(!qr){
-            let newQR;
-            if(repeat){
-                newQR = new QR({ name, scans: 1, repeated: 1 });
-            } else {
-                newQR = new QR({ name, scans: 1, repeated: 0 });
-            }
-            await newQR.save();
-            console.log('QR scan registered');
-            return { success: true, message: 'QR scan registered' };
-        } else {
-            qr.scans++;
-            if(repeat){
-                qr.repeated++;
-            }
-            await qr.save();
-            console.log('QR scan registered');
-            return { success: true, message: 'QR scan registered' };
+        
+        if (!qr) {
+            return res.status(404).json({ success: false, error: 'QR code not found' });
         }
+
+        if (!qr.isActive) {
+            return res.status(400).json({ success: false, error: 'QR code is inactive' });
+        }
+
+        // Collect scan data
+        const scanData = {
+            timestamp: new Date(),
+            isRepeat: repeat || false,
+            userAgent: req.headers['user-agent'] || '',
+            ipAddress: req.ip || req.connection.remoteAddress || '',
+            referrer: req.headers.referer || ''
+        };
+
+        // Update QR code statistics
+        qr.scans++;
+        qr.lastScanned = new Date();
+        
+        if (repeat) {
+            qr.repeated++;
+        } else {
+            qr.uniqueScans++;
+        }
+
+        // Add scan to history
+        qr.scanHistory.push(scanData);
+
+        await qr.save();
+        
+        // Redirect to the configured URL
+        res.json({ 
+            success: true, 
+            message: 'QR scan registered',
+            redirectUrl: qr.redirectUrl
+        });
     } catch (err) {
         console.error(err);
-        res.status(500).json({ success :false, error: 'An error occurred while generating the QR code' });
+        res.status(500).json({ success: false, error: 'An error occurred while processing QR scan' });
     }
 });
 

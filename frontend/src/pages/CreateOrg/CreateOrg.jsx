@@ -67,10 +67,6 @@ function CreateOrg(){
             navigate('/login');
         } else {
             if(user){
-                if(user.developer === 0){
-                    navigate('/settings');
-
-                }
                 setUserInfo(user);
             }
         }

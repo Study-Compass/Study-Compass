@@ -4,6 +4,26 @@
     position: relative;
     overflow-x: hidden;
 
+    .header{
+        padding: 1rem 3rem;
+        box-sizing: border-box;
+        padding-bottom: 0;
+    }
+
+    .back{
+        display: flex;
+        align-items: center;
+        font-family: 'OpenSauce';
+        font-weight: 600;
+        font-size: 1rem;
+        color: var(--text);
+        cursor: pointer;
+        transition: all 0.3s ease;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+
+    }
+
     .loading-container,
     .error-container {
         display: flex;
@@ -62,6 +82,7 @@
         max-width: 1200px;
         margin: 0 auto;
         padding: 2rem;
+        padding-top:10px;
         position: relative;
         z-index: 2;
 
@@ -86,8 +107,6 @@
             backdrop-filter: blur(10px);
             border-radius: 16px;
             padding: 2rem;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-            border: 1px solid var(--lighterborder);
 
             .rsvp-section{
                 .rsvp-header{
@@ -107,6 +126,13 @@
                 }
             }
 
+            // Events by Creator section styling
+            .events-by-creator {
+                margin-top: 2rem;
+                padding-top: 2rem;
+                border-top: 1px solid rgba(0, 0, 0, 0.1);
+            }
+
             h1 {
                 font-size: 2.2rem;
                 font-weight: 700;
@@ -124,9 +150,12 @@
                 margin-bottom: 2rem;
             }
 
+            .row.hosting{
+                align-items: center;
+            }
+
             .row {
                 display: flex;
-                align-items: center;
 
                 &.event-detail {
                     font-size: 1.1rem;
@@ -186,23 +215,16 @@
                         font-size: 0.8rem;
                         font-weight: 600;
 
-                        &.developer {
-                            background: #ff6b6b;
+                        &.faculty{
+                            background-color: var(--blue);
                             color: white;
                         }
-
-                        &.faculty {
-                            background: #4ecdc4;
+                        &.organization{
+                            background-color: var(--red);
                             color: white;
                         }
-
-                        &.student {
-                            background: #45b7d1;
-                            color: white;
-                        }
-
-                        &.organization {
-                            background: #96ceb4;
+                        &.developer{
+                            background-color: var(--developerBlue);
                             color: white;
                         }
                     }
@@ -262,11 +284,16 @@
 // Responsive design
 @media (max-width: 768px) {
     .event-page {
+        .header{
+            padding: 1rem 2rem;
+            padding-bottom: 0;
+        }
         .event-content {
             padding: 1rem;
 
             .event-details {
                 padding: 1.5rem;
+                padding-top: 0;
 
                 h1 {
                     font-size: 2rem;
@@ -290,6 +317,13 @@
                         .rsvp-btn {
                             width: 100%;
                             justify-content: center;
+                        }
+                    }
+
+                    .events-by-creator {
+                        .events-grid {
+                            display: flex;
+                            flex-direction: row;
                         }
                     }
                 }

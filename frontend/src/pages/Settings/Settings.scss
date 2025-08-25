@@ -346,127 +346,130 @@
 }
 
 @media (max-width: 700px) {
-    .settings {
-        &-left {
-            display: block;
-            width: 100%;
-            border-right: none;
-
-            .header {
-                padding: 20px;
-                padding-bottom: 10px;
-                gap: 10px;
-                position: relative;
-
-                img {
-                    height: 50px;
-                    width: 50px;
-                    padding: 0px;
-                }
-
-                .right-arrow {
-                    height: 100%;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    position: absolute;
-                    top: 0;
-                    right: 20px;
-                    background: none;
-                    border: none;
-
+    .settings{
+        margin-top:50px;
+        .settings {
+            &-left {
+                display: block;
+                width: 100%;
+                border-right: none;
+    
+                .header {
+                    padding: 20px;
+                    padding-bottom: 10px;
+                    gap: 10px;
+                    position: relative;
+    
                     img {
-                        height: 17px;
-                        width: 17px;
+                        height: 50px;
+                        width: 50px;
+                        padding: 0px;
+                    }
+    
+                    .right-arrow {
+                        height: 100%;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        position: absolute;
+                        top: 0;
+                        right: 20px;
+                        background: none;
+                        border: none;
+    
+                        img {
+                            height: 17px;
+                            width: 17px;
+                        }
+                    }
+    
+                    h1 {
+                        font-size: 18px;
+                    }
+    
+                    p {
+                        font-size: 17px;
                     }
                 }
-
-                h1 {
-                    font-size: 18px;
-                }
-
-                p {
+    
+                .preferences {
                     font-size: 17px;
+                    padding: 0px 24px;
+                    position: relative;
+    
+                    img {
+                        width: 25px;
+                    }
+    
+                    .right-arrow {
+                        height: 100%;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        position: absolute;
+                        top: 0;
+                        right: 20px;
+                        background: none;
+                        border: none;
+    
+                        img {
+                            height: 17px;
+                            width: 17px;
+                        }
+                    }
                 }
             }
-
-            .preferences {
-                font-size: 17px;
-                padding: 0px 24px;
-                position: relative;
-
-                img {
-                    width: 25px;
+    
+            &-container {
+                width: 100%;
+                box-sizing: border-box;
+                height: 100%;
+                max-height: 100%;
+                flex-direction: column;
+                overflow: hidden;
+            }
+    
+            &-right {
+                width: 100%;
+                transition: all 0.5s ease;
+                transform: translateX(100%);
+                position: absolute;
+                background-color: white;
+                border: 1px solid var(--lightborder);
+                border-radius: 20px;
+    
+                &.active {
+                    overflow-x: hidden;
+                    transform: translateX(0px);
                 }
-
-                .right-arrow {
-                    height: 100%;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    position: absolute;
-                    top: 0;
-                    right: 20px;
-                    background: none;
-                    border: none;
-
+    
+                .user-container {
+                    padding: 10px;
+                }
+    
+                .header {
+                    position: relative;
+                    padding-left: 20px;
+    
                     img {
                         height: 17px;
                         width: 17px;
                     }
-                }
-            }
-        }
-
-        &-container {
-            width: 100%;
-            box-sizing: border-box;
-            height: 100%;
-            max-height: 100%;
-            flex-direction: column;
-            overflow: hidden;
-        }
-
-        &-right {
-            width: 100%;
-            transition: all 0.5s ease;
-            transform: translateX(100%);
-            position: absolute;
-            background-color: white;
-            border: 1px solid var(--lightborder);
-            border-radius: 20px;
-
-            &.active {
-                overflow-x: hidden;
-                transform: translateX(0px);
-            }
-
-            .user-container {
-                padding: 10px;
-            }
-
-            .header {
-                position: relative;
-                padding-left: 20px;
-
-                img {
-                    height: 17px;
-                    width: 17px;
-                }
-
-                .back-arrow {
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    position: absolute;
-                    top: 0px;
-                    left: -15px;
-                    background: none;
-                    border: none;
-                    height: calc(100% - 10px);
-                    padding: 0;
-                    margin-bottom: 10px;
-                    box-sizing: border-box;
+    
+                    .back-arrow {
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        position: absolute;
+                        top: 0px;
+                        left: -15px;
+                        background: none;
+                        border: none;
+                        height: calc(100% - 10px);
+                        padding: 0;
+                        margin-bottom: 10px;
+                        box-sizing: border-box;
+                    }
                 }
             }
         }
