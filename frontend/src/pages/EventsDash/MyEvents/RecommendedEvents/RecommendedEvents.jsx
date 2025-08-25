@@ -1,35 +1,88 @@
-import React from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import "./RecommendedEvents.scss";
+import axios from "axios";
 
 import { Icon } from '@iconify-icon/react/dist/iconify.mjs';
-import { useFetch } from "../../../../hooks/useFetch";
 import { useNavigate } from "react-router-dom";
-
-
+import { useNotification } from "../../../../NotificationContext";
 import HeaderContainer from "../../../../components/HeaderContainer/HeaderContainer";
 import EventCard from "./RecommendedEventPreviewCard/RecommendedEventPreviewCard";
 import RecommendedRoomCard from "../../../../components/RecommendedRoomCard/RecommendedRoomCard";
 
 const RecommendedEvents = () => {
-    // need to add more stuff to this algo, ensure control on how many we can fetch and add other ways to grab if no friend events are found
-    const { data: eventsData, loading, error } = useFetch('/friends-events');
-    const { data: roomData, loading: roomLoading, error: roomError } = useFetch('/get-recommendation');
+    const [eventsData, setEventsData] = useState(null);
+    const [roomData, setRoomData] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [roomLoading, setRoomLoading] = useState(true);
+    
+    // Use refs to track if requests have been initiated to prevent duplicate calls
+    const eventsRequestInitiated = useRef(false);
+    const roomRequestInitiated = useRef(false);
+    
     const navigate = useNavigate();
-
-    if (loading) {
-        return <div>Loading...</div>;
-    }
-
-    if (error) {
-        return <div>Error: {error}</div>;
-    }
-
+    const { addNotification } = useNotification();
+    
     const events = Array.isArray(eventsData) ? eventsData : 
                    eventsData?.events ? eventsData.events : 
                    eventsData?.data ? eventsData.data : [];
 
     const recommendedRoom = roomData?.data || null;
 
+    // Memoized fetch functions to prevent recreating on every render
+    const fetchEvents = useCallback(async () => {
+        if (eventsRequestInitiated.current) return; // Prevent duplicate calls
+        eventsRequestInitiated.current = true;
+        
+        try {
+            setLoading(true);
+            const response = await axios({
+                url: '/event-recommendation',
+                params: { limit: 5 },
+                method: 'GET',
+                withCredentials: true,
+            });
+            setEventsData(response.data);
+        } catch (error) {
+            console.error('Error fetching events:', error);
+            addNotification({
+                title: 'Error', 
+                message: 'Error fetching events', 
+                type: 'error'
+            });
+        } finally {
+            setLoading(false);
+        }
+    }, []); // Empty dependency array since we don't want this to recreate
+
+    const fetchRoomRecommendation = useCallback(async () => {
+        if (roomRequestInitiated.current) return; // Prevent duplicate calls
+        roomRequestInitiated.current = true;
+        
+        try {
+            setRoomLoading(true);
+            const response = await axios({
+                url: '/get-recommendation',
+                method: 'GET',
+                withCredentials: true,
+            });
+            setRoomData(response.data);
+        } catch (error) {
+            console.error('Error fetching recommended room:', error);
+            addNotification({
+                title: 'Error', 
+                message: 'Error fetching recommended room', 
+                type: 'error'
+            });
+        } finally {
+            setRoomLoading(false);
+        }
+    }, []); // Empty dependency array since we don't want this to recreate
+
+    // Effect to trigger initial data fetching
+    useEffect(() => {
+        fetchEvents();
+        fetchRoomRecommendation();
+    }, [fetchEvents, fetchRoomRecommendation]);
 
   const exploreButton = (
     <div className="explore-events-button" onClick={() => navigate('/events-dashboard?page=0')}>
