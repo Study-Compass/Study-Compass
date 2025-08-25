@@ -4,7 +4,6 @@ import { Icon } from '@iconify-icon/react';
 import { useFetch } from '../../hooks/useFetch';
 import './EventsByCreator.scss';
 import Event from '../EventsViewer/EventsGrid/EventsColumn/Event/Event';
-import EnhancedLoader from '../Loader/EnhancedLoader';
 import EventSkeleton from '../EventsList/EventSkeleton';
 
 function EventsByCreator({ eventId, creatorName, creatorType }) {
@@ -57,7 +56,7 @@ function EventsByCreator({ eventId, creatorName, creatorType }) {
             </div>
             <div className="events-grid">
                 {creatorEvents.events.map((event) => (
-                    <Event key={event.id} event={event} />
+                    <Event key={event._id} event={event} />
                 ))}
             </div>
         </div>

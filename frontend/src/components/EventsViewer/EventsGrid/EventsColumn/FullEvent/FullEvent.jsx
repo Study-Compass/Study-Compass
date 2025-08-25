@@ -50,8 +50,9 @@ function FullEvent({ event }){
             hostingName = event.hostingId.org_name;
             level = "Organization";
         }
+        // onClick={()=>{level === "Organization" && navigate(`/org/${hostingName}`)}}
         return (
-            <div className={`row hosting ${level.toLowerCase()}`} onClick={()=>{level === "Organization" && navigate(`/org/${hostingName}`)}}>
+            <div className={`row hosting ${level.toLowerCase()}`}>
                 <p>Hosted by</p>
                 <img src={hostingImage} alt="" />
                 <p className="user-name">{hostingName}</p>

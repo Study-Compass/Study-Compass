@@ -1,8 +1,6 @@
 import React, { useCallback, useRef, useEffect } from 'react';
 import Event from '../EventsViewer/EventsGrid/EventsColumn/Event/Event';
 import Loader from '../Loader/Loader';
-import EnhancedLoader from '../Loader/EnhancedLoader';
-import EventSkeleton from './EventSkeleton';
 import useBulkRSVP from '../../hooks/useBulkRSVP';
 import './EventsList.scss';
 
@@ -71,13 +69,7 @@ const EventsList = ({
     }, []);
 
     if (groupedEvents.length === 0) {
-        if (loading) {
-            return (
-                <div className="events-list" role="list" aria-label="Events list">
-                    <EventSkeleton count={6} />
-                </div>
-            );
-        }
+
         
         return (
             <div className="no-events" role="status">
@@ -119,15 +111,7 @@ const EventsList = ({
                     })}
                 </div>
             ))}
-            {loading && page > 1 && (
-                <div className="loading-more-container">
-                    <EnhancedLoader 
-                        type="compact" 
-                        message="Loading more events..." 
-                        size="small"
-                    />
-                </div>
-            )}
+
         </div>
     );
 };
