@@ -24,7 +24,12 @@ const RSVPButton = ({ event, onRSVPUpdate }) => {
         }
     }, [rsvpData]);
 
-    const handleRSVP = async (status) => {
+    const handleRSVP = async (status, domEvent) => {
+        // Prevent event propagation to avoid triggering parent click handlers
+        if (domEvent) {
+            domEvent.stopPropagation();
+        }
+        
         if (!user) {
             addNotification({
                 title: "Login Required",
@@ -98,7 +103,7 @@ const RSVPButton = ({ event, onRSVPUpdate }) => {
         <div className="rsvp-button-container">
             <button
                 className={`rsvp-btn going ${rsvpStatus?.status === 'going' ? 'active' : ''} ${isAtCapacity ? 'disabled' : ''}`}
-                onClick={() => !isAtCapacity && handleRSVP('going')}
+                onClick={(e) => !isAtCapacity && handleRSVP('going', e)}
                 disabled={loading || isAtCapacity}
                 title="I'm going"
             >
@@ -107,7 +112,7 @@ const RSVPButton = ({ event, onRSVPUpdate }) => {
             </button>
             <button
                 className={`rsvp-btn maybe ${rsvpStatus?.status === 'maybe' ? 'active' : ''}`}
-                onClick={() => handleRSVP('maybe')}
+                onClick={(e) => handleRSVP('maybe', e)}
                 disabled={loading}
                 title="Maybe"
             >
@@ -116,7 +121,7 @@ const RSVPButton = ({ event, onRSVPUpdate }) => {
             </button>
             <button
                 className={`rsvp-btn not-going ${rsvpStatus?.status === 'not-going' ? 'active' : ''}`}
-                onClick={() => handleRSVP('not-going')}
+                onClick={(e) => handleRSVP('not-going', e)}
                 disabled={loading}
                 title="Not going"
             >

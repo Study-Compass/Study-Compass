@@ -247,7 +247,7 @@ function Explore(){
                                         </div>
                                         <div className="legend-content" role="list" aria-label="Event type color legend">
                                             <div className="legend-item" role="listitem">
-                                                <div className="legend-item-color" style={{backgroundColor: 'rgba(250, 117, 109, 1)'}} aria-label="Campus event color"></div>
+                                                <div className="legend-item-color" style={{backgroundColor: '#6D8EFA'}} aria-label="Campus event color"></div>
                                                 <p>campus</p>
                                             </div>
                                             <div className="legend-item" role="listitem">
@@ -279,8 +279,8 @@ function Explore(){
                         <aside className="sidebar mobile-sidebar" role="complementary" aria-label="Event filters and view options">
                             <div className="sidebar-header">
                                 <div className="logo">
-                                    <img src={compass} alt="Compass icon" />
-                                    <h2>explore</h2>
+                                    <h2>Events at</h2>
+                                    <img src={RPIlogo} alt="RPI Logo" />
                                 </div>
                                 <Switch
                                     options={['list', 'calendar']}

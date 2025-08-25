@@ -13,6 +13,7 @@ function Dashboard({ menuItems, children, additionalClass = '', middleItem=null,
     const [currentSubItems, setCurrentSubItems] = useState(null);
     const [isTransitioning, setIsTransitioning] = useState(false);
     const [contentOpacity, setContentOpacity] = useState(1);
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const [transitionDirection, setTransitionDirection] = useState('right');
@@ -35,6 +36,30 @@ function Dashboard({ menuItems, children, additionalClass = '', middleItem=null,
 
     // Check if menuItems have elements or if we're using the old children pattern
     const hasElementsInMenuItems = menuItems && menuItems.length > 0 && menuItems[0].element;
+
+    // Close mobile menu when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (width < 768 && isMobileMenuOpen) {
+                const sidebar = document.querySelector('.dash-left');
+                const hamburger = document.querySelector('.mobile-hamburger');
+                if (sidebar && !sidebar.contains(event.target) && hamburger && !hamburger.contains(event.target)) {
+                    setIsMobileMenuOpen(false);
+                }
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, [isMobileMenuOpen, width]);
+
+    // Close mobile menu when navigating
+    const handleMobileNavigation = (callback) => {
+        if (width < 768) {
+            setIsMobileMenuOpen(false);
+        }
+        callback();
+    };
 
     useEffect(() => {
         // Get the page from URL parameters, default to 0 if not specified
@@ -107,6 +132,10 @@ function Dashboard({ menuItems, children, additionalClass = '', middleItem=null,
         }, 200);
     }
 
+    const handlePageChangeWithMobile = (index) => {
+        handleMobileNavigation(() => handlePageChange(index));
+    };
+
     const handleSubItemClick = useCallback((parentIndex, subIndex, subItems) => {
         if (enableSubSidebar && subItems && subItems.length > 0) {
             // Start opacity transition
@@ -142,7 +171,7 @@ function Dashboard({ menuItems, children, additionalClass = '', middleItem=null,
             }, 500);
         } else {
             // Regular page change
-            handlePageChange(parentIndex);
+            handlePageChangeWithMobile(parentIndex);
         }
     }, [enableSubSidebar, navigate]);
 
@@ -240,24 +269,26 @@ function Dashboard({ menuItems, children, additionalClass = '', middleItem=null,
                                     );
                                 } else {
                                     // For sub-menu items without sub-items, just update display and URL
-                                    setContentOpacity(0);
-                                    setTimeout(() => {
-                                        setCurrentDisplay(index);
-                                        const currentParentIndex = navigationStack[navigationStack.length - 1]?.parentIndex || 0;
-                                        navigate(`?page=${currentParentIndex}&sub=${index}`, { replace: true });
-                                        
-                                        // Fade content back in
+                                    handleMobileNavigation(() => {
+                                        setContentOpacity(0);
                                         setTimeout(() => {
-                                            setContentOpacity(1);
-                                        }, 50);
-                                    }, 200);
+                                            setCurrentDisplay(index);
+                                            const currentParentIndex = navigationStack[navigationStack.length - 1]?.parentIndex || 0;
+                                            navigate(`?page=${currentParentIndex}&sub=${index}`, { replace: true });
+                                            
+                                            // Fade content back in
+                                            setTimeout(() => {
+                                                setContentOpacity(1);
+                                            }, 50);
+                                        }, 200);
+                                    });
                                 }
                             } else {
                                 // Main menu items
                                 if (enableSubSidebar && item.subItems && item.subItems.length > 0) {
                                     handleSubItemClick(index, 0, item.subItems);
                                 } else {
-                                    handlePageChange(index);
+                                    handlePageChangeWithMobile(index);
                                 }
                             }
                         }}>
@@ -320,15 +351,25 @@ function Dashboard({ menuItems, children, additionalClass = '', middleItem=null,
                 '--secondary-color': secondaryColor,
             }}
         >
+            {/* Mobile backdrop overlay */}
+            {width < 768 && isMobileMenuOpen && (
+                <div 
+                    className="mobile-backdrop" 
+                    onClick={() => setIsMobileMenuOpen(false)}
+                />
+            )}
             {
                 width < 768 && 
                 (
                     <div className="mobile-heading">
+                        <div className="mobile-hamburger" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
+                            <Icon icon="material-symbols:menu" />
+                        </div>
                         <img src={logo} alt="Logo" />
                     </div>
                 )
             }
-            <div className={`dash-left ${expanded ? "hidden" : ""}`}>
+            <div className={`dash-left ${expanded ? "hidden" : ""} ${isMobileMenuOpen ? "mobile-open" : ""}`}>
                 <div className="top">
                     <div className="logo">
                         <img src={logo} alt="Logo" />
@@ -377,15 +418,15 @@ function Dashboard({ menuItems, children, additionalClass = '', middleItem=null,
                             </div>
                             <div className="user-info">
                                 <p className="username">{user.name}</p>
-                                <p className="email">{user.email}</p>
+                                <p className="email">@{user.username}</p>
                             </div>
                         </div>
                         )
                     }
-                    <div className="back" onClick={() => navigate('/room/none')}>
+                    {/* <div className="back" onClick={() => navigate('/room/none')}>
                         <Icon icon="ep:back" />
-                        <p>Back to Study Compass</p>
-                    </div>
+                        <p>Back to Meridian</p>
+                    </div> */}
                 </div>
             </div>
             <div className={`dash-right ${expandedClass}`}>

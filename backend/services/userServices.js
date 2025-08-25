@@ -96,14 +96,14 @@ function getRedirectUri(url) {
     const allowedOrigins = [
         'http://localhost:3000/login',
         'http://localhost:3000/register',
-        'https://study-compass.com/login',
-        'https://study-compass.com/register',
-        'https://www.study-compass.com/login',
-        'https://www.study-compass.com/register',
-        'https://rpi.study-compass.com/login',
-        'https://rpi.study-compass.com/register',
-        'https://berkeley.study-compass.com/login',
-        'https://berkeley.study-compass.com/register'
+        'https://meridian.study/login',
+        'https://meridian.study/register',
+        'https://www.meridian.study/login',
+        'https://www.meridian.study/register',
+        'https://rpi.meridian.study/login',
+        'https://rpi.meridian.study/register',
+        'https://berkeley.meridian.study/login',
+        'https://berkeley.meridian.study/register'
     ];
 
     if(!allowedOrigins.includes(uri)) {

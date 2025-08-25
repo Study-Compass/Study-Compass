@@ -53,7 +53,7 @@ function EventsDash({  }){
                     </div>
                 </div>
             )}
-            <Dashboard menuItems={menuItems} additionalClass='events-dash' logo={eventsLogo} primaryColor='#BDB2FF' secondaryColor='rgba(189, 178, 255, 0.15)' >
+            <Dashboard menuItems={menuItems} additionalClass='events-dash' logo={eventsLogo} primaryColor='#6D8EFA' secondaryColor='rgba(109, 142, 250, 0.15)' >
             </Dashboard>
         </>
     )

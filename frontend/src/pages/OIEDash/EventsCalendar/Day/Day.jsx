@@ -81,7 +81,7 @@ function Day({ height, start = new Date(new Date().setHours(0, 0, 0, 0)) , start
                     <h1 id="day-display">
                         {startingText}{nav && (
                             <span className={isToday ? 'today' : ''}>
-                                {dayText}{isToday && ' (today)'}
+                                {dayText}
                             </span>
                         )}
                     </h1>

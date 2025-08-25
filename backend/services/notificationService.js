@@ -430,7 +430,7 @@ class NotificationService {
         let url = action.url;
         if (req && req.headers && req.headers.cookie && url && url.startsWith('/')) {
             headers.Cookie = req.headers.cookie;
-            const baseUrl = process.env.NODE_ENV === 'production' ? `https://${req.school}.study-compass.com` : 'http://localhost:5001';
+            const baseUrl = process.env.NODE_ENV === 'production' ? `https://${req.school}.meridian.study` : 'http://localhost:5001';
             url = baseUrl + url;
         }
         // Optionally, add more headers (user-agent, etc.)

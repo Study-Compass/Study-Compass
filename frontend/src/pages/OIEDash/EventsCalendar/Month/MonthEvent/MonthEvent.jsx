@@ -67,7 +67,7 @@ function MonthEvent({ event }) {
         if(event.type === 'study'){
             return '#000000';
         } else if(event.type === 'campus'){
-            return '#FBD8D6';
+            return '#D3DDFD';
         } else if(event.type === 'alumni'){
             return '#D6D6D6';
         } else if(event.type === 'sports'){
@@ -83,7 +83,7 @@ function MonthEvent({ event }) {
         if(event.type === 'study'){
             return '#000000';
         } else if(event.type === 'campus'){
-            return 'rgba(250, 117, 109, 1)';
+            return '#6D8EFA';
         } else if(event.type === 'alumni'){
             return '#5C5C5C';
         } else if(event.type === 'sports'){
