@@ -17,8 +17,8 @@ function Layout() {
       <Banner visible={visible} setVisible={setVisible} bannerType="default" />
       
       {/* This will render the content of the page (children) */}
-      <main>
-        <div className="out" >
+      <main style={{height:viewport}}>
+        <div className="out" style={{height:viewport}}>
             <Outlet />      
         </div>
       </main>
