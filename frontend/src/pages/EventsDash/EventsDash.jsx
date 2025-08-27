@@ -12,9 +12,11 @@ import useAuth from '../../hooks/useAuth';
 import Friends from '../Friends/Friends';
 
 
-function EventsDash({  }){
+
+function EventsDash({}){
     const [showLoading, setShowLoading] = useState(false);
-    const { user } = useAuth();
+    const { user, isAuthenticating } = useAuth();
+
     
     // Create menu items based on authentication status
     const getMenuItems = () => {
@@ -55,7 +57,7 @@ function EventsDash({  }){
 
     return (
         <>
-            {showLoading && (
+            {showLoading && !isAuthenticating && !user && (
                 <div 
                     className="loading-overlay" 
                     role="status" 
