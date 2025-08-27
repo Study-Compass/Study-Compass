@@ -55,6 +55,18 @@ function EventsDash({}){
         return () => clearTimeout(timer);
     }, []);
 
+    return(
+        // maintenance
+        <div className="maintenance">
+            <img src={eventsLogo} alt="Events Logo" />
+            <div className="maintenance-content">
+                <h1>Maintenance</h1>
+                <p>We are currently performing maintenance on the events dashboard. Please check back later.</p>
+            </div>
+        </div>
+
+    )
+
     return (
         <>
             {showLoading && !isAuthenticating && !user && (
