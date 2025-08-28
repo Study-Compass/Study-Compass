@@ -12,6 +12,7 @@ import useAuth from '../../hooks/useAuth';
 import Friends from '../Friends/Friends';
 import EventsGrad from '../../assets/Gradients/EventsGrad.png';
 import Popup from '../../components/Popup/Popup';
+import EventsAnalytics from '../../components/EventsAnalytics/EventsAnalytics';
 
 // Sign-up prompt component
 const SignUpPrompt = ({ onSignUp, onExplore, handleClose }) => {
@@ -125,6 +126,15 @@ function EventsDash({}){
                 icon: 'mingcute:calendar-fill',
                 element: <Friends />
             });
+            
+            // Add Analytics tab for admin users
+            if (user.roles && user.roles.includes('admin')) {
+                items.push({
+                    label: 'Analytics', 
+                    icon: 'mingcute:chart-fill',
+                    element: <EventsAnalytics />
+                });
+            }
         }
         
         return items;

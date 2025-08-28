@@ -12,12 +12,14 @@ import Header from '../../components/Header/Header';
 import RSVPSection from '../../components/RSVPSection/RSVPSection';
 import EventsByCreator from '../../components/EventsByCreator/EventsByCreator';
 import Logo from '../../assets/Brand Image/BEACON.svg';
+import EventAnalytics from '../../components/EventAnalytics/EventAnalytics';
 
 function EventPage() {
     const { eventId } = useParams();
     const navigate = useNavigate();
     const { user } = useAuth();
     const { addNotification } = useNotification();
+    const [activeTab, setActiveTab] = useState('details');
     
     // Fetch event data
     const { data: eventData, loading: eventLoading, error: eventError } = useFetch(
@@ -152,9 +154,36 @@ function EventPage() {
                     )}
                     <RSVPSection event={eventData.event} />
                     
+                    {/* Analytics Tab for Admin Users */}
+                    {user && user.roles && user.roles.includes('admin') && (
+                        <div className="analytics-tab">
+                            <div className="tab-buttons">
+                                <button 
+                                    className={activeTab === 'details' ? 'active' : ''}
+                                    onClick={() => setActiveTab('details')}
+                                >
+                                    Event Details
+                                </button>
+                                <button 
+                                    className={activeTab === 'analytics' ? 'active' : ''}
+                                    onClick={() => setActiveTab('analytics')}
+                                >
+                                    <Icon icon="mingcute:chart-fill" />
+                                    Analytics
+                                </button>
+                            </div>
+                            
+                            {activeTab === 'analytics' && (
+                                <div className="analytics-content">
+                                    <EventAnalytics />
+                                </div>
+                            )}
+                        </div>
+                    )}
+                    
                     {/* More Events by This Creator Section */}
                 </div>
-                    {eventData.event && (
+                    {eventData.event && activeTab === 'details' && (
                         <EventsByCreator 
                             eventId={eventId}
                             creatorName={eventData.event.hostingType === "User" 

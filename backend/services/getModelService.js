@@ -31,6 +31,7 @@ const formSchema = require('../events/schemas/form');
 const formResponseSchema = require('../events/schemas/formResponse');
 const orgVerificationSchema = require('../schemas/orgVerification');
 const orgManagementConfigSchema = require('../schemas/orgManagementConfig');
+const eventAnalyticsSchema = require('../schemas/eventAnalytics');
 
 
 const getModels = (req, ...names) => {
@@ -64,7 +65,8 @@ const getModels = (req, ...names) => {
         OrgManagementConfig: req.db.model('OrgManagementConfig', orgManagementConfigSchema, 'orgManagementConfigs'),
         OrgMemberApplication: req.db.model('OrgMemberApplication', orgMemberApplicationSchema, 'orgMemberApplications'),
         SAMLConfig: req.db.model('SAMLConfig', samlConfigSchema, 'samlConfigs'),
-        Notification: req.db.model('Notification', notificationSchema, 'notifications')
+        Notification: req.db.model('Notification', notificationSchema, 'notifications'),
+        EventAnalytics: req.db.model('EventAnalytics', eventAnalyticsSchema, 'eventAnalytics')
     };
 
     return names.reduce((acc, name) => {

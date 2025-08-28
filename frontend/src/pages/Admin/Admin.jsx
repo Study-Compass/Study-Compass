@@ -11,6 +11,7 @@ import General from './General/General'
 import BadgeManager from './BadgeManager/BadgeManager';
 import ManageUsers from './ManageUsers/ManageUsers';
 import QRManager from './QRManager/QRManager';
+import EventsAnalytics from '../../components/EventsAnalytics/EventsAnalytics';
 
 import eventsLogo from '../../assets/Brand Image/EventsLogo.svg';
 
@@ -49,6 +50,11 @@ function Admin(){
             label: 'Analytics', 
             icon: 'bx:stats',
             element: <Analytics/>
+        },
+        { 
+            label: 'Events Analytics', 
+            icon: 'mingcute:chart-fill',
+            element: <EventsAnalytics/>
         },
         { 
             label: 'Manage Users', 
