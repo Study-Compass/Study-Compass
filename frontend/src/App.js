@@ -46,6 +46,7 @@ import CreateEvent from './pages/CreateEvent/CreateEvent';
 import EventsDash from './pages/EventsDash/EventsDash';
 import EventPage from './pages/EventPage/EventPage';
 import SubSidebarExample from './components/Dashboard/SubSidebarExample';
+import RebrandingNotice from './components/RebrandingNotice/RebrandingNotice';
 
 function App() {
     useEffect(() => {
@@ -109,6 +110,7 @@ function App() {
     // document.documentElement.classList.add('dark-mode');
     return (
         <GoogleOAuthProvider clientId="639818062398-k4qnm9l320phu967ctc2l1jt1sp9ib7p.apps.googleusercontent.com">
+            <RebrandingNotice />
             <ErrorProvider>
                 <NotificationProvider>
                     <WebSocketProvider>
