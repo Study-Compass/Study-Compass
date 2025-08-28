@@ -52,7 +52,7 @@ const RebrandingNotice = () => {
                 }
                 return prev - 1;
             });
-        }, 1000000);
+        }, 1000);
 
         return () => clearInterval(timer);
     }, []);
