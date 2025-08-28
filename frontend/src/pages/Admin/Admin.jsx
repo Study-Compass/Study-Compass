@@ -19,6 +19,7 @@ import './Admin.scss';
 
 function Admin(){
     const { user } = useAuth();
+    const navigate = useNavigate();
 
     const [showPage, setShowPage] = useState("analytics");
 
@@ -67,7 +68,7 @@ function Admin(){
     ]
 
     return(
-        <Dashboard menuItems={menuItems} additionalClass='admin' logo={eventsLogo}>
+        <Dashboard menuItems={menuItems} additionalClass='admin' logo={eventsLogo} onBack={()=>navigate('/events-dashboard')}>
         </Dashboard>
     );
 }

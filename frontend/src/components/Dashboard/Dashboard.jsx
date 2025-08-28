@@ -6,7 +6,7 @@ import { Icon } from '@iconify-icon/react';
 import ProfilePopup from '../ProfilePopup/ProfilePopup';
 import './Dashboard.scss'
 
-function Dashboard({ menuItems, children, additionalClass = '', middleItem=null, logo, primaryColor, secondaryColor, enableSubSidebar = false, defaultPage = 0} ) {
+function Dashboard({ menuItems, children, additionalClass = '', middleItem=null, logo, primaryColor, secondaryColor, enableSubSidebar = false, defaultPage = 0, onBack=null} ) {
     const [expanded, setExpanded] = useState(false);
     const [expandedClass, setExpandedClass] = useState("");
     const [currentDisplay, setCurrentDisplay] = useState(0);
@@ -457,10 +457,8 @@ function Dashboard({ menuItems, children, additionalClass = '', middleItem=null,
                         />
                         )
                     }
-                    {/* <div className="back" onClick={() => navigate('/room/none')}>
-                        <Icon icon="ep:back" />
-                        <p>Back to Meridian</p>
-                    </div> */}
+                    
+                    
                     {
                         width > 768 && !user && (
                             //login
@@ -469,6 +467,15 @@ function Dashboard({ menuItems, children, additionalClass = '', middleItem=null,
                             }}>
                                 Login
                             </button>
+                        )
+                    }
+                                        
+                    {
+                        onBack && (
+                            <div className="back" onClick={onBack}>
+                                <Icon icon="ep:back" />
+                                <p>Back</p>
+                            </div>
                         )
                     }
                 </div>

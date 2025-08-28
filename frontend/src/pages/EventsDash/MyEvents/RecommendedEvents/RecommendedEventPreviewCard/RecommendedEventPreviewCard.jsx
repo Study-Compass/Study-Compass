@@ -1,8 +1,10 @@
 import React from "react";
 import "./RecommendedEventPreviewCard.scss";
 import { Icon } from '@iconify-icon/react/dist/iconify.mjs';
+import { useNavigate } from "react-router-dom";
 
 const RecommendedEventPreviewCard = ({ event }) => {
+    const navigate = useNavigate();
   const date = new Date(event?.start_time || Date.now());
 
   // Color mapping based on event type (from Explore.jsx color legend)
@@ -22,7 +24,7 @@ const RecommendedEventPreviewCard = ({ event }) => {
   const hasPreviewImage = event?.image || event?.previewImage;
 
   return (
-    <div className="recommended-event-preview-card">
+    <div className="recommended-event-preview-card" onClick={()=>{navigate(`/event/${event._id}`)}}>
       {/* Preview Image or Gradient */}
       <div 
         className={`event-image ${!hasPreviewImage ? 'gradient-background' : ''}`}

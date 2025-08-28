@@ -63,6 +63,12 @@ function EventPage() {
         );
     };
 
+    useEffect(()=>{
+        if(eventError){
+            console.log(eventError);
+        }
+    },[eventError]);
+
     // RSVP section now handled by RSVPSection component
 
     if (eventLoading) {
@@ -78,24 +84,25 @@ function EventPage() {
         );
     }
 
-    if (eventError || !eventData?.event) {
-        return (
-            <div className="event-page">
-                            <div className="header">
-                <img src={Logo} alt="Logo" className="logo" />
-            </div>
-                <div className="error-container">
-                    <Icon icon="mdi:alert-circle" className="error-icon" />
-                    <h2>Event Not Found</h2>
-                    <p>The event you're looking for doesn't exist or has been removed.</p>
-                    <button onClick={() => navigate('/events-dashboard')} className="back-button">
-                        <Icon icon="mdi:arrow-left" />
-                        Back to Events
-                    </button>
-                </div>
-            </div>
-        );
-    }
+    // if (eventError) {
+    //     console.log(eventError);
+    //     return (
+    //         <div className="event-page">
+    //                         <div className="header">
+    //             <img src={Logo} alt="Logo" className="logo" />
+    //         </div>
+    //             <div className="error-container">
+    //                 <Icon icon="mdi:alert-circle" className="error-icon" />
+    //                 <h2>Event Not Found</h2>
+    //                 <p>The event you're looking for doesn't exist or has been removed.</p>
+    //                 <button onClick={() => navigate('/events-dashboard')} className="back-button">
+    //                     <Icon icon="mdi:arrow-left" />
+    //                     Back to Events
+    //                 </button>
+    //             </div>
+    //         </div>
+    //     );
+    // }
 
     const event = eventData.event;
     const date = new Date(event.start_time);
