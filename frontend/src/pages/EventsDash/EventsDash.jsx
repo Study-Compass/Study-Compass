@@ -81,7 +81,6 @@ function EventsDash({}){
     const shouldShowSignUpPrompt = () => {
         const lastPromptDate = localStorage.getItem('lastSignUpPromptDate');
         if (!lastPromptDate) return true;
-        return true;
         
         const today = new Date().toDateString();
         return lastPromptDate !== today;
