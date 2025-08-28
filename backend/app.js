@@ -117,6 +117,7 @@ const adminRoutes = require('./routes/adminRoutes.js');
 const eventsRoutes = require('./events/index.js');
 const notificationRoutes = require('./routes/notificationRoutes.js');
 const qrRoutes = require('./routes/qrRoutes.js');
+const eventAnalyticsRoutes = require('./routes/eventAnalyticsRoutes.js');
 
 app.use(authRoutes);
 app.use('/auth/saml', samlRoutes);
@@ -124,6 +125,7 @@ app.use(dataRoutes);
 app.use(friendRoutes);
 app.use(userRoutes);
 app.use(analyticsRoutes);
+app.use('/event-analytics', eventAnalyticsRoutes);
 
 app.use(classroomChangeRoutes);
 app.use(ratingRoutes);

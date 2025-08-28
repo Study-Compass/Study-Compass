@@ -96,6 +96,53 @@
         position: relative;
         z-index: 2;
 
+        .analytics-tab {
+            margin-top: 2rem;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+
+            .tab-buttons {
+                display: flex;
+                border-bottom: 1px solid #e0e0e0;
+
+                button {
+                    flex: 1;
+                    padding: 1rem;
+                    border: none;
+                    background: transparent;
+                    font-size: 1rem;
+                    font-weight: 500;
+                    color: #666;
+                    cursor: pointer;
+                    transition: all 0.2s ease;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 0.5rem;
+
+                    &:hover {
+                        background: #f8f9fa;
+                        color: #333;
+                    }
+
+                    &.active {
+                        background: #6D8EFA;
+                        color: white;
+                    }
+
+                    iconify-icon {
+                        font-size: 1.25rem;
+                    }
+                }
+            }
+
+            .analytics-content {
+                padding: 0;
+            }
+        }
+
         .image-container {
             width: 100%;
             height: 300px;
