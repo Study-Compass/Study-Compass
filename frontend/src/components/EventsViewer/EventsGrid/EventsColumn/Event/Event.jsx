@@ -16,18 +16,7 @@ function Event({event, hasFriendsFilter = false, rsvpStatus, onRSVPStatusUpdate}
     // Use pre-computed friends data from backend
     const friendsGoing = event.friendsGoing || 0;
 
-    // Debug logging to see what's happening with friendsGoing
-    console.log('Event component debug:', {
-        eventId: event._id,
-        eventName: event.name,
-        friendsGoing: event.friendsGoing,
-        friendsGoingCalculated: friendsGoing,
-        user: user ? 'authenticated' : 'not authenticated',
-        hasFriendsFilter,
-        rsvpEnabled: event.rsvpEnabled,
-        rsvpStats: event.rsvpStats,
-        attendees: event.attendees ? event.attendees.length : 0
-    });
+    // Debug logging to see what's happening with friendsGoing  
 
     const renderHostingStatus = () => {
         let hostingImage = '';

@@ -147,7 +147,7 @@ function Friends() {
 
     return (
         
-        <div className="friends component dash" style={{height: viewport}}>
+        <div className="friends dash" style={{height: viewport}}>
             <div className={`dark-overlay ${showSearch ? "active" : ""}`}></div>
             <header className="header">
                 <img src={EventsGrad} alt="" />

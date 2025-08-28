@@ -312,6 +312,7 @@
         background-color: var(--background);
         box-shadow: var(--shadow);
         width:calc(100% - 200px);
+        max-width:calc(100% - 200px);
         height: 100vh;
         max-height:100%;
         height:100%;
@@ -441,6 +442,10 @@
                 }
             }
         }
+        .dash-right{
+            width:100%;
+            max-width:calc(100% - 150px);
+        }
     }
 }
 
@@ -508,6 +513,7 @@
         .dash-right{
             width:100%;
             z-index: 1;
+            max-width:100%;
             .dash{
                 header.header{
                     h1{
