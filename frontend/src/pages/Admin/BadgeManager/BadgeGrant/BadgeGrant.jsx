@@ -7,7 +7,7 @@ import Popup from '../../../../components/Popup/Popup';
 import ActivateBadge from '../ActivateBadge/ActivateBadge';
 import MockBadge from '../../../../components/Interface/MockBadge/MockBadge';
 
-const BadgeGrant = ({badgeGrant}) => {
+const BadgeGrant = ({badgeGrant, onRefresh}) => {
     const { addNotification } = useNotification();
 
     const today = new Date();
@@ -18,8 +18,37 @@ const BadgeGrant = ({badgeGrant}) => {
     const [addPopup, setAddPopup] = useState(false);
     const [activateDays, setActivateDays] = useState(0);
 
-    async function onActivateDays(){
-        
+    async function onActivateDays(daysValid){
+        try {
+            const response = await postRequest('/renew-badge-grant', {
+                badgeGrantId: badgeGrant._id,
+                daysValid: daysValid
+            });
+            
+            if (response.error) {
+                addNotification({
+                    title: 'Error',
+                    message: response.error,
+                    type: 'error'
+                });
+            } else {
+                addNotification({
+                    title: 'Success',
+                    message: 'Badge grant activated successfully',
+                    type: 'success'
+                });
+                setActivatePopup(false);
+                if (onRefresh) {
+                    onRefresh();
+                }
+            }
+        } catch (error) {
+            addNotification({
+                title: 'Error',
+                message: 'Failed to activate badge grant',
+                type: 'error'
+            });
+        }
     }
 
     return (
@@ -27,7 +56,7 @@ const BadgeGrant = ({badgeGrant}) => {
             <Popup onClose={()=>setActivatePopup(false)} isOpen={activatePopup} customClassName='narrow-content'>
                 {/* activate popup */}  
                 {
-                    badgeGrant && <ActivateBadge badgeGrant={badgeGrant}/>
+                    badgeGrant && <ActivateBadge badgeGrant={badgeGrant} onActivate={onActivateDays}/>
                 }
             </Popup>
             <div className="badge-grant">
@@ -54,6 +83,31 @@ const BadgeGrant = ({badgeGrant}) => {
                 <button className={`badge-button ${isInactive ? 'inactive' : 'active'}`} onClick={()=>setActivatePopup(true)}>
                     <p>{isInactive ? 'activate' : 'deactivate'}</p>
                 </button>
+                
+                <div className="badge-hash">
+                    <p>Share URL:</p>
+                    <div className="hash-container">
+                        <input 
+                            type="text" 
+                            value={`${window.location.origin}/new-badge/${badgeGrant.hash}`}
+                            readOnly
+                            onClick={(e) => e.target.select()}
+                        />
+                        <button 
+                            onClick={() => {
+                                navigator.clipboard.writeText(`${window.location.origin}/new-badge/${badgeGrant.hash}`);
+                                addNotification({
+                                    title: 'Copied!',
+                                    message: 'Badge URL copied to clipboard',
+                                    type: 'success'
+                                });
+                            }}
+                            className="copy-btn"
+                        >
+                            Copy
+                        </button>
+                    </div>
+                </div>
 
             </div>
         </>
