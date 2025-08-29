@@ -65,7 +65,7 @@ function RegisterForm() {
             // if(redirectto){
                 // navigate(redirectto, { replace: true });
             // } else {
-                navigate('/room/none', { replace: true });
+                navigate('/events-dashboard', { replace: true });
             // }
         }
     }, [isAuthenticated, navigate]);

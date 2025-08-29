@@ -3,9 +3,10 @@ import './ActivateBadge.scss';
 import postRequest from '../../../../utils/postRequest';
 import MockBadge from '../../../../components/Interface/MockBadge/MockBadge';
 
-const ActivateBadge = ({badgeGrant}) => {
+const ActivateBadge = ({badgeGrant, onActivate}) => {
     const [activateDays, setActivateDays] = useState(0);
     const [activeUntil, setActiveUntil] = useState(null);
+    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(()=>{
         if(activateDays !== 0){
@@ -18,17 +19,36 @@ const ActivateBadge = ({badgeGrant}) => {
         }
     },[activateDays]);
 
+    const handleActivate = async () => {
+        if (activateDays <= 0) {
+            return;
+        }
+        
+        setIsLoading(true);
+        try {
+            await onActivate(activateDays);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
     return (   
         <div className="activate-badge">
             <MockBadge badgeColor={badgeGrant.badgeColor} badgeContent={badgeGrant.badgeContent} isInactive={false}/>
             <div className="activate-input">
                 activate for:
-                <input type="number" value={activateDays} onChange={(e)=>{
-                    if(e.target.value < 0){
-                        return;
-                    }
-                    setActivateDays(e.target.value);
-                    }}/>
+                <input 
+                    type="number" 
+                    value={activateDays} 
+                    onChange={(e)=>{
+                        if(e.target.value < 0){
+                            return;
+                        }
+                        setActivateDays(parseInt(e.target.value) || 0);
+                    }}
+                    min="1"
+                    max="365"
+                />
                 days
             </div>
             {
@@ -39,8 +59,12 @@ const ActivateBadge = ({badgeGrant}) => {
                     </div>
                 )
             }
-            <button>
-                activate
+            <button 
+                onClick={handleActivate}
+                disabled={isLoading || activateDays <= 0}
+                className={isLoading ? 'loading' : ''}
+            >
+                {isLoading ? 'Activating...' : 'Activate'}
             </button>
         </div>
     )

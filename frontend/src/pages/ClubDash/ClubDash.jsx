@@ -15,7 +15,7 @@ import {useFetch} from '../../hooks/useFetch';
 import { use } from 'react';
 import OrgDropdown from './OrgDropdown/OrgDropdown';
 import Dashboard from '../../components/Dashboard/Dashboard';
-import orgLogo from '../../assets/Brand Image/OrgLogo.svg';
+import orgLogo from '../../assets/Brand Image/ATLAS.svg';
 import apiRequest from '../../utils/postRequest';
 import { useLocation } from 'react-router-dom';
 import EventsPanel from './EventsPanel/EventsPanel';

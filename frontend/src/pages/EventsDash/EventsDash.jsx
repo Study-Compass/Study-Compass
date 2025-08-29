@@ -105,6 +105,15 @@ function EventsDash({}){
         }
     }, [isAuthenticating, user, showExplore]);
 
+    useEffect(() => {
+        const newBadgeRedirect = localStorage.getItem('badge');
+        console.log(newBadgeRedirect);
+        if(newBadgeRedirect){
+            navigate(newBadgeRedirect);
+            localStorage.removeItem('badge');
+        }
+    },[]);
+
     // Create menu items based on authentication status
     const getMenuItems = () => {
         const items = [
