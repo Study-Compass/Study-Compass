@@ -56,27 +56,36 @@ const NewBadge = () => {
             }
         }
 
-        if(isAuthenticated){
+        if(isAuthenticated && !isAuthenticating){
             grantBadge();
         } else {
-            return;
+            if(!isAuthenticating && !isAuthenticated){
+                reloadNotification({title: "Please login to access this page", message: "You will be redirected to the login page", type: "error"});
+                localStorage.setItem('badge', location.pathname);
+                //reload
+                setTimeout(() => {
+                    window.location.reload();
+                }, 100);
+                navigate('/login');
+            }
         }
-    }, [isAuthenticated, user ]);
+
+    }, [isAuthenticated, user, isAuthenticating]);
     
 
     if(isAuthenticating){  
         return null;
     }
     
-    if (!user) {
-        reloadNotification({title: "Please login to access this page", message: "You will be redirected to the login page", type: "error"});
-        // setTimeout(() => {
-        //     window.location.reload();
-        // }, 100);
-        localStorage.setItem('badge', location.pathname);
-        console.log(localStorage.getItem('badge'));
-        return <Navigate to="/login" replace/>;
-    } 
+    // if (!isAuthenticated) {
+    //     reloadNotification({title: "Please login to access this page", message: "You will be redirected to the login page", type: "error"});
+    //     // setTimeout(() => {
+    //     //     window.location.reload();
+    //     // }, 100);
+    //     localStorage.setItem('badge', location.pathname);
+    //     console.log(localStorage.getItem('badge'));
+    //     // return <Navigate to="/login" replace/>;
+    // } 
 
     const onClaim = async () => {
         await validateToken();
