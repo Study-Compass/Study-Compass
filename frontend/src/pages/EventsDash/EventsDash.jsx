@@ -106,13 +106,15 @@ function EventsDash({}){
     }, [isAuthenticating, user, showExplore]);
 
     useEffect(() => {
+        if(!isAuthenticating && user){
         const newBadgeRedirect = localStorage.getItem('badge');
         console.log(newBadgeRedirect);
         if(newBadgeRedirect){
             navigate(newBadgeRedirect);
             localStorage.removeItem('badge');
         }
-    },[]);
+    }
+    },[isAuthenticating, user]);
 
     // Create menu items based on authentication status
     const getMenuItems = () => {
