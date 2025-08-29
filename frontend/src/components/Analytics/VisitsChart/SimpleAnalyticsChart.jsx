@@ -123,6 +123,8 @@ const SimpleAnalyticsChart = ({endpoint, heading, color}) => {
                     },
                     y: {
                       display: false,
+                      beginAtZero: true,
+                      min: 0,
                     },
                   },
                   plugins: {

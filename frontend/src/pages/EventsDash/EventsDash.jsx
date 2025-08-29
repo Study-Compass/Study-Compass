@@ -13,6 +13,7 @@ import Friends from '../Friends/Friends';
 import EventsGrad from '../../assets/Gradients/EventsGrad.png';
 import Popup from '../../components/Popup/Popup';
 import EventsAnalytics from '../../components/EventsAnalytics/EventsAnalytics';
+import Room from '../Room/Room1';
 
 // Sign-up prompt component
 const SignUpPrompt = ({ onSignUp, onExplore, handleClose }) => {
@@ -111,6 +112,11 @@ function EventsDash({}){
                 label: 'Explore', 
                 icon: 'mingcute:compass-fill',
                 element: <Explore />
+            },
+            {
+                label: 'Rooms',
+                icon: 'mingcute:calendar-fill',
+                element: <Room hideHeader={true} urlType="embedded" />
             }
         ];
         
@@ -152,7 +158,7 @@ function EventsDash({}){
 
     const handleSignUp = () => {
         setShowSignUpPrompt(false);
-        navigate('/login');
+        navigate('/register');
     };
 
     const handleExplore = () => {

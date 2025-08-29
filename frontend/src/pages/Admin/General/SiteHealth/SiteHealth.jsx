@@ -50,12 +50,14 @@ const SiteHealth = ({}) => {
                 {
                     good ? 
                     <div className="status good">
-                        <div className="operational">
-                            <PulseDot color="var(--green)" size="10px" pulse={true}/>   
+                        <div className="status-text">
+                            <div className="operational">
+                                <PulseDot color="var(--green)" size="10px" pulse={true}/>   
+                            </div>
+                            <h2>
+                                {health.data.subDomain}.meridian.study
+                            </h2>
                         </div>
-                        <h2>
-                            {health.data.subDomain}.meridian.study
-                        </h2>
                         <div className="tag">
                             <Icon icon="icon-park-solid:check-one" />
                             <p>all systems operational</p>

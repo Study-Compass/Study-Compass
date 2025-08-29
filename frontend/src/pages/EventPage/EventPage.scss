@@ -100,12 +100,11 @@
             margin-top: 2rem;
             background: white;
             border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
             overflow: hidden;
+            border: 1px solid var(--lighterborder);
 
             .tab-buttons {
                 display: flex;
-                border-bottom: 1px solid #e0e0e0;
 
                 button {
                     flex: 1;
@@ -121,6 +120,8 @@
                     align-items: center;
                     justify-content: center;
                     gap: 0.5rem;
+                    border-radius: 0;
+                    
 
                     &:hover {
                         background: #f8f9fa;
@@ -130,6 +131,11 @@
                     &.active {
                         background: #6D8EFA;
                         color: white;
+
+                    }
+
+                    &:first-child{
+                        border-right: 1px solid var(--lighterborder);
                     }
 
                     iconify-icon {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import defaultAvatar from '../../assets/defaultAvatar.svg';
 import useAuth from '../../hooks/useAuth';
@@ -9,7 +9,7 @@ import './Dashboard.scss'
 function Dashboard({ menuItems, children, additionalClass = '', middleItem=null, logo, primaryColor, secondaryColor, enableSubSidebar = false, defaultPage = 0, onBack=null} ) {
     const [expanded, setExpanded] = useState(false);
     const [expandedClass, setExpandedClass] = useState("");
-    const [currentDisplay, setCurrentDisplay] = useState(0);
+    const [currentDisplay, setCurrentDisplay] = useState(null); // Initialize as null to prevent flash
     const [navigationStack, setNavigationStack] = useState([]);
     const [currentSubItems, setCurrentSubItems] = useState(null);
     const [isTransitioning, setIsTransitioning] = useState(false);
@@ -22,6 +22,8 @@ function Dashboard({ menuItems, children, additionalClass = '', middleItem=null,
     const [showBackButton, setShowBackButton] = useState(false);
     const [pendingNavigation, setPendingNavigation] = useState(null);
     const [fakeMenuData, setFakeMenuData] = useState(null);
+    const [isInitialized, setIsInitialized] = useState(false); // Track if URL params have been processed
+    const hasInitializedRef = useRef(false); // Track if we've already processed URL params
     
     const [width, setWidth] = useState(window.innerWidth);
     useEffect(() => { //useEffect for window resizing
@@ -38,6 +40,8 @@ function Dashboard({ menuItems, children, additionalClass = '', middleItem=null,
 
     // Check if menuItems have elements or if we're using the old children pattern
     const hasElementsInMenuItems = menuItems && menuItems.length > 0 && menuItems[0].element;
+
+
 
     // Close mobile menu when clicking outside
     useEffect(() => {
@@ -64,9 +68,30 @@ function Dashboard({ menuItems, children, additionalClass = '', middleItem=null,
     };
 
     useEffect(() => {
+        // Ensure menuItems are available before processing
+        if (!menuItems || menuItems.length === 0) {
+            return;
+        }
+        
+        // Only process URL parameters once
+        if (hasInitializedRef.current) {
+            return;
+        }
+        
         // Get the page from URL parameters, default to defaultPage if not specified
-        const page = parseInt(searchParams.get('page') || defaultPage.toString());
+        const pageParam = searchParams.get('page');
+        const page = parseInt(pageParam || defaultPage.toString());
         const sub = searchParams.get('sub');
+        
+        console.log('Dashboard initialization:', { 
+            pageParam, 
+            page, 
+            sub, 
+            menuItemsLength: menuItems.length, 
+            defaultPage, 
+            currentDisplay,
+            searchParams: Object.fromEntries(searchParams.entries())
+        });
         
         if (sub !== null) {
             // We're in a sub-menu context
@@ -77,8 +102,16 @@ function Dashboard({ menuItems, children, additionalClass = '', middleItem=null,
         } else if (page >= 0 && page < menuItems.length) {
             // We're in the main menu
             setCurrentDisplay(page);
+        } else {
+            // Fallback to default page if the parsed page is invalid
+            setCurrentDisplay(defaultPage);
         }
-    }, [searchParams, menuItems.length, defaultPage]);
+        
+        // Mark as initialized after processing URL parameters
+        hasInitializedRef.current = true;
+        setIsInitialized(true);
+        console.log('Dashboard initialized with currentDisplay:', currentDisplay);
+    }, [searchParams, menuItems, defaultPage]);
 
     // Set initial URL if no page parameter is present
     useEffect(() => {
@@ -86,6 +119,19 @@ function Dashboard({ menuItems, children, additionalClass = '', middleItem=null,
             navigate(`?page=${defaultPage}`, { replace: true });
         }
     }, [searchParams, navigate, defaultPage]);
+
+    // Fallback timeout to ensure content is shown even if URL processing fails
+    useEffect(() => {
+        const timeout = setTimeout(() => {
+            if (!isInitialized) {
+                console.warn('Dashboard initialization timeout - falling back to default page');
+                setCurrentDisplay(defaultPage);
+                setIsInitialized(true);
+            }
+        }, 1000); // 1 second timeout
+
+        return () => clearTimeout(timeout);
+    }, [isInitialized, defaultPage]);
 
     // Handle pending navigation after animation completes
     useEffect(() => {
@@ -349,6 +395,34 @@ function Dashboard({ menuItems, children, additionalClass = '', middleItem=null,
             >
                 {renderNavItems(fakeMenuData.items, fakeMenuData.isSubMenu)}
             </nav>
+        );
+    }
+
+    // Don't render anything until we're initialized
+    if (!isInitialized) {
+        return (
+            <div 
+                className={`general-dash ${additionalClass}`} 
+                style={{
+                    '--primary-color': primaryColor,
+                    '--secondary-color': secondaryColor,
+                }}
+            >
+                <div className="dash-left">
+                    <div className="top">
+                        <div className="logo">
+                            <img src={logo} alt="Logo" />
+                        </div>
+                    </div>
+                </div>
+                <div className="dash-right">
+                    <div className="dash-content">
+                        <div className="loading-content">
+                            <div className="loading-spinner"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         );
     }
 

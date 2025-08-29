@@ -67,6 +67,11 @@ export const AuthProvider = ({ children }) => {
                 setAuthMethod('email');
                 console.log(response.data);
                 addNotification({ title:'Logged in successfully',type: 'success'});
+                
+                // Redirect admin users to admin dashboard
+                if (response.data.data.user.roles && response.data.data.user.roles.includes('admin')) {
+                    window.location.href = '/admin';
+                }
             }
         } catch (error) {
             // console.error('Login failed:', error);
@@ -88,6 +93,11 @@ export const AuthProvider = ({ children }) => {
             setUser(response.data.data.user);
             setAuthMethod('google');
             // addNotification({title: 'Logged in successfully',type: 'success'});
+            
+            // Redirect admin users to admin dashboard
+            if (response.data.data.user.roles && response.data.data.user.roles.includes('admin')) {
+                window.location.href = '/admin';
+            }
             // For example, redirect the user or store the received token in local storage
         } catch (error) {
             console.error('Error sending code to backend:', error);

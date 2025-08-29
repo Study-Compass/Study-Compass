@@ -13,7 +13,7 @@ import ManageUsers from './ManageUsers/ManageUsers';
 import QRManager from './QRManager/QRManager';
 import EventsAnalytics from '../../components/EventsAnalytics/EventsAnalytics';
 
-import eventsLogo from '../../assets/Brand Image/EventsLogo.svg';
+import AdminLogo from '../../assets/Brand Image/ADMIN.svg';
 
 
 import './Admin.scss';
@@ -49,12 +49,23 @@ function Admin(){
         { 
             label: 'Analytics', 
             icon: 'bx:stats',
-            element: <Analytics/>
-        },
-        { 
-            label: 'Events Analytics', 
-            icon: 'mingcute:chart-fill',
-            element: <EventsAnalytics/>
+            subItems: [
+                {
+                    label: 'General',
+                    icon: 'bx:stats',
+                    element: <Analytics/>
+                },
+                {
+                    label: 'Events Analytics',
+                    icon: 'material-symbols:event',
+                    element: <EventsAnalytics/>
+                },
+                {
+                    label: 'QR Codes',
+                    icon: 'mingcute:qrcode-fill',
+                    element: <QRManager/>
+                }
+            ]
         },
         { 
             label: 'Manage Users', 
@@ -65,16 +76,17 @@ function Admin(){
             label: 'Badge Grants', 
             icon: 'bx:stats',
             element: <BadgeManager/>
-        },
-        { 
-            label: 'QR Codes', 
-            icon: 'material-symbols:qr-code',
-            element: <QRManager/>
         }
     ]
 
     return(
-        <Dashboard menuItems={menuItems} additionalClass='admin' logo={eventsLogo} onBack={()=>navigate('/events-dashboard')}>
+        <Dashboard 
+            menuItems={menuItems} 
+            additionalClass='admin' 
+            logo={AdminLogo} 
+            onBack={()=>navigate('/events-dashboard')}
+            enableSubSidebar={true}
+        >
         </Dashboard>
     );
 }

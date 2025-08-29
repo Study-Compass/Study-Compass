@@ -85,8 +85,9 @@
         border:none;
         box-shadow: none;
         background-color: transparent;
+        border-radius: 0;
+        scale:1;
         .chart-container{
-            scale: 1.2;
             height:80px;
         }
         .row{
@@ -98,6 +99,12 @@
                 font-family: 'Satoshi';
             }
         }
+        
+    }
+    @media (max-width: 1000px) {
+        &.simple{
+            width:100%;
 
+        }
     }
 }
