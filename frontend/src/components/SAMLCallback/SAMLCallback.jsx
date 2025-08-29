@@ -6,7 +6,7 @@ import './SAMLCallback.scss';
 const SAMLCallback = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    const { validateToken } = useAuth();
+    const { validateToken, user } = useAuth();
     const [status, setStatus] = useState('processing');
     const [error, setError] = useState(null);
 
@@ -30,8 +30,14 @@ const SAMLCallback = () => {
                 
                 setStatus('success');
                 
-                // Redirect to the intended destination or default
-                const redirectTo = relayState || '/room/none';
+                // Determine redirect destination
+                let redirectTo = relayState || '/room/none';
+                
+                // If user is admin, redirect to admin dashboard
+                if (user && user.roles && user.roles.includes('admin')) {
+                    redirectTo = '/admin';
+                }
+                
                 setTimeout(() => {
                     navigate(redirectTo, { replace: true });
                 }, 1000);
@@ -52,7 +58,7 @@ const SAMLCallback = () => {
         };
 
         handleSAMLCallback();
-    }, [location, navigate, validateToken]);
+    }, [location, navigate, validateToken, user]);
 
     if (status === 'processing') {
         return (

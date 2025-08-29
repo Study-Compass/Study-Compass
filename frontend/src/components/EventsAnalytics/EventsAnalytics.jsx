@@ -93,7 +93,7 @@ function EventsAnalytics() {
 
                 <div className="metric-card">
                     <div className="metric-icon">
-                        <Icon icon="mingcute:user-fill" />
+                        <Icon icon="mdi:anonymous" />
                     </div>
                     <div className="metric-content">
                         <h3>Anonymous Views</h3>
