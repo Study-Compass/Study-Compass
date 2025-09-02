@@ -72,7 +72,12 @@
                 background-color: var(--background);
                 padding:20px 30px;
                 font-size:16px; 
+                gap:10px;
+                color: var(--lighter-text);
                 border-radius: 10px;
+                &:hover{
+                    background-color: var(--lighter);
+                }
             }
         }
     }

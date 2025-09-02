@@ -8,7 +8,7 @@ import CheckBlack from '../../assets/Icons/CheckBlack.svg';
 import WhenWhere from '../../components/CreateEvent/WhenWhere/WhenWhere';
 import GenInfo from '../../components/CreateEvent/GenInfo/GenInfo';
 import Review from '../../components/CreateEvent/Review/Review';
-
+import CustomFormFill from '../../components/CreateEvent/CustomFormFill/CustomFormFill';
 import { useNotification } from '../../NotificationContext';
 import { createEvent } from './CreateEventHelpers';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -31,19 +31,21 @@ function CreateEvent(){
     const navigate = useNavigate();
     const [showDrop, setShowDrop] = useState(false);
 
+    const [showForm, setShowForm] = useState(false);
+
     useEffect(()=>{
         if(isAuthenticating){
             return;
         }
-        if(!isAuthenticated){
-            navigate('/');
-        }
+        // if(!isAuthenticated){
+        //     navigate('/');
+        // }
         if(!user){
             return;
         }
-        if(!(user.roles.includes('oie') || user.roles.includes('admin') || user.roles.includes('developer'))){
-            navigate('/');
-        }
+        // if(!(user.roles.includes('oie') || user.roles.includes('admin') || user.roles.includes('developer'))){
+        //     navigate('/');
+        // }
         if(origin && origin !== ""){
             const club = user.clubAssociations.find((org)=>org.org_name === origin);
             if(club){
@@ -80,7 +82,11 @@ function CreateEvent(){
     }
 
     useEffect(()=>{
-        console.log(info);
+        if(info.location === 'Darrin Communications Center 174'){
+            setShowForm(true);
+        } else {
+            setShowForm(false);
+        }
     }, [info])
 
     const renderStep = () => {
@@ -90,6 +96,14 @@ function CreateEvent(){
             case 1:
                 return <WhenWhere next={nextStep}/>
             case 2:
+                if(showForm){
+                    
+                    return <CustomFormFill next={nextStep}/>
+                } else {
+                    console.log("here")
+                    return <Review next={nextStep}/>
+                }
+            case 3:
                 return <Review next={nextStep}/>
             default:
                 return <GenInfo next={nextStep}/>
@@ -135,6 +149,7 @@ function CreateEvent(){
 
         if(response){
             addNotification({title: "Event created", message: "Your event has been created successfully", type: "success"});
+            navigate('/events-dashboard');
         } else {
             addNotification({title: "Failed to create event", message: "An error occurred while creating your event", type: "error"});
         }
@@ -199,18 +214,27 @@ function CreateEvent(){
                                 <img src={Calendar} alt="" />
                                 <p>when & where</p>
                             </div>
-                            <div className={`step ${step === 2 && "selected"}`}  onClick={()=>{handleSwitch(2)}}>
+                            {
+                                showForm &&
+                                <div className={`step ${step === 2 && "selected"}`} onClick={()=>{handleSwitch(2)}}>
+                                    <Icon icon="mdi:form" />
+                                    <p>form</p> 
+                                </div>
+                            }
+                            <div className={`step ${(showForm ? step === 3 : step === 2 )&& "selected"}`}  onClick={()=>{handleSwitch(showForm ? 3 : 2)}}>
                                 <img src={CheckBlack} alt="" />
                                 <p>review</p>
                             </div>
                         </div>
                     </div>
                     <div className="create-workspace">
-                        <GenInfo next={nextStep} visible={step === 0 && currentSubStep === 0} setInfo={setInfo}/>
-                        <WhenWhere next={nextStep} visible={step === 1 && currentSubStep === 0} setInfo={setInfo}/>
-                        <WhenWhere next={nextStep} visible={step === 1 && currentSubStep === 1} setInfo={setInfo}/>
-                        <WhenWhere next={nextStep} visible={step === 1 && currentSubStep === 2} setInfo={setInfo}/>
-                        <Review next={nextStep} visible={step === 2 && currentSubStep === 0} info={info} setInfo={setInfo} onSubmit={onSubmit}/>
+                        <GenInfo next={nextStep} visible={step === 0} setInfo={setInfo}/>
+                        <WhenWhere next={nextStep} visible={step === 1} setInfo={setInfo}/>
+                        {
+                            showForm &&
+                            <CustomFormFill next={nextStep} visible={step === 2} setInfo={setInfo}/>
+                        }
+                        <Review next={nextStep} visible={showForm ? step === 3 : step === 2} info={info} setInfo={setInfo} onSubmit={onSubmit}/>
                     </div>
                 </div>
             </div>

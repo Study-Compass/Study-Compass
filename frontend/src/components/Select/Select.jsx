@@ -3,7 +3,7 @@ import './Select.scss';
 import { Icon } from '@iconify-icon/react/dist/iconify.mjs';
 import useOutsideClick from '../../hooks/useClickOutside';
 
-const Select = ({ options, onChange, defaultValue, placeholder = 'Select an option' }) => {
+const Select = ({ options, onChange = console.log, defaultValue, placeholder = 'Select an option' }) => {
     const [selectedOption, setSelectedOption] = useState(defaultValue);
     const [isOpen, setIsOpen] = useState(false);
 

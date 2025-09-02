@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './UserSearch.scss';
-import axios from 'axios';
+import apiRequest from '../../utils/postRequest';
 import pfp from '../../assets/defaultAvatar.svg';
 import useOutsideClick from '../../hooks/useClickOutside';
 
@@ -48,40 +48,40 @@ function UserSearch({
         setError(null);
         
         try {
-            //build query params
-            const params = new URLSearchParams();
-            params.append('query', query);
-            params.append('limit', limit);
-            params.append('sortBy', sortBy);
-            params.append('sortOrder', sortOrder);
+            // Build query parameters
+            const params = {
+                query: query,
+                limit: limit,
+                sortBy: sortBy,
+                sortOrder: sortOrder
+            };
             
             if (excludeIds.length > 0) {
-                params.append('excludeIds', JSON.stringify(excludeIds));
+                params.excludeIds = JSON.stringify(excludeIds);
             }
             
             if (roles.length > 0) {
-                params.append('roles', JSON.stringify(roles));
+                params.roles = JSON.stringify(roles);
             }
             
             if (tags.length > 0) {
-                params.append('tags', JSON.stringify(tags));
+                params.tags = JSON.stringify(tags);
             }
             
-            const response = await axios.get(`/search-users?${params.toString()}`, {
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
-                }
+            const response = await apiRequest('/search-users', {}, {
+                method: 'GET',
+                params: params
             });
             
-            if (response.data.success) {
-                setResults(response.data.data);
+            if (response.success) {
+                setResults(response.data);
             } else {
-                setError(response.data.message || 'Error searching users');
+                setError(response.message || 'Error searching users');
                 setResults([]);
             }
         } catch (error) {
             console.error('Error searching users:', error);
-            setError(error.response?.data?.message || 'Error searching users');
+            setError(error.message || 'Error searching users');
             setResults([]);
         } finally {
             setIsLoading(false);

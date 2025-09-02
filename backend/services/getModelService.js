@@ -2,7 +2,6 @@ const badgeGrantSchema = require('../schemas/badgeGrant');
 const buildingSchema = require('../schemas/building');
 const classroomSchema = require('../schemas/classroom');
 const developerSchema = require('../schemas/developer');
-const eventSchema = require('../schemas/event');
 const friendshipSchema = require('../schemas/friendship');
 const OIESchema = require('../schemas/OIE');
 const OIEConfigSchema = require('../schemas/OIEConfig');
@@ -18,10 +17,22 @@ const searchSchema = require('../schemas/search');
 const studyHistorySchema = require('../schemas/studyHistory');
 const userSchema = require('../schemas/user');
 const visitSchema = require('../schemas/visit');
+const orgMemberApplicationSchema = require('../schemas/orgMemberApplication');
+const samlConfigSchema = require('../schemas/samlConfig');
+const notificationSchema = require('../schemas/notification');
+
 
 //events
-const approvalFlowDefinition = require('../schemas/events/approvalFlowDefinition');
-const approvalFlowInstance = require('../schemas/events/approvalInstance');
+const rssFeedSchema = require('../events/schemas/rssFeed');
+const approvalFlowDefinition = require('../events/schemas/approvalFlowDefinition');
+const approvalFlowInstance = require('../events/schemas/approvalInstance');
+const eventSchema = require('../events/schemas/event');
+const formSchema = require('../events/schemas/form');
+const formResponseSchema = require('../events/schemas/formResponse');
+const orgVerificationSchema = require('../schemas/orgVerification');
+const orgManagementConfigSchema = require('../schemas/orgManagementConfig');
+const eventAnalyticsSchema = require('../schemas/eventAnalytics');
+
 
 const getModels = (req, ...names) => {
     const models = {
@@ -46,7 +57,16 @@ const getModels = (req, ...names) => {
         User: req.db.model('User', userSchema, 'users'),
         Visit: req.db.model('Visit', visitSchema, 'visits'),
         ApprovalFlow: req.db.model('ApprovalFlow', approvalFlowDefinition, 'approvalFlows'),
-        ApprovalInstance: req.db.model('ApprovalInstance', approvalFlowInstance, 'approvalInstances')
+        ApprovalInstance: req.db.model('ApprovalInstance', approvalFlowInstance, 'approvalInstances'),
+        RssFeed: req.db.model('RssFeed', rssFeedSchema, 'rssFeeds'),
+        Form: req.db.model('Form', formSchema, 'forms'),    
+        FormResponse: req.db.model('FormResponse', formResponseSchema, 'formResponses'),
+        OrgVerification: req.db.model('OrgVerification', orgVerificationSchema, 'orgVerifications'),
+        OrgManagementConfig: req.db.model('OrgManagementConfig', orgManagementConfigSchema, 'orgManagementConfigs'),
+        OrgMemberApplication: req.db.model('OrgMemberApplication', orgMemberApplicationSchema, 'orgMemberApplications'),
+        SAMLConfig: req.db.model('SAMLConfig', samlConfigSchema, 'samlConfigs'),
+        Notification: req.db.model('Notification', notificationSchema, 'notifications'),
+        EventAnalytics: req.db.model('EventAnalytics', eventAnalyticsSchema, 'eventAnalytics')
     };
 
     return names.reduce((acc, name) => {

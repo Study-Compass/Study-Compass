@@ -49,13 +49,12 @@ async function registerUser({ username, email, password, req }) {
     const hashedPassword = await bcrypt.hash(password, 10); // Example hashing
     const user = new User({
         username,
-        email,
+        email: email.toLowerCase(),
         password: hashedPassword
     });
     await user.save();
 
-    const token = jwt.sign({ userId: user._id, roles:user.roles }, process.env.JWT_SECRET, { expiresIn: '5d' });
-    return { user, token };
+    return { user };
 }
 
 async function loginUser({ email, password, req }) {
@@ -63,13 +62,13 @@ async function loginUser({ email, password, req }) {
     //check if it is an email or username
     let user;
     if (!email.includes('@')) {
-        user = await User.findOne({ username: email })
-            .select('-googleId') // Add fields to exclude
+        user = await User.findOne({ username: email.toLowerCase() })
+            .select('-googleId -refreshToken') // Add fields to exclude
             .lean()
             .populate('clubAssociations'); 
     } else {
-        user = await User.findOne({ email })
-            .select('-googleId') // Add fields to exclude
+        user = await User.findOne({ email: email.toLowerCase() })
+            .select('-googleId -refreshToken') // Add fields to exclude
             .lean()
             .populate('clubAssociations'); 
     }
@@ -82,8 +81,7 @@ async function loginUser({ email, password, req }) {
         throw new Error('Invalid credentials');
     }
     delete user.password;
-    const token = jwt.sign({ userId: user._id, roles: user.roles }, process.env.JWT_SECRET, { expiresIn: '5d' });
-    return { user, token };
+    return { user };
 }
 function getRedirectUri(url) {
     const urlObj = new URL(url);
@@ -98,14 +96,14 @@ function getRedirectUri(url) {
     const allowedOrigins = [
         'http://localhost:3000/login',
         'http://localhost:3000/register',
-        'https://study-compass.com/login',
-        'https://study-compass.com/register',
-        'https://www.study-compass.com/login',
-        'https://www.study-compass.com/register',
-        'https://rpi.study-compass.com/login',
-        'https://rpi.study-compass.com/register',
-        'https://berkeley.study-compass.com/login',
-        'https://berkeley.study-compass.com/register'
+        'https://meridian.study/login',
+        'https://meridian.study/register',
+        'https://www.meridian.study/login',
+        'https://www.meridian.study/register',
+        'https://rpi.meridian.study/login',
+        'https://rpi.meridian.study/register',
+        'https://berkeley.meridian.study/login',
+        'https://berkeley.meridian.study/register'
     ];
 
     if(!allowedOrigins.includes(uri)) {
@@ -140,9 +138,9 @@ async function authenticateWithGoogle(code, isRegister = false, url, req) {
     const userInfo = await oauth2.userinfo.get();
     console.log('Google user info:', userInfo.data)
     let user = await User.findOne({ googleId: userInfo.data.id })
-        .select('-password -googleId') // Add fields to exclude
-        .lean();
-
+        .select('-password -googleId -refreshToken') // Add fields to exclude
+        .lean()
+        .populate('clubAssociations');
 
     if (!user) {
         //check if email already exists
@@ -162,11 +160,15 @@ async function authenticateWithGoogle(code, isRegister = false, url, req) {
         });
         await user.save();
         sendDiscordMessage(`New user registered`, `user ${user.username} registered`, "newUser");
+        
+        // Fetch the user again with populated fields
+        user = await User.findById(user._id)
+            .select('-password -googleId -refreshToken')
+            .lean()
+            .populate('clubAssociations');
     }
 
-    const jwtToken = jwt.sign({ userId: user._id, roles: user.roles }, process.env.JWT_SECRET, { expiresIn: '5d' });
-
-    return { user, token: jwtToken };
+    return { user };
 }
 
 async function generateUniqueUsername(email, req) {

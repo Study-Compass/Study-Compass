@@ -50,12 +50,14 @@ const SiteHealth = ({}) => {
                 {
                     good ? 
                     <div className="status good">
-                        <div className="operational">
-                            <PulseDot color="var(--green)" size="10px" pulse={true}/>   
+                        <div className="status-text">
+                            <div className="operational">
+                                <PulseDot color="var(--green)" size="10px" pulse={true}/>   
+                            </div>
+                            <h2>
+                                {health.data.subDomain}.meridian.study
+                            </h2>
                         </div>
-                        <h2>
-                            {health.data.subDomain}.study-compass.com
-                        </h2>
                         <div className="tag">
                             <Icon icon="icon-park-solid:check-one" />
                             <p>all systems operational</p>
@@ -67,7 +69,7 @@ const SiteHealth = ({}) => {
                             <PulseDot color="var(--red)" size="10px" pulse={true}/>   
                         </div>
                         <h2>
-                            {health.data.subDomain}.study-compass.com
+                            {health.data.subDomain}.meridian.study
                         </h2>
                     </div>
                 }
@@ -93,7 +95,7 @@ const SiteHealth = ({}) => {
                             </div>
                             <Icon icon="material-symbols-light:database" />
                             <p>database</p>
-                            <p className="stat">latency: <b><AnimatedNumber value={health.data.statuses.database.latency} /></b>ms</p>
+                            <p className="stat">latency: <b><AnimatedNumber value={parseFloat(health.data.statuses.database.latency)} /></b>ms</p>
 
                         </div>
                     </div>

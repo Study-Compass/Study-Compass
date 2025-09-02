@@ -10,16 +10,56 @@
     gap:10px;
     transition: padding 1s ease-in-out;
     max-height:100vh;
+    align-items: center;
     .header{
-        padding: 20px;
+        padding: 25px 30px 10px 30px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width:100%;
+        box-sizing: border-box;
 
+        .form-buttons {
+            display: flex;
+            gap: 10px;
+
+            button {
+                padding: 10px 20px;
+                background-color: var(--red);
+                color: white;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+                transition: opacity 0.2s;
+
+                &:hover {
+                    opacity: 0.9;
+                }
+            }
+        }
     }
-    .approval-container{
-        padding:0px 40px;
+    
+    .config-item{
+        padding:0px 30px;
         display: flex;
         flex-direction: column;
         gap:10px;
+        width:90%;
+        min-width:20%;
+        .config-title{
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            justify-content: space-between;
+            h2{
+                font-family: 'Inter';
+                font-weight:700;
+                font-size:20px;
+                margin: 0;
+            }
+        }
     }
+
     .config-content{
         display: flex;
         flex-direction: column;
@@ -62,15 +102,51 @@
             }
 
         }
-        .config-container{
-            padding:20px;
-            min-height: 100px;
-            .config-container-content{
-                h2{
-                    margin: 0;
-                    font-size:18px;
-                }
+
+        
+        
+    }
+    .config-container-content{
+        padding: 10px;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        h2{
+            margin: 0;
+            font-size:18px;
+        }
+        .approval-criteria{
+            padding: 10px;
+            box-sizing: border-box;
+        }
+    }
+
+    .header-actions {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+
+        .add-group-button,
+        .save-button {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            color: var(--lighter-text); 
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+
+            &:hover {
+                background-color: var(--lighterborder);
+            }
+
+            .icon {
+                font-size: 20px;
             }
         }
+
     }
 }

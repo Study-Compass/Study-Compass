@@ -13,7 +13,7 @@ https://incongruous-reply-44a.notion.site/Frontend-SearchBar-Component-35e616d52
 
 
 //need to add support for abbreviated versions
-function SearchBar({ data, addQuery, onEnter, onSearch, room, onX, onBlur }) {
+function SearchBar({ data, addQuery, onEnter, onSearch, room, onX, onBlur, urlType = 'normal' }) {
     let navigate =  useNavigate();
     const itemRefs = useRef([]);
 
@@ -264,7 +264,9 @@ function SearchBar({ data, addQuery, onEnter, onSearch, room, onX, onBlur }) {
         setSearchInput('');
         setLower("");
         setResults([]);
-        navigate('/room/none');
+        if (urlType !== 'embedded') {
+            navigate('/room/none');
+        }
     }
 
     function tabShadow(word){

@@ -1,6 +1,6 @@
 import React,{ useEffect, useState, useRef } from 'react'
 import { useNavigate,useLocation, Link } from 'react-router-dom';
-import logo from '../../assets/Brand Image/Logo.svg';
+import logo from '../../assets/Brand Image/COMPASS.svg';
 import './Header.scss';
 import ProfilePicture from '../ProfilePicture/ProfilePicture';
 import useAuth from '../../hooks/useAuth';
@@ -8,6 +8,7 @@ import MobileLogo from '../../assets/MobileLogo.svg';
 import { useWebSocket } from '../../WebSocketContext';
 import RpiLogo from '../../assets/Brand Image/RpiLogo.svg';
 import BerkeleyLogo from '../../assets/Brand Image/BerkeleyLogo.svg';
+import NotificationInbox from '../NotificationInbox/NotificationInbox';
 
 function getLogo() {
     const hostname = window.location.hostname;
@@ -86,7 +87,7 @@ const Header = React.memo(()=>{
                         <nav>
                             {isAuthenticated && <Link className={`nav-link ${ pageClass === "room" ? "active" : ""}`} to="/room/none" ><h2>search</h2></Link>}
                             {isAuthenticated && <Link className={`nav-link ${ pageClass === "friends" ? "active" : ""}`} to="/friends" ><h2>friends</h2></Link>}
-                            {isAuthenticated && user && (user.roles.includes('admin') || user.roles.includes('oie')) && <Link className={`nav-link ${ pageClass === "events" ? "active" : ""}`} to="/events-dashboard" ><h2>events</h2></Link>}                         
+                            <Link className={`nav-link ${ pageClass === "events" ? "active" : ""}`} to="/events-dashboard" ><h2>events</h2></Link>                         
                         </nav>  
                     </div>
                     
@@ -105,6 +106,7 @@ const Header = React.memo(()=>{
 
                 {page === "/login" || page === "/register" ? "" :
                     <div className="header-right">
+                        {isAuthenticated ? <NotificationInbox/> : ""}
                         {isAuthenticated ? <ProfilePicture/> : ""}
                         {!isAuthenticated ? <button onClick={goToLogin}>login</button> : ""}
                     </div>    

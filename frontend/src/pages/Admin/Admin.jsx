@@ -10,12 +10,17 @@ import Dashboard from '../../components/Dashboard/Dashboard';
 import General from './General/General'
 import BadgeManager from './BadgeManager/BadgeManager';
 import ManageUsers from './ManageUsers/ManageUsers';
+import QRManager from './QRManager/QRManager';
+import EventsAnalytics from '../../components/EventsAnalytics/EventsAnalytics';
+
+import AdminLogo from '../../assets/Brand Image/ADMIN.svg';
 
 
 import './Admin.scss';
 
 function Admin(){
     const { user } = useAuth();
+    const navigate = useNavigate();
 
     const [showPage, setShowPage] = useState("analytics");
 
@@ -36,18 +41,52 @@ function Admin(){
     }
 
     const menuItems = [
-        { label: 'General', icon: 'ic:round-dashboard' },
-        { label: 'Analytics', icon: 'bx:stats' },
-        { label: 'Manage Users', icon: 'ic:round-dashboard'},
-        { label: 'Badge Grants', icon: 'bx:stats'}
+        { 
+            label: 'General', 
+            icon: 'ic:round-dashboard',
+            element: <General/>
+        },
+        { 
+            label: 'Analytics', 
+            icon: 'bx:stats',
+            subItems: [
+                {
+                    label: 'General',
+                    icon: 'bx:stats',
+                    element: <Analytics/>
+                },
+                {
+                    label: 'Events Analytics',
+                    icon: 'material-symbols:event',
+                    element: <EventsAnalytics/>
+                },
+                {
+                    label: 'QR Codes',
+                    icon: 'mingcute:qrcode-fill',
+                    element: <QRManager/>
+                }
+            ]
+        },
+        { 
+            label: 'Manage Users', 
+            icon: 'ic:round-dashboard',
+            element: <ManageUsers/>
+        },
+        { 
+            label: 'Badge Grants', 
+            icon: 'bx:stats',
+            element: <BadgeManager/>
+        }
     ]
 
     return(
-        <Dashboard menuItems={menuItems} additionalClass='admin'>
-            <General/>
-            <Analytics/>
-            <ManageUsers/>
-            <BadgeManager/>
+        <Dashboard 
+            menuItems={menuItems} 
+            additionalClass='admin' 
+            logo={AdminLogo} 
+            onBack={()=>navigate('/events-dashboard')}
+            enableSubSidebar={true}
+        >
         </Dashboard>
     );
 }

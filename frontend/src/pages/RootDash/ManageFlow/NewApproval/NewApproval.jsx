@@ -4,8 +4,9 @@ import Flag from '../../../../components/Flag/Flag';
 import postRequest from '../../../../utils/postRequest';
 import { UserSearch, SelectedUsers } from '../../../../components/UserSearch';
 import { useNotification } from '../../../../NotificationContext';
+import HeaderContainer from '../../../../components/HeaderContainer/HeaderContainer';
 
-function NewApproval(){
+function NewApproval({refetch, handleClose}){
     const [approvalName, setApprovalName] = useState('');
     const [selectedUsers, setSelectedUsers] = useState([]);
     const { addNotification } = useNotification();
@@ -63,10 +64,12 @@ function NewApproval(){
                     message: 'Approval role created successfully',
                     type: 'success'
                 });
-                
+                                
                 // Reset form
                 setApprovalName('');
                 setSelectedUsers([]);
+                refetch();
+                handleClose();
             } else {
                 addNotification({
                     title: 'Error',
@@ -85,7 +88,7 @@ function NewApproval(){
     };
 
     return (
-        <div className="new-approval">
+        <HeaderContainer classN="new-approval" icon="fluent:flowchart-24-filled" header="New Approval Role" subHeader="create a new approval">
             <div className="header">
                 <h2>New Approval Role</h2>
                 <p>create a new approval</p>
@@ -111,22 +114,22 @@ function NewApproval(){
                     />
                 </div>
                 <div className="field">
-                    <SelectedUsers 
-                        users={selectedUsers}
-                        onRemoveUser={handleRemoveUser}
-                    />
                     <label htmlFor="user-search">Add Users</label>
                     <UserSearch 
                         onUserSelect={handleUserSelect}
                         placeholder="Search for users by name or username"
                         excludeIds={selectedUsers.map(user => user._id)}
                     />
+                    <SelectedUsers 
+                        users={selectedUsers}
+                        onRemoveUser={handleRemoveUser}
+                    />
                 </div>
                 <button type="submit" className="submit-button">
                     Create Approval Role
                 </button>
             </form>
-        </div>
+        </HeaderContainer>
     );
 }
 

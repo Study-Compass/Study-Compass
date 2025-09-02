@@ -15,11 +15,11 @@
         rgba(255, 255, 255, 0.3) 80%, /* Peak opacity reduced */
         rgba(255, 255, 255, 0) 75%  
       );
-      animation: shimmer $duration infinite;
+      animation: shimmer1 $duration infinite;
     }
   }
   
-  @keyframes shimmer {
+  @keyframes shimmer1 {
     0% {
       transform: translateX(0%);
     }

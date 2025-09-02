@@ -33,7 +33,7 @@ import { useWebSocket } from '../../WebSocketContext.js';
 
 import '../../pages/Room/Room.scss';
 
-function Classroom({ room, state, setState, schedule, roomName, width, setShowMobileCalendar, setIsUp, reload }) {
+function Classroom({ room, state, setState, schedule, roomName, width, setShowMobileCalendar, setIsUp, reload, urlType }) {
     const [image, setImage] = useState("")
     const { isAuthenticating, isAuthenticated, user, getCheckedIn } = useAuth();
     const [success, setSuccess] = useState(null);
@@ -106,7 +106,7 @@ function Classroom({ room, state, setState, schedule, roomName, width, setShowMo
         }
         getRatings(room._id)
             .then((response) => {
-                setRatings(response.data.data);
+                setRatings(response);
             })
             .catch((error) => {
                 console.log(error);
@@ -244,7 +244,10 @@ function Classroom({ room, state, setState, schedule, roomName, width, setShowMo
 
     const backtoResults = () => {
         setState("calendarSearch");
-        navigate(-1);
+        
+        if(urlType !== "embedded"){
+            navigate(-1);
+        }
     };
 
     const handleCheckIn = async () => {

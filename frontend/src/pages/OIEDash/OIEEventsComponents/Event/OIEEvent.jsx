@@ -8,8 +8,9 @@ import FullEvent from '../../../../components/EventsViewer/EventsGrid/EventsColu
 import { useNotification } from '../../../../NotificationContext';
 import defaultAvatar from '../../../../assets/defaultAvatar.svg';
 import deleteRequest from '../../../../utils/deleteRequest';
+import apiRequest from '../../../../utils/postRequest';
 
-function OIEEvent({event, showStatus=false, refetch, showOIE=false, index, showExpand=true, manage=false}){
+function OIEEvent({event, showStatus=false, refetch, showOIE=false, index, showExpand=true, manage=false, viewingRole, showHosting=true, extraInfo, showHostingType=true}){
     const [popupOpen, setPopupOpen] = useState(false);
     const [edited, setEdited] = useState(false);
     const navigate = useNavigate();
@@ -38,7 +39,7 @@ function OIEEvent({event, showStatus=false, refetch, showOIE=false, index, showE
         "Pending" : ["Pending OIE Approval", "pending"],
     }
 
-    const renderHostingStatus = () => {
+    const renderHostingStatus = (showHostingType) => {
         let hostingImage = '';
         let hostingName = '';
         let level = '';
@@ -64,15 +65,15 @@ function OIEEvent({event, showStatus=false, refetch, showOIE=false, index, showE
             <div className={`row ${level.toLowerCase()}`}>
                 <img src={hostingImage} alt="" />
                 <p className="user-name">{hostingName}</p>
-                <div className={`level ${level.toLowerCase()}`}>
+                {showHostingType && <div className={`level ${level.toLowerCase()}`}>
                     {level}
-                </div>
+                </div>}
             </div>
         );
     }
 
     const onArchiveEvent = async () => {
-        const response = await deleteRequest(`/delete-event/${event._id}`);
+        const response = await apiRequest(`/delete-event/${event._id}`, {}, {method: 'DELETE'});
         console.log(response);
         if(response.success){
             setArchived(true);
@@ -101,7 +102,7 @@ function OIEEvent({event, showStatus=false, refetch, showOIE=false, index, showE
         <div className={`oie-event-component ${managePopupOpen ? "manage" : ""} ${archived && "archived"}`} style={index ? {animationDelay: `${index * 0.1}s`}:{}}>
             <Popup isOpen={popupOpen} onClose={onPopupClose} customClassName={"wide-content no-padding no-styling oie"} waitForLoad={true} >
                 {showOIE && !(event.OIEStatus === "Not Applicable") ?
-                    <OIEFullEvent event={event} refetch={refetch} setEdited={setEdited}/>
+                    <OIEFullEvent event={event} refetch={refetch} setEdited={setEdited} viewingRole={viewingRole}/>
                 :
                     <FullEvent event={event}/>
                 }
@@ -110,17 +111,17 @@ function OIEEvent({event, showStatus=false, refetch, showOIE=false, index, showE
                 {
                     // showStatus && <div className={`oie-status ${statusMessages[event.OIEStatus][1]}`}><p>{statusMessages[event.OIEStatus][0]}</p></div>
                 }
+                {extraInfo && extraInfo}
                 <h2>{event.name}</h2>
-                {/* <p>{event.location }</p> */}
+                {showHosting && renderHostingStatus(showHostingType)}
                 {/* display date in day of the week, month/day */}
-                {renderHostingStatus()}
                 <div className="row">
                     <Icon icon="heroicons:calendar-16-solid" />
                     <p>{date.toLocaleString('default', {weekday: 'long'})} {date.toLocaleString('default', {month: 'numeric'})}/{date.getDate()}</p>
                 </div>
                 <div className="row">
                     <Icon icon="fluent:location-28-filled" />
-                    <p>{event.location}</p>
+                    <p className="location">{event.location}</p>
                 </div>
             </div>
             <div className="event-button-container">

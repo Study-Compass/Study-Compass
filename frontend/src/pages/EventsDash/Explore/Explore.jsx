@@ -1,11 +1,11 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useRef, useCallback} from 'react';
 import './Explore.scss';
 import { Icon } from '@iconify-icon/react/dist/iconify.mjs';
 import {useFetch} from '../../../hooks/useFetch';
-import RPIlogo from '../../../assets/Rpi.png';
+import RPIlogo from '../../../assets/Schools/RPI.svg';
 import compass from '../../../assets/Brand Image/discover.svg';
 import FilterPanel from '../../../components/FilterPanel/FilterPanel';
-import Event from '../../../components/EventsViewer/EventsGrid/EventsColumn/Event/Event';
+import EventsList from '../../../components/EventsList/EventsList';
 import Switch from '../../../components/Switch/Switch';
 import Month from '../../../pages/OIEDash/EventsCalendar/Month/Month';
 import Week from '../../../pages/OIEDash/EventsCalendar/Week/Week';
@@ -13,38 +13,68 @@ import Day from '../../../pages/OIEDash/EventsCalendar/Day/Day';
 import useAuth from '../../../hooks/useAuth';
 import postRequest from '../../../utils/postRequest';
 import { useNotification } from '../../../NotificationContext';
+import Loader from '../../../components/Loader/Loader';
+import eventsLogo from '../../../assets/Brand Image/EventsLogo.svg';
+import exploreBackgroundGradient from '../../../assets/Gradients/ExploreBackgroundGradient.png';
+
+const getSunday = () => {
+    const today = new Date();
+    const day = today.getDay();
+    const diff = today.getDate() - day;
+    return new Date(today.setDate(diff));
+}
 
 function Explore(){
     const {user} = useAuth();
     const {addNotification} = useNotification();
     const roles = [''];
     const [page, setPage] = useState(1);
+    const [hasMore, setHasMore] = useState(true);
+    const [events, setEvents] = useState([]);
     const limit = 15;
 
     const [view, setView] = useState(0);
-
     const [viewType, setViewType] = useState(0);
+    const [selectedDate, setSelectedDate] = useState(new Date());
+
+    const [width, setWidth] = useState(window.innerWidth);
+    useEffect(() => { //useEffect for window resizing
+        function handleResize() {
+          setWidth(window.innerWidth);
+        }
+        window.addEventListener('resize', handleResize);
+  
+  
+        return () => window.removeEventListener('resize', handleResize);
+      }, []);
 
     // Define our available filter options.
     const filterOptions = {
         eventTypes: {
             label: "event type",
-            options: ["social", "workshop", "meeting", "campus", "study", "sports"],
-            optionValues: ["social", "workshop", "meeting", "campus", "study", "sports"],
+            options: [ "meeting", "campus", "study", "athletics", "alumni", "EMPAC"],
+            optionValues: [ "meeting", "campus", "study", "sports", "alumni", "arts"],
             field: 'type'
         },
         eventCreator: {
             label: "event creator",
-            options: ["student", "faculty", "administration", "organization", "sports"],
-            optionValues: ["User", "faculty", "Admin", "Org", "asdasdad"],
+            options: ["student", "administration", "organization"],
+            optionValues: ["User", "Admin", "Org"],
             field: 'hostingType'
+        },
+        friendsEvents: {
+            label: "friends events",
+            options: ["friends going"],
+            optionValues: ["friends"],
+            field: 'friendsFilter'
         }
     };
 
     // Store raw selected filter values
     const [filters, setFilters] = useState({
         type: [],
-        hostingType: []
+        hostingType: [],
+        friendsFilter: []
     });
 
     // Build the API filters object
@@ -52,6 +82,10 @@ function Explore(){
         const apiFilters = {};
         Object.keys(filters).forEach((field) => {
             if (filters[field].length) {
+                if (field === 'friendsFilter') {
+                    // Handle friends filter separately
+                    return;
+                }
                 apiFilters[field] = { "$in": filters[field] };
             }
         });
@@ -60,9 +94,45 @@ function Explore(){
 
     // Build the filter query param as a JSON string
     const apiFilters = buildApiFilters();
-    const filterParam = encodeURIComponent(JSON.stringify(apiFilters));
+    const filterParam = apiFilters;
 
-    const futureEvents = useFetch(`/get-future-events?roles=${roles}&page=${page}&limit=${limit}&filter=${filterParam}`);
+    // Determine which endpoint to use based on filters
+    const hasFriendsFilter = filters.friendsFilter.includes('friends');
+    const endpoint = hasFriendsFilter ? '/friends-events' : '/get-future-events';
+    const queryParams = hasFriendsFilter 
+        ? `?page=${page}&limit=${limit}`
+        : `?roles=${roles}&page=${page}&limit=${limit}&filter=${JSON.stringify(filterParam)}`;
+
+    const { data, loading, error } = useFetch(`${endpoint}${queryParams}`);
+
+    // Handle load more for infinite scroll
+    const handleLoadMore = useCallback(() => {
+        setPage(prevPage => prevPage + 1);
+    }, []);
+
+    // Update events when new data arrives
+    useEffect(() => {
+        if (data) {
+            if (page === 1) {
+                setEvents(data.events);
+            } else {
+                // Filter out duplicates when adding new events
+                setEvents(prevEvents => {
+                    const existingIds = new Set(prevEvents.map(event => event._id));
+                    const newEvents = data.events.filter(event => !existingIds.has(event._id));
+                    return [...prevEvents, ...newEvents];
+                });
+            }
+            setHasMore(data.events.length === limit);
+        }
+    }, [data, page]);
+
+    // Reset pagination when filters change
+    useEffect(() => {
+        setPage(1);
+        setEvents([]);
+        setHasMore(true);
+    }, [filters]);
 
     // Toggle a filter option on/off
     const toggleFilter = (field, value) => {
@@ -77,12 +147,6 @@ function Explore(){
             return { ...prev, [field]: newValues };
         });
     };
-
-    useEffect(() => {
-        if(futureEvents.data){
-            console.log(futureEvents.data);
-        }
-    }, [futureEvents.data]);
 
     // Helper function to format date
     const formatDate = (date) => {
@@ -104,98 +168,192 @@ function Explore(){
         });
     };
 
+    const changeView = (view) => {
+        if(view === 0){
+            //change to month
+
+        } else if(view === 1){
+            //change to week
+            setSelectedDate(getSunday());
+        } else if(view === 2){
+            //change to day
+            setSelectedDate(new Date());
+        }
+        setView(view);
+    }
+
     // Helper function to group events by date
     const groupEventsByDate = (events) => {
         if (!events) return [];
         
-        const groups = {};
+        // Use a Map to ensure unique events per date
+        const groups = new Map();
         events.forEach(event => {
             const date = new Date(event.start_time).toDateString();
-            if (!groups[date]) {
-                groups[date] = [];
+            if (!groups.has(date)) {
+                groups.set(date, []);
             }
-            groups[date].push(event);
+            // Check if event already exists in the group
+            const existingEvent = groups.get(date).find(e => e._id === event._id);
+            if (!existingEvent) {
+                groups.get(date).push(event);
+            }
         });
         
-        return Object.entries(groups).map(([date, events]) => ({
+        return Array.from(groups.entries()).map(([date, events]) => ({
             date: new Date(date),
             events
         })).sort((a, b) => a.date - b.date);
     };
 
-    return(
-        <div className="explore">
-            <div className="heading">
-                <h1>Explore Events at </h1>
-                <img src={RPIlogo} alt="RPI Logo" />
-            </div>
-            <div className="explore-content">
-                <div className="sidebar">
+    // Helper function to check if friends are going to an event
+    const hasFriendsGoing = (event) => {
+        if (!event.attendees || !user) return false;
+        // This would need to be implemented based on your friendship system
+        // For now, we'll show the indicator if there are any attendees
+        return event.attendees.some(attendee => 
+            attendee.status === 'going' && attendee.userId !== user._id
+        );
+    };
 
-                    <div className="sidebar-header">
-                        <img src={compass} alt="compass" />
-                        <h2>explore</h2>
-                    </div>
-                    <Switch
-                        options={['list', 'calendar']}
-                        selectedPass={viewType}
-                        setSelectedPass={setViewType}
-                        onChange={setViewType}
-                    />
-                    <FilterPanel 
-                        filterOptions={filterOptions}
-                        filters={filters}
-                        onFilterToggle={toggleFilter}
-                    />
-                    {
-                        user.roles.includes('admin') && (
-                            <button className='shift-events-forward' onClick={() => {
-                                postRequest('/shift-events-forward', {days: 7});
-                                addNotification('Events shifted forward successfully');
-                            }}>
-                                Shift Events Forward
-                            </button>
-                        )
-                    }
-                </div>
-                <div className="explore-events">
-                    {futureEvents.loading ? (
-                        <div className="loading">Loading events...</div>
-                    ) : futureEvents.error ? (
-                        <div className="error">Error loading events</div>
-                    ) : futureEvents.data ? 
-                    viewType === 0 ? 
-                    (
-                        <div className="events-list">
-                            {groupEventsByDate(futureEvents.data.events).map(({ date, events }) => (
-                                <div key={date.toISOString()} className="date-group">
-                                    <div className="date-separator">{formatDate(date)}</div>
-                                    {events.map(event => (
-                                        <Event key={event._id} event={event} />
-                                    ))}
-                                </div>
-                            ))}
+    const groupedEvents = groupEventsByDate(events);
+
+    return(
+        <main className="explore" role="main" aria-label="Explore events">
+            {/* <header className="heading">
+                <img src={RPIlogo} alt="RPI Logo" />
+                <h1>Explore Events</h1>
+            </header> */}
+            <div className="explore-content">
+                {
+                    width > 768 ? (
+                        <aside className="sidebar" role="complementary" aria-label="Event filters and view options">
+                            <div className="sidebar-header">
+                                <h2>Events at</h2>
+                                <img src={RPIlogo} alt="RPI Logo" />
+                            </div>
+                            <Switch
+                                options={['list', 'calendar']}
+                                selectedPass={viewType}
+                                setSelectedPass={setViewType}
+                                onChange={setViewType}
+                                ariaLabel="View type selection"
+                            />
                             {
-                                groupEventsByDate(futureEvents.data.events).length === 0 && (
-                                    <div className="no-events">No events found</div>
+                                viewType === 1 && (
+                                    <section className="legend" aria-labelledby="legend-header">
+                                        <div className="legend-header">
+                                            <p id="legend-header">color legend</p>
+                                        </div>
+                                        <div className="legend-content" role="list" aria-label="Event type color legend">
+                                            <div className="legend-item" role="listitem">
+                                                <div className="legend-item-color" style={{backgroundColor: '#6D8EFA'}} aria-label="Campus event color"></div>
+                                                <p>campus</p>
+                                            </div>
+                                            <div className="legend-item" role="listitem">
+                                                <div className="legend-item-color" style={{backgroundColor: '#5C5C5C'}} aria-label="Alumni event color"></div>
+                                                <p>alumni</p>
+                                            </div>
+                                            <div className="legend-item" role="listitem">
+                                                <div className="legend-item-color" style={{backgroundColor: '#6EB25F'}} aria-label="Athletics event color"></div>
+                                                <p>athletics</p>
+                                            </div>
+                                            <div className="legend-item" role="listitem">
+                                                <div className="legend-item-color" style={{backgroundColor: '#FBEBBB'}} aria-label="Arts event color"></div>
+                                                <p>arts</p>
+                                            </div>
+                                        </div>
+                                    </section>
+
                                 )
                             }
-                        </div>
-                    ) 
+                            <FilterPanel 
+                                filterOptions={filterOptions}
+                                filters={filters}
+                                onFilterToggle={toggleFilter}
+                            />
+                        </aside>
+                    )
                     :
                     (
-                        view === 0 ?
-                        <Month height={'calc(100% - 44px)'} filter={filterParam} changeToWeek={() => {}} view={view} setView={setView}/>
-                        : view === 1 ?
-                        <Week height={'calc(100% - 44px)'} filter={filterParam} changeToDay={() => {}} view={view} setView={setView}/>
-                        :
-                        <Day height={'calc(100% - 44px)'} filter={filterParam} view={view} setView={setView}/>
+                        <aside className="sidebar mobile-sidebar" role="complementary" aria-label="Event filters and view options">
+                            <div className="sidebar-header">
+                                <div className="logo">
+                                    <h2>Events at</h2>
+                                    <img src={RPIlogo} alt="RPI Logo" />
+                                </div>
+                                <Switch
+                                    options={['list', 'calendar']}
+                                    selectedPass={viewType}
+                                    setSelectedPass={setViewType}
+                                    onChange={setViewType}
+                                    ariaLabel="View type selection"
+                                />
+                            </div>
+                            {/* <FilterPanel 
+                                filterOptions={filterOptions}
+                                filters={filters}
+                                onFilterToggle={toggleFilter}
+                            /> */}
+
+                        </aside>
+
                     )
-                    
-                    : null}
-                </div>
+                }
+                <section className="explore-events" role="region" aria-label="Events display">
+                    {loading && page === 1 ? (
+                        <div className="loading" role="status" aria-live="polite">
+                            <Icon icon="mdi:loading" />
+                            <p>Loading events...</p>
+                        </div>
+                    ) : error ? (
+                        <div className="error" role="alert">Error loading events</div>
+                    ) : viewType === 0 ? (
+                        <EventsList 
+                            groupedEvents={groupedEvents}
+                            loading={loading}
+                            page={page}
+                            hasMore={hasMore}
+                            onLoadMore={handleLoadMore}
+                            formatDate={formatDate}
+                            hasFriendsFilter={hasFriendsFilter}
+                        />
+                    ) : (
+                        view === 0 ?
+                        <Month 
+                            height={'calc(100% - 44px)'} 
+                            filter={filterParam} 
+                            changeToWeek={(date) => {
+                                setSelectedDate(date);
+                                setView(1);
+                            }} 
+                            view={view} 
+                            setView={changeView}
+                        />
+                        : view === 1 ?
+                        <Week 
+                            height={'calc(100% - 44px)'} 
+                            filter={filterParam} 
+                            start={selectedDate}
+                            changeToDay={(date) => {
+                                setSelectedDate(date);
+                                setView(2);
+                            }} 
+                            view={view} 
+                            setView={changeView}
+                        />
+                        :
+                        <Day 
+                            height={'calc(100% - 44px)'} 
+                            filter={filterParam} 
+                            start={selectedDate}
+                            view={view} 
+                            setView={changeView}
+                        />
+                    )}
+                </section>
             </div>
-        </div>
+        </main>
     )
 }
 

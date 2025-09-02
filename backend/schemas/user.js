@@ -7,6 +7,24 @@ const userSchema = new mongoose.Schema({
         required: false,
         trim: true, // trims whitespace
     },
+    // SAML-related fields
+    samlId: {
+        type: String,
+        required: false,
+        trim: true,
+        sparse: true, // Allows multiple null values
+    },
+    samlProvider: {
+        type: String,
+        required: false,
+        trim: true,
+    },
+    // SAML attributes (stored as JSON for flexibility)
+    samlAttributes: {
+        type: Map,
+        of: String,
+        default: new Map()
+    },
     username: {
         type: String,
         required: false,
@@ -106,6 +124,11 @@ const userSchema = new mongoose.Schema({
             ref: 'Org'
         }
     ],
+    refreshToken: {
+        type: String,
+        required: false,
+        default: null
+    },
 
     
     // you can add more fields here if needed, like 'createdAt', 'updatedAt', etc.
@@ -120,5 +143,14 @@ userSchema.pre('save', async function (next) {
     next();
   });
 
+
+// Indexes for performance optimization
+userSchema.index({ email: 1 }); // For email lookups
+userSchema.index({ googleId: 1 }); // For Google OAuth
+userSchema.index({ samlId: 1, samlProvider: 1 }); // For SAML authentication
+userSchema.index({ username: 1 }); // For username lookups
+userSchema.index({ roles: 1 }); // For role-based queries
+userSchema.index({ approvalRoles: 1 }); // For approval role queries
+userSchema.index({ admin: 1 }); // For admin queries
 
 module.exports = userSchema;

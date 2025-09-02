@@ -88,7 +88,6 @@ function Settings() {
 
     return (
         <div className='settings component'>
-            <Header />
             <div className='content-container'>
                 <div className='settings-container'>
                     <div className='settings-left'>

@@ -1,78 +1,61 @@
 import './MyEvents.scss';
-import CreateEventButton from '../../../components/EventsViewer/EventsGrid/EventsColumn/CreateEventButton/CreateEvent';
-import { useFetch } from '../../../hooks/useFetch';
+import EventsGrad from '../../../assets/Gradients/EventsGrad.png';
+import useAuth from '../../../hooks/useAuth';
 import { useState, useEffect } from 'react';
-import OIEEvent from '../../OIEDash/OIEEventsComponents/Event/OIEEvent';
+import { useNavigate } from 'react-router-dom';
 import { Icon } from '@iconify-icon/react/dist/iconify.mjs';
+import { getFriends } from '../../../pages/Friends/FriendsHelpers.js';
+
+import RecommendedEvents from './RecommendedEvents/RecommendedEvents';
+import MyEventsContent from './MyEventsContent/MyEventsContent';
 
 function MyEvents(){
+    //define welcometext to be either good morning, good afternoon, or good evening, in one line
+    const welcomeText = `Good ${new Date().getHours() < 12 ? "Morning" : new Date().getHours() < 18 ? "Afternoon" : "Evening"}`;
+    const { user, isAuthenticated } = useAuth();
+    const navigate = useNavigate();
+    const [friends, setFriends] = useState([]);
 
-    const [fetchType, setFetchType] = useState('future');
-    const [sort, setSort] = useState('desc');
-    const myEvents = useFetch(`/get-my-events?type=${fetchType}&sort=${sort}`);
+    useEffect(() => {
+        const fetchFriends = async () => {
+            if (isAuthenticated) {
+                try {
+                    const result = await getFriends();
+                    setFriends(result);
+                } catch (error) {
+                    console.error('Error fetching friends:', error);
+                }
+            }
+        };
+        
+        fetchFriends();
+    }, [isAuthenticated]);
 
-    const selectorItems = [
-        {
-            label: 'upcoming',
-            value: 'future'
-        },
-        {
-            label: 'past',
-            value: 'past'
-        },
-        {
-            label: 'archived',
-            value: 'archived'
-        }
-    ]
-
-    const handleFetchTypeChange = (value) => {
-        setFetchType(value);
-        setSort('desc');
-    }
-
-    useEffect(()=>{
-        console.log(myEvents.data);
-    },[myEvents.data]);
+    const handleAddFriends = () => {
+        navigate('/events-dashboard?page=2');
+    };
 
     return(
-        <div className="my-events">
-            <div className="heading">
-                <h1>My Events</h1>
-            </div>
-            <div className="event-button-container">
-                <CreateEventButton row={true} color="red"/>
-            </div>
-            <div className="item-container">
-                <div className="item-header">
-                    <div className="header-row">
-                        <div>
-                            <Icon icon="mingcute:calendar-fill" />
-                            <h2>
-                                events
-                            </h2>
-                        </div>
+        <div className="my-events dash">
+            <header className="header">
+                <img src={EventsGrad} alt="" />
+                <h1>{welcomeText}, {user?.username || 'User'}</h1>
+                <p>Check out your upcoming events and see top picks for you</p>
+            </header>
+            {isAuthenticated && friends.length === 0 && (
+                <div className="friends-notice">
+                    <div className="notice-container">
+                        <Icon icon="mingcute:user-add-fill" />
+                        <span>You don't have any friends yet. Start connecting with people!</span>
                     </div>
-                    <div className="selector-row">
-                        { 
-                            selectorItems.map((item)=>(
-                                <div className={`selector-item ${item.value === fetchType ? 'selected' : ''}`} key={item.value} onClick={()=>handleFetchTypeChange(item.value)}>
-                                    <h3>
-                                        {item.label}
-                                    </h3>
-                                </div>
-                            ))
-                        }
-                        
-                    </div>
+                    <button onClick={handleAddFriends}>
+                        Add Friends <Icon icon="heroicons:chevron-right" />
+                    </button>
                 </div>
-                <div className="items-container">
-                    <div className="items item-grid">
-                        {myEvents.data && myEvents.data.events.map((event)=>(
-                            <OIEEvent key={event._id} event={event} showOIE={event.approvalReference} manage={true} refetch={myEvents.refetch} />
-                        ))}
-                    </div>
-                </div>
+            )}
+            <div className="my-events-container">
+                <RecommendedEvents />
+                <MyEventsContent />
             </div>
         </div>
     )

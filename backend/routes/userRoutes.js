@@ -274,9 +274,11 @@ router.get("/search-users", verifyToken, async (req, res) => {
         
         // Text search on username or name
         if (query) {
+            // Escape regex special characters to prevent regex errors
+            const escapedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
             searchQuery.$or = [
-                { username: { $regex: new RegExp(query, 'i') } },
-                { name: { $regex: new RegExp(query, 'i') } }
+                { username: { $regex: new RegExp(escapedQuery, 'i') } },
+                { name: { $regex: new RegExp(escapedQuery, 'i') } }
             ];
         }
         
@@ -419,7 +421,37 @@ router.post('/grant-badge', verifyToken, async (req, res) => {
 });
 
 router.post('/renew-badge-grant', verifyToken, authorizeRoles('admin'), async (req,res) => {
-    
+    const { BadgeGrant } = getModels(req, 'BadgeGrant');
+    try {
+        const { badgeGrantId, daysValid } = req.body;
+
+        if (!badgeGrantId || !daysValid) {
+            return res.status(400).json({ error: 'Badge grant ID and days valid are required' });
+        }
+
+        const badgeGrant = await BadgeGrant.findById(badgeGrantId);
+        if (!badgeGrant) {
+            return res.status(404).json({ error: 'Badge grant not found' });
+        }
+
+        const validFrom = new Date();
+        const validTo = new Date();
+        validTo.setDate(validTo.getDate() + daysValid);
+
+        badgeGrant.validFrom = validFrom;
+        badgeGrant.validTo = validTo;
+
+        await badgeGrant.save();
+
+        res.status(200).json({
+            message: 'Badge grant renewed successfully',
+            validFrom,
+            validTo,
+        });
+    } catch (error) {
+        console.error('Error renewing badge grant:', error);
+        res.status(500).json({ error: 'Server error' });
+    }
 })
 
 router.get('/get-badge-grants', verifyToken, authorizeRoles('admin'), async (req,res) => {
@@ -440,6 +472,34 @@ router.get('/get-badge-grants', verifyToken, authorizeRoles('admin'), async (req
     } catch (error){
         console.error('Error getting badges:', error);
         res.status(500).json({erorr:error})
+    }
+});
+
+router.get('/get-badge-grant/:hash', async (req,res) => {
+    const { BadgeGrant } = getModels(req, 'BadgeGrant');
+    try{
+        const { hash } = req.params;
+        const badgeGrant = await BadgeGrant.findOne({ hash });
+        
+        if(!badgeGrant){
+            return res.status(404).json({
+                success: false,
+                message: 'Badge grant not found'
+            })
+        }
+        
+        return res.status(200).json({
+            success: true,
+            badgeGrant: {
+                badgeContent: badgeGrant.badgeContent,
+                badgeColor: badgeGrant.badgeColor,
+                validFrom: badgeGrant.validFrom,
+                validTo: badgeGrant.validTo
+            }
+        })
+    } catch (error){
+        console.error('Error getting badge grant:', error);
+        res.status(500).json({error: error})
     }
 });
 
@@ -538,5 +598,46 @@ router.post('/manage-roles', verifyToken, authorizeRoles('admin'), async (req,re
         })
     }
 })
+
+// Get user by username (for development testing)
+router.post('/get-user-by-username', verifyToken, async (req, res) => {
+    const { User } = getModels(req, 'User');
+    const { username } = req.body;
+    
+    try {
+        if (!username) {
+            return res.status(400).json({
+                success: false,
+                message: 'Username is required'
+            });
+        }
+
+        const user = await User.findOne({ username: { $regex: new RegExp(username, "i") } });
+        
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: 'User not found'
+            });
+        }
+
+        // Return minimal user info for security
+        res.status(200).json({
+            success: true,
+            user: {
+                _id: user._id,
+                username: user.username,
+                name: user.name,
+                email: user.email
+            }
+        });
+    } catch (error) {
+        console.error('Error getting user by username:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Internal server error'
+        });
+    }
+});
 
 module.exports = router;

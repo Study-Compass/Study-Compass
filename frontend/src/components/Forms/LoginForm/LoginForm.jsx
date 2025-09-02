@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import '../Forms.scss';
 import { generalIcons } from '../../../Icons';
@@ -7,6 +7,8 @@ import circleWarning from '../../../assets/circle-warning.svg';
 import { useGoogleLogin } from '@react-oauth/google';
 import axios from 'axios';
 import Flag from '../../Flag/Flag';
+import SAMLLoginButton from '../SAMLLoginButton/SAMLLoginButton';
+import { isSAMLEnabled, getUniversityDisplayName, getUniversityLogo, getUniversityClassName } from '../../../config/universities';
 
 function LoginForm() {
     const { isAuthenticated, login, googleLogin } = useAuth();
@@ -21,16 +23,36 @@ function LoginForm() {
     const [email, setEmail] = useState(false);
     
     const location = useLocation();
+    const redirectPathRef = useRef(null);
+    const [isGoogleLoginInProgress, setIsGoogleLoginInProgress] = useState(false);
     
     const googleLogo = generalIcons.google;
-    const from = location.state?.from?.pathname || '/room/none';
-    console.log(from);
+    
+    // Store the redirect path when component mounts or location changes
     useEffect(() => {
-      if (isAuthenticated){
+        if (location.state?.from?.pathname) {
+            redirectPathRef.current = location.state.from.pathname;
+            console.log('LoginForm - stored redirect path:', redirectPathRef.current);
+        }
+    }, [location.state]);
+    
+    const from = redirectPathRef.current || location.state?.from?.pathname || '/events-dashboard';
+    console.log('LoginForm - location.state:', location.state);
+    console.log('LoginForm - from pathname:', from);
+
+    // Get university info for SAML
+    const universityName = getUniversityDisplayName();
+    const universityLogo = getUniversityLogo();
+    const universityClassName = getUniversityClassName();
+    const samlEnabled = isSAMLEnabled();
+
+    useEffect(() => {
+      if (isAuthenticated && !isGoogleLoginInProgress){
         console.log("logged in already");
-        navigate('/room/none')
+        console.log("auto-redirecting to:", from);
+        navigate(from, { replace: true })
       }
-    },[isAuthenticated, navigate]);
+    },[isAuthenticated, navigate, from, isGoogleLoginInProgress]);
 
     useEffect(() => {
         // const token = localStorage.getItem('token'); // or sessionStorage
@@ -52,6 +74,7 @@ function LoginForm() {
       try {
         await login(formData);
         console.log("logged in");
+        console.log("redirecting to:", from);
         navigate(from,{ replace: true })
         // Handle success (e.g., store the token and redirect to a protected page)
       } catch (error) {
@@ -77,9 +100,14 @@ function LoginForm() {
     useEffect(() => {
         async function googleLog(code) {
             try{
+                setIsGoogleLoginInProgress(true);
                 const codeResponse = await googleLogin(code, false);
                 console.log("codeResponse: " + codeResponse);
+                console.log("Google login successful, redirecting to:", redirectPathRef.current || from);
+                // Navigate after successful Google login
+                navigate(redirectPathRef.current || from, { replace: true });
             } catch (error){
+                setIsGoogleLoginInProgress(false);
                 if(error.response.status  === 409){
                     failed("Email already exists");
                 } else {
@@ -101,7 +129,7 @@ function LoginForm() {
             setLoadContent(true);
         }
 
-    }, [location]);
+    }, [location, navigate, from]);
 
     const google = useGoogleLogin({
         onSuccess: () => { console.log("succeeded") },
@@ -130,6 +158,19 @@ function LoginForm() {
         {errorText !== "" && 
             <Flag text={errorText} img={circleWarning} color={"#FD5858"} primary={"rgba(250, 117, 109, 0.16)"} accent={"#FD5858"} /> 
         }
+
+        {/* SAML Login Button - Show first if enabled */}
+        {samlEnabled && (
+            <SAMLLoginButton
+                universityName={universityName}
+                universityLogo={universityLogo}
+                className={universityClassName}
+                onError={setErrorText}
+                relayState={from}
+            />
+        )}
+
+        {/* Google Login Button */}
         <button type="button" className="button google" onClick={() => google()}>Continue with Google<img src={googleLogo} alt="google"/></button>
 
         <div className="divider">

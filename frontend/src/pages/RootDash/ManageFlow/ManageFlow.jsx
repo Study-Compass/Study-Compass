@@ -28,7 +28,7 @@ function ManageFlow(){
     return (
         <div className="dash manage-flow">
             <Popup onClose={()=>setPopupOpen(false)} isOpen={popupOpen} defaultStyling={false}>
-                <NewApproval/>
+                <NewApproval refetch={flowData.refetch}/>
             </Popup>
             <header className="header">
                 <img src={AdminGradient} alt="" />
@@ -48,10 +48,10 @@ function ManageFlow(){
                             <Icon icon="icon-park-solid:check-one"/>
                             <h2>approval rules</h2>
                         </div>
-                        <button onClick={console.log}>
+                        {/* <button onClick={console.log}>
                             <Icon icon="fluent:flow-16-filled"/>
                             <p>edit workflow</p>
-                        </button>
+                        </button> */}
                     </div>
                     <div className="container">
                         {

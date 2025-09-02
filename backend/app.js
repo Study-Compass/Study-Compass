@@ -4,6 +4,8 @@ const cors = require('cors');
 const path = require('path'); 
 const cookieParser = require('cookie-parser');
 const multer = require('multer');
+const session = require('express-session');
+const passport = require('passport');
 require('dotenv').config();
 const { createServer } = require('http');
 const { Server } = require('socket.io');
@@ -20,7 +22,7 @@ const io = new Server(server, {
     transports: ['websocket', 'polling'], // WebSocket first, fallback to polling if necessary
     cors: {
         origin: process.env.NODE_ENV === 'production'
-            ? ['https://www.study-compass.com', 'https://studycompass.com']
+            ? ['https://www.meridian.study', 'https://meridian.study']
             : 'http://localhost:3000',  // Allow localhost during development
         methods: ['GET', 'POST'],
         allowedHeaders: ['Content-Type'],
@@ -28,21 +30,42 @@ const io = new Server(server, {
     }
 });
 
+// Configure CORS for cookie-based authentication
+const corsOptions = {
+    origin: process.env.NODE_ENV === 'production'
+        ? ['https://www.meridian.study', 'https://meridian.study']
+        : 'http://localhost:3000',
+    credentials: true, // This is crucial for cookies
+    optionsSuccessStatus: 200 // for legacy browser support
+};
+
 if (process.env.NODE_ENV === 'production') {
     app.use(enforce.HTTPS({ trustProtoHeader: true }));
-    const corsOptions = {
-        origin: [
-            'https://www.study-compass.com', 
-            'https://studycompass.com',
-        ],
-        optionsSuccessStatus: 200 // for legacy browser support
-    };
+    app.use(cors(corsOptions));
+} else {
     app.use(cors(corsOptions));
 }
 
 // Other middleware
 app.use(express.json());
+app.use(express.urlencoded({ extended: true })); // Add this for form-encoded data
 app.use(cookieParser());
+
+// Session middleware for SAML
+app.use(session({
+    secret: process.env.SESSION_SECRET || 'your-secret-key',
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+        secure: process.env.NODE_ENV === 'production',
+        httpOnly: true,
+        maxAge: 24 * 60 * 60 * 1000 // 24 hours
+    }
+}));
+
+// Initialize Passport
+app.use(passport.initialize());
+app.use(passport.session());
 
 // if (process.env.NODE_ENV === 'production') {
 //     mongoose.connect(process.env.MONGO_URL);
@@ -78,6 +101,7 @@ const upload = multer({
 
 // Define your routes and other middleware
 const authRoutes = require('./routes/authRoutes.js');
+const samlRoutes = require('./routes/samlRoutes.js');
 const dataRoutes = require('./routes/dataRoutes.js');
 const friendRoutes = require('./routes/friendRoutes.js');
 const userRoutes = require('./routes/userRoutes.js');
@@ -85,29 +109,39 @@ const analyticsRoutes = require('./routes/analytics.js');
 const classroomChangeRoutes = require('./routes/classroomChangeRoutes.js');
 const ratingRoutes = require('./routes/ratingRoutes.js');
 const searchRoutes = require('./routes/searchRoutes.js');
-const eventRoutes = require('./routes/eventRoutes.js');
-const oieRoutes = require('./routes/oie-routes.js');
 const orgRoutes = require('./routes/orgRoutes.js');
-const workflowRoutes = require('./routes/workflowRoutes.js');
+const orgRoleRoutes = require('./routes/orgRoleRoutes.js');
+const orgManagementRoutes = require('./routes/orgManagementRoutes.js');
+const roomRoutes = require('./routes/roomRoutes.js');
 const adminRoutes = require('./routes/adminRoutes.js');
+const eventsRoutes = require('./events/index.js');
+const notificationRoutes = require('./routes/notificationRoutes.js');
+const qrRoutes = require('./routes/qrRoutes.js');
+const eventAnalyticsRoutes = require('./routes/eventAnalyticsRoutes.js');
 
 app.use(authRoutes);
+app.use('/auth/saml', samlRoutes);
 app.use(dataRoutes);
 app.use(friendRoutes);
 app.use(userRoutes);
 app.use(analyticsRoutes);
-app.use(eventRoutes);
+app.use('/event-analytics', eventAnalyticsRoutes);
 
 app.use(classroomChangeRoutes);
 app.use(ratingRoutes);
 app.use(searchRoutes);
 
-app.use(eventRoutes);
-app.use(oieRoutes);
+
 app.use(orgRoutes);
-app.use(workflowRoutes);
+app.use('/org-roles', orgRoleRoutes);
+app.use('/org-management', orgManagementRoutes);
+app.use('/admin', roomRoutes);
 app.use(adminRoutes);
 
+app.use('/notifications', notificationRoutes);
+app.use('/api/qr', qrRoutes);
+
+app.use(eventsRoutes);
 // Serve static files from the React app in production
 if (process.env.NODE_ENV === 'production') {
     app.use(express.static(path.join(__dirname, '../frontend/build')));

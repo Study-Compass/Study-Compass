@@ -7,6 +7,15 @@
     height:100vh;
     max-height:100vh;
     position: relative;
+
+    &.hide-header{
+        .calendar-container{
+            width:100%;
+            box-shadow: none;
+        }
+    }
+
+
 }
 
 .calendar-container{
@@ -93,13 +102,14 @@ select{
 
 
 ::-webkit-scrollbar {
-    width: 10px; /* or height for horizontal scrollbars */
+    width: 9px; /* or height for horizontal scrollbars */
   }
   
   /* This styles the scrollbar thumb (the moving part) */
 ::-webkit-scrollbar-thumb {
     background: var(--lightborder); /* Thumb color */
     border-radius: 10px; /* Roundness of the thumb */
+    border:2px solid var(--background);
 }
   
   /* This styles the scrollbar thumb on hover */
@@ -417,8 +427,10 @@ select{
     .content-container{
         padding:0px 10px 10px 10px;
         width:97%;
-        height: calc(100% - 80px);
-        max-height: calc(100% - 80px);
+        height: calc(100% - 20px);
+        max-height: calc(100% - 20px);
+        margin:10px;
+        height:100%;
     }
     .dot{
         height:18px;

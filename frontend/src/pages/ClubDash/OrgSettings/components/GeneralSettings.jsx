@@ -1,0 +1,180 @@
+import React, { useState, useEffect } from 'react';
+import { useOrgPermissions, useOrgSave } from './settingsHelpers';
+import OrgGrad from '../../../../assets/Gradients/OrgGrad.png';
+import UnsavedChangesBanner from '../../../../components/UnsavedChangesBanner/UnsavedChangesBanner';
+import useUnsavedChanges from '../../../../hooks/useUnsavedChanges';
+
+const GeneralSettings = ({ org, expandedClass }) => {
+    const [formData, setFormData] = useState({
+        org_name: '',
+        org_description: '',
+        org_profile_image: '',
+        weekly_meeting: '',
+        positions: []
+    });
+    const [permissionsChecked, setPermissionsChecked] = useState(false);
+    const [canManageSettings, setCanManageSettings] = useState(false);
+    const [hasAccess, setHasAccess] = useState(false);
+
+    const { checkUserPermissions } = useOrgPermissions(org);
+    const { saveOrgSettings } = useOrgSave(org);
+
+    useEffect(() => {
+        if (org && !permissionsChecked) {
+            initializePermissions();
+            initializeFormData();
+        }
+    }, [org, permissionsChecked]);
+
+    const initializePermissions = async () => {
+        const permissions = await checkUserPermissions();
+        setCanManageSettings(permissions.canManageSettings);
+        setHasAccess(permissions.hasAccess);
+        setPermissionsChecked(true);
+    };
+
+    const initializeFormData = () => {
+        if (org) {
+            setFormData({
+                org_name: org.org_name || '',
+                org_description: org.org_description || '',
+                org_profile_image: org.org_profile_image || '',
+                weekly_meeting: org.weekly_meeting || '',
+                positions: org.positions || []
+            });
+        }
+    };
+
+    // Original data for comparison
+    const originalData = {
+        org_name: org?.org_name || '',
+        org_description: org?.org_description || '',
+        org_profile_image: org?.org_profile_image || '',
+        weekly_meeting: org?.weekly_meeting || '',
+        positions: org?.positions || []
+    };
+
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({
+            ...prev,
+            [name]: value
+        }));
+    };
+
+    const handleSave = async () => {
+        if (!canManageSettings) {
+            return false;
+        }
+
+        const success = await saveOrgSettings(formData);
+        if (success) {
+            // Optionally refresh the org data or update local state
+            initializeFormData();
+        }
+        return success;
+    };
+
+    const handleDiscard = () => {
+        // Reset to original values
+        setFormData({
+            org_name: org?.org_name || '',
+            org_description: org?.org_description || '',
+            org_profile_image: org?.org_profile_image || '',
+            weekly_meeting: org?.weekly_meeting || '',
+            positions: org?.positions || []
+        });
+    };
+
+    const { hasChanges, saving, handleSave: saveChanges, handleDiscard: discardChanges } = useUnsavedChanges(
+        originalData,
+        formData,
+        handleSave,
+        handleDiscard
+    );
+
+    if (!hasAccess) {
+        return (
+            <div className={`dash ${expandedClass}`}>
+                <div className="settings-section">
+                    <h2>General Settings</h2>
+                    <div className="permission-warning">
+                        <p>You don't have access to this organization's settings.</p>
+                        <p>You must be a member with appropriate permissions to view settings.</p>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    return (
+        <div className="dash settings-section">
+            <UnsavedChangesBanner
+                hasChanges={hasChanges}
+                onSave={saveChanges}
+                onDiscard={discardChanges}
+                saving={saving}
+            />
+            
+            <header className="header">
+                <h1>General Settings</h1>
+                <p>Manage basic organization information</p>
+                <img src={OrgGrad} alt="" />
+            </header>
+            <div className="settings-content">
+                
+                <div className="settings-child">
+                    <label htmlFor="org_name">
+                        <h4>Organization Name</h4>
+                        <p>The name of your organization</p>
+                    </label>
+                    <input
+                        type="text"
+                        id="org_name"
+                        name="org_name"
+                        value={formData.org_name}
+                        onChange={handleInputChange}
+                        disabled={!canManageSettings}
+                        placeholder="Enter organization name"
+                    />
+                </div>
+
+                <div className="form-group settings-child">
+                    <label htmlFor="org_description">
+                        <h4>Description</h4>
+                        <p>A brief description of your organization</p>
+                    </label>
+                    <textarea
+                        id="org_description"
+                        name="org_description"
+                        value={formData.org_description}
+                        onChange={handleInputChange}
+                        disabled={!canManageSettings}
+                        placeholder="Describe your organization"
+                        rows={4}
+                        maxLength={500}
+                    />
+                    <span className="char-count">{formData.org_description.length}/500</span>
+                </div>
+
+                <div className="settings-child">
+                    <label htmlFor="weekly_meeting">
+                        <h4>Weekly Meeting Time</h4>
+                        <p>The time of your weekly meeting</p>
+                    </label>
+                    <input
+                        type="text"
+                        id="weekly_meeting"
+                        name="weekly_meeting"
+                        value={formData.weekly_meeting}
+                        onChange={handleInputChange}
+                        disabled={!canManageSettings}
+                        placeholder="e.g., Every Monday at 6 PM"
+                    />
+                </div>
+            </div>
+        </div>
+    );
+};
+
+export default GeneralSettings; 

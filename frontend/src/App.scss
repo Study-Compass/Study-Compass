@@ -1,6 +1,15 @@
 /* @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800&display=swap'); */
 
 :root{
+
+    // New System
+    // Meridian
+    // Atlas
+    // Beacon
+    --beacon-accent: #998DF2;
+    // Compass
+
+    // old system
     --light:rgba(238, 238, 238, 1);
     --dark: rgba(226, 226, 226, 1);
     --lightred: rgba(250, 117, 109, 0.3);
@@ -29,6 +38,7 @@
     --green: #64AB6C;
     --dark-blue: #6D8EFA;
     --shadow: 0px 7px 29px 0px rgba(100, 100, 111, 0.1);
+    --shadow-hover: 0px 0px 29px 0px rgba(250, 117, 109, 0.4);
     --lighter: #F5F5F5;
     --offwhite: #F6F6F6;
     --yellow: #FBBC05;
@@ -53,6 +63,10 @@
     /* statuses */
     --green-main: #6EB25F;
     --green-bg: rgba(147,235,127, 0.32);
+
+    //org
+    --org-primary: #64AB6C;
+    --org-primary-transparent: #EDF6EE;
 
 }
 
@@ -300,7 +314,7 @@ button.active{
 
 
 .button.active{
-    background-color: rgba(177, 230, 176, 0.80);
+    background-color: #D3DDFD;
     color: #414141;
     pointer-events: all;
 }
