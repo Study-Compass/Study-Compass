@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import './FlowComponentV2.scss';
-import Logo from '../../assets/Brand Image/EventsLogo.svg';
+// import Logo from '../../assets/Brand Image/Beacon.svg';
 // import { Icon } from '@iconify/react/dist/iconify.js';
 // import Icon from '../../assets/Icons/Bookmark.svg';
+
 
 const FlowComponentV2 = ({
     steps, // array of objects with id, title, description, component
@@ -16,7 +17,8 @@ const FlowComponentV2 = ({
     continueButtonText = 'Continue',
     backButtonText = 'Back',
     className = '',
-    onError = null
+    onError = null,
+    validationFunction = null // Custom validation function
 }) => {
     const [currentStep, setCurrentStep] = useState(0);
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -24,6 +26,12 @@ const FlowComponentV2 = ({
 
     // Function to check if a step is completed based on form data
     const isStepCompleted = (stepIndex) => {
+        // Use custom validation function if provided
+        if (validationFunction) {
+            return validationFunction(stepIndex, formData);
+        }
+        
+        // Default validation for event creation
         switch(stepIndex) {
             case 0: // GenInfo
                 return !!(formData.name && formData.description && formData.type && formData.visibility && formData.expectedAttendance > 0);
@@ -41,7 +49,6 @@ const FlowComponentV2 = ({
     // Initialize validation state based on existing form data
     useEffect(() => {
         const initialValidation = steps.map((step, index) => isStepCompleted(index));
-        console.log('Initial validation state:', initialValidation);
         setStepValidation(initialValidation);
     }, [formData, steps.length]);
 
@@ -52,11 +59,9 @@ const FlowComponentV2 = ({
     }, [formData, steps.length]);
 
     const handleStepComplete = (stepIndex, isValid) => {
-        console.log(`Step ${stepIndex} validation:`, isValid);
         setStepValidation(prev => {
             const newValidation = [...prev];
             newValidation[stepIndex] = isValid;
-            console.log('Updated validation state:', newValidation);
             return newValidation;
         });
     };

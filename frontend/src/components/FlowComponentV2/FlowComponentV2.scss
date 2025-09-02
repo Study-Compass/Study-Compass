@@ -9,7 +9,7 @@
 
     // Default styling (NewUserSetup style)
     &.new-user-setup-v2 {
-        // No background gradient, clean look
+        background: transparent; // No background gradient, clean look
     }
 
     // CreateLine variant styling
@@ -36,6 +36,7 @@
         overflow: hidden;
         min-height: 600px;
         max-height: calc(100vh - 80px); // Ensure it doesn't overflow viewport
+        position: relative; // For sticky positioning
 
         @media (max-width: 768px) {
             flex-direction: column;
@@ -105,20 +106,20 @@
                 
                 .step-number {
                     background: transparent;
-                    color: var(--red);
+                    color: var(--blue);
                     
                     .completed-icon {
-                        color: var(--red);
+                        color: var(--blue);
                     }
                 }
             }
             &:hover {
-                background: var(--red-transparent);
+                background: rgba(59, 130, 246, 0.1);
             }
 
             &.active {
-                background-color: var(--red-transparent);
-                border: 1px solid var(--red);
+                background-color: rgba(59, 130, 246, 0.1);
+                border: 1px solid var(--blue);
             }
 
             .step-number {
@@ -142,7 +143,7 @@
                 }
 
                 .completed-icon {
-                    color: var(--red);
+                    color: var(--blue);
                     font-weight: bold;
                     font-size: 14px;
                 }
@@ -175,14 +176,14 @@
 
     .content-area {
         flex: 1;
-        padding: 32px;
+        padding: 32px 32px 0 32px; // Remove bottom padding
         display: flex;
         flex-direction: column;
         min-height: 0; // Important for flex child to shrink
         height: 100%; // Use full available height
 
         @media (max-width: 768px) {
-            padding: 24px 20px 100px 20px;
+            padding: 24px 20px 0 20px; // Remove bottom padding on mobile too
         }
 
         .content-header {
@@ -215,17 +216,27 @@
             flex-direction: column;
             justify-content: flex-start;
             min-height: 0; // Important for flex child to shrink
-            overflow: hidden; // Prevent overflow from breaking layout
+            overflow-y: auto; // Allow content to scroll if needed
+            margin-bottom: 20px; // Space before navigation buttons
         }
 
         .navigation-buttons {
+            position: sticky;
+            bottom: 0;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-top: 24px; // Reduced from 32px to give more space to content
-            padding-top: 20px; // Reduced from 24px
+            padding: 20px 32px; // Add horizontal padding to match content
+            margin: 0 -32px; // Negative margin to extend to edges
             border-top: 1px solid #e2e8f0;
+            background: white; // Ensure buttons have solid background
             flex-shrink: 0; // Don't let navigation buttons shrink
+            z-index: 10; // Ensure buttons stay on top
+
+            @media (max-width: 768px) {
+                padding: 20px;
+                margin: 0 -20px;
+            }
 
             .right-buttons {
                 display: flex;
@@ -249,11 +260,11 @@
             }
 
             .btn-primary {
-                background: var(--red);
+                background: var(--blue);
                 color: white;
 
                 &:hover:not(:disabled) {
-                    background: var(--red);
+                    background: var(--blue);
                     transform: translateY(-1px);
                 }
 

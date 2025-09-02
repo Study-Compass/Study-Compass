@@ -1,0 +1,99 @@
+.time-location-step {
+    .form-section {
+        h3 {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1f2937;
+            margin: 0 0 8px 0;
+        }
+
+        p {
+            font-size: 16px;
+            color: #6b7280;
+            margin: 0 0 32px 0;
+            line-height: 1.5;
+        }
+
+        .datetime-section, .location-section {
+            margin-bottom: 32px;
+
+            h4 {
+                font-size: 18px;
+                font-weight: 600;
+                color: #374151;
+                margin: 0 0 16px 0;
+                border-bottom: 2px solid #e5e7eb;
+                padding-bottom: 8px;
+            }
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+            position: relative;
+
+            label {
+                display: block;
+                font-size: 14px;
+                font-weight: 600;
+                color: #374151;
+                margin-bottom: 8px;
+            }
+
+            input, select {
+                width: 100%;
+                padding: 12px 16px;
+                border: 2px solid #e5e7eb;
+                border-radius: 12px;
+                font-size: 16px;
+                transition: all 0.2s ease;
+                box-sizing: border-box;
+
+                &:focus {
+                    outline: none;
+                    border-color: #6d8efa;
+                    box-shadow: 0 0 0 3px rgba(109, 142, 250, 0.1);
+                }
+
+                &::placeholder {
+                    color: #9ca3af;
+                }
+            }
+
+            .location-help {
+                font-size: 13px;
+                color: #6b7280;
+                margin-top: 6px;
+                font-style: italic;
+            }
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+
+            @media (max-width: 768px) {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+        }
+
+        .error-message {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #dc2626;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-top: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+
+            &::before {
+                content: "⚠️";
+                font-size: 16px;
+            }
+        }
+    }
+}

@@ -51,13 +51,6 @@ const studySessionSchema = new Schema({
         rsvpAt: { type: Date, default: Date.now }
     }],
     
-    maxParticipants: { 
-        type: Number, 
-        default: 10,
-        min: 2,
-        max: 50
-    },
-    
     // Invited Users (for private sessions)
     invitedUsers: [{ type: Schema.Types.ObjectId, ref: 'User' }],
     
@@ -84,16 +77,6 @@ const studySessionSchema = new Schema({
     },
     
     // Metadata
-    tags: [{ 
-        type: String,
-        trim: true,
-        maxlength: 30
-    }],
-    requirements: { 
-        type: String,
-        trim: true,
-        maxlength: 200
-    },
     
     // Optional availability poll reference
     availabilityPoll: { 

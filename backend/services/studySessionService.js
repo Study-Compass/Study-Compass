@@ -52,7 +52,7 @@ class StudySessionService {
             attendees: [],
             rsvpEnabled: true,
             rsvpRequired: false,
-            expectedAttendance: sessionData.maxParticipants || 10,
+            expectedAttendance: 10, // Default for study sessions
             isStudySession: true, // Flag for filtering
             isDeleted: false
         };
@@ -127,13 +127,7 @@ class StudySessionService {
             throw new Error('Cannot RSVP to non-scheduled session');
         }
 
-        // Check if session is at capacity (for 'going' status)
-        if (status === 'going') {
-            const goingCount = session.participants.filter(p => p.status === 'going').length;
-            if (goingCount >= session.maxParticipants) {
-                throw new Error('Session is at maximum capacity');
-            }
-        }
+        // No capacity restrictions - unlimited participants
 
         // Remove existing participation
         session.participants = session.participants.filter(p => p.user.toString() !== userId);
@@ -280,7 +274,7 @@ class StudySessionService {
     // Discover public study sessions
     async discoverStudySessions(options = {}) {
         const { StudySession } = this.models;
-        const { course, tags, limit = 20, skip = 0 } = options;
+        const { course, limit = 20, skip = 0 } = options;
         
         const query = {
             visibility: 'public',
@@ -289,10 +283,6 @@ class StudySessionService {
 
         if (course) {
             query.course = { $regex: course, $options: 'i' };
-        }
-
-        if (tags && tags.length > 0) {
-            query.tags = { $in: tags };
         }
 
         const sessions = await StudySession.find(query)

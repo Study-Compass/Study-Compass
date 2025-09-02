@@ -43,16 +43,13 @@ router.get('/', verifyToken, withStudySessionService, async (req, res) => {
 // Are these error messages rational? alot of this should be handled on the frontend, though backend confirmation is fine too
 router.post('/', [
     verifyToken,
-    body('title').trim().isLength({ min: 1, max: 100 }).withMessage('Title is required (max 100 characterss)'),
+    body('title').trim().isLength({ min: 1, max: 100 }).withMessage('Title is required (max 100 characters)'),
     body('course').trim().isLength({ min: 1, max: 100 }).withMessage('Course is required (max 100 characters)'),
     body('description').optional().trim().isLength({ max: 1000 }).withMessage('Description too long (max 1000 characters)'),
     body('visibility').isIn(['public', 'private']).withMessage('Visibility must be public or private'),
     body('startTime').isISO8601().withMessage('Valid start time required'),
     body('endTime').isISO8601().withMessage('Valid end time required'),
-    body('location').trim().isLength({ min: 1 }).withMessage('Location is required'),
-    body('maxParticipants').optional().isInt({ min: 1, max: 50 }).withMessage('Max participants must be between 1 and 50'),
-    body('tags').optional().isArray().withMessage('Tags must be an array'),
-    body('requirements').optional().trim().isLength({ max: 200 }).withMessage('Requirements too long (max 200 chars)')
+    body('location').trim().isLength({ min: 1 }).withMessage('Location is required')
 ], withStudySessionService, async (req, res) => {
     try {
         const errors = validationResult(req);
@@ -166,10 +163,7 @@ router.put('/:id', [
     body('description').optional().trim().isLength({ max: 1000 }),
     body('startTime').optional().isISO8601(),
     body('endTime').optional().isISO8601(),
-    body('location').optional().trim().isLength({ min: 1 }),
-    body('maxParticipants').optional().isInt({ min: 1, max: 50 }),
-    body('tags').optional().isArray(),
-    body('requirements').optional().trim().isLength({ max: 200 })
+    body('location').optional().trim().isLength({ min: 1 })
 ], withStudySessionService, async (req, res) => {
     try {
         const errors = validationResult(req);
@@ -278,7 +272,7 @@ router.delete('/:id', verifyToken, withStudySessionService, async (req, res) => 
 // Discover public study sessions
 router.get('/discover', verifyTokenOptional, withStudySessionService, async (req, res) => {
     try {
-        const { course, tags, limit = 20, skip = 0 } = req.query;
+        const { course, limit = 20, skip = 0 } = req.query;
         
         const options = {
             limit: parseInt(limit),
@@ -286,9 +280,6 @@ router.get('/discover', verifyTokenOptional, withStudySessionService, async (req
         };
 
         if (course) options.course = course;
-        if (tags) {
-            options.tags = Array.isArray(tags) ? tags : [tags];
-        }
 
         const sessions = await req.studySessionService.discoverStudySessions(options);
 
