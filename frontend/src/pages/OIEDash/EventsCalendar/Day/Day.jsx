@@ -5,7 +5,7 @@ import DailyCalendar from './DailyCalendar/DailyCalendar';
 import Switch from '../../../../components/Switch/Switch';
 import './Day.scss';
 
-function Day({ height, start = new Date(new Date().setHours(0, 0, 0, 0)) , startingText = "", nav=true, setView = () => {}, view = 2, showSwitch = true, blockedEvents = [] }) {
+function Day({ height, start = new Date(new Date().setHours(0, 0, 0, 0)) , startingText = "", nav=true, setView = () => {}, view = 2, showSwitch = true, blockedEvents = [], filter }) {
     const initialStartDate = typeof start === 'string' ? new Date(start) : start;
     // Ensure the initial date is set to the start of the day
     const getStartOfDay = (date) => {
@@ -62,6 +62,8 @@ function Day({ height, start = new Date(new Date().setHours(0, 0, 0, 0)) , start
         ...(events.data ? events.data.events : []),
         ...dayBlockedEvents
     ];
+    const dayText = formattedDate(day);
+    const isToday = day.toDateString() === new Date().toDateString();
 
     return (
         <>

@@ -8,7 +8,6 @@ import CheckBlack from '../../assets/Icons/CheckBlack.svg';
 import WhenWhere from '../../components/CreateEvent/WhenWhere/WhenWhere';
 import GenInfo from '../../components/CreateEvent/GenInfo/GenInfo';
 import Review from '../../components/CreateEvent/Review/Review';
-import CustomFormFill from '../../components/CreateEvent/CustomFormFill/CustomFormFill';
 import { useNotification } from '../../NotificationContext';
 import { createEvent } from './CreateEventHelpers';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -228,13 +227,11 @@ function CreateEvent(){
                         </div>
                     </div>
                     <div className="create-workspace">
-                        <GenInfo next={nextStep} visible={step === 0} setInfo={setInfo}/>
-                        <WhenWhere next={nextStep} visible={step === 1} setInfo={setInfo}/>
-                        {
-                            showForm &&
-                            <CustomFormFill next={nextStep} visible={step === 2} setInfo={setInfo}/>
-                        }
-                        <Review next={nextStep} visible={showForm ? step === 3 : step === 2} info={info} setInfo={setInfo} onSubmit={onSubmit}/>
+                        <GenInfo next={nextStep} visible={step === 0 && currentSubStep === 0} setInfo={setInfo}/>
+                        <WhenWhere next={nextStep} visible={step === 1 && currentSubStep === 0} setInfo={setInfo}/>
+                        <WhenWhere next={nextStep} visible={step === 1 && currentSubStep === 1} setInfo={setInfo}/>
+                        <WhenWhere next={nextStep} visible={step === 1 && currentSubStep === 2} setInfo={setInfo}/>
+                        <Review next={nextStep} visible={step === 2 && currentSubStep === 0} info={info} setInfo={setInfo} onSubmit={onSubmit}/>
                     </div>
                 </div>
             </div>
