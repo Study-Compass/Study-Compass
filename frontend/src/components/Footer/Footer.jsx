@@ -8,7 +8,7 @@ function Footer(){
         <div className="mini-footer">
             <p>© {new Date().getFullYear()} Study Compass</p> 
             <p>|</p>
-            <p>MIT license</p>
+            <p>AGPL-3.0 license</p>
             <p>|</p>
             <p className="githubText">Github</p>
             <a href="https://github.com/AZ0228/Study-Compass" className="github" ><img src={Github} alt="" className="github" /></a>
