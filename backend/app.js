@@ -119,6 +119,13 @@ const notificationRoutes = require('./routes/notificationRoutes.js');
 const qrRoutes = require('./routes/qrRoutes.js');
 const eventAnalyticsRoutes = require('./routes/eventAnalyticsRoutes.js');
 
+// Study Sessions
+const studySessionRoutes = require('./routes/studySessionRoutes.js');
+const availabilityPollRoutes = require('./routes/availabilityPollRoutes.js');
+
+// Universal Feedback
+const feedbackRoutes = require('./routes/feedbackRoutes.js');
+
 app.use(authRoutes);
 app.use('/auth/saml', samlRoutes);
 app.use(dataRoutes);
@@ -140,6 +147,13 @@ app.use(adminRoutes);
 
 app.use('/notifications', notificationRoutes);
 app.use('/api/qr', qrRoutes);
+
+// Study Sessions routes
+app.use('/study-sessions', studySessionRoutes);
+app.use('/availability-polls', availabilityPollRoutes);
+
+// Universal Feedback routes
+app.use('/feedback', feedbackRoutes);
 
 app.use(eventsRoutes);
 // Serve static files from the React app in production

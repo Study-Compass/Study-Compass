@@ -21,6 +21,14 @@ const orgMemberApplicationSchema = require('../schemas/orgMemberApplication');
 const samlConfigSchema = require('../schemas/samlConfig');
 const notificationSchema = require('../schemas/notification');
 
+// Study Sessions
+const studySessionSchema = require('../schemas/studySession');
+const availabilityPollSchema = require('../schemas/availabilityPoll');
+
+// Universal Feedback System
+const universalFeedbackSchema = require('../schemas/universalFeedback');
+const feedbackConfigSchema = require('../schemas/feedbackConfig');
+const systemVersionSchema = require('../schemas/systemVersion');
 
 //events
 const rssFeedSchema = require('../events/schemas/rssFeed');
@@ -66,7 +74,16 @@ const getModels = (req, ...names) => {
         OrgMemberApplication: req.db.model('OrgMemberApplication', orgMemberApplicationSchema, 'orgMemberApplications'),
         SAMLConfig: req.db.model('SAMLConfig', samlConfigSchema, 'samlConfigs'),
         Notification: req.db.model('Notification', notificationSchema, 'notifications'),
-        EventAnalytics: req.db.model('EventAnalytics', eventAnalyticsSchema, 'eventAnalytics')
+        EventAnalytics: req.db.model('EventAnalytics', eventAnalyticsSchema, 'eventAnalytics'),
+        
+        // Study Sessions
+        StudySession: req.db.model('StudySession', studySessionSchema, 'studySessions'),
+        AvailabilityPoll: req.db.model('AvailabilityPoll', availabilityPollSchema, 'availabilityPolls'),
+        
+        // Universal Feedback System
+        UniversalFeedback: req.db.model('UniversalFeedback', universalFeedbackSchema, 'universalFeedback'),
+        FeedbackConfig: req.db.model('FeedbackConfig', feedbackConfigSchema, 'feedbackConfigs'),
+        SystemVersion: req.db.model('SystemVersion', systemVersionSchema, 'systemVersions')
     };
 
     return names.reduce((acc, name) => {
