@@ -116,6 +116,16 @@ function EventsDash({}){
     }
     },[isAuthenticating, user]);
 
+    // Handle room navigation from search results
+    const handleRoomNavigation = (room) => {
+        // Navigate to Rooms tab (index 2 for authenticated users, index 1 for non-authenticated)
+        const roomsTabIndex = user ? 2 : 1;
+        
+        // Navigate to Rooms tab with the room name as roomid parameter
+        // The Room component in embedded mode expects room names, not IDs
+        navigate(`/events-dashboard?page=${roomsTabIndex}&roomid=${encodeURIComponent(room.name)}`);
+    };
+
     // Create menu items based on authentication status
     const getMenuItems = () => {
         const items = [
@@ -126,7 +136,7 @@ function EventsDash({}){
             },
             {
                 label: 'Rooms',
-                icon: 'mingcute:calendar-fill',
+                icon: 'ic:baseline-room',
                 element: <Room hideHeader={true} urlType="embedded" />
             }
         ];
@@ -136,11 +146,11 @@ function EventsDash({}){
             items.unshift({
                 label: 'My Events', 
                 icon: 'mingcute:calendar-fill',
-                element: <MyEvents />
+                element: <MyEvents onRoomNavigation={handleRoomNavigation} />
             });
             items.push({
                 label: 'Friends', 
-                icon: 'mingcute:calendar-fill',
+                icon: 'mdi:account-group',
                 element: <Friends />
             });
             
@@ -203,7 +213,7 @@ function EventsDash({}){
                 logo={eventsLogo} 
                 primaryColor='#6D8EFA' 
                 secondaryColor='rgba(109, 142, 250, 0.15)'
-                // Set default page to "My Events" (index 1) if user is logged in, otherwise "Explore" (index 0)
+                defaultPage={user ? 1 : 0}
             >
             </Dashboard>
 

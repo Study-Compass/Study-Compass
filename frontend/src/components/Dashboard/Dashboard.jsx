@@ -73,24 +73,20 @@ function Dashboard({ menuItems, children, additionalClass = '', middleItem=null,
             return;
         }
         
-        // Only process URL parameters once
-        if (hasInitializedRef.current) {
-            return;
-        }
-        
         // Get the page from URL parameters, default to defaultPage if not specified
         const pageParam = searchParams.get('page');
         const page = parseInt(pageParam || defaultPage.toString());
         const sub = searchParams.get('sub');
         
-        console.log('Dashboard initialization:', { 
+        console.log('Dashboard URL processing:', { 
             pageParam, 
             page, 
             sub, 
             menuItemsLength: menuItems.length, 
             defaultPage, 
             currentDisplay,
-            searchParams: Object.fromEntries(searchParams.entries())
+            searchParams: Object.fromEntries(searchParams.entries()),
+            isInitialized: hasInitializedRef.current
         });
         
         if (sub !== null) {
@@ -102,15 +98,17 @@ function Dashboard({ menuItems, children, additionalClass = '', middleItem=null,
         } else if (page >= 0 && page < menuItems.length) {
             // We're in the main menu
             setCurrentDisplay(page);
-        } else {
-            // Fallback to default page if the parsed page is invalid
+        } else if (!hasInitializedRef.current) {
+            // Only fallback to default page on initial load if the parsed page is invalid
             setCurrentDisplay(defaultPage);
         }
         
-        // Mark as initialized after processing URL parameters
-        hasInitializedRef.current = true;
-        setIsInitialized(true);
-        console.log('Dashboard initialized with currentDisplay:', currentDisplay);
+        // Mark as initialized after first processing of URL parameters
+        if (!hasInitializedRef.current) {
+            hasInitializedRef.current = true;
+            setIsInitialized(true);
+            console.log('Dashboard initialized with currentDisplay:', currentDisplay);
+        }
     }, [searchParams, menuItems, defaultPage]);
 
     // Set initial URL if no page parameter is present
