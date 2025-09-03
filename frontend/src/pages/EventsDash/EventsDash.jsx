@@ -126,7 +126,7 @@ function EventsDash({}){
             },
             {
                 label: 'Rooms',
-                icon: 'mingcute:calendar-fill',
+                icon: 'ic:baseline-room',
                 element: <Room hideHeader={true} urlType="embedded" />
             }
         ];
@@ -140,7 +140,7 @@ function EventsDash({}){
             });
             items.push({
                 label: 'Friends', 
-                icon: 'mingcute:calendar-fill',
+                icon: 'mdi:account-group',
                 element: <Friends />
             });
             
