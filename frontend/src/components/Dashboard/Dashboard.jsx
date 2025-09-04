@@ -445,11 +445,9 @@ function Dashboard({ menuItems, children, additionalClass = '', middleItem=null,
                 width < 768 && 
                 (
                     <div className="mobile-heading">
-                        {user && (
-                            <div className="mobile-hamburger" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
-                                <Icon icon="material-symbols:menu-rounded" />
-                            </div>
-                        )}
+                        <div className="mobile-hamburger" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
+                            <Icon icon="material-symbols:menu-rounded" />
+                        </div>
                         <img src={logo} alt="Logo" />
                         {user ? 
                             <div className="mobile-justifier">
