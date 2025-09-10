@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Icon } from '@iconify-icon/react';
 import { useFetch } from '../../hooks/useFetch';
+import MetricCard from '../MetricCard';
 import './EventsAnalytics.scss';
 
 function EventsAnalytics() {
@@ -69,60 +70,50 @@ function EventsAnalytics() {
             </div>
 
             <div className="analytics-overview">
-                <div className="metric-card">
-                    <div className="metric-icon">
-                        <Icon icon="mingcute:calendar-fill" />
-                    </div>
-                    <div className="metric-content">
-                        <h3>Total Events</h3>
-                        <p className="metric-value">{formatNumber(data?.totalEvents || 0)}</p>
-                        <p className="metric-label">{getTimeRangeLabel(timeRange)}</p>
-                    </div>
-                </div>
+                <MetricCard
+                    icon="mingcute:calendar-fill"
+                    title="Total Events"
+                    value={data?.totalEvents || 0}
+                    label={getTimeRangeLabel(timeRange)}
+                    color="var(--dark-blue)"
+                    size="small"
+                />
 
-                <div className="metric-card">
-                    <div className="metric-icon">
-                        <Icon icon="mingcute:eye-fill" />
-                    </div>
-                    <div className="metric-content">
-                        <h3>Total Views</h3>
-                        <p className="metric-value">{formatNumber(data?.totalViews || 0)}</p>
-                        <p className="metric-label">{formatNumber(data?.totalUniqueViews || 0)} unique logged-in</p>
-                    </div>
-                </div>
+                <MetricCard
+                    icon="mingcute:eye-fill"
+                    title="Total Views"
+                    value={data?.totalViews || 0}
+                    label={`${formatNumber(data?.totalUniqueViews || 0)} unique logged-in`}
+                    color="var(--dark-blue)"
+                    size="small"
+                />
 
-                <div className="metric-card">
-                    <div className="metric-icon">
-                        <Icon icon="mdi:anonymous" />
-                    </div>
-                    <div className="metric-content">
-                        <h3>Anonymous Views</h3>
-                        <p className="metric-value">{formatNumber(data?.totalAnonymousViews || 0)}</p>
-                        <p className="metric-label">{formatNumber(data?.totalUniqueAnonymousViews || 0)} unique anonymous</p>
-                    </div>
-                </div>
+                <MetricCard
+                    icon="mdi:anonymous"
+                    title="Anonymous Views"
+                    value={data?.totalAnonymousViews || 0}
+                    label={`${formatNumber(data?.totalUniqueAnonymousViews || 0)} unique anonymous`}
+                    color="var(--dark-blue)"
+                    size="small"
+                />
 
-                <div className="metric-card">
-                    <div className="metric-icon">
-                        <Icon icon="mingcute:user-add-fill" />
-                    </div>
-                    <div className="metric-content">
-                        <h3>Total RSVPs</h3>
-                        <p className="metric-value">{formatNumber(data?.totalRsvps || 0)}</p>
-                        <p className="metric-label">{formatNumber(data?.totalUniqueRsvps || 0)} unique</p>
-                    </div>
-                </div>
+                <MetricCard
+                    icon="mingcute:user-add-fill"
+                    title="Total RSVPs"
+                    value={data?.totalRsvps || 0}
+                    label={`${formatNumber(data?.totalUniqueRsvps || 0)} unique`}
+                    color="var(--dark-blue)"
+                    size="small"
+                />
 
-                <div className="metric-card">
-                    <div className="metric-icon">
-                        <Icon icon="mingcute:trending-up-fill" />
-                    </div>
-                    <div className="metric-content">
-                        <h3>Engagement Rate</h3>
-                        <p className="metric-value">{data?.engagementRate || 0}%</p>
-                        <p className="metric-label">RSVPs per view</p>
-                    </div>
-                </div>
+                <MetricCard
+                    icon="mingcute:trending-up-fill"
+                    title="Engagement Rate"
+                    value={`${data?.engagementRate || 0}%`}
+                    label="RSVPs per view"
+                    color="var(--dark-blue)"
+                    size="small"
+                />
             </div>
 
             <div className="top-events-section">

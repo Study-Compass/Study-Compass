@@ -33,12 +33,11 @@ async function getSAMLConfig(school, req) {
     }
 }
 
-// Function to create or update user from SAML attributes
 async function createOrUpdateUserFromSAML(profile, school) {
     try {
         const { User } = getModels({ school }, 'User');
         
-        // Extract user information from SAML profile
+        //extract user info
         const email = profile['urn:oid:1.3.6.1.4.1.5923.1.1.1.6'] || profile.email || profile.mail;
         const givenName = profile['urn:oid:2.5.4.42'] || profile.givenName || profile.firstName;
         const surname = profile['urn:oid:2.5.4.4'] || profile.sn || profile.lastName;
@@ -50,7 +49,7 @@ async function createOrUpdateUserFromSAML(profile, school) {
             throw new Error('Email is required for SAML authentication');
         }
 
-        // Check if user already exists
+        //check if user exists
         let user = await User.findOne({ 
             $or: [
                 { email: email },
@@ -59,13 +58,13 @@ async function createOrUpdateUserFromSAML(profile, school) {
         });
 
         if (user) {
-            // Update existing user with SAML information
+            //update existing user with SAML information
             user.samlId = uid;
             user.samlProvider = 'rpi';
             user.name = displayName || `${givenName} ${surname}`.trim();
             user.samlAttributes = profile;
             
-            // Update roles based on affiliation
+            //update roles based on affiliation
             if (affiliation && affiliation.includes('faculty')) {
                 if (!user.roles.includes('admin')) {
                     user.roles.push('admin');
@@ -74,7 +73,7 @@ async function createOrUpdateUserFromSAML(profile, school) {
             
             await user.save();
         } else {
-            // Create new user
+            //create new user
             const username = uid || email.split('@')[0];
             
             user = new User({
@@ -119,7 +118,7 @@ function configureSAMLStrategy(school, req) {
     });
 }
 
-// SAML Login endpoint
+//SAML Login endpoint
 router.get('/login', async (req, res) => {
     try {
         const { relayState } = req.query;
@@ -129,7 +128,7 @@ router.get('/login', async (req, res) => {
         
         const strategy = await configureSAMLStrategy(school, req);
         
-        // Store relay state in session or pass it through
+        //store relay state in session or pass it through
         if (relayState) {
             req.session = req.session || {};
             req.session.relayState = relayState;
@@ -169,7 +168,7 @@ router.get('/callback', async (req, res) => {
             }
             
             try {
-                // Generate tokens
+                //generate tokens
                 const accessToken = jwt.sign(
                     { userId: user._id, roles: user.roles }, 
                     process.env.JWT_SECRET, 
@@ -182,13 +181,13 @@ router.get('/callback', async (req, res) => {
                     { expiresIn: REFRESH_TOKEN_EXPIRY }
                 );
 
-                // Store refresh token in database
+                //store refresh token in database
                 const { User } = getModels({ school }, 'User');
                 await User.findByIdAndUpdate(user._id, { 
                     refreshToken: refreshToken 
                 });
 
-                // Set cookies
+                //set cookies
                 res.cookie('accessToken', accessToken, {
                     httpOnly: true,
                     secure: process.env.NODE_ENV === 'production',
@@ -205,17 +204,17 @@ router.get('/callback', async (req, res) => {
                     path: '/'
                 });
 
-                // Get relay state for redirect
+                //get relay state for redirect
                 const relayState = req.session?.relayState || '/room/none';
                 
-                // Clear session
+                //clear session
                 if (req.session) {
                     delete req.session.relayState;
                 }
 
                 console.log(`SAML authentication successful for user: ${user.email}`);
                 
-                // Redirect to frontend callback page
+                //redirect to frontend callback page
                 const frontendUrl = process.env.NODE_ENV === 'production'
                     ? 'https://study-compass.com'
                     : 'http://localhost:3000';
@@ -234,23 +233,23 @@ router.get('/callback', async (req, res) => {
     }
 });
 
-// SAML Logout endpoint
+//SAML Logout endpoint
 router.post('/logout', verifyToken, async (req, res) => {
     try {
         const school = req.school || 'rpi';
         const config = await getSAMLConfig(school);
         
-        // Clear cookies
+        //clear cookies
         res.clearCookie('accessToken');
         res.clearCookie('refreshToken');
         
-        // Clear refresh token from database
+        //clear refresh token from database
         const { User } = getModels({ school }, 'User');
         await User.findByIdAndUpdate(req.user.userId, { 
             refreshToken: null 
         });
         
-        // If SAML logout URL is configured, redirect to it
+        //if SAML logout URL is configured, redirect to it
         if (config.logoutUrl) {
             res.redirect(config.logoutUrl);
         } else {
@@ -263,40 +262,40 @@ router.post('/logout', verifyToken, async (req, res) => {
     }
 });
 
-// SAML Metadata endpoint
+//SAML Metadata endpoint
 router.get('/metadata', async (req, res) => {
     try {
         const school = req.school || 'rpi';
         const config = await getSAMLConfig(school, req);
         
-        // Helper function to clean certificate
+        //helper function to clean certificate
         const cleanCertificate = (cert) => {
             return cert.replace(/-----BEGIN CERTIFICATE-----|-----END CERTIFICATE-----|\s/g, '');
         };
 
-        // Generate SP metadata
+        //generate SP metadata
         const metadata = `<?xml version="1.0"?>
-<md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" entityID="${config.issuer}">
-    <md:SPSSODescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
-        <md:KeyDescriptor use="signing">
-            <ds:KeyInfo>
-                <ds:X509Data>
-                    <ds:X509Certificate>${cleanCertificate(config.signingCert)}</ds:X509Certificate>
-                </ds:X509Data>
-            </ds:KeyInfo>
-        </md:KeyDescriptor>
-        <md:KeyDescriptor use="encryption">
-            <ds:KeyInfo>
-                <ds:X509Data>
-                    <ds:X509Certificate>${cleanCertificate(config.encryptCert)}</ds:X509Certificate>
-                </ds:X509Data>
-            </ds:KeyInfo>
-        </md:KeyDescriptor>
-        <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="${config.callbackUrl}" index="0"/>
-        <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="${config.logoutUrl || config.callbackUrl.replace('/callback', '/logout')}"/>
-        <md:NameIDFormat>${config.identifierFormat}</md:NameIDFormat>
-    </md:SPSSODescriptor>
-</md:EntityDescriptor>`;
+            <md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" entityID="${config.issuer}">
+                <md:SPSSODescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
+                    <md:KeyDescriptor use="signing">
+                        <ds:KeyInfo>
+                            <ds:X509Data>
+                                <ds:X509Certificate>${cleanCertificate(config.signingCert)}</ds:X509Certificate>
+                            </ds:X509Data>
+                        </ds:KeyInfo>
+                    </md:KeyDescriptor>
+                    <md:KeyDescriptor use="encryption">
+                        <ds:KeyInfo>
+                            <ds:X509Data>
+                                <ds:X509Certificate>${cleanCertificate(config.encryptCert)}</ds:X509Certificate>
+                            </ds:X509Data>
+                        </ds:KeyInfo>
+                    </md:KeyDescriptor>
+                    <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="${config.callbackUrl}" index="0"/>
+                    <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="${config.logoutUrl || config.callbackUrl.replace('/callback', '/logout')}"/>
+                    <md:NameIDFormat>${config.identifierFormat}</md:NameIDFormat>
+                </md:SPSSODescriptor>
+            </md:EntityDescriptor>`;
         
         res.set('Content-Type', 'application/xml');
         res.send(metadata);

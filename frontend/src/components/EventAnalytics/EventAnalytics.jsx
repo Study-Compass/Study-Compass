@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Icon } from '@iconify-icon/react';
 import { useFetch } from '../../hooks/useFetch';
 import { useParams } from 'react-router-dom';
+import MetricCard from '../MetricCard';
 import './EventAnalytics.scss';
 
 function EventAnalytics() {
@@ -84,49 +85,37 @@ function EventAnalytics() {
             </div>
 
             <div className="analytics-overview">
-                <div className="metric-card">
-                    <div className="metric-icon">
-                        <Icon icon="mingcute:eye-fill" />
-                    </div>
-                    <div className="metric-content">
-                        <h3>Logged-in Views</h3>
-                        <p className="metric-value">{formatNumber(data?.views || 0)}</p>
-                        <p className="metric-label">{formatNumber(data?.uniqueViews || 0)} unique logged-in</p>
-                    </div>
-                </div>
+                <MetricCard
+                    icon="mingcute:eye-fill"
+                    title="Logged-in Views"
+                    value={data?.views || 0}
+                    label={`${formatNumber(data?.uniqueViews || 0)} unique logged-in`}
+                    color="#17a2b8"
+                />
 
-                <div className="metric-card">
-                    <div className="metric-icon">
-                        <Icon icon="mdi:anonymous" />
-                    </div>
-                    <div className="metric-content">
-                        <h3>Anonymous Views</h3>
-                        <p className="metric-value">{formatNumber(data?.anonymousViews || 0)}</p>
-                        <p className="metric-label">{formatNumber(data?.uniqueAnonymousViews || 0)} unique anonymous</p>
-                    </div>
-                </div>
+                <MetricCard
+                    icon="mdi:anonymous"
+                    title="Anonymous Views"
+                    value={data?.anonymousViews || 0}
+                    label={`${formatNumber(data?.uniqueAnonymousViews || 0)} unique anonymous`}
+                    color="#6c757d"
+                />
 
-                <div className="metric-card">
-                    <div className="metric-icon">
-                        <Icon icon="mingcute:user-add-fill" />
-                    </div>
-                    <div className="metric-content">
-                        <h3>Total RSVPs</h3>
-                        <p className="metric-value">{formatNumber(data?.rsvps || 0)}</p>
-                        <p className="metric-label">{formatNumber(data?.uniqueRsvps || 0)} unique RSVPs</p>
-                    </div>
-                </div>
+                <MetricCard
+                    icon="mingcute:user-add-fill"
+                    title="Total RSVPs"
+                    value={data?.rsvps || 0}
+                    label={`${formatNumber(data?.uniqueRsvps || 0)} unique RSVPs`}
+                    color="#28a745"
+                />
 
-                <div className="metric-card">
-                    <div className="metric-icon">
-                        <Icon icon="mingcute:trending-up-fill" />
-                    </div>
-                    <div className="metric-content">
-                        <h3>Engagement Rate</h3>
-                        <p className="metric-value">{data?.engagementRate || 0}%</p>
-                        <p className="metric-label">RSVPs per view</p>
-                    </div>
-                </div>
+                <MetricCard
+                    icon="mingcute:trending-up-fill"
+                    title="Engagement Rate"
+                    value={`${data?.engagementRate || 0}%`}
+                    label="RSVPs per view"
+                    color="#ffc107"
+                />
             </div>
 
             <div className="analytics-sections">

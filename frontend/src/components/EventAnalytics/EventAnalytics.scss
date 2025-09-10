@@ -69,60 +69,6 @@
         grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
         gap: 1.5rem;
         margin-bottom: 3rem;
-
-        .metric-card {
-            background: white;
-            border-radius: 12px;
-            padding: 1.5rem;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            border: 1px solid #e0e0e0;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-
-            &:hover {
-                transform: translateY(-2px);
-                box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
-            }
-
-            .metric-icon {
-                width: 48px;
-                height: 48px;
-                background: linear-gradient(135deg, #6D8EFA, #8BA3FF);
-                border-radius: 12px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                margin-bottom: 1rem;
-
-                iconify-icon {
-                    font-size: 1.5rem;
-                    color: white;
-                }
-            }
-
-            .metric-content {
-                h3 {
-                    font-size: 0.875rem;
-                    font-weight: 600;
-                    color: #666;
-                    margin: 0 0 0.5rem 0;
-                    text-transform: uppercase;
-                    letter-spacing: 0.5px;
-                }
-
-                .metric-value {
-                    font-size: 2rem;
-                    font-weight: 700;
-                    color: #333;
-                    margin: 0 0 0.25rem 0;
-                }
-
-                .metric-label {
-                    font-size: 0.875rem;
-                    color: #888;
-                    margin: 0;
-                }
-            }
-        }
     }
 
     .analytics-sections {

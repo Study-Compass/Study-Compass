@@ -4,6 +4,7 @@ import defaultAvatar from '../../assets/defaultAvatar.svg';
 import useAuth from '../../hooks/useAuth';
 import { Icon } from '@iconify-icon/react';
 import ProfilePopup from '../ProfilePopup/ProfilePopup';
+import { DashboardProvider } from '../../contexts/DashboardContext';
 import './Dashboard.scss'
 
 function Dashboard({ menuItems, children, additionalClass = '', middleItem=null, logo, primaryColor, secondaryColor, enableSubSidebar = false, defaultPage = 0, onBack=null} ) {
@@ -24,6 +25,7 @@ function Dashboard({ menuItems, children, additionalClass = '', middleItem=null,
     const [fakeMenuData, setFakeMenuData] = useState(null);
     const [isInitialized, setIsInitialized] = useState(false); // Track if URL params have been processed
     const hasInitializedRef = useRef(false); // Track if we've already processed URL params
+    const [overlayContent, setOverlayContent] = useState(null);
     
     const [width, setWidth] = useState(window.innerWidth);
     useEffect(() => { //useEffect for window resizing
@@ -425,13 +427,14 @@ function Dashboard({ menuItems, children, additionalClass = '', middleItem=null,
     }
 
     return (
-        <div 
-            className={`general-dash ${additionalClass}`} 
-            style={{
-                '--primary-color': primaryColor,
-                '--secondary-color': secondaryColor,
-            }}
-        >
+        <DashboardProvider setOverlayContent={setOverlayContent}>
+            <div 
+                className={`general-dash ${additionalClass}`} 
+                style={{
+                    '--primary-color': primaryColor,
+                    '--secondary-color': secondaryColor,
+                }}
+            >
             {/* Mobile backdrop overlay */}
             {width < 768 && isMobileMenuOpen && (
                 <div 
@@ -563,8 +566,16 @@ function Dashboard({ menuItems, children, additionalClass = '', middleItem=null,
                 <div className={`expand`} onClick={onExpand}>
                     <Icon icon="material-symbols:expand-content-rounded" />
                 </div>
+                
+                {/* Overlay for full-screen content */}
+                {overlayContent && (
+                    <div className="dashboard-overlay">
+                        {overlayContent}
+                    </div>
+                )}
             </div>
         </div>
+        </DashboardProvider>
     );
 }
 
