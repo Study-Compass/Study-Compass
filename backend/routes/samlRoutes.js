@@ -149,7 +149,7 @@ router.get('/login', async (req, res) => {
 });
 
 // SAML Callback endpoint
-router.get('/callback', async (req, res) => {
+router.post('/callback', async (req, res) => {
     try {
         const school = req.school || 'rpi';
         const strategy = await configureSAMLStrategy(school, req);
