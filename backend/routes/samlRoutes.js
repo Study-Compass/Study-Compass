@@ -26,7 +26,21 @@ async function getSAMLConfig(school, req) {
         if (!config) {
             throw new Error(`No active SAML configuration found for school: ${school}`);
         }
-        return config.toPassportSamlConfig();
+        
+        const passportConfig = config.toPassportSamlConfig();
+        
+        // Debug certificate information
+        console.log('SAML Config Debug:', {
+            school: school,
+            hasIdpCert: !!passportConfig.cert,
+            hasPrivateCert: !!passportConfig.privateCert,
+            hasPrivateKey: !!passportConfig.privateKey,
+            hasDecryptionKey: !!passportConfig.decryptionPvk,
+            idpCertLength: passportConfig.cert?.length || 0,
+            privateCertLength: passportConfig.privateCert?.length || 0
+        });
+        
+        return passportConfig;
     } catch (error) {
         console.error('Error getting SAML config:', error);
         throw error;
@@ -154,12 +168,21 @@ router.post('/callback', async (req, res) => {
         const school = req.school || 'rpi';
         const strategy = await configureSAMLStrategy(school, req);
         
+        // Debug logging for SAML response
+        console.log('SAML callback received for school:', school);
+        console.log('SAML response body keys:', Object.keys(req.body));
+        
         passport.authenticate(strategy, { 
             failureRedirect: '/login',
             failureFlash: true 
         }, async (err, user) => {
             if (err) {
                 console.error('SAML callback error:', err);
+                console.error('Error details:', {
+                    message: err.message,
+                    stack: err.stack,
+                    school: school
+                });
                 return res.redirect('/login?error=saml_authentication_failed');
             }
             
