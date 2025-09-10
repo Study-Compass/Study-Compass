@@ -275,27 +275,29 @@ router.get('/metadata', async (req, res) => {
 
         //generate SP metadata
         const metadata = `<?xml version="1.0"?>
-            <md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" entityID="${config.issuer}">
-                <md:SPSSODescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
-                    <md:KeyDescriptor use="signing">
-                        <ds:KeyInfo>
-                            <ds:X509Data>
-                                <ds:X509Certificate>${cleanCertificate(config.signingCert)}</ds:X509Certificate>
-                            </ds:X509Data>
-                        </ds:KeyInfo>
-                    </md:KeyDescriptor>
-                    <md:KeyDescriptor use="encryption">
-                        <ds:KeyInfo>
-                            <ds:X509Data>
-                                <ds:X509Certificate>${cleanCertificate(config.encryptCert)}</ds:X509Certificate>
-                            </ds:X509Data>
-                        </ds:KeyInfo>
-                    </md:KeyDescriptor>
-                    <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="${config.callbackUrl}" index="0"/>
-                    <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="${config.logoutUrl || config.callbackUrl.replace('/callback', '/logout')}"/>
-                    <md:NameIDFormat>${config.identifierFormat}</md:NameIDFormat>
-                </md:SPSSODescriptor>
-            </md:EntityDescriptor>`;
+<md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" entityID="${config.issuer}">
+    <md:SPSSODescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
+        <md:KeyDescriptor use="signing">
+            <ds:KeyInfo>
+                <ds:X509Data>
+                    <ds:X509Certificate>${cleanCertificate(config.signingCert)}</ds:X509Certificate>
+                </ds:X509Data>
+            </ds:KeyInfo>
+        </md:KeyDescriptor>
+        <md:KeyDescriptor use="encryption">
+            <ds:KeyInfo>
+                <ds:X509Data>
+                    <ds:X509Certificate>${cleanCertificate(config.encryptCert)}</ds:X509Certificate>
+                </ds:X509Data>
+            </ds:KeyInfo>
+        </md:KeyDescriptor>
+        <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="${config.callbackUrl}" index="0"/>
+        <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="${config.logoutUrl || config.callbackUrl.replace('/callback', '/logout')}"/>
+        <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress</md:NameIDFormat>
+        <md:NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:transient</md:NameIDFormat>
+        <md:NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:persistent</md:NameIDFormat>
+    </md:SPSSODescriptor>
+</md:EntityDescriptor>`;
         
         res.set('Content-Type', 'application/xml');
         res.send(metadata);
