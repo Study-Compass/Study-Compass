@@ -2,6 +2,9 @@ import React from 'react';
 import './Month.scss';
 import MonthEvent from './MonthEvent/MonthEvent';
 
+
+//display component for month calendar
+
 const getDaysInMonth = (month, year) => {
     return new Date(year, month, 0).getDate();
 };

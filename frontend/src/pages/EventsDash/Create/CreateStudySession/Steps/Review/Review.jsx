@@ -139,14 +139,6 @@ const Review = ({ formData, setFormData, onComplete, allStepsValid }) => {
                         </div>
                     )}
                 </div>
-
-                <div className="creation-notice">
-                    <Icon icon="mingcute:information-fill" />
-                    <div>
-                        <strong>Ready to create your study session?</strong>
-                        <p>Once created, you'll be automatically signed up as a participant. Others can join if it's public, or you can invite them if it's private.</p>
-                    </div>
-                </div>
             </div>
         </div>
     );

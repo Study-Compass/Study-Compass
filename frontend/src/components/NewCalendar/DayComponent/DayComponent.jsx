@@ -3,6 +3,8 @@ import PropTypes from 'prop-types';
 import MonthEvent from '../../../pages/OIEDash/EventsCalendar/Month/MonthEvent/MonthEvent';
 import './DayComponent.scss';
 
+//display component for day calendar
+
 const DayComponent = ({ date, day, events }) => {
     if(day === "Time"){
         return (

@@ -3,6 +3,8 @@ import './WeeklyCalendar.scss';
 import { DateTime } from "luxon";
 import CalendarEvent from '../../CalendarEvent/CalendarEvent';
 
+//display component for week calendar
+
 const WeeklyCalendar = ({ startOfWeek, events, height, dayClick }) => {
     const [days, setDays] = useState([]);
     const hours = Array.from({ length: 24 }, (_, i) => i);
