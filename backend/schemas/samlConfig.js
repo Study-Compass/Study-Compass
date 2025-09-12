@@ -150,6 +150,7 @@ const samlConfigSchema = new mongoose.Schema({
             authnContext: 'urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport',
             validateInResponseTo: false,
             disableRequestedAuthnContext: true,
+            authnRequestsSigned: this.settings.authnRequestsSigned,
             wantAssertionsSigned: this.settings.wantAssertionsSigned,
             wantMessageSigned: this.settings.wantMessageSigned,
             wantLogoutRequestSigned: this.settings.wantLogoutRequestSigned,
