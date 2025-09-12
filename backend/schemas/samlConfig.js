@@ -145,7 +145,7 @@ const samlConfigSchema = new mongoose.Schema({
             privateKey: this.sp.signingKey,
             decryptionPvk: this.sp.encryptKey,
             signatureAlgorithm: 'sha256',
-            acceptedClockSkewMs: -1,
+            acceptedClockSkewMs: 30000, // 30 seconds
             identifierFormat: this.nameIDFormat,
             authnContext: 'urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport',
             validateInResponseTo: false,
@@ -157,7 +157,7 @@ const samlConfigSchema = new mongoose.Schema({
             wantNameId: true,
             wantNameIdFormat: true,
             wantAttributeStatement: this.settings.wantAttributeStatement,
-            wantAssertionsEncrypted: this.settings.wantAssertionsEncrypted,
+            wantAssertionsEncrypted: this.settings.isAssertionEncrypted,
             // wantNameIdEncrypted: false,      // Temporarily disable NameID encryption
             attributeMapping: this.attributeMapping,
             authnRequestBinding: 'HTTP-REDIRECT',
