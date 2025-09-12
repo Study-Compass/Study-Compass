@@ -156,11 +156,11 @@ const samlConfigSchema = new mongoose.Schema({
             wantLogoutResponseSigned: this.settings.wantLogoutResponseSigned,
             wantNameId: true,
             wantNameIdFormat: true,
-            wantAttributeStatement: true,
-            wantAssertionsEncrypted: true,  // Temporarily disable encryption
+            wantAttributeStatement: this.settings.wantAttributeStatement,
+            wantAssertionsEncrypted: this.settings.wantAssertionsEncrypted,
             // wantNameIdEncrypted: false,      // Temporarily disable NameID encryption
             attributeMapping: this.attributeMapping,
-            authnRequestBinding: 'HTTP-REDIRECT',
+            authnRequestBinding: 'HTTP-POST',
             // Additional fields for metadata generation
             signingCert: this.sp.signingCert,
             encryptCert: this.sp.encryptCert
