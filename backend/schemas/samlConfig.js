@@ -160,7 +160,7 @@ const samlConfigSchema = new mongoose.Schema({
             wantAssertionsEncrypted: this.settings.wantAssertionsEncrypted,
             // wantNameIdEncrypted: false,      // Temporarily disable NameID encryption
             attributeMapping: this.attributeMapping,
-            authnRequestBinding: 'HTTP-POST',
+            authnRequestBinding: 'HTTP-REDIRECT',
             // Additional fields for metadata generation
             signingCert: this.sp.signingCert,
             encryptCert: this.sp.encryptCert
