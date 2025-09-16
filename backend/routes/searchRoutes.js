@@ -14,13 +14,14 @@ router.get('/search', verifyTokenOptional, async (req, res) => {
     const query = req.query.query;
     const attributes = req.query.attributes ? req.query.attributes : []; // Ensure attributes is an array
     const sort = req.query.sort;
+    const fullObjects = req.query.fullObjects === 'true'; // New parameter to return full objects
     const userId = req.user ? req.user.userId : null;
     console.log('sort', sort);
     let user;
-    if(userId){
-        try{
+    if (userId) {
+        try {
             user = await User.findOne({ _id: userId });
-        } catch(error) {
+        } catch (error) {
             console.log('invalid user')
         }
     }
@@ -32,15 +33,15 @@ router.get('/search', verifyTokenOptional, async (req, res) => {
             { name: 1 } // Project only the name field
         );
 
-        if(attributes.length === 0){
+        if (attributes.length === 0) {
             findQuery = Classroom.find(
-                { name: { $regex: query, $options: 'i' }},
+                { name: { $regex: query, $options: 'i' } },
                 { name: 1 } // Project only the name field
             );
         }
 
-        if(sort === "availability"){
-            findQuery =  Classroom.aggregate([
+        if (sort === "availability") {
+            findQuery = Classroom.aggregate([
                 {
                     $match: {
                         name: { $regex: query, $options: 'i' } // Filters classrooms by name using regex
@@ -66,7 +67,7 @@ router.get('/search', verifyTokenOptional, async (req, res) => {
             ]);
         }
 
-        console.log({ name: { $regex: query, $options: 'i' }, attributes: { $all: attributes } },{ name: 1} ) 
+        console.log({ name: { $regex: query, $options: 'i' }, attributes: { $all: attributes } }, { name: 1 });
 
 
         // Conditionally add sorting if required
@@ -75,7 +76,7 @@ router.get('/search', verifyTokenOptional, async (req, res) => {
         // Execute the query
         let classrooms = await findQuery;
 
-        if(sort === "availability"){
+        if (sort === "availability") {
             classrooms = sortByAvailability(classrooms);
             // console.log(classrooms);
         }
@@ -87,7 +88,7 @@ router.get('/search', verifyTokenOptional, async (req, res) => {
 
             // Split classrooms into saved and not saved
             const { saved, notSaved } = classrooms.reduce((acc, classroom) => {
-                if (savedSet.has(classroom._id.toString())) { 
+                if (savedSet.has(classroom._id.toString())) {
                     acc.saved.push(classroom);
                 } else {
                     acc.notSaved.push(classroom);
@@ -101,14 +102,128 @@ router.get('/search', verifyTokenOptional, async (req, res) => {
             sortedClassrooms = classrooms; // No user or saved info, use original order
         }
 
-        // Extract only the names from the result set
-        const names = sortedClassrooms.map(classroom => classroom.name);
-
-        console.log(`GET: /search?query=${query}&attributes=${attributes}&sort=${sort}`);
-        res.json({ success: true, message: "Rooms found", data: names });
+        if (fullObjects) {
+            // Return full classroom objects with schedule data
+            const fullRoomData = await Promise.all(
+                sortedClassrooms.map(async (classroom) => {
+                    try {
+                        // Get full classroom data
+                        const fullRoom = await Classroom.findById(classroom._id);
+                        // Get schedule data
+                        const schedule = await Schedule.findOne({ classroom_id: classroom._id });
+                        
+                        return {
+                            ...fullRoom.toObject(),
+                            schedule: schedule ? schedule.toObject() : null
+                        };
+                    } catch (error) {
+                        console.error(`Error fetching full data for room ${classroom._id}:`, error);
+                        return {
+                            _id: classroom._id,
+                            name: classroom.name || 'Unknown Room',
+                            schedule: null
+                        };
+                    }
+                })
+            );
+            
+            console.log(`GET: /search?query=${query}&attributes=${attributes}&sort=${sort}&fullObjects=true - Returning ${fullRoomData.length} full objects`);
+            res.json({ success: true, message: "Rooms found", data: fullRoomData });
+        } else {
+            // Extract only the names from the result set (original behavior)
+            const names = sortedClassrooms.map(classroom => classroom.name);
+            
+            console.log(`GET: /search?query=${query}&attributes=${attributes}&sort=${sort}`);
+            res.json({ success: true, message: "Rooms found", data: names });
+        }
     } catch (error) {
         res.status(500).json({ success: false, message: 'Error searching for rooms', error: error.message });
         console.error(error);
+    }
+});
+
+// Search rooms by name and return full room objects
+router.get('/search-rooms', verifyTokenOptional, async (req, res) => {
+    const { Classroom, User } = getModels(req, 'Classroom', 'User');
+    const { query, limit = 20, page = 1 } = req.query;
+    const userId = req.user ? req.user.userId : null;
+
+    try {
+        if (!query || query.trim().length === 0) {
+            return res.status(400).json({
+                success: false,
+                message: 'Search query is required'
+            });
+        }
+
+        let user = null;
+        if (userId) {
+            try {
+                user = await User.findOne({ _id: userId });
+            } catch (error) {
+                console.log('Invalid user ID:', error);
+            }
+        }
+
+        // Build search query
+        const searchQuery = {
+            $or: [
+                { name: { $regex: query.trim(), $options: 'i' } },
+                { attributes: { $regex: query.trim(), $options: 'i' } }
+            ]
+        };
+
+        // Calculate pagination
+        const skip = (parseInt(page) - 1) * parseInt(limit);
+
+        // Execute search with pagination
+        const [rooms, total] = await Promise.all([
+            Classroom.find(searchQuery)
+                .sort({ name: 1 })
+                .skip(skip)
+                .limit(parseInt(limit)),
+            Classroom.countDocuments(searchQuery)
+        ]);
+
+        // Sort results based on user's saved rooms
+        let sortedRooms = rooms;
+        if (user && user.saved && user.saved.length > 0) {
+            const savedSet = new Set(user.saved.map(id => id.toString()));
+
+            // Split rooms into saved and not saved
+            const { saved, notSaved } = rooms.reduce((acc, room) => {
+                if (savedSet.has(room._id.toString())) {
+                    acc.saved.push(room);
+                } else {
+                    acc.notSaved.push(room);
+                }
+                return acc;
+            }, { saved: [], notSaved: [] });
+
+            // Concatenate saved items in front of not saved items
+            sortedRooms = saved.concat(notSaved);
+        }
+
+        console.log(`GET: /search-rooms?query=${query}&limit=${limit}&page=${page} - Found ${sortedRooms.length} rooms`);
+
+        res.json({
+            success: true,
+            message: 'Rooms found',
+            rooms: sortedRooms,
+            pagination: {
+                total,
+                totalPages: Math.ceil(total / parseInt(limit)),
+                currentPage: parseInt(page),
+                limit: parseInt(limit)
+            }
+        });
+    } catch (error) {
+        console.error('GET: /search-rooms failed', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error searching for rooms',
+            error: error.message
+        });
     }
 });
 
@@ -125,7 +240,7 @@ router.get('/all-purpose-search', verifyTokenOptional, async (req, res) => {
     const createTimePeriodQuery = (queryObject) => {
         let conditions = [];
         Object.entries(queryObject).forEach(([day, periods]) => {
-            if(periods.length > 0){
+            if (periods.length > 0) {
                 periods.forEach(period => {
                     const condition = {
                         [`weekly_schedule.${day}`]: {
@@ -144,10 +259,10 @@ router.get('/all-purpose-search', verifyTokenOptional, async (req, res) => {
         return conditions;
     };
 
-    if(userId){
-        try{
+    if (userId) {
+        try {
             user = await User.findOne({ _id: userId });
-        } catch(error) {
+        } catch (error) {
             console.log('invalid user')
         }
     }
@@ -155,18 +270,18 @@ router.get('/all-purpose-search', verifyTokenOptional, async (req, res) => {
     try {
         // Define the base query with projection to only include the name field
         let findQuery = Classroom.find(
-            { name: { $regex: query, $options: 'i' }, attributes: { $all: attributes },  mainSearch: { $ne: false } },
+            { name: { $regex: query, $options: 'i' }, attributes: { $all: attributes }, mainSearch: { $ne: false } },
             { name: 1 } // Project only the name field
         );
 
-        if(attributes.length === 0){
+        if (attributes.length === 0) {
             findQuery = Classroom.find(
-                { name: { $regex: query, $options: 'i' },  mainSearch: { $ne: false }},
+                { name: { $regex: query, $options: 'i' }, mainSearch: { $ne: false } },
                 { name: 1 } // Project only the name field
             );
         }
 
-        if(timePeriod){
+        if (timePeriod) {
             const queryConditions = createTimePeriodQuery(timePeriod);
             const mongoQuery = { "$and": queryConditions };
             const rooms = await Schedule.find(mongoQuery);
@@ -174,8 +289,8 @@ router.get('/all-purpose-search', verifyTokenOptional, async (req, res) => {
             findQuery = findQuery.where('_id').in(roomIds);
         }
 
-        if(sort === "availability"){
-            findQuery =  Classroom.aggregate([
+        if (sort === "availability") {
+            findQuery = Classroom.aggregate([
                 {
                     $match: {
                         name: { $regex: query, $options: 'i' }, // Filters classrooms by name using regex
@@ -184,8 +299,8 @@ router.get('/all-purpose-search', verifyTokenOptional, async (req, res) => {
                 },
                 {
                     $lookup: {
-                        from: "schedules", 
-                        localField: "_id", 
+                        from: "schedules",
+                        localField: "_id",
                         foreignField: "classroom_id", // Corresponding field in 'schedule' documents
                         as: "schedule_info" // Temporarily holds the entire joined schedule documents
                     }
@@ -202,11 +317,11 @@ router.get('/all-purpose-search', verifyTokenOptional, async (req, res) => {
             ]);
         }
 
-        findQuery = findQuery.sort('name'); 
+        findQuery = findQuery.sort('name');
 
         let classrooms = await findQuery;
 
-        if(sort === "availability"){
+        if (sort === "availability") {
             classrooms = sortByAvailability(classrooms);
             // console.log(classrooms);
         }
@@ -214,22 +329,22 @@ router.get('/all-purpose-search', verifyTokenOptional, async (req, res) => {
         let sortedClassrooms = [];
 
         if (userId && user) {
-            if(sort === "availability"){
+            if (sort === "availability") {
                 sortedClassrooms = classrooms;
-                
+
             } else {
                 const savedSet = new Set(user.saved); // Convert saved items to a Set for efficient lookups
-    
+
                 // Split classrooms into saved and not saved
                 const { saved, notSaved } = classrooms.reduce((acc, classroom) => {
-                    if (savedSet.has(classroom._id.toString())) { 
+                    if (savedSet.has(classroom._id.toString())) {
                         acc.saved.push(classroom);
                     } else {
                         acc.notSaved.push(classroom);
                     }
                     return acc;
                 }, { saved: [], notSaved: [] });
-    
+
                 // Concatenate saved items in front of not saved items
                 sortedClassrooms = saved.concat(notSaved);
             }
@@ -247,13 +362,13 @@ router.get('/all-purpose-search', verifyTokenOptional, async (req, res) => {
                 attributes: attributes,
                 timePeriod: timePeriod
             },
-            user_id: userId ? userId : null,        
+            user_id: userId ? userId : null,
         });
 
         search.save();
         res.json({ success: true, message: "Rooms found", data: names });
 
-        
+
     } catch (error) {
         res.status(500).json({ success: false, message: 'Error searching for rooms', error: error.message });
         console.error(error);

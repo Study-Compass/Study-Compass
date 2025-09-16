@@ -122,8 +122,19 @@ function Room({hideHeader = false, urlType = 'embedded'}) {
             return;
         }
         
-        // In embedded mode, don't rely on URL search parameters
+        // In embedded mode, check if we have a roomid from URL parameters
         if (urlType === 'embedded') {
+            // Check if roomid is provided via URL parameters (for EventsDash integration)
+            const urlParams = new URLSearchParams(window.location.search);
+            const urlRoomId = urlParams.get('roomid');
+            
+            if (urlRoomId && urlRoomId !== "none") {
+                // We have a roomid from URL, use it
+                roomid = decodeURIComponent(urlRoomId);
+                setContentState("classroom");
+                return;
+            }
+            
             if(roomid === "none"){
                 setContentState("empty");
                 setSearchQuery("");
@@ -149,6 +160,13 @@ function Room({hideHeader = false, urlType = 'embedded'}) {
     },[roomid]);
 
     function changeURL(option) {
+        // Check if the room exists in roomIds
+        if (roomIds[option] === undefined) {
+            // Room not found, trigger a search instead
+            onSearch(option, [], "name");
+            return;
+        }
+        
         if (urlType === 'embedded') {
             // In embedded mode, just update internal state without navigation
             fetchData(roomIds[option]);
@@ -161,6 +179,13 @@ function Room({hideHeader = false, urlType = 'embedded'}) {
     }
 
     function changeURL2(option) {
+        // Check if the room exists in roomIds
+        if (roomIds[option] === undefined) {
+            // Room not found, trigger a search instead
+            onSearch(option, [], "name");
+            return;
+        }
+        
         if (urlType === 'embedded') {
             // In embedded mode, just update internal state without navigation
             fetchData(roomIds[option]);
@@ -241,8 +266,32 @@ function Room({hideHeader = false, urlType = 'embedded'}) {
             return;
         }
         
-        // In embedded mode, don't rely on URL search parameters
+        // In embedded mode, check for roomid from URL parameters
         if (urlType === 'embedded') {
+            // Check if roomid is provided via URL parameters (for EventsDash integration)
+            const urlParams = new URLSearchParams(window.location.search);
+            const urlRoomId = urlParams.get('roomid');
+            
+            if (urlRoomId && urlRoomId !== "none") {
+                // We have a roomid from URL, decode it and use it
+                const decodedRoomId = decodeURIComponent(urlRoomId);
+                
+                // Check if this room exists in our roomIds mapping
+                if (roomIds[decodedRoomId] === undefined) {
+                    // Room not found, show empty state
+                    setContentState("empty");
+                    fetchData("none");
+                    return;
+                }
+                
+                // Room found, fetch its data
+                fetchData(roomIds[decodedRoomId]);
+                setContentState("classroom");
+                clearQuery();
+                return;
+            }
+            
+            // No URL roomid, use the roomid from props
             if(roomIds[roomid] === undefined && roomid !== "none"){
                 return;
             }
@@ -328,6 +377,10 @@ function Room({hideHeader = false, urlType = 'embedded'}) {
         if(noquery && searchQuery === "" && searchAttributes.length === 0 && contentState !== "classroom"){
             setContentState("empty");
             return;
+        }
+        // In embedded mode, if we have a search query, set content state to nameSearch
+        if (urlType === 'embedded' && searchQuery && searchQuery !== "" && contentState !== "classroom") {
+            setContentState("nameSearch");
         }
         allPurposeSearch();
     }, [searchQuery, searchAttributes, searchSort, query]);

@@ -19,6 +19,7 @@ import orgLogo from '../../assets/Brand Image/ATLAS.svg';
 import apiRequest from '../../utils/postRequest';
 import { useLocation } from 'react-router-dom';
 import EventsPanel from './EventsPanel/EventsPanel';
+import EventsManagement from './EventsManagement/EventsManagement';
 import { 
     GeneralSettings, 
     AppearanceSettings, 
@@ -201,7 +202,7 @@ function ClubDash(){
             label: 'Events', 
             icon: 'mingcute:calendar-fill', 
             key: 'events',
-            element: <EventsPanel expandedClass={expandedClass} orgId={orgData.data?.org?.overview?._id}/>
+            element: <EventsManagement expandedClass={expandedClass} orgId={clubId}/>
         },
         { 
             label: 'Members', 

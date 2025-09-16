@@ -122,7 +122,7 @@ function EventPage() {
                     </div>
                 )}
                 <div className="event-details">
-                    <div className="back" onClick={() => navigate('/events-dashboard?page=0')}>
+                    <div className="back" onClick={() => navigate(-1)}>
                         <Icon icon="mdi:arrow-left" />
                         <p>Back to Events</p>
                     </div>
