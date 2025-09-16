@@ -160,6 +160,13 @@ function Room({hideHeader = false, urlType = 'embedded'}) {
     },[roomid]);
 
     function changeURL(option) {
+        // Check if the room exists in roomIds
+        if (roomIds[option] === undefined) {
+            // Room not found, trigger a search instead
+            onSearch(option, [], "name");
+            return;
+        }
+        
         if (urlType === 'embedded') {
             // In embedded mode, just update internal state without navigation
             fetchData(roomIds[option]);
@@ -172,6 +179,13 @@ function Room({hideHeader = false, urlType = 'embedded'}) {
     }
 
     function changeURL2(option) {
+        // Check if the room exists in roomIds
+        if (roomIds[option] === undefined) {
+            // Room not found, trigger a search instead
+            onSearch(option, [], "name");
+            return;
+        }
+        
         if (urlType === 'embedded') {
             // In embedded mode, just update internal state without navigation
             fetchData(roomIds[option]);
@@ -363,6 +377,10 @@ function Room({hideHeader = false, urlType = 'embedded'}) {
         if(noquery && searchQuery === "" && searchAttributes.length === 0 && contentState !== "classroom"){
             setContentState("empty");
             return;
+        }
+        // In embedded mode, if we have a search query, set content state to nameSearch
+        if (urlType === 'embedded' && searchQuery && searchQuery !== "" && contentState !== "classroom") {
+            setContentState("nameSearch");
         }
         allPurposeSearch();
     }, [searchQuery, searchAttributes, searchSort, query]);
