@@ -1,9 +1,10 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import './WeeklyCalendar.scss';
 import { DateTime } from "luxon";
 import CalendarEvent from '../../CalendarEvent/CalendarEvent';
+import { usePerformanceMonitor } from '../../../../../utils/performanceTest';
 
-const WeeklyCalendar = ({ startOfWeek, events, height, dayClick }) => {
+const WeeklyCalendar = ({ startOfWeek, events, height, dayClick, onTimeSelection, allowCrossDaySelection = true, timeIncrement = 15 }) => {
     const [days, setDays] = useState([]);
     const hours = Array.from({ length: 24 }, (_, i) => i);
     const MINUTE_HEIGHT = 1; // 1px per minute
@@ -14,6 +15,20 @@ const WeeklyCalendar = ({ startOfWeek, events, height, dayClick }) => {
     const [width, setWidth] = useState(0);
     const [bottom, setBottom] = useState(0);
     const [currentDay, setCurrentDay] = useState(null);
+
+    // Drag selection state
+    const [dragSelectionMode, setDragSelectionMode] = useState(false);
+    const [isDragging, setIsDragging] = useState(false);
+    const [dragStart, setDragStart] = useState(null);
+    const [dragEnd, setDragEnd] = useState(null);
+    const [selectionArea, setSelectionArea] = useState(null);
+    
+    // Performance optimization refs
+    const calendarBodyRef = useRef(null);
+    const mouseMoveThrottleRef = useRef(null);
+    
+    // Performance monitoring
+    const { recordMouseMove, recordRender } = usePerformanceMonitor();
 
 
     useEffect(() => {
@@ -39,6 +54,26 @@ const WeeklyCalendar = ({ startOfWeek, events, height, dayClick }) => {
         setCurrentDay(todayIndex);
         console.log(todayIndex);
     }, [days]);
+
+    // Keyboard shortcut for toggling drag selection
+    useEffect(() => {
+        const handleKeyDown = (event) => {
+            // Ctrl/Cmd + S to toggle selection mode
+            if ((event.ctrlKey || event.metaKey) && event.key === 's') {
+                event.preventDefault();
+                toggleDragSelection();
+            }
+            // Escape to exit selection mode
+            if (event.key === 'Escape' && dragSelectionMode) {
+                setDragSelectionMode(false);
+                setSelectionArea(null);
+                setIsDragging(false);
+            }
+        };
+
+        document.addEventListener('keydown', handleKeyDown);
+        return () => document.removeEventListener('keydown', handleKeyDown);
+    }, [dragSelectionMode]);
 
     const ref = useRef(null);
 
@@ -163,22 +198,262 @@ const WeeklyCalendar = ({ startOfWeek, events, height, dayClick }) => {
     };
 
     const renderTimeGrid = () => {
-        const times = Array.from({ length: 48 }, (_, i) => i * 30); // 30-minute intervals
+        // Generate grid lines based on time increment
+        const totalMinutes = 24 * 60; // 1440 minutes in a day
+        const incrementCount = Math.floor(totalMinutes / timeIncrement);
+        const times = Array.from({ length: incrementCount }, (_, i) => i * timeIncrement);
 
         return times.map((minutes, index) => {
             const isHour = minutes % 60 === 0;
+            const isIncrement = minutes % timeIncrement === 0;
+            const isHalfHour = minutes % 30 === 0;
+            
+            let className = 'time-grid-line';
+            if (isHour) {
+                className += ' hour-line';
+            } else if (isHalfHour && timeIncrement <= 30) {
+                className += ' half-hour-line';
+            } else if (isIncrement) {
+                className += ' increment-line';
+            }
+            
             return (
                 <div
                     key={index}
-                    className={`time-grid-line ${isHour ? 'hour-line' : 'half-hour-line'}`}
+                    className={className}
                     style={{ top: `${minutes * MINUTE_HEIGHT}px` }}
                 />
             );
         });
     };
 
+    // Optimized drag selection handlers with 15-minute snapping
+    const getTimeFromPosition = useCallback((clientY, dayIndex) => {
+        const calendarBody = calendarBodyRef.current;
+        if (!calendarBody) return null;
+
+        const rect = calendarBody.getBoundingClientRect();
+        const relativeY = clientY - rect.top;
+        const rawMinutes = Math.max(0, Math.min(1440, Math.floor(relativeY / MINUTE_HEIGHT))); // 1440 = 24 * 60
+        
+        // Snap to configurable increments for better performance and UX
+        const minutes = Math.round(rawMinutes / timeIncrement) * timeIncrement;
+        
+        return {
+            dayIndex,
+            minutes,
+            time: days[dayIndex] // Use existing date object instead of creating new one
+        };
+    }, [days]);
+
+    const handleMouseDown = (event) => {
+        if (!dragSelectionMode) return;
+        
+        const dayColumn = event.target.closest('.day-column');
+        if (!dayColumn) return;
+
+        const dayIndex = parseInt(dayColumn.dataset.dayIndex);
+        const timeData = getTimeFromPosition(event.clientY, dayIndex);
+        
+        if (timeData) {
+            setIsDragging(true);
+            setDragStart(timeData);
+            setDragEnd(timeData);
+            setSelectionArea({
+                startDay: timeData.dayIndex,
+                endDay: timeData.dayIndex,
+                startMinutes: timeData.minutes,
+                endMinutes: timeData.minutes,
+                startTime: timeData.time,
+                endTime: timeData.time
+            });
+        }
+    };
+
+    // Throttled mouse move handler for better performance
+    const handleMouseMove = useCallback((event) => {
+        if (!isDragging || !dragStart) return;
+
+        // Record performance metrics
+        recordMouseMove();
+
+        // Throttle mouse move events to 16ms (60fps)
+        if (mouseMoveThrottleRef.current) return;
+        
+        mouseMoveThrottleRef.current = requestAnimationFrame(() => {
+            mouseMoveThrottleRef.current = null;
+            
+            const dayColumn = event.target.closest('.day-column');
+            if (!dayColumn) {
+                // If mouse moves outside day columns, use the last valid day
+                const timeData = getTimeFromPosition(event.clientY, dragStart.dayIndex);
+                if (timeData) {
+                    setDragEnd(timeData);
+                    setSelectionArea(prev => ({
+                        ...prev,
+                        endMinutes: timeData.minutes,
+                        endTime: timeData.time
+                    }));
+                }
+                return;
+            }
+
+            const dayIndex = parseInt(dayColumn.dataset.dayIndex);
+            const timeData = getTimeFromPosition(event.clientY, dayIndex);
+            
+            if (timeData) {
+                setDragEnd(timeData);
+                
+                // Update selection area - handle single column selection properly
+                let startDay, endDay;
+                
+                if (allowCrossDaySelection) {
+                    // Allow selection across multiple days
+                    startDay = Math.min(dragStart.dayIndex, timeData.dayIndex);
+                    endDay = Math.max(dragStart.dayIndex, timeData.dayIndex);
+                } else {
+                    // Restrict selection to the starting day only
+                    startDay = dragStart.dayIndex;
+                    endDay = dragStart.dayIndex;
+                }
+                
+                // For time calculation, always use the actual start and end minutes from the drag
+                const actualStartMinutes = Math.min(dragStart.minutes, timeData.minutes);
+                const actualEndMinutes = Math.max(dragStart.minutes, timeData.minutes);
+
+                setSelectionArea({
+                    startDay,
+                    endDay,
+                    startMinutes: actualStartMinutes,
+                    endMinutes: actualEndMinutes,
+                    startTime: days[startDay], // Use existing date object
+                    endTime: days[endDay] // Use existing date object
+                });
+            }
+        });
+    }, [isDragging, dragStart, getTimeFromPosition, allowCrossDaySelection, days]);
+
+    const handleMouseUp = useCallback(() => {
+        // Clean up throttle
+        if (mouseMoveThrottleRef.current) {
+            cancelAnimationFrame(mouseMoveThrottleRef.current);
+            mouseMoveThrottleRef.current = null;
+        }
+
+        if (isDragging && selectionArea && onTimeSelection) {
+            // Calculate the actual time range
+            const startTime = new Date(selectionArea.startTime);
+            startTime.setHours(Math.floor(selectionArea.startMinutes / 60));
+            startTime.setMinutes(selectionArea.startMinutes % 60);
+            startTime.setSeconds(0);
+
+            const endTime = new Date(selectionArea.endTime);
+            endTime.setHours(Math.floor(selectionArea.endMinutes / 60));
+            endTime.setMinutes(selectionArea.endMinutes % 60);
+            endTime.setSeconds(0);
+
+            onTimeSelection({
+                startTime: startTime.toISOString(),
+                endTime: endTime.toISOString(),
+                startDay: selectionArea.startDay,
+                endDay: selectionArea.endDay,
+                duration: selectionArea.endMinutes - selectionArea.startMinutes
+            });
+        }
+
+        setIsDragging(false);
+        setDragStart(null);
+        setDragEnd(null);
+        setSelectionArea(null);
+    }, [isDragging, selectionArea, onTimeSelection]);
+
+    const toggleDragSelection = () => {
+        setDragSelectionMode(!dragSelectionMode);
+        // Clear any existing selection when toggling off
+        if (dragSelectionMode) {
+            setSelectionArea(null);
+            setIsDragging(false);
+        }
+    };
+
+    // Memoized cursor style function
+    const getCursorStyle = useCallback(() => {
+        if (!dragSelectionMode) return 'default';
+        if (allowCrossDaySelection) return 'crosshair';
+        return 'ns-resize'; // Vertical resize cursor for single-day selection
+    }, [dragSelectionMode, allowCrossDaySelection]);
+
+    // Optimized selection area render with memoization
+    const renderSelectionArea = useCallback(() => {
+        if (!selectionArea || !isDragging) return null;
+
+        // Record render performance
+        recordRender();
+
+        const startTop = selectionArea.startMinutes * MINUTE_HEIGHT;
+        const endTop = selectionArea.endMinutes * MINUTE_HEIGHT;
+        const selectionHeight = Math.max(2, Math.abs(endTop - startTop)); // Minimum 2px height
+
+        return (
+            <div 
+                className="drag-selection-overlay"
+                style={{
+                    position: 'absolute',
+                    left: `${(selectionArea.startDay / 7) * 100}%`,
+                    width: `${((selectionArea.endDay - selectionArea.startDay + 1) / 7) * 100}%`,
+                    top: `${Math.min(startTop, endTop)}px`,
+                    height: `${selectionHeight}px`,
+                    backgroundColor: 'rgba(74, 144, 226, 0.3)',
+                    border: '2px solid #4a90e2',
+                    pointerEvents: 'none',
+                    zIndex: 10
+                }}
+            />
+        );
+    }, [selectionArea, isDragging, recordRender]);
+
     return (
         <div className="oie-weekly-calendar-container" style={{ height: `${height}` }} ref={ref}>
+            {/* Drag selection toggle button */}
+            <div className="drag-selection-controls" style={{ 
+                position: 'absolute', 
+                top: '10px', 
+                right: '10px', 
+                zIndex: 20 
+            }}>
+                <button 
+                    className={`drag-selection-toggle ${dragSelectionMode ? 'active' : ''}`}
+                    onClick={toggleDragSelection}
+                    title={
+                        dragSelectionMode 
+                            ? `Exit selection mode (Esc) - ${allowCrossDaySelection ? 'Multi-day' : 'Single-day'} selection` 
+                            : `Enter selection mode (Ctrl+S) - ${allowCrossDaySelection ? 'Multi-day' : 'Single-day'} selection`
+                    }
+                    style={{
+                        padding: '8px 12px',
+                        border: '1px solid #ccc',
+                        borderRadius: '4px',
+                        backgroundColor: dragSelectionMode ? '#4a90e2' : '#fff',
+                        color: dragSelectionMode ? '#fff' : '#333',
+                        cursor: 'pointer',
+                        fontSize: '12px'
+                    }}
+                >
+                    {dragSelectionMode ? 'Exit Selection' : 'Select Time'}
+                    <span style={{ fontSize: '10px', opacity: 0.7, marginLeft: '4px' }}>
+                        ({dragSelectionMode ? 'Esc' : 'Ctrl+S'})
+                    </span>
+                    {!allowCrossDaySelection && (
+                        <span style={{ fontSize: '10px', opacity: 0.7, marginLeft: '4px' }}>
+                            [Single-day]
+                        </span>
+                    )}
+                    <span style={{ fontSize: '10px', opacity: 0.7, marginLeft: '4px' }}>
+                        [{timeIncrement}min]
+                    </span>
+                </button>
+            </div>
+
             {/* current time line */}
             <div className="calendar-header">
                 <div className="time-header"></div>
@@ -190,7 +465,18 @@ const WeeklyCalendar = ({ startOfWeek, events, height, dayClick }) => {
                 ))}
             </div>
 
-            <div className="calendar-body">
+            <div 
+                className="calendar-body"
+                ref={calendarBodyRef}
+                onMouseDown={handleMouseDown}
+                onMouseMove={handleMouseMove}
+                onMouseUp={handleMouseUp}
+                onMouseLeave={handleMouseUp}
+                style={{ 
+                    position: 'relative',
+                    cursor: getCursorStyle()
+                }}
+            >
                 <div 
                     className="current-time-line" 
                     style={{ top: `${currentMinutes * MINUTE_HEIGHT}px` }} 
@@ -203,14 +489,25 @@ const WeeklyCalendar = ({ startOfWeek, events, height, dayClick }) => {
                     ))}
                 </div>
 
-                <div className="days-container">
+                <div className="days-container" style={{ position: 'relative' }}>
                     {days.map((day, index) => (
-                        <div key={index} className={`day-column ${currentDay === index ? 'current-day' : ''}`} onClick={()=>dayClick(day.toISOString())}>
+                        <div 
+                            key={index} 
+                            className={`day-column ${currentDay === index ? 'current-day' : ''} ${dragSelectionMode ? 'selection-mode' : ''}`} 
+                            onClick={() => !dragSelectionMode && dayClick(day.toISOString())}
+                            data-day-index={index}
+                            style={{
+                                cursor: dragSelectionMode ? getCursorStyle() : 'pointer'
+                            }}
+                        >
                             {currentDay === index && <div className="current-day-time-line" style={{ top: `${currentMinutes * MINUTE_HEIGHT}px` }} />}
                             {renderTimeGrid()}
                             {renderEvents(day)}
                         </div>
                     ))}
+                    
+                    {/* Selection area overlay - positioned relative to days container */}
+                    {renderSelectionArea()}
                 </div>
             </div>
             <div className="fixed-bottom" style={{ width: `${width}px`, top: `${bottom - 10}px` }}>

@@ -5,7 +5,7 @@ import './Week.scss';
 import WeeklyCalendar from './WeeklyCalendar/WeeklyCalendar';
 import Switch from '../../../../components/Switch/Switch';
 
-function Week({ height, changeToDay, start = new Date(new Date().setDate(new Date().getDate() - new Date().getDay())), startingText = "", nav=true , filter, setView = () => {}, view = 1, showSwitch = true }) {
+function Week({ height, changeToDay, start = new Date(new Date().setDate(new Date().getDate() - new Date().getDay())), startingText = "", nav=true , filter, setView = () => {}, view = 1, showSwitch = true, allowCrossDaySelection = true, timeIncrement = 15 }) {
     const initialStartDate = typeof start === 'string' ? new Date(start) : start;
     const initialEndDate = new Date(initialStartDate);
     console.log(initialStartDate);
@@ -112,7 +112,14 @@ function Week({ height, changeToDay, start = new Date(new Date().setDate(new Dat
                         if (changeToDay) {
                             changeToDay(date);
                         }
-                    }} 
+                    }}
+                    onTimeSelection={(selection) => {
+                        console.log('Time selection:', selection);
+                        // You can add custom logic here to handle the time selection
+                        // For example, create a new event, show a modal, etc.
+                    }}
+                    allowCrossDaySelection={allowCrossDaySelection}
+                    timeIncrement={timeIncrement}
                 />
             </div>
         </>

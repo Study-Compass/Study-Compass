@@ -68,6 +68,10 @@
         border-top: 1px dashed #f0f0f0;
     }
 
+    .increment-line {
+        border-top: 1px dotted #e0e0e0;
+    }
+
     .day-header {
         flex: 1;
         text-align: center;
@@ -228,6 +232,46 @@
         height: 10px;
         border-radius: 10px;
         background-color: transparent;
+    }
+
+    // Drag selection styles
+    .drag-selection-controls {
+        .drag-selection-toggle {
+            transition: all 0.2s ease;
+            font-weight: 500;
+            
+            &:hover {
+                transform: translateY(-1px);
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            }
+            
+            &.active {
+                box-shadow: 0 2px 8px rgba(74, 144, 226, 0.3);
+            }
+        }
+    }
+
+    .drag-selection-overlay {
+        border-radius: 4px;
+        transition: all 0.1s ease;
+        box-shadow: 0 2px 8px rgba(74, 144, 226, 0.2);
+    }
+
+    .day-column.selection-mode {
+        position: relative;
+        
+        &::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent 48%, rgba(74, 144, 226, 0.1) 49%, rgba(74, 144, 226, 0.1) 51%, transparent 52%);
+            background-size: 10px 10px;
+            pointer-events: none;
+            z-index: 1;
+        }
     }
 
     //scrollbar
