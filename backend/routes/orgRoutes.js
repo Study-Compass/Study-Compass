@@ -71,6 +71,7 @@ router.get("/get-org/:id", verifyToken, async (req, res) => {
 router.get("/get-org-by-name/:name", verifyToken, async (req, res) => {
     const { Org, OrgMember, OrgFollower, Event, User, OrgMemberApplication } = getModels(req, "Org", "OrgMember", "OrgFollower", "Event", "User", "OrgMemberApplication");
     const { exhaustive } = req.query;
+    console.log(exhaustive);
 
     try {
         const orgName = req.params.name;
@@ -78,7 +79,6 @@ router.get("/get-org-by-name/:name", verifyToken, async (req, res) => {
         const org = await Org.findOne({ org_name: orgName }).populate('memberForm');
 
         if (!org) {
-            console.log(`GET: /get-org-by-name/${orgName} - Org not found`);
             return res.status(404).json({ success: false, message: "Org not found" });
         }
 

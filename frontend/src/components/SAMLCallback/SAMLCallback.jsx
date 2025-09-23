@@ -15,11 +15,16 @@ const SAMLCallback = () => {
             try {
                 setStatus('processing');
                 
-                // Get relayState from URL parameters (passed by backend after SAML processing)
+                // Check if we have SAML response parameters
                 const urlParams = new URLSearchParams(location.search);
-                const relayState = urlParams.get('relayState');
+                const samlResponse = urlParams.get('SAMLResponse');
+                const relayState = urlParams.get('RelayState');
                 
-                // The SAML response has already been processed by the backend
+                if (!samlResponse) {
+                    throw new Error('No SAML response received');
+                }
+
+                // The SAML response should have been processed by the backend
                 // and cookies should be set. Let's validate the token.
                 await validateToken();
                 

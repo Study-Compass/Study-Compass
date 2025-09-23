@@ -26,32 +26,19 @@ async function getSAMLConfig(school, req) {
         if (!config) {
             throw new Error(`No active SAML configuration found for school: ${school}`);
         }
-        
-        const passportConfig = config.toPassportSamlConfig();
-        
-        // Debug certificate information
-        console.log('SAML Config Debug:', {
-            school: school,
-            hasIdpCert: !!passportConfig.cert,
-            hasPrivateCert: !!passportConfig.privateCert,
-            hasPrivateKey: !!passportConfig.privateKey,
-            hasDecryptionKey: !!passportConfig.decryptionPvk,
-            idpCertLength: passportConfig.cert?.length || 0,
-            privateCertLength: passportConfig.privateCert?.length || 0
-        });
-        
-        return passportConfig;
+        return config.toPassportSamlConfig();
     } catch (error) {
         console.error('Error getting SAML config:', error);
         throw error;
     }
 }
 
+// Function to create or update user from SAML attributes
 async function createOrUpdateUserFromSAML(profile, school) {
     try {
         const { User } = getModels({ school }, 'User');
         
-        //extract user info
+        // Extract user information from SAML profile
         const email = profile['urn:oid:1.3.6.1.4.1.5923.1.1.1.6'] || profile.email || profile.mail;
         const givenName = profile['urn:oid:2.5.4.42'] || profile.givenName || profile.firstName;
         const surname = profile['urn:oid:2.5.4.4'] || profile.sn || profile.lastName;
@@ -63,7 +50,7 @@ async function createOrUpdateUserFromSAML(profile, school) {
             throw new Error('Email is required for SAML authentication');
         }
 
-        //check if user exists
+        // Check if user already exists
         let user = await User.findOne({ 
             $or: [
                 { email: email },
@@ -72,13 +59,13 @@ async function createOrUpdateUserFromSAML(profile, school) {
         });
 
         if (user) {
-            //update existing user with SAML information
+            // Update existing user with SAML information
             user.samlId = uid;
             user.samlProvider = 'rpi';
             user.name = displayName || `${givenName} ${surname}`.trim();
             user.samlAttributes = profile;
             
-            //update roles based on affiliation
+            // Update roles based on affiliation
             if (affiliation && affiliation.includes('faculty')) {
                 if (!user.roles.includes('admin')) {
                     user.roles.push('admin');
@@ -87,7 +74,7 @@ async function createOrUpdateUserFromSAML(profile, school) {
             
             await user.save();
         } else {
-            //create new user
+            // Create new user
             const username = uid || email.split('@')[0];
             
             user = new User({
@@ -132,7 +119,7 @@ function configureSAMLStrategy(school, req) {
     });
 }
 
-//SAML Login endpoint
+// SAML Login endpoint
 router.get('/login', async (req, res) => {
     try {
         const { relayState } = req.query;
@@ -142,7 +129,7 @@ router.get('/login', async (req, res) => {
         
         const strategy = await configureSAMLStrategy(school, req);
         
-        //store relay state in session or pass it through
+        // Store relay state in session or pass it through
         if (relayState) {
             req.session = req.session || {};
             req.session.relayState = relayState;
@@ -163,14 +150,10 @@ router.get('/login', async (req, res) => {
 });
 
 // SAML Callback endpoint
-router.post('/callback', async (req, res) => {
+router.get('/callback', async (req, res) => {
     try {
         const school = req.school || 'rpi';
         const strategy = await configureSAMLStrategy(school, req);
-        
-        // Debug logging for SAML response
-        console.log('SAML callback received for school:', school);
-        console.log('SAML response body keys:', Object.keys(req.body));
         
         passport.authenticate(strategy, { 
             failureRedirect: '/login',
@@ -178,11 +161,6 @@ router.post('/callback', async (req, res) => {
         }, async (err, user) => {
             if (err) {
                 console.error('SAML callback error:', err);
-                console.error('Error details:', {
-                    message: err.message,
-                    stack: err.stack,
-                    school: school
-                });
                 return res.redirect('/login?error=saml_authentication_failed');
             }
             
@@ -191,7 +169,7 @@ router.post('/callback', async (req, res) => {
             }
             
             try {
-                //generate tokens
+                // Generate tokens
                 const accessToken = jwt.sign(
                     { userId: user._id, roles: user.roles }, 
                     process.env.JWT_SECRET, 
@@ -204,13 +182,13 @@ router.post('/callback', async (req, res) => {
                     { expiresIn: REFRESH_TOKEN_EXPIRY }
                 );
 
-                //store refresh token in database
+                // Store refresh token in database
                 const { User } = getModels({ school }, 'User');
                 await User.findByIdAndUpdate(user._id, { 
                     refreshToken: refreshToken 
                 });
 
-                //set cookies
+                // Set cookies
                 res.cookie('accessToken', accessToken, {
                     httpOnly: true,
                     secure: process.env.NODE_ENV === 'production',
@@ -227,17 +205,17 @@ router.post('/callback', async (req, res) => {
                     path: '/'
                 });
 
-                //get relay state for redirect
+                // Get relay state for redirect
                 const relayState = req.session?.relayState || '/room/none';
                 
-                //clear session
+                // Clear session
                 if (req.session) {
                     delete req.session.relayState;
                 }
 
                 console.log(`SAML authentication successful for user: ${user.email}`);
                 
-                //redirect to frontend callback page
+                // Redirect to frontend callback page
                 const frontendUrl = process.env.NODE_ENV === 'production'
                     ? 'https://study-compass.com'
                     : 'http://localhost:3000';
@@ -256,23 +234,23 @@ router.post('/callback', async (req, res) => {
     }
 });
 
-//SAML Logout endpoint
+// SAML Logout endpoint
 router.post('/logout', verifyToken, async (req, res) => {
     try {
         const school = req.school || 'rpi';
         const config = await getSAMLConfig(school);
         
-        //clear cookies
+        // Clear cookies
         res.clearCookie('accessToken');
         res.clearCookie('refreshToken');
         
-        //clear refresh token from database
+        // Clear refresh token from database
         const { User } = getModels({ school }, 'User');
         await User.findByIdAndUpdate(req.user.userId, { 
             refreshToken: null 
         });
         
-        //if SAML logout URL is configured, redirect to it
+        // If SAML logout URL is configured, redirect to it
         if (config.logoutUrl) {
             res.redirect(config.logoutUrl);
         } else {
@@ -285,18 +263,18 @@ router.post('/logout', verifyToken, async (req, res) => {
     }
 });
 
-//SAML Metadata endpoint
+// SAML Metadata endpoint
 router.get('/metadata', async (req, res) => {
     try {
         const school = req.school || 'rpi';
         const config = await getSAMLConfig(school, req);
         
-        //helper function to clean certificate
+        // Helper function to clean certificate
         const cleanCertificate = (cert) => {
             return cert.replace(/-----BEGIN CERTIFICATE-----|-----END CERTIFICATE-----|\s/g, '');
         };
 
-        //generate SP metadata
+        // Generate SP metadata
         const metadata = `<?xml version="1.0"?>
 <md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" entityID="${config.issuer}">
     <md:SPSSODescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
@@ -314,11 +292,9 @@ router.get('/metadata', async (req, res) => {
                 </ds:X509Data>
             </ds:KeyInfo>
         </md:KeyDescriptor>
-        <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="${config.callbackUrl}" index="0"/>
+        <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="${config.callbackUrl}" index="0"/>
         <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="${config.logoutUrl || config.callbackUrl.replace('/callback', '/logout')}"/>
-        <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress</md:NameIDFormat>
-        <md:NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:transient</md:NameIDFormat>
-        <md:NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:persistent</md:NameIDFormat>
+        <md:NameIDFormat>${config.identifierFormat}</md:NameIDFormat>
     </md:SPSSODescriptor>
 </md:EntityDescriptor>`;
         

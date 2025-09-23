@@ -153,9 +153,9 @@ function App() {
                                                 <Route path="/admin" element={<AnimatedPageWrapper><Admin/></AnimatedPageWrapper>}/>
                                             </Route>
 
-                                                <Route path="/org/:name" element={<AnimatedPageWrapper><OrgDisplay/></AnimatedPageWrapper>}/>
                                             {/* features under development */}
                                             <Route element={ <ProtectedRoute authorizedRoles={['user', 'admin', 'developer']}/> }>
+                                                <Route path="/org/:name" element={<AnimatedPageWrapper><OrgDisplay/></AnimatedPageWrapper>}/>
                                                 <Route path="/events" element={<AnimatedPageWrapper><Events/></AnimatedPageWrapper>}/>
                                                 <Route path="/club-dashboard/:id" element={<AnimatedPageWrapper><ClubDash/></AnimatedPageWrapper>}/>
                                                 <Route path='/create-org' element={<AnimatedPageWrapper><CreateOrg/></AnimatedPageWrapper>}/>

@@ -51,10 +51,10 @@ function EventPage() {
             level = "Organization";
         }
 
-        
+        //onClick={() => {if (level === "Organization") {navigate(`/org/${hostingName}`);}}
 
         return (
-            <div className={`row hosting ${level.toLowerCase()}`} onClick={() => {if (level === "Organization") {navigate(`/org/${hostingName}`);}}}>
+            <div className={`row hosting ${level.toLowerCase()}`} >
                 <p>Hosted by</p>
                 <img src={hostingImage} alt="" />
                 <p className="user-name">{hostingName}</p>
@@ -122,7 +122,7 @@ function EventPage() {
                     </div>
                 )}
                 <div className="event-details">
-                    <div className="back" onClick={() => navigate(-1)}>
+                    <div className="back" onClick={() => navigate('/events-dashboard?page=1')}>
                         <Icon icon="mdi:arrow-left" />
                         <p>Back to Events</p>
                     </div>

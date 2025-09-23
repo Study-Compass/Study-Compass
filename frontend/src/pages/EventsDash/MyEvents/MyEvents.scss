@@ -5,18 +5,6 @@
     overflow-y: auto;
     display: flex;
     flex-direction: column;
-    height:100%;
-
-    header.header{
-        //add bezier
-        transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-        &.search-mode{
-            opacity: 0;
-            height:40px !important;
-            min-height:40px !important;
-            overflow: hidden !important;
-        }
-    }
 
     .friends-notice{
         --color: var(--blue);
@@ -65,59 +53,9 @@
         }
     }
 
-    .my-events-search.compact {
-        .search-container{
-            margin: 10px 40px 0 40px;
-            width:calc(100% - 80px);
-        }
-        &.search-focused {
-            margin-bottom: 10px;
-        }
-    }
-
     .my-events-container{
         display: flex;
         flex-direction: column;
         gap: 10px;
-        transition: all 0.3s ease;
-
-        &.search-mode {
-            .search-placeholder {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                justify-content: center;
-                gap: 16px;
-                padding: 60px 20px;
-                color: #6b7280;
-                text-align: center;
-
-                .iconify {
-                    font-size: 48px;
-                    opacity: 0.3;
-                }
-
-                h3 {
-                    margin: 0;
-                    font-size: 18px;
-                    font-weight: 600;
-                    color: var(--text);
-                }
-
-                p {
-                    margin: 0;
-                    font-size: 14px;
-                    max-width: 400px;
-                }
-            }
-        }
-    }
-    @media (max-width: 768px) {
-        .my-events-search.compact {
-            .search-container {
-                margin: 0px 20px 0 20px;
-                width:calc(100% - 40px);
-            }
-        }
     }
 }
