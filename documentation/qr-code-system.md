@@ -30,7 +30,7 @@ The QR Code Management System allows administrators to create, manage, and track
 3. Fill in the required fields:
    - **Name**: Unique identifier for the QR code
    - **Description**: Optional description for organization
-   - **Redirect URL**: Where users will be redirected when scanning
+   - **Redirect URL**: Where users will be redirected when scanning (supports both relative and absolute URLs)
    - **Location**: Optional location tag
    - **Campaign**: Optional campaign tag
    - **Active Status**: Whether the QR code is currently active
@@ -39,9 +39,14 @@ The QR Code Management System allows administrators to create, manage, and track
 1. After creating a QR code, you'll get a URL like: `https://yourdomain.com/qr/your-qr-name`
 2. Use any QR code generator to create a QR code with this URL
 3. When users scan the QR code, they'll be:
-   - Automatically redirected to your specified URL
+   - Automatically redirected to your specified URL (relative URLs are converted to absolute)
    - Tracked for analytics (if they haven't visited before)
    - Marked as a repeat visitor on subsequent scans
+
+### URL Examples
+- **Relative URLs**: `/room/none`, `/events`, `/profile`, `/admin`
+- **Absolute URLs**: `https://example.com`, `https://google.com`
+- **Mixed Usage**: You can use relative URLs for internal pages and absolute URLs for external sites
 
 ### Analytics Access
 1. In the QR Codes admin panel, click "Analytics" on any QR code
@@ -104,7 +109,9 @@ The QR code system uses an enhanced schema with the following fields:
 - Consider using a naming convention (e.g., `location-purpose-date`)
 
 ### Redirect URLs
-- Always use full URLs (including `https://`)
+- **Relative URLs**: Use paths like `/room/none`, `/events`, `/profile` for internal redirects
+- **Absolute URLs**: Use full URLs (including `https://`) for external redirects
+- The system automatically converts relative URLs to absolute URLs
 - Test redirect URLs before creating QR codes
 - Consider using URL shorteners for long redirect URLs
 

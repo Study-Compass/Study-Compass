@@ -122,8 +122,19 @@ function Room({hideHeader = false, urlType = 'embedded'}) {
             return;
         }
         
-        // In embedded mode, don't rely on URL search parameters
+        // In embedded mode, check if we have a roomid from URL parameters
         if (urlType === 'embedded') {
+            // Check if roomid is provided via URL parameters (for EventsDash integration)
+            const urlParams = new URLSearchParams(window.location.search);
+            const urlRoomId = urlParams.get('roomid');
+            
+            if (urlRoomId && urlRoomId !== "none") {
+                // We have a roomid from URL, use it
+                roomid = decodeURIComponent(urlRoomId);
+                setContentState("classroom");
+                return;
+            }
+            
             if(roomid === "none"){
                 setContentState("empty");
                 setSearchQuery("");
@@ -241,8 +252,32 @@ function Room({hideHeader = false, urlType = 'embedded'}) {
             return;
         }
         
-        // In embedded mode, don't rely on URL search parameters
+        // In embedded mode, check for roomid from URL parameters
         if (urlType === 'embedded') {
+            // Check if roomid is provided via URL parameters (for EventsDash integration)
+            const urlParams = new URLSearchParams(window.location.search);
+            const urlRoomId = urlParams.get('roomid');
+            
+            if (urlRoomId && urlRoomId !== "none") {
+                // We have a roomid from URL, decode it and use it
+                const decodedRoomId = decodeURIComponent(urlRoomId);
+                
+                // Check if this room exists in our roomIds mapping
+                if (roomIds[decodedRoomId] === undefined) {
+                    // Room not found, show empty state
+                    setContentState("empty");
+                    fetchData("none");
+                    return;
+                }
+                
+                // Room found, fetch its data
+                fetchData(roomIds[decodedRoomId]);
+                setContentState("classroom");
+                clearQuery();
+                return;
+            }
+            
+            // No URL roomid, use the roomid from props
             if(roomIds[roomid] === undefined && roomid !== "none"){
                 return;
             }

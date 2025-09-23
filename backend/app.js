@@ -53,7 +53,7 @@ app.use(cookieParser());
 
 // Session middleware for SAML
 app.use(session({
-    secret: process.env.SESSION_SECRET || 'your-secret-key',
+    secret: process.env.SESSION_SECRET || 'secret',
     resave: false,
     saveUninitialized: false,
     cookie: {
@@ -118,6 +118,7 @@ const eventsRoutes = require('./events/index.js');
 const notificationRoutes = require('./routes/notificationRoutes.js');
 const qrRoutes = require('./routes/qrRoutes.js');
 const eventAnalyticsRoutes = require('./routes/eventAnalyticsRoutes.js');
+const orgEventManagementRoutes = require('./routes/orgEventManagementRoutes.js');
 
 // Study Sessions
 const studySessionRoutes = require('./routes/studySessionRoutes.js');
@@ -142,6 +143,7 @@ app.use(searchRoutes);
 app.use(orgRoutes);
 app.use('/org-roles', orgRoleRoutes);
 app.use('/org-management', orgManagementRoutes);
+app.use('/org-event-management', orgEventManagementRoutes);
 app.use('/admin', roomRoutes);
 app.use(adminRoutes);
 
