@@ -143,7 +143,7 @@ function EventsDash({}){
             
             items.push({
                 label: 'Friends', 
-                icon: 'mingcute:group-2-fill',
+                icon: 'mdi:account-group',
                 element: <Friends />
             });
             
