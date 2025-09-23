@@ -191,17 +191,21 @@ function SearchBar({ data, addQuery, onEnter, onSearch, room, onX, onBlur, urlTy
     }
 
     const handleKeyDown = (event) => {
-        if(results.length === 0){
-            return;
-        }
         if (event.key === 'Enter') {
             event.preventDefault();
             if (results.length > 0) {
                 next();
-                inputRef.current.blur();
+            } else {
+                // No results, trigger search with current input
+                console.log("No results, searching for:", getAbbFull(searchInput));
+                onSearch(getAbbFull(searchInput), [], "name");
             }
+            inputRef.current.blur();
         }
         if (event.key === 'ArrowDown') {
+            if(results.length === 0){
+                return;
+            }
             event.preventDefault();
             if(selected === results.length-1){
                 setSelected(0);

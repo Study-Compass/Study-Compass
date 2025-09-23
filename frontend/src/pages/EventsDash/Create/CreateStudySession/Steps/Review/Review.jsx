@@ -4,33 +4,7 @@ import { Icon } from '@iconify-icon/react';
 
 const Review = ({ formData, setFormData, onComplete, allStepsValid }) => {
     
-    // Format date and time for display
-    const formatDateTime = (dateTimeString) => {
-        if (!dateTimeString) return 'Not set';
-        const date = new Date(dateTimeString);
-        return date.toLocaleString('en-US', {
-            weekday: 'long',
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-            hour: 'numeric',
-            minute: '2-digit',
-            hour12: true
-        });
-    };
 
-    const formatDuration = () => {
-        if (!formData.startTime || !formData.endTime) return '';
-        const start = new Date(formData.startTime);
-        const end = new Date(formData.endTime);
-        const durationMs = end - start;
-        const hours = Math.floor(durationMs / (1000 * 60 * 60));
-        const minutes = Math.floor((durationMs % (1000 * 60 * 60)) / (1000 * 60));
-        
-        if (hours === 0) return `${minutes} minutes`;
-        if (minutes === 0) return `${hours} hour${hours > 1 ? 's' : ''}`;
-        return `${hours} hour${hours > 1 ? 's' : ''} and ${minutes} minutes`;
-    };
 
     // Call onComplete once on mount - validation is handled by FlowComponentV2
     useEffect(() => {
@@ -76,29 +50,38 @@ const Review = ({ formData, setFormData, onComplete, allStepsValid }) => {
                         </div>
                     </div>
 
-                    {/* Time & Location */}
+                    {/* Available Times & Location */}
                     <div className="review-section">
                         <div className="section-header">
                             <Icon icon="mingcute:time-fill" />
-                            <h4>Time & Location</h4>
+                            <h4>Available Times & Location</h4>
                         </div>
                         <div className="review-items">
                             <div className="review-item">
-                                <span className="label">Start Time:</span>
-                                <span className="value">{formatDateTime(formData.startTime)}</span>
-                            </div>
-                            <div className="review-item">
-                                <span className="label">End Time:</span>
-                                <span className="value">{formatDateTime(formData.endTime)}</span>
-                            </div>
-                            <div className="review-item">
-                                <span className="label">Duration:</span>
-                                <span className="value">{formatDuration()}</span>
+                                <span className="label">Possible Meeting Times:</span>
+                                <div className="value timeslots-list">
+                                    {formData.selectedTimeslots && formData.selectedTimeslots.length > 0 ? (
+                                        formData.selectedTimeslots.map((timeslot, index) => (
+                                            <div key={timeslot.id || index} className="timeslot-review-item">
+                                                <Icon icon="mingcute:calendar-fill" />
+                                                <span>{timeslot.displayText}</span>
+                                            </div>
+                                        ))
+                                    ) : (
+                                        <span className="no-timeslots">No timeslots selected</span>
+                                    )}
+                                </div>
                             </div>
                             <div className="review-item">
                                 <span className="label">Location:</span>
                                 <span className="value">{formData.location}</span>
                             </div>
+                            {formData.selectedTimeslots && formData.selectedTimeslots.length > 0 && (
+                                <div className="review-item">
+                                    <span className="label">Total Options:</span>
+                                    <span className="value">{formData.selectedTimeslots.length} possible meeting time{formData.selectedTimeslots.length !== 1 ? 's' : ''}</span>
+                                </div>
+                            )}
                         </div>
                     </div>
 

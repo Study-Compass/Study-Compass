@@ -20,8 +20,7 @@ const CreateStudySession = ({ onClose }) => {
         title: '',
         course: '',
         description: '',
-        startTime: null,
-        endTime: null,
+        selectedTimeslots: [], // Array of selected timeslot objects
         location: '',
         visibility: 'public',
         invitedUsers: [],
@@ -37,8 +36,8 @@ const CreateStudySession = ({ onClose }) => {
         },
         {
             id: 1,
-            title: 'Time & Location',
-            description: 'Choose when and where to meet',
+            title: 'Available Times',
+            description: 'Select multiple possible meeting times',
             component: TimeLocation,
         },
         {
@@ -62,8 +61,7 @@ const CreateStudySession = ({ onClose }) => {
                 title: formData.title,
                 course: formData.course,
                 description: formData.description,
-                startTime: formData.startTime,
-                endTime: formData.endTime,
+                possibleTimeslots: formData.selectedTimeslots, // Array of possible meeting times
                 location: formData.location,
                 visibility: formData.visibility,
                 invitedUsers: formData.invitedUsers
@@ -105,14 +103,12 @@ const CreateStudySession = ({ onClose }) => {
         switch(stepIndex) {
             case 0: // Basic Info
                 return !!(formData.title && formData.course && formData.visibility);
-            case 1: // Time & Location
-                return !!(formData.startTime && formData.endTime && formData.location &&
-                         new Date(formData.startTime) < new Date(formData.endTime) &&
-                         new Date(formData.startTime) > new Date());
+            case 1: // Available Times
+                return !!(formData.selectedTimeslots && formData.selectedTimeslots.length > 0 && formData.location);
             case 2: // Invite (optional but requires visit)
                 return formData.inviteStepVisited;
             case 3: // Review (only valid when all required fields are present)
-                return !!(formData.title && formData.course && formData.startTime && formData.endTime && formData.location && formData.visibility);
+                return !!(formData.title && formData.course && formData.selectedTimeslots && formData.selectedTimeslots.length > 0 && formData.location && formData.visibility);
             default:
                 return false;
         }

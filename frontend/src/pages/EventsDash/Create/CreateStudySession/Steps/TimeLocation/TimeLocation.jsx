@@ -1,25 +1,32 @@
 import React, { useEffect, useState } from 'react';
 import './TimeLocation.scss';
+import WeeklyCalendar from '../../../../../OIEDash/EventsCalendar/Week/WeeklyCalendar/WeeklyCalendar';
 
 const TimeLocation = ({ formData, setFormData, onComplete }) => {
-    const [startDate, setStartDate] = useState('');
-    const [startTime, setStartTime] = useState('');
-    const [endDate, setEndDate] = useState('');
-    const [endTime, setEndTime] = useState('');
+    const [currentWeekStart, setCurrentWeekStart] = useState(new Date());
+    const [selectedTimeslots, setSelectedTimeslots] = useState(formData.selectedTimeslots || []);
 
-    // Convert formData dates to form inputs on load
+    // Initialize current week to start of this week
     useEffect(() => {
-        if (formData.startTime) {
-            const start = new Date(formData.startTime);
-            setStartDate(start.toISOString().split('T')[0]);
-            setStartTime(start.toTimeString().slice(0, 5));
-        }
-        if (formData.endTime) {
-            const end = new Date(formData.endTime);
-            setEndDate(end.toISOString().split('T')[0]);
-            setEndTime(end.toTimeString().slice(0, 5));
-        }
+        const today = new Date();
+        const startOfWeek = new Date(today);
+        startOfWeek.setDate(today.getDate() - today.getDay()); // Start on Sunday
+        startOfWeek.setHours(0, 0, 0, 0);
+        setCurrentWeekStart(startOfWeek);
     }, []);
+
+    // Update form data when timeslots change
+    useEffect(() => {
+        setFormData(prev => ({
+            ...prev,
+            selectedTimeslots: selectedTimeslots
+        }));
+    }, [selectedTimeslots, setFormData]);
+
+    // Validate step completion
+    useEffect(() => {
+        onComplete(true);
+    }, [onComplete]);
 
     const handleInputChange = (field, value) => {
         setFormData(prev => ({
@@ -28,125 +35,135 @@ const TimeLocation = ({ formData, setFormData, onComplete }) => {
         }));
     };
 
-    const updateDateTime = () => {
-        if (startDate && startTime) {
-            const startDateTime = new Date(`${startDate}T${startTime}`);
-            setFormData(prev => ({ ...prev, startTime: startDateTime.toISOString() }));
-        }
-        if (endDate && endTime) {
-            const endDateTime = new Date(`${endDate}T${endTime}`);
-            setFormData(prev => ({ ...prev, endTime: endDateTime.toISOString() }));
-        }
+    const handleTimeslotSelection = (selectionData) => {
+        // Add the new selection to our list of selected timeslots
+        const newTimeslot = {
+            id: `timeslot-${Date.now()}-${Math.random()}`,
+            startTime: selectionData.startTime,
+            endTime: selectionData.endTime,
+            startDay: selectionData.startDay,
+            endDay: selectionData.endDay,
+            duration: selectionData.duration,
+            displayText: formatTimeslotDisplay(selectionData)
+        };
+
+        setSelectedTimeslots(prev => [...prev, newTimeslot]);
     };
 
-    useEffect(() => {
-        updateDateTime();
-    }, [startDate, startTime, endDate, endTime]);
-
-    // Auto-fill end date when start date is selected
-    useEffect(() => {
-        if (startDate && !endDate) {
-            setEndDate(startDate);
-        }
-    }, [startDate]);
-
-    // Auto-fill end time (2 hours after start) when start time is selected
-    useEffect(() => {
-        if (startTime && !endTime) {
-            const [hours, minutes] = startTime.split(':').map(Number);
-            const endHours = (hours + 2) % 24;
-            const formattedEndTime = `${endHours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
-            setEndTime(formattedEndTime);
-        }
-    }, [startTime]);
-
-    // Validate step completion
-    // Call onComplete once on mount - validation is handled by FlowComponentV2
-    useEffect(() => {
-        onComplete(true);
-    }, []);
-
-    // Get minimum date (today)
-    const getMinDate = () => {
-        const today = new Date();
-        return today.toISOString().split('T')[0];
+    const formatTimeslotDisplay = (selectionData) => {
+        const startDate = new Date(selectionData.startTime);
+        const endDate = new Date(selectionData.endTime);
+        
+        const dayName = startDate.toLocaleDateString('en-US', { weekday: 'short' });
+        const startTimeStr = startDate.toLocaleTimeString('en-US', { 
+            hour: 'numeric', 
+            minute: '2-digit',
+            hour12: true 
+        });
+        const endTimeStr = endDate.toLocaleTimeString('en-US', { 
+            hour: 'numeric', 
+            minute: '2-digit',
+            hour12: true 
+        });
+        
+        return `${dayName} ${startTimeStr} - ${endTimeStr}`;
     };
 
-    // Get minimum time for today
-    const getMinTime = () => {
-        const now = new Date();
-        const currentDate = now.toISOString().split('T')[0];
-        if (startDate === currentDate) {
-            return now.toTimeString().slice(0, 5);
-        }
-        return '';
+    const removeTimeslot = (timeslotId) => {
+        setSelectedTimeslots(prev => prev.filter(slot => slot.id !== timeslotId));
+    };
+
+    const navigateWeek = (direction) => {
+        const newWeekStart = new Date(currentWeekStart);
+        newWeekStart.setDate(newWeekStart.getDate() + (direction * 7));
+        setCurrentWeekStart(newWeekStart);
     };
 
     return (
         <div className="time-location-step">
             <div className="form-section">
-                <h3>When & Where</h3>
-                <p>Choose the date, time, and location for your study session.</p>
+                <h3>Available Times & Location</h3>
+                <p>Select multiple possible meeting times for your study session. Group members can vote on their preferred times.</p>
 
-                <div className="datetime-section">
-                    <h4>Date & Time</h4>
-                    
-                    <div className="form-row">
-                        <div className="form-group">
-                            <label htmlFor="startDate">Start Date *</label>
-                            <input
-                                id="startDate"
-                                type="date"
-                                value={startDate}
-                                onChange={(e) => setStartDate(e.target.value)}
-                                min={getMinDate()}
-                            />
-                        </div>
+                <div className="timeslot-selection-section">
+                    <h4>Select Possible Meeting Times</h4>
+                    <p className="selection-help">
+                        Click and drag on the calendar to select time periods. You can select multiple timeslots across different days.
+                    </p>
 
-                        <div className="form-group">
-                            <label htmlFor="startTime">Start Time *</label>
-                            <input
-                                id="startTime"
-                                type="time"
-                                value={startTime}
-                                onChange={(e) => setStartTime(e.target.value)}
-                                min={getMinTime()}
-                            />
-                        </div>
+                    {/* Week Navigation */}
+                    <div className="week-navigation">
+                        <button 
+                            type="button" 
+                            onClick={() => navigateWeek(-1)}
+                            className="nav-button"
+                        >
+                            ← Previous Week
+                        </button>
+                        <span className="current-week">
+                            Week of {currentWeekStart.toLocaleDateString('en-US', { 
+                                month: 'short', 
+                                day: 'numeric',
+                                year: 'numeric'
+                            })}
+                        </span>
+                        <button 
+                            type="button" 
+                            onClick={() => navigateWeek(1)}
+                            className="nav-button"
+                        >
+                            Next Week →
+                        </button>
                     </div>
 
-                    <div className="form-row">
-                        <div className="form-group">
-                            <label htmlFor="endDate">End Date *</label>
-                            <input
-                                id="endDate"
-                                type="date"
-                                value={endDate}
-                                onChange={(e) => setEndDate(e.target.value)}
-                                min={startDate || getMinDate()}
-                            />
-                        </div>
-
-                        <div className="form-group">
-                            <label htmlFor="endTime">End Time *</label>
-                            <input
-                                id="endTime"
-                                type="time"
-                                value={endTime}
-                                onChange={(e) => setEndTime(e.target.value)}
-                            />
-                        </div>
+                    {/* Enhanced WeeklyCalendar for timeslot selection */}
+                    <div className="calendar-container">
+                        <WeeklyCalendar
+                            startOfWeek={currentWeekStart}
+                            events={[]} // No existing events for now
+                            height="500px"
+                            
+                            // Auto-enable selection mode for study session creation
+                            autoEnableSelection={true}
+                            selectionMode="multiple"
+                            allowCrossDaySelection={false}
+                            timeIncrement={30} // 30-minute increments for study sessions
+                            singleSelectionOnly={false}
+                            
+                            // Callbacks
+                            dayClick={() => {}} // Disable day click
+                            onTimeSelection={handleTimeslotSelection}
+                        />
                     </div>
 
-                    {formData.startTime && formData.endTime && new Date(formData.startTime) >= new Date(formData.endTime) && (
-                        <div className="error-message">
-                            End time must be after start time
+                    {/* Selected Timeslots Display */}
+                    {selectedTimeslots.length > 0 && (
+                        <div className="selected-timeslots">
+                            <h5>Selected Possible Meeting Times ({selectedTimeslots.length})</h5>
+                            <div className="timeslot-list">
+                                {selectedTimeslots.map((timeslot) => (
+                                    <div key={timeslot.id} className="timeslot-item">
+                                        <span className="timeslot-text">{timeslot.displayText}</span>
+                                        <button
+                                            type="button"
+                                            onClick={() => removeTimeslot(timeslot.id)}
+                                            className="remove-timeslot"
+                                            title="Remove this timeslot"
+                                        >
+                                            ×
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+                            <p className="timeslot-help">
+                                Group members will be able to vote on their preferred times from these options.
+                            </p>
                         </div>
                     )}
 
-                    {formData.startTime && new Date(formData.startTime) <= new Date() && (
-                        <div className="error-message">
-                            Start time must be in the future
+                    {selectedTimeslots.length === 0 && (
+                        <div className="no-timeslots-message">
+                            <p>No timeslots selected yet. Use the calendar above to select possible meeting times.</p>
                         </div>
                     )}
                 </div>

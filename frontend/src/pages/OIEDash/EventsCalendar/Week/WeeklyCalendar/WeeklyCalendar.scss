@@ -68,6 +68,10 @@
         border-top: 1px dashed #f0f0f0;
     }
 
+    .increment-line {
+        border-top: 1px dotted #e0e0e0;
+    }
+
     .day-header {
         flex: 1;
         text-align: center;
@@ -228,6 +232,103 @@
         height: 10px;
         border-radius: 10px;
         background-color: transparent;
+    }
+
+    // Drag selection styles
+    .drag-selection-controls {
+        .drag-selection-toggle {
+            transition: all 0.2s ease;
+            font-weight: 500;
+            
+            &:hover {
+                transform: translateY(-1px);
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            }
+            
+            &.active {
+                box-shadow: 0 2px 8px rgba(74, 144, 226, 0.3);
+            }
+        }
+    }
+
+    .drag-selection-overlay {
+        border-radius: 4px;
+        transition: all 0.1s ease;
+        box-shadow: 0 2px 8px rgba(74, 144, 226, 0.2);
+
+        &.drag-preview {
+            animation: pulse 1s infinite;
+            box-shadow: 0 4px 16px rgba(74, 144, 226, 0.4);
+            
+            @keyframes pulse {
+                0%, 100% { opacity: 0.8; }
+                50% { opacity: 1; }
+            }
+        }
+
+        &.persisted {
+            &:hover {
+                transform: translateY(-1px);
+                box-shadow: 0 4px 12px rgba(74, 144, 226, 0.3);
+            }
+
+            &.active {
+                box-shadow: 0 4px 16px rgba(74, 144, 226, 0.4);
+                border-width: 3px;
+            }
+
+            &.manipulating {
+                box-shadow: 0 6px 20px rgba(74, 144, 226, 0.5);
+                transform: scale(1.02);
+            }
+
+            .resize-handle {
+                opacity: 0;
+                transition: opacity 0.2s ease;
+
+                &:hover {
+                    opacity: 0.3;
+                    background-color: rgba(74, 144, 226, 0.5);
+                }
+            }
+
+            &:hover .resize-handle {
+                opacity: 0.2;
+            }
+
+            .selection-delete-button {
+                opacity: 0;
+                transition: all 0.2s ease;
+                
+                &:hover {
+                    opacity: 1;
+                    background-color: #dc2626;
+                    transform: translateY(-50%) scale(1.1);
+                }
+            }
+
+            &:hover .selection-delete-button,
+            &.active .selection-delete-button {
+                opacity: 0.8;
+            }
+        }
+    }
+
+    .day-column.selection-mode {
+        position: relative;
+        
+        &::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent 48%, rgba(74, 144, 226, 0.1) 49%, rgba(74, 144, 226, 0.1) 51%, transparent 52%);
+            background-size: 10px 10px;
+            pointer-events: none;
+            z-index: 1;
+        }
     }
 
     //scrollbar
