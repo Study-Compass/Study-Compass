@@ -987,6 +987,20 @@ router.post('/:orgId/approval-settings', verifyToken, requireMemberManagement(),
     }
 })
 
-
+router.get('/:orgId/forms', verifyToken, async (req, res) => {
+    const { Form } = getModels(req, 'Form');
+    const { orgId } = req.params;
+    try{
+        const forms = await Form.find({formOwner: orgId, formOwnerType: 'Org'});
+        console.log('GET: /forms successful');
+        res.status(200).json({success: true, forms});
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+});
 
 module.exports = router;

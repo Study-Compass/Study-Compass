@@ -20,6 +20,7 @@ import apiRequest from '../../utils/postRequest';
 import { useLocation } from 'react-router-dom';
 import EventsPanel from './EventsPanel/EventsPanel';
 import EventsManagement from './EventsManagement/EventsManagement';
+import ClubForms from './ClubForms/ClubForms';
 import { 
     GeneralSettings, 
     AppearanceSettings, 
@@ -210,6 +211,12 @@ function ClubDash(){
             key: 'members', 
             requiresPermission: 'canManageMembers',
             element: <Members expandedClass={expandedClass} org={orgData.data?.org?.overview}/>
+        },
+        { 
+            label: 'Forms', 
+            icon: 'mdi:file-document', 
+            key: 'forms',
+            element: <ClubForms expandedClass={expandedClass} org={orgData.data?.org?.overview}/>
         },
         // { 
         //     label: 'Roles', 
