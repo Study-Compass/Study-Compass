@@ -940,6 +940,53 @@ router.post('/:orgId/edit-member-form', verifyToken, requireMemberManagement(), 
     }
 })
 
+// Update approval settings for approval groups
+router.post('/:orgId/approval-settings', verifyToken, requireMemberManagement(), async (req, res) => {
+    const { Org } = getModels(req, 'Org');
+    const { orgId } = req.params;
+    const { approvalSettings } = req.body;
+    
+    try {
+        const org = await Org.findById(orgId);
+        if (!org) {
+            return res.status(404).json({
+                success: false,
+                message: 'Organization not found'
+            });
+        }
+
+        // Check if this is an approval group
+        if (org.approvalSettings.type !== 'approval_group') {
+            return res.status(400).json({
+                success: false,
+                message: 'This organization is not an approval group'
+            });
+        }
+
+        // Update approval settings
+        org.approvalSettings = {
+            ...org.approvalSettings,
+            ...approvalSettings
+        };
+
+        await org.save();
+
+        console.log('POST: /approval-settings successful');
+        return res.status(200).json({
+            success: true,
+            message: 'Approval settings updated successfully',
+            data: org.approvalSettings
+        });
+    } catch (error) {
+        console.log('POST: /approval-settings failed', error);
+        return res.status(500).json({
+            success: false,
+            message: 'Error updating approval settings',
+            error: error.message
+        });
+    }
+})
+
 
 
 module.exports = router;

@@ -66,7 +66,7 @@ const getModels = (req, ...names) => {
         OrgMemberApplication: req.db.model('OrgMemberApplication', orgMemberApplicationSchema, 'orgMemberApplications'),
         SAMLConfig: req.db.model('SAMLConfig', samlConfigSchema, 'samlConfigs'),
         Notification: req.db.model('Notification', notificationSchema, 'notifications'),
-        EventAnalytics: req.db.model('EventAnalytics', eventAnalyticsSchema, 'eventAnalytics')
+        EventAnalytics: req.db.model('EventAnalytics', eventAnalyticsSchema, 'eventAnalytics'),
     };
 
     return names.reduce((acc, name) => {

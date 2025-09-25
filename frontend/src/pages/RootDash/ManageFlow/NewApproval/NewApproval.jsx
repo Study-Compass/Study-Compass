@@ -6,27 +6,18 @@ import { UserSearch, SelectedUsers } from '../../../../components/UserSearch';
 import { useNotification } from '../../../../NotificationContext';
 import HeaderContainer from '../../../../components/HeaderContainer/HeaderContainer';
 
-function NewApproval({refetch, handleClose}){
+function NewApproval({refetch, handleClose, refetchFlow}){
     const [approvalName, setApprovalName] = useState('');
-    const [selectedUsers, setSelectedUsers] = useState([]);
+    const [approvalDescription, setApprovalDescription] = useState('');
+    const [selectedOwner, setSelectedOwner] = useState(null);
     const { addNotification } = useNotification();
 
-    const handleUserSelect = (user) => {
-        // Check if user is already selected
-        if (selectedUsers.some(selectedUser => selectedUser._id === user._id)) {
-            addNotification({
-                title: 'User already selected',
-                message: `${user.username} is already in the list`,
-                type: 'info'
-            });
-            return;
-        }
-        
-        setSelectedUsers([...selectedUsers, user]);
+    const handleOwnerSelect = (user) => {
+        setSelectedOwner(user);
     };
 
-    const handleRemoveUser = (user) => {
-        setSelectedUsers(selectedUsers.filter(selectedUser => selectedUser._id !== user._id));
+    const handleRemoveOwner = () => {
+        setSelectedOwner(null);
     };
 
     const onSubmit = async (e) => {
@@ -35,66 +26,100 @@ function NewApproval({refetch, handleClose}){
         if (!approvalName.trim()) {
             addNotification({
                 title: 'Missing information',
-                message: 'Please enter an approval name',
+                message: 'Please enter an approval group name',
                 type: 'error'
             });
             return;
         }
         
-        if (selectedUsers.length === 0) {
+        if (!approvalDescription.trim()) {
             addNotification({
                 title: 'Missing information',
-                message: 'Please select at least one user',
+                message: 'Please enter an approval group description',
                 type: 'error'
             });
             return;
         }
         
-        const usernames = selectedUsers.map(user => user.username);
+        if (!selectedOwner) {
+            addNotification({
+                title: 'Missing information',
+                message: 'Please select an owner for the approval group',
+                type: 'error'
+            });
+            return;
+        }
         
         try {
-            const response = await postRequest('/add-approval', {
-                role: approvalName,
-                usernames: usernames
+            const response = await postRequest('/approval-groups', {
+                name: approvalName,
+                displayName: approvalName,
+                description: approvalDescription,
+                ownerId: selectedOwner._id
             });
             
             if (response.success) {
-                addNotification({
-                    title: 'Success',
-                    message: 'Approval role created successfully',
-                    type: 'success'
-                });
+                // Add the approval group to the approval flow
+                try {
+                    const flowResponse = await postRequest('/add-approval', {
+                        orgId: response.data._id,
+                        role: 'admin' // Default role for the approval group
+                    });
+                    
+                    if (flowResponse.success) {
+                        addNotification({
+                            title: 'Success',
+                            message: 'Approval group created and added to flow successfully',
+                            type: 'success'
+                        });
+                    } else {
+                        addNotification({
+                            title: 'Partial Success',
+                            message: 'Approval group created but failed to add to flow',
+                            type: 'warning'
+                        });
+                    }
+                } catch (flowError) {
+                    console.error('Error adding to approval flow:', flowError);
+                    addNotification({
+                        title: 'Partial Success',
+                        message: 'Approval group created but failed to add to flow',
+                        type: 'warning'
+                    });
+                }
                                 
                 // Reset form
                 setApprovalName('');
-                setSelectedUsers([]);
+                setApprovalDescription('');
+                setSelectedOwner(null);
                 refetch();
+                if(refetchFlow) refetchFlow();
                 handleClose();
             } else {
                 addNotification({
                     title: 'Error',
-                    message: response.message || 'Failed to create approval role',
+                    message: response.message || 'Failed to create approval group',
                     type: 'error'
                 });
             }
         } catch (error) {
-            console.error('Error creating approval role:', error);
+            console.error('Error creating approval group:', error);
             addNotification({
                 title: 'Error',
-                message: 'Failed to create approval role',
+                message: 'Failed to create approval group',
                 type: 'error'
             });
         }
     };
 
     return (
-        <HeaderContainer classN="new-approval" icon="fluent:flowchart-24-filled" header="New Approval Role" subHeader="create a new approval">
+        <HeaderContainer classN="new-approval" icon="fluent:flowchart-24-filled" header="New Approval Group" subHeader="create a new approval group">
             <div className="header">
-                <h2>New Approval Role</h2>
-                <p>create a new approval</p>
+                <h2>New Approval Group</h2>
+                <p>create a new approval group</p>
             </div>
             <Flag 
-                text="Administrators with this role will be prompted to create their own criteria and approval process." 
+                text="Approval groups can manage their own members and configure approval rules. The selected owner will have full control over the group." 
                 primary="rgba(235,226,127,0.32)" 
                 accent='#B29F5F' 
                 color="#B29F5F" 
@@ -102,7 +127,7 @@ function NewApproval({refetch, handleClose}){
             />
             <form onSubmit={onSubmit} className="content">
                 <div className="field">
-                    <label htmlFor="approval-name">Approval Name</label>
+                    <label htmlFor="approval-name">Approval Group Name</label>
                     <input 
                         type="text" 
                         name="approval-name" 
@@ -110,23 +135,46 @@ function NewApproval({refetch, handleClose}){
                         className="short" 
                         value={approvalName} 
                         onChange={(e) => setApprovalName(e.target.value)}
-                        placeholder="Enter approval role name"
+                        placeholder="Enter approval group name"
                     />
                 </div>
                 <div className="field">
-                    <label htmlFor="user-search">Add Users</label>
-                    <UserSearch 
-                        onUserSelect={handleUserSelect}
-                        placeholder="Search for users by name or username"
-                        excludeIds={selectedUsers.map(user => user._id)}
-                    />
-                    <SelectedUsers 
-                        users={selectedUsers}
-                        onRemoveUser={handleRemoveUser}
+                    <label htmlFor="approval-description">Description</label>
+                    <textarea 
+                        name="approval-description" 
+                        id="approval-description" 
+                        className="long" 
+                        value={approvalDescription} 
+                        onChange={(e) => setApprovalDescription(e.target.value)}
+                        placeholder="Describe the purpose of this approval group"
+                        rows="3"
                     />
                 </div>
+                <div className="field">
+                    <label htmlFor="owner-search">Select Owner</label>
+                    <UserSearch 
+                        onUserSelect={handleOwnerSelect}
+                        placeholder="Search for the owner by name or username"
+                        excludeIds={selectedOwner ? [selectedOwner._id] : []}
+                    />
+                    {selectedOwner && (
+                        <div className="selected-owner">
+                            <div className="owner-info">
+                                <span className="owner-name">{selectedOwner.name || selectedOwner.username}</span>
+                                <span className="owner-email">{selectedOwner.email}</span>
+                            </div>
+                            <button 
+                                type="button" 
+                                className="remove-owner" 
+                                onClick={handleRemoveOwner}
+                            >
+                                Remove
+                            </button>
+                        </div>
+                    )}
+                </div>
                 <button type="submit" className="submit-button">
-                    Create Approval Role
+                    Create Approval Group
                 </button>
             </form>
         </HeaderContainer>

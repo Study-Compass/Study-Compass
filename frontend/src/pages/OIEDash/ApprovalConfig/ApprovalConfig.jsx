@@ -13,11 +13,13 @@ import Rule from './Rule/Rule';
 import postRequest from '../../../utils/postRequest';
 
 const ApprovalConfig = ({ approvalId }) => {
-    const approvalSteps = useFetch('/get-approval-steps');
+    const approvalGroupsData = useFetch('/approval-groups');
+    const approvalFlowData = useFetch('/get-approval-flow');
+    const [approvalGroups, setApprovalGroups] = useState([]);
     const [steps, setSteps] = useState([]);
     const [fieldDefinitions, setFieldDefinitions] = useState([]);
     const [allowedOperators, setAllowedOperators] = useState([]);
-    const [selectedStep, setSelectedStep] = useState(steps.find((step)=>step.role === approvalId));
+    const [selectedStep, setSelectedStep] = useState(null);
     const [showFormBuilder, setShowFormBuilder] = useState(false);
     const [showFormViewer, setShowFormViewer] = useState(false);
     const [currentForm, setCurrentForm] = useState(null);
@@ -35,16 +37,32 @@ const ApprovalConfig = ({ approvalId }) => {
     }
 
     useEffect(()=>{
-        if(approvalSteps.data){
-            setSteps(approvalSteps.data.steps);
-            setSelectedStep(approvalSteps.data.steps.find((step)=>step.role === approvalId));
-            setFieldDefinitions(approvalSteps.data.fieldDefinitions);
-            setAllowedOperators(approvalSteps.data.allowedOperators);
+        if(approvalGroupsData.data){
+            setApprovalGroups(approvalGroupsData.data.data || []);
         }
-        if(approvalSteps.error){
-            console.log(approvalSteps.error);
+        if(approvalGroupsData.error){
+            console.log(approvalGroupsData.error);
         }
-    },[approvalSteps.data]);
+    },[approvalGroupsData.data]);
+
+    useEffect(()=>{
+        if(approvalFlowData.data){
+            setSteps(approvalFlowData.data.data.steps || []);
+            setFieldDefinitions(approvalFlowData.data.data.fieldDefinitions || []);
+            setAllowedOperators(approvalFlowData.data.data.allowedOperators || []);
+            
+            // Find the step that matches the approvalId (which is now an org name)
+            const matchingStep = approvalFlowData.data.data.steps?.find((step) => {
+                // Find the org that matches this step
+                const matchingOrg = approvalGroups.find(org => org._id === step.orgId);
+                return matchingOrg && matchingOrg.org_name === approvalId;
+            });
+            setSelectedStep(matchingStep || null);
+        }
+        if(approvalFlowData.error){
+            console.log(approvalFlowData.error);
+        }
+    },[approvalFlowData.data, approvalGroups]);
 
     useEffect(()=> {console.log(selectedStep)}, [selectedStep])
 
