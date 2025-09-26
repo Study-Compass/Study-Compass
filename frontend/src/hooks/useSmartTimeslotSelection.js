@@ -113,11 +113,34 @@ const useSmartTimeslotSelection = (timeIncrement = 15, existingEvents = []) => {
      */
     const updateSelection = useCallback((selectionId, updates) => {
         setSelections(prev => {
-            const updated = prev.map(sel => 
-                sel.id === selectionId 
-                    ? { ...sel, ...updates }
-                    : sel
-            );
+            const updated = prev.map(sel => {
+                if (sel.id !== selectionId) return sel;
+                
+                const updatedSelection = { ...sel, ...updates };
+                
+                // If startMinutes or endMinutes were updated, recalculate ISO strings
+                if (updates.startMinutes !== undefined || updates.endMinutes !== undefined) {
+                    const baseDate = new Date(sel.startTime);
+                    
+                    if (updates.startMinutes !== undefined) {
+                        const startTime = new Date(baseDate);
+                        startTime.setHours(Math.floor(updates.startMinutes / 60));
+                        startTime.setMinutes(updates.startMinutes % 60);
+                        startTime.setSeconds(0);
+                        updatedSelection.startTime = startTime.toISOString();
+                    }
+                    
+                    if (updates.endMinutes !== undefined) {
+                        const endTime = new Date(baseDate);
+                        endTime.setHours(Math.floor(updates.endMinutes / 60));
+                        endTime.setMinutes(updates.endMinutes % 60);
+                        endTime.setSeconds(0);
+                        updatedSelection.endTime = endTime.toISOString();
+                    }
+                }
+                
+                return updatedSelection;
+            });
             
             // Re-apply smart merging after update
             return mergeSelections(updated);

@@ -132,6 +132,7 @@ const CreateStudySession = ({ onClose }) => {
             setFormData={setFormData}
             onSubmit={handleSubmit}
             onError={handleError}
+            onClose={onClose}
             headerTitle="Create Study Session"
             headerSubtitle="Organize a study group in just a few steps!"
             submitButtonText="Create Study Session"

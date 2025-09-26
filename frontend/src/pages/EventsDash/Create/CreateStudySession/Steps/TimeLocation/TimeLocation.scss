@@ -81,108 +81,11 @@
             border-radius: 12px;
             overflow: hidden;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+
+
         }
 
-        .selected-timeslots {
-            background: #f0f9ff;
-            border: 2px solid #bae6fd;
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 24px;
 
-            h5 {
-                font-size: 16px;
-                font-weight: 600;
-                color: #0c4a6e;
-                margin: 0 0 16px 0;
-                display: flex;
-                align-items: center;
-                gap: 8px;
-
-                &::before {
-                    content: "📅";
-                    font-size: 18px;
-                }
-            }
-
-            .timeslot-list {
-                display: flex;
-                flex-direction: column;
-                gap: 8px;
-                margin-bottom: 16px;
-            }
-
-            .timeslot-item {
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-                background: white;
-                padding: 12px 16px;
-                border-radius: 8px;
-                border: 1px solid #bae6fd;
-                transition: all 0.2s ease;
-
-                &:hover {
-                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-                }
-
-                .timeslot-text {
-                    font-size: 14px;
-                    font-weight: 500;
-                    color: #0c4a6e;
-                }
-
-                .remove-timeslot {
-                    background: #ef4444;
-                    color: white;
-                    border: none;
-                    width: 24px;
-                    height: 24px;
-                    border-radius: 50%;
-                    font-size: 16px;
-                    font-weight: bold;
-                    cursor: pointer;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    transition: all 0.2s ease;
-
-                    &:hover {
-                        background: #dc2626;
-                        transform: scale(1.1);
-                    }
-                }
-            }
-
-            .timeslot-help {
-                font-size: 13px;
-                color: #0c4a6e;
-                margin: 0;
-                font-style: italic;
-            }
-        }
-
-        .no-timeslots-message {
-            background: #fef3c7;
-            border: 2px solid #fcd34d;
-            border-radius: 12px;
-            padding: 20px;
-            text-align: center;
-            margin-bottom: 24px;
-
-            p {
-                font-size: 14px;
-                color: #92400e;
-                margin: 0;
-                font-weight: 500;
-
-                &::before {
-                    content: "⏰";
-                    font-size: 18px;
-                    margin-right: 8px;
-                }
-            }
-        }
 
         .form-group {
             margin-bottom: 24px;
@@ -256,17 +159,7 @@
                 }
             }
 
-            .selected-timeslots {
-                .timeslot-item {
-                    flex-direction: column;
-                    align-items: flex-start;
-                    gap: 8px;
 
-                    .remove-timeslot {
-                        align-self: flex-end;
-                    }
-                }
-            }
         }
     }
 }

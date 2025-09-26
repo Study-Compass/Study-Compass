@@ -18,7 +18,8 @@ const FlowComponentV2 = ({
     backButtonText = 'Back',
     className = '',
     onError = null,
-    validationFunction = null // Custom validation function
+    validationFunction = null, // Custom validation function
+    onClose = null // Function to handle closing the flow
 }) => {
     const [currentStep, setCurrentStep] = useState(0);
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -105,6 +106,16 @@ const FlowComponentV2 = ({
 
     return (
         <div className={`shared-flow-manager ${className}`}>
+            {/* Close button for full-screen flows */}
+            {onClose && className.includes('create-study-session-flow') && (
+                <button 
+                    className="flow-close-button"
+                    onClick={onClose}
+                    aria-label="Close"
+                >
+                    ✕
+                </button>
+            )}
             <div className="setup-container">
                 {/* Left sidebar with steps */}
                 <div className="steps-sidebar">

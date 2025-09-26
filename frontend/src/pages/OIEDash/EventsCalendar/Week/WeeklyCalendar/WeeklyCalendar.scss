@@ -221,6 +221,62 @@
         &:hover {
             z-index: 5;
         }
+
+        &.user-selection {
+            z-index: 6;
+            
+            &:hover {
+                z-index: 7;
+                transform: translateY(-1px);
+                box-shadow: 0 4px 12px rgba(74, 144, 226, 0.3) !important;
+            }
+
+            &.active {
+                z-index: 8;
+                box-shadow: 0 4px 16px rgba(74, 144, 226, 0.4) !important;
+                border-width: 3px !important;
+            }
+
+            &.manipulating {
+                z-index: 9;
+                box-shadow: 0 6px 20px rgba(74, 144, 226, 0.5) !important;
+                transform: scale(1.02);
+            }
+
+            .resize-handle {
+                opacity: 0;
+                transition: opacity 0.2s ease;
+
+                &:hover {
+                    opacity: 0.3;
+                    background-color: rgba(74, 144, 226, 0.5);
+                }
+            }
+
+            &:hover .resize-handle {
+                opacity: 0.2;
+            }
+
+            .selection-delete-button {
+                opacity: 0;
+                transition: all 0.2s ease;
+                pointer-events: auto;
+                z-index: 101;
+                
+                &:hover {
+                    opacity: 1 !important;
+                    background-color: var(--red, #dc2626) !important;
+                    transform: translateX(-50%) scale(1.05) !important;
+                    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4) !important;
+                    border-color: rgba(255, 255, 255, 1) !important;
+                }
+            }
+
+            &:hover .selection-delete-button,
+            &.active .selection-delete-button {
+                opacity: 0.85;
+            }
+        }
     }
 
     .fixed-bottom {
@@ -266,55 +322,9 @@
             }
         }
 
-        &.persisted {
-            &:hover {
-                transform: translateY(-1px);
-                box-shadow: 0 4px 12px rgba(74, 144, 226, 0.3);
-            }
-
-            &.active {
-                box-shadow: 0 4px 16px rgba(74, 144, 226, 0.4);
-                border-width: 3px;
-            }
-
-            &.manipulating {
-                box-shadow: 0 6px 20px rgba(74, 144, 226, 0.5);
-                transform: scale(1.02);
-            }
-
-            .resize-handle {
-                opacity: 0;
-                transition: opacity 0.2s ease;
-
-                &:hover {
-                    opacity: 0.3;
-                    background-color: rgba(74, 144, 226, 0.5);
-                }
-            }
-
-            &:hover .resize-handle {
-                opacity: 0.2;
-            }
-
-            .selection-delete-button {
-                opacity: 0;
-                transition: all 0.2s ease;
-                pointer-events: auto;
-                z-index: 101;
-                
-                &:hover {
-                    opacity: 1 !important;
-                    background-color: var(--red, #dc2626) !important;
-                    transform: translateX(-50%) scale(1.05) !important;
-                    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4) !important;
-                    border-color: rgba(255, 255, 255, 1) !important;
-                }
-            }
-
-            &:hover .selection-delete-button,
-            &.active .selection-delete-button {
-                opacity: 0.85;
-            }
+        &.creating {
+            border-radius: 4px;
+            box-shadow: 0 2px 8px rgba(74, 144, 226, 0.3);
         }
     }
 

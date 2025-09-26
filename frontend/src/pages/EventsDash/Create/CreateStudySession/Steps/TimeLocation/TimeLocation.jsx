@@ -6,6 +6,7 @@ const TimeLocation = ({ formData, setFormData, onComplete }) => {
     const [currentWeekStart, setCurrentWeekStart] = useState(new Date());
     const [selectedTimeslots, setSelectedTimeslots] = useState(formData.selectedTimeslots || []);
 
+
     // Initialize current week to start of this week
     useEffect(() => {
         const today = new Date();
@@ -69,9 +70,7 @@ const TimeLocation = ({ formData, setFormData, onComplete }) => {
         return `${dayName} ${startTimeStr} - ${endTimeStr}`;
     };
 
-    const removeTimeslot = (timeslotId) => {
-        setSelectedTimeslots(prev => prev.filter(slot => slot.id !== timeslotId));
-    };
+
 
     const navigateWeek = (direction) => {
         const newWeekStart = new Date(currentWeekStart);
@@ -121,7 +120,7 @@ const TimeLocation = ({ formData, setFormData, onComplete }) => {
                         <WeeklyCalendar
                             startOfWeek={currentWeekStart}
                             events={[]} // No existing events for now
-                            height="500px"
+                            height="calc(100vh - 300px)"
                             
                             // Auto-enable selection mode for study session creation
                             autoEnableSelection={true}
@@ -136,36 +135,7 @@ const TimeLocation = ({ formData, setFormData, onComplete }) => {
                         />
                     </div>
 
-                    {/* Selected Timeslots Display */}
-                    {selectedTimeslots.length > 0 && (
-                        <div className="selected-timeslots">
-                            <h5>Selected Possible Meeting Times ({selectedTimeslots.length})</h5>
-                            <div className="timeslot-list">
-                                {selectedTimeslots.map((timeslot) => (
-                                    <div key={timeslot.id} className="timeslot-item">
-                                        <span className="timeslot-text">{timeslot.displayText}</span>
-                                        <button
-                                            type="button"
-                                            onClick={() => removeTimeslot(timeslot.id)}
-                                            className="remove-timeslot"
-                                            title="Remove this timeslot"
-                                        >
-                                            ×
-                                        </button>
-                                    </div>
-                                ))}
-                            </div>
-                            <p className="timeslot-help">
-                                Group members will be able to vote on their preferred times from these options.
-                            </p>
-                        </div>
-                    )}
 
-                    {selectedTimeslots.length === 0 && (
-                        <div className="no-timeslots-message">
-                            <p>No timeslots selected yet. Use the calendar above to select possible meeting times.</p>
-                        </div>
-                    )}
                 </div>
 
                 <div className="location-section">

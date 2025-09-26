@@ -42,8 +42,7 @@ const WeeklyCalendar = ({
   } = useSmartTimeslotSelection(timeIncrement, events);
 
   // UI interaction state (simplified)
-  const [dragSelectionMode, setDragSelectionMode] =
-    useState(autoEnableSelection);
+  const dragSelectionMode = autoEnableSelection;
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState(null);
 
@@ -88,33 +87,22 @@ const WeeklyCalendar = ({
     console.log(todayIndex);
   }, [days]);
 
-  // Toggle drag selection function
-  const toggleDragSelection = useCallback(() => {
-    setDragSelectionMode(!dragSelectionMode);
-    // Clear any existing selection when toggling off
-    if (dragSelectionMode) {
-      setSelectionArea(null);
-      setIsDragging(false);
-    }
-  }, [dragSelectionMode]);
 
-  // Keyboard shortcut for toggling drag selection
+
+  // Keyboard shortcuts for selection mode
   useEffect(() => {
     const handleKeyDown = (event) => {
-      // Ctrl/Cmd + S to toggle selection mode
-      if ((event.ctrlKey || event.metaKey) && event.key === "s") {
-        event.preventDefault();
-        toggleDragSelection();
-      }
-      // Escape to exit selection mode
-      if (event.key === "Escape" && dragSelectionMode) {
-        setDragSelectionMode(false);
+      // Only handle keyboard shortcuts if selection mode is enabled
+      if (!dragSelectionMode) return;
+      
+      // Escape to clear current selection
+      if (event.key === "Escape") {
         setSelectionArea(null);
         setIsDragging(false);
         setActiveSelectionId(null);
       }
       // Delete key to remove active selection
-      if (event.key === "Delete" && dragSelectionMode && activeSelectionId) {
+      if (event.key === "Delete" && activeSelectionId) {
         event.preventDefault();
         console.log("Delete key pressed for selection:", activeSelectionId);
 
@@ -129,7 +117,6 @@ const WeeklyCalendar = ({
     dragSelectionMode,
     activeSelectionId,
     removeSelection,
-    toggleDragSelection,
   ]);
 
   const ref = useRef(null);
@@ -213,12 +200,34 @@ const WeeklyCalendar = ({
   };
 
   const renderEvents = (day) => {
+    // Get regular events for this day
     const dayEvents = events.filter((event) => {
       const eventDate = new Date(event.start_time).toDateString();
       return eventDate === day.toDateString();
     });
 
-    const processedEvents = processEvents(dayEvents);
+    // Convert selections to event format for this day
+    const daySelections = selections
+      .filter((selection) => {
+        // Check if selection spans this day
+        const dayIndex = days.findIndex(
+          (d) => d.toDateString() === day.toDateString()
+        );
+        return dayIndex >= selection.startDay && dayIndex <= selection.endDay;
+      })
+      .map((selection) => ({
+        id: `selection-${selection.id}`,
+        name: "Selection",
+        type: "user-selection",
+        start_time: selection.startTime,
+        end_time: selection.endTime,
+        isUserSelection: true,
+        selectionData: selection, // Keep original selection data for manipulation
+      }));
+
+    // Combine regular events and selections
+    const allEvents = [...dayEvents, ...daySelections];
+    const processedEvents = processEvents(allEvents);
 
     return processedEvents.map((event, index) => {
       const start = new Date(event.start_time);
@@ -228,9 +237,226 @@ const WeeklyCalendar = ({
       const left = (event.groups.laneIndex / event.groups.totalLanes) * 100;
       const width = 100 / event.groups.totalLanes;
 
+      // Special handling for user selections
+      if (event.isUserSelection) {
+        const isActive = event.selectionData.id === activeSelectionId;
+        const isBeingManipulated = isDragging && isActive;
+
+        // Hide the original selection when it's being dragged (show preview instead)
+        if (
+          isBeingManipulated &&
+          (interactionMode === "moving" || interactionMode === "resizing") &&
+          dragPreview
+        ) {
+          return null;
+        }
+
+        return (
+          <div
+            key={`selection-${event.id}`}
+            className={`event user-selection ${isActive ? "active" : ""} ${
+              isBeingManipulated ? "manipulating" : ""
+            }`}
+            style={{
+              top: `${top}px`,
+              height: `${height}px`,
+              left: `${left}%`,
+              width: `calc(${width}% - 4px)`,
+              backgroundColor: isActive
+                ? "rgba(74, 144, 226, 0.4)"
+                : "rgba(74, 144, 226, 0.2)",
+              border: `2px solid ${
+                isActive ? "#4a90e2" : "rgba(74, 144, 226, 0.8)"
+              }`,
+              borderRadius: "4px",
+              cursor: dragSelectionMode ? "grab" : "default",
+              transition: isBeingManipulated ? "none" : "all 0.2s ease",
+              boxShadow: isActive
+                ? "0 4px 12px rgba(74, 144, 226, 0.3)"
+                : "0 2px 8px rgba(74, 144, 226, 0.2)",
+              zIndex: isActive ? 15 : 5,
+            }}
+            onClick={(e) => {
+              e.stopPropagation();
+              if (dragSelectionMode && !isDragging) {
+                setActiveSelectionId(event.selectionData.id);
+              }
+            }}
+            onMouseDown={(e) => {
+              // Don't interfere with delete button clicks or area
+              if (
+                e.target.classList.contains("selection-delete-button") ||
+                e.target.closest(".selection-delete-button")
+              ) {
+                return;
+              }
+
+              e.stopPropagation();
+              if (!dragSelectionMode) return;
+
+              // Set this selection as active and start interaction
+              setActiveSelectionId(event.selectionData.id);
+              setOriginalSelectionBounds({ ...event.selectionData });
+
+              // Determine if this is a resize or move operation
+              const rect = e.currentTarget.getBoundingClientRect();
+              const relativeY = e.clientY - rect.top;
+              const handleSize = 8;
+
+              if (relativeY <= handleSize) {
+                setInteractionMode("resizing");
+                setResizeHandle("top");
+              } else if (relativeY >= rect.height - handleSize) {
+                setInteractionMode("resizing");
+                setResizeHandle("bottom");
+              } else {
+                setInteractionMode("moving");
+              }
+
+              setIsDragging(true);
+              setDragStart({
+                dayIndex: event.selectionData.startDay,
+                minutes:
+                  event.selectionData.startMinutes +
+                  (event.selectionData.endMinutes -
+                    event.selectionData.startMinutes) /
+                    2,
+                time: days[event.selectionData.startDay],
+              });
+            }}
+          >
+            {/* Selection content */}
+            <div
+              style={{
+                padding: "4px 8px",
+                color: "#4a90e2",
+                fontSize: "12px",
+                fontWeight: "600",
+                fontFamily: "Inter, sans-serif",
+                display: "flex",
+                flexDirection: "column",
+                gap: "2px",
+              }}
+            >
+              <div>Selection</div>
+              <div
+                style={{ fontSize: "10px", fontWeight: "400", opacity: 0.8 }}
+              >
+                {(() => {
+                  const formatTime = (minutes) => {
+                    const hours = Math.floor(minutes / 60);
+                    const mins = minutes % 60;
+                    const period = hours >= 12 ? "PM" : "AM";
+                    const displayHours =
+                      hours === 0 ? 12 : hours > 12 ? hours - 12 : hours;
+                    return `${displayHours}:${mins
+                      .toString()
+                      .padStart(2, "0")} ${period}`;
+                  };
+
+                  return `${formatTime(
+                    event.selectionData.startMinutes
+                  )} - ${formatTime(event.selectionData.endMinutes)}`;
+                })()}
+              </div>
+            </div>
+
+            {/* Resize handles */}
+            {dragSelectionMode && !isDragging && (
+              <>
+                <div
+                  className="resize-handle resize-handle-top"
+                  style={{
+                    position: "absolute",
+                    top: "0",
+                    left: "0",
+                    right: "0",
+                    height: "8px",
+                    cursor: "ns-resize",
+                    backgroundColor: "transparent",
+                  }}
+                />
+                <div
+                  className="resize-handle resize-handle-bottom"
+                  style={{
+                    position: "absolute",
+                    bottom: "0",
+                    left: "0",
+                    right: "0",
+                    height: "8px",
+                    cursor: "ns-resize",
+                    backgroundColor: "transparent",
+                  }}
+                />
+              </>
+            )}
+
+            {/* Delete button */}
+            {dragSelectionMode && !isDragging && (
+              <button
+                type="button"
+                className="selection-delete-button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+
+                  console.log(
+                    "Delete button clicked for selection:",
+                    event.selectionData.id
+                  );
+
+                  // Direct deletion using smart hook
+                  removeSelection(event.selectionData.id);
+
+                  // Clear active selection if it was the deleted one
+                  if (activeSelectionId === event.selectionData.id) {
+                    setActiveSelectionId(null);
+                  }
+                }}
+                onMouseDown={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                }}
+                onMouseUp={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                }}
+                style={{
+                  position: "absolute",
+                  bottom: "6px",
+                  left: "50%",
+                  transform: "translateX(-50%)",
+                  width: "20px",
+                  height: "18px",
+                  borderRadius: "4px",
+                  border: "1px solid rgba(255, 255, 255, 0.8)",
+                  backgroundColor: "var(--red, #ef4444)",
+                  color: "white",
+                  fontSize: "11px",
+                  fontWeight: "600",
+                  fontFamily: "Inter, sans-serif",
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  zIndex: 101,
+                  opacity: 0,
+                  transition: "all 0.2s ease",
+                  boxShadow: "0 2px 8px rgba(74, 144, 226, 0.2)",
+                  backdropFilter: "blur(4px)",
+                }}
+              >
+                ×
+              </button>
+            )}
+          </div>
+        );
+      }
+
+      // Regular event rendering
       return (
         <div
-          key={index}
+          key={`event-${index}`}
           className="event"
           style={{
             top: `${top}px`,
@@ -239,14 +465,6 @@ const WeeklyCalendar = ({
             width: `calc(${width}% - 4px)`,
           }}
         >
-          {/* <div className="event-name">{event.name}</div>
-                    <div className="event-details">
-                        <span className="event-type">{event.type}</span>
-                        <span className="event-location">{event.location}</span>
-                    </div>
-                    <div className="event-time">
-                        {formatTime(event.start_time)} - {formatTime(event.end_time)}
-                    </div> */}
           <CalendarEvent event={event} />
         </div>
       );
@@ -685,9 +903,10 @@ const WeeklyCalendar = ({
     ]
   );
 
-  // Optimized selection area render with memoization
+  // Render temporary selection area during creation
   const renderSelectionArea = useCallback(() => {
-    if (!selectionArea || !isDragging) return null;
+    if (!selectionArea || !isDragging || interactionMode !== "creating")
+      return null;
 
     // Record render performance
     recordRender();
@@ -698,7 +917,7 @@ const WeeklyCalendar = ({
 
     return (
       <div
-        className="drag-selection-overlay"
+        className="drag-selection-overlay creating"
         style={{
           position: "absolute",
           left: `calc(${(selectionArea.startDay / 7) * 100}% + 2px)`,
@@ -709,12 +928,13 @@ const WeeklyCalendar = ({
           height: `${selectionHeight}px`,
           backgroundColor: "rgba(74, 144, 226, 0.3)",
           border: "2px solid #4a90e2",
+          borderRadius: "4px",
           pointerEvents: "none",
           zIndex: 10,
         }}
       />
     );
-  }, [selectionArea, isDragging, recordRender]);
+  }, [selectionArea, isDragging, interactionMode, recordRender]);
 
   // Render drag preview for moving/resizing selections
   const renderDragPreview = useCallback(() => {
@@ -745,254 +965,13 @@ const WeeklyCalendar = ({
     );
   }, [dragPreview, isDragging]);
 
-  // Render enhanced persisted selections with interaction capabilities
-  const renderPersistedSelections = useCallback(() => {
-    if (!selections || selections.length === 0) return null;
-
-    return selections.map((sel, idx) => {
-      const startTop = sel.startMinutes * MINUTE_HEIGHT;
-      const endTop = sel.endMinutes * MINUTE_HEIGHT;
-      const selectionHeight = Math.max(2, Math.abs(endTop - startTop));
-      const isActive = sel.id === activeSelectionId;
-      const isBeingManipulated = isDragging && isActive;
-
-      // Hide the original selection when it's being dragged (show preview instead)
-      if (
-        isBeingManipulated &&
-        (interactionMode === "moving" || interactionMode === "resizing") &&
-        dragPreview
-      ) {
-        return null;
-      }
-
-      return (
-        <div
-          key={sel.id || idx}
-          className={`drag-selection-overlay persisted ${
-            isActive ? "active" : ""
-          } ${isBeingManipulated ? "manipulating" : ""}`}
-          style={{
-            position: "absolute",
-            left: `calc(${(sel.startDay / 7) * 100}% + 2px)`,
-            width: `calc(${
-              ((sel.endDay - sel.startDay + 1) / 7) * 100
-            }% - 4px)`,
-            top: `${Math.min(startTop, endTop)}px`,
-            height: `${selectionHeight}px`,
-            backgroundColor: isActive
-              ? "rgba(74, 144, 226, 0.4)"
-              : "rgba(74, 144, 226, 0.2)",
-            border: `2px solid ${
-              isActive ? "#4a90e2" : "rgba(74, 144, 226, 0.8)"
-            }`,
-            pointerEvents: dragSelectionMode ? "auto" : "none",
-            zIndex: isActive ? 15 : 5,
-            cursor: dragSelectionMode ? "grab" : "default",
-            transition: isBeingManipulated ? "none" : "all 0.2s ease",
-            boxShadow: isActive ? "0 4px 12px rgba(74, 144, 226, 0.3)" : "none",
-          }}
-          onClick={(e) => {
-            e.stopPropagation();
-            if (dragSelectionMode && !isDragging) {
-              setActiveSelectionId(sel.id);
-            }
-          }}
-          onMouseDown={(e) => {
-            // Don't interfere with delete button clicks or area
-            if (
-              e.target.classList.contains("selection-delete-button") ||
-              e.target.closest(".selection-delete-button")
-            ) {
-              return;
-            }
-
-            e.stopPropagation();
-            if (!dragSelectionMode) return;
-
-            // Set this selection as active and start interaction
-            setActiveSelectionId(sel.id);
-            setOriginalSelectionBounds({ ...sel });
-
-            // Determine if this is a resize or move operation
-            const rect = e.currentTarget.getBoundingClientRect();
-            const relativeY = e.clientY - rect.top;
-            const handleSize = 8;
-
-            if (relativeY <= handleSize) {
-              setInteractionMode("resizing");
-              setResizeHandle("top");
-            } else if (relativeY >= rect.height - handleSize) {
-              setInteractionMode("resizing");
-              setResizeHandle("bottom");
-            } else {
-              setInteractionMode("moving");
-            }
-
-            setIsDragging(true);
-            setDragStart({
-              dayIndex: sel.startDay,
-              minutes:
-                sel.startMinutes + (sel.endMinutes - sel.startMinutes) / 2, // Middle of selection
-              time: days[sel.startDay],
-            });
-          }}
-        >
-          {/* Resize handles */}
-          {dragSelectionMode && !isDragging && (
-            <>
-              <div
-                className="resize-handle resize-handle-top"
-                style={{
-                  position: "absolute",
-                  top: "0",
-                  left: "0",
-                  right: "0",
-                  height: "8px",
-                  cursor: "ns-resize",
-                  backgroundColor: "transparent",
-                }}
-              />
-              <div
-                className="resize-handle resize-handle-bottom"
-                style={{
-                  position: "absolute",
-                  bottom: "0",
-                  left: "0",
-                  right: "0",
-                  height: "8px",
-                  cursor: "ns-resize",
-                  backgroundColor: "transparent",
-                }}
-              />
-            </>
-          )}
-
-          {/* Delete button - centered at bottom, square design */}
-          {dragSelectionMode && !isDragging && (
-            <button
-              type="button"
-              className="selection-delete-button"
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-
-                console.log("Delete button clicked for selection:", sel.id);
-
-                // Direct deletion using smart hook
-                removeSelection(sel.id);
-
-                // Clear active selection if it was the deleted one
-                if (activeSelectionId === sel.id) {
-                  setActiveSelectionId(null);
-                }
-              }}
-              onMouseDown={(e) => {
-                // Prevent drag detection from interfering with delete button
-                e.preventDefault();
-                e.stopPropagation();
-              }}
-              onMouseUp={(e) => {
-                // Prevent any mouse up handlers from interfering
-                e.preventDefault();
-                e.stopPropagation();
-              }}
-              className="selection-delete-button"
-              style={{
-                position: "absolute",
-                bottom: "6px",
-                left: "50%",
-                transform: "translateX(-50%)",
-                width: "20px",
-                height: "18px",
-                borderRadius: "4px",
-                border: "1px solid rgba(255, 255, 255, 0.8)",
-                backgroundColor: "var(--red, #ef4444)",
-                color: "white",
-                fontSize: "11px",
-                fontWeight: "600",
-                fontFamily: "Inter, sans-serif",
-                cursor: "pointer",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                zIndex: 101,
-                opacity: 0,
-                transition: "all 0.2s ease",
-                boxShadow: "0 2px 8px rgba(74, 144, 226, 0.2)",
-                backdropFilter: "blur(4px)",
-              }}
-            >
-              ×
-            </button>
-          )}
-        </div>
-      );
-    });
-  }, [
-    selections,
-    activeSelectionId,
-    isDragging,
-    dragSelectionMode,
-    interactionMode,
-    dragPreview,
-    removeSelection,
-    days,
-  ]);
-
   return (
     <div
       className="oie-weekly-calendar-container"
       style={{ height: `${height}` }}
       ref={ref}
     >
-      {/* Drag selection toggle button */}
-      <div
-        className="drag-selection-controls"
-        style={{
-          position: "absolute",
-          top: "10px",
-          right: "10px",
-          zIndex: 20,
-        }}
-      >
-        <button
-          className={`drag-selection-toggle ${
-            dragSelectionMode ? "active" : ""
-          }`}
-          onClick={toggleDragSelection}
-          title={
-            dragSelectionMode
-              ? `Exit selection mode (Esc) - ${
-                  allowCrossDaySelection ? "Multi-day" : "Single-day"
-                } selection`
-              : `Enter selection mode (Ctrl+S) - ${
-                  allowCrossDaySelection ? "Multi-day" : "Single-day"
-                } selection`
-          }
-          style={{
-            padding: "8px 12px",
-            border: "1px solid #ccc",
-            borderRadius: "4px",
-            backgroundColor: dragSelectionMode ? "#4a90e2" : "#fff",
-            color: dragSelectionMode ? "#fff" : "#333",
-            cursor: "pointer",
-            fontSize: "12px",
-          }}
-        >
-          {dragSelectionMode ? "Exit Selection" : "Select Time"}
-          <span style={{ fontSize: "10px", opacity: 0.7, marginLeft: "4px" }}>
-            ({dragSelectionMode ? "Esc" : "Ctrl+S"})
-          </span>
-          {!allowCrossDaySelection && (
-            <span style={{ fontSize: "10px", opacity: 0.7, marginLeft: "4px" }}>
-              [Single-day]
-            </span>
-          )}
-          <span style={{ fontSize: "10px", opacity: 0.7, marginLeft: "4px" }}>
-            [{timeIncrement}min]
-          </span>
-        </button>
-      </div>
+
 
       {/* current time line */}
       <div className="calendar-header">
@@ -1087,8 +1066,7 @@ const WeeklyCalendar = ({
             </div>
           ))}
 
-          {/* Selection area overlay - positioned relative to days container */}
-          {renderPersistedSelections()}
+          {/* Temporary overlays for drag operations */}
           {renderSelectionArea()}
           {renderDragPreview()}
         </div>
