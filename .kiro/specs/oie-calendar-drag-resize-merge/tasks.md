@@ -15,7 +15,7 @@
   - Add hover effects and transitions for availability indicators
   - _Requirements: 6.1, 6.4, 6.7_
 
-- [ ] 2.2 Add availability overlay rendering
+- [x] 2.2 Add availability overlay rendering
 
   - Create AvailabilityOverlay component for visual feedback
   - Implement availability state calculation for time slots
@@ -23,7 +23,7 @@
   - _Requirements: 6.1, 6.2, 6.4_
 
 - [ ] 3. Enhance timeslot selection with availability awareness
-- [x] 3.1 Implement flexible selection modes
+- [ ] 3.1 Implement flexible selection modes
 
   - Add support for single, multiple, and range selection modes
   - Create selection state management for different modes

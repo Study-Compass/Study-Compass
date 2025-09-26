@@ -299,17 +299,21 @@
             .selection-delete-button {
                 opacity: 0;
                 transition: all 0.2s ease;
+                pointer-events: auto;
+                z-index: 101;
                 
                 &:hover {
-                    opacity: 1;
-                    background-color: #dc2626;
-                    transform: translateY(-50%) scale(1.1);
+                    opacity: 1 !important;
+                    background-color: var(--red, #dc2626) !important;
+                    transform: translateX(-50%) scale(1.05) !important;
+                    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4) !important;
+                    border-color: rgba(255, 255, 255, 1) !important;
                 }
             }
 
             &:hover .selection-delete-button,
             &.active .selection-delete-button {
-                opacity: 0.8;
+                opacity: 0.85;
             }
         }
     }
