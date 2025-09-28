@@ -135,6 +135,63 @@ router.get('/getrooms', async (req, res) => {
     }
 });
 
+
+// Route to get all currently free rooms with pagination support
+router.get('/free-rooms', async (req, res) => {
+    const { Schedule, Classroom } = getModels(req, 'Schedule', 'Classroom');
+    
+    try {
+        const currentTime = new Date();
+        const days = ['X', 'M', 'T', 'W', 'R', 'F', 'X']; // Sunday=0, Monday=1, etc.
+        const day = days[currentTime.getDay()];
+        const hour = currentTime.getHours();
+        const minute = currentTime.getMinutes();
+        const time = hour * 60 + minute; // Convert to minutes since midnight
+        
+        let query;
+        
+        // If it's weekend (Saturday or Sunday), return all rooms
+        if (day === 'X') {
+            query = {};
+        } else {
+            // Find rooms that don't have a class scheduled right now
+            query = {
+                [`weekly_schedule.${day}`]: {
+                    $not: {
+                        $elemMatch: { 
+                            start_time: { $lt: time }, 
+                            end_time: { $gt: time } 
+                        }
+                    }
+                }
+            };
+        }
+
+        // Get all free room IDs
+        const freeSchedules = await Schedule.find(query);
+        const freeRoomIds = freeSchedules.map(schedule => schedule.classroom_id);
+        
+        console.log(`GET: /free-rooms - Found ${freeRoomIds.length} free rooms at ${hour}:${minute.toString().padStart(2, '0')} on ${day}`);
+        
+        // Return the room IDs for pagination
+        res.json({ 
+            success: true, 
+            message: "Free rooms found", 
+            data: freeRoomIds,
+            total: freeRoomIds.length,
+            timestamp: currentTime.toISOString()
+        });
+    } catch (error) {
+        console.error('Error finding free rooms:', error);
+        res.status(500).json({ 
+            success: false, 
+            message: 'Error finding free rooms', 
+            error: error.message 
+        });
+    }
+});
+
+
 // Route to find classrooms available during given free periods
 router.post('/free', async (req, res) => {
     const freePeriods = req.body.query; // Assuming the input object is in the request body
