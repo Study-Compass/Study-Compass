@@ -16,6 +16,71 @@ const getModels = require('../services/getModelService');
 
 const router = express.Router();
 
+
+// Route to get featured content (rooms and events) for explore screen
+router.get('/featured-all', async (req, res) => {
+    try {
+        const { Classroom, Event } = getModels(req, 'Classroom', 'Event');
+        
+        // Get 5 random rooms
+        const rooms = await Classroom.aggregate([
+            { $sample: { size: 5 } },
+            {
+                $project: {
+                    _id: 1,
+                    name: 1,
+                    building: 1,
+                    floor: 1,
+                    capacity: 1,
+                    image: 1,
+                    attributes: 1,
+                    average_rating: 1,
+                    number_of_ratings: 1
+                }
+            }
+        ]);
+
+        // Get 5 random events
+        //prioritize events that have an image
+        const events = await Event.aggregate([
+            { $sample: { size: 5 } },
+            
+            {
+                $project: {
+                    _id: 1,
+                    name: 1,
+                    description: 1,
+                    start_time: 1,
+                    end_time: 1,
+                    location: 1,
+                    image: 1,
+                    type: 1,
+                    rsvp_count: 1,
+                    max_capacity: 1
+                }
+            }
+        ]);
+
+        console.log(`GET: /featured-all - Returning ${rooms.length} rooms and ${events.length} events`);
+        
+        res.json({
+            success: true,
+            message: "Featured content retrieved",
+            data: {
+                rooms: rooms,
+                events: events
+            }
+        });
+    } catch (error) {
+        console.error('Error retrieving featured content:', error);
+        res.status(500).json({ 
+            success: false, 
+            message: 'Error retrieving featured content', 
+            error: error.message 
+        });
+    }
+});
+
 // Route to get a specific classroom by name
 router.get('/getroom/:id', async (req, res) => {
     const { Classroom, Schedule } = getModels(req, 'Classroom', 'Schedule');
