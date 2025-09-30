@@ -1,62 +1,107 @@
-.club-forms-header{
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width:100%;
-    padding: 20px;
-    box-sizing: border-box;
-}
-.club-forms-or-templates{
-    display: flex;
-    flex-direction: column;
-    width:100%;
-    padding: 20px;
-    padding-bottom: 0;
-    box-sizing: border-box;
-}
-.boarder{
-    width:100%;
-    height:100%;
-    border:1px solid var(--lightborder);
-    border-radius: 10px;
-    box-sizing: border-box;
-    margin-top: 20px; /* Add space at the top */
-    margin-bottom: 20px;
-}
+.club-forms {
+    // Main container styles (if any needed)
+    
+    button {
+            padding: 6px 40px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            background-color: var(--light);
+            font-family: satoshi;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-family: 'Inter';
+            font-weight: 700;
+            margin-top: 5px;
 
-.form-container{
-    width:250px;
-    display: flex;
-    flex-direction: column;
-    gap:20px;
-    padding:20px;
-    margin: 30px;
-    border: 1px solid var(--lightborder);
-    border-radius: 10px;
-    background-color: var(--background, #ffffff);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    box-sizing: border-box;
-}
-
-.form-body{
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    .boarder{
-        margin-top: 0;
-        margin-bottom: 0;
+            iconify-icon{
+                font-size: 16px;
+            }
     }
-}
+    
+    .club-forms-or-templates {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        padding: 20px;
+        padding-bottom: 0;
+        box-sizing: border-box;
+         .create-form-header{
+             display: flex;
+             flex-direction: row;
+             justify-content: space-between;
+             align-items: center;
+             
+             .club-forms-or-templates-header {
+                 display: flex;
+                 flex-direction: row;
+                 gap: 10px;
+                 
+                 button {
+                     // Style for Forms/Templates buttons
+                 }
+             }
 
-.form-body h1{
-    font-size: 20px;
-    font-weight: 600;
-    margin: 0;
-    color: var(--text-primary, #333);
-}
-
-.form-date{
-    font-size: 0.9rem;
-    color: var(--text-secondary, #666);
-    margin: 0;
+         }
+        
+        .border {
+            width: 100%;
+            height: 100%;
+            border: 1px solid var(--lightborder);
+            border-radius: 10px;
+            box-sizing: border-box;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+    }
+    
+    .form-container {
+        width: fit-content;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        padding: 20px;
+        margin: 30px;
+        border: 1px solid var(--lightborder);
+        border-radius: 10px;
+        background-color: var(--background, #ffffff);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        box-sizing: border-box;
+        
+        .form-body {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            
+            h1 {
+                font-size: 20px;
+                font-weight: 600;
+                margin: 0;
+                color: var(--text-primary, #333);
+            }
+            
+            .border {
+                margin-top: 0;
+                margin-bottom: 0;
+            }
+            
+            .form-date {
+                font-size: 0.9rem;
+                color: var(--text-secondary, #666);
+                margin: 0;
+            }
+            
+            .form-actions {
+                display: flex;
+                flex-direction: row;
+                gap: 10px;
+                
+                button {
+                    // Style for Copy Link and Open buttons
+                }
+            }
+        }
+    }
 }

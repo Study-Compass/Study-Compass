@@ -940,6 +940,85 @@ router.post('/:orgId/edit-member-form', verifyToken, requireMemberManagement(), 
     }
 })
 
+// Create a new form for the organization
+router.post('/:orgId/forms', verifyToken, requireMemberManagement(), async (req, res) => {
+    const { Org, Form } = getModels(req, 'Org', 'Form');
+    const { orgId } = req.params;
+    const { form } = req.body;
+    
+    try {
+        // Verify organization exists
+        const org = await Org.findById(orgId);
+        if (!org) {
+            return res.status(404).json({
+                success: false,
+                message: 'Organization not found'
+            });
+        }
+
+        // Add organization and user context to the form
+        const formData = {
+            ...form,
+            createdBy: req.user.userId,
+            formOwner: orgId,
+            formOwnerType: 'Org'
+        };
+
+        // Remove temporary IDs from questions
+        const processedForm = {
+            ...formData,
+            questions: formData.questions.map(q => {
+                if (q._id && q._id.startsWith('NEW_QUESTION_')) {
+                    const { _id, ...questionWithoutId } = q;
+                    return questionWithoutId;
+                }
+                return q;
+            })
+        };
+
+        const newForm = new Form(processedForm);
+        await newForm.save();
+
+        console.log('POST: /:orgId/forms successful');
+        return res.status(200).json({
+            success: true,
+            message: "Form created successfully",
+            form: newForm
+        });
+    } catch (error) {
+        console.log('Error creating form:', error);
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+});
+
+// Get all forms for the organization
+router.get('/:orgId/forms', verifyToken, requireMemberManagement(), async (req, res) => {
+    const { Form } = getModels(req, 'Form');
+    const { orgId } = req.params;
+    
+    try {
+        const forms = await Form.find({
+            formOwner: orgId,
+            formOwnerType: 'Org'
+        }).sort({ createdAt: -1 });
+
+        console.log('GET: /:orgId/forms successful');
+        return res.status(200).json({
+            success: true,
+            forms: forms
+        });
+    } catch (error) {
+        console.log('Error retrieving forms:', error);
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+});
+
 // Update approval settings for approval groups
 router.post('/:orgId/approval-settings', verifyToken, requireMemberManagement(), async (req, res) => {
     const { Org } = getModels(req, 'Org');
