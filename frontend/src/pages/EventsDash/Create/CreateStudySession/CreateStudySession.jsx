@@ -5,7 +5,7 @@ import { useNotification } from '../../../../NotificationContext';
 import useAuth from '../../../../hooks/useAuth';
 import postRequest from '../../../../utils/postRequest';
 
-// Step components (we'll create these)
+// Step component   s (we'll create these)
 import BasicInfo from './Steps/BasicInfo/BasicInfo';
 import TimeLocation from './Steps/TimeLocation/TimeLocation';
 import Invite from './Steps/Invite/Invite';
@@ -20,7 +20,8 @@ const CreateStudySession = ({ onClose }) => {
         title: '',
         course: '',
         description: '',
-        selectedTimeslots: [], // Array of selected timeslot objects
+        startTime: null,
+        endTime: null,
         location: '',
         visibility: 'public',
         invitedUsers: [],
@@ -36,8 +37,8 @@ const CreateStudySession = ({ onClose }) => {
         },
         {
             id: 1,
-            title: 'Available Times',
-            description: 'Select multiple possible meeting times',
+            title: 'Time & Location',
+            description: 'Choose when and where to meet',
             component: TimeLocation,
         },
         {
@@ -61,7 +62,8 @@ const CreateStudySession = ({ onClose }) => {
                 title: formData.title,
                 course: formData.course,
                 description: formData.description,
-                possibleTimeslots: formData.selectedTimeslots, // Array of possible meeting times
+                startTime: formData.startTime,
+                endTime: formData.endTime,
                 location: formData.location,
                 visibility: formData.visibility,
                 invitedUsers: formData.invitedUsers
@@ -103,12 +105,14 @@ const CreateStudySession = ({ onClose }) => {
         switch(stepIndex) {
             case 0: // Basic Info
                 return !!(formData.title && formData.course && formData.visibility);
-            case 1: // Available Times
-                return !!(formData.selectedTimeslots && formData.selectedTimeslots.length > 0 && formData.location);
+            case 1: // Time & Location
+                return !!(formData.startTime && formData.endTime && formData.location &&
+                         new Date(formData.startTime) < new Date(formData.endTime) &&
+                         new Date(formData.startTime) > new Date());
             case 2: // Invite (optional but requires visit)
                 return formData.inviteStepVisited;
             case 3: // Review (only valid when all required fields are present)
-                return !!(formData.title && formData.course && formData.selectedTimeslots && formData.selectedTimeslots.length > 0 && formData.location && formData.visibility);
+                return !!(formData.title && formData.course && formData.startTime && formData.endTime && formData.location && formData.visibility);
             default:
                 return false;
         }
@@ -132,7 +136,6 @@ const CreateStudySession = ({ onClose }) => {
             setFormData={setFormData}
             onSubmit={handleSubmit}
             onError={handleError}
-            onClose={onClose}
             headerTitle="Create Study Session"
             headerSubtitle="Organize a study group in just a few steps!"
             submitButtonText="Create Study Session"

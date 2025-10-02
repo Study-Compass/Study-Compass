@@ -252,6 +252,7 @@ const WeeklyCalendar = ({
         }
 
         return (
+          // need a better styling system for this
           <div
             key={`selection-${event.id}`}
             className={`event user-selection ${isActive ? "active" : ""} ${
@@ -262,19 +263,6 @@ const WeeklyCalendar = ({
               height: `${height}px`,
               left: `${left}%`,
               width: `calc(${width}% - 4px)`,
-              backgroundColor: isActive
-                ? "rgba(74, 144, 226, 0.4)"
-                : "rgba(74, 144, 226, 0.2)",
-              border: `2px solid ${
-                isActive ? "#4a90e2" : "rgba(74, 144, 226, 0.8)"
-              }`,
-              borderRadius: "4px",
-              cursor: dragSelectionMode ? "grab" : "default",
-              transition: isBeingManipulated ? "none" : "all 0.2s ease",
-              boxShadow: isActive
-                ? "0 4px 12px rgba(74, 144, 226, 0.3)"
-                : "0 2px 8px rgba(74, 144, 226, 0.2)",
-              zIndex: isActive ? 15 : 5,
             }}
             onClick={(e) => {
               e.stopPropagation();
@@ -326,22 +314,9 @@ const WeeklyCalendar = ({
             }}
           >
             {/* Selection content */}
-            <div
-              style={{
-                padding: "4px 8px",
-                color: "#4a90e2",
-                fontSize: "12px",
-                fontWeight: "600",
-                fontFamily: "Inter, sans-serif",
-                display: "flex",
-                flexDirection: "column",
-                gap: "2px",
-              }}
-            >
+            <div className="selection-content">
               <div>Selection</div>
-              <div
-                style={{ fontSize: "10px", fontWeight: "400", opacity: 0.8 }}
-              >
+              <div className="selection-time">
                 {(() => {
                   const formatTime = (minutes) => {
                     const hours = Math.floor(minutes / 60);
@@ -364,30 +339,8 @@ const WeeklyCalendar = ({
             {/* Resize handles */}
             {dragSelectionMode && !isDragging && (
               <>
-                <div
-                  className="resize-handle resize-handle-top"
-                  style={{
-                    position: "absolute",
-                    top: "0",
-                    left: "0",
-                    right: "0",
-                    height: "8px",
-                    cursor: "ns-resize",
-                    backgroundColor: "transparent",
-                  }}
-                />
-                <div
-                  className="resize-handle resize-handle-bottom"
-                  style={{
-                    position: "absolute",
-                    bottom: "0",
-                    left: "0",
-                    right: "0",
-                    height: "8px",
-                    cursor: "ns-resize",
-                    backgroundColor: "transparent",
-                  }}
-                />
+                <div className="resize-handle resize-handle-top" />
+                <div className="resize-handle resize-handle-bottom" />
               </>
             )}
 
@@ -420,30 +373,6 @@ const WeeklyCalendar = ({
                 onMouseUp={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
-                }}
-                style={{
-                  position: "absolute",
-                  bottom: "6px",
-                  left: "50%",
-                  transform: "translateX(-50%)",
-                  width: "20px",
-                  height: "18px",
-                  borderRadius: "4px",
-                  border: "1px solid rgba(255, 255, 255, 0.8)",
-                  backgroundColor: "var(--red, #ef4444)",
-                  color: "white",
-                  fontSize: "11px",
-                  fontWeight: "600",
-                  fontFamily: "Inter, sans-serif",
-                  cursor: "pointer",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  zIndex: 101,
-                  opacity: 0,
-                  transition: "all 0.2s ease",
-                  boxShadow: "0 2px 8px rgba(74, 144, 226, 0.2)",
-                  backdropFilter: "blur(4px)",
                 }}
               >
                 ×
@@ -870,38 +799,7 @@ const WeeklyCalendar = ({
     updateSelection,
   ]);
 
-  // Enhanced cursor style function
-  const getCursorStyle = useCallback(
-    (dayIndex, minutes) => {
-      if (!dragSelectionMode) return "default";
-
-      if (isDragging) {
-        if (interactionMode === "moving") return "grabbing";
-        if (interactionMode === "resizing") return "ns-resize";
-        return "crosshair";
-      }
-
-      // Check if hovering over existing selection
-      if (dayIndex !== undefined && minutes !== undefined) {
-        const existingSelection = findSelectionAtPosition(dayIndex, minutes);
-        if (existingSelection) {
-          const handle = detectResizeHandle(existingSelection, minutes);
-          if (handle) return "ns-resize";
-          return "grab";
-        }
-      }
-
-      return allowCrossDaySelection ? "crosshair" : "ns-resize";
-    },
-    [
-      dragSelectionMode,
-      isDragging,
-      interactionMode,
-      allowCrossDaySelection,
-      findSelectionAtPosition,
-      detectResizeHandle,
-    ]
-  );
+  // Cursor styling handled via CSS
 
   // Render temporary selection area during creation
   const renderSelectionArea = useCallback(() => {
@@ -1000,7 +898,6 @@ const WeeklyCalendar = ({
         onMouseLeave={handleMouseUp}
         style={{
           position: "relative",
-          cursor: getCursorStyle(),
         }}
       >
         <div
@@ -1038,22 +935,6 @@ const WeeklyCalendar = ({
               } ${dragSelectionMode ? "selection-mode" : ""}`}
               onClick={() => !dragSelectionMode && dayClick(day.toISOString())}
               data-day-index={index}
-              style={{
-                cursor: dragSelectionMode
-                  ? getCursorStyle(index, undefined)
-                  : "pointer",
-              }}
-              onMouseMove={(e) => {
-                if (dragSelectionMode && !isDragging) {
-                  const timeData = getTimeFromPosition(e.clientY, index);
-                  if (timeData) {
-                    e.target.style.cursor = getCursorStyle(
-                      index,
-                      timeData.minutes
-                    );
-                  }
-                }
-              }}
             >
               {currentDay === index && (
                 <div
