@@ -81,14 +81,11 @@ const TimeLocation = ({ formData, setFormData, onComplete }) => {
     return (
         <div className="time-location-step">
             <div className="form-section">
-                <h3>Available Times & Location</h3>
-                <p>Select multiple possible meeting times for your study session. Group members can vote on their preferred times.</p>
+                {/* <h3>Available Times & Location</h3>
+                <p>Select multiple possible meeting times for your study session. Group members can vote on their preferred times.</p> */}
 
                 <div className="timeslot-selection-section">
-                    <h4>Select Possible Meeting Times</h4>
-                    <p className="selection-help">
-                        Click and drag on the calendar to select time periods. You can select multiple timeslots across different days.
-                    </p>
+                
 
                     {/* Week Navigation */}
                     <div className="week-navigation">
@@ -128,6 +125,9 @@ const TimeLocation = ({ formData, setFormData, onComplete }) => {
                             allowCrossDaySelection={false}
                             timeIncrement={30} // 30-minute increments for study sessions
                             singleSelectionOnly={false}
+                            // Limit visible hours for better usability on this step
+                            startHour={6}
+                            endHour={24}
                             
                             // Callbacks
                             dayClick={() => {}} // Disable day click

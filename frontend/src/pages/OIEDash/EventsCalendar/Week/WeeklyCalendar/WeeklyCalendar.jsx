@@ -18,6 +18,8 @@ const WeeklyCalendar = ({
   autoEnableSelection = false,
   selectionMode = "single",
   showAvailability = true,
+  startHour = 0,
+  endHour = 24,
 }) => {
   const [days, setDays] = useState([]);
   const hours = Array.from({ length: 24 }, (_, i) => i);
@@ -27,6 +29,14 @@ const WeeklyCalendar = ({
   const [currentMinutes, setCurrentMinutes] = useState(
     now.hour * 60 + now.minute
   );
+
+  // Visible time window derived from props
+  const visibleStartMinutes = Math.max(0, Math.min(1440, Math.floor(startHour * 60)));
+  const visibleEndMinutes = Math.max(
+    visibleStartMinutes + timeIncrement,
+    Math.min(1440, Math.floor(endHour * 60))
+  );
+  const rangeMinutes = Math.max(timeIncrement, visibleEndMinutes - visibleStartMinutes);
 
   const [width, setWidth] = useState(0);
   const [bottom, setBottom] = useState(0);
@@ -232,7 +242,8 @@ const WeeklyCalendar = ({
     return processedEvents.map((event, index) => {
       const start = new Date(event.start_time);
       const end = new Date(event.end_time);
-      const top = (start.getHours() * 60 + start.getMinutes()) * MINUTE_HEIGHT;
+      const startMinutesAbs = start.getHours() * 60 + start.getMinutes();
+      const top = (startMinutesAbs - visibleStartMinutes) * MINUTE_HEIGHT;
       const height = ((end - start) / (1000 * 60)) * MINUTE_HEIGHT;
       const left = (event.groups.laneIndex / event.groups.totalLanes) * 100;
       const width = 100 / event.groups.totalLanes;
@@ -402,7 +413,7 @@ const WeeklyCalendar = ({
 
   const renderTimeGrid = () => {
     // Generate grid lines based on time increment
-    const totalMinutes = 24 * 60; // 1440 minutes in a day
+    const totalMinutes = rangeMinutes;
     const incrementCount = Math.floor(totalMinutes / timeIncrement);
     const times = Array.from(
       { length: incrementCount },
@@ -410,7 +421,8 @@ const WeeklyCalendar = ({
     );
 
     return times.map((minutes, index) => {
-      const isHour = minutes % 60 === 0;
+      const actualMinutes = visibleStartMinutes + minutes;
+      const isHour = actualMinutes % 60 === 0;
       const isIncrement = minutes % timeIncrement === 0;
       const isHalfHour = minutes % 30 === 0;
 
@@ -441,13 +453,15 @@ const WeeklyCalendar = ({
 
       const rect = calendarBody.getBoundingClientRect();
       const relativeY = clientY - rect.top;
-      const rawMinutes = Math.max(
+      const rawMinutesInRange = Math.max(
         0,
-        Math.min(1440, Math.floor(relativeY / MINUTE_HEIGHT))
-      ); // 1440 = 24 * 60
+        Math.min(rangeMinutes, Math.floor(relativeY / MINUTE_HEIGHT))
+      );
 
       // Snap to configurable increments for better performance and UX
-      const minutes = Math.round(rawMinutes / timeIncrement) * timeIncrement;
+      const minutesFromStart =
+        Math.round(rawMinutesInRange / timeIncrement) * timeIncrement;
+      const minutes = visibleStartMinutes + minutesFromStart;
 
       return {
         dayIndex,
@@ -455,7 +469,7 @@ const WeeklyCalendar = ({
         time: days[dayIndex], // Use existing date object instead of creating new one
       };
     },
-    [days, timeIncrement]
+    [days, timeIncrement, rangeMinutes, visibleStartMinutes]
   );
 
   // Helper function to find selection at a given position
@@ -809,8 +823,8 @@ const WeeklyCalendar = ({
     // Record render performance
     recordRender();
 
-    const startTop = selectionArea.startMinutes * MINUTE_HEIGHT;
-    const endTop = selectionArea.endMinutes * MINUTE_HEIGHT;
+    const startTop = (selectionArea.startMinutes - visibleStartMinutes) * MINUTE_HEIGHT;
+    const endTop = (selectionArea.endMinutes - visibleStartMinutes) * MINUTE_HEIGHT;
     const selectionHeight = Math.max(2, Math.abs(endTop - startTop)); // Minimum 2px height
 
     return (
@@ -832,14 +846,14 @@ const WeeklyCalendar = ({
         }}
       />
     );
-  }, [selectionArea, isDragging, interactionMode, recordRender]);
+  }, [selectionArea, isDragging, interactionMode, recordRender, visibleStartMinutes]);
 
   // Render drag preview for moving/resizing selections
   const renderDragPreview = useCallback(() => {
     if (!dragPreview || !isDragging) return null;
 
-    const startTop = dragPreview.startMinutes * MINUTE_HEIGHT;
-    const endTop = dragPreview.endMinutes * MINUTE_HEIGHT;
+    const startTop = (dragPreview.startMinutes - visibleStartMinutes) * MINUTE_HEIGHT;
+    const endTop = (dragPreview.endMinutes - visibleStartMinutes) * MINUTE_HEIGHT;
     const selectionHeight = Math.max(2, Math.abs(endTop - startTop));
 
     return (
@@ -861,7 +875,7 @@ const WeeklyCalendar = ({
         }}
       />
     );
-  }, [dragPreview, isDragging]);
+  }, [dragPreview, isDragging, visibleStartMinutes]);
 
   return (
     <div
@@ -898,24 +912,33 @@ const WeeklyCalendar = ({
         onMouseLeave={handleMouseUp}
         style={{
           position: "relative",
+          minHeight: `${rangeMinutes * MINUTE_HEIGHT}px`,
         }}
       >
-        <div
-          className="current-time-line"
-          style={{ top: `${currentMinutes * MINUTE_HEIGHT}px` }}
-        />
+        {(currentMinutes >= visibleStartMinutes && currentMinutes <= visibleEndMinutes) && (
+          <div
+            className="current-time-line"
+            style={{ top: `${(currentMinutes - visibleStartMinutes) * MINUTE_HEIGHT}px` }}
+          />
+        )}
         <div className="time-column">
-          {hours.map((hour) => (
-            <div
-              key={hour}
-              className="time-label"
-              style={{ top: `${hour * 60 * MINUTE_HEIGHT}px` }}
-            >
-              {new Date(0, 0, 0, hour).toLocaleTimeString([], {
-                hour: "2-digit",
-              })}
-            </div>
-          ))}
+          {Array.from({ length: Math.ceil(rangeMinutes / 60) + 1 }, (_, i) => {
+            const minutesFromStart = i * 60;
+            const actualMinutes = visibleStartMinutes + minutesFromStart;
+            if (actualMinutes > visibleEndMinutes) return null;
+            const hour = Math.floor(actualMinutes / 60);
+            return (
+              <div
+                key={i}
+                className="time-label"
+                style={{ top: `${minutesFromStart * MINUTE_HEIGHT}px` }}
+              >
+                {new Date(0, 0, 0, hour).toLocaleTimeString([], {
+                  hour: "2-digit",
+                })}
+              </div>
+            );
+          })}
         </div>
 
         <div className="days-container" style={{ position: "relative" }}>
@@ -936,12 +959,14 @@ const WeeklyCalendar = ({
               onClick={() => !dragSelectionMode && dayClick(day.toISOString())}
               data-day-index={index}
             >
-              {currentDay === index && (
-                <div
-                  className="current-day-time-line"
-                  style={{ top: `${currentMinutes * MINUTE_HEIGHT}px` }}
-                />
-              )}
+              {currentDay === index &&
+                currentMinutes >= visibleStartMinutes &&
+                currentMinutes <= visibleEndMinutes && (
+                  <div
+                    className="current-day-time-line"
+                    style={{ top: `${(currentMinutes - visibleStartMinutes) * MINUTE_HEIGHT}px` }}
+                  />
+                )}
               {renderTimeGrid()}
               {renderEvents(day)}
             </div>
