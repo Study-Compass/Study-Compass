@@ -147,12 +147,12 @@ function App() {
                                                 <Route path="/developer-onboarding" element={<AnimatedPageWrapper><DeveloperOnboard/></AnimatedPageWrapper>}/>
                                             </Route>
 
+                                            <Route path="/org/:name" element={<AnimatedPageWrapper><OrgDisplay/></AnimatedPageWrapper>}/>
                                             {/* admin routes */}
                                             <Route element={ <ProtectedRoute authorizedRoles={['admin']}/> }>
                                                 <Route path="/admin" element={<AnimatedPageWrapper><Admin/></AnimatedPageWrapper>}/>
                                             </Route>
 
-                                                <Route path="/org/:name" element={<AnimatedPageWrapper><OrgDisplay/></AnimatedPageWrapper>}/>
                                             {/* features under development */}
                                             <Route element={ <ProtectedRoute authorizedRoles={['user', 'admin', 'developer']}/> }>
                                                 <Route path="/events" element={<AnimatedPageWrapper><Events/></AnimatedPageWrapper>}/>

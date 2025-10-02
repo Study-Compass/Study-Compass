@@ -37,7 +37,7 @@ const handleMulterError = (err, req, res, next) => {
 };
 
 //Route to get a specific org by name
-router.get("/get-org/:id", verifyToken, async (req, res) => {
+router.get("/get-org/:id", async (req, res) => {
     //May eventually change login permissions
     const { Org } = getModels(req, "Org");
 
@@ -68,7 +68,7 @@ router.get("/get-org/:id", verifyToken, async (req, res) => {
     }
 });
 
-router.get("/get-org-by-name/:name", verifyToken, async (req, res) => {
+router.get("/get-org-by-name/:name", verifyToken,  async (req, res) => {
     const { Org, OrgMember, OrgFollower, Event, User, OrgMemberApplication } = getModels(req, "Org", "OrgMember", "OrgFollower", "Event", "User", "OrgMemberApplication");
     const { exhaustive } = req.query;
 

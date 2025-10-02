@@ -138,6 +138,12 @@ function EventsDash({}){
                 label: 'Rooms',
                 icon: 'ic:baseline-room',
                 element: <Room hideHeader={true} urlType="embedded" />
+            },
+            //orgs
+            {
+                label: 'Orgs',
+                icon: 'mingcute:group-2-fill',
+                element: <Orgs />
             }
         ];
         
