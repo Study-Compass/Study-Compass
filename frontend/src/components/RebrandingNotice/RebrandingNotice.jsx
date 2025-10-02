@@ -74,14 +74,14 @@ const RebrandingNotice = () => {
                 <img src={GradientTR} alt="Gradient" className="gradient tr" />
                 <img src={GradientBL} alt="Gradient" className="gradient bl" />
                 <div className="notice-content">
-                    <p className="main-message">
+                    <div className="main-message">
                         <div className="logos">
                             <img src={StudyCompassLogo} alt="Study Compass Logo" className="study-compass-logo" /> 
                             <Icon icon="line-md:arrow-right" className="arrow-right" />
                             <img src={MeridianLogo} alt="Meridian Logo" className="meridian-logo" />
                         </div>
-                        <p><strong className="study-compass-text">Study Compass</strong> is now under the umbrella of <strong className="meridian-text">Meridian</strong> to better encompass all areas of student life!</p>
-                    </p>
+                        <div><strong className="study-compass-text">Study Compass</strong> is now under the umbrella of <strong className="meridian-text">Meridian</strong> to better encompass all areas of student life!</div>
+                    </div>
                     
                     <div className="notice-details">
                         <div className="notice">

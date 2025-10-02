@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import './TimeLocation.scss';
 import WeeklyCalendar from '../../../../../OIEDash/EventsCalendar/Week/WeeklyCalendar/WeeklyCalendar';
 
@@ -20,14 +20,19 @@ const TimeLocation = ({ formData, setFormData, onComplete }) => {
     useEffect(() => {
         setFormData(prev => ({
             ...prev,
-            selectedTimeslots: selectedTimeslots
+            selectedTimeslots
         }));
     }, [selectedTimeslots, setFormData]);
 
-    // Validate step completion
+    // Validate step completion (call once, avoid Flow re-render loop)
+    const onCompleteRef = useRef(onComplete);
+    useEffect(() => { onCompleteRef.current = onComplete; }, [onComplete]);
     useEffect(() => {
-        onComplete(true);
-    }, [onComplete]);
+        if (onCompleteRef.current) {
+            onCompleteRef.current(true);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     const handleInputChange = (field, value) => {
         setFormData(prev => ({
@@ -116,22 +121,19 @@ const TimeLocation = ({ formData, setFormData, onComplete }) => {
                     <div className="calendar-container">
                         <WeeklyCalendar
                             startOfWeek={currentWeekStart}
-                            events={[]} // No existing events for now
+                            events={[]}
                             height="calc(100vh - 300px)"
-                            
-                            // Auto-enable selection mode for study session creation
                             autoEnableSelection={true}
                             selectionMode="multiple"
                             allowCrossDaySelection={false}
-                            timeIncrement={30} // 30-minute increments for study sessions
+                            timeIncrement={30}
                             singleSelectionOnly={false}
-                            // Limit visible hours for better usability on this step
                             startHour={6}
                             endHour={24}
-                            
-                            // Callbacks
-                            dayClick={() => {}} // Disable day click
+                            dayClick={() => {}}
                             onTimeSelection={handleTimeslotSelection}
+                            initialSelections={selectedTimeslots}
+                            onSelectionsChange={setSelectedTimeslots}
                         />
                     </div>
 

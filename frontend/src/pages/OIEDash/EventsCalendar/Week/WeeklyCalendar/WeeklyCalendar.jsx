@@ -20,6 +20,9 @@ const WeeklyCalendar = ({
   showAvailability = true,
   startHour = 0,
   endHour = 24,
+  // New props for external selection control/sync
+  initialSelections = [],
+  onSelectionsChange,
 }) => {
   const [days, setDays] = useState([]);
   const hours = Array.from({ length: 24 }, (_, i) => i);
@@ -38,8 +41,7 @@ const WeeklyCalendar = ({
   );
   const rangeMinutes = Math.max(timeIncrement, visibleEndMinutes - visibleStartMinutes);
 
-  const [width, setWidth] = useState(0);
-  const [bottom, setBottom] = useState(0);
+  // Removed width/bottom feedback loop; prefer sticky CSS for any footer UI
   const [currentDay, setCurrentDay] = useState(null);
 
   // Smart selection management (RoomHelpers philosophy)
@@ -83,8 +85,9 @@ const WeeklyCalendar = ({
     };
 
     generateWeek();
-    setNow(DateTime.now().setZone("America/New_York"));
-    setCurrentMinutes(now.hour * 60 + now.minute);
+    const current = DateTime.now().setZone("America/New_York");
+    setNow(current);
+    setCurrentMinutes(current.hour * 60 + current.minute);
   }, [startOfWeek]);
 
   useEffect(() => {
@@ -93,7 +96,7 @@ const WeeklyCalendar = ({
     const todayIndex = days.findIndex(
       (day) => day.toDateString() === today.toDateString()
     );
-    setCurrentDay(todayIndex);
+    setCurrentDay((prev) => (prev !== todayIndex ? todayIndex : prev));
     console.log(todayIndex);
   }, [days]);
 
@@ -176,13 +179,56 @@ const WeeklyCalendar = ({
         console.log("Initial scroll to earliest event:", earliestHour);
       }
     }
-
-    if (ref.current) {
-      // Set width and bottom for fixed-bottom (this can run on updates)
-      setWidth(ref.current.clientWidth);
-      setBottom(ref.current.getBoundingClientRect().bottom);
-    }
   }, [ref, events, currentDay, currentMinutes]);
+
+  // Live update current time line, with minimal impact
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const current = DateTime.now().setZone("America/New_York");
+      const minutes = current.hour * 60 + current.minute;
+      setCurrentMinutes((prev) => (prev !== minutes ? minutes : prev));
+    }, 30000); // update every 30s
+    return () => clearInterval(interval);
+  }, []);
+
+  // Initialize internal selections from external initialSelections
+  useEffect(() => {
+    if (!Array.isArray(initialSelections) || initialSelections.length === 0) return;
+    // Convert to internal shape with minutes if needed
+    const prepared = initialSelections.map((sel) => {
+      const start = new Date(sel.startTime);
+      const end = new Date(sel.endTime);
+      return {
+        id: sel.id || `selection-${Date.now()}-${Math.random()}`,
+        startDay: sel.startDay ?? 0,
+        endDay: sel.endDay ?? 0,
+        startMinutes: start.getHours() * 60 + start.getMinutes(),
+        endMinutes: end.getHours() * 60 + end.getMinutes(),
+        startTime: sel.startTime,
+        endTime: sel.endTime,
+      };
+    });
+
+    // Only seed if internal selections are empty to avoid loops
+    if (selections.length === 0) {
+      prepared.forEach((s) => addSelection(s));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialSelections]);
+
+  // Emit selections upward whenever they change
+  useEffect(() => {
+    if (!onSelectionsChange) return;
+    const exported = selections.map((sel) => ({
+      id: sel.id,
+      startTime: sel.startTime,
+      endTime: sel.endTime,
+      startDay: sel.startDay,
+      endDay: sel.endDay,
+      duration: sel.endMinutes - sel.startMinutes,
+    }));
+    onSelectionsChange(exported);
+  }, [selections, onSelectionsChange]);
 
   const processEvents = (dayEvents) => {
     // Sort events by start time
@@ -977,10 +1023,6 @@ const WeeklyCalendar = ({
           {renderDragPreview()}
         </div>
       </div>
-      <div
-        className="fixed-bottom"
-        style={{ width: `${width}px`, top: `${bottom - 10}px` }}
-      ></div>
     </div>
   );
 };
