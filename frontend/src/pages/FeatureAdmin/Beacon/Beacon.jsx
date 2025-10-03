@@ -4,6 +4,8 @@ import Dashboard from '../../../components/Dashboard/Dashboard';
 import Home from './Home/Home';
 import BeaconLogo from '../../../assets/Brand Image/SolutionLogos/Beacon.svg';
 import { useNavigate } from 'react-router-dom';
+import ManageFlow from '../../RootDash/ManageFlow/ManageFlow';
+import RSSManagement from '../../RootDash/RSSManagement/RSSManagement';
 
 const Beacon = () => {
     const navigate = useNavigate();
@@ -12,6 +14,16 @@ const Beacon = () => {
             label: 'Home',
             icon: 'material-symbols:home-outline',
             element: <Home />
+        },
+        {
+            label: 'Manage Flow',
+            icon: 'fluent:flow-16-filled',
+            element: <ManageFlow />
+        },
+        {
+            label: 'RSS Management',
+            icon: 'mdi:rss',
+            element: <RSSManagement />
         }
     ];
     return (

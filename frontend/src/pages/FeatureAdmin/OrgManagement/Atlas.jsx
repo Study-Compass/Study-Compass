@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
-import './OrgManagement.scss';
+import './Atlas.scss';
 import Dashboard from '../../../components/Dashboard/Dashboard';
 import OrgOverview from './OrgOverview/OrgOverview';
 import VerificationRequests from './VerificationRequests/VerificationRequests';
 import OrgList from './OrgList/OrgList';
 import Configuration from './Configuration/Configuration';
 import Analytics from './Analytics/Analytics';
-import eventsLogo from '../../../assets/Brand Image/EventsLogo.svg';
-import MeridianLogo from '../../../assets/Brand Image/TestMeridian.svg';
-
-function OrgManagement() {
+import AtlasLogo from '../../../assets/Brand Image/SolutionLogos/Atlas.svg';
+import { useNavigate } from 'react-router-dom';
+function Atlas() {
+    const navigate = useNavigate();
     const menuItems = [
         {
             label: 'Overview',
@@ -63,12 +63,13 @@ function OrgManagement() {
         <Dashboard 
             menuItems={menuItems} 
             additionalClass='org-management-dash' 
-            logo={MeridianLogo}
+            logo={AtlasLogo}
             enableSubSidebar={true}
-            primaryColor='#6D8EFA'
-            secondaryColor='#E9EEFE'
+            primaryColor='#4DAA57'
+            secondaryColor='#E9EEDF6EEEFE'
+            onBack={()=>navigate('/root-dashboard')}
         />
     );
 }
 
-export default OrgManagement;
+export default Atlas;

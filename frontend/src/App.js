@@ -28,7 +28,7 @@ import CreateOrg from './pages/CreateOrg/CreateOrg';
 import ClubDash from './pages/ClubDash/ClubDash';
 import OrgDisplay from './pages/Org/OrgDisplay';
 import RootDash from './pages/RootDash/RootDash';
-import OrgManagement from './pages/RootDash/OrgManagement/OrgManagement';
+import OrgManagement from './pages/FeatureAdmin/OrgManagement/Atlas';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 import SAMLCallback from './components/SAMLCallback/SAMLCallback';
@@ -162,7 +162,6 @@ function App() {
                                                 <Route path="/club-dashboard/:id" element={<AnimatedPageWrapper><ClubDash/></AnimatedPageWrapper>}/>
                                                 <Route path='/create-org' element={<AnimatedPageWrapper><CreateOrg/></AnimatedPageWrapper>}/>
                                                 <Route path="/root-dashboard" element={<AnimatedPageWrapper><RootDash/></AnimatedPageWrapper>}/>
-                                            <Route path="/org-management" element={<AnimatedPageWrapper><OrgManagement/></AnimatedPageWrapper>}/>
                                                 <Route path="/approval-dashboard/:id" element={<AnimatedPageWrapper><OIEDash/></AnimatedPageWrapper>}/>
                                             </Route>
                                             <Route path="/events-dashboard" element={<AnimatedPageWrapper><EventsDash/></AnimatedPageWrapper>}/>
@@ -173,7 +172,7 @@ function App() {
                                                 <Route path="/oie-dashboard" element={<AnimatedPageWrapper><OIEDash/></AnimatedPageWrapper>}/>
                                                 <Route path="/feature-admin/beacon" element={<AnimatedPageWrapper><Beacon/></AnimatedPageWrapper>}/>
                                                 <Route path="/feature-admin/compass" element={<AnimatedPageWrapper><Compass/></AnimatedPageWrapper>}/>
-                                                <Route path="/feature-admin/atlas" element={<AnimatedPageWrapper><Atlas/></AnimatedPageWrapper>}/>
+                                                <Route path="/feature-admin/atlas" element={<AnimatedPageWrapper><OrgManagement/></AnimatedPageWrapper>}/>
                                             </Route>
                                             <Route path="/create-event" element={<AnimatedPageWrapper><CreateEvent/></AnimatedPageWrapper   >}/>
                                         </Route>

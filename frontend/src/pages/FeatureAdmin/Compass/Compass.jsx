@@ -3,7 +3,8 @@ import './Compass.scss';
 import Dashboard from '../../../components/Dashboard/Dashboard';
 import Home from './Pages/Home/Home';
 import CompassLogo from '../../../assets/Brand Image/SolutionLogos/Compass.svg';
-import { useNavigate } from 'react-router-dom'  
+import { useNavigate } from 'react-router-dom';
+import RoomManager from '../../RootDash/RoomManager/RoomManager';
 
 const Compass = () => {
     const navigate = useNavigate();
@@ -12,6 +13,11 @@ const Compass = () => {
             label: 'Home',
             icon: 'material-symbols:home-outline',
             element: <Home />
+        },
+        {
+            label: 'Room Manager',
+            icon: 'mdi:home-city',
+            element: <RoomManager />
         }
     ];
     return (
