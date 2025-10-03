@@ -47,6 +47,9 @@ import EventsDash from './pages/EventsDash/EventsDash';
 import EventPage from './pages/EventPage/EventPage';
 import SubSidebarExample from './components/Dashboard/SubSidebarExample';
 import RebrandingNotice from './components/RebrandingNotice/RebrandingNotice';
+import Beacon from './pages/FeatureAdmin/Beacon/Beacon';
+import Compass from './pages/FeatureAdmin/Compass/Compass';
+import Atlas from './pages/FeatureAdmin/Atlas/Atlas';
 
 function App() {
     useEffect(() => {
@@ -168,6 +171,9 @@ function App() {
                                             {/* oie routes */}
                                             <Route element={ <ProtectedRoute authorizedRoles={['admin', 'developer', 'oie']}/> }>
                                                 <Route path="/oie-dashboard" element={<AnimatedPageWrapper><OIEDash/></AnimatedPageWrapper>}/>
+                                                <Route path="/feature-admin/beacon" element={<AnimatedPageWrapper><Beacon/></AnimatedPageWrapper>}/>
+                                                <Route path="/feature-admin/compass" element={<AnimatedPageWrapper><Compass/></AnimatedPageWrapper>}/>
+                                                <Route path="/feature-admin/atlas" element={<AnimatedPageWrapper><Atlas/></AnimatedPageWrapper>}/>
                                             </Route>
                                             <Route path="/create-event" element={<AnimatedPageWrapper><CreateEvent/></AnimatedPageWrapper   >}/>
                                         </Route>

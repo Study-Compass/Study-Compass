@@ -1,0 +1,23 @@
+import React from 'react';
+import './Compass.scss';
+import Dashboard from '../../../components/Dashboard/Dashboard';
+import Home from './Pages/Home/Home';
+import CompassLogo from '../../../assets/Brand Image/SolutionLogos/Compass.svg';
+import { useNavigate } from 'react-router-dom'  
+
+const Compass = () => {
+    const navigate = useNavigate();
+    const menuItems = [
+        {
+            label: 'Home',
+            icon: 'material-symbols:home-outline',
+            element: <Home />
+        }
+    ];
+    return (
+        <Dashboard menuItems={menuItems} additionalClass='root-dash' logo={CompassLogo} onBack={()=>navigate('/root-dashboard')}>
+        </Dashboard>
+    );
+};
+
+export default Compass;
