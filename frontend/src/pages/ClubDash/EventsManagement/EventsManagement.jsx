@@ -6,7 +6,7 @@ import { useNotification } from '../../../NotificationContext';
 import { useDashboardOverlay } from '../../../hooks/useDashboardOverlay';
 import EventViewer from '../../../components/EventViewer';
 import './EventsManagement.scss';
-import OrgGrad from '../../../assets/Gradients/OrgGrad.png';
+import { useGradient } from '../../../hooks/useGradient';
 
 // Import sub-components
 import EventsOverview from './components/EventsOverview';
@@ -21,7 +21,7 @@ function EventsManagement({ orgId, expandedClass }) {
     const [activeTab, setActiveTab] = useState('overview');
     const [selectedEvents, setSelectedEvents] = useState([]);
     const [refreshTrigger, setRefreshTrigger] = useState(0);
-
+    const {AtlasMain} = useGradient();
     // Fetch organization data
     const { data: orgData, loading: orgLoading } = useFetch(
         orgId ? `/get-org-by-name/${orgId}?exhaustive=true` : null
@@ -136,7 +136,7 @@ function EventsManagement({ orgId, expandedClass }) {
             <header className="events-management-header header">
                 <h1>Events Management</h1>
                 <p>Manage and analyze your organization's events</p>
-                <img src={OrgGrad} alt="" />
+                <img src={AtlasMain} alt="" />
             </header>
 
             <container className="content">

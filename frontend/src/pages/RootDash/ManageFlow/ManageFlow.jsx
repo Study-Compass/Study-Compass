@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import './ManageFlow.scss';
-import AdminGradient from '../../../assets/Gradients/AdminGrad.png';
+import { useGradient } from '../../../hooks/useGradient';
 import { Icon } from '@iconify-icon/react/dist/iconify.mjs';
 import {useFetch} from '../../../hooks/useFetch';
 import { useNotification } from '../../../NotificationContext';
@@ -12,10 +12,11 @@ import FlowAnalytics from './FlowAnalytics/FlowAnalytics';
 function ManageFlow(){
     const approvalGroupsData = useFetch('/approval-groups');
     const approvalFlowData = useFetch('/get-approval-flow');
+    const eventSystemConfigData = useFetch('/api/event-system-config');
     const [popupOpen, setPopupOpen] = useState(false);
     const [activeTab, setActiveTab] = useState('flows');
     const { addNotification } = useNotification();
-
+    const {BeaconMain} = useGradient();
     const openPopup = () => {
         setPopupOpen(true);
     }
@@ -68,15 +69,15 @@ function ManageFlow(){
             </Popup>
             
             <header className="header">
-                <img src={AdminGradient} alt="" />
-                <h1>Approval Flows</h1>
-                <p>Manage your approval workflows and groups</p>
+                <img src={BeaconMain} alt="" />
+                <h1>Event Workflow Management</h1>
+                <p>Manage approval workflows, stakeholder configurations, and event processing rules</p>
 
             </header>
             <div className="actions">
                     <button className="create-btn" onClick={openPopup}>
                         <Icon icon="fluent:add-12-filled"/>
-                        Create Approval Group
+                        Create Stakeholder Group
                     </button>
                 </div>
             <div className="content">
@@ -86,7 +87,21 @@ function ManageFlow(){
                         onClick={() => setActiveTab('flows')}
                     >
                         <Icon icon="mdi:workflow" />
-                        Flows
+                        Workflow Rules
+                    </button>
+                    <button 
+                        className={`tab ${activeTab === 'stakeholders' ? 'active' : ''}`}
+                        onClick={() => setActiveTab('stakeholders')}
+                    >
+                        <Icon icon="mdi:account-group" />
+                        Stakeholders
+                    </button>
+                    <button 
+                        className={`tab ${activeTab === 'domains' ? 'active' : ''}`}
+                        onClick={() => setActiveTab('domains')}
+                    >
+                        <Icon icon="mdi:domain" />
+                        Domains
                     </button>
                     <button 
                         className={`tab ${activeTab === 'management' ? 'active' : ''}`}
@@ -94,20 +109,6 @@ function ManageFlow(){
                     >
                         <Icon icon="mdi:cog" />
                         Management
-                    </button>
-                    <button 
-                        className={`tab ${activeTab === 'groups' ? 'active' : ''}`}
-                        onClick={() => setActiveTab('groups')}
-                    >
-                        <Icon icon="mdi:account-group" />
-                        Groups
-                    </button>
-                    <button 
-                        className={`tab ${activeTab === 'settings' ? 'active' : ''}`}
-                        onClick={() => setActiveTab('settings')}
-                    >
-                        <Icon icon="mdi:settings" />
-                        Settings
                     </button>
                     <button 
                         className={`tab ${activeTab === 'analytics' ? 'active' : ''}`}
@@ -122,15 +123,19 @@ function ManageFlow(){
                     {activeTab === 'flows' && (
                         <div className="flows-section">
                             <div className="section-header">
-                                <h2>Approval Flows</h2>
+                                <h2>Workflow Rules</h2>
                                 <div className="flow-stats">
                                     <div className="stat">
                                         <Icon icon="mdi:account-group" />
-                                        <span>{approvalGroupsData.data?.data?.length || 0} Groups</span>
+                                        <span>{approvalGroupsData.data?.data?.length || 0} Stakeholder Groups</span>
                                     </div>
                                     <div className="stat">
                                         <Icon icon="mdi:check-circle" />
-                                        <span>{approvalFlowData.data?.data?.steps?.length || 0} Steps</span>
+                                        <span>{approvalFlowData.data?.data?.steps?.length || 0} Workflow Steps</span>
+                                    </div>
+                                    <div className="stat">
+                                        <Icon icon="mdi:domain" />
+                                        <span>{eventSystemConfigData.data?.data?.domains?.length || 0} Domains</span>
                                     </div>
                                 </div>
                             </div>
@@ -156,14 +161,96 @@ function ManageFlow(){
                         </div>
                     )}
 
+                    {activeTab === 'domains' && (
+                        <div className="domains-section">
+                            <div className="section-header">
+                                <h2>Domain Management</h2>
+                                <div className="domain-actions">
+                                    <button className="bulk-action-btn">
+                                        <Icon icon="mdi:domain-plus" />
+                                        Add Domain
+                                    </button>
+                                    <button className="bulk-action-btn">
+                                        <Icon icon="mdi:export" />
+                                        Export Domains
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div className="domains-grid">
+                                {eventSystemConfigData.data?.data?.domains?.map((domain) => (
+                                    <div key={domain.domainId} className="domain-management-card">
+                                        <div className="domain-header">
+                                            <div className="domain-info">
+                                                <h3>{domain.domainName}</h3>
+                                                <p>{domain.domainType}</p>
+                                                <div className="domain-meta">
+                                                    <span className="domain-type">{domain.domainType}</span>
+                                                    <span className="stakeholder-count">
+                                                        {domain.domainSettings?.approvalWorkflow?.stakeholders?.length || 0} stakeholders
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div className="domain-status">
+                                                <div className="status-indicator active"></div>
+                                                <span>Active</span>
+                                            </div>
+                                        </div>
+
+                                        <div className="domain-content">
+                                            <div className="domain-stats">
+                                                <div className="stat">
+                                                    <Icon icon="mdi:calendar" />
+                                                    <span>0</span>
+                                                    <label>Events</label>
+                                                </div>
+                                                <div className="stat">
+                                                    <Icon icon="mdi:account-group" />
+                                                    <span>{domain.domainSettings?.approvalWorkflow?.stakeholders?.length || 0}</span>
+                                                    <label>Stakeholders</label>
+                                                </div>
+                                                <div className="stat">
+                                                    <Icon icon="mdi:shield-check" />
+                                                    <span>{domain.domainSettings?.approvalWorkflow?.enabled ? 'Yes' : 'No'}</span>
+                                                    <label>Approval</label>
+                                                </div>
+                                            </div>
+
+                                            <div className="domain-actions">
+                                                <button className="manage-domain-btn">
+                                                    <Icon icon="mdi:cog" />
+                                                    Configure
+                                                </button>
+                                                <button className="edit-domain-btn">
+                                                    <Icon icon="mdi:pencil" />
+                                                    Edit
+                                                </button>
+                                                <button className="domain-settings-btn">
+                                                    <Icon icon="mdi:settings" />
+                                                    Settings
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )) || (
+                                    <div className="no-domains">
+                                        <Icon icon="mdi:domain-off" />
+                                        <h3>No Domains Configured</h3>
+                                        <p>Configure domains in the System Configuration section to manage facility-specific event settings.</p>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    )}
+
                     {activeTab === 'management' && (
                         <div className="management-section">
                             <div className="section-header">
-                                <h2>Flow Management</h2>
+                                <h2>Workflow Management</h2>
                                 <div className="management-actions">
                                     <button className="bulk-action-btn">
                                         <Icon icon="mdi:reorder-horizontal" />
-                                        Reorder Flows
+                                        Reorder Workflows
                                     </button>
                                     <button className="bulk-action-btn">
                                         <Icon icon="mdi:export" />
@@ -180,10 +267,10 @@ function ManageFlow(){
                                 <div className="management-card">
                                     <div className="card-header">
                                         <Icon icon="mdi:workflow" />
-                                        <h3>Flow Order</h3>
+                                        <h3>Workflow Order</h3>
                                     </div>
                                     <div className="card-content">
-                                        <p>Drag and drop to reorder approval steps</p>
+                                        <p>Drag and drop to reorder workflow steps</p>
                                         <div className="flow-order-list">
                                             {approvalFlowData.data?.data?.steps?.map((step, index) => {
                                                 const group = approvalGroupsData.data?.data?.find(g => g._id === step.orgId);
@@ -212,12 +299,12 @@ function ManageFlow(){
                                 <div className="management-card">
                                     <div className="card-header">
                                         <Icon icon="mdi:shield-check" />
-                                        <h3>Flow Status</h3>
+                                        <h3>Workflow Status</h3>
                                     </div>
                                     <div className="card-content">
                                         <div className="status-controls">
                                             <div className="status-item">
-                                                <label>Overall Flow Status</label>
+                                                <label>Overall Workflow Status</label>
                                                 <div className="status-toggle">
                                                     <input type="checkbox" defaultChecked />
                                                     <span className="toggle-label">Active</span>
@@ -290,18 +377,18 @@ function ManageFlow(){
                         </div>
                     )}
 
-                    {activeTab === 'groups' && (
+                    {activeTab === 'stakeholders' && (
                         <div className="groups-section">
                             <div className="section-header">
-                                <h2>Group Management</h2>
+                                <h2>Stakeholder Management</h2>
                                 <div className="group-actions">
                                     <button className="bulk-action-btn">
                                         <Icon icon="mdi:account-multiple-plus" />
-                                        Bulk Add Members
+                                        Bulk Add Stakeholders
                                     </button>
                                     <button className="bulk-action-btn">
                                         <Icon icon="mdi:export" />
-                                        Export Members
+                                        Export Stakeholders
                                     </button>
                                 </div>
                             </div>
@@ -317,7 +404,7 @@ function ManageFlow(){
                                                     <p>{group.org_description}</p>
                                                     <div className="group-meta">
                                                         <span className="step-position">Step {step ? approvalFlowData.data?.data?.steps?.indexOf(step) + 1 : 'N/A'}</span>
-                                                        <span className="member-count">{group.members?.length || 0} members</span>
+                                                        <span className="member-count">{group.members?.length || 0} stakeholders</span>
                                                     </div>
                                                 </div>
                                                 <div className="group-status">
@@ -331,7 +418,7 @@ function ManageFlow(){
                                                     <div className="stat">
                                                         <Icon icon="mdi:account-group" />
                                                         <span>{group.members?.length || 0}</span>
-                                                        <label>Members</label>
+                                                        <label>Stakeholders</label>
                                                     </div>
                                                     <div className="stat">
                                                         <Icon icon="mdi:clock-outline" />
@@ -348,7 +435,7 @@ function ManageFlow(){
                                                 <div className="group-actions">
                                                     <button className="manage-members-btn">
                                                         <Icon icon="mdi:account-group" />
-                                                        Manage Members
+                                                        Manage Stakeholders
                                                     </button>
                                                     <button className="edit-group-btn">
                                                         <Icon icon="mdi:pencil" />

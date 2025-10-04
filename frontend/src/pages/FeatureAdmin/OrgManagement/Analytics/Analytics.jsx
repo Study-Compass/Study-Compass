@@ -2,13 +2,13 @@ import React, { useState } from 'react';
 import { useFetch } from '../../../../hooks/useFetch';
 import { Icon } from '@iconify-icon/react';
 import './Analytics.scss';
-import OrgGrad from '../../../../assets/Gradients/OrgGrad.png';
 
+import { useGradient } from '../../../../hooks/useGradient';
 
 function Analytics() {
     const [timeRange, setTimeRange] = useState('30d');
     const { data: analytics, loading, error } = useFetch(`/org-management/analytics?timeRange=${timeRange}`);
-
+    const {AtlasMain} = useGradient();
     const formatNumber = (num) => {
         return new Intl.NumberFormat().format(num);
     };
@@ -45,7 +45,7 @@ function Analytics() {
             <header className="header">
                 <h1>Analytics</h1>
                 <p>Comprehensive insights into organization management</p>
-                <img src={OrgGrad} alt="Org Grad" />
+                <img src={AtlasMain} alt="Org Grad" />
             </header>
 
             <div className="content">

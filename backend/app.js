@@ -120,6 +120,7 @@ const qrRoutes = require('./routes/qrRoutes.js');
 const eventAnalyticsRoutes = require('./routes/eventAnalyticsRoutes.js');
 const orgEventManagementRoutes = require('./routes/orgEventManagementRoutes.js');
 const eventSystemConfigRoutes = require('./routes/eventSystemConfigRoutes.js');
+const stakeholderRoleRoutes = require('./routes/stakeholderRoleRoutes.js');
 
 app.use(authRoutes);
 app.use('/auth/saml', samlRoutes);
@@ -144,6 +145,7 @@ app.use(adminRoutes);
 app.use('/notifications', notificationRoutes);
 app.use('/api/qr', qrRoutes);
 app.use('/api', eventSystemConfigRoutes);
+app.use('/api', stakeholderRoleRoutes);
 
 app.use(eventsRoutes);
 // Serve static files from the React app in production

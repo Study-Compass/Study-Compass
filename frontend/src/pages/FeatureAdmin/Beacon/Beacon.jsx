@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import ManageFlow from '../../RootDash/ManageFlow/ManageFlow';
 import RSSManagement from '../../RootDash/RSSManagement/RSSManagement';
 import EventSystemConfig from './EventSystemConfig/EventSystemConfig';
+import { useGradient } from '../../../hooks/useGradient';
 
 const Beacon = () => {
     const navigate = useNavigate();
@@ -33,7 +34,14 @@ const Beacon = () => {
         }
     ];
     return (
-        <Dashboard menuItems={menuItems} additionalClass='root-dash' logo={BeaconLogo} onBack={()=>navigate('/root-dashboard')}>
+        <Dashboard 
+        menuItems={menuItems} 
+        additionalClass='root-dash' 
+        logo={BeaconLogo} 
+        onBack={()=>navigate('/root-dashboard')}
+        primaryColor='#998DF2'
+        secondaryColor='rgba(153, 141, 242, 0.1)'
+        >
         </Dashboard>
     );
 };

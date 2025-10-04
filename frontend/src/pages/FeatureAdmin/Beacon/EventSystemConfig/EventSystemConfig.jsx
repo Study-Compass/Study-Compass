@@ -8,6 +8,7 @@ import TemplateManager from './TemplateManager/TemplateManager';
 import IntegrationManager from './IntegrationManager/IntegrationManager';
 import AnalyticsConfig from './AnalyticsConfig/AnalyticsConfig';
 import { useNotification } from '../../../../NotificationContext';
+import { useGradient } from '../../../../hooks/useGradient';
 
 const EventSystemConfig = () => {
     const [activeTab, setActiveTab] = useState('system');
@@ -15,7 +16,7 @@ const EventSystemConfig = () => {
     const [hasChanges, setHasChanges] = useState(false);
     const [originalConfig, setOriginalConfig] = useState(null);
     const { addNotification } = useNotification();
-    
+    const { BeaconMain } = useGradient();
     const configData = useFetch('/api/event-system-config');
     
     useEffect(() => {
@@ -123,13 +124,14 @@ const EventSystemConfig = () => {
     }
     
     return (
-        <div className="event-system-config">
-            <div className="config-header">
-                <div className="header-content">
+        <div className="event-system-config dash">
+            <header className="header">
+                {/* <div className="header-content"> */}
                     <h1>Event System Configuration</h1>
-                    <p>Configure global settings, domains, templates, and integrations for the event management system</p>
-                </div>
-                <div className="header-actions">
+                    <p>Configure global settings for the event management system</p>
+                    <img src={BeaconMain} alt="" />
+                {/* </div> */}
+                {/* <div className="header-actions">
                     {hasChanges && (
                         <button className="save-btn" onClick={handleSave}>
                             <Icon icon="mdi:content-save" />
@@ -144,8 +146,8 @@ const EventSystemConfig = () => {
                         <Icon icon="mdi:refresh" />
                         Reset
                     </button>
-                </div>
-            </div>
+                </div> */}
+            </header>
             
             <div className="config-tabs">
                 <button 

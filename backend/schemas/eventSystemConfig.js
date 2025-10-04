@@ -11,7 +11,22 @@ const conditionGroupSchema = new mongoose.Schema({
   conditionLogicalOperators: [{ type: String, enum: ['AND', 'OR'] }]
 });
 
-// Schema for stakeholder configuration
+// Schema for stakeholder role reference (updated to use StakeholderRole)
+const stakeholderRoleReferenceSchema = new mongoose.Schema({
+  stakeholderRoleId: { type: Schema.Types.ObjectId, ref: 'StakeholderRole', required: true },
+  isRequired: { type: Boolean, default: true },
+  priority: { type: Number, default: 1 },
+  conditionGroups: [conditionGroupSchema],
+  groupLogicalOperators: [{ type: String, enum: ['AND', 'OR'] }],
+  settings: {
+    escalationTimeout: { type: Number, default: 72 },
+    allowDelegation: { type: Boolean, default: false },
+    notificationChannels: [{ type: String, enum: ['email', 'push', 'sms', 'in_app'] }]
+  },
+  formDefinition: { type: Schema.Types.ObjectId, ref: 'Form' }
+});
+
+// Legacy stakeholder schema (for backward compatibility)
 const stakeholderSchema = new mongoose.Schema({
   stakeholderId: { type: Schema.Types.ObjectId, required: true },
   stakeholderType: { type: String, enum: ['User', 'Org'], required: true },
@@ -105,13 +120,14 @@ const eventSystemConfigSchema = new mongoose.Schema({
         maxRecurringInstances: { type: Number, default: 12 }
       },
       
-      // Approval workflow
+      // Approval workflow (updated to use stakeholder roles)
       approvalWorkflow: {
         enabled: { type: Boolean, default: true },
         autoApprove: { type: Boolean, default: false },
         requireAllApprovers: { type: Boolean, default: true },
         escalationTimeout: { type: Number, default: 72 }, // hours
-        stakeholders: [stakeholderSchema]
+        stakeholderRoles: [stakeholderRoleReferenceSchema], // New: stakeholder role references
+        stakeholders: [stakeholderSchema] // Legacy: direct stakeholder references
       },
       
       // Notification preferences
@@ -140,10 +156,11 @@ const eventSystemConfigSchema = new mongoose.Schema({
       optionalFields: [{ type: String }],
       autoFillRules: mongoose.Schema.Types.Mixed,
       
-      // Template-specific workflow
+      // Template-specific workflow (updated to use stakeholder roles)
       workflowOverride: {
         enabled: { type: Boolean, default: false },
-        stakeholders: [stakeholderSchema]
+        stakeholderRoles: [stakeholderRoleReferenceSchema], // New: stakeholder role references
+        stakeholders: [stakeholderSchema] // Legacy: direct stakeholder references
       }
     }
   }],

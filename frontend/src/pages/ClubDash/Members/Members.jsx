@@ -4,7 +4,7 @@ import { useNotification } from '../../../NotificationContext';
 import useAuth from '../../../hooks/useAuth';
 import { useFetch } from '../../../hooks/useFetch';
 import apiRequest from '../../../utils/postRequest';
-import OrgGrad from '../../../assets/Gradients/OrgGrad.png';
+import { useGradient } from '../../../hooks/useGradient';
 import { Icon } from '@iconify-icon/react';
 import Popup from '../../../components/Popup/Popup';
 import Modal from '../../../components/Modal/Modal';
@@ -16,6 +16,7 @@ import MemberApplicationsViewer from './MemberApplicationsViewer/MemberApplicati
 function Members({ expandedClass, org }) {
     const { user } = useAuth();
     const { addNotification } = useNotification();
+    const {AtlasMain} = useGradient();
     const [roles, setRoles] = useState([]);
     const [canManageMembers, setCanManageMembers] = useState(false);
     const [userRole, setUserRole] = useState(null);
@@ -242,7 +243,7 @@ function Members({ expandedClass, org }) {
                     <header className="header">
                         <h1>Member Management</h1>
                         <p>Manage members and assign roles for {org.org_name}</p>
-                        <img src={OrgGrad} alt="" />
+                        <img src={AtlasMain} alt="" />
                     </header>
 
                     <div className="permission-warning">
@@ -269,7 +270,7 @@ function Members({ expandedClass, org }) {
                 <header className="header">
                     <h1>Member Management</h1>
                     <p>Manage members and assign roles for {org.org_name}</p>
-                    <img src={OrgGrad} alt="" />
+                    <img src={AtlasMain} alt="" />
                 </header>
 
                 {/* <div className="user-role-info">

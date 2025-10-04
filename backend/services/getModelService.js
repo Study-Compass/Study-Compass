@@ -21,6 +21,7 @@ const orgMemberApplicationSchema = require('../schemas/orgMemberApplication');
 const samlConfigSchema = require('../schemas/samlConfig');
 const notificationSchema = require('../schemas/notification');
 const eventSystemConfigSchema = require('../schemas/eventSystemConfig');
+const stakeholderRoleSchema = require('../schemas/stakeholderRole');
 
 //events
 const rssFeedSchema = require('../events/schemas/rssFeed');
@@ -68,6 +69,7 @@ const getModels = (req, ...names) => {
         Notification: req.db.model('Notification', notificationSchema, 'notifications'),
         EventAnalytics: req.db.model('EventAnalytics', eventAnalyticsSchema, 'eventAnalytics'),
         EventSystemConfig: req.db.model('EventSystemConfig', eventSystemConfigSchema, 'eventSystemConfigs'),
+        StakeholderRole: req.db.model('StakeholderRole', stakeholderRoleSchema, 'stakeholderRoles'),
     };
 
     return names.reduce((acc, name) => {

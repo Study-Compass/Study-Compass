@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import ImageUpload from '../../../../components/ImageUpload/ImageUpload';
 import { useOrgPermissions, useOrgSave } from './settingsHelpers';
 import './AppearanceSettings.scss';
-import OrgGrad from '../../../../assets/Gradients/OrgGrad.png';
+import { useGradient } from '../../../../hooks/useGradient';
 import UnsavedChangesBanner from '../../../../components/UnsavedChangesBanner/UnsavedChangesBanner';
 import useUnsavedChanges from '../../../../hooks/useUnsavedChanges';
 
@@ -19,7 +19,7 @@ const AppearanceSettings = ({ org, expandedClass }) => {
     const [permissionsChecked, setPermissionsChecked] = useState(false);
     const [canManageSettings, setCanManageSettings] = useState(false);
     const [hasAccess, setHasAccess] = useState(false);
-
+    const {AtlasMain} = useGradient();
     const { checkUserPermissions } = useOrgPermissions(org);
     const { saveOrgSettings } = useOrgSave(org);
 
@@ -128,7 +128,7 @@ const AppearanceSettings = ({ org, expandedClass }) => {
             <header className="header">
                 <h1>Appearance</h1>
                 <p>Customize your organization's visual identity</p>
-                <img src={OrgGrad} alt="" />
+                <img src={AtlasMain} alt="" />
             </header>
             <div className="settings-content">
                 <div className="form-group">
