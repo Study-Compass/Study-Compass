@@ -51,8 +51,8 @@ const DomainManager = ({ domains = [], onChange }) => {
                         <div key={domain.domainId} className="domain-card">
                             <div className="domain-header">
                                 <div className="domain-info">
-                                    <h3>{domain.domainName}</h3>
-                                    <span className="domain-type">{domain.domainType}</span>
+                                    <h3>{domain.name}</h3>
+                                    <span className="domain-type">{domain.type}</span>
                                 </div>
                                 <div className="domain-actions">
                                     <button className="edit-btn">
