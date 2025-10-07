@@ -50,6 +50,7 @@ import RebrandingNotice from './components/RebrandingNotice/RebrandingNotice';
 import Beacon from './pages/FeatureAdmin/Beacon/Beacon';
 import Compass from './pages/FeatureAdmin/Compass/Compass';
 import Atlas from './pages/FeatureAdmin/Atlas/Atlas';
+import DomainDashboard from './pages/DomainDash/DomainDashboard';
 
 function App() {
     useEffect(() => {
@@ -163,6 +164,7 @@ function App() {
                                                 <Route path='/create-org' element={<AnimatedPageWrapper><CreateOrg/></AnimatedPageWrapper>}/>
                                                 <Route path="/root-dashboard" element={<AnimatedPageWrapper><RootDash/></AnimatedPageWrapper>}/>
                                                 <Route path="/approval-dashboard/:id" element={<AnimatedPageWrapper><OIEDash/></AnimatedPageWrapper>}/>
+                                                <Route path="/domain-dashboard/:domainId" element={<AnimatedPageWrapper><DomainDashboard/></AnimatedPageWrapper>}/>
                                             </Route>
                                             <Route path="/events-dashboard" element={<AnimatedPageWrapper><EventsDash/></AnimatedPageWrapper>}/>
                                             <Route path="/event/:eventId" element={<AnimatedPageWrapper><EventPage/></AnimatedPageWrapper>}/>
