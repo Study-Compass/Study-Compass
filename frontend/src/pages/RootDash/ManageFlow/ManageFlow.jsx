@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './ManageFlow.scss';
 import { useGradient } from '../../../hooks/useGradient';
 import { Icon } from '@iconify-icon/react/dist/iconify.mjs';
@@ -6,18 +7,27 @@ import {useFetch} from '../../../hooks/useFetch';
 import { useNotification } from '../../../NotificationContext';
 import Popup from '../../../components/Popup/Popup';
 import NewApproval from './NewApproval/NewApproval';
+import NewDomain from './NewDomain/NewDomain';
+import NewStakeholderRole from './NewStakeholderRole/NewStakeholderRole';
 import FlowCard from './FlowCard/FlowCard';
 import FlowAnalytics from './FlowAnalytics/FlowAnalytics';
+import postRequest from '../../../utils/postRequest';
 
 function ManageFlow(){
+    const navigate = useNavigate();
     const approvalGroupsData = useFetch('/approval-groups');
-    const approvalFlowData = useFetch('/get-approval-flow');
-    const eventSystemConfigData = useFetch('/api/event-system-config');
+    const approvalFlowData = useFetch('/api/event-system-config/get-approval-flow');
+    const domainsData = useFetch('/api/domains');
     const [popupOpen, setPopupOpen] = useState(false);
+    const [popupType, setPopupType] = useState('stakeholder'); // 'stakeholder', 'domain'
     const [activeTab, setActiveTab] = useState('flows');
+    const [selectedDomain, setSelectedDomain] = useState(null);
+    const [stakeholderRoles, setStakeholderRoles] = useState([]);
+    const [loadingStakeholders, setLoadingStakeholders] = useState(false);
     const { addNotification } = useNotification();
     const {BeaconMain} = useGradient();
-    const openPopup = () => {
+    const openPopup = (type = 'stakeholder') => {
+        setPopupType(type);
         setPopupOpen(true);
     }
 
@@ -35,6 +45,7 @@ function ManageFlow(){
             });
             approvalGroupsData.refetch();
             approvalFlowData.refetch();
+            domainsData.refetch();
         } catch (error) {
             addNotification({
                 title: 'Error',
@@ -43,6 +54,72 @@ function ManageFlow(){
             });
         }
     }
+
+    const handleDomainSelect = async (domainId) => {
+        setSelectedDomain(domainId);
+        setLoadingStakeholders(true);
+        
+        try {
+            const response = await postRequest(`/api/event-system-config/stakeholder-roles/${domainId}`, {}, {
+                method: 'GET'
+            });
+            
+            if (response.success) {
+                setStakeholderRoles(response.data);
+            } else {
+                addNotification({
+                    title: 'Error',
+                    message: 'Failed to load stakeholder roles',
+                    type: 'error'
+                });
+            }
+        } catch (error) {
+            console.error('Error loading stakeholder roles:', error);
+            addNotification({
+                title: 'Error',
+                message: 'Failed to load stakeholder roles',
+                type: 'error'
+            });
+        } finally {
+            setLoadingStakeholders(false);
+        }
+    }
+
+    const handleCreateStakeholderRole = async (roleData) => {
+        try {
+            const response = await postRequest('/api/event-system-config/stakeholder-role', roleData);
+            
+            if (response.success) {
+                addNotification({
+                    title: 'Success',
+                    message: 'Stakeholder role created successfully',
+                    type: 'success'
+                });
+                
+                // Refresh stakeholder roles for the selected domain
+                if (selectedDomain) {
+                    handleDomainSelect(selectedDomain);
+                }
+                
+                // Refresh domains
+                domainsData.refetch();
+            } else {
+                addNotification({
+                    title: 'Error',
+                    message: response.message || 'Failed to create stakeholder role',
+                    type: 'error'
+                });
+            }
+        } catch (error) {
+            console.error('Error creating stakeholder role:', error);
+            addNotification({
+                title: 'Error',
+                message: 'Failed to create stakeholder role',
+                type: 'error'
+            });
+        }
+    }
+
     
     useEffect(()=>{
         if(approvalGroupsData.data){
@@ -65,7 +142,29 @@ function ManageFlow(){
     return (
         <div className="dash manage-flow">
             <Popup onClose={()=>setPopupOpen(false)} isOpen={popupOpen} defaultStyling={false}>
-                <NewApproval refetch={approvalGroupsData.refetch} refetchFlow={approvalFlowData.refetch}/>
+                {popupType === 'stakeholder' ? (
+                    <NewStakeholderRole 
+                        handleClose={() => setPopupOpen(false)} 
+                        refetch={() => {
+                            approvalFlowData.refetch();
+                            domainsData.refetch();
+                        }}
+                    />
+                ) : popupType === 'domain' ? (
+                    <NewDomain 
+                        handleClose={() => setPopupOpen(false)} 
+                        refetch={() => {
+                            approvalFlowData.refetch();
+                            domainsData.refetch();
+                        }}
+                    />
+                ) : (
+                    <NewApproval 
+                        handleClose={() => setPopupOpen(false)} 
+                        refetch={approvalGroupsData.refetch}
+                        refetchFlow={approvalFlowData.refetch}
+                    />
+                )}
             </Popup>
             
             <header className="header">
@@ -74,10 +173,14 @@ function ManageFlow(){
                 <p>Manage approval workflows, stakeholder configurations, and event processing rules</p>
 
             </header>
-            <div className="actions">
-                    <button className="create-btn" onClick={openPopup}>
-                        <Icon icon="fluent:add-12-filled"/>
-                        Create Stakeholder Group
+            <div className="actions row">
+                    <button className="create-btn" onClick={() => openPopup('stakeholder')}>
+                        <Icon icon="fluent:person-add-24-filled"/>
+                        Create Stakeholder Role
+                    </button>
+                    <button className="create-btn" onClick={() => openPopup('domain')}>
+                        <Icon icon="ic:round-add-home"/>
+                        Create Domain
                     </button>
                 </div>
             <div className="content">
@@ -135,7 +238,7 @@ function ManageFlow(){
                                     </div>
                                     <div className="stat">
                                         <Icon icon="mdi:domain" />
-                                        <span>{eventSystemConfigData.data?.data?.domains?.length || 0} Domains</span>
+                                        <span>{domainsData.data?.data?.length || 0} Domains</span>
                                     </div>
                                 </div>
                             </div>
@@ -153,6 +256,7 @@ function ManageFlow(){
                                             onRefresh={() => {
                                                 approvalGroupsData.refetch();
                                                 approvalFlowData.refetch();
+                                                domainsData.refetch();
                                             }}
                                         />
                                     );
@@ -166,9 +270,12 @@ function ManageFlow(){
                             <div className="section-header">
                                 <h2>Domain Management</h2>
                                 <div className="domain-actions">
-                                    <button className="bulk-action-btn">
-                                        <Icon icon="mdi:domain-plus" />
-                                        Add Domain
+                                    <button 
+                                        className="bulk-action-btn primary"
+                                        onClick={() => openPopup('domain')}
+                                    >
+                                        <Icon icon="ic:round-add-home" />
+                                        Create Domain
                                     </button>
                                     <button className="bulk-action-btn">
                                         <Icon icon="mdi:export" />
@@ -177,69 +284,178 @@ function ManageFlow(){
                                 </div>
                             </div>
 
-                            <div className="domains-grid">
-                                {eventSystemConfigData.data?.data?.domains?.map((domain) => (
-                                    <div key={domain.domainId} className="domain-management-card">
-                                        <div className="domain-header">
-                                            <div className="domain-info">
-                                                <h3>{domain.domainName}</h3>
-                                                <p>{domain.domainType}</p>
-                                                <div className="domain-meta">
-                                                    <span className="domain-type">{domain.domainType}</span>
-                                                    <span className="stakeholder-count">
-                                                        {domain.domainSettings?.approvalWorkflow?.stakeholders?.length || 0} stakeholders
-                                                    </span>
+                            {domainsData.loading ? (
+                                <div className="loading-section">
+                                    <Icon icon="mdi:loading" className="spinning" />
+                                    <span>Loading domains...</span>
+                                </div>
+                            ) : domainsData.data?.data?.length > 0 ? (
+                                <div className="domains-grid">
+                                    {domainsData.data.data.map((domain) => (
+                                        <div key={domain._id} className="domain-management-card">
+                                            <div className="domain-header">
+                                                <div className="domain-info">
+                                                    <h3>{domain.name}</h3>
+                                                    <p className="domain-description">{domain.description || 'No description provided'}</p>
+                                                    <div className="domain-meta">
+                                                        <span className={`domain-type-badge ${domain.type}`}>
+                                                            <Icon icon={`mdi:${domain.type === 'facility' ? 'building' : domain.type === 'department' ? 'office-building' : domain.type === 'organization' ? 'account-group' : 'cog'}`} />
+                                                            {domain.type}
+                                                        </span>
+                                                        <span className="capacity-info">
+                                                            <Icon icon="mdi:account-group" />
+                                                            {domain.domainSettings?.maxCapacity ? `Max ${domain.domainSettings.maxCapacity} people` : 'No capacity limit'}
+                                                        </span>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <div className="domain-status">
-                                                <div className="status-indicator active"></div>
-                                                <span>Active</span>
-                                            </div>
-                                        </div>
-
-                                        <div className="domain-content">
-                                            <div className="domain-stats">
-                                                <div className="stat">
-                                                    <Icon icon="mdi:calendar" />
-                                                    <span>0</span>
-                                                    <label>Events</label>
-                                                </div>
-                                                <div className="stat">
-                                                    <Icon icon="mdi:account-group" />
-                                                    <span>{domain.domainSettings?.approvalWorkflow?.stakeholders?.length || 0}</span>
-                                                    <label>Stakeholders</label>
-                                                </div>
-                                                <div className="stat">
-                                                    <Icon icon="mdi:shield-check" />
-                                                    <span>{domain.domainSettings?.approvalWorkflow?.enabled ? 'Yes' : 'No'}</span>
-                                                    <label>Approval</label>
+                                                <div className="domain-status">
+                                                    <div className={`status-indicator ${domain.isActive ? 'active' : 'inactive'}`}></div>
+                                                    <span>{domain.isActive ? 'Active' : 'Inactive'}</span>
                                                 </div>
                                             </div>
 
-                                            <div className="domain-actions">
-                                                <button className="manage-domain-btn">
-                                                    <Icon icon="mdi:cog" />
-                                                    Configure
-                                                </button>
-                                                <button className="edit-domain-btn">
-                                                    <Icon icon="mdi:pencil" />
-                                                    Edit
-                                                </button>
-                                                <button className="domain-settings-btn">
-                                                    <Icon icon="mdi:settings" />
-                                                    Settings
-                                                </button>
+                                            <div className="domain-content">
+                                                <div className="domain-stats">
+                                                    <div className="stat">
+                                                        <Icon icon="mdi:calendar" />
+                                                        <span>0</span>
+                                                        <label>Events</label>
+                                                    </div>
+                                                    <div className="stat">
+                                                        <Icon icon="mdi:account-group" />
+                                                        <span>0</span>
+                                                        <label>Stakeholder Roles</label>
+                                                    </div>
+                                                    <div className="stat">
+                                                        <Icon icon="mdi:shield-check" />
+                                                        <span>{domain.domainSettings?.approvalWorkflow?.enabled ? 'Yes' : 'No'}</span>
+                                                        <label>Approval Required</label>
+                                                    </div>
+                                                </div>
+
+                                                <div className="domain-settings-preview">
+                                                    <div className="setting-item">
+                                                        <Icon icon="mdi:clock-outline" />
+                                                        <span>Escalation: {domain.domainSettings?.approvalWorkflow?.escalationTimeout || 72}h</span>
+                                                    </div>
+                                                    <div className="setting-item">
+                                                        <Icon icon="mdi:calendar-clock" />
+                                                        <span>Max Advance: {domain.domainSettings?.bookingRules?.maxAdvanceBooking || 30} days</span>
+                                                    </div>
+                                                    <div className="setting-item">
+                                                        <Icon icon="mdi:repeat" />
+                                                        <span>Recurring: {domain.domainSettings?.bookingRules?.allowRecurring ? 'Yes' : 'No'}</span>
+                                                    </div>
+                                                </div>
+
+                                                <div className="domain-actions">
+                                                    <button 
+                                                        className="domain-dashboard-btn"
+                                                        onClick={() => navigate(`/domain-dashboard/${domain._id}`)}
+                                                    >
+                                                        <Icon icon="mdi:view-dashboard" />
+                                                        Domain Dashboard
+                                                    </button>
+                                                    <button 
+                                                        className="manage-domain-btn"
+                                                        onClick={() => handleDomainSelect(domain._id)}
+                                                    >
+                                                        <Icon icon="mdi:account-group" />
+                                                        Manage Stakeholders
+                                                    </button>
+                                                    <button className="edit-domain-btn">
+                                                        <Icon icon="mdi:pencil" />
+                                                        Edit Domain
+                                                    </button>
+                                                </div>
                                             </div>
+
+                                            {/* Stakeholder Roles Section */}
+                                            {selectedDomain === domain._id && (
+                                                <div className="stakeholder-roles-section">
+                                                    <div className="section-header">
+                                                        <h4>Stakeholder Roles for {domain.name}</h4>
+                                                        <button 
+                                                            className="add-role-btn"
+                                                            onClick={() => openPopup('stakeholder')}
+                                                        >
+                                                            <Icon icon="mdi:plus" />
+                                                            Add Stakeholder Role
+                                                        </button>
+                                                    </div>
+                                                    
+                                                    {loadingStakeholders ? (
+                                                        <div className="loading-stakeholders">
+                                                            <Icon icon="mdi:loading" className="spinning" />
+                                                            <span>Loading stakeholder roles...</span>
+                                                        </div>
+                                                    ) : stakeholderRoles.length === 0 ? (
+                                                        <div className="no-stakeholder-roles">
+                                                            <Icon icon="mdi:account-group" />
+                                                            <h5>No Stakeholder Roles</h5>
+                                                            <p>This domain doesn't have any stakeholder roles configured yet.</p>
+                                                            <button 
+                                                                className="create-role-btn"
+                                                                onClick={() => openPopup('stakeholder')}
+                                                            >
+                                                                <Icon icon="mdi:plus" />
+                                                                Create First Role
+                                                            </button>
+                                                        </div>
+                                                    ) : (
+                                                        <div className="stakeholder-roles-list">
+                                                            {stakeholderRoles.map((role) => (
+                                                                <div key={role._id} className="stakeholder-role-card">
+                                                                    <div className="role-info">
+                                                                        <h5>{role.stakeholderName}</h5>
+                                                                        <p className="role-description">{role.description || 'No description provided'}</p>
+                                                                        <div className="role-meta">
+                                                                            <span className={`role-type-badge ${role.stakeholderType}`}>
+                                                                                <Icon icon={`mdi:${role.stakeholderType === 'approver' ? 'shield-check' : role.stakeholderType === 'acknowledger' ? 'check-circle' : 'bell'}`} />
+                                                                                {role.stakeholderType}
+                                                                            </span>
+                                                                            <span className={`assignee-status ${role.currentAssignee?.userId ? 'assigned' : 'unassigned'}`}>
+                                                                                <Icon icon={role.currentAssignee?.userId ? 'mdi:account-check' : 'mdi:account-off'} />
+                                                                                {role.currentAssignee?.userId ? 'Assigned' : 'Unassigned'}
+                                                                            </span>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div className="role-actions">
+                                                                        <button className="edit-role-btn" title="Edit Role">
+                                                                            <Icon icon="mdi:pencil" />
+                                                                        </button>
+                                                                        <button className="assign-role-btn" title="Assign User">
+                                                                            <Icon icon="mdi:account-plus" />
+                                                                        </button>
+                                                                        <button className="delete-role-btn" title="Delete Role">
+                                                                            <Icon icon="mdi:delete" />
+                                                                        </button>
+                                                                    </div>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            )}
                                         </div>
-                                    </div>
-                                )) || (
-                                    <div className="no-domains">
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="no-domains">
+                                    <div className="empty-state">
                                         <Icon icon="mdi:domain-off" />
                                         <h3>No Domains Configured</h3>
-                                        <p>Configure domains in the System Configuration section to manage facility-specific event settings.</p>
+                                        <p>Create domains to manage facility-specific event settings, stakeholder roles, and approval workflows.</p>
+                                        <button 
+                                            className="create-domain-btn"
+                                            onClick={() => openPopup('domain')}
+                                        >
+                                            <Icon icon="mdi:domain-plus" />
+                                            Create Your First Domain
+                                        </button>
                                     </div>
-                                )}
-                            </div>
+                                </div>
+                            )}
                         </div>
                     )}
 
@@ -337,15 +553,27 @@ function ManageFlow(){
                                         <div className="timeout-settings">
                                             <div className="timeout-item">
                                                 <label>Default Escalation (hours)</label>
-                                                <input type="number" defaultValue={72} className="timeout-input" />
+                                                <input 
+                                                    type="number" 
+                                                    defaultValue={72} 
+                                                    className="timeout-input"
+                                                />
                                             </div>
                                             <div className="timeout-item">
                                                 <label>Max Processing Time (days)</label>
-                                                <input type="number" defaultValue={7} className="timeout-input" />
+                                                <input 
+                                                    type="number" 
+                                                    defaultValue={365} 
+                                                    className="timeout-input"
+                                                />
                                             </div>
                                             <div className="timeout-item">
                                                 <label>Reminder Interval (hours)</label>
-                                                <input type="number" defaultValue={24} className="timeout-input" />
+                                                <input 
+                                                    type="number" 
+                                                    defaultValue={24} 
+                                                    className="timeout-input"
+                                                />
                                             </div>
                                         </div>
                                     </div>
@@ -378,79 +606,130 @@ function ManageFlow(){
                     )}
 
                     {activeTab === 'stakeholders' && (
-                        <div className="groups-section">
+                        <div className="stakeholders-section">
                             <div className="section-header">
-                                <h2>Stakeholder Management</h2>
-                                <div className="group-actions">
-                                    <button className="bulk-action-btn">
-                                        <Icon icon="mdi:account-multiple-plus" />
-                                        Bulk Add Stakeholders
+                                <h2>Stakeholder Role Management</h2>
+                                <div className="stakeholder-actions">
+                                    <button 
+                                        className="bulk-action-btn primary"
+                                        onClick={() => openPopup('stakeholder')}
+                                    >
+                                        <Icon icon="mdi:account-plus" />
+                                        Create Stakeholder Role
                                     </button>
                                     <button className="bulk-action-btn">
                                         <Icon icon="mdi:export" />
-                                        Export Stakeholders
+                                        Export Roles
                                     </button>
                                 </div>
                             </div>
 
-                            <div className="groups-grid">
-                                {approvalGroupsData.data?.data?.map((group) => {
-                                    const step = approvalFlowData.data?.data?.steps?.find(s => s.orgId === group._id);
-                                    return (
-                                        <div key={group._id} className="group-management-card">
-                                            <div className="group-header">
-                                                <div className="group-info">
-                                                    <h3>{group.org_name}</h3>
-                                                    <p>{group.org_description}</p>
-                                                    <div className="group-meta">
-                                                        <span className="step-position">Step {step ? approvalFlowData.data?.data?.steps?.indexOf(step) + 1 : 'N/A'}</span>
-                                                        <span className="member-count">{group.members?.length || 0} stakeholders</span>
-                                                    </div>
-                                                </div>
-                                                <div className="group-status">
-                                                    <div className="status-indicator active"></div>
-                                                    <span>Active</span>
-                                                </div>
+                            {domainsData.loading ? (
+                                <div className="loading-section">
+                                    <Icon icon="mdi:loading" className="spinning" />
+                                    <span>Loading stakeholder roles...</span>
+                                </div>
+                            ) : domainsData.data?.data?.length > 0 ? (
+                                <div className="stakeholders-overview">
+                                    <div className="overview-stats">
+                                        <div className="stat-card">
+                                            <div className="stat-icon">
+                                                <Icon icon="mdi:domain" />
                                             </div>
-
-                                            <div className="group-content">
-                                                <div className="group-stats">
-                                                    <div className="stat">
-                                                        <Icon icon="mdi:account-group" />
-                                                        <span>{group.members?.length || 0}</span>
-                                                        <label>Stakeholders</label>
-                                                    </div>
-                                                    <div className="stat">
-                                                        <Icon icon="mdi:clock-outline" />
-                                                        <span>0</span>
-                                                        <label>Pending</label>
-                                                    </div>
-                                                    <div className="stat">
-                                                        <Icon icon="mdi:check-circle" />
-                                                        <span>0</span>
-                                                        <label>Approved</label>
-                                                    </div>
-                                                </div>
-
-                                                <div className="group-actions">
-                                                    <button className="manage-members-btn">
-                                                        <Icon icon="mdi:account-group" />
-                                                        Manage Stakeholders
-                                                    </button>
-                                                    <button className="edit-group-btn">
-                                                        <Icon icon="mdi:pencil" />
-                                                        Edit Group
-                                                    </button>
-                                                    <button className="group-settings-btn">
-                                                        <Icon icon="mdi:cog" />
-                                                        Settings
-                                                    </button>
-                                                </div>
+                                            <div className="stat-content">
+                                                <h3>{domainsData.data.data.length}</h3>
+                                                <p>Active Domains</p>
                                             </div>
                                         </div>
-                                    );
-                                })}
-                            </div>
+                                        <div className="stat-card">
+                                            <div className="stat-icon">
+                                                <Icon icon="mdi:account-group" />
+                                            </div>
+                                            <div className="stat-content">
+                                                <h3>0</h3>
+                                                <p>Total Stakeholder Roles</p>
+                                            </div>
+                                        </div>
+                                        <div className="stat-card">
+                                            <div className="stat-icon">
+                                                <Icon icon="mdi:account-check" />
+                                            </div>
+                                            <div className="stat-content">
+                                                <h3>0</h3>
+                                                <p>Assigned Roles</p>
+                                            </div>
+                                        </div>
+                                        <div className="stat-card">
+                                            <div className="stat-icon">
+                                                <Icon icon="mdi:shield-check" />
+                                            </div>
+                                            <div className="stat-content">
+                                                <h3>0</h3>
+                                                <p>Approver Roles</p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="stakeholders-grid">
+                                        {domainsData.data.data.map((domain) => (
+                                            <div key={domain._id} className="domain-stakeholders-card">
+                                                <div className="domain-header">
+                                                    <div className="domain-info">
+                                                        <h3>{domain.name}</h3>
+                                                        <p className="domain-type">{domain.type}</p>
+                                                        <div className="domain-meta">
+                                                            <span className={`domain-type-badge ${domain.type}`}>
+                                                                <Icon icon={`mdi:${domain.type === 'facility' ? 'building' : domain.type === 'department' ? 'office-building' : domain.type === 'organization' ? 'account-group' : 'cog'}`} />
+                                                                {domain.type}
+                                                            </span>
+                                                            <span className="stakeholder-count">
+                                                                <Icon icon="mdi:account-group" />
+                                                                0 stakeholder roles
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                    <div className="domain-status">
+                                                        <div className={`status-indicator ${domain.isActive ? 'active' : 'inactive'}`}></div>
+                                                        <span>{domain.isActive ? 'Active' : 'Inactive'}</span>
+                                                    </div>
+                                                </div>
+
+                                                <div className="stakeholder-roles-list">
+                                                    <div className="no-stakeholder-roles">
+                                                        <div className="empty-state">
+                                                            <Icon icon="mdi:account-group" />
+                                                            <h5>No Stakeholder Roles</h5>
+                                                            <p>This domain doesn't have any stakeholder roles configured yet.</p>
+                                                            <button 
+                                                                className="add-role-btn"
+                                                                onClick={() => openPopup('stakeholder')}
+                                                            >
+                                                                <Icon icon="mdi:plus" />
+                                                                Add Stakeholder Role
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="no-domains">
+                                    <div className="empty-state">
+                                        <Icon icon="mdi:domain-off" />
+                                        <h3>No Domains Available</h3>
+                                        <p>Create domains first to manage stakeholder roles for different facilities and departments.</p>
+                                        <button 
+                                            className="create-domain-btn"
+                                            onClick={() => openPopup('domain')}
+                                        >
+                                            <Icon icon="mdi:domain-plus" />
+                                            Create Your First Domain
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     )}
 
@@ -618,6 +897,7 @@ function ManageFlow(){
                             approvalFlow={approvalFlowData.data?.data}
                         />
                     )}
+
                 </div>
             </div>
         </div>
