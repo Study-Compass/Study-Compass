@@ -262,14 +262,31 @@ const WeeklyCalendar = ({
       return eventDate === day.toDateString();
     });
 
-    // Convert selections to event format for this day
+    // Convert selections to event format for this day using absolute dates
     const daySelections = selections
       .filter((selection) => {
-        // Check if selection spans this day
-        const dayIndex = days.findIndex(
-          (d) => d.toDateString() === day.toDateString()
-        );
-        return dayIndex >= selection.startDay && dayIndex <= selection.endDay;
+        const selectionStart = new Date(selection.startTime);
+        const selectionEnd = new Date(selection.endTime);
+        const dayDateString = day.toDateString();
+
+        // If cross-day selection were allowed, include if day falls within start/end inclusive
+        // For now, when allowCrossDaySelection is false, this effectively restricts to same-day
+        const startsSameDay = selectionStart.toDateString() === dayDateString;
+        const endsSameDay = selectionEnd.toDateString() === dayDateString;
+
+        if (allowCrossDaySelection) {
+          // Day is on/after start and on/before end (date-only compare)
+          const dayMidnight = new Date(day);
+          dayMidnight.setHours(0, 0, 0, 0);
+          const startMidnight = new Date(selectionStart);
+          startMidnight.setHours(0, 0, 0, 0);
+          const endMidnight = new Date(selectionEnd);
+          endMidnight.setHours(0, 0, 0, 0);
+          return dayMidnight >= startMidnight && dayMidnight <= endMidnight;
+        }
+
+        // Single-day selections must match the actual calendar day
+        return startsSameDay || endsSameDay;
       })
       .map((selection) => ({
         id: `selection-${selection.id}`,
@@ -278,7 +295,7 @@ const WeeklyCalendar = ({
         start_time: selection.startTime,
         end_time: selection.endTime,
         isUserSelection: true,
-        selectionData: selection, // Keep original selection data for manipulation
+        selectionData: selection,
       }));
 
     // Combine regular events and selections
@@ -758,7 +775,7 @@ const WeeklyCalendar = ({
 
     if (!isDragging) return;
 
-    if (interactionMode === "creating" && selectionArea) {
+      if (interactionMode === "creating" && selectionArea) {
       // Creating new selection
       let persistedArea = selectionArea;
       if (!allowCrossDaySelection) {

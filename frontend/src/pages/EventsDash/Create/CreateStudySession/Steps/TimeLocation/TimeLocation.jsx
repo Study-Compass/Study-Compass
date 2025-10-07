@@ -94,27 +94,26 @@ const TimeLocation = ({ formData, setFormData, onComplete }) => {
 
                     {/* Week Navigation */}
                     <div className="week-navigation">
-                        <button 
-                            type="button" 
+                        <span 
+                            role="button"
+                            tabIndex={0}
+                            className="nav-link left"
                             onClick={() => navigateWeek(-1)}
-                            className="nav-button"
+                            onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && navigateWeek(-1)}
                         >
-                            ← Previous Week
-                        </button>
-                        <span className="current-week">
-                            Week of {currentWeekStart.toLocaleDateString('en-US', { 
-                                month: 'short', 
-                                day: 'numeric',
-                                year: 'numeric'
-                            })}
+                            <span className="arrow">←</span>
+                            <span className="label">previous</span>
                         </span>
-                        <button 
-                            type="button" 
+                        <span 
+                            role="button"
+                            tabIndex={0}
+                            className="nav-link right"
                             onClick={() => navigateWeek(1)}
-                            className="nav-button"
+                            onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && navigateWeek(1)}
                         >
-                            Next Week →
-                        </button>
+                            <span className="label">next</span>
+                            <span className="arrow">→</span>
+                        </span>
                     </div>
 
                     {/* Enhanced WeeklyCalendar for timeslot selection */}

@@ -42,47 +42,71 @@
             align-items: center;
             justify-content: space-between;
             margin-bottom: 20px;
-            padding: 12px 16px;
-            background: #f9fafb;
-            border-radius: 8px;
-            border: 1px solid #e5e7eb;
+            padding: 0;
+            margin: 0;
+            background: transparent;
+            border-radius: 0;
+            border: none;
 
-            .nav-button {
-                background: #6d8efa;
-                color: white;
-                border: none;
-                padding: 8px 16px;
-                border-radius: 6px;
-                font-size: 14px;
-                font-weight: 500;
+            .nav-link {
+                font-size: 16px;
+                font-weight: 600;
+                color: #111827;
                 cursor: pointer;
-                transition: all 0.2s ease;
+                user-select: none;
+                transition: color 0.2s ease;
+                outline: none;
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+                flex-direction: row;    
+
+                &.left {
+                    border: none;
+                    padding: 0;
+                    margin: 0;
+            margin: 0;
+                }
+                &.right {
+                    padding: 0;
+                    margin: 0;
+                }
 
                 &:hover {
-                    background: #5a7bf8;
-                    transform: translateY(-1px);
+                    color: var(--blue);
                 }
 
                 &:active {
-                    transform: translateY(0);
+                    color: var(--blue);
                 }
-            }
 
-            .current-week {
-                font-size: 16px;
-                font-weight: 600;
-                color: #374151;
+                .arrow {
+                    display: inline-block;
+                    transition: transform 0.2s ease;
+                }
+
+                &.left:hover .arrow {
+                    transform: translateX(-2px);
+                }
+
+                &.right:hover .arrow {
+                    transform: translateX(2px);
+                }
             }
         }
 
         .calendar-container {
-            margin-bottom: 24px;
-            border: 2px solid #e5e7eb;
-            border-radius: 12px;
+            margin: 0 0 24px 0;
+            border: none;
+            border-radius: 0;
             overflow: hidden;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            box-shadow: none;
+            width: 100%;
 
-
+            // Make inner calendar go edge-to-edge within this section
+            .oie-weekly-calendar-container {
+                border-radius: 0;
+            }
         }
 
 
@@ -153,10 +177,7 @@
                 gap: 12px;
                 text-align: center;
 
-                .nav-button {
-                    width: 100%;
-                    max-width: 200px;
-                }
+                .nav-link { text-align: center; }
             }
 
 
