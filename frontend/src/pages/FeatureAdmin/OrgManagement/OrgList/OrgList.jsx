@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useFetch } from '../../../../hooks/useFetch';
+import { useGradient } from '../../../../hooks/useGradient';
 import apiRequest from '../../../../utils/postRequest';
 import { Icon } from '@iconify-icon/react';
 import './OrgList.scss';
@@ -10,6 +11,7 @@ function OrgList() {
         verified: '',
         page: 1
     });
+    const { AtlasMain } = useGradient();
 
     const { data: orgs, loading, error, refetch } = useFetch(
         `/org-management/organizations?${new URLSearchParams(filters).toString()}`
@@ -69,10 +71,11 @@ function OrgList() {
     }
 
     return (
-        <div className="org-list">
+        <div className="org-list dash">
             <header className="header">
                 <h1>Organizations</h1>
                 <p>Manage and monitor all student organizations</p>
+                <img src={AtlasMain} alt="Organizations Grad" />
             </header>
 
             <div className="content">

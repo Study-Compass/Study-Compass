@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useFetch } from '../../../../hooks/useFetch';
+import { useGradient } from '../../../../hooks/useGradient';
 import apiRequest from '../../../../utils/postRequest';
 import { Icon } from '@iconify-icon/react';
 import Modal from '../../../../components/Modal/Modal';
@@ -18,6 +19,7 @@ function VerificationRequests() {
         status: 'approved',
         reviewNotes: ''
     });
+    const { AtlasMain } = useGradient();
 
     const { data: requests, loading, error, refetch } = useFetch(
         `/org-management/verification-requests?${new URLSearchParams(filters).toString()}`
@@ -116,10 +118,11 @@ function VerificationRequests() {
     }
 
     return (
-        <div className="verification-requests">
+        <div className="verification-requests dash">
             <header className="header">
                 <h1>Verification Requests</h1>
                 <p>Review and manage organization verification requests</p>
+                <img src={AtlasMain} alt="Verification Requests Grad" />
             </header>
 
             <div className="content">

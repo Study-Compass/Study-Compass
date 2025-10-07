@@ -1,12 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { useFetch } from '../../../../hooks/useFetch';
+import { useGradient } from '../../../../hooks/useGradient';
 import { Icon } from '@iconify-icon/react';
+import MetricCard from '../../../../components/MetricCard';
 import './OrgOverview.scss';
 
 function OrgOverview() {
     const { data: analytics, loading, error } = useFetch('/org-management/analytics?timeRange=30d');
     const { data: config } = useFetch('/org-management/config');
     const [timeRange, setTimeRange] = useState('30d');
+    const { AtlasMain } = useGradient();
 
     const getStatusColor = (status) => {
         switch (status) {
@@ -46,54 +49,51 @@ function OrgOverview() {
     const data = analytics?.data;
 
     return (
-        <div className="org-overview">
+        <div className="org-overview dash">
             <header className="header">
                 <h1>Organization Management Overview</h1>
                 <p>Monitor and manage student organizations</p>
+                <img src={AtlasMain} alt="Org Management Grad" />
             </header>
 
             <div className="content">
                 {/* Quick Stats */}
-                <div className="stats-grid">
-                    <div className="stat-card">
-                        <div className="stat-icon">
-                            <Icon icon="mdi:account-group" />
-                        </div>
-                        <div className="stat-content">
-                            <h3>{data?.overview?.totalOrgs || 0}</h3>
-                            <p>Total Organizations</p>
-                        </div>
-                    </div>
+                <div className="analytics-overview">
+                    <MetricCard
+                        icon="mdi:account-group"
+                        title="Total Organizations"
+                        value={data?.overview?.totalOrgs || 0}
+                        label="All registered organizations"
+                        color="var(--primary-color)"
+                        size="small"
+                    />
 
-                    <div className="stat-card">
-                        <div className="stat-icon verified">
-                            <Icon icon="mdi:shield-check" />
-                        </div>
-                        <div className="stat-content">
-                            <h3>{data?.overview?.verifiedOrgs || 0}</h3>
-                            <p>Verified Organizations</p>
-                        </div>
-                    </div>
+                    <MetricCard
+                        icon="mdi:shield-check"
+                        title="Verified Organizations"
+                        value={data?.overview?.verifiedOrgs || 0}
+                        label="Successfully verified"
+                        color="var(--primary-color)"
+                        size="small"
+                    />
 
-                    <div className="stat-card">
-                        <div className="stat-icon members">
-                            <Icon icon="mdi:account-multiple" />
-                        </div>
-                        <div className="stat-content">
-                            <h3>{data?.overview?.totalMembers || 0}</h3>
-                            <p>Total Members</p>
-                        </div>
-                    </div>
+                    <MetricCard
+                        icon="mdi:account-multiple"
+                        title="Total Members"
+                        value={data?.overview?.totalMembers || 0}
+                        label="Across all organizations"
+                        color="var(--primary-color)"
+                        size="small"
+                    />
 
-                    <div className="stat-card">
-                        <div className="stat-icon events">
-                            <Icon icon="mdi:calendar" />
-                        </div>
-                        <div className="stat-content">
-                            <h3>{data?.overview?.totalEvents || 0}</h3>
-                            <p>Events This Month</p>
-                        </div>
-                    </div>
+                    <MetricCard
+                        icon="mdi:calendar"
+                        title="Events This Month"
+                        value={data?.overview?.totalEvents || 0}
+                        label="Organization events"
+                        color="var(--primary-color)"
+                        size="small"
+                    />
                 </div>
 
                 {/* Verification Requests Summary */}
