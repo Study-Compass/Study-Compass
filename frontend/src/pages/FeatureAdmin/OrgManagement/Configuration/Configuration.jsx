@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { useFetch } from '../../../../hooks/useFetch';
+import { useGradient } from '../../../../hooks/useGradient';
 import apiRequest from '../../../../utils/postRequest';
 import { Icon } from '@iconify-icon/react';
 import UnsavedChangesBanner from '../../../../components/UnsavedChangesBanner/UnsavedChangesBanner';
@@ -10,6 +11,7 @@ function Configuration({ section = 'general' }) {
     const { data: config, loading, error, refetch } = useFetch('/org-management/config');
     const [localConfig, setLocalConfig] = useState(null);
     const originalDataRef = useRef(null);
+    const { AtlasMain } = useGradient();
 
     React.useEffect(() => {
         if (config?.data) {
@@ -575,7 +577,7 @@ function Configuration({ section = 'general' }) {
     );
 
     return (
-        <div className="configuration">
+        <div className="configuration dash">
             <UnsavedChangesBanner
                 hasChanges={hasChanges}
                 onSave={saveChanges}
@@ -589,6 +591,7 @@ function Configuration({ section = 'general' }) {
                      section === 'review-workflow' ? 'Review Workflow' :
                      section === 'policies' ? 'Organization Policies' : 'Configuration'}</h1>
                 <p>Manage organization management system settings</p>
+                <img src={AtlasMain} alt="Configuration Grad" />
             </header>
 
             <div className="content">
