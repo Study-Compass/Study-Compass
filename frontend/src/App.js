@@ -28,7 +28,7 @@ import CreateOrg from './pages/CreateOrg/CreateOrg';
 import ClubDash from './pages/ClubDash/ClubDash';
 import OrgDisplay from './pages/Org/OrgDisplay';
 import RootDash from './pages/RootDash/RootDash';
-import OrgManagement from './pages/RootDash/OrgManagement/OrgManagement';
+import OrgManagement from './pages/FeatureAdmin/OrgManagement/Atlas';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 import SAMLCallback from './components/SAMLCallback/SAMLCallback';
@@ -48,6 +48,10 @@ import EventsDash from './pages/EventsDash/EventsDash';
 import EventPage from './pages/EventPage/EventPage';
 import SubSidebarExample from './components/Dashboard/SubSidebarExample';
 import RebrandingNotice from './components/RebrandingNotice/RebrandingNotice';
+import Beacon from './pages/FeatureAdmin/Beacon/Beacon';
+import Compass from './pages/FeatureAdmin/Compass/Compass';
+import Atlas from './pages/FeatureAdmin/Atlas/Atlas';
+import DomainDashboard from './pages/DomainDash/DomainDashboard';
 
 function App() {
     useEffect(() => {
@@ -148,6 +152,7 @@ function App() {
                                                 <Route path="/developer-onboarding" element={<AnimatedPageWrapper><DeveloperOnboard/></AnimatedPageWrapper>}/>
                                             </Route>
 
+                                            <Route path="/org/:name" element={<AnimatedPageWrapper><OrgDisplay/></AnimatedPageWrapper>}/>
                                             {/* admin routes */}
                                             <Route element={ <ProtectedRoute authorizedRoles={['admin']}/> }>
                                                 <Route path="/admin" element={<AnimatedPageWrapper><Admin/></AnimatedPageWrapper>}/>
@@ -160,8 +165,8 @@ function App() {
                                                 <Route path="/club-dashboard/:id" element={<AnimatedPageWrapper><ClubDash/></AnimatedPageWrapper>}/>
                                                 <Route path='/create-org' element={<AnimatedPageWrapper><CreateOrg/></AnimatedPageWrapper>}/>
                                                 <Route path="/root-dashboard" element={<AnimatedPageWrapper><RootDash/></AnimatedPageWrapper>}/>
-                                            <Route path="/org-management" element={<AnimatedPageWrapper><OrgManagement/></AnimatedPageWrapper>}/>
                                                 <Route path="/approval-dashboard/:id" element={<AnimatedPageWrapper><OIEDash/></AnimatedPageWrapper>}/>
+                                                <Route path="/domain-dashboard/:domainId" element={<AnimatedPageWrapper><DomainDashboard/></AnimatedPageWrapper>}/>
                                             </Route>
                                             <Route path="/events-dashboard" element={<AnimatedPageWrapper><EventsDash/></AnimatedPageWrapper>}/>
                                             <Route path="/event/:eventId" element={<AnimatedPageWrapper><EventPage/></AnimatedPageWrapper>}/>
@@ -169,6 +174,9 @@ function App() {
                                             {/* oie routes */}
                                             <Route element={ <ProtectedRoute authorizedRoles={['admin', 'developer', 'oie']}/> }>
                                                 <Route path="/oie-dashboard" element={<AnimatedPageWrapper><OIEDash/></AnimatedPageWrapper>}/>
+                                                <Route path="/feature-admin/beacon" element={<AnimatedPageWrapper><Beacon/></AnimatedPageWrapper>}/>
+                                                <Route path="/feature-admin/compass" element={<AnimatedPageWrapper><Compass/></AnimatedPageWrapper>}/>
+                                                <Route path="/feature-admin/atlas" element={<AnimatedPageWrapper><OrgManagement/></AnimatedPageWrapper>}/>
                                             </Route>
                                             <Route path="/create-event" element={<AnimatedPageWrapper><CreateEvent/></AnimatedPageWrapper   >}/>
                                         </Route>

@@ -130,6 +130,12 @@ function EventsDash({}){
                 label: 'Rooms',
                 icon: 'mingcute:calendar-fill',
                 element: <Room hideHeader={true} urlType="embedded" />
+            },
+            //orgs
+            {
+                label: 'Orgs',
+                icon: 'mingcute:group-2-fill',
+                element: <Orgs />
             }
         ];
         

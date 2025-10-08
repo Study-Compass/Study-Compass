@@ -26,6 +26,13 @@ const OrgSchema= new Schema({
             },
             permissions: {
                 type: [String],
+                enum: [
+                    // Organization permissions
+                    'manage_members', 'manage_events', 'view_analytics', 'all',
+                    // Approval permissions
+                    'approve_events', 'reject_events', 'request_changes', 
+                    'configure_approval_rules', 'escalate_approvals'
+                ],
                 default: []
             },
             isDefault: {
@@ -156,6 +163,41 @@ const OrgSchema= new Schema({
             type: Boolean,
             default: false
         }
+    },
+    
+    // Approval-specific settings (for approval groups)
+    approvalSettings: {
+        type: {
+            type: String,
+            enum: ['regular', 'approval_group'],
+            default: 'regular'
+        },
+        maxPendingApprovals: {
+            type: Number,
+            default: 50
+        },
+        escalationTimeout: {
+            type: Number,
+            default: 72 // hours
+        },
+        autoEscalate: {
+            type: Boolean,
+            default: true
+        },
+        notificationPreferences: {
+            email: {
+                type: Boolean,
+                default: true
+            },
+            sms: {
+                type: Boolean,
+                default: false
+            },
+            push: {
+                type: Boolean,
+                default: true
+            }
+        }
     }
 });
 
@@ -218,6 +260,96 @@ OrgSchema.methods.hasPermission = function(roleName, permission) {
     if (!role) return false;
     
     return role.permissions.includes('all') || role.permissions.includes(permission);
+};
+
+// Approval-specific methods
+OrgSchema.methods.isApprovalGroup = function() {
+    return this.approvalSettings.type === 'approval_group';
+};
+
+OrgSchema.methods.canApproveEvents = function(roleName) {
+    return this.hasPermission(roleName, 'approve_events');
+};
+
+OrgSchema.methods.canRejectEvents = function(roleName) {
+    return this.hasPermission(roleName, 'reject_events');
+};
+
+OrgSchema.methods.canConfigureApprovalRules = function(roleName) {
+    return this.hasPermission(roleName, 'configure_approval_rules');
+};
+
+OrgSchema.methods.canEscalateApprovals = function(roleName) {
+    return this.hasPermission(roleName, 'escalate_approvals');
+};
+
+// Static method to create approval group
+OrgSchema.statics.createApprovalGroup = function(name, displayName, description, ownerId) {
+    const approvalRoles = [
+        {
+            name: 'owner',
+            displayName: 'Owner',
+            permissions: ['all'],
+            isDefault: false,
+            canManageMembers: true,
+            canManageRoles: true,
+            canManageEvents: true,
+            canViewAnalytics: true,
+            order: 0
+        },
+        {
+            name: 'admin',
+            displayName: 'Administrator',
+            permissions: ['approve_events', 'reject_events', 'request_changes', 'manage_members', 'configure_approval_rules', 'view_analytics'],
+            isDefault: false,
+            canManageMembers: true,
+            canManageRoles: false,
+            canManageEvents: true,
+            canViewAnalytics: true,
+            order: 1
+        },
+        {
+            name: 'approver',
+            displayName: 'Approver',
+            permissions: ['approve_events', 'reject_events', 'request_changes'],
+            isDefault: false,
+            canManageMembers: false,
+            canManageRoles: false,
+            canManageEvents: false,
+            canViewAnalytics: false,
+            order: 2
+        },
+        {
+            name: 'member',
+            displayName: 'Member',
+            permissions: ['approve_events'],
+            isDefault: true,
+            canManageMembers: false,
+            canManageRoles: false,
+            canManageEvents: false,
+            canViewAnalytics: false,
+            order: 3
+        }
+    ];
+
+    return new this({
+        org_name: name,
+        org_description: description,
+        org_profile_image: '/Logo.svg', // Default image for approval groups
+        positions: approvalRoles,
+        owner: ownerId,
+        approvalSettings: {
+            type: 'approval_group',
+            maxPendingApprovals: 50,
+            escalationTimeout: 72,
+            autoEscalate: true,
+            notificationPreferences: {
+                email: true,
+                sms: false,
+                push: true
+            }
+        }
+    });
 };
 
 module.exports=OrgSchema;

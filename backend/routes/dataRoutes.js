@@ -16,6 +16,71 @@ const getModels = require('../services/getModelService');
 
 const router = express.Router();
 
+
+// Route to get featured content (rooms and events) for explore screen
+router.get('/featured-all', async (req, res) => {
+    try {
+        const { Classroom, Event } = getModels(req, 'Classroom', 'Event');
+        
+        // Get 5 random rooms
+        const rooms = await Classroom.aggregate([
+            { $sample: { size: 5 } },
+            {
+                $project: {
+                    _id: 1,
+                    name: 1,
+                    building: 1,
+                    floor: 1,
+                    capacity: 1,
+                    image: 1,
+                    attributes: 1,
+                    average_rating: 1,
+                    number_of_ratings: 1
+                }
+            }
+        ]);
+
+        // Get 5 random events
+        //prioritize events that have an image
+        const events = await Event.aggregate([
+            { $sample: { size: 5 } },
+            
+            {
+                $project: {
+                    _id: 1,
+                    name: 1,
+                    description: 1,
+                    start_time: 1,
+                    end_time: 1,
+                    location: 1,
+                    image: 1,
+                    type: 1,
+                    rsvp_count: 1,
+                    max_capacity: 1
+                }
+            }
+        ]);
+
+        console.log(`GET: /featured-all - Returning ${rooms.length} rooms and ${events.length} events`);
+        
+        res.json({
+            success: true,
+            message: "Featured content retrieved",
+            data: {
+                rooms: rooms,
+                events: events
+            }
+        });
+    } catch (error) {
+        console.error('Error retrieving featured content:', error);
+        res.status(500).json({ 
+            success: false, 
+            message: 'Error retrieving featured content', 
+            error: error.message 
+        });
+    }
+});
+
 // Route to get a specific classroom by name
 router.get('/getroom/:id', async (req, res) => {
     const { Classroom, Schedule } = getModels(req, 'Classroom', 'Schedule');
@@ -69,6 +134,63 @@ router.get('/getrooms', async (req, res) => {
         res.status(500).json({ success: false, message: 'Error fetching room names', error: error.message });
     }
 });
+
+
+// Route to get all currently free rooms with pagination support
+router.get('/free-rooms', async (req, res) => {
+    const { Schedule, Classroom } = getModels(req, 'Schedule', 'Classroom');
+    
+    try {
+        const currentTime = new Date();
+        const days = ['X', 'M', 'T', 'W', 'R', 'F', 'X']; // Sunday=0, Monday=1, etc.
+        const day = days[currentTime.getDay()];
+        const hour = currentTime.getHours();
+        const minute = currentTime.getMinutes();
+        const time = hour * 60 + minute; // Convert to minutes since midnight
+        
+        let query;
+        
+        // If it's weekend (Saturday or Sunday), return all rooms
+        if (day === 'X') {
+            query = {};
+        } else {
+            // Find rooms that don't have a class scheduled right now
+            query = {
+                [`weekly_schedule.${day}`]: {
+                    $not: {
+                        $elemMatch: { 
+                            start_time: { $lt: time }, 
+                            end_time: { $gt: time } 
+                        }
+                    }
+                }
+            };
+        }
+
+        // Get all free room IDs
+        const freeSchedules = await Schedule.find(query);
+        const freeRoomIds = freeSchedules.map(schedule => schedule.classroom_id);
+        
+        console.log(`GET: /free-rooms - Found ${freeRoomIds.length} free rooms at ${hour}:${minute.toString().padStart(2, '0')} on ${day}`);
+        
+        // Return the room IDs for pagination
+        res.json({ 
+            success: true, 
+            message: "Free rooms found", 
+            data: freeRoomIds,
+            total: freeRoomIds.length,
+            timestamp: currentTime.toISOString()
+        });
+    } catch (error) {
+        console.error('Error finding free rooms:', error);
+        res.status(500).json({ 
+            success: false, 
+            message: 'Error finding free rooms', 
+            error: error.message 
+        });
+    }
+});
+
 
 // Route to find classrooms available during given free periods
 router.post('/free', async (req, res) => {

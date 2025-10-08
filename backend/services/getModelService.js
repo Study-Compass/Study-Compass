@@ -39,7 +39,10 @@ const formSchema = require('../events/schemas/form');
 const formResponseSchema = require('../events/schemas/formResponse');
 const orgVerificationSchema = require('../schemas/orgVerification');
 const orgManagementConfigSchema = require('../schemas/orgManagementConfig');
-const eventAnalyticsSchema = require('../schemas/eventAnalytics');
+const eventAnalyticsSchema = require('../events/schemas/eventAnalytics');
+const eventSystemConfigSchema = require('../events/schemas/eventSystemConfig');
+const stakeholderRoleSchema = require('../events/schemas/stakeholderRole');
+const domainSchema = require('../events/schemas/domain');
 
 
 const getModels = (req, ...names) => {
@@ -74,6 +77,10 @@ const getModels = (req, ...names) => {
         OrgMemberApplication: req.db.model('OrgMemberApplication', orgMemberApplicationSchema, 'orgMemberApplications'),
         SAMLConfig: req.db.model('SAMLConfig', samlConfigSchema, 'samlConfigs'),
         Notification: req.db.model('Notification', notificationSchema, 'notifications'),
+        EventAnalytics: req.db.model('EventAnalytics', eventAnalyticsSchema, 'eventAnalytics'),
+        EventSystemConfig: req.db.model('EventSystemConfig', eventSystemConfigSchema, 'eventSystemConfigs'),
+        StakeholderRole: req.db.model('StakeholderRole', stakeholderRoleSchema, 'stakeholderRoles'),
+        Domain: req.db.model('Domain', domainSchema, 'domains'),
         EventAnalytics: req.db.model('EventAnalytics', eventAnalyticsSchema, 'eventAnalytics'),
         
         // Study Sessions
