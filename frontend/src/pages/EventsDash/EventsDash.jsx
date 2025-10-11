@@ -14,7 +14,7 @@ import EventsGrad from '../../assets/Gradients/EventsGrad.png';
 import Popup from '../../components/Popup/Popup';
 import EventsAnalytics from '../../components/EventsAnalytics/EventsAnalytics';
 import Room from '../Room/Room1';
-
+import CreateStudySession from '../Create/CreateStudySession';
 // Sign-up prompt component
 const SignUpPrompt = ({ onSignUp, onExplore, handleClose }) => {
     return (
@@ -76,6 +76,7 @@ function EventsDash({}){
     const [showLoading, setShowLoading] = useState(false);
     const [showExplore, setShowExplore] = useState(false);
     const [showSignUpPrompt, setShowSignUpPrompt] = useState(false);
+    const [showCreatePopup, setShowCreatePopup] = useState(false);
     const { user, isAuthenticating } = useAuth();
     const navigate = useNavigate();
 
@@ -116,16 +117,6 @@ function EventsDash({}){
     }
     },[isAuthenticating, user]);
 
-    // Handle room navigation from search results
-    const handleRoomNavigation = (room) => {
-        // Navigate to Rooms tab (index 2 for authenticated users, index 1 for non-authenticated)
-        const roomsTabIndex = user ? 2 : 1;
-        
-        // Navigate to Rooms tab with the room name as roomid parameter
-        // The Room component in embedded mode expects room names, not IDs
-        navigate(`/events-dashboard?page=${roomsTabIndex}&roomid=${encodeURIComponent(room.name)}`);
-    };
-
     // Create menu items based on authentication status
     const getMenuItems = () => {
         const items = [
@@ -136,14 +127,8 @@ function EventsDash({}){
             },
             {
                 label: 'Rooms',
-                icon: 'ic:baseline-room',
+                icon: 'mingcute:calendar-fill',
                 element: <Room hideHeader={true} urlType="embedded" />
-            },
-            //orgs
-            {
-                label: 'Orgs',
-                icon: 'mingcute:group-2-fill',
-                element: <Orgs />
             }
         ];
         
@@ -152,8 +137,9 @@ function EventsDash({}){
             items.unshift({
                 label: 'My Events', 
                 icon: 'mingcute:calendar-fill',
-                element: <MyEvents onRoomNavigation={handleRoomNavigation} />
+                element: <MyEvents />
             });
+            
             items.push({
                 label: 'Friends', 
                 icon: 'mdi:account-group',
@@ -197,6 +183,32 @@ function EventsDash({}){
         setShowSignUpPrompt(false);
     };
 
+    const handleCreateClick = () => {
+        setShowCreatePopup(true);
+    };
+
+    const handleCloseCreatePopup = () => {
+        setShowCreatePopup(false);
+    };
+
+    // Create the plus button middle item for authenticated users
+    const getMiddleItem = () => {
+        if (!user) return null;
+        
+        return (
+            <div className="create-button-container">
+                <button 
+                    className="create-plus-button" 
+                    onClick={handleCreateClick}
+                    title="Create Study Session"
+                >
+                    <Icon icon="mingcute:add-circle-fill" />
+                    <span>Create</span>
+                </button>
+            </div>
+        );
+    };
+
     return (
         <>
             {showLoading && !isAuthenticating && !user && (
@@ -219,7 +231,8 @@ function EventsDash({}){
                 logo={eventsLogo} 
                 primaryColor='#6D8EFA' 
                 secondaryColor='rgba(109, 142, 250, 0.15)'
-                defaultPage={user ? 1 : 0}
+                middleItem={getMiddleItem()}
+                // Set default page to "My Events" (index 1) if user is logged in, otherwise "Explore" (index 0)
             >
             </Dashboard>
 
@@ -235,6 +248,16 @@ function EventsDash({}){
                     onExplore={handleExplore} 
                     handleClose={handleClosePrompt}
                 />
+            </Popup>
+
+            {/* Create Study Session popup */}
+            <Popup 
+                isOpen={showCreatePopup} 
+                onClose={handleCloseCreatePopup}
+                customClassName="create-study-session-popup"
+                defaultStyling={false}
+            >
+                <CreateStudySession onClose={handleCloseCreatePopup} />
             </Popup>
         </>
     )

@@ -119,6 +119,9 @@ const notificationRoutes = require('./routes/notificationRoutes.js');
 const qrRoutes = require('./routes/qrRoutes.js');
 const eventAnalyticsRoutes = require('./routes/eventAnalyticsRoutes.js');
 const orgEventManagementRoutes = require('./routes/orgEventManagementRoutes.js');
+const studySessionRoutes = require('./routes/studySessionRoutes.js');
+const availabilityPollRoutes = require('./routes/availabilityPollRoutes.js');
+const feedbackRoutes = require('./routes/feedbackRoutes.js');
 
 app.use(authRoutes);
 app.use('/auth/saml', samlRoutes);
@@ -144,6 +147,12 @@ app.use('/notifications', notificationRoutes);
 app.use('/api/qr', qrRoutes);
 
 app.use(eventsRoutes);
+
+app.use('/study-sessions', studySessionRoutes);
+app.use('/availability-polls', availabilityPollRoutes);
+
+app.use('/feedback', feedbackRoutes);
+
 // Serve static files from the React app in production
 if (process.env.NODE_ENV === 'production') {
     app.use(express.static(path.join(__dirname, '../frontend/build')));
