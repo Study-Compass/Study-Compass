@@ -994,6 +994,69 @@ router.post('/:orgId/forms', verifyToken, requireMemberManagement(), async (req,
     }
 });
 
+// Update a form for the organization
+router.put('/:orgId/forms/:formId', verifyToken, requireMemberManagement(), async (req, res) => {
+    const { Org, Form } = getModels(req, 'Org', 'Form');
+    const { orgId, formId } = req.params;
+    const { form } = req.body;
+    
+    try {
+        // Verify organization exists
+        const org = await Org.findById(orgId);
+        if (!org) {
+            return res.status(404).json({
+                success: false,
+                message: 'Organization not found'
+            });
+        }
+
+        // Verify form exists and belongs to organization
+        const existingForm = await Form.findOne({
+            _id: formId,
+            formOwner: orgId,
+            formOwnerType: 'Org'
+        });
+
+        if (!existingForm) {
+            return res.status(404).json({
+                success: false,
+                message: 'Form not found or access denied'
+            });
+        }
+
+        // Remove temporary IDs from questions
+        const processedForm = {
+            ...form,
+            questions: form.questions.map(q => {
+                if (q._id && q._id.startsWith('NEW_QUESTION_')) {
+                    const { _id, ...questionWithoutId } = q;
+                    return questionWithoutId;
+                }
+                return q;
+            })
+        };
+
+        const updatedForm = await Form.findByIdAndUpdate(
+            formId,
+            { ...processedForm, updatedAt: Date.now() },
+            { new: true }
+        );
+
+        console.log('PUT: /:orgId/forms/:formId successful');
+        return res.status(200).json({
+            success: true,
+            message: "Form updated successfully",
+            form: updatedForm
+        });
+    } catch (error) {
+        console.log('Error updating form:', error);
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+});
+
 // Get all forms for the organization
 router.get('/:orgId/forms', verifyToken, requireMemberManagement(), async (req, res) => {
     const { Form } = getModels(req, 'Form');
