@@ -1,5 +1,7 @@
 .dash.manage-flow {
-
+    --primary: var(--primary-color);
+    --primary-light: var(--secondary-color);
+    
     .header {
         // display: flex;
         // align-items: center;

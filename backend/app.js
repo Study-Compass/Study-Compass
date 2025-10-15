@@ -119,6 +119,10 @@ const notificationRoutes = require('./routes/notificationRoutes.js');
 const qrRoutes = require('./routes/qrRoutes.js');
 const eventAnalyticsRoutes = require('./routes/eventAnalyticsRoutes.js');
 const orgEventManagementRoutes = require('./routes/orgEventManagementRoutes.js');
+const inngestRoutes = require('./routes/inngestRoutes.js');
+
+// Inngest integration
+const inngestServe = require('./inngest/serve.js');
 
 app.use(authRoutes);
 app.use('/auth/saml', samlRoutes);
@@ -142,6 +146,12 @@ app.use(adminRoutes);
 
 app.use('/notifications', notificationRoutes);
 app.use('/api/qr', qrRoutes);
+
+// Inngest serve handler - this handles all Inngest function execution
+app.use('/api/inngest', inngestServe);
+
+// Inngest example routes for triggering events
+app.use('/api/inngest-examples', inngestRoutes);
 
 app.use(eventsRoutes);
 // Serve static files from the React app in production

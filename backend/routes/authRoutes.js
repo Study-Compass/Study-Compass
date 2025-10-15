@@ -10,6 +10,7 @@ const router = express.Router();
 const { verifyToken } = require('../middlewares/verifyToken.js');
 
 const { authenticateWithGoogle, loginUser, registerUser } = require('../services/userServices.js');
+const { sendUserRegisteredEvent } = require('../inngest/events.js');
 const getModels = require('../services/getModelService.js');
 
 const { Resend } = require('resend');
@@ -133,6 +134,15 @@ router.post('/register', async (req, res) => {
 
         console.log(`POST: /register new user ${username}`);
         sendDiscordMessage(`New user registered`, `user ${username} registered`, "newUser");
+        
+        // Send Inngest event for user registration
+        await sendUserRegisteredEvent({
+            id: user._id,
+            email: user.email,
+            username: user.username,
+            name: user.name,
+            school: req.school
+        });
         
         // Send the response without tokens in body
         res.status(201).json({

@@ -135,6 +135,30 @@ router.get('/getrooms', async (req, res) => {
     }
 });
 
+//route to calculate the number of classes in total
+router.get('/total-classes', async (req, res) => {
+    const { Schedule } = getModels(req, 'Schedule');
+    try{
+        const schedules = await Schedule.find({});
+        const uniqueClassNames = new Set();
+        
+        schedules.forEach(schedule => {
+            Object.keys(schedule.weekly_schedule).forEach(day => {
+                schedule.weekly_schedule[day].forEach(classEntry => {
+                    if (classEntry.class_name) {
+                        uniqueClassNames.add(classEntry.class_name);
+                    }
+                });
+            });
+        });
+        
+        const totalUniqueClasses = uniqueClassNames.size;
+        res.json({ success: true, message: "Total unique classes fetched", data: totalUniqueClasses });
+    } catch(error){
+        res.status(500).json({ success: false, message: "Error fetching total classes", error: error.message });
+    }
+});
+
 
 // Route to get all currently free rooms with pagination support
 router.get('/free-rooms', async (req, res) => {
