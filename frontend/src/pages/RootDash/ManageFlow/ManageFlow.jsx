@@ -199,18 +199,18 @@ function ManageFlow(){
                         Overview
                     </button>
                     <button 
-                        className={`tab ${activeTab === 'stakeholders' ? 'active' : ''}`}
-                        onClick={() => setActiveTab('stakeholders')}
-                    >
-                        <Icon icon="mdi:account-group" />
-                        Stakeholders
-                    </button>
-                    <button 
                         className={`tab ${activeTab === 'domains' ? 'active' : ''}`}
                         onClick={() => setActiveTab('domains')}
                     >
                         <Icon icon="mdi:domain" />
                         Domains
+                    </button>
+                    <button 
+                        className={`tab ${activeTab === 'stakeholders' ? 'active' : ''}`}
+                        onClick={() => setActiveTab('stakeholders')}
+                    >
+                        <Icon icon="mdi:account-group" />
+                        Stakeholders
                     </button>
                     <button 
                         className={`tab ${activeTab === 'management' ? 'active' : ''}`}

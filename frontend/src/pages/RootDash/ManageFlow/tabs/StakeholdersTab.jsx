@@ -6,6 +6,17 @@ function StakeholdersTab({
     openPopup 
 }) {
     console.log(domainsData);
+    
+    // Calculate statistics from real data
+    const totalStakeholderRoles = domainsData.data?.data?.reduce((total, domain) => 
+        total + (domain.stakeholderRoles?.length || 0), 0) || 0;
+    
+    const assignedRoles = domainsData.data?.data?.reduce((total, domain) => 
+        total + (domain.stakeholderRoles?.filter(role => role.currentAssignee?.userId).length || 0), 0) || 0;
+    
+    const approverRoles = domainsData.data?.data?.reduce((total, domain) => 
+        total + (domain.stakeholderRoles?.filter(role => role.stakeholderType === 'approver').length || 0), 0) || 0;
+    
     return (
         <div className="stakeholders-section">
             <div className="section-header">
@@ -47,7 +58,7 @@ function StakeholdersTab({
                                 <Icon icon="mdi:account-group" />
                             </div>
                             <div className="stat-content">
-                                <h3>0</h3>
+                                <h3>{totalStakeholderRoles}</h3>
                                 <p>Total Stakeholder Roles</p>
                             </div>
                         </div>
@@ -56,7 +67,7 @@ function StakeholdersTab({
                                 <Icon icon="mdi:account-check" />
                             </div>
                             <div className="stat-content">
-                                <h3>0</h3>
+                                <h3>{assignedRoles}</h3>
                                 <p>Assigned Roles</p>
                             </div>
                         </div>
@@ -65,7 +76,7 @@ function StakeholdersTab({
                                 <Icon icon="mdi:shield-check" />
                             </div>
                             <div className="stat-content">
-                                <h3>0</h3>
+                                <h3>{approverRoles}</h3>
                                 <p>Approver Roles</p>
                             </div>
                         </div>
@@ -85,7 +96,7 @@ function StakeholdersTab({
                                             </span>
                                             <span className="stakeholder-count">
                                                 <Icon icon="mdi:account-group" />
-                                                0 stakeholder roles
+                                                {domain.stakeholderRoles?.length || 0} stakeholder roles
                                             </span>
                                         </div>
                                     </div>
@@ -96,20 +107,92 @@ function StakeholdersTab({
                                 </div>
 
                                 <div className="stakeholder-roles-list">
-                                    <div className="no-stakeholder-roles">
-                                        <div className="empty-state">
-                                            <Icon icon="mdi:account-group" />
-                                            <h5>No Stakeholder Roles</h5>
-                                            <p>This domain doesn't have any stakeholder roles configured yet.</p>
-                                            <button 
-                                                className="add-role-btn"
-                                                onClick={() => openPopup('stakeholder')}
-                                            >
-                                                <Icon icon="mdi:plus" />
-                                                Add Stakeholder Role
-                                            </button>
+                                    {domain.stakeholderRoles && domain.stakeholderRoles.length > 0 ? (
+                                        <div className="roles-grid">
+                                            {domain.stakeholderRoles.map((role) => (
+                                                <div key={role._id} className="stakeholder-role-card">
+                                                    <div className="role-header">
+                                                        <div className="role-info">
+                                                            <h4>{role.stakeholderName}</h4>
+                                                            <span className={`role-type-badge ${role.stakeholderType}`}>
+                                                                <Icon icon={`mdi:${role.stakeholderType === 'approver' ? 'shield-check' : role.stakeholderType === 'acknowledger' ? 'account-check' : 'account'}`} />
+                                                                {role.stakeholderType}
+                                                            </span>
+                                                        </div>
+                                                        <div className="role-status">
+                                                            <div className={`status-indicator ${role.isActive ? 'active' : 'inactive'}`}></div>
+                                                            <span>{role.isActive ? 'Active' : 'Inactive'}</span>
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <div className="role-details">
+                                                        <div className="role-assignment">
+                                                            <div className="assignment-info">
+                                                                <Icon icon="mdi:account" />
+                                                                <span>
+                                                                    {role.currentAssignee?.userId ? 'Assigned' : 'Unassigned'}
+                                                                </span>
+                                                            </div>
+                                                            {role.currentAssignee?.userId && (
+                                                                <div className="assignee-info">
+                                                                    <span className="assignee-name">Assigned to user</span>
+                                                                    <span className="assignment-date">
+                                                                        {new Date(role.currentAssignee.assignedAt).toLocaleDateString()}
+                                                                    </span>
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                        
+                                                        <div className="role-permissions">
+                                                            <div className="permissions-header">
+                                                                <Icon icon="mdi:shield-account" />
+                                                                <span>Permissions</span>
+                                                            </div>
+                                                            <div className="permissions-list">
+                                                                {role.permissions.map((permission, index) => (
+                                                                    <span key={index} className="permission-tag">
+                                                                        {permission.replace('_', ' ')}
+                                                                    </span>
+                                                                ))}
+                                                            </div>
+                                                        </div>
+                                                        
+                                                        {role.description && (
+                                                            <div className="role-description">
+                                                                <p>{role.description}</p>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                    
+                                                    <div className="role-actions">
+                                                        <button className="action-btn edit">
+                                                            <Icon icon="mdi:pencil" />
+                                                            Edit
+                                                        </button>
+                                                        <button className="action-btn assign">
+                                                            <Icon icon="mdi:account-plus" />
+                                                            Assign
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            ))}
                                         </div>
-                                    </div>
+                                    ) : (
+                                        <div className="no-stakeholder-roles">
+                                            <div className="empty-state">
+                                                <Icon icon="mdi:account-group" />
+                                                <h5>No Stakeholder Roles</h5>
+                                                <p>This domain doesn't have any stakeholder roles configured yet.</p>
+                                                <button 
+                                                    className="add-role-btn"
+                                                    onClick={() => openPopup('stakeholder')}
+                                                >
+                                                    <Icon icon="mdi:plus" />
+                                                    Add Stakeholder Role
+                                                </button>
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         ))}
@@ -136,5 +219,6 @@ function StakeholdersTab({
 }
 
 export default StakeholdersTab;
+
 
 

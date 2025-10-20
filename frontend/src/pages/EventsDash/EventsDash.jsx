@@ -130,6 +130,11 @@ function EventsDash({}){
     const getMenuItems = () => {
         const items = [
             { 
+                label: 'Home', 
+                icon: 'mingcute:home-fill',
+                element: <MyEvents onRoomNavigation={handleRoomNavigation} />
+            },
+            { 
                 label: 'Explore', 
                 icon: 'mingcute:compass-fill',
                 element: <Explore />
@@ -147,13 +152,8 @@ function EventsDash({}){
             }
         ];
         
-        // Only add "My Events" if user is logged in
+        // Add additional tabs for authenticated users
         if (user) {
-            items.unshift({
-                label: 'My Events', 
-                icon: 'mingcute:calendar-fill',
-                element: <MyEvents onRoomNavigation={handleRoomNavigation} />
-            });
             items.push({
                 label: 'Friends', 
                 icon: 'mdi:account-group',
@@ -219,7 +219,7 @@ function EventsDash({}){
                 logo={eventsLogo} 
                 primaryColor='#6D8EFA' 
                 secondaryColor='rgba(109, 142, 250, 0.15)'
-                defaultPage={user ? 1 : 0}
+                defaultPage={0}
             >
             </Dashboard>
 

@@ -1,7 +1,9 @@
 .dash.manage-flow {
     --primary: var(--primary-color);
     --primary-light: var(--secondary-color);
-    
+    --primary-dark: #675EAA;
+    --success-dark: var(--primary-dark);
+    --success: var(--green);
     .header {
         // display: flex;
         // align-items: center;
@@ -200,7 +202,7 @@
                 .groups-grid,
                 .settings-grid {
                     display: grid;
-                    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+                    grid-template-columns: repeat(auto-fit, minmax(375px, 1fr));
                     gap: 20px;
                 }
 
@@ -728,6 +730,245 @@
                     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
                 }
 
+                .stakeholder-roles-list {
+                    .roles-grid {
+                        display: grid;
+                        grid-template-columns: repeat(auto-fill, minmax(375px, 1fr));
+                        gap: 16px;
+                        padding: 15px;
+                    }
+
+                    .stakeholder-role-card {
+                        background: var(--lightest);
+                        border: 1px solid var(--border);
+                        border-radius: 12px;
+                        overflow: hidden;
+                        transition: all 0.2s ease;
+
+                        &:hover {
+                            transform: translateY(-2px);
+                            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+                        }
+
+                        .role-header {
+                            display: flex;
+                            justify-content: space-between;
+                            align-items: flex-start;
+                            padding: 20px;
+                            background: var(--background);
+                            border-bottom: 1px solid var(--border);
+
+                            .role-info {
+                                flex: 1;
+
+                                h4 {
+                                    margin: 0 0 8px 0;
+                                    font-size: 15px;
+                                    font-weight: 600;
+                                    color: var(--text);
+                                }
+
+                                .role-type-badge {
+                                    display: inline-flex;
+                                    align-items: center;
+                                    gap: 6px;
+                                    padding: 6px 12px;
+                                    border-radius: 20px;
+                                    font-size: 12px;
+                                    font-weight: 500;
+                                    text-transform: capitalize;
+
+                                    svg {
+                                        width: 14px;
+                                        height: 14px;
+                                    }
+
+                                    &.approver {
+                                        background: #ffebee;
+                                        color: #c62828;
+                                    }
+
+                                    &.acknowledger {
+                                        background: #e8f5e8;
+                                        color: #2e7d32;
+                                    }
+
+                                    &.notifiee {
+                                        background: #e3f2fd;
+                                        color: #1565c0;
+                                    }
+                                }
+                            }
+
+                            .role-status {
+                                display: flex;
+                                align-items: center;
+                                gap: 8px;
+
+                                .status-indicator {
+                                    width: 8px;
+                                    height: 8px;
+                                    border-radius: 50%;
+
+                                    &.active {
+                                        background: var(--success);
+                                    }
+
+                                    &.inactive {
+                                        background: var(--error);
+                                    }
+                                }
+
+                                span {
+                                    font-size: 12px;
+                                    font-weight: 500;
+                                    color: var(--lighter-text);
+                                }
+                            }
+                        }
+
+                        .role-details {
+                            padding: 20px;
+                            display: flex;
+                            flex-direction: column;
+                            gap: 16px;
+
+                            .role-assignment {
+                                .assignment-info {
+                                    display: flex;
+                                    align-items: center;
+                                    gap: 8px;
+                                    margin-bottom: 8px;
+
+                                    svg {
+                                        width: 16px;
+                                        height: 16px;
+                                        color: var(--lighter-text);
+                                    }
+
+                                    span {
+                                        font-size: 14px;
+                                        font-weight: 500;
+                                        color: var(--text);
+                                    }
+                                }
+
+                                .assignee-info {
+                                    margin-left: 24px;
+                                    display: flex;
+                                    flex-direction: column;
+                                    gap: 2px;
+
+                                    .assignee-name {
+                                        font-size: 12px;
+                                        color: var(--lighter-text);
+                                    }
+
+                                    .assignment-date {
+                                        font-size: 11px;
+                                        color: var(--lighter-text);
+                                    }
+                                }
+                            }
+
+                            .role-permissions {
+                                .permissions-header {
+                                    display: flex;
+                                    align-items: center;
+                                    gap: 8px;
+                                    margin-bottom: 8px;
+
+                                    svg {
+                                        width: 16px;
+                                        height: 16px;
+                                        color: var(--lighter-text);
+                                    }
+
+                                    span {
+                                        font-size: 14px;
+                                        font-weight: 500;
+                                        color: var(--text);
+                                    }
+                                }
+
+                                .permissions-list {
+                                    display: flex;
+                                    flex-wrap: wrap;
+                                    gap: 6px;
+
+                                    .permission-tag {
+                                        padding: 4px 8px;
+                                        background: var(--primary-light);
+                                        color: var(--primary);
+                                        border-radius: 12px;
+                                        font-size: 11px;
+                                        font-weight: 500;
+                                        text-transform: capitalize;
+                                    }
+                                }
+                            }
+
+                            .role-description {
+                                p {
+                                    margin: 0;
+                                    font-size: 13px;
+                                    color: var(--lighter-text);
+                                    line-height: 1.4;
+                                }
+                            }
+                        }
+
+                        .role-actions {
+                            display: flex;
+                            gap: 8px;
+                            padding: 16px 20px;
+                            background: var(--background);
+                            border-top: 1px solid var(--border);
+
+                            .action-btn {
+                                display: flex;
+                                align-items: center;
+                                gap: 6px;
+                                padding: 8px 16px;
+                                border: 1px solid var(--border);
+                                border-radius: 6px;
+                                font-size: 12px;
+                                font-weight: 500;
+                                cursor: pointer;
+                                transition: all 0.2s ease;
+
+                                svg {
+                                    width: 14px;
+                                    height: 14px;
+                                }
+
+                                &.edit {
+                                    background: var(--lightest);
+                                    color: var(--text);
+
+                                    &:hover {
+                                        background: var(--primary);
+                                        color: white;
+                                        border-color: var(--primary);
+                                    }
+                                }
+
+                                &.assign {
+                                    background: var(--success-light);
+                                    color: var(--success);
+                                    border-color: var(--success-light);
+
+                                    &:hover {
+                                        background: var(--success);
+                                        color: white;
+                                        border-color: var(--success);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
                 .domain-header {
                     display: flex;
                     justify-content: space-between;
@@ -957,10 +1198,7 @@
                     }
                 }
 
-                .stakeholder-roles-section {
-                    border-top: 1px solid var(--border);
-                    padding: 20px;
-                    background: var(--background);
+                .stakeholder-roles-list {
 
                     .section-header {
                         display: flex;
@@ -1018,6 +1256,10 @@
                         padding: 40px 20px;
 
                         .empty-state {
+                            display: flex;
+                            flex-direction: column;
+                            align-items: center;
+                            justify-content: center;
                             svg {
                                 width: 48px;
                                 height: 48px;
@@ -1038,7 +1280,7 @@
                                 font-size: 14px;
                             }
 
-                            .create-role-btn {
+                            .add-role-btn {
                                 display: flex;
                                 align-items: center;
                                 gap: 6px;
@@ -1054,6 +1296,7 @@
 
                                 &:hover {
                                     background: var(--primary-dark);
+                                    transform: translateY(-1px);
                                 }
 
                                 svg {
@@ -1064,135 +1307,6 @@
                         }
                     }
 
-                    .stakeholder-roles-list {
-                        display: flex;
-                        flex-direction: column;
-                        gap: 12px;
-
-                        .stakeholder-role-card {
-                            display: flex;
-                            justify-content: space-between;
-                            align-items: flex-start;
-                            padding: 16px;
-                            background: var(--lightest);
-                            border: 1px solid var(--border);
-                            border-radius: 8px;
-                            transition: all 0.2s ease;
-
-                            &:hover {
-                                background: var(--background);
-                            }
-
-                            .role-info {
-                                flex: 1;
-
-                                h5 {
-                                    margin: 0 0 4px 0;
-                                    font-size: 14px;
-                                    font-weight: 600;
-                                    color: var(--text);
-                                }
-
-                                .role-description {
-                                    margin: 0 0 8px 0;
-                                    color: var(--lighter-text);
-                                    font-size: 12px;
-                                    line-height: 1.4;
-                                }
-
-                                .role-meta {
-                                    display: flex;
-                                    gap: 8px;
-
-                                    .role-type-badge {
-                                        display: flex;
-                                        align-items: center;
-                                        gap: 4px;
-                                        padding: 2px 6px;
-                                        border-radius: 8px;
-                                        font-size: 10px;
-                                        font-weight: 500;
-                                        text-transform: capitalize;
-
-                                        svg {
-                                            width: 12px;
-                                            height: 12px;
-                                        }
-
-                                        &.approver {
-                                            background: #ffebee;
-                                            color: #c62828;
-                                        }
-
-                                        &.acknowledger {
-                                            background: #e8f5e8;
-                                            color: #2e7d32;
-                                        }
-
-                                        &.notifiee {
-                                            background: #e3f2fd;
-                                            color: #1565c0;
-                                        }
-                                    }
-
-                                    .assignee-status {
-                                        display: flex;
-                                        align-items: center;
-                                        gap: 4px;
-                                        font-size: 10px;
-                                        font-weight: 500;
-
-                                        svg {
-                                            width: 12px;
-                                            height: 12px;
-                                        }
-
-                                        &.assigned {
-                                            color: var(--success);
-                                        }
-
-                                        &.unassigned {
-                                            color: var(--error);
-                                        }
-                                    }
-                                }
-                            }
-
-                            .role-actions {
-                                display: flex;
-                                gap: 4px;
-
-                                button {
-                                    display: flex;
-                                    align-items: center;
-                                    justify-content: center;
-                                    width: 28px;
-                                    height: 28px;
-                                    background: var(--background);
-                                    border: 1px solid var(--border);
-                                    border-radius: 4px;
-                                    cursor: pointer;
-                                    transition: all 0.2s ease;
-
-                                    &:hover {
-                                        background: var(--primary);
-                                        color: white;
-                                        border-color: var(--primary);
-                                    }
-
-                                    svg {
-                                        width: 14px;
-                                        height: 14px;
-                                    }
-
-                                    &.delete-role-btn:hover {
-                                        background: var(--error);
-                                        border-color: var(--error);
-                                    }
-                                }
-                            }
-                        }
-                    }
                 }
             }
 
@@ -1291,6 +1405,55 @@
                     .flow-stats {
                         flex-wrap: wrap;
                         gap: 12px;
+                    }
+                }
+            }
+
+            .stakeholders-section {
+                .stakeholders-overview {
+                    .overview-stats {
+                        grid-template-columns: 1fr;
+                        gap: 12px;
+                    }
+
+                    .stakeholders-grid {
+                        .domain-stakeholders-card {
+                            .stakeholder-roles-list {
+                                .roles-grid {
+                                    grid-template-columns: 1fr;
+                                    gap: 12px;
+                                }
+
+                                .stakeholder-role-card {
+                                    .role-header {
+                                        flex-direction: column;
+                                        align-items: flex-start;
+                                        gap: 12px;
+                                        padding: 16px;
+
+                                        .role-status {
+                                            align-self: flex-end;
+                                        }
+                                    }
+
+                                    .role-details {
+                                        padding: 16px;
+                                        gap: 12px;
+                                    }
+
+                                    .role-actions {
+                                        flex-direction: column;
+                                        gap: 8px;
+                                        padding: 12px 16px;
+
+                                        .action-btn {
+                                            justify-content: center;
+                                            width: 100%;
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
