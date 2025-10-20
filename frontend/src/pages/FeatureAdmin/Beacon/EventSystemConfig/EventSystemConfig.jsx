@@ -1,19 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import './EventSystemConfig.scss';
 import { useFetch } from '../../../../hooks/useFetch';
+import useUnsavedChanges from '../../../../hooks/useUnsavedChanges';
+import UnsavedChangesBanner from '../../../../components/UnsavedChangesBanner/UnsavedChangesBanner';
 import { Icon } from '@iconify-icon/react/dist/iconify.mjs';
 import SystemSettings from './SystemSettings/SystemSettings';
 import DomainManager from './DomainManager/DomainManager';
 import TemplateManager from './TemplateManager/TemplateManager';
 import IntegrationManager from './IntegrationManager/IntegrationManager';
 import AnalyticsConfig from './AnalyticsConfig/AnalyticsConfig';
+import ApprovalFlowConfig from './ApprovalFlowConfig/ApprovalFlowConfig';
 import { useNotification } from '../../../../NotificationContext';
 import { useGradient } from '../../../../hooks/useGradient';
 
 const EventSystemConfig = () => {
     const [activeTab, setActiveTab] = useState('system');
     const [config, setConfig] = useState(null);
-    const [hasChanges, setHasChanges] = useState(false);
     const [originalConfig, setOriginalConfig] = useState(null);
     const { addNotification } = useNotification();
     const { BeaconMain } = useGradient();
@@ -26,62 +28,65 @@ const EventSystemConfig = () => {
             setOriginalConfig(JSON.parse(JSON.stringify(config)));
         }
     }, [configData.data]);
+
+    // Use the unsaved changes hook
+    const { hasChanges, saving, handleSave: saveChanges, handleDiscard } = useUnsavedChanges(
+        originalConfig,
+        config,
+        async () => {
+            if (!config) return false;
+            
+            try {
+                const response = await fetch('/api/event-system-config', {
+                    method: 'PUT',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify(config)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    setOriginalConfig(JSON.parse(JSON.stringify(config)));
+                    addNotification({
+                        title: 'Success',
+                        message: 'Configuration saved successfully',
+                        type: 'success'
+                    });
+                    return true;
+                } else {
+                    throw new Error(result.message || 'Failed to save configuration');
+                }
+            } catch (error) {
+                console.error('Failed to save configuration:', error);
+                addNotification({
+                    title: 'Error',
+                    message: 'Failed to save configuration: ' + error.message,
+                    type: 'error'
+                });
+                return false;
+            }
+        },
+        () => {
+            if (originalConfig) {
+                setConfig(JSON.parse(JSON.stringify(originalConfig)));
+                addNotification({
+                    title: 'Reset',
+                    message: 'Configuration reset to last saved state',
+                    type: 'info'
+                });
+            }
+        }
+    );
     
     const handleConfigChange = (section, updates) => {
         setConfig(prev => ({
             ...prev,
             [section]: { ...prev[section], ...updates }
         }));
-        setHasChanges(true);
-    };
-    
-    const handleSave = async () => {
-        if (!config) return;
-        
-        try {
-            const response = await fetch('/api/event-system-config', {
-                method: 'PUT',
-                headers: { 
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
-                },
-                credentials: 'include',
-                body: JSON.stringify(config)
-            });
-            
-            const result = await response.json();
-            
-            if (result.success) {
-                setHasChanges(false);
-                setOriginalConfig(JSON.parse(JSON.stringify(config)));
-                addNotification({
-                    title: 'Success',
-                    message: 'Configuration saved successfully',
-                    type: 'success'
-                });
-            } else {
-                throw new Error(result.message || 'Failed to save configuration');
-            }
-        } catch (error) {
-            console.error('Failed to save configuration:', error);
-            addNotification({
-                title: 'Error',
-                message: 'Failed to save configuration: ' + error.message,
-                type: 'error'
-            });
-        }
-    };
-    
-    const handleReset = () => {
-        if (originalConfig) {
-            setConfig(JSON.parse(JSON.stringify(originalConfig)));
-            setHasChanges(false);
-            addNotification({
-                title: 'Reset',
-                message: 'Configuration reset to last saved state',
-                type: 'info'
-            });
-        }
     };
     
     if (configData.loading) {
@@ -126,28 +131,21 @@ const EventSystemConfig = () => {
     return (
         <div className="event-system-config dash">
             <header className="header">
-                {/* <div className="header-content"> */}
+                <div className="header-content">
                     <h1>Event System Configuration</h1>
                     <p>Configure global settings for the event management system</p>
                     <img src={BeaconMain} alt="" />
-                {/* </div> */}
-                {/* <div className="header-actions">
-                    {hasChanges && (
-                        <button className="save-btn" onClick={handleSave}>
-                            <Icon icon="mdi:content-save" />
-                            Save Changes
-                        </button>
-                    )}
-                    <button 
-                        className="reset-btn" 
-                        onClick={handleReset}
-                        disabled={!hasChanges}
-                    >
-                        <Icon icon="mdi:refresh" />
-                        Reset
-                    </button>
-                </div> */}
+                </div>
             </header>
+            
+            <UnsavedChangesBanner
+                hasChanges={hasChanges}
+                onSave={saveChanges}
+                onDiscard={handleDiscard}
+                saving={saving}
+                saveText="Save Configuration"
+                discardText="Reset Changes"
+            />
             
             <div className="config-tabs">
                 <button 
@@ -185,6 +183,13 @@ const EventSystemConfig = () => {
                     <Icon icon="mdi:chart-line" />
                     Analytics
                 </button>
+                <button 
+                    className={`tab ${activeTab === 'approval' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('approval')}
+                >
+                    <Icon icon="mdi:check-circle" />
+                    Approval Flow
+                </button>
             </div>
             
             <div className="config-content">
@@ -220,6 +225,13 @@ const EventSystemConfig = () => {
                     <AnalyticsConfig
                         analytics={config.analytics}
                         onChange={(analytics) => handleConfigChange('analytics', analytics)}
+                    />
+                )}
+                
+                {activeTab === 'approval' && (
+                    <ApprovalFlowConfig
+                        config={config.approvalFlow}
+                        onChange={(approvalFlow) => handleConfigChange('approvalFlow', approvalFlow)}
                     />
                 )}
             </div>

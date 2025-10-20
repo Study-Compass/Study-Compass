@@ -2,6 +2,7 @@
   min-height: 100vh;
   background: var(--background);
   padding: 0;
+  position: relative;
 
   &.loading {
     display: flex;
@@ -21,14 +22,19 @@
         &.spinning {
           animation: spin 1s linear infinite;
         }
+
       }
+
 
       p {
         font-size: 1.1rem;
         margin: 0;
       }
+
     }
+
   }
+
 
   &.error {
     display: flex;
@@ -50,17 +56,20 @@
         margin-bottom: 1rem;
       }
 
+
       h3 {
         color: #dc3545;
         margin: 0 0 1rem 0;
         font-size: 1.5rem;
       }
 
+
       p {
         color: #6c757d;
         margin: 0 0 1.5rem 0;
         font-size: 1rem;
       }
+
 
       button {
         background: #007bff;
@@ -78,15 +87,20 @@
         &:hover {
           background: #0056b3;
         }
+
       }
+
     }
+
   }
+
 
 //   &.dash header.header{
 //     flex-direction: row !important;
 //     justify-content: space-between !important;
 //     align-items: center !important;
 //   }
+
 
   .no-config {
     text-align: center;
@@ -103,18 +117,22 @@
       margin-bottom: 1rem;
     }
 
+
     h3 {
       color: #2c3e50;
       margin: 0 0 1rem 0;
       font-size: 1.5rem;
     }
 
+
     p {
       color: #6c757d;
       margin: 0;
       font-size: 1rem;
     }
+
   }
+
 
 
   .config-tabs {
@@ -140,18 +158,23 @@
         color: var(--text);
       }
 
+
       &.active {
         color: var(--primary);
         border-bottom-color: var(--primary);
         background: var(--background);
       }
 
+
       .iconify {
         width: 20px;
         height: 20px;
       }
+
     }
+
   }
+
 
   .config-content {
     padding: 20px;
@@ -178,6 +201,7 @@
             background: var(--lighter);
           }
 
+
           .section-title {
             display: flex;
             align-items: center;
@@ -188,20 +212,25 @@
               color: var(--primary);
             }
 
+
             h3 {
               margin: 0;
               color: var(--text);
               font-size: 1.2rem;
               font-weight: 600;
             }
+
           }
+
 
           .expand-icon {
             font-size: 1.5rem;
             color: var(--lighter-text);
             transition: transform 0.2s;
           }
+
         }
+
 
         .section-content {
           padding: 1.5rem;
@@ -223,6 +252,7 @@
                 font-size: 0.95rem;
               }
 
+
               input[type="text"],
               input[type="number"],
               input[type="date"],
@@ -240,7 +270,9 @@
                   border-color: var(--primary);
                   box-shadow: 0 0 0 2px rgba(var(--primary-rgb), 0.2);
                 }
+
               }
+
 
               .toggle-switch {
                 position: relative;
@@ -259,8 +291,11 @@
                     &:before {
                       transform: translateX(26px);
                     }
+
                   }
+
                 }
+
 
                 .slider {
                   position: absolute;
@@ -284,8 +319,11 @@
                     transition: 0.4s;
                     border-radius: 50%;
                   }
+
                 }
+
               }
+
 
               .checkbox-group {
                 display: flex;
@@ -309,8 +347,11 @@
                       &:after {
                         display: block;
                       }
+
                     }
+
                   }
+
 
                   .checkmark {
                     width: 20px;
@@ -333,9 +374,13 @@
                       border-width: 0 2px 2px 0;
                       transform: rotate(45deg);
                     }
+
                   }
+
                 }
+
               }
+
 
               .array-input {
                 display: flex;
@@ -351,6 +396,7 @@
                     flex: 1;
                   }
 
+
                   button {
                     background: var(--error);
                     color: var(--lightest);
@@ -365,8 +411,11 @@
                     &:hover {
                       background: var(--error-dark);
                     }
+
                   }
+
                 }
+
 
                 > button {
                   background: var(--success);
@@ -383,8 +432,11 @@
                   &:hover {
                     background: var(--success-dark);
                   }
+
                 }
+
               }
+
 
               .blackout-dates {
                 display: flex;
@@ -403,14 +455,17 @@
                     flex: 0 0 auto;
                   }
 
+
                   input[type="text"] {
                     flex: 1;
                   }
+
 
                   span {
                     color: var(--lighter-text);
                     font-weight: 500;
                   }
+
 
                   button {
                     background: var(--error);
@@ -426,8 +481,11 @@
                     &:hover {
                       background: var(--error-dark);
                     }
+
                   }
+
                 }
+
 
                 .add-blackout-btn {
                   background: var(--primary);
@@ -444,13 +502,21 @@
                   &:hover {
                     background: var(--primary-dark);
                   }
+
                 }
+
               }
+
             }
+
           }
+
         }
+
       }
+
     }
+
 
     // Domain Manager specific styling
     .domain-manager {
@@ -470,12 +536,15 @@
             font-weight: 600;
           }
 
+
           p {
             color: #7f8c8d;
             margin: 0;
             font-size: 0.95rem;
           }
+
         }
+
 
         .add-domain-btn {
           background: #3498db;
@@ -493,8 +562,11 @@
           &:hover {
             background: #2980b9;
           }
+
         }
+
       }
+
 
       .no-domains {
         text-align: center;
@@ -509,17 +581,20 @@
           margin-bottom: 1rem;
         }
 
+
         h3 {
           color: #2c3e50;
           margin: 0 0 0.5rem 0;
           font-size: 1.3rem;
         }
 
+
         p {
           color: #7f8c8d;
           margin: 0 0 2rem 0;
           font-size: 1rem;
         }
+
 
         .add-first-domain-btn {
           background: #27ae60;
@@ -539,8 +614,11 @@
           &:hover {
             background: #229954;
           }
+
         }
+
       }
+
 
       .domains-grid {
         display: grid;
@@ -557,6 +635,7 @@
           &:hover {
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
           }
+
 
           .domain-header {
             padding: 1rem 1.5rem;
@@ -576,6 +655,7 @@
                 font-weight: 600;
               }
 
+
               .domain-type {
                 background: #3498db;
                 color: white;
@@ -585,7 +665,9 @@
                 font-weight: 500;
                 text-transform: capitalize;
               }
+
             }
+
 
             .domain-actions {
               display: flex;
@@ -608,7 +690,9 @@
                   &:hover {
                     background: #e3f2fd;
                   }
+
                 }
+
 
                 &.delete-btn {
                   color: #e74c3c;
@@ -616,10 +700,15 @@
                   &:hover {
                     background: #ffebee;
                   }
+
                 }
+
               }
+
             }
+
           }
+
 
           .domain-content {
             padding: 1.5rem;
@@ -641,11 +730,13 @@
                   margin-bottom: 0.5rem;
                 }
 
+
                 span {
                   font-size: 1.5rem;
                   font-weight: 600;
                   color: #2c3e50;
                 }
+
 
                 label {
                   font-size: 0.8rem;
@@ -653,8 +744,11 @@
                   text-transform: uppercase;
                   letter-spacing: 0.5px;
                 }
+
               }
+
             }
+
 
             .domain-settings {
               display: flex;
@@ -672,12 +766,19 @@
                   font-size: 1rem;
                   color: #95a5a6;
                 }
+
               }
+
             }
+
           }
+
         }
+
       }
+
     }
+
 
     // Template Manager, Integration Manager, Analytics Config styling
     .template-manager,
@@ -701,12 +802,15 @@
             font-weight: 600;
           }
 
+
           p {
             color: #7f8c8d;
             margin: 0;
             font-size: 0.95rem;
           }
+
         }
+
 
         .add-template-btn {
           background: #3498db;
@@ -724,8 +828,11 @@
           &:hover {
             background: #2980b9;
           }
+
         }
+
       }
+
 
       .coming-soon {
         text-align: center;
@@ -740,17 +847,20 @@
           margin-bottom: 1rem;
         }
 
+
         h3 {
           color: #2c3e50;
           margin: 0 0 1rem 0;
           font-size: 1.3rem;
         }
 
+
         p {
           color: #7f8c8d;
           margin: 0 0 1.5rem 0;
           font-size: 1rem;
         }
+
 
         ul {
           text-align: left;
@@ -762,17 +872,26 @@
             margin: 0.5rem 0;
             padding-left: 0.5rem;
           }
+
         }
+
       }
+
     }
+
   }
+
 }
+
 
 // Animations
 @keyframes spin {
   0% { transform: rotate(0deg); }
+
   100% { transform: rotate(360deg); }
+
 }
+
 
 // Responsive design
 @media (max-width: 768px) {
@@ -785,10 +904,13 @@
           font-size: 2rem;
         }
 
+
         p {
           font-size: 1rem;
         }
+
       }
+
 
       .header-actions {
         position: static;
@@ -799,15 +921,20 @@
           flex: 1;
           justify-content: center;
         }
+
       }
+
     }
+
 
     .config-tabs {
       .tab {
         padding: 0.75rem 1rem;
         font-size: 0.9rem;
       }
+
     }
+
 
     .config-content {
       padding: 1rem;
@@ -823,8 +950,11 @@
               h3 {
                 font-size: 1.1rem;
               }
+
             }
+
           }
+
 
           .section-content {
             padding: 1rem;
@@ -838,6 +968,7 @@
                   gap: 0.75rem;
                 }
 
+
                 .blackout-dates {
                   .blackout-date-item {
                     flex-direction: column;
@@ -847,13 +978,21 @@
                     span {
                       text-align: center;
                     }
+
                   }
+
                 }
+
               }
+
             }
+
           }
+
         }
+
       }
+
 
       .domain-manager {
         .domain-header {
@@ -864,7 +1003,9 @@
           .add-domain-btn {
             align-self: flex-end;
           }
+
         }
+
 
         .domains-grid {
           grid-template-columns: 1fr;
@@ -877,10 +1018,17 @@
               .domain-stats {
                 gap: 1rem;
               }
+
             }
+
           }
+
         }
+
       }
+
     }
+
   }
+
 }
