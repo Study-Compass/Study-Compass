@@ -1057,30 +1057,30 @@ router.put('/:orgId/forms/:formId', verifyToken, requireMemberManagement(), asyn
     }
 });
 
-// Get all forms for the organization
-router.get('/:orgId/forms', verifyToken, requireMemberManagement(), async (req, res) => {
-    const { Form } = getModels(req, 'Form');
-    const { orgId } = req.params;
+// // Get all forms for the organization
+// router.get('/:orgId/forms', verifyToken, requireMemberManagement(), async (req, res) => {
+//     const { Form } = getModels(req, 'Form');
+//     const { orgId } = req.params;
     
-    try {
-        const forms = await Form.find({
-            formOwner: orgId,
-            formOwnerType: 'Org'
-        }).sort({ createdAt: -1 });
+//     try {
+//         const forms = await Form.find({
+//             formOwner: orgId,
+//             formOwnerType: 'Org'
+//         }).sort({ createdAt: -1 });
 
-        console.log('GET: /:orgId/forms successful');
-        return res.status(200).json({
-            success: true,
-            forms: forms
-        });
-    } catch (error) {
-        console.log('Error retrieving forms:', error);
-        res.status(500).json({
-            success: false,
-            message: error.message
-        });
-    }
-});
+//         console.log('GET: /:orgId/forms successful');
+//         return res.status(200).json({
+//             success: true,
+//             forms: forms
+//         });
+//     } catch (error) {
+//         console.log('Error retrieving forms:', error);
+//         res.status(500).json({
+//             success: false,
+//             message: error.message
+//         });
+//     }
+// });
 
 // Update approval settings for approval groups
 router.post('/:orgId/approval-settings', verifyToken, requireMemberManagement(), async (req, res) => {

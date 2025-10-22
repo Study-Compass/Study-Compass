@@ -119,6 +119,8 @@ const notificationRoutes = require('./routes/notificationRoutes.js');
 const qrRoutes = require('./routes/qrRoutes.js');
 const eventAnalyticsRoutes = require('./routes/eventAnalyticsRoutes.js');
 const orgEventManagementRoutes = require('./routes/orgEventManagementRoutes.js');
+const formRoutes = require('./routes/formRoutes.js');
+
 
 app.use(authRoutes);
 app.use('/auth/saml', samlRoutes);
@@ -133,13 +135,14 @@ app.use(ratingRoutes);
 app.use(searchRoutes);
 
 
+
 app.use(orgRoutes);
 app.use('/org-roles', orgRoleRoutes);
 app.use('/org-management', orgManagementRoutes);
 app.use('/org-event-management', orgEventManagementRoutes);
 app.use('/admin', roomRoutes);
 app.use(adminRoutes);
-
+app.use(formRoutes);
 app.use('/notifications', notificationRoutes);
 app.use('/api/qr', qrRoutes);
 
