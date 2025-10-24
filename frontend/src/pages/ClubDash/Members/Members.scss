@@ -198,14 +198,14 @@
                 align-items: center;
                 gap: 8px;
                 padding: 5px 16px;
-                background: var(tra);
-                color: white;
+                background-color: var(--gray);
+                color: black;
                 border: none;
                 border-radius: 8px;
                 font-family: 'Inter', sans-serif;
 
                 &:hover {
-                    background: var(--gray);
+                    background: var(--lighter);
                 }
             }
         }

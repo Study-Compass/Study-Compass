@@ -127,8 +127,24 @@ function TabbedContainer({
     const currentTab = tabs.find(tab => tab.id === activeTab);
     const currentContent = currentTab?.content;
 
+    // Helper function to generate class names
+    const generateClassNames = (baseClasses) => {
+        return baseClasses
+            .map(cls => {
+                if (typeof cls === 'object' && cls !== null) {
+                    return Object.entries(cls)
+                        .filter(([_, value]) => value)
+                        .map(([key]) => key)
+                        .join(' ');
+                }
+                return cls;
+            })
+            .filter(Boolean)
+            .join(' ');
+    };
+
     // Generate CSS classes
-    const containerClasses = [
+    const containerClasses = generateClassNames([
         'tabbed-container',
         `tabbed-container--${tabPosition}`,
         `tabbed-container--${tabStyle}`,
@@ -138,32 +154,33 @@ function TabbedContainer({
             'tabbed-container--scrollable': scrollable,
             'tabbed-container--animated': animated,
             'tabbed-container--lazy': lazyLoad
-        }
-    ].filter(Boolean).join(' ');
+        },
+        className
+    ]);
 
-    const tabsClasses = [
+    const tabsClasses = generateClassNames([
         'tabbed-container__tabs',
         `tabbed-container__tabs--${tabPosition}`,
         {
             'tabbed-container__tabs--scrollable': scrollable,
             'tabbed-container__tabs--full-width': fullWidth
         }
-    ].filter(Boolean).join(' ');
+    ]);
 
-    const contentClasses = [
+    const contentClasses = generateClassNames([
         'tabbed-container__content',
         `tabbed-container__content--${tabPosition}`,
         {
             'tabbed-container__content--animated': animated
         }
-    ].filter(Boolean).join(' ');
+    ]);
 
     // Render tab button
     const renderTabButton = (tab, index) => {
         const isActive = tab.id === activeTab;
         const isDisabled = tab.disabled;
         
-        const tabClasses = [
+        const tabClasses = generateClassNames([
             'tabbed-container__tab',
             `tabbed-container__tab--${tabStyle}`,
             {
@@ -172,7 +189,7 @@ function TabbedContainer({
                 'tabbed-container__tab--icon-only': !showTabLabels,
                 'tabbed-container__tab--label-only': !showTabIcons
             }
-        ].filter(Boolean).join(' ');
+        ]);
 
         const handleClick = () => {
             if (!isDisabled) {
@@ -190,12 +207,12 @@ function TabbedContainer({
                 title={tab.tooltip || tab.label}
                 {...tabProps}
             >
-                {/* {showTabIcons && tab.icon && (
+                {showTabIcons && tab.icon && (
                     <Icon 
                         icon={tab.icon} 
                         className="tabbed-container__tab-icon"
                     />
-                )} */}
+                )}
                 {showTabLabels && (
                     <span className="tabbed-container__tab-label">
                         {tab.label}
@@ -288,7 +305,7 @@ function TabbedContainer({
 
     if (tabs.length === 0) {
         return (
-            <div className={`${containerClasses} ${className}`} style={styles}>
+            <div className={containerClasses} style={styles}>
                 <div className="tabbed-container__empty">
                     No tabs configured
                 </div>
@@ -298,7 +315,7 @@ function TabbedContainer({
 
     return (
         <div 
-            className={`${containerClasses} ${className}`} 
+            className={containerClasses} 
             style={{
                 ...styles,
                 '--animation-duration': `${animationDuration}ms`
@@ -371,8 +388,3 @@ function TabbedContainer({
 }
 
 export default TabbedContainer;
-
-
-
-
-

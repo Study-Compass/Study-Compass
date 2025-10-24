@@ -197,12 +197,13 @@
     color: var(--lighter-text);
     background: none;
     border: none;
+    border-bottom: 3px solid transparent;
     cursor: pointer;
     white-space: nowrap;
     position: relative;
     transition: all 0.2s ease;
     border-radius: 0;
-    border-bottom: 2px solid transparent;
+    margin-bottom: -1px; // Pull tab down to overlap container border
 
     &:hover {
       color: var(--text);
@@ -213,16 +214,19 @@
       outline-offset: -2px;
     }
 
-    // Active state
+    // Active state - using higher specificity
+    &.tabbed-container__tab--active {
+      color: var(--text);
+      border-bottom: 3px solid var(--text);
+      background: transparent;
+      font-weight: 600;
+    }
+    
     &--active {
-      color: var(--primary);
-      border-bottom-color: var(--primary);
-      background: var(--background);
-      font-weight: 500;
-
-      &::after {
-        display: none;
-      }
+      color: var(--text);
+      border-bottom: 3px solid var(--text);
+      background: transparent;
+      font-weight: 600;
     }
 
     // Disabled state
@@ -250,14 +254,20 @@
       }
     }
 
-    // Style variants
+    // Style variants - only apply when NOT active
+    &--default:not(.tabbed-container__tab--active) {
+      border-bottom: 2px solid transparent !important;
+    }
+
     &--pills {
       border-radius: 20px;
       margin: 4px;
+      border-bottom: none !important;
       
-      &--active {
+      &.tabbed-container__tab--active {
         background: var(--tabbed-active-bg, #3b82f6);
         color: var(--tabbed-active-text-color, #ffffff);
+        border-bottom: none !important;
         
         &::after {
           display: none;
@@ -265,25 +275,23 @@
       }
     }
 
-    &--underline {
-      border-bottom: 2px solid transparent;
-      
-      &--active {
-        border-bottom-color: var(--tabbed-active-indicator-color, #3b82f6);
-        background: transparent;
-        
-        &::after {
-          display: none;
-        }
-      }
+    &--underline:not(.tabbed-container__tab--active) {
+      border-bottom: 2px solid transparent !important;
+    }
+    
+    &--underline.tabbed-container__tab--active {
+      border-bottom: 2px solid var(--tabbed-active-indicator-color, #3b82f6) !important;
+      background: transparent;
     }
 
     &--minimal {
       background: transparent;
+      border-bottom: none !important;
       
-      &--active {
+      &.tabbed-container__tab--active {
         background: transparent;
         color: var(--tabbed-active-text-color, #3b82f6);
+        border-bottom: none !important;
         
         &::after {
           display: none;
@@ -556,6 +564,3 @@
 .tabbed-container__fade-out {
   animation: tabSlideOut var(--animation-duration, 300ms) ease;
 }
-
-
-
