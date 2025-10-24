@@ -957,11 +957,19 @@ router.get('/:orgId/search-events', async (req, res) => {
             hostingType: 'Org',
             $or: [
                 { name: { $regex: query, $options: 'i' } },
-                { description: { $regex: query, $options: 'i' } }
+                { description: { $regex: query, $options: 'i' } },
+                { type: { $regex: query, $options: 'i' } },
+                { location: { $regex: query, $options: 'i' } }
             ]
         };
+
+        if (!isNaN(new Date(query).getTime())) {
+            searchFilter.$or.push({ start_time: { $gte: new Date(query) } });
+        }
+
         
         const events = await Event.find(searchFilter);
+        console.log(events);
         return res.status(200).json({success: true, events, message: "Events searched successfully"});
 
 
