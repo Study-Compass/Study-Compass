@@ -44,7 +44,7 @@ const ClubForms = ({ org }) => {
 
     const handleCopyLink = async (formId) => {
         try {
-            const link = `${window.location.origin}/forms/${formId}`; //doesnt work
+            const link = `${window.location.origin}/form/${formId}`; //doesnt work
 
             await navigator.clipboard.writeText(link);
             
