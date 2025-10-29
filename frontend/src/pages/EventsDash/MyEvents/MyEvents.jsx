@@ -109,7 +109,9 @@ function MyEvents({ onRoomNavigation }){
 
     // Handle room press
     const handleRoomPress = (room) => {
-        navigate(`/events-dashboard?page=2&roomid=${encodeURIComponent(room.name)}`);
+        // Navigate to Rooms tab (index 2 for authenticated users, index 1 for non-authenticated)
+        const roomsTabIndex = 2;
+        navigate(`/events-dashboard?page=${roomsTabIndex}&roomid=${encodeURIComponent(room.name)}`);
     };
 
     // Handle errors
@@ -322,6 +324,7 @@ function MyEvents({ onRoomNavigation }){
                                                     key={room._id}
                                                     horizontalScroll={true}
                                                     room={room}
+                                                    onRoomClick={handleRoomPress}
                                                 />
                                             ))}
                                         </div>

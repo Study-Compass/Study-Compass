@@ -13,8 +13,7 @@
     box-shadow: var(--shadow);
     box-sizing: border-box;
     overflow: hidden;
-
-
+    height: -webkit-fill-available;
 
     .card-header {
         display: flex;

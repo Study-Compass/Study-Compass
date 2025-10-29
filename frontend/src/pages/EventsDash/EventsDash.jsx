@@ -120,7 +120,7 @@ function EventsDash({}){
     // Handle room navigation from search results
     const handleRoomNavigation = (room) => {
         // Navigate to Rooms tab (index 2 for authenticated users, index 1 for non-authenticated)
-        const roomsTabIndex = user ? 2 : 1;
+        const roomsTabIndex = 2;
         
         // Navigate to Rooms tab with the room name as roomid parameter
         // The Room component in embedded mode expects room names, not IDs
