@@ -6,7 +6,7 @@ import FilledStar from '../../assets/Icons/FilledStar.svg';
 
 
 
-const RecommendedRoomCard = ({ room }) => {
+const RecommendedRoomCard = ({ room, horizontalScroll = false }) => {
     const navigate = useNavigate();
 
     console.log(room);
@@ -32,7 +32,7 @@ const RecommendedRoomCard = ({ room }) => {
     }
 
     return (
-        <div className="recommended-room-card" onClick={handleClick}>
+        <div className={`recommended-room-card ${horizontalScroll ? 'scroll': ""}`} onClick={handleClick} >
             
             <div className="card-header">
                 <img src={room.image} alt={room.name} />
