@@ -63,7 +63,7 @@ const SignUpPrompt = ({ onSignUp, onExplore, handleClose }) => {
                         <Icon icon="mingcute:user-add-fill" />
                         Sign Up Now
                     </button>
-                    <button className="signup-btn secondary" onClick={onExplore}>
+                    <button className="signup-btn secondary" onClick={handleClose}>
                         no thanks
                     </button>
                 </div>
@@ -86,6 +86,7 @@ function EventsDash({}){
         
         const today = new Date().toDateString();
         return lastPromptDate !== today;
+
     };
 
     // Helper function to mark sign-up prompt as shown today
@@ -130,6 +131,11 @@ function EventsDash({}){
     const getMenuItems = () => {
         const items = [
             { 
+                label: 'Home', 
+                icon: 'material-symbols:home-rounded',
+                element: <MyEvents onRoomNavigation={handleRoomNavigation} />
+            },
+            { 
                 label: 'Explore', 
                 icon: 'mingcute:compass-fill',
                 element: <Explore />
@@ -138,16 +144,13 @@ function EventsDash({}){
                 label: 'Rooms',
                 icon: 'ic:baseline-room',
                 element: <Room hideHeader={true} urlType="embedded" />
-            }
+            },
+            //orgs
+
         ];
         
-        // Only add "My Events" if user is logged in
+        // Add additional tabs for authenticated users
         if (user) {
-            items.unshift({
-                label: 'My Events', 
-                icon: 'mingcute:calendar-fill',
-                element: <MyEvents onRoomNavigation={handleRoomNavigation} />
-            });
             items.push({
                 label: 'Friends', 
                 icon: 'mdi:account-group',
@@ -160,6 +163,11 @@ function EventsDash({}){
                     label: 'Analytics', 
                     icon: 'mingcute:chart-fill',
                     element: <EventsAnalytics />
+                });
+                items.push({
+                    label: 'Orgs',
+                    icon: 'mingcute:group-2-fill',
+                    element: <Orgs />
                 });
             }
         }
@@ -213,7 +221,7 @@ function EventsDash({}){
                 logo={eventsLogo} 
                 primaryColor='#6D8EFA' 
                 secondaryColor='rgba(109, 142, 250, 0.15)'
-                defaultPage={user ? 1 : 0}
+                defaultPage={0}
             >
             </Dashboard>
 
