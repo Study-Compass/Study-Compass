@@ -131,7 +131,7 @@ function EventsDash({}){
         const items = [
             { 
                 label: 'Home', 
-                icon: 'mingcute:home-fill',
+                icon: 'material-symbols:home-rounded',
                 element: <MyEvents onRoomNavigation={handleRoomNavigation} />
             },
             { 

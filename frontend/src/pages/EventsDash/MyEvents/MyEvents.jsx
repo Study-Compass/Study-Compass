@@ -163,7 +163,7 @@ function MyEvents({ onRoomNavigation }){
             {/* Quick Actions Section */}
             {!isSearchFocused && (
                 <div className="quick-actions-section">
-                <h2 className="section-title">Quick Actions</h2>
+                <h2 className="section-title">Explore</h2>
                 <div className="quick-actions-grid">
                     <div 
                         className="quick-action-card"
@@ -182,7 +182,7 @@ function MyEvents({ onRoomNavigation }){
                         </div>
                         <div className="quick-action-content">
                             <h3 className="quick-action-title">Events</h3>
-                            <p className="quick-action-subtitle">Join study groups</p>
+                            <p className="quick-action-subtitle">Discover campus events</p>
                         </div>
                     </div>
 
@@ -203,7 +203,7 @@ function MyEvents({ onRoomNavigation }){
                         </div>
                         <div className="quick-action-content">
                             <h3 className="quick-action-title">Study Rooms</h3>
-                            <p className="quick-action-subtitle">Find quiet spaces</p>
+                            <p className="quick-action-subtitle">Find available study spaces</p>
                         </div>
                     </div>
 
@@ -221,8 +221,8 @@ function MyEvents({ onRoomNavigation }){
                                     }
                                 }}
                             >
-                                <div className="quick-action-icon" style={{ backgroundColor: '#FBEBBB20' }}>
-                                    <Icon icon="mingcute:group-2-fill" style={{ color: '#FBEBBB' }} />
+                                <div className="quick-action-icon" style={{ backgroundColor: '#FFF8E6' }}>
+                                    <Icon icon="mingcute:group-2-fill" style={{ color: '#FFDE82' }} />
                                 </div>
                                 <div className="quick-action-content">
                                     <h3 className="quick-action-title">Organizations</h3>
@@ -391,7 +391,7 @@ function MyEvents({ onRoomNavigation }){
                         )}
 
                         {/* Call to Action for Non-Authenticated Users */}
-                        {!isAuthenticated && (
+                        {/* {!isAuthenticated && (
                             <div className="cta-section">
                                 <div className="cta-card">
                                     <div className="cta-icon">
@@ -409,7 +409,7 @@ function MyEvents({ onRoomNavigation }){
                                     </div>
                                 </div>
                             </div>
-                        )}
+                        )} */}
 
                         {/* Authenticated User Content */}
                         {isAuthenticated && (

@@ -219,6 +219,13 @@ function ManageFlow(){
                         <Icon icon="mdi:cog" />
                         Management
                     </button>
+                    <button 
+                        className={`tab ${activeTab === 'analytics' ? 'active' : ''}`}
+                        onClick={() => setActiveTab('analytics')}
+                    >
+                        <Icon icon="mdi:chart-line" />
+                        Analytics
+                    </button>
                 </div>
 
                 <div className="tab-content">
@@ -254,6 +261,10 @@ function ManageFlow(){
                             approvalGroups={approvalGroupsData.data?.data || []}
                             approvalFlow={approvalFlowData.data?.data}
                         />
+                    )}
+
+                    {activeTab === 'analytics' && (
+                        <AnalyticsTab />
                     )}
 
                 </div>
