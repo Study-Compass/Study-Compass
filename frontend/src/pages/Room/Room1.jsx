@@ -204,6 +204,9 @@ function Room({hideHeader = false, urlType = 'embedded'}) {
         clearQuery();
         setLoadedResults([]);
         setFreeNow(false);
+        setSearchQuery(''); // Clear search query
+        setSearchAttributes([]); // Clear search attributes
+        setSearchSort('name'); // Reset search sort to default
     }
 
     function setReportUp(){

@@ -6,14 +6,18 @@ import FilledStar from '../../assets/Icons/FilledStar.svg';
 
 
 
-const RecommendedRoomCard = ({ room, horizontalScroll = false }) => {
+const RecommendedRoomCard = ({ room, horizontalScroll = false, onRoomClick }) => {
     const navigate = useNavigate();
 
     console.log(room);
 
     const handleClick = () => {
         if (room && room._id) {
-            navigate(`/room/${room.name}`);
+            if (onRoomClick) {
+                onRoomClick(room);
+            } else {
+                navigate(`/room/${room.name}`);
+            }
         }
     };
 

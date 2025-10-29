@@ -42,9 +42,10 @@ router.get('/featured-all', async (req, res) => {
 
         // Get 5 random events
         //prioritize events that have an image
+        //no past events
         const events = await Event.aggregate([
             { $sample: { size: 5 } },
-            
+            { $match: { start_time: { $gte: new Date() } } },
             {
                 $project: {
                     _id: 1,
