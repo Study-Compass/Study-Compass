@@ -1,0 +1,39 @@
+.analytics {
+  .kpi-dashboard {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+
+    @media (max-width: 1200px) {
+      grid-template-columns: repeat(3, 1fr);
+    }
+    @media (max-width: 900px) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    @media (max-width: 600px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .kpi-card {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+
+    &__title { font-size: 12px; color: #71717a; margin-bottom: 6px; }
+    &__value { font-size: 28px; font-weight: 700; color: #0f172a; }
+    &__subtitle { margin-top: 6px; }
+  }
+
+  .visit-chart {
+    .chart-container {
+      height: 250px;
+    }
+
+    .header { flex-wrap: wrap; gap: 12px; }
+  }
+}
+
+

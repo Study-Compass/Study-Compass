@@ -39,14 +39,6 @@ function RootManagement(){
                     </div>
                 </div>
                 <SiteHealth />
-                <HeaderContainer header='weekly analytics' icon="mage:chart-up-fill">
-                    <div className="analytics-container">
-                        <SimpleAnalyticsChart endpoint='visits' heading='Visits' color='#7CCF6A' />
-                        <SimpleAnalyticsChart endpoint='users' heading='Users' color='#7CCF6A' />
-                        <SimpleAnalyticsChart endpoint='searches' heading='Searches' color='#7CCF6A' />
-
-                    </div>
-                </HeaderContainer>
             </div>
         </div>
     )
