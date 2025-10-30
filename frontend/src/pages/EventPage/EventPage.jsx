@@ -46,8 +46,8 @@ function EventPage() {
                 level = "Student";
             }
         } else {
-            hostingImage = eventData.event.hostingId.org_profile_image;
-            hostingName = eventData.event.hostingId.org_name;
+            hostingImage = eventData.event.hostingId?.org_profile_image;
+            hostingName = eventData.event.hostingId?.org_name || 'Unknown Organization';
             level = "Organization";
         }
 

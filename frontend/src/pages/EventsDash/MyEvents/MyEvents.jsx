@@ -8,9 +8,12 @@ import { getFriends } from '../../../pages/Friends/FriendsHelpers.js';
 import Search from '../../../components/Search/Search';
 import { useFetch } from '../../../hooks/useFetch';
 import { useNotification } from '../../../NotificationContext';
+import HeaderContainer from '../../../components/HeaderContainer/HeaderContainer';
 
 import RecommendedEvents from './RecommendedEvents/RecommendedEvents';
 import MyEventsContent from './MyEventsContent/MyEventsContent';
+import RecommendedRoomCard from '../../../components/RecommendedRoomCard/RecommendedRoomCard';
+import RecommendedEventPreviewCard from './RecommendedEvents/RecommendedEventPreviewCard/RecommendedEventPreviewCard';
 
 function MyEvents({ onRoomNavigation }){
     //define welcometext to be either good morning, good afternoon, or good evening, in one line
@@ -24,9 +27,13 @@ function MyEvents({ onRoomNavigation }){
 
     // Fetch featured content for all users
     const { data: featuredResponse, loading: featuredLoading, error: featuredError } = useFetch('/featured-all');
+
+    useEffect(()=>{
+        console.log(featuredResponse);
+    },[featuredResponse])
     
-    const featuredEvents = featuredResponse?.events || [];
-    const featuredRooms = featuredResponse?.rooms || [];
+    const featuredEvents = featuredResponse?.data?.events || [];
+    const featuredRooms = featuredResponse?.data?.rooms || [];
 
     // Customize search types for MyEvents - focus on events and organizations
     const myEventsSearchTypes = [
@@ -102,7 +109,9 @@ function MyEvents({ onRoomNavigation }){
 
     // Handle room press
     const handleRoomPress = (room) => {
-        navigate(`/events-dashboard?page=2&roomid=${encodeURIComponent(room.name)}`);
+        // Navigate to Rooms tab (index 2 for authenticated users, index 1 for non-authenticated)
+        const roomsTabIndex = 2;
+        navigate(`/events-dashboard?page=${roomsTabIndex}&roomid=${encodeURIComponent(room.name)}`);
     };
 
     // Handle errors
@@ -140,7 +149,7 @@ function MyEvents({ onRoomNavigation }){
                 onSearchFocus={handleSearchFocus}
                 onSearchBlur={handleSearchBlur}
                 isSearchFocused={isSearchFocused}
-                placeholder="Search for events, rooms, or users..."
+                placeholder="Search for events or rooms..."
                 className={`my-events-search ${isSearchFocused ? 'search-focused' : ''}`}
                 searchTypes={myEventsSearchTypes}
                 showAllTab={true}
@@ -209,7 +218,7 @@ function MyEvents({ onRoomNavigation }){
 
                     {isAuthenticated && (
                         <>
-                            <div 
+                            {/* <div 
                                 className="quick-action-card"
                                 onClick={handleNavigateToOrgs}
                                 role="button"
@@ -228,7 +237,7 @@ function MyEvents({ onRoomNavigation }){
                                     <h3 className="quick-action-title">Organizations</h3>
                                     <p className="quick-action-subtitle">Join campus groups</p>
                                 </div>
-                            </div>
+                            </div> */}
 
                             <div 
                                 className="quick-action-card"
@@ -272,120 +281,54 @@ function MyEvents({ onRoomNavigation }){
                         {/* Featured Content for All Users */}
                         {!featuredLoading && (
                             <>
-                                {/* Featured Events */}
-                                {featuredEvents.length > 0 && (
-                                    <div className="featured-section">
-                                        <div className="section-header">
-                                            <h3 className="section-title">Featured Events</h3>
+                                {/* Featured Events - Show for both authenticated and unauthenticated users */}
+                                {featuredEvents?.length > 0 && !isAuthenticated &&  (
+                                    <HeaderContainer
+                                        icon="mingcute:calendar-fill"
+                                        header="Featured Events"
+                                        right={
                                             <button className="see-all-button" onClick={handleNavigateToEvents}>
                                                 See all
                                                 <Icon icon="mingcute:arrow-right-fill" />
                                             </button>
-                                        </div>
+                                        }
+                                        classN="featured-section"
+                                    >
                                         <div className="horizontal-scroll">
                                             {featuredEvents.slice(0, 5).map((event) => (
-                                                <div 
+                                                <RecommendedEventPreviewCard 
                                                     key={event._id}
-                                                    className="featured-event-card"
-                                                    onClick={() => handleEventPress(event)}
-                                                    role="button"
-                                                    tabIndex={0}
-                                                    onKeyDown={(e) => {
-                                                        if (e.key === 'Enter' || e.key === ' ') {
-                                                            e.preventDefault();
-                                                            handleEventPress(event);
-                                                        }
-                                                    }}
-                                                >
-                                                    <div className="event-image">
-                                                        {event.image ? (
-                                                            <img src={event.image} alt={event.title} />
-                                                        ) : (
-                                                            <div className="event-image-placeholder">
-                                                                <Icon icon="mingcute:calendar-fill" />
-                                                            </div>
-                                                        )}
-                                                    </div>
-                                                    <div className="event-content">
-                                                        <div className="event-date-time">
-                                                            <span className="event-date">
-                                                                {new Date(event.start_time).toLocaleDateString('en-US', { 
-                                                                    weekday: 'short', 
-                                                                    month: 'short', 
-                                                                    day: 'numeric' 
-                                                                })}
-                                                            </span>
-                                                            <span className="event-time">
-                                                                {new Date(event.start_time).toLocaleTimeString('en-US', { 
-                                                                    hour: 'numeric', 
-                                                                    minute: '2-digit',
-                                                                    hour12: true 
-                                                                })}
-                                                            </span>
-                                                        </div>
-                                                        <h4 className="event-title">{event.title}</h4>
-                                                        <p className="event-location">{event.location || 'Location TBD'}</p>
-                                                    </div>
-                                                </div>
+                                                    event={event}
+                                                />
                                             ))}
                                         </div>
-                                    </div>
+                                    </HeaderContainer>
                                 )}
 
-                                {/* Featured Rooms */}
+                                {/* Featured Rooms - Show for both authenticated and unauthenticated users */}
                                 {featuredRooms.length > 0 && (
-                                    <div className="featured-section">
-                                        <div className="section-header">
-                                            <h3 className="section-title">Available Study Rooms</h3>
+                                    <HeaderContainer
+                                        icon="ic:baseline-room"
+                                        header="Available Study Rooms"
+                                        right={
                                             <button className="see-all-button" onClick={handleNavigateToRooms}>
                                                 See all
                                                 <Icon icon="mingcute:arrow-right-fill" />
                                             </button>
-                                        </div>
+                                        }
+                                        classN="featured-section"
+                                    >
                                         <div className="horizontal-scroll">
                                             {featuredRooms.slice(0, 5).map((room) => (
-                                                <div 
+                                                <RecommendedRoomCard 
                                                     key={room._id}
-                                                    className="featured-room-card"
-                                                    onClick={() => handleRoomPress(room)}
-                                                    role="button"
-                                                    tabIndex={0}
-                                                    onKeyDown={(e) => {
-                                                        if (e.key === 'Enter' || e.key === ' ') {
-                                                            e.preventDefault();
-                                                            handleRoomPress(room);
-                                                        }
-                                                    }}
-                                                >
-                                                    <div className="room-image">
-                                                        {room.image ? (
-                                                            <img src={room.image} alt={room.name} />
-                                                        ) : (
-                                                            <div className="room-image-placeholder">
-                                                                <Icon icon="ic:baseline-room" />
-                                                            </div>
-                                                        )}
-                                                    </div>
-                                                    <div className="room-content">
-                                                        <h4 className="room-name">{room.name}</h4>
-                                                        <p className="room-building">{room.building || 'Unknown Building'}</p>
-                                                        <div className="room-details">
-                                                            <span className="room-capacity">
-                                                                <Icon icon="mingcute:group-fill" />
-                                                                {room.capacity || 'N/A'}
-                                                            </span>
-                                                            {room.average_rating > 0 && (
-                                                                <span className="room-rating">
-                                                                    <Icon icon="mingcute:star-fill" />
-                                                                    {room.average_rating.toFixed(1)}
-                                                                </span>
-                                                            )}
-                                                        </div>
-                                                    </div>
-                                                </div>
+                                                    horizontalScroll={true}
+                                                    room={room}
+                                                    onRoomClick={handleRoomPress}
+                                                />
                                             ))}
                                         </div>
-                                    </div>
+                                    </HeaderContainer>
                                 )}
                             </>
                         )}

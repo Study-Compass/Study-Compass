@@ -6,6 +6,7 @@
     display: flex;
     flex-direction: column;
     height:100%;
+    padding-bottom: 60px;
 
     header.header{
         //add bezier
@@ -80,6 +81,7 @@
         flex-direction: column;
         gap: 10px;
         transition: all 0.3s ease;
+        padding: 0 20px;
 
         &.search-mode {
             .search-placeholder {
@@ -123,22 +125,23 @@
 
     // Quick Actions Section
     .quick-actions-section {
-        margin-bottom: 32px;
+        margin-bottom: 20px;
         padding: 0 20px;
 
         .section-title {
-            font-size: 24px;
+            font-size: 20px;
             margin-left:10px;
             font-weight: 700;
             color: var(--text);
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             letter-spacing: -0.025em;
             font-family: 'Inter';
+            margin-top:0;
         }
 
         .quick-actions-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
             gap: 16px;
             margin-bottom: 20px;
         }
@@ -218,7 +221,7 @@
 
     // Featured Sections
     .featured-section {
-        margin-bottom: 32px;
+        margin-bottom: 10px;
 
         .section-header {
             display: flex;
@@ -261,8 +264,8 @@
         .horizontal-scroll {
             display: flex;
             gap: 16px;
+            padding:15px;
             overflow-x: auto;
-            padding-bottom: 8px;
             scrollbar-width: thin;
             scrollbar-color: #cbd5e1 transparent;
 
@@ -523,6 +526,27 @@
                     &:active {
                         transform: translateY(0);
                     }
+                }
+            }
+        }
+    }
+}
+
+
+@media (max-width:768px) {
+    .my-events {
+        header.header{
+            height:150px !important;
+            min-height:150px !important;
+            h1{
+                font-size:30px !important;
+                margin-bottom: 5px !important;
+            }
+        }
+        .quick-actions-section{
+            .quick-actions-grid{
+                .quick-action-card{
+                    flex-direction: column;
                 }
             }
         }

@@ -63,7 +63,7 @@ const SignUpPrompt = ({ onSignUp, onExplore, handleClose }) => {
                         <Icon icon="mingcute:user-add-fill" />
                         Sign Up Now
                     </button>
-                    <button className="signup-btn secondary" onClick={onExplore}>
+                    <button className="signup-btn secondary" onClick={handleClose}>
                         no thanks
                     </button>
                 </div>
@@ -86,6 +86,7 @@ function EventsDash({}){
         
         const today = new Date().toDateString();
         return lastPromptDate !== today;
+
     };
 
     // Helper function to mark sign-up prompt as shown today
@@ -119,7 +120,7 @@ function EventsDash({}){
     // Handle room navigation from search results
     const handleRoomNavigation = (room) => {
         // Navigate to Rooms tab (index 2 for authenticated users, index 1 for non-authenticated)
-        const roomsTabIndex = user ? 2 : 1;
+        const roomsTabIndex = 2;
         
         // Navigate to Rooms tab with the room name as roomid parameter
         // The Room component in embedded mode expects room names, not IDs
@@ -166,6 +167,11 @@ function EventsDash({}){
                     label: 'Analytics', 
                     icon: 'mingcute:chart-fill',
                     element: <EventsAnalytics />
+                });
+                items.push({
+                    label: 'Orgs',
+                    icon: 'mingcute:group-2-fill',
+                    element: <Orgs />
                 });
             }
         }

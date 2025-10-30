@@ -42,9 +42,10 @@ router.get('/featured-all', async (req, res) => {
 
         // Get 5 random events
         //prioritize events that have an image
+        //no past events, choose from events in the next 2 weeks
         const events = await Event.aggregate([
+            { $match: { start_time: { $gte: new Date(), $lte: new Date(Date.now() + 2 * 7 * 24 * 60 * 60 * 1000) } }, },
             { $sample: { size: 5 } },
-            
             {
                 $project: {
                     _id: 1,
