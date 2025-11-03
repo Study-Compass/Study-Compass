@@ -102,12 +102,12 @@ function WorkflowGraph() {
             source: 'start', 
             target: 'advisor', 
             type: 'bezier', 
-            style: { stroke: '#d0d0d0', strokeWidth: 2 },
+            style: { stroke: '#d0d0d0', strokeWidth: 1 },
             markerEnd: {
                 type: MarkerType.ArrowClosed,
                 color: '#d0d0d0',
-                width: 8,
-                height: 8
+                width: 20,
+                height: 20
             }
         },
         { 
@@ -115,12 +115,12 @@ function WorkflowGraph() {
             source: 'advisor', 
             target: 'public-safety', 
             type: 'bezier', 
-            style: { stroke: '#d0d0d0', strokeWidth: 2 },
+            style: { stroke: '#d0d0d0', strokeWidth: 1 },
             markerEnd: {
                 type: MarkerType.ArrowClosed,
                 color: '#d0d0d0',
-                width: 8,
-                height: 8
+                width: 20,
+                height: 20
             }
         },
         { 
@@ -128,12 +128,12 @@ function WorkflowGraph() {
             source: 'advisor', 
             target: 'building-manager', 
             type: 'bezier', 
-            style: { stroke: '#d0d0d0', strokeWidth: 2 },
+            style: { stroke: '#d0d0d0', strokeWidth: 1 },
             markerEnd: {
                 type: MarkerType.ArrowClosed,
                 color: '#d0d0d0',
-                width: 8,
-                height: 8
+                width: 20,
+                height: 20
             }
         },
         { 
@@ -141,12 +141,12 @@ function WorkflowGraph() {
             source: 'public-safety', 
             target: 'end', 
             type: 'bezier', 
-            style: { stroke: '#d0d0d0', strokeWidth: 2 },
+            style: { stroke: '#d0d0d0', strokeWidth: 1 },
             markerEnd: {
                 type: MarkerType.ArrowClosed,
                 color: '#d0d0d0',
-                width: 8,
-                height: 8
+                width: 20,
+                height: 20
             }
         },
         { 
@@ -154,12 +154,12 @@ function WorkflowGraph() {
             source: 'building-manager', 
             target: 'end', 
             type: 'bezier', 
-            style: { stroke: '#d0d0d0', strokeWidth: 2 },
+            style: { stroke: '#d0d0d0', strokeWidth: 1 },
             markerEnd: {
                 type: MarkerType.ArrowClosed,
                 color: '#d0d0d0',
-                width: 8,
-                height: 8
+                width: 20,
+                height: 20
             }
         }
     ], []);

@@ -6,6 +6,7 @@ import heroImage from "../../assets/Mockups/LandingMockup.png";
 import backgroundImage from "../../assets/LandingBackground.png";
 import { Icon } from '@iconify-icon/react/dist/iconify.mjs';
 import WorkflowGraph from './WorkflowGraph';
+import RPI from "../../assets/Schools/RPI.svg";
 
 function Landing() {
     const navigate = useNavigate();
@@ -412,6 +413,15 @@ function Landing() {
                                 {activeMetric === 'organizations' && (
                                     <div className="metrics__visual-content">
                                         <div className="dashboard-mockup">
+                                            <div className="dashboard-mockup__insight">
+                                                <div className="dashboard-mockup__insight-icon">
+                                                    <Icon icon="octicon:sparkle-fill-24" />
+                                                </div>
+                                                <div className="dashboard-mockup__insight-content">
+                                                    <div className="dashboard-mockup__insight-title">Weekly report focus</div>
+                                                    <div className="dashboard-mockup__insight-text">Track member growth rates, event participation by org, and retention trends. Filter by org size, sector, and engagement level to identify intervention opportunities.</div>
+                                                </div>
+                                            </div>
                                             <div className="dashboard-mockup__header">
                                                 <h4>Organizations Dashboard</h4>
                                                 <div className="dashboard-mockup__header-controls">
@@ -438,15 +448,24 @@ function Landing() {
                                                     <div className="dashboard-mockup__metric-sublabel">Org ↔ Event disconnect</div>
                                                 </div>
                                             </div>
-                                            <div className="dashboard-mockup__chart">
+                                            {/* <div className="dashboard-mockup__chart">
                                                 <div className="placeholder"></div>
-                                            </div>
+                                            </div> */}
                                         </div>
                                     </div>
                                 )}
                                 {activeMetric === 'events' && (
                                     <div className="metrics__visual-content">
                                         <div className="dashboard-mockup">
+                                            <div className="dashboard-mockup__insight">
+                                                <div className="dashboard-mockup__insight-icon">
+                                                    <Icon icon="octicon:sparkle-fill-24" />
+                                                </div>
+                                                <div className="dashboard-mockup__insight-content">
+                                                    <div className="dashboard-mockup__insight-title">Weekly report focus</div>
+                                                    <div className="dashboard-mockup__insight-text">Monitor RSVP trends, attendance rates, and cross-org participation. Segment by event type, time of day, and organizer to optimize scheduling and identify promotion opportunities.</div>
+                                                </div>
+                                            </div>
                                             <div className="dashboard-mockup__header">
                                                 <h4>Events Dashboard</h4>
                                                 <div className="dashboard-mockup__header-controls">
@@ -473,15 +492,24 @@ function Landing() {
                                                     <div className="dashboard-mockup__metric-sublabel">Below engagement threshold</div>
                                                 </div>
                                             </div>
-                                            <div className="dashboard-mockup__chart">
+                                            {/* <div className="dashboard-mockup__chart">
                                                 <div className="placeholder"></div>
-                                            </div>
+                                            </div> */}
                                         </div>
                                     </div>
                                 )}
                                 {activeMetric === 'spaces' && (
                                     <div className="metrics__visual-content">
                                         <div className="dashboard-mockup">
+                                            <div className="dashboard-mockup__insight">
+                                                <div className="dashboard-mockup__insight-icon">
+                                                    <Icon icon="fluent:sparkle-16-filled" />
+                                                </div>
+                                                <div className="dashboard-mockup__insight-content">
+                                                    <div className="dashboard-mockup__insight-title">Weekly report focus</div>
+                                                    <div className="dashboard-mockup__insight-text">Analyze utilization rates, booking patterns, and satisfaction scores. Group by building, room type, and time slots to prioritize maintenance and optimize space allocation.</div>
+                                                </div>
+                                            </div>
                                             <div className="dashboard-mockup__header">
                                                 <h4>Spaces Dashboard</h4>
                                                 <div className="dashboard-mockup__header-controls">
@@ -508,9 +536,9 @@ function Landing() {
                                                     <div className="dashboard-mockup__metric-sublabel">Schedule around these times</div>
                                                 </div>
                                             </div>
-                                            <div className="dashboard-mockup__chart">
+                                            {/* <div className="dashboard-mockup__chart">
                                                 <div className="placeholder"></div>
-                                            </div>
+                                            </div> */}
                                         </div>
                                     </div>
                                 )}
@@ -582,23 +610,44 @@ function Landing() {
                 {/* Credibility */}
                 <section className="cred">
                     <div className="cred__content">
-                        <div className="cred__badge">
-                            <div className="cred__logo placeholder placeholder--pill"></div>
-                            <div className="cred__text">
-                                <h4>RPI Alpha</h4>
-                                <p>Campus‑wide traction with sustained weekly actives and active RFP consideration.</p>
-                            </div>
+                        <div className="cred__head">
+                            <h2>Organic growth, real impact</h2>
+                            <p>Built by students, for students. See how Meridian gained traction through grassroots adoption—proving value before any institutional commitment.</p>
                         </div>
-                        <div className="cred__grid">
-                            <div className="placeholder"></div>
-                            <div className="placeholder"></div>
-                            <div className="placeholder"></div>
+                        <div className="cred__card">
+                            <div className="cred__badge">
+                                <div className="cred__logo-container">
+                                    <img src={RPI} alt="RPI Alpha" className="cred__logo" />
+                                </div>
+                                <div className="cred__text">
+                                    <h4>RPI Alpha</h4>
+                                    <p>Campus‑wide traction with sustained weekly actives and active RFP consideration.</p>
+                                </div>
+                            </div>
+                            <div className="cred__stats">
+                                <div className="cred__stat">
+                                    <div className="cred__stat-value">8,000+</div>
+                                    <div className="cred__stat-label">unique visitors</div>
+                                </div>
+                                <div className="cred__stat">
+                                    <div className="cred__stat-value">13%</div>
+                                    <div className="cred__stat-label">of campus uses weekly</div>
+                                </div>
+                                <div className="cred__stat">
+                                    <div className="cred__stat-value">200+/mo</div>
+                                    <div className="cred__stat-label">events processed</div>
+                                </div>
+                                <div className="cred__stat">
+                                    <div className="cred__stat-value">157</div>
+                                    <div className="cred__stat-label">classrooms integrated</div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </section>
 
                 {/* Testimonials */}
-                <section className="testimonials">
+                {/* <section className="testimonials">
                     <div className="testimonials__content">
                         <div className="testimonials__grid">
                             <div className="quote">
@@ -615,7 +664,7 @@ function Landing() {
                             </div>
                         </div>
                     </div>
-                </section>
+                </section> */}
 
                 {/* Pricing teaser */}
                 <section className="pricing">
