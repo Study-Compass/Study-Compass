@@ -41,7 +41,7 @@ const Header = React.memo(()=>{
     const [width, setWidth] = useState(window.innerWidth);
 
     const goToMeridian = ()=>{
-        navigate('/events-dashboard',{replace : true});
+        navigate('/events-dashboard');
     }
 
     const goHome = ()=>{

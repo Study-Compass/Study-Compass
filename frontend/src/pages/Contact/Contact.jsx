@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Contact.scss';
 import Header from '../../components/Header/Header';
-import logo from '../../assets/red_logo.svg';
+import logo from '../../assets/Brand Image/BEACON.svg';
 import axios from 'axios';
 import { useNotification } from '../../NotificationContext';
 
@@ -24,7 +24,14 @@ function Contact() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsSubmitting(true);
-
+        addNotification({
+            title: 'Success',
+            message: 'Thank you for contacting us! We\'ll get back to you soon.',
+            type: 'success'
+        });
+        setIsSubmitting(false);
+        navigate('/');
+        return;
         try {
             // You can replace this with your actual contact endpoint
             await axios.post('/contact', formData);

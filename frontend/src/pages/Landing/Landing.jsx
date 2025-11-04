@@ -40,7 +40,7 @@ function Landing() {
                             </h1>
                             <p className="hero__subtitle hero__subtitle--animated">Meridian unifies student life — organizations, events, and spaces — into one connected, data‑informed experience.</p>
                             <div className="hero__cta">
-                                <button className="btn btn--primary" onClick={() => navigate('/register')}>Get started</button>
+                                <button className="btn btn--primary" onClick={() => navigate('/events-dashboard')}>Get started</button>
                                 <button className="btn btn--secondary" onClick={() => navigate('/contact')}>Explore demo</button>
                             </div>
                             {/* <div className="statbar">
@@ -410,6 +410,19 @@ function Landing() {
                                 </button>
                             </div>
                             <div className="metrics__visual">
+                                {/* <div className="header">
+                                    <h4>Organizations Dashboard</h4>
+                                    <div className="header-controls">
+                                        <button className="dashboard-mockup__header-control">
+                                            <Icon icon="mdi:filter" />
+                                            <span>Filter</span>
+                                        </button>
+                                        <button className="dashboard-mockup__header-control">
+                                            <Icon icon="mdi:sort" />
+                                            <span>Sort</span>
+                                        </button>
+                                    </div>
+                                </div> */}
                                 {activeMetric === 'organizations' && (
                                     <div className="metrics__visual-content">
                                         <div className="dashboard-mockup">
@@ -430,22 +443,31 @@ function Landing() {
                                             </div>
                                             <div className="dashboard-mockup__metrics">
                                                 <div className="dashboard-mockup__metric">
+                                                    <div className="dashboard-mockup__metric-icon">
+                                                        <Icon icon="mdi:rocket-launch" />
+                                                    </div>
                                                     <div className="dashboard-mockup__metric-label">High-Impact Opportunities</div>
                                                     <div className="dashboard-mockup__metric-value">5</div>
                                                     <div className="dashboard-mockup__metric-trend">AI identified</div>
                                                     <div className="dashboard-mockup__metric-sublabel">Ready to scale</div>
                                                 </div>
                                                 <div className="dashboard-mockup__metric">
-                                                    <div className="dashboard-mockup__metric-label">Member Retention Risk</div>
-                                                    <div className="dashboard-mockup__metric-value">8 orgs</div>
-                                                    <div className="dashboard-mockup__metric-trend">Action needed</div>
-                                                    <div className="dashboard-mockup__metric-sublabel">Next 30 days</div>
+                                                    <div className="dashboard-mockup__metric-icon">
+                                                        <Icon icon="mdi:trending-up" />
+                                                    </div>
+                                                    <div className="dashboard-mockup__metric-label">Growing Organizations</div>
+                                                    <div className="dashboard-mockup__metric-value">12 orgs</div>
+                                                    <div className="dashboard-mockup__metric-trend">+25% this month</div>
+                                                    <div className="dashboard-mockup__metric-sublabel">Member growth</div>
                                                 </div>
                                                 <div className="dashboard-mockup__metric">
-                                                    <div className="dashboard-mockup__metric-label">Cross-Sector Engagement Gaps</div>
-                                                    <div className="dashboard-mockup__metric-value">6</div>
-                                                    <div className="dashboard-mockup__metric-trend">Connection opportunity</div>
-                                                    <div className="dashboard-mockup__metric-sublabel">Org ↔ Event disconnect</div>
+                                                    <div className="dashboard-mockup__metric-icon">
+                                                        <Icon icon="mdi:link-variant" />
+                                                    </div>
+                                                    <div className="dashboard-mockup__metric-label">Active Cross-Sector Connections</div>
+                                                    <div className="dashboard-mockup__metric-value">24</div>
+                                                    <div className="dashboard-mockup__metric-trend">Strong engagement</div>
+                                                    <div className="dashboard-mockup__metric-sublabel">Org ↔ Event partnerships</div>
                                                 </div>
                                             </div>
                                             {/* <div className="dashboard-mockup__chart">
@@ -474,22 +496,31 @@ function Landing() {
                                             </div>
                                             <div className="dashboard-mockup__metrics">
                                                 <div className="dashboard-mockup__metric">
-                                                    <div className="dashboard-mockup__metric-label">Events At Risk</div>
-                                                    <div className="dashboard-mockup__metric-value">5</div>
-                                                    <div className="dashboard-mockup__metric-trend">Low RSVP trend</div>
-                                                    <div className="dashboard-mockup__metric-sublabel">Intervention recommended</div>
+                                                    <div className="dashboard-mockup__metric-icon">
+                                                        <Icon icon="mdi:star" />
+                                                    </div>
+                                                    <div className="dashboard-mockup__metric-label">High-Performing Events</div>
+                                                    <div className="dashboard-mockup__metric-value">18</div>
+                                                    <div className="dashboard-mockup__metric-trend">Above 90% capacity</div>
+                                                    <div className="dashboard-mockup__metric-sublabel">Strong engagement</div>
                                                 </div>
                                                 <div className="dashboard-mockup__metric">
+                                                    <div className="dashboard-mockup__metric-icon">
+                                                        <Icon icon="mdi:clock-outline" />
+                                                    </div>
                                                     <div className="dashboard-mockup__metric-label">Peak Scheduling Windows</div>
                                                     <div className="dashboard-mockup__metric-value">3</div>
                                                     <div className="dashboard-mockup__metric-trend">This month</div>
                                                     <div className="dashboard-mockup__metric-sublabel">Optimal times identified</div>
                                                 </div>
                                                 <div className="dashboard-mockup__metric">
-                                                    <div className="dashboard-mockup__metric-label">Underperforming Events</div>
-                                                    <div className="dashboard-mockup__metric-value">8</div>
-                                                    <div className="dashboard-mockup__metric-trend">Review needed</div>
-                                                    <div className="dashboard-mockup__metric-sublabel">Below engagement threshold</div>
+                                                    <div className="dashboard-mockup__metric-icon">
+                                                        <Icon icon="iconamoon:trend-up" />
+                                                    </div>
+                                                    <div className="dashboard-mockup__metric-label">Top Events This Month</div>
+                                                    <div className="dashboard-mockup__metric-value">12</div>
+                                                    <div className="dashboard-mockup__metric-trend">+150 avg RSVPs</div>
+                                                    <div className="dashboard-mockup__metric-sublabel">Record attendance</div>
                                                 </div>
                                             </div>
                                             {/* <div className="dashboard-mockup__chart">
@@ -503,7 +534,7 @@ function Landing() {
                                         <div className="dashboard-mockup">
                                             <div className="dashboard-mockup__insight">
                                                 <div className="dashboard-mockup__insight-icon">
-                                                    <Icon icon="fluent:sparkle-16-filled" />
+                                                    <Icon icon="octicon:sparkle-fill-24" />
                                                 </div>
                                                 <div className="dashboard-mockup__insight-content">
                                                     <div className="dashboard-mockup__insight-title">Weekly report focus</div>
@@ -518,18 +549,27 @@ function Landing() {
                                             </div>
                                             <div className="dashboard-mockup__metrics">
                                                 <div className="dashboard-mockup__metric">
+                                                    <div className="dashboard-mockup__metric-icon">
+                                                        <Icon icon="mdi:wrench" />
+                                                    </div>
                                                     <div className="dashboard-mockup__metric-label">Rooms Need Maintenance</div>
                                                     <div className="dashboard-mockup__metric-value">7</div>
                                                     <div className="dashboard-mockup__metric-trend">Urgent priority</div>
                                                     <div className="dashboard-mockup__metric-sublabel">From student reviews</div>
                                                 </div>
                                                 <div className="dashboard-mockup__metric">
+                                                    <div className="dashboard-mockup__metric-icon">
+                                                        <Icon icon="fluent:building-20-regular" />
+                                                    </div>
                                                     <div className="dashboard-mockup__metric-label">Quality Score Trending Down</div>
                                                     <div className="dashboard-mockup__metric-value">4.2</div>
                                                     <div className="dashboard-mockup__metric-trend">↓ -0.3 this month</div>
                                                     <div className="dashboard-mockup__metric-sublabel">Review sentiment declining</div>
                                                 </div>
                                                 <div className="dashboard-mockup__metric">
+                                                    <div className="dashboard-mockup__metric-icon">
+                                                        <Icon icon="mdi:clock-outline" />
+                                                    </div>
                                                     <div className="dashboard-mockup__metric-label">Peak Usage Windows</div>
                                                     <div className="dashboard-mockup__metric-value">3</div>
                                                     <div className="dashboard-mockup__metric-trend">Daily patterns</div>
@@ -699,7 +739,7 @@ function Landing() {
                                 </div>
                             </div>
                             <div className="pricecard pricecard--highlight">
-                                <div className="pricecard__badge">Most Popular</div>
+                                {/* <div className="pricecard__badge">Most Popular</div> */}
                                 <div className="pricecard__header">
                                     <h4>Campus</h4>
                                     <p className="pricecard__description">For institutions ready to scale</p>
