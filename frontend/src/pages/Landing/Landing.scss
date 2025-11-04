@@ -62,8 +62,8 @@
       grid-template-columns: 1.1fr 1fr;
       gap: 48px;
       align-items: center;
-      padding: 88px min(6vw, 72px) 24px;
-      padding-bottom: 80px;
+      padding: 108px min(6vw, 72px) 24px;
+      padding-bottom: 60px;
       box-sizing: border-box;
       position: relative;
       z-index: 2;
@@ -144,7 +144,7 @@
       animation: hero-text-in 1.2s cubic-bezier(0.165, 0.84, 0.44, 1) 0.8s forwards;
     }
     &__visual {
-      height: 800px;
+      height: 750px;
       border-radius: 20px;
       max-width: 450px;
       img{
@@ -1904,50 +1904,192 @@
   .pricing {
     width: 100%;
     box-sizing: border-box;
+    background: #fafafa;
     
     &__content {
       width: 100%;
       max-width: 1200px;
       margin: 0 auto;
-      padding: 8px min(6vw, 72px) 72px;
+      padding: 60px min(6vw, 72px) 72px;
       box-sizing: border-box;
     }
     
     &__head {
+      text-align: center;
+      margin-bottom: 48px;
+      
       h2 {
-        margin: 0 0 8px;
-        font-size: 32px;
+        margin: 0 0 12px;
+        font-size: clamp(24px, 3.5vw, 32px);
+        font-weight: 700;
+        line-height: 1.2;
+        color: var(--text, #111);
       }
+      
       p {
-        margin: 0 0 24px;
-        color: #444;
+        margin: 0;
+        font-size: clamp(14px, 1.8vw, 16px);
+        color: var(--text-secondary, #666);
+        line-height: 1.6;
+        max-width: 640px;
+        margin-left: auto;
+        margin-right: auto;
       }
     }
+    
     &__grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 16px;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+      max-width: 800px;
+      margin: 0 auto;
+      
+      @media (max-width: 768px) {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
     }
+    
     .pricecard {
       background: #fff;
-      border: 1px solid #eee;
+      border: 1px solid #e8e8e8;
       border-radius: 16px;
-      padding: 18px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+      
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+        border-color: #d0d0d0;
+      }
+      
       &--highlight {
-        border-color: #111;
-        box-shadow: 0 10px 32px rgba(0, 0, 0, 0.08);
+        border: 2px solid var(--dark-blue, #667eea);
+        box-shadow: 0 4px 16px rgba(102, 126, 234, 0.12);
+        
+        &:hover {
+          box-shadow: 0 8px 24px rgba(102, 126, 234, 0.18);
+          transform: translateY(-2px);
+        }
       }
-      h4 {
-        margin: 0 0 8px;
+      
+      &__badge {
+        position: absolute;
+        top: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: var(--dark-blue, #667eea);
+        color: #fff;
+        padding: 4px 12px;
+        border-radius: 16px;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.3px;
+        text-transform: uppercase;
+        box-shadow: 0 2px 8px rgba(102, 126, 234, 0.25);
       }
+      
+      &__header {
+        margin-bottom: 16px;
+        
+        h4 {
+          margin: 0 0 6px;
+          font-size: 20px;
+          font-weight: 700;
+          color: var(--text, #111);
+          letter-spacing: -0.02em;
+        }
+        
+        .pricecard__description {
+          margin: 0;
+          font-size: 13px;
+          color: var(--text-secondary, #666);
+          line-height: 1.4;
+        }
+      }
+      
+      &__price-section {
+        margin-bottom: 16px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid #f0f0f0;
+      }
+      
       &__price {
+        font-size: 28px;
         font-weight: 800;
-        margin: 0 0 10px;
-      }
-      ul {
         margin: 0;
-        padding: 0 0 0 18px;
-        color: #444;
+        color: var(--text, #111);
+        letter-spacing: -0.03em;
+        line-height: 1;
+        
+        &::before {
+          content: '';
+        }
+      }
+      
+      &__cta {
+        width: 100%;
+        padding: 10px 20px;
+        border: 1.5px solid #e8e8e8;
+        border-radius: 10px;
+        font-size: 14px;
+        font-weight: 600;
+        background: #fff;
+        color: var(--text, #111);
+        cursor: pointer;
+        transition: all 0.2s ease;
+        margin-bottom: 20px;
+        font-family: inherit;
+        
+        &:hover {
+          border-color: var(--dark-blue, #667eea);
+          color: var(--dark-blue, #667eea);
+          background: #fafafa;
+        }
+        
+        &--primary {
+          background: var(--dark-blue, #667eea);
+          color: #fff;
+          border-color: var(--dark-blue, #667eea);
+          
+          &:hover {
+            background: #5568d3;
+            border-color: #5568d3;
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.25);
+          }
+        }
+      }
+      
+      &__features {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        flex: 1;
+      }
+      
+      &__feature {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        font-size: 14px;
+        color: var(--text, #111);
+        line-height: 1.4;
+        
+        iconify-icon {
+          font-size: 18px;
+          color: var(--dark-blue, #667eea);
+          flex-shrink: 0;
+          margin-top: 1px;
+        }
+        
+        span {
+          flex: 1;
+        }
       }
     }
   }
@@ -2005,6 +2147,13 @@
     }
     .hero__cta {
       justify-content: center;
+      .btn--primary {
+        background: var(--dark-blue);
+        color: #fff;
+        &:hover {
+          box-shadow: var(--shadow-hover);
+        }
+      }
     }
   }
 
@@ -2229,8 +2378,47 @@
       }
     }
     .pricing {
+      &__content {
+        padding: 48px min(6vw, 48px) 60px;
+      }
+      
+      &__head {
+        margin-bottom: 36px;
+      }
+      
       &__grid {
         grid-template-columns: 1fr;
+        gap: 16px;
+      }
+      
+      .pricecard {
+        padding: 20px;
+        
+        &__header {
+          margin-bottom: 14px;
+          
+          h4 {
+            font-size: 18px;
+          }
+        }
+        
+        &__price {
+          font-size: 24px;
+        }
+        
+        &__cta {
+          padding: 10px 18px;
+          font-size: 14px;
+        }
+        
+        &__feature {
+          font-size: 13px;
+          gap: 8px;
+          
+          iconify-icon {
+            font-size: 16px;
+          }
+        }
       }
     }
     .usecases {

@@ -41,7 +41,7 @@ function Landing() {
                             <p className="hero__subtitle hero__subtitle--animated">Meridian unifies student life — organizations, events, and spaces — into one connected, data‑informed experience.</p>
                             <div className="hero__cta">
                                 <button className="btn btn--primary" onClick={() => navigate('/register')}>Get started</button>
-                                <button className="btn btn--secondary" onClick={() => navigate('/events-dashboard')}>Explore demo</button>
+                                <button className="btn btn--secondary" onClick={() => navigate('/contact')}>Explore demo</button>
                             </div>
                             {/* <div className="statbar">
                                 <div className="stat"><span className="stat__num">8,000+</span><span className="stat__label">unique visitors</span></div>
@@ -352,11 +352,11 @@ function Landing() {
                     <div className="metrics__content">
                         <div className="metrics__head">
                             <h2 className="metrics__title">
-                                <span className="metrics__title-line metrics__title-line--1">Understand how Meridian</span>
+                                <span className="metrics__title-line metrics__title-line--1">Understand how Students</span>
                                 <br />
-                                <span className="metrics__title-line metrics__title-line--2">sees your campus</span>
+                                <span className="metrics__title-line metrics__title-line--2">Enagage</span>
                             </h2>
-                            <p className="metrics__subtitle">Go beyond point-in-time snapshots. Get AI-powered insights that tell you exactly what to do next — which orgs need support, which events are at risk, and where capacity gaps are coming.</p>
+                            <p className="metrics__subtitle">Go beyond point-in-time snapshots. Get AI-powered insights that tell you exactly what to do next, which orgs need support, which events are at risk, and where capacity gaps are coming.</p>
                         </div>
                         <div className="metrics__container">
                             <div className="metrics__tabs">
@@ -675,31 +675,61 @@ function Landing() {
                         </div>
                         <div className="pricing__grid">
                             <div className="pricecard">
-                                <h4>Starter</h4>
-                                <p className="pricecard__price">Contact us</p>
-                                <ul>
-                                    <li>Organizations & events</li>
-                                    <li>Standard approvals</li>
-                                    <li>Email support</li>
-                                </ul>
+                                <div className="pricecard__header">
+                                    <h4>Communities</h4>
+                                    <p className="pricecard__description">Perfect for small teams getting started</p>
+                                </div>
+                                <div className="pricecard__price-section">
+                                    <p className="pricecard__price">Contact us</p>
+                                </div>
+                                <button className="pricecard__cta" onClick={() => navigate('/contact')}>Get started</button>
+                                <div className="pricecard__features">
+                                    <div className="pricecard__feature">
+                                        <Icon icon="mdi:check-circle" />
+                                        <span>Organizations & events</span>
+                                    </div>
+                                    <div className="pricecard__feature">
+                                        <Icon icon="mdi:check-circle" />
+                                        <span>Standard approvals</span>
+                                    </div>
+                                    <div className="pricecard__feature">
+                                        <Icon icon="mdi:check-circle" />
+                                        <span>Email support</span>
+                                    </div>
+                                </div>
                             </div>
                             <div className="pricecard pricecard--highlight">
-                                <h4>Campus</h4>
-                                <p className="pricecard__price">By enrollment</p>
-                                <ul>
-                                    <li>All Starter features</li>
-                                    <li>Spaces & utilization</li>
-                                    <li>Analytics & exports</li>
-                                </ul>
-                            </div>
-                            <div className="pricecard">
-                                <h4>Enterprise</h4>
-                                <p className="pricecard__price">Custom</p>
-                                <ul>
-                                    <li>SAML/SSO, SLAs</li>
-                                    <li>Custom workflows</li>
-                                    <li>Dedicated support</li>
-                                </ul>
+                                <div className="pricecard__badge">Most Popular</div>
+                                <div className="pricecard__header">
+                                    <h4>Campus</h4>
+                                    <p className="pricecard__description">For institutions ready to scale</p>
+                                </div>
+                                <div className="pricecard__price-section">
+                                    <p className="pricecard__price">Contact us</p>
+                                </div>
+                                <button className="pricecard__cta pricecard__cta--primary" onClick={() => navigate('/contact')}>Get started</button>
+                                <div className="pricecard__features">
+                                    <div className="pricecard__feature">
+                                        <Icon icon="mdi:check-circle" />
+                                        <span>SAML/SSO integration</span>
+                                    </div>
+                                    <div className="pricecard__feature">
+                                        <Icon icon="mdi:check-circle" />
+                                        <span>Custom workflows</span>
+                                    </div>
+                                    <div className="pricecard__feature">
+                                        <Icon icon="mdi:check-circle" />
+                                        <span>Dedicated support</span>
+                                    </div>
+                                    <div className="pricecard__feature">
+                                        <Icon icon="mdi:check-circle" />
+                                        <span>Spaces & utilization</span>
+                                    </div>
+                                    <div className="pricecard__feature">
+                                        <Icon icon="mdi:check-circle" />
+                                        <span>Analytics & exports</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -730,10 +760,10 @@ function Landing() {
                 <section className="cta">
                     <div className="cta__content">
                         <h2>Ready to connect your campus?</h2>
-                        <p>Start for free, then scale across departments and campuses.</p>
+                        <p>Start with a pilot, then scale across departments and campuses.</p>
                         <div className="hero__cta">
-                            <button className="btn btn--primary" onClick={() => navigate('/register')}>Create account</button>
-                            <button className="btn btn--secondary" onClick={() => navigate('/login')}>Sign in</button>
+                            <button className="btn btn--primary" onClick={() => navigate('/register')}>Contact us</button>
+                            {/* <button className="btn btn--secondary" onClick={() => navigate('/login')}>Sign in</button> */}
                         </div>
                     </div>
                 </section>

@@ -9,6 +9,7 @@ import { useWebSocket } from '../../WebSocketContext';
 import RpiLogo from '../../assets/Brand Image/RpiLogo.svg';
 import BerkeleyLogo from '../../assets/Brand Image/BerkeleyLogo.svg';
 import NotificationInbox from '../NotificationInbox/NotificationInbox';
+import { Icon } from '@iconify-icon/react/dist/iconify.mjs';
 
 function getLogo() {
     const hostname = window.location.hostname;
@@ -39,8 +40,8 @@ const Header = React.memo(()=>{
 
     const [width, setWidth] = useState(window.innerWidth);
 
-    const goToLogin = ()=>{
-        navigate('/login',{replace : true});
+    const goToMeridian = ()=>{
+        navigate('/events-dashboard',{replace : true});
     }
 
     const goHome = ()=>{
@@ -185,9 +186,11 @@ const Header = React.memo(()=>{
 
                 {page === "/login" || page === "/register" ? "" :
                     <div className="header-right">
-                        {isAuthenticated ? <NotificationInbox/> : ""}
-                        {isAuthenticated ? <ProfilePicture/> : ""}
-                        {!isAuthenticated ? <button onClick={goToLogin}>login</button> : ""}
+                        {/* {isAuthenticated ? <NotificationInbox/> : ""}
+                        {isAuthenticated ? <ProfilePicture/> : ""} */}
+                        <button onClick={goToMeridian}>Go to Meridian
+                            <Icon icon="mdi:arrow-right" className="arrow-right" />
+                        </button>
                     </div>    
                 }
             </div>

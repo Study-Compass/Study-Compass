@@ -91,18 +91,21 @@
 }
 
 .Header button{
-    font-family: 'Satoshi';
+    font-family: 'Montserrat';
     font-size: 15px;
     outline:none;
     border-radius: 12px;
-    background-color: var(--red);
+    background-color: #111;
     border:none;
-    padding:5px 20px;
+    padding:10px 20px;
     margin:10px;
     color: white;
     width:calc(100% - 20px);
     pointer-events: all;
     transition: all 0.5s;
+    display: flex;
+    align-items: center;
+    box-shadow: 0 0 20px 0 rgba(255, 255, 255, 0.5);
 }
 
 .Header button:hover{
