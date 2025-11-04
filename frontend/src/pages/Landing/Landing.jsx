@@ -7,11 +7,23 @@ import backgroundImage from "../../assets/LandingBackground.png";
 import { Icon } from '@iconify-icon/react/dist/iconify.mjs';
 import WorkflowGraph from './WorkflowGraph';
 import RPI from "../../assets/Schools/RPI.svg";
+import useAuth from "../../hooks/useAuth";
 
 function Landing() {
     const navigate = useNavigate();
     const [activeMetric, setActiveMetric] = useState('organizations');
     const [width, setWidth] = useState(window.innerWidth);
+
+    const { isAuthenticating, isAuthenticated } = useAuth();
+
+    useEffect(() => {
+        if (isAuthenticating) {
+            return;
+        }
+        if (isAuthenticated) {
+            navigate('/events-dashboard');
+        }
+    }, [isAuthenticating, isAuthenticated]);
 
     useEffect(() => {
         window.addEventListener('resize', () => {
@@ -23,6 +35,10 @@ function Landing() {
             });
         };
     }, []);
+
+    if(isAuthenticating) {
+        return <div>Loading...</div>;
+    }
 
     return (
         <div className="landing-container" >
@@ -802,7 +818,7 @@ function Landing() {
                         <h2>Ready to connect your campus?</h2>
                         <p>Start with a pilot, then scale across departments and campuses.</p>
                         <div className="hero__cta">
-                            <button className="btn btn--primary" onClick={() => navigate('/register')}>Contact us</button>
+                            <button className="btn btn--primary" onClick={() => navigate('/contact')}>Contact us</button>
                             {/* <button className="btn btn--secondary" onClick={() => navigate('/login')}>Sign in</button> */}
                         </div>
                     </div>
