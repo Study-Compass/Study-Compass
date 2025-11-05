@@ -150,6 +150,7 @@ router.get('/free-rooms', async (req, res) => {
         const time = hour * 60 + minute; // Convert to minutes since midnight
         
         let query;
+        console.log(day);
         
         // If it's weekend (Saturday or Sunday), return all rooms
         if (day === 'X') {
