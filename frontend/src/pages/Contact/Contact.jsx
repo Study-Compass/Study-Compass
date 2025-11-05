@@ -32,30 +32,6 @@ function Contact() {
         setIsSubmitting(false);
         navigate('/');
         return;
-        try {
-            // You can replace this with your actual contact endpoint
-            await axios.post('/contact', formData);
-            addNotification({
-                title: 'Success',
-                message: 'Thank you for contacting us! We\'ll get back to you soon.',
-                type: 'success'
-            });
-            setFormData({
-                name: '',
-                email: '',
-                organization: '',
-                message: ''
-            });
-        } catch (error) {
-            console.error('Contact form submission failed:', error);
-            addNotification({
-                title: 'Error',
-                message: 'Failed to send message. Please try again later.',
-                type: 'error'
-            });
-        } finally {
-            setIsSubmitting(false);
-        }
     };
 
     const isValid = formData.name && formData.email && formData.message;
