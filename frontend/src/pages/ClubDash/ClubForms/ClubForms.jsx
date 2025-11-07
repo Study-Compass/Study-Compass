@@ -4,8 +4,11 @@ import { useFetch } from '../../../hooks/useFetch';
 import OrgGrad from '../../../assets/Gradients/OrgGrad.png';
 import FormBuilder from '../../../components/FormBuilder/FormBuilder';
 import FormViewer from '../../../components/FormViewer/FormViewer';
+import FormResponseViewer from '../../../components/FormResponseViewer/FormResponseViewer';
 import Popup from '../../../components/Popup/Popup';
 import apiRequest from '../../../utils/postRequest';
+import axios from 'axios';
+import { Icon } from '@iconify-icon/react';
 
 
 const ClubForms = ({ org }) => {
@@ -13,8 +16,12 @@ const ClubForms = ({ org }) => {
     const [showFormBuilder, setShowFormBuilder] = useState(false);
     const [showCopyNotification, setShowCopyNotification] = useState(false);
     const [showFormViewer, setShowFormViewer] = useState(false);
+    const [showResponsesViewer, setShowResponsesViewer] = useState(false);
     const [currentForm, setCurrentForm] = useState(null);
+    const [currentFormResponses, setCurrentFormResponses] = useState(null);
+    const [selectedResponseIndex, setSelectedResponseIndex] = useState(0);
     const [viewMode, setViewMode] = useState('view'); // 'view' or 'edit'
+    const [responsesLoading, setResponsesLoading] = useState(false);
     
     // Extract forms from the API response
     const forms = formsData?.forms || [];
@@ -87,6 +94,32 @@ const ClubForms = ({ org }) => {
         }
     };
 
+    const handleViewResponses = async (form) => {
+        try {
+            setResponsesLoading(true);
+            // Use axios directly since useFetch is a hook and can't be called conditionally
+            const responsesResponse = await axios.get(`/form/${form._id}/responses`, {
+                withCredentials: true
+            });
+
+            if (responsesResponse.data.success) {
+                setCurrentFormResponses(responsesResponse.data.responses);
+                setCurrentForm(form);
+                setSelectedResponseIndex(0);
+                setShowResponsesViewer(true);
+            } else {
+                console.error('Failed to load responses:', responsesResponse.data.message);
+                alert('Failed to load form responses: ' + (responsesResponse.data.message || 'Unknown error'));
+            }
+        } catch (error) {
+            console.error('Error loading responses:', error);
+            const errorMessage = error.response?.data?.message || error.message || 'Unknown error';
+            alert('Error loading form responses: ' + errorMessage);
+        } finally {
+            setResponsesLoading(false);
+        }
+    };
+
     return (
         <div className="club-forms dash">
             {/* Form Builder Popup */}
@@ -114,6 +147,7 @@ const ClubForms = ({ org }) => {
                 onClose={() => {
                     setShowFormViewer(false);
                     setCurrentForm(null);
+                    setViewMode('view');
                 }}
                 customClassName="wide-content"
                 defaultStyling={false}
@@ -148,6 +182,61 @@ const ClubForms = ({ org }) => {
                                 <FormViewer form={currentForm} />
                             </div>
                         )}
+                    </div>
+                )}
+            </Popup>
+
+            {/* Form Responses Viewer Popup */}
+            <Popup
+                title={`Responses: ${currentForm?.title}`}
+                isOpen={showResponsesViewer}
+                onClose={() => {
+                    setShowResponsesViewer(false);
+                    setCurrentForm(null);
+                    setCurrentFormResponses(null);
+                    setSelectedResponseIndex(0);
+                }}
+                customClassName="wide-content"
+                defaultStyling={false}
+            >
+                {currentFormResponses && currentFormResponses.length > 0 ? (
+                    <div className="responses-viewer-container">
+                        <div className="responses-header">
+                            <div className="response-navigation">
+                                <button
+                                    className="nav-btn"
+                                    onClick={() => setSelectedResponseIndex(Math.max(0, selectedResponseIndex - 1))}
+                                    disabled={selectedResponseIndex === 0}
+                                >
+                                    <Icon icon="mdi:chevron-left" />
+                                </button>
+                                <span className="response-counter">
+                                    {selectedResponseIndex + 1} of {currentFormResponses.length}
+                                </span>
+                                <button
+                                    className="nav-btn"
+                                    onClick={() => setSelectedResponseIndex(Math.min(currentFormResponses.length - 1, selectedResponseIndex + 1))}
+                                    disabled={selectedResponseIndex === currentFormResponses.length - 1}
+                                >
+                                    <Icon icon="mdi:chevron-right" />
+                                </button>
+                            </div>
+                            <div className="response-meta-info">
+                                {currentFormResponses[selectedResponseIndex].submittedBy && (
+                                    <span className="submitted-by">
+                                        Submitted by: {currentFormResponses[selectedResponseIndex].submittedBy.name || currentFormResponses[selectedResponseIndex].submittedBy.email}
+                                    </span>
+                                )}
+                                <span className="submitted-date">
+                                    {new Date(currentFormResponses[selectedResponseIndex].submittedAt).toLocaleString()}
+                                </span>
+                            </div>
+                        </div>
+                        <FormResponseViewer formResponse={currentFormResponses[selectedResponseIndex]} />
+                    </div>
+                ) : (
+                    <div className="no-responses">
+                        <p>No responses yet for this form.</p>
                     </div>
                 )}
             </Popup>
@@ -197,9 +286,6 @@ const ClubForms = ({ org }) => {
                                 <p className="form-date">
                                     Created: {new Date(form.createdAt).toLocaleDateString()}
                                 </p>
-                                <p className="submission-count">
-                                    Submissions: {form.submissionCount || 0}
-                                </p>
                                 <div className="form-actions">
                                     <button 
                                         onClick={() => handleCopyLink(form._id)}
@@ -207,7 +293,13 @@ const ClubForms = ({ org }) => {
                                         Copy Link
                                     </button>
                                     <button onClick={() => handleOpenForm(form, 'view')}>
-                                        Open
+                                        View Form
+                                    </button>
+                                    <button 
+                                        onClick={() => handleViewResponses(form)}
+                                        disabled={responsesLoading}
+                                    >
+                                        {responsesLoading ? 'Loading...' : 'View Responses'}
                                     </button>
                                 </div>
                             </div>

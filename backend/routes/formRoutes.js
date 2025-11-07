@@ -5,13 +5,11 @@ const {
     verifyTokenOptional,
 } = require("../middlewares/verifyToken.js");
 const getModels = require("../services/getModelService.js");
-const FormResponse = require("../events/schemas/formResponse.js");
 
 
 
-router.get("/get-form-by-id/:id", verifyToken, async (req, res) => {
+router.get("/get-form-by-id/:id", verifyTokenOptional, async (req, res) => {
     try{
-
         const { Form } = getModels(req, "Form");
         const formId = req.params.id;
         const form = await Form.findById(formId);
@@ -28,7 +26,7 @@ router.get("/get-form-by-id/:id", verifyToken, async (req, res) => {
 router.post("/submit-form-response", verifyToken, async (req, res) => {
     try {
         const { formId, responses } = req.body;
-        const { Form } = getModels(req, "Form");
+        const { Form, FormResponse } = getModels(req, "Form", "FormResponse");
 
         if (!formId || !responses) {
             return res.status(400).json({ success: false, message: "Missing formId or responses" });
@@ -40,12 +38,20 @@ router.post("/submit-form-response", verifyToken, async (req, res) => {
             return res.status(404).json({ success: false, message: "Form not found" });
         }
 
-        // Save a new FormResponse
+        // Convert responses array to answers array in the same order as questions
+        // responses format: [{ referenceId, answer, question, type }, ...]
+        // answers format: [answer1, answer2, ...] in order of questions
+        const answers = form.questions.map(question => {
+            const response = responses.find(r => r.referenceId === question._id.toString());
+            return response ? response.answer : null;
+        });
+
+        // Save a new FormResponse using the schema correctly
         const formResponse = new FormResponse({
             formSnapshot: form.toObject(),
             form: formId,
-            user: req.user?.id,
-            responses: responses,
+            submittedBy: req.user?.id,
+            answers: answers,
             submittedAt: new Date()
         });
 
@@ -54,15 +60,17 @@ router.post("/submit-form-response", verifyToken, async (req, res) => {
         res.status(201).json({ success: true, message: "Form response submitted", formResponse });
     } catch (error) {
         console.error("Error submitting form response:", error);
-        res.status(500).json({ success: false, message: "Internal server error" });
+        res.status(500).json({ success: false, message: "Internal server error", error: error.message });
     }
 });
 
 // ---- GET FORM RESPONSES FOR ORG DASHBOARD ----
-router.get("/:formId/responses", verifyToken, async (req, res) => {
+// This route must come after the more specific routes above
+router.get("/form/:formId/responses", verifyToken, async (req, res) => {
     try {
-        const { Form } = getModels(req, "Form");
+        const { Form, FormResponse, OrgMember } = getModels(req, "Form", "FormResponse", "OrgMember");
         const formId = req.params.formId;
+        const userId = req.user?.id;
 
         // Fetch form to ensure it exists and get org
         const form = await Form.findById(formId).lean();
@@ -70,12 +78,35 @@ router.get("/:formId/responses", verifyToken, async (req, res) => {
             return res.status(404).json({ success: false, message: "Form not found" });
         }
 
-        // Optionally, you may want to check permissions here:
-        // e.g. only org admins/owners can see responses
+        // Check if form belongs to an org and user has permission
+        if (form.formOwnerType === 'Org') {
+            const orgId = form.formOwner;
+            // Check if user is a member of the org with admin/owner role
+            const orgMember = await OrgMember.findOne({
+                org_id: orgId,
+                user_id: userId,
+                role: { $in: ['owner', 'admin'] }
+            });
+
+            if (!orgMember) {
+                return res.status(403).json({ 
+                    success: false, 
+                    message: "You do not have permission to view form responses" 
+                });
+            }
+        } else if (form.formOwnerType === 'User') {
+            // If form is owned by a user, only that user can see responses
+            if (form.formOwner.toString() !== userId) {
+                return res.status(403).json({ 
+                    success: false, 
+                    message: "You do not have permission to view form responses" 
+                });
+            }
+        }
 
         // Fetch all responses for this form, and populate user fields for dashboard display
         const responses = await FormResponse.find({ form: formId })
-            .populate("user", "name email")
+            .populate("submittedBy", "name email")
             .sort({ submittedAt: -1 })
             .lean();
 
