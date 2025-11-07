@@ -559,7 +559,7 @@ function Room({hideHeader = false, urlType = 'embedded'}) {
                             <Sort
                                 query={searchQuery}
                                 searchAttributes={searchAttributes}
-                                setSearchAttributes={setSearchAttributes}
+                                setSearchAttributes={setSearchAttributes}   
                                 searchSort={searchSort}
                                 setSearchSort={setSearchSort}
                                 onSearch={onSearch}
