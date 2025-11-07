@@ -42,7 +42,7 @@ import { ProfileCreationProvider } from './ProfileCreationContext';
 import { WebSocketProvider } from './WebSocketContext';
 import Layout from './pages/Layout/Layout';
 import axios from 'axios';
-import CreateEvent from './pages/CreateEvent/CreateEvent';
+import CreateEvent from './pages/CreateEventV2/CreateEventV2';
 import EventsDash from './pages/EventsDash/EventsDash';
 import EventPage from './pages/EventPage/EventPage';
 import SubSidebarExample from './components/Dashboard/SubSidebarExample';
