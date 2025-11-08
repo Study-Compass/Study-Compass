@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import './When.scss'
 
 import WeeklyCalendar from '../../../../pages/OIEDash/EventsCalendar/Week/WeeklyCalendar/WeeklyCalendar';
@@ -24,6 +24,22 @@ function When({ formData, setFormData, onComplete }){
     const [month, setMonth] = useState(new Date().getMonth() + 1);
     const [year, setYear] = useState(new Date().getFullYear());
     const [filter, setFilter] = useState({type: "all"});
+    const [showAvailability, setShowAvailability] = useState(true);
+    
+    // Time selection state - initialize from formData if available
+    const [selectedTimeslots, setSelectedTimeslots] = useState(() => {
+        if (formData.start_time && formData.end_time) {
+            return [{
+                id: 'initial-selection',
+                startTime: new Date(formData.start_time),
+                endTime: new Date(formData.end_time),
+                startDay: new Date(formData.start_time),
+                endDay: new Date(formData.end_time),
+                duration: (new Date(formData.end_time) - new Date(formData.start_time)) / (1000 * 60)
+            }];
+        }
+        return [];
+    });
     
     const contentRef = useRef(null);
     
@@ -261,20 +277,71 @@ function When({ formData, setFormData, onComplete }){
         fetchAndCombineSchedules();
     }, [formData.selectedRoomIds]);
 
-    // Initialize completion state
+    // Handle time selection from calendar - memoized to prevent infinite loops
+    const handleTimeSelection = useCallback((selections) => {
+        setSelectedTimeslots(selections);
+        
+        // Use the first selection for start_time and end_time
+        if (selections && selections.length > 0) {
+            const firstSelection = selections[0];
+            setFormData(prev => {
+                const newStartTime = new Date(firstSelection.startTime);
+                const newEndTime = new Date(firstSelection.endTime);
+                
+                // Only update if times actually changed
+                if (prev.start_time?.getTime() === newStartTime.getTime() && 
+                    prev.end_time?.getTime() === newEndTime.getTime()) {
+                    return prev; // Return previous state if unchanged
+                }
+                
+                return {
+                    ...prev,
+                    start_time: newStartTime,
+                    end_time: newEndTime
+                };
+            });
+        } else {
+            // Clear times if no selection
+            setFormData(prev => {
+                if (!prev.start_time && !prev.end_time) {
+                    return prev; // Already cleared
+                }
+                return {
+                    ...prev,
+                    start_time: null,
+                    end_time: null
+                };
+            });
+        }
+    }, [setFormData]);
+
+    // Refs to avoid dependency issues
+    const onCompleteRef = useRef(onComplete);
+    const prevValidityRef = useRef(null);
+    
+    // Keep onComplete ref up to date
     useEffect(() => {
-        if (!isInitialized && !loading) {
-            // Since we're not requiring room selection anymore, just check if we have rooms
-            if (formData.selectedRoomIds && formData.selectedRoomIds.length > 0) {
-                console.log('When component validation: true (rooms available)');
-                onComplete(true);
-            } else {
-                console.log('When component validation: false (no rooms selected)');
-                onComplete(false);
-            }
+        onCompleteRef.current = onComplete;
+    }, [onComplete]);
+
+    // Initialize completion state and validate when times change
+    useEffect(() => {
+        const hasTimes = !!(formData.start_time && formData.end_time);
+        const hasRooms = formData.selectedRoomIds && formData.selectedRoomIds.length > 0;
+        
+        // Validate: need both rooms and times
+        const isValid = hasRooms && hasTimes;
+        
+        if (!isInitialized) {
             setIsInitialized(true);
         }
-    }, [loading, formData.selectedRoomIds, isInitialized, onComplete]);
+        
+        // Only call onComplete if validity actually changed
+        if (prevValidityRef.current !== isValid) {
+            prevValidityRef.current = isValid;
+            onCompleteRef.current(isValid);
+        }
+    }, [formData.start_time, formData.end_time, formData.selectedRoomIds, isInitialized]);
 
     if (loading) {
         return (
@@ -306,8 +373,16 @@ function When({ formData, setFormData, onComplete }){
             <div className="info-box">
                 <div className="info-content">
                     <span className="info-text">
-                        Grey blocks show unavailable times across all selected rooms ({formData.selectedRoomIds.length} rooms). Schedule during open times.
+                        {showAvailability 
+                            ? `Grey blocks show unavailable times across all selected rooms (${formData.selectedRoomIds.length} rooms). Click and drag on the calendar to select your event time.`
+                            : `Click and drag on the calendar to select your event time. Toggle "Show Availability" to see room availability.`
+                        }
                     </span>
+                    {formData.start_time && formData.end_time && (
+                        <div className="selected-time-info" style={{ marginTop: '0.5rem', fontWeight: '500' }}>
+                            Selected: {new Date(formData.start_time).toLocaleString()} - {new Date(formData.end_time).toLocaleString()}
+                        </div>
+                    )}
                 </div>
             </div>
             
@@ -360,6 +435,19 @@ function When({ formData, setFormData, onComplete }){
                     </div>
                     
                     <div className="calendar-controls-right">
+                        {view === 1 && (
+                            <div className="availability-toggle" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginRight: '1rem' }}>
+                                <label style={{ fontSize: '0.875rem', cursor: 'pointer', userSelect: 'none' }} onClick={() => setShowAvailability(!showAvailability)}>
+                                    Show Availability
+                                </label>
+                                <Switch 
+                                    options={["off", "on"]} 
+                                    onChange={(index) => setShowAvailability(index === 1)} 
+                                    selectedPass={showAvailability ? 1 : 0} 
+                                    setSelectedPass={(index) => setShowAvailability(index === 1)}
+                                />
+                            </div>
+                        )}
                         <Switch 
                             options={["month", "week", "day"]} 
                             onChange={setView} 
@@ -395,6 +483,16 @@ function When({ formData, setFormData, onComplete }){
                             events={filteredEvents}
                             height={`${contentHeight}px`}
                             dayClick={changeToDay}
+                            autoEnableSelection={true}
+                            selectionMode="single"
+                            allowCrossDaySelection={false}
+                            timeIncrement={15}
+                            singleSelectionOnly={true}
+                            startHour={6}
+                            endHour={24}
+                            showAvailability={showAvailability}
+                            onSelectionsChange={handleTimeSelection}
+                            initialSelections={selectedTimeslots}
                         />
                     )}
                     

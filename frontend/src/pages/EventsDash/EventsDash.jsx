@@ -150,11 +150,6 @@ function EventsDash({}){
         
         // Add additional tabs for authenticated users
         if (user) {
-            items.unshift({
-                label: 'My Events', 
-                icon: 'mingcute:calendar-fill',
-                element: <MyEvents />
-            });
             
             items.push({
                 label: 'Friends', 

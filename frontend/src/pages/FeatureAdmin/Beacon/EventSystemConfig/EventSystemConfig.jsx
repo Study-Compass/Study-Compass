@@ -10,6 +10,7 @@ import TemplateManager from './TemplateManager/TemplateManager';
 import IntegrationManager from './IntegrationManager/IntegrationManager';
 import AnalyticsConfig from './AnalyticsConfig/AnalyticsConfig';
 import ApprovalFlowConfig from './ApprovalFlowConfig/ApprovalFlowConfig';
+import FormConfig from './FormConfig/FormConfig';
 import { useNotification } from '../../../../NotificationContext';
 import { useGradient } from '../../../../hooks/useGradient';
 
@@ -190,6 +191,13 @@ const EventSystemConfig = () => {
                     <Icon icon="mdi:check-circle" />
                     Approval Flow
                 </button>
+                <button 
+                    className={`tab ${activeTab === 'form-config' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('form-config')}
+                >
+                    <Icon icon="mdi:form-select" />
+                    Form Config
+                </button>
             </div>
             
             <div className="config-content">
@@ -232,6 +240,19 @@ const EventSystemConfig = () => {
                     <ApprovalFlowConfig
                         config={config.approvalFlow}
                         onChange={(approvalFlow) => handleConfigChange('approvalFlow', approvalFlow)}
+                    />
+                )}
+                
+                {activeTab === 'form-config' && (
+                    <FormConfig
+                        config={config}
+                        onChange={(updates) => {
+                            // Merge formConfig updates into the main config
+                            setConfig(prev => ({
+                                ...prev,
+                                formConfig: updates.formConfig
+                            }));
+                        }}
                     />
                 )}
             </div>

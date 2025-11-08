@@ -16,7 +16,7 @@ import {
     StakeholdersTab, 
     DomainsTab, 
     ManagementTab, 
-    AnalyticsTab 
+    AnalyticsTab
 } from './tabs';
 
 function ManageFlow(){

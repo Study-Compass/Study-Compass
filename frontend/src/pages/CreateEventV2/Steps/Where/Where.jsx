@@ -307,6 +307,19 @@ function Where({ formData, setFormData, onComplete }){
             .filter(Boolean); // Filter out any undefined rooms
     }, [roomData, selectedRoomIds]);
 
+    // Refs to avoid dependency issues
+    const setFormDataRef = useRef(setFormData);
+    const onCompleteRef = useRef(onComplete);
+    
+    // Keep refs up to date
+    useEffect(() => {
+        setFormDataRef.current = setFormData;
+        onCompleteRef.current = onComplete;
+    }, [setFormData, onComplete]);
+    
+    // Track previous values to prevent unnecessary updates
+    const prevSelectionRef = useRef(null);
+
     // Update form data when selection changes - but ONLY after initialization
     useEffect(() => {
         if (!isInitialized) return;
@@ -314,21 +327,33 @@ function Where({ formData, setFormData, onComplete }){
         const selectedRoomIdsArray = Array.from(selectedRoomIds);
         const hasSelectedRooms = selectedRoomIdsArray.length > 0;
         
+        // Create a key to compare if selection actually changed
+        const selectionKey = JSON.stringify({
+            roomIds: selectedRoomIdsArray.sort(),
+            roomDataLength: roomData.length
+        });
+        
+        // Only update if selection actually changed
+        if (prevSelectionRef.current === selectionKey) {
+            return;
+        }
+        
+        prevSelectionRef.current = selectionKey;
+        
         // Get the first selected room for backward compatibility
         const firstSelectedRoom = hasSelectedRooms ? 
             roomData.find(room => room.id === selectedRoomIdsArray[0]) : null;
 
         // Update form data
-        setFormData(prev => ({
+        setFormDataRef.current(prev => ({
             ...prev,
             selectedRoomIds: selectedRoomIdsArray,
             location: firstSelectedRoom?.name || null,
             classroomId: firstSelectedRoom?.id || null
         }));
 
-        console.log(`Where component validation: ${hasSelectedRooms ? 'true (rooms selected)' : 'false (no rooms selected)'}`);
-        onComplete(hasSelectedRooms);
-    }, [selectedRoomIds, roomData, setFormData, onComplete, isInitialized]);
+        onCompleteRef.current(hasSelectedRooms);
+    }, [selectedRoomIds, roomData, isInitialized]);
 
     // Handle room selection/deselection
     const handleRoomToggle = useCallback((room) => {
@@ -694,7 +719,6 @@ function Where({ formData, setFormData, onComplete }){
                                         {room.roomInfo.attributes && Array.isArray(room.roomInfo.attributes) && room.roomInfo.attributes.length > 0 ? (
                                             <div className="attributes">
                                                 {room.roomInfo.attributes.slice(0, 4).map((attr, index) => {
-                                                    console.log(`Processing selected room attribute: "${attr}"`);
                                                     
                                                     // Safely check for icons - don't let icon failures prevent attribute display
                                                     let iconSrc = null;
@@ -757,12 +781,6 @@ function Where({ formData, setFormData, onComplete }){
                             const roomNumber = getRoomNumber(room.name);
                             const roomNameWithoutNumber = getRoomNameWithoutNumber(room.name);
                             
-                            console.log('Recommended room attributes check:', {
-                                roomName: room.name,
-                                attributes: room.roomInfo.attributes,
-                                attributesType: typeof room.roomInfo.attributes,
-                                attributesLength: room.roomInfo.attributes?.length
-                            });
                             
                             return (
                                 <div 
@@ -800,7 +818,6 @@ function Where({ formData, setFormData, onComplete }){
                                         {room.roomInfo.attributes && Array.isArray(room.roomInfo.attributes) && room.roomInfo.attributes.length > 0 ? (
                                             <div className="attributes">
                                                 {room.roomInfo.attributes.slice(0, 4).map((attr, index) => {
-                                                    console.log(`Processing recommended room attribute: "${attr}"`);
                                                     
                                                     // Safely check for icons - don't let icon failures prevent attribute display
                                                     let iconSrc = null;
@@ -1022,12 +1039,6 @@ function Where({ formData, setFormData, onComplete }){
                      const roomNumber = getRoomNumber(room.name);
                      const roomNameWithoutNumber = getRoomNameWithoutNumber(room.name);
 
-                     console.log('List room attributes check:', {
-                         roomName: room.name,
-                         attributes: room.roomInfo.attributes,
-                         attributesType: typeof room.roomInfo.attributes,
-                         attributesLength: room.roomInfo.attributes?.length
-                     });
                      
                      return (
                          <div 
@@ -1061,7 +1072,6 @@ function Where({ formData, setFormData, onComplete }){
                                  {room.roomInfo.attributes && Array.isArray(room.roomInfo.attributes) && room.roomInfo.attributes.length > 0 ? (
                                      <div className="attributes">
                                          {room.roomInfo.attributes.map((attr, index) => {
-                                            console.log(`Processing list room attribute: "${attr}"`);
                                             
                                             // Safely check for icons - don't let icon failures prevent attribute display
                                             let iconSrc = null;

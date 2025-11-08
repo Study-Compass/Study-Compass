@@ -17,7 +17,7 @@ const WeeklyCalendar = ({
   singleSelectionOnly = false,
   autoEnableSelection = false,
   selectionMode = "single",
-  showAvailability = true,
+  showAvailability = false,
   startHour = 0,
   endHour = 24,
   // New props for external selection control/sync
@@ -217,18 +217,38 @@ const WeeklyCalendar = ({
   }, [initialSelections]);
 
   // Emit selections upward whenever they change
+  const onSelectionsChangeRef = useRef(onSelectionsChange);
+  const prevSelectionsRef = useRef(null);
+  
+  // Keep ref up to date
   useEffect(() => {
-    if (!onSelectionsChange) return;
-    const exported = selections.map((sel) => ({
+    onSelectionsChangeRef.current = onSelectionsChange;
+  }, [onSelectionsChange]);
+  
+  useEffect(() => {
+    if (!onSelectionsChangeRef.current) return;
+    
+    // Create a key to compare if selections actually changed
+    const selectionsKey = JSON.stringify(selections.map(sel => ({
       id: sel.id,
       startTime: sel.startTime,
-      endTime: sel.endTime,
-      startDay: sel.startDay,
-      endDay: sel.endDay,
-      duration: sel.endMinutes - sel.startMinutes,
-    }));
-    onSelectionsChange(exported);
-  }, [selections, onSelectionsChange]);
+      endTime: sel.endTime
+    })));
+    
+    // Only emit if selections actually changed
+    if (prevSelectionsRef.current !== selectionsKey) {
+      prevSelectionsRef.current = selectionsKey;
+      const exported = selections.map((sel) => ({
+        id: sel.id,
+        startTime: sel.startTime,
+        endTime: sel.endTime,
+        startDay: sel.startDay,
+        endDay: sel.endDay,
+        duration: sel.endMinutes - sel.startMinutes,
+      }));
+      onSelectionsChangeRef.current(exported);
+    }
+  }, [selections]);
 
   const processEvents = (dayEvents) => {
     // Sort events by start time
@@ -1011,6 +1031,8 @@ const WeeklyCalendar = ({
             events={events}
             timeIncrement={timeIncrement}
             showAvailability={showAvailability}
+            visibleStartMinutes={visibleStartMinutes}
+            visibleEndMinutes={visibleEndMinutes}
           />
 
           {days.map((day, index) => (

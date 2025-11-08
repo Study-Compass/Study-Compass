@@ -1,19 +1,20 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import FlowComponentV2 from '../../components/FlowComponentV2/FlowComponentV2';
+import DynamicStep from '../../components/DynamicStep/DynamicStep';
+import { useFetch } from '../../hooks/useFetch';
 
 import { useNotification } from '../../NotificationContext';
 import useAuth from '../../hooks/useAuth';
 
 import defaultAvatar from '../../assets/defaultAvatar.svg';
 
-// Step components
+// Step components (kept for backward compatibility)
 import GenInfo from './Steps/GenInfo/GenInfo';
 import Where from './Steps/Where/Where';
 import When from './Steps/When/When';
 import Review from './Steps/Review/Review';
-// ERROR: all steps need refactor with new layout ^
 
 const CreateEventV2 = () => {
     // general vars:
@@ -62,29 +63,37 @@ const CreateEventV2 = () => {
     // }, [isAuthenticating, isAuthenticated, user]);
 
     const {addNotification} = useNotification();
+    const formConfigData = useFetch('/api/event-system-config/form-config');
     
-    // confirm valid:
+    // Initialize form data with defaults from config
     const [formData, setFormData] = useState({
             name: '',
             type: '',
-            hostingId: null, //check
-            hostingType: '',
+            hostingId: user?._id || null,
+            hostingType: user ? 'User' : '',
             going: [],
-            location: "", //this feels bad to store as a string, any object format we could swap to?
-            start_time: new Date(), // check formating
-            end_time: new Date(), // check
+            location: "",
+            start_time: null,
+            end_time: null,
             description: '',
-            image: '',
-            classroom_id: null, //check
+            image: null,
+            classroom_id: null,
             visibility: '',
-            expectedAttendance: 0, //check
-            approvalReference: null, // check
+            expectedAttendance: 0,
+            approvalReference: null,
             status: '',
             contact: '',
-            isDeleted: false
+            isDeleted: false,
+            selectedRoomIds: [],
+            // RSVP fields
+            rsvpEnabled: false,
+            rsvpRequired: false,
+            rsvpDeadline: null,
+            maxAttendees: null
     });
 
-    const steps = [
+    // Default steps as fallback - always available
+    const defaultSteps = [
         {
             id: 0,
             title: 'Basic Information',
@@ -111,54 +120,122 @@ const CreateEventV2 = () => {
         }
     ];
 
+    // Build steps from form configuration
+    const steps = useMemo(() => {
+        // If config is not available yet, return default steps immediately
+        if (!formConfigData.data?.data) {
+            return defaultSteps;
+        }
+
+        const config = formConfigData.data.data;
+        
+        // If no steps in config, return default
+        if (!config.steps || config.steps.length === 0) {
+            return defaultSteps;
+        }
+
+        const activeSteps = config.steps
+            .filter(step => step.isActive)
+            .sort((a, b) => a.order - b.order);
+
+        // If no active steps, return default
+        if (activeSteps.length === 0) {
+            return defaultSteps;
+        }
+
+        return activeSteps.map((step, index) => ({
+            id: index,
+            title: step.title,
+            description: step.description || '',
+            component: (props) => (
+                <DynamicStep
+                    step={step}
+                    formConfig={config}
+                    {...props}
+                />
+            ),
+            stepId: step.id // Store original step ID for reference
+        }));
+    }, [formConfigData.data]);
+
+    // Initialize form data with default values from config
+    useEffect(() => {
+        if (formConfigData.data?.data) {
+            const config = formConfigData.data.data;
+            const defaultValues = {};
+            
+            config.fields.forEach(field => {
+                if (field.validation?.defaultValue !== undefined && field.validation?.defaultValue !== null) {
+                    defaultValues[field.name] = field.validation.defaultValue;
+                }
+            });
+
+            setFormData(prev => ({
+                ...prev,
+                ...defaultValues
+            }));
+        }
+    }, [formConfigData.data]);
+
     const handleSubmit = async (formData) => {
             // Handle create mode (existing logic)
             const submitData = new FormData();
 
-            // CHECK
+            // Prepare data - include all fields from form config
             const data = {
                 name: formData.name,
                 type: formData.type,
-                hostingId: formData.hostingId,
-                hostingType: formData.hostingType,
-                going: formData.going,
+                hostingId: formData.hostingId || user?._id,
+                hostingType: formData.hostingType || (user ? 'User' : ''),
+                going: formData.going || [],
                 location: formData.location,
                 start_time: formData.start_time,
                 end_time: formData.end_time,
                 description: formData.description,
-                // image: formData.image, CHECK (see below)
-                classroom_id: formData.classroom_id,
+                classroom_id: formData.classroom_id || formData.classroomId,
                 visibility: formData.visibility,
                 expectedAttendance: formData.expectedAttendance,
-                // approvalReference: CHECK: assuming i don't pass this here?
-                // status: CHECK
                 contact: formData.contact,
-                // isDeleted CHECK
-            }
+                // RSVP fields
+                rsvpEnabled: formData.rsvpEnabled || false,
+                rsvpRequired: formData.rsvpRequired || false,
+                rsvpDeadline: formData.rsvpDeadline || null,
+                maxAttendees: formData.maxAttendees || null
+            };
 
-            if(formData.image) {
+            // Append all data fields to FormData
+            Object.keys(data).forEach(key => {
+                if (data[key] !== null && data[key] !== undefined) {
+                    if (data[key] instanceof Date) {
+                        submitData.append(key, data[key].toISOString());
+                    } else {
+                        submitData.append(key, data[key]);
+                    }
+                }
+            });
+
+            // Handle image separately
+            if (formData.image) {
                 submitData.append('image', formData.image);
             }
 
-            // check
-            const response = await axios.post("/create-event", submitData, {
+            const response = await axios.post("/api/events/create-event", submitData, {
                 headers: { 
-                    Authorization: `Bearer ${localStorage.getItem("token")}` 
+                    Authorization: `Bearer ${localStorage.getItem("token")}`,
+                    'Content-Type': 'multipart/form-data'
                 },
             });
             
             if (response.data.success) {
-                // is there any local storage for these that should be removed here?
                 addNotification({
                     title: 'Event Created',
-                    message: `Your event has been created successfully, you'll be contacted shortly apon it's approval!`,
+                    message: `Your event has been created successfully, you'll be contacted shortly upon it's approval!`,
                     type: 'success'
                 });
                 
-                navigate(`/`);
-                // idk if there is anywhere i should be routing to here, will there be an instant event page?
+                navigate(`/events-dashboard`);
             } else {
-                throw new Error(response.data.error || 'Failed to create event');
+                throw new Error(response.data.message || 'Failed to create event');
             }
         
     };
@@ -170,6 +247,112 @@ const CreateEventV2 = () => {
             type: 'error'
         });
     };
+
+    // Function to get missing required fields
+    const getMissingFields = useMemo(() => {
+        return (formData, formConfig) => {
+            const missingFields = [];
+            
+            // Check special steps first (location and date-time)
+            if (formConfig?.steps) {
+                formConfig.steps.forEach(step => {
+                    if (!step.isActive) return;
+                    
+                    // Check location step
+                    if (step.id === 'location') {
+                        if (!formData.selectedRoomIds || (Array.isArray(formData.selectedRoomIds) && formData.selectedRoomIds.length === 0)) {
+                            missingFields.push({
+                                fieldName: 'selectedRoomIds',
+                                label: 'Room Selection',
+                                step: step.id,
+                                stepTitle: step.title || 'Location'
+                            });
+                        }
+                    }
+                    
+                    // Check date-time step
+                    if (step.id === 'date-time') {
+                        if (!formData.start_time) {
+                            missingFields.push({
+                                fieldName: 'start_time',
+                                label: 'Start Time',
+                                step: step.id,
+                                stepTitle: step.title || 'Date & Time'
+                            });
+                        }
+                        if (!formData.end_time) {
+                            missingFields.push({
+                                fieldName: 'end_time',
+                                label: 'End Time',
+                                step: step.id,
+                                stepTitle: step.title || 'Date & Time'
+                            });
+                        }
+                    }
+                });
+            }
+            
+            // Check regular form fields
+            if (formConfig?.fields) {
+                formConfig.fields.forEach(field => {
+                    if (!field.isActive) return;
+                    
+                    // Skip fields that belong to special steps (already checked above)
+                    if (field.step === 'location' || field.step === 'date-time') return;
+                    
+                    const isRequired = field.isRequired || field.validation?.required;
+                    if (!isRequired) return;
+                    
+                    const value = formData[field.name];
+                    let isMissing = false;
+                    
+                    // Special handling for different field types
+                    if (field.name === 'selectedRoomIds') {
+                        isMissing = !value || (Array.isArray(value) && value.length === 0);
+                    } else if (field.name === 'start_time' || field.name === 'end_time') {
+                        isMissing = !value;
+                    } else if (typeof value === 'string') {
+                        isMissing = !value.trim();
+                    } else if (typeof value === 'number') {
+                        isMissing = value === undefined || value === null || value <= 0;
+                    } else {
+                        isMissing = value === undefined || value === null || value === '';
+                    }
+                    
+                    if (isMissing) {
+                        missingFields.push({
+                            fieldName: field.name,
+                            label: field.label,
+                            step: field.step,
+                            stepTitle: formConfig.steps?.find(s => s.id === field.step)?.title || 'Unknown Step'
+                        });
+                    }
+                });
+            }
+            
+            return missingFields;
+        };
+    }, []);
+
+    // Get formConfig for validation
+    const formConfig = formConfigData.data?.data;
+
+    // Steps should always be available (defaultSteps), but show loading if config is still loading
+    // This ensures FlowComponentV2 never receives empty steps
+    if (formConfigData.loading && !formConfigData.data) {
+        return (
+            <div style={{ 
+                display: 'flex', 
+                justifyContent: 'center', 
+                alignItems: 'center', 
+                height: '100vh',
+                flexDirection: 'column',
+                gap: '1rem'
+            }}>
+                <div>Loading form configuration...</div>
+            </div>
+        );
+    }
 
     return (
         <FlowComponentV2
@@ -183,6 +366,8 @@ const CreateEventV2 = () => {
             submitButtonText={"Publish"}
             submittingButtonText={"Creating..."}
             className="create-line-v2"
+            formConfig={formConfig}
+            getMissingFields={getMissingFields}
         />
     );
 };

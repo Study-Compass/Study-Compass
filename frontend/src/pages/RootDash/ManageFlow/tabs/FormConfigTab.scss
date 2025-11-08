@@ -1,0 +1,445 @@
+.form-config-tab {
+    padding: 2rem;
+    
+    .form-config-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        
+        h2 {
+            margin: 0;
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .save-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            background: #6D8EFA;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            
+            &:hover:not(:disabled) {
+                background: #5a7ae8;
+            }
+            
+            &:disabled {
+                opacity: 0.6;
+                cursor: not-allowed;
+            }
+        }
+    }
+    
+    .form-config-content {
+        display: grid;
+        grid-template-columns: 300px 1fr;
+        gap: 2rem;
+        height: calc(100vh - 200px);
+        
+        .steps-sidebar {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            overflow-y: auto;
+            
+            .steps-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 1.5rem;
+                
+                h3 {
+                    margin: 0;
+                }
+                
+                .add-step-btn {
+                    display: flex;
+                    align-items: center;
+                    gap: 0.5rem;
+                    padding: 0.5rem 1rem;
+                    background: #6D8EFA;
+                    color: white;
+                    border: none;
+                    border-radius: 6px;
+                    cursor: pointer;
+                    font-size: 0.875rem;
+                    
+                    &:hover {
+                        background: #5a7ae8;
+                    }
+                }
+            }
+            
+            .steps-list {
+                display: flex;
+                flex-direction: column;
+                gap: 0.75rem;
+                
+                .step-item {
+                    padding: 1rem;
+                    border: 2px solid #e0e0e0;
+                    border-radius: 8px;
+                    cursor: pointer;
+                    transition: all 0.2s;
+                    
+                    &.active {
+                        border-color: #6D8EFA;
+                        background: #f0f4ff;
+                    }
+                    
+                    &.inactive {
+                        opacity: 0.6;
+                    }
+                    
+                    &:hover {
+                        border-color: #6D8EFA;
+                    }
+                    
+                    .step-info {
+                        h4 {
+                            margin: 0 0 0.25rem 0;
+                            font-size: 1rem;
+                        }
+                        
+                        p {
+                            margin: 0 0 0.5rem 0;
+                            font-size: 0.875rem;
+                            color: #666;
+                        }
+                        
+                        .field-count {
+                            font-size: 0.75rem;
+                            color: #999;
+                        }
+                    }
+                    
+                    .step-actions {
+                        margin-top: 0.5rem;
+                        
+                        .delete-step-btn {
+                            padding: 0.25rem 0.5rem;
+                            background: #ff4444;
+                            color: white;
+                            border: none;
+                            border-radius: 4px;
+                            cursor: pointer;
+                            
+                            &:hover {
+                                background: #cc0000;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        .fields-panel {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            overflow-y: auto;
+            
+            .step-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: flex-start;
+                margin-bottom: 2rem;
+                padding-bottom: 1rem;
+                border-bottom: 2px solid #e0e0e0;
+                
+                h3 {
+                    margin: 0 0 0.5rem 0;
+                }
+                
+                p {
+                    margin: 0;
+                    color: #666;
+                }
+                
+                .add-field-btn {
+                    display: flex;
+                    align-items: center;
+                    gap: 0.5rem;
+                    padding: 0.75rem 1.5rem;
+                    background: #6D8EFA;
+                    color: white;
+                    border: none;
+                    border-radius: 8px;
+                    cursor: pointer;
+                    
+                    &:hover {
+                        background: #5a7ae8;
+                    }
+                }
+            }
+            
+            .fields-list {
+                display: flex;
+                flex-direction: column;
+                gap: 1rem;
+                margin-bottom: 2rem;
+                
+                .field-item {
+                    border: 1px solid #e0e0e0;
+                    border-radius: 8px;
+                    padding: 1rem;
+                    
+                    &.locked {
+                        background: #f9f9f9;
+                        border-color: #ffa500;
+                    }
+                    
+                    &.inactive {
+                        opacity: 0.6;
+                    }
+                    
+                    .field-header {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: flex-start;
+                        
+                        .field-info {
+                            flex: 1;
+                            
+                            h4 {
+                                margin: 0 0 0.25rem 0;
+                                display: flex;
+                                align-items: center;
+                                gap: 0.5rem;
+                                
+                                .lock-icon {
+                                    color: #ffa500;
+                                }
+                                
+                                .required-badge {
+                                    font-size: 0.75rem;
+                                    padding: 0.25rem 0.5rem;
+                                    background: #ff4444;
+                                    color: white;
+                                    border-radius: 4px;
+                                    margin-left: 0.5rem;
+                                }
+                            }
+                            
+                            .field-name {
+                                margin: 0;
+                                font-size: 0.875rem;
+                                color: #999;
+                            }
+                        }
+                        
+                        .field-actions {
+                            display: flex;
+                            gap: 0.5rem;
+                            
+                            button {
+                                padding: 0.5rem;
+                                border: none;
+                                border-radius: 4px;
+                                cursor: pointer;
+                                background: #f0f0f0;
+                                
+                                &:hover {
+                                    background: #e0e0e0;
+                                }
+                            }
+                            
+                            .remove-field-btn {
+                                background: #ffebee;
+                                color: #c62828;
+                                
+                                &:hover {
+                                    background: #ffcdd2;
+                                }
+                            }
+                        }
+                    }
+                    
+                    .field-editor {
+                        margin-top: 1rem;
+                        padding-top: 1rem;
+                        border-top: 1px solid #e0e0e0;
+                        
+                        .form-group {
+                            margin-bottom: 1rem;
+                            
+                            label {
+                                display: block;
+                                margin-bottom: 0.5rem;
+                                font-weight: 500;
+                            }
+                            
+                            input, textarea, select {
+                                width: 100%;
+                                padding: 0.75rem;
+                                border: 1px solid #e0e0e0;
+                                border-radius: 6px;
+                                font-size: 0.875rem;
+                            }
+                            
+                            textarea {
+                                min-height: 80px;
+                                resize: vertical;
+                            }
+                        }
+                        
+                        .field-editor-actions {
+                            display: flex;
+                            gap: 1rem;
+                            margin-top: 1rem;
+                            
+                            button {
+                                padding: 0.75rem 1.5rem;
+                                border: none;
+                                border-radius: 6px;
+                                cursor: pointer;
+                                font-weight: 500;
+                                
+                                &.delete-btn {
+                                    background: #ff4444;
+                                    color: white;
+                                    
+                                    &:hover {
+                                        background: #cc0000;
+                                    }
+                                }
+                                
+                                &:first-child {
+                                    background: #6D8EFA;
+                                    color: white;
+                                    
+                                    &:hover {
+                                        background: #5a7ae8;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            
+            .available-fields {
+                padding-top: 2rem;
+                border-top: 2px solid #e0e0e0;
+                
+                h4 {
+                    margin-bottom: 1rem;
+                }
+                
+                .available-fields-list {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 0.5rem;
+                    
+                    .available-field-item {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        padding: 0.75rem;
+                        border: 1px dashed #e0e0e0;
+                        border-radius: 6px;
+                        cursor: pointer;
+                        
+                        &:hover {
+                            border-color: #6D8EFA;
+                            background: #f0f4ff;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            
+            h3 {
+                margin: 0 0 1.5rem 0;
+            }
+            
+            .form-group {
+                margin-bottom: 1rem;
+                
+                label {
+                    display: block;
+                    margin-bottom: 0.5rem;
+                    font-weight: 500;
+                }
+                
+                input, textarea, select {
+                    width: 100%;
+                    padding: 0.75rem;
+                    border: 1px solid #e0e0e0;
+                    border-radius: 6px;
+                    font-size: 0.875rem;
+                }
+            }
+            
+            .modal-actions {
+                display: flex;
+                gap: 1rem;
+                margin-top: 1.5rem;
+                
+                button {
+                    flex: 1;
+                    padding: 0.75rem;
+                    border: none;
+                    border-radius: 6px;
+                    cursor: pointer;
+                    font-weight: 500;
+                    
+                    &:first-child {
+                        background: #6D8EFA;
+                        color: white;
+                        
+                        &:hover {
+                            background: #5a7ae8;
+                        }
+                    }
+                    
+                    &:last-child {
+                        background: #e0e0e0;
+                        
+                        &:hover {
+                            background: #d0d0d0;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    .form-config-loading {
+        text-align: center;
+        padding: 4rem;
+        color: #666;
+    }
+}
+

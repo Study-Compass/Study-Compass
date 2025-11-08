@@ -13,13 +13,9 @@ import EventsAnalytics from '../../../components/EventsAnalytics/EventsAnalytics
 const Beacon = () => {
     const navigate = useNavigate();
     const menuItems = [
+
         {
             label: 'Home',
-            icon: 'material-symbols:home-outline',
-            element: <Home />
-        },
-        {
-            label: 'Manage Flow',
             icon: 'fluent:flow-16-filled',
             element: <ManageFlow />
         },

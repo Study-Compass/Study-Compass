@@ -13,7 +13,9 @@ const AvailabilityOverlay = ({
     days, 
     events, 
     timeIncrement = 15,
-    showAvailability = true 
+    showAvailability = true,
+    visibleStartMinutes = 0,
+    visibleEndMinutes = 1440
 }) => {
     const MINUTE_HEIGHT = 1; // 1px per minute
 
@@ -25,15 +27,20 @@ const AvailabilityOverlay = ({
         if (!showAvailability || !days || days.length === 0) return [];
 
         const availabilityGrid = [];
-        const totalMinutes = 24 * 60; // 1440 minutes in a day
-        const slotsPerDay = Math.floor(totalMinutes / timeIncrement);
+        // Only calculate slots for the visible time range
+        const visibleRangeMinutes = visibleEndMinutes - visibleStartMinutes;
+        const slotsPerDay = Math.ceil(visibleRangeMinutes / timeIncrement);
 
         days.forEach((day, dayIndex) => {
             const dayAvailability = [];
             
+            // Start from visibleStartMinutes, not midnight
             for (let slotIndex = 0; slotIndex < slotsPerDay; slotIndex++) {
-                const slotStartMinutes = slotIndex * timeIncrement;
-                const slotEndMinutes = slotStartMinutes + timeIncrement;
+                const slotStartMinutes = visibleStartMinutes + (slotIndex * timeIncrement);
+                const slotEndMinutes = Math.min(slotStartMinutes + timeIncrement, visibleEndMinutes);
+                
+                // Skip if slot is outside visible range
+                if (slotStartMinutes >= visibleEndMinutes) break;
                 
                 // Create time objects for this slot
                 const slotStart = new Date(day);
@@ -46,8 +53,28 @@ const AvailabilityOverlay = ({
                 slotEnd.setMinutes(slotEndMinutes % 60);
                 slotEnd.setSeconds(0);
                 
-                // Check for conflicts with existing events
+                // Check for conflicts with existing events (exclude user selections)
                 const hasConflict = events.some(event => {
+                    // Skip user selections - they're temporary and shouldn't show as conflicts
+                    if (event.isUserSelection) return false;
+                    
+                    const eventStart = new Date(event.start_time);
+                    const eventEnd = new Date(event.end_time);
+                    
+                    // Same day check
+                    if (eventStart.toDateString() !== day.toDateString()) {
+                        return false;
+                    }
+                    
+                    // Time overlap check
+                    return !(eventEnd <= slotStart || slotEnd <= eventStart);
+                });
+                
+                // Check for blocked events (room unavailable times)
+                const isBlocked = events.some(event => {
+                    // Only check blocked events
+                    if (event.type !== 'blocked' && event.status !== 'blocked') return false;
+                    
                     const eventStart = new Date(event.start_time);
                     const eventEnd = new Date(event.end_time);
                     
@@ -62,12 +89,11 @@ const AvailabilityOverlay = ({
                 
                 // Determine availability state
                 let availabilityState = 'available';
-                if (hasConflict) {
+                if (isBlocked) {
+                    availabilityState = 'blocked';
+                } else if (hasConflict) {
                     availabilityState = 'conflict';
                 }
-                
-                // Future enhancement: Add 'blocked' state for business rules
-                // (e.g., outside business hours, holidays, etc.)
                 
                 dayAvailability.push({
                     dayIndex,
@@ -84,7 +110,7 @@ const AvailabilityOverlay = ({
         });
 
         return availabilityGrid;
-    }, [days, events, timeIncrement, showAvailability]);
+    }, [days, events, timeIncrement, showAvailability, visibleStartMinutes, visibleEndMinutes]);
 
     /**
      * Render availability indicators for a single day
@@ -94,8 +120,9 @@ const AvailabilityOverlay = ({
             // Skip rendering for available slots to reduce DOM overhead
             if (slot.state === 'available') return null;
             
-            const top = slot.startMinutes * MINUTE_HEIGHT;
-            const height = timeIncrement * MINUTE_HEIGHT;
+            // Position relative to visible start, not absolute from midnight
+            const top = (slot.startMinutes - visibleStartMinutes) * MINUTE_HEIGHT;
+            const height = (slot.endMinutes - slot.startMinutes) * MINUTE_HEIGHT;
             
             return (
                 <div
