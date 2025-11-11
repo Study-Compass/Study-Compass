@@ -98,12 +98,12 @@ const ClubForms = ({ org }) => {
         try {
             setResponsesLoading(true);
             // Use axios directly since useFetch is a hook and can't be called conditionally
-            const responsesResponse = await axios.get(`/form/${form._id}/responses`, {
-                withCredentials: true
+            const responsesResponse = await apiRequest(`/form/${form._id}/responses`, null, {
+                method: 'GET'
             });
 
-            if (responsesResponse.data.success) {
-                setCurrentFormResponses(responsesResponse.data.responses);
+            if (responsesResponse.success) {
+                setCurrentFormResponses(responsesResponse.responses);
                 setCurrentForm(form);
                 setSelectedResponseIndex(0);
                 setShowResponsesViewer(true);

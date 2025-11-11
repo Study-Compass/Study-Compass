@@ -24,16 +24,29 @@ const FormViewer = ({ form, onSubmit, handleClose}) => {
       alert(`Please answer the following required questions: ${missingRequired.map(q => q.question).join(', ')}`);
       return;
     }
+    // Create response in the format expected by the backend
+    const response = Object.keys(responses).map(key => {
+      const question = form.questions.find(q => q._id === key || q._id?.toString() === key);
+      if (!question) {
+        console.warn(`Question not found for key: ${key}`);
+        return null;
+      }
+      return {
+        question: question.question,
+        referenceId: question._id?.toString() || key,
+        type: question.type,
+        answer: responses[key]
+      };
+    }).filter(r => r !== null); // Remove any null entries
+    
+    if (response.length === 0) {
+      alert('No valid responses found. Please try again.');
+      return;
+    }
+    
     if(handleClose) {
       handleClose();
     }
-    // Create response in the format expected by the backend
-    const response = Object.keys(responses).map(key => ({
-      question: form.questions.find(q => q._id === key).question,
-      referenceId: key,
-      type: form.questions.find(q => q._id === key).type,
-      answer: responses[key]
-    }));
     onSubmit(response);
   };
 

@@ -1,36 +1,93 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import './Form.scss';
-import Header from '../../components/Header/Header';
 import FormViewer from '../../components/FormViewer/FormViewer';
-import useAuth from '../../hooks/useAuth';
-import { useNavigate } from 'react-router-dom';
 import { useParams } from 'react-router-dom';
 import { useFetch } from '../../hooks/useFetch';
+import apiRequest from '../../utils/postRequest';
 
 function Form() {
-    const { user } = useAuth();
-    const navigate = useNavigate();
     const { id } = useParams();
+    const [submitStatus, setSubmitStatus] = useState(null); // 'success', 'error', or null
+    const [isSubmitted, setIsSubmitted] = useState(false);
 
     const { data: formData, loading: formLoading, error: formError } = useFetch(`/get-form-by-id/${id}`);
 
+    const handleFormSubmit = async (responses) => {
+        try {
+            setSubmitStatus(null);
+            console.log('Submitting form:', { formId: id, responsesCount: responses.length, responses });
+            
+            const response = await apiRequest('/submit-form-response', {
+                formId: id,
+                responses: responses
+            });
+
+            console.log('Submission response:', response);
+
+            if (response.success) {
+                setSubmitStatus('success');
+                setIsSubmitted(true);
+            } else {
+                setSubmitStatus('error');
+                const errorMessage = response.message || response.error || 'Unknown error occurred';
+                console.error('Form submission failed:', errorMessage);
+                alert(`Form submission failed: ${errorMessage}`);
+            }
+        } catch (error) {
+            setSubmitStatus('error');
+            console.error('Error submitting form:', error);
+            const errorMessage = error.response?.data?.message || error.message || 'Unknown error occurred';
+            alert(`Error submitting form: ${errorMessage}`);
+        }
+    };
 
     if (!formData || formLoading){
-        return <div></div>;
+        return (
+            <div className="form-page">
+                    <div className="loading-container">
+                    <p>Loading form...</p>
+                </div>
+            </div>
+        );
+    }
+
+    if (formError) {
+        return (
+            <div className="form-page">
+                <div className="error-container">
+                    <p>Error loading form: {formError.message || 'Unknown error'}</p>
+                </div>
+            </div>
+        );
     }
 
     return (
-        <div>
-            <FormViewer form={formData.form} />
+        <div className="form-page">
+            {submitStatus === 'success' && (
+                <div className="submit-success">
+                    <p>✓ Form submitted successfully!</p>
+                </div>
+            )}
+            {submitStatus === 'error' && (
+                <div className="submit-error">
+                    <p>✗ Error submitting form. Please try again.</p>
+                </div>
+            )}
+            {!isSubmitted ? (
+                <FormViewer 
+                    form={formData.form} 
+                    onSubmit={handleFormSubmit}
+                />
+            ) : (
+                <div className="form-submitted">
+                    <h2>Thank you for your submission!</h2>
+                    <p>Your form has been submitted successfully.</p>
+                </div>
+            )}
         </div>
-
-
     );
 
 
 }
 
 export default Form;
-//make page 
-// implement submission
-// and seeing the responses on the admin side

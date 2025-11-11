@@ -27,9 +27,16 @@ router.post("/submit-form-response", verifyToken, async (req, res) => {
     try {
         const { formId, responses } = req.body;
         const { Form, FormResponse } = getModels(req, "Form", "FormResponse");
+        const userId = req.user?.userId;
+
+        console.log("Form submission request:", { formId, responsesCount: responses?.length, userId });
 
         if (!formId || !responses) {
             return res.status(400).json({ success: false, message: "Missing formId or responses" });
+        }
+
+        if (!userId) {
+            return res.status(401).json({ success: false, message: "User not authenticated" });
         }
 
         // Make sure the form exists
@@ -38,29 +45,49 @@ router.post("/submit-form-response", verifyToken, async (req, res) => {
             return res.status(404).json({ success: false, message: "Form not found" });
         }
 
+        console.log("Form found:", form.title, "Questions:", form.questions.length);
+
         // Convert responses array to answers array in the same order as questions
         // responses format: [{ referenceId, answer, question, type }, ...]
         // answers format: [answer1, answer2, ...] in order of questions
-        const answers = form.questions.map(question => {
-            const response = responses.find(r => r.referenceId === question._id.toString());
+        const answers = form.questions.map((question, index) => {
+            const response = responses.find(r => {
+                // Try to match by referenceId (string comparison)
+                const questionIdStr = question._id.toString();
+                const responseIdStr = r.referenceId?.toString();
+                return questionIdStr === responseIdStr;
+            });
+            if (!response) {
+                console.log(`No response found for question ${index + 1}: ${question.question}`);
+            }
             return response ? response.answer : null;
         });
+
+        console.log("Converted answers:", answers.length, "answers");
 
         // Save a new FormResponse using the schema correctly
         const formResponse = new FormResponse({
             formSnapshot: form.toObject(),
             form: formId,
-            submittedBy: req.user?.id,
+            submittedBy: userId,
             answers: answers,
             submittedAt: new Date()
         });
 
         await formResponse.save();
 
+        console.log("Form response saved successfully:", formResponse._id);
+
         res.status(201).json({ success: true, message: "Form response submitted", formResponse });
     } catch (error) {
         console.error("Error submitting form response:", error);
-        res.status(500).json({ success: false, message: "Internal server error", error: error.message });
+        console.error("Error stack:", error.stack);
+        res.status(500).json({ 
+            success: false, 
+            message: "Internal server error", 
+            error: error.message,
+            stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+        });
     }
 });
 
@@ -70,7 +97,7 @@ router.get("/form/:formId/responses", verifyToken, async (req, res) => {
     try {
         const { Form, FormResponse, OrgMember } = getModels(req, "Form", "FormResponse", "OrgMember");
         const formId = req.params.formId;
-        const userId = req.user?.id;
+        const userId = req.user?.userId;
 
         // Fetch form to ensure it exists and get org
         const form = await Form.findById(formId).lean();
@@ -85,8 +112,9 @@ router.get("/form/:formId/responses", verifyToken, async (req, res) => {
             const orgMember = await OrgMember.findOne({
                 org_id: orgId,
                 user_id: userId,
-                role: { $in: ['owner', 'admin'] }
             });
+
+            console.log("orgMember", orgMember);
 
             if (!orgMember) {
                 return res.status(403).json({ 
