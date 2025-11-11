@@ -126,6 +126,7 @@
     position: relative;
     display: flex;
     align-items: center;
+    border-bottom: 1px solid var(--border);
   }
 
   // Tabs container
@@ -133,17 +134,17 @@
     display: flex;
     align-items: center;
     background: transparent;
-    border-bottom: 1px solid var(--border);
+    border-bottom: none;
     position: relative;
     z-index: 1;
 
     // Position variants
     &--top {
-      border-bottom: 1px solid var(--border);
+      //border-bottom: 1px solid var(--border);
     }
 
     &--bottom {
-      border-top: 1px solid var(--border);
+      //border-top: 1px solid var(--border);
       border-bottom: none;
     }
 
@@ -458,7 +459,7 @@
         flex-direction: row;
         border-right: none;
         border-left: none;
-        border-bottom: 1px solid var(--tabbed-border-color, #e5e7eb);
+       // border-bottom: 1px solid var(--tabbed-border-color, #e5e7eb);
       }
       
       .tabbed-container__body {
