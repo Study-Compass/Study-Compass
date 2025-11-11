@@ -240,5 +240,147 @@
         }
     }
 
-  
+    // Responses Viewer Container Styles
+    .responses-viewer-container {
+        width: 100%;
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 20px;
+        background: #f8f9fa;
+        border-radius: 12px;
+
+        .responses-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            flex-wrap: wrap;
+            gap: 15px;
+
+            .response-navigation {
+                display: flex;
+                align-items: center;
+                gap: 15px;
+
+                .nav-btn {
+                    width: 40px;
+                    height: 40px;
+                    border: 2px solid var(--primary, #007bff);
+                    background: white;
+                    color: var(--primary, #007bff);
+                    border-radius: 50%;
+                    cursor: pointer;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    transition: all 0.3s ease;
+                    font-size: 20px;
+
+                    &:hover:not(:disabled) {
+                        background: var(--primary, #007bff);
+                        color: white;
+                        transform: scale(1.1);
+                        box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
+                    }
+
+                    &:disabled {
+                        opacity: 0.4;
+                        cursor: not-allowed;
+                        border-color: #ccc;
+                        color: #ccc;
+                    }
+
+                    iconify-icon {
+                        font-size: 24px;
+                    }
+                }
+
+                .response-counter {
+                    font-size: 1rem;
+                    font-weight: 600;
+                    color: var(--text-primary, #333);
+                    padding: 8px 16px;
+                    background: var(--light, #f5f5f5);
+                    border-radius: 20px;
+                    min-width: 100px;
+                    text-align: center;
+                }
+            }
+
+            .response-meta-info {
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
+                align-items: flex-end;
+
+                .submitted-by {
+                    font-size: 0.95rem;
+                    color: var(--text-secondary, #666);
+                    font-weight: 500;
+                }
+
+                .submitted-date {
+                    font-size: 0.85rem;
+                    color: var(--text-secondary, #888);
+                    font-style: italic;
+                }
+            }
+        }
+
+        .no-responses {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-secondary, #666);
+
+            p {
+                font-size: 1.1rem;
+                margin: 0;
+            }
+        }
+
+        // Enhanced form response viewer within the container
+        .form-response-viewer {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            margin-top: 0;
+        }
+    }
+}
+
+// Responsive design for responses viewer
+@media (max-width: 768px) {
+    .club-forms {
+        .responses-viewer-container {
+            padding: 15px;
+
+            .responses-header {
+                flex-direction: column;
+                align-items: stretch;
+                padding: 15px;
+
+                .response-navigation {
+                    justify-content: center;
+                    width: 100%;
+                }
+
+                .response-meta-info {
+                    align-items: center;
+                    width: 100%;
+                    margin-top: 10px;
+                    padding-top: 15px;
+                    border-top: 1px solid #e0e0e0;
+                }
+            }
+
+            .form-response-viewer {
+                padding: 20px 15px;
+            }
+        }
+    }
 }
