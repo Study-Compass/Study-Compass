@@ -319,7 +319,7 @@
 
                 .submitted-by {
                     font-size: 0.95rem;
-                    color: var(--text-secondary, #666);
+                    color: var(--text-secondary, var(--text));
                     font-weight: 500;
                 }
 

@@ -103,7 +103,7 @@ const ClubForms = ({ org }) => {
             });
 
             if (responsesResponse.success) {
-                setCurrentFormResponses(responsesResponse.responses);
+                setCurrentFormResponses(responsesResponse.data.responses);
                 setCurrentForm(form);
                 setSelectedResponseIndex(0);
                 setShowResponsesViewer(true);
@@ -221,6 +221,8 @@ const ClubForms = ({ org }) => {
                                     <Icon icon="mdi:chevron-right" />
                                 </button>
                             </div>
+                        </div>
+                        <FormResponseViewer formResponse={currentFormResponses[selectedResponseIndex]} />
                             <div className="response-meta-info">
                                 {currentFormResponses[selectedResponseIndex].submittedBy && (
                                     <span className="submitted-by">
@@ -231,8 +233,6 @@ const ClubForms = ({ org }) => {
                                     {new Date(currentFormResponses[selectedResponseIndex].submittedAt).toLocaleString()}
                                 </span>
                             </div>
-                        </div>
-                        <FormResponseViewer formResponse={currentFormResponses[selectedResponseIndex]} />
                     </div>
                 ) : (
                     <div className="no-responses">
