@@ -938,7 +938,50 @@ router.post('/:orgId/edit-member-form', verifyToken, requireMemberManagement(), 
             message: error.message
         });
     }
-})
+});
+
+router.get('/:orgId/search-events', async (req, res) => {
+    console.log('GET: /search-events');
+    //need to be able to search by name and description *start with this --commit after this
+    //need to be able to search by time range
+    //need to be able to search by type
+    //need to be able to search by location
+    try{
+        const { Event } = getModels(req, 'Event');
+        let { orgId } = req.params;
+        let { query } = req.query;  
+        console.log(query);
+
+        const searchFilter = {
+            hostingId: orgId,
+            hostingType: 'Org',
+            $or: [
+                { name: { $regex: query, $options: 'i' } },
+                { description: { $regex: query, $options: 'i' } },
+                { type: { $regex: query, $options: 'i' } },
+                { location: { $regex: query, $options: 'i' } }
+            ]
+        };
+
+        if (!isNaN(new Date(query).getTime())) {
+            searchFilter.$or.push({ start_time: { $gte: new Date(query) } });
+        }
+
+        
+        const events = await Event.find(searchFilter);
+        console.log(events);
+        return res.status(200).json({success: true, events, message: "Events searched successfully"});
+
+
+    } catch (error) {
+        console.log(`GET: /search-events failed`, error);
+        return res.status(500).json({
+            success: false,
+            message: "Error searching events",
+            error: error.message,
+        });
+    }
+});
 
 
 
