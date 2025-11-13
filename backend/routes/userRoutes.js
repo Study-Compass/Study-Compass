@@ -108,7 +108,7 @@ router.post("/check-in", verifyToken, async (req, res) => {
         io.to(classroomId).emit('check-in', { classroomId, userId: req.user.userId });
 
         // Send Inngest event to schedule auto-checkout after 2 hours
-        await sendRoomCheckinEvent(req.user.userId, classroomId, new Date());
+        // await sendRoomCheckinEvent(req.user.userId, classroomId, new Date());
 
         console.log(`POST: /check-in ${req.user.userId} into ${classroom.name} successful`);
         return res.status(200).json({ 
