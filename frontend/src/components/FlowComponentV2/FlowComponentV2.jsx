@@ -23,7 +23,8 @@ const FlowComponentV2 = ({
     validationFunction = null, // Custom validation function
     onClose = null, // Function to handle closing the flow
     formConfig = null, // Form configuration for dynamic validation
-    getMissingFields = null // Function to get missing fields
+    getMissingFields = null, // Function to get missing fields
+    hostSelector = null // Component to render in sidebar (e.g., host selector)
 }) => {
     const [currentStep, setCurrentStep] = useState(0);
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -85,16 +86,18 @@ const FlowComponentV2 = ({
     };
 
     const handleSubmit = async () => {
-        // Check if all steps are completed
-        if (!canSubmit()) {
-            // Show missing fields if available
-            if (getMissingFields && formConfig) {
-                const missingFields = getMissingFields(formData, formConfig);
-                if (missingFields.length > 0) {
-                    setShowMissingFields(true);
-                    return;
-                }
+        // Always check for missing fields first
+        if (getMissingFields && formConfig) {
+            const missing = getMissingFields(formData, formConfig);
+            if (missing.length > 0) {
+                setShowMissingFields(true);
+                return;
             }
+        }
+        
+        // Check if all steps are completed (fallback)
+        if (!canSubmit()) {
+            setShowMissingFields(true);
             return;
         }
         
@@ -113,11 +116,20 @@ const FlowComponentV2 = ({
 
     const canSubmit = () => {
         if(!steps || steps.length === 0) return false;
-        if(currentStep === steps.length - 1){
-            return steps.every((_, index) => isStepCompleted(index));
+        if(currentStep !== steps.length - 1) return false;
+        
+        // Use getMissingFields if available (more accurate for dynamic forms)
+        if (getMissingFields && formConfig) {
+            const missingFields = getMissingFields(formData, formConfig);
+            return missingFields.length === 0;
         }
-        return false;
+        
+        // Fallback to step validation
+        return steps.every((_, index) => isStepCompleted(index));
     }
+    
+    // Get missing fields for display
+    const missingFields = getMissingFields && formConfig ? getMissingFields(formData, formConfig) : [];
 
     // Safety check: ensure steps exist and currentStep is valid
     if(!steps || steps.length === 0 || !steps[currentStep]) {
@@ -158,6 +170,12 @@ const FlowComponentV2 = ({
                         </div>
                         <p>{headerSubtitle}</p>
                         
+                        {/* Host selector in sidebar */}
+                        {hostSelector && (
+                            <div className="host-selector-sidebar">
+                                {hostSelector}
+                            </div>
+                        )}
                     </div>
                     
                     <div className="steps-list">
@@ -216,25 +234,47 @@ const FlowComponentV2 = ({
                         <div className="right-buttons">
                             {isLastStep ? (
                                 <>
+                                    {missingFields.length > 0 && (
+                                        <div className="missing-fields-warning" style={{
+                                            marginRight: '1rem',
+                                            padding: '0.5rem 1rem',
+                                            backgroundColor: '#fff3cd',
+                                            border: '1px solid #ffc107',
+                                            borderRadius: '4px',
+                                            color: '#856404',
+                                            fontSize: '0.875rem',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '0.5rem'
+                                        }}>
+                                            <Icon icon="mdi:alert-circle" style={{ fontSize: '1.2rem' }} />
+                                            <span>
+                                                {missingFields.length} required {missingFields.length === 1 ? 'field' : 'fields'} missing
+                                            </span>
+                                        </div>
+                                    )}
                                     <button 
                                         className={`btn-primary ${ !canSubmit() || isSubmitting ? 'disabled' : ''}`}
                                         onClick={handleSubmit}
                                         disabled={isSubmitting}
+                                        title={missingFields.length > 0 ? `Missing ${missingFields.length} required field(s)` : ''}
                                     >
                                         {isSubmitting ? submittingButtonText : submitButtonText}
                                     </button>
                                     
                                     {/* Show missing fields popup */}
                                     <Popup isOpen={showMissingFields} onClose={() => setShowMissingFields(false)} defaultStyling={true}>
-                                        <div style={{ padding: '2rem', minWidth: '400px' }}>
-                                            <h3 style={{ marginTop: 0 }}>Missing Required Fields</h3>
+                                        <div style={{ padding: '2rem', minWidth: '400px', maxWidth: '600px' }}>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
+                                                <Icon icon="mdi:alert-circle" style={{ fontSize: '2rem', color: '#ffc107' }} />
+                                                <h3 style={{ margin: 0 }}>Missing Required Fields</h3>
+                                            </div>
                                             <p style={{ marginBottom: '1.5rem', color: '#666' }}>
-                                                Please complete the following required fields before publishing:
+                                                Please complete the following required fields before publishing your event:
                                             </p>
-                                            {getMissingFields && formConfig ? (
-                                                <div style={{ marginBottom: '1.5rem' }}>
+                                            {missingFields.length > 0 ? (
+                                                <div style={{ marginBottom: '1.5rem', maxHeight: '400px', overflowY: 'auto' }}>
                                                     {(() => {
-                                                        const missingFields = getMissingFields(formData, formConfig);
                                                         // Group by step
                                                         const groupedByStep = missingFields.reduce((acc, field) => {
                                                             if (!acc[field.stepTitle]) {
@@ -245,13 +285,27 @@ const FlowComponentV2 = ({
                                                         }, {});
                                                         
                                                         return Object.entries(groupedByStep).map(([stepTitle, fields]) => (
-                                                            <div key={stepTitle} style={{ marginBottom: '1rem' }}>
-                                                                <h4 style={{ marginBottom: '0.5rem', fontSize: '1rem', fontWeight: '600' }}>
+                                                            <div key={stepTitle} style={{ 
+                                                                marginBottom: '1.25rem',
+                                                                padding: '1rem',
+                                                                backgroundColor: '#f8f9fa',
+                                                                borderRadius: '6px',
+                                                                border: '1px solid #dee2e6'
+                                                            }}>
+                                                                <h4 style={{ 
+                                                                    marginBottom: '0.75rem', 
+                                                                    fontSize: '1rem', 
+                                                                    fontWeight: '600',
+                                                                    color: '#495057'
+                                                                }}>
                                                                     {stepTitle}
                                                                 </h4>
-                                                                <ul style={{ margin: 0, paddingLeft: '1.5rem' }}>
+                                                                <ul style={{ margin: 0, paddingLeft: '1.5rem', listStyle: 'disc' }}>
                                                                     {fields.map((field, idx) => (
-                                                                        <li key={idx} style={{ marginBottom: '0.25rem' }}>
+                                                                        <li key={idx} style={{ 
+                                                                            marginBottom: '0.5rem',
+                                                                            color: '#6c757d'
+                                                                        }}>
                                                                             {field.label}
                                                                         </li>
                                                                     ))}
@@ -261,49 +315,53 @@ const FlowComponentV2 = ({
                                                     })()}
                                                 </div>
                                             ) : (
-                                                <p>Unable to determine missing fields.</p>
+                                                <p style={{ color: '#6c757d', fontStyle: 'italic' }}>
+                                                    Unable to determine missing fields. Please check all steps are completed.
+                                                </p>
                                             )}
-                                            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
-                                                <button 
-                                                    onClick={() => {
-                                                        setShowMissingFields(false);
-                                                        // Navigate to first incomplete step
-                                                        if (getMissingFields && formConfig) {
-                                                            const missingFields = getMissingFields(formData, formConfig);
-                                                            if (missingFields.length > 0) {
-                                                                const firstMissingStep = steps.findIndex(step => 
-                                                                    step.stepId === missingFields[0].step
-                                                                );
-                                                                if (firstMissingStep !== -1) {
-                                                                    setCurrentStep(firstMissingStep);
-                                                                }
-                                                            }
-                                                        }
-                                                    }}
-                                                    style={{
-                                                        padding: '0.5rem 1.5rem',
-                                                        backgroundColor: '#007bff',
-                                                        color: 'white',
-                                                        border: 'none',
-                                                        borderRadius: '4px',
-                                                        cursor: 'pointer'
-                                                    }}
-                                                >
-                                                    Go to First Missing Field
-                                                </button>
+                                            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end', marginTop: '1.5rem' }}>
                                                 <button 
                                                     onClick={() => setShowMissingFields(false)}
                                                     style={{
-                                                        padding: '0.5rem 1.5rem',
+                                                        padding: '0.75rem 1.5rem',
                                                         backgroundColor: '#6c757d',
                                                         color: 'white',
                                                         border: 'none',
                                                         borderRadius: '4px',
-                                                        cursor: 'pointer'
+                                                        cursor: 'pointer',
+                                                        fontSize: '0.875rem',
+                                                        fontWeight: '500'
                                                     }}
                                                 >
                                                     Close
                                                 </button>
+                                                {missingFields.length > 0 && (
+                                                    <button 
+                                                        onClick={() => {
+                                                            setShowMissingFields(false);
+                                                            // Navigate to first incomplete step
+                                                            const firstMissingField = missingFields[0];
+                                                            const firstMissingStep = steps.findIndex(step => 
+                                                                step.id === firstMissingField.step
+                                                            );
+                                                            if (firstMissingStep !== -1) {
+                                                                setCurrentStep(firstMissingStep);
+                                                            }
+                                                        }}
+                                                        style={{
+                                                            padding: '0.75rem 1.5rem',
+                                                            backgroundColor: '#007bff',
+                                                            color: 'white',
+                                                            border: 'none',
+                                                            borderRadius: '4px',
+                                                            cursor: 'pointer',
+                                                            fontSize: '0.875rem',
+                                                            fontWeight: '500'
+                                                        }}
+                                                    >
+                                                        Go to First Missing Field
+                                                    </button>
+                                                )}
                                             </div>
                                         </div>
                                     </Popup>

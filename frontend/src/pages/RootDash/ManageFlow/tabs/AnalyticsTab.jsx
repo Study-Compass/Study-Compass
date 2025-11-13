@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Icon } from '@iconify-icon/react/dist/iconify.mjs';
+import KpiCard from '../../../../components/Analytics/Dashboard/KpiCard';
 import './AnalyticsTab.scss';
 
 function AnalyticsTab() {
@@ -179,49 +180,36 @@ function AnalyticsTab() {
                 {/* Key Performance Indicators */}
                 <div className="kpi-section">
                     <div className="kpi-cards">
-                        <div className="kpi-card">
-                            <div className="kpi-icon">
-                                <Icon icon="mdi:calendar-multiple" />
-                            </div>
-                            <div className="kpi-content">
-                                <div className="kpi-number">{mockEventAnalytics.totalEvents.toLocaleString()}</div>
-                                <div className="kpi-label">Total Events</div>
-                                <div className="kpi-subtitle">{getTimeRangeLabel(timeRange)}</div>
-                            </div>
-                        </div>
+                        <KpiCard
+                            icon="mdi:calendar-multiple"
+                            title="Total Events"
+                            value={mockEventAnalytics.totalEvents.toLocaleString()}
+                            subtitle={getTimeRangeLabel(timeRange)}
+                        />
 
-                        <div className="kpi-card">
-                            <div className="kpi-icon active">
-                                <Icon icon="mdi:account-group" />
-                            </div>
-                            <div className="kpi-content">
-                                <div className="kpi-number">{mockEventAnalytics.totalParticipants.toLocaleString()}</div>
-                                <div className="kpi-label">Total Participants</div>
-                                <div className="kpi-subtitle">{mockEventAnalytics.averageAttendance}% avg attendance</div>
-                            </div>
-                        </div>
+                        <KpiCard
+                            icon="mdi:account-group"
+                            title="Total Participants"
+                            value={mockEventAnalytics.totalParticipants.toLocaleString()}
+                            subtitle={`${mockEventAnalytics.averageAttendance}% avg attendance`}
+                            iconVariant="approved"
+                        />
 
-                        <div className="kpi-card">
-                            <div className="kpi-icon engagement">
-                                <Icon icon="mdi:heart" />
-                            </div>
-                            <div className="kpi-content">
-                                <div className="kpi-number">{mockEventAnalytics.engagementRate}%</div>
-                                <div className="kpi-label">Engagement Rate</div>
-                                <div className="kpi-subtitle">Overall event engagement</div>
-                            </div>
-                        </div>
+                        <KpiCard
+                            icon="mdi:heart"
+                            title="Engagement Rate"
+                            value={`${mockEventAnalytics.engagementRate}%`}
+                            subtitle="Overall event engagement"
+                            iconVariant="rejected"
+                        />
 
-                        <div className="kpi-card">
-                            <div className="kpi-icon discovery">
-                                <Icon icon="mdi:compass" />
-                            </div>
-                            <div className="kpi-content">
-                                <div className="kpi-number">{mockEventAnalytics.discoveryRate}%</div>
-                                <div className="kpi-label">Discovery Rate</div>
-                                <div className="kpi-subtitle">New participant acquisition</div>
-                            </div>
-                        </div>
+                        <KpiCard
+                            icon="mdi:compass"
+                            title="Discovery Rate"
+                            value={`${mockEventAnalytics.discoveryRate}%`}
+                            subtitle="New participant acquisition"
+                            iconVariant="pending"
+                        />
                     </div>
                 </div>
 

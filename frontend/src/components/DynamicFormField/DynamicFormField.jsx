@@ -3,11 +3,20 @@ import ImageUpload from '../ImageUpload/ImageUpload';
 import './DynamicFormField.scss';
 
 const DynamicFormField = ({ field, value, onChange, formData, errors = {} }) => {
-    const [localValue, setLocalValue] = useState(value || field.validation?.defaultValue || '');
+    // Normalize value to never be null - use empty string instead
+    const normalizeValue = (val) => {
+        if (val === null || val === undefined) {
+            return field.validation?.defaultValue || '';
+        }
+        return val;
+    };
+    
+    const [localValue, setLocalValue] = useState(normalizeValue(value));
 
     useEffect(() => {
-        if (value !== undefined && value !== localValue) {
-            setLocalValue(value);
+        const normalized = normalizeValue(value);
+        if (normalized !== localValue) {
+            setLocalValue(normalized);
         }
     }, [value]);
 
@@ -41,7 +50,7 @@ const DynamicFormField = ({ field, value, onChange, formData, errors = {} }) => 
                     <input
                         type={field.inputType}
                         id={field.name}
-                        value={localValue}
+                        value={localValue === null || localValue === undefined ? '' : localValue}
                         onChange={(e) => handleChange(e.target.value)}
                         placeholder={field.placeholder || ''}
                         className={errors[field.name] ? 'error' : ''}
@@ -57,7 +66,7 @@ const DynamicFormField = ({ field, value, onChange, formData, errors = {} }) => 
                     <input
                         type="number"
                         id={field.name}
-                        value={localValue}
+                        value={localValue === null || localValue === undefined ? '' : localValue}
                         onChange={(e) => handleChange(parseFloat(e.target.value) || 0)}
                         placeholder={field.placeholder || ''}
                         className={errors[field.name] ? 'error' : ''}
@@ -68,12 +77,13 @@ const DynamicFormField = ({ field, value, onChange, formData, errors = {} }) => 
                 );
 
             case 'range':
+                const rangeValue = localValue === null || localValue === undefined ? (field.validation?.min || 0) : localValue;
                 return (
                     <div className="range-field">
                         <div className="range-value-display">
                             <input
                                 type="text"
-                                value={localValue}
+                                value={rangeValue}
                                 onChange={(e) => {
                                     const val = parseInt(e.target.value) || field.validation?.min || 0;
                                     const clamped = Math.max(
@@ -85,7 +95,7 @@ const DynamicFormField = ({ field, value, onChange, formData, errors = {} }) => 
                                 className="range-preview"
                                 style={{
                                     position: 'absolute',
-                                    left: `${((localValue - (field.validation?.min || 0)) / ((field.validation?.max || 10000) - (field.validation?.min || 0))) * 100}%`,
+                                    left: `${((rangeValue - (field.validation?.min || 0)) / ((field.validation?.max || 10000) - (field.validation?.min || 0))) * 100}%`,
                                     transform: 'translateX(-50%)',
                                 }}
                             />
@@ -93,7 +103,7 @@ const DynamicFormField = ({ field, value, onChange, formData, errors = {} }) => 
                         <input
                             type="range"
                             id={field.name}
-                            value={localValue}
+                            value={rangeValue}
                             onChange={(e) => handleChange(parseInt(e.target.value))}
                             className={errors[field.name] ? 'error' : ''}
                             min={field.validation?.min || 1}
@@ -111,7 +121,7 @@ const DynamicFormField = ({ field, value, onChange, formData, errors = {} }) => 
                 return (
                     <textarea
                         id={field.name}
-                        value={localValue}
+                        value={localValue === null || localValue === undefined ? '' : localValue}
                         onChange={(e) => handleChange(e.target.value)}
                         placeholder={field.placeholder || ''}
                         className={errors[field.name] ? 'error' : ''}
@@ -126,7 +136,7 @@ const DynamicFormField = ({ field, value, onChange, formData, errors = {} }) => 
                 return (
                     <select
                         id={field.name}
-                        value={localValue}
+                        value={localValue === null || localValue === undefined ? '' : localValue}
                         onChange={(e) => handleChange(e.target.value)}
                         className={errors[field.name] ? 'error' : ''}
                         required={field.isRequired || field.validation?.required}
@@ -209,7 +219,7 @@ const DynamicFormField = ({ field, value, onChange, formData, errors = {} }) => 
                     <input
                         type="text"
                         id={field.name}
-                        value={localValue}
+                        value={localValue === null || localValue === undefined ? '' : localValue}
                         onChange={(e) => handleChange(e.target.value)}
                         placeholder={field.placeholder || 'Enter location'}
                         className={errors[field.name] ? 'error' : ''}
@@ -222,7 +232,7 @@ const DynamicFormField = ({ field, value, onChange, formData, errors = {} }) => 
                     <input
                         type="text"
                         id={field.name}
-                        value={localValue}
+                        value={localValue === null || localValue === undefined ? '' : localValue}
                         onChange={(e) => handleChange(e.target.value)}
                         placeholder={field.placeholder || ''}
                         className={errors[field.name] ? 'error' : ''}

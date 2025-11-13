@@ -6,12 +6,11 @@ import DailyCalendar from '../../../../pages/OIEDash/EventsCalendar/Day/DailyCal
 import MonthDisplay from '../../../../pages/OIEDash/EventsCalendar/Month/MonthDisplay';
 import Switch from '../../../../components/Switch/Switch';
 import Filter from '../../../../components/Filter/Filter';
-import { useCache } from '../../../../CacheContext';
 import { useNotification } from '../../../../NotificationContext';
+import apiRequest from '../../../../utils/postRequest';
 
 function When({ formData, setFormData, onComplete }){
     const {addNotification} = useNotification();
-    const {getRoom} = useCache();
     const [combinedBlockedEvents, setCombinedBlockedEvents] = useState([]);
     const [loading, setLoading] = useState(true);
     const [isInitialized, setIsInitialized] = useState(false);
@@ -174,18 +173,26 @@ function When({ formData, setFormData, onComplete }){
                 return;
             }
 
-            // Fetch detailed data for each selected room
-            const roomPromises = formData.selectedRoomIds.map(async (roomId) => {
-                const roomDetail = await getRoom(roomId);
-                return {
-                    id: roomId,
-                    name: roomDetail?.room?.name || `Room ${roomId}`,
-                    data: roomDetail?.data || {},
-                    roomInfo: roomDetail?.room || {}
-                };
+            // Batch fetch all selected rooms at once (more efficient than individual calls)
+            const batchResponse = await apiRequest('/getbatch-new', {
+                queries: formData.selectedRoomIds,
+                exhaustive: true
             });
 
-            const roomsWithData = await Promise.all(roomPromises);
+            if (!batchResponse || !batchResponse.success || !batchResponse.data) {
+                throw new Error('Failed to fetch room schedules');
+            }
+
+            // Transform batch response into room data format
+            const roomsWithData = batchResponse.data.map((item, index) => {
+                const roomId = formData.selectedRoomIds[index];
+                return {
+                    id: roomId,
+                    name: item?.room?.name || `Room ${roomId}`,
+                    data: item?.data || {},
+                    roomInfo: item?.room || {}
+                };
+            });
             
             // Combine all schedules
             const combinedSchedule = combineRoomSchedules(roomsWithData);

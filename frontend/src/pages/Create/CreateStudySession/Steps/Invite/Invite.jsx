@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './Invite.scss';
 import { Icon } from '@iconify-icon/react';
-import { useFetch } from '../../../../hooks/useFetch';
+import { useFetch } from '../../../../../hooks/useFetch';
 
 const Invite = ({ formData, setFormData, onComplete }) => {
     const [searchTerm, setSearchTerm] = useState('');

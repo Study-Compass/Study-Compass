@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import './TimeLocation.scss';
-import WeeklyCalendar from '../../../OIEDash/EventsCalendar/Week/WeeklyCalendar/WeeklyCalendar';
+import WeeklyCalendar from '../../../../OIEDash/EventsCalendar/Week/WeeklyCalendar/WeeklyCalendar';
 
 const TimeLocation = ({ formData, setFormData, onComplete }) => {
     const [currentWeekStart, setCurrentWeekStart] = useState(new Date());

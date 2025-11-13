@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import FlowComponentV2 from '../../components/FlowComponentV2/FlowComponentV2';
-import { useNotification } from '../../NotificationContext';
-import useAuth from '../../hooks/useAuth';
-import postRequest from '../../utils/postRequest';
+import FlowComponentV2 from '../../../components/FlowComponentV2/FlowComponentV2';
+import { useNotification } from '../../../NotificationContext';
+import useAuth from '../../../hooks/useAuth';
+import postRequest from '../../../utils/postRequest';
 
 // Step component   s (we'll create these)
 import BasicInfo from './Steps/BasicInfo/BasicInfo';

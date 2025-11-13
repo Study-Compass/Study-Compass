@@ -1,18 +1,20 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import axios from 'axios';
 import FlowComponentV2 from '../../components/FlowComponentV2/FlowComponentV2';
+import apiRequest from '../../utils/postRequest';
 import DynamicStep from '../../components/DynamicStep/DynamicStep';
 import { useFetch } from '../../hooks/useFetch';
+import './CreateEventV2.scss';
 
 import { useNotification } from '../../NotificationContext';
 import useAuth from '../../hooks/useAuth';
+import HostSelector from './Components/HostSelector/HostSelector';
 
 import defaultAvatar from '../../assets/defaultAvatar.svg';
 
 // Step components (kept for backward compatibility)
 import GenInfo from './Steps/GenInfo/GenInfo';
-import Where from './Steps/Where/Where';
+import RoomSelectorV2 from './Steps/Where/RoomSelectorV2/RoomSelectorV2';
 import When from './Steps/When/When';
 import Review from './Steps/Review/Review';
 
@@ -24,6 +26,17 @@ const CreateEventV2 = () => {
     
     // Create Event Specific:
     const [alias, setAlias] =  useState(null);
+    const [selectedHost, setSelectedHost] = useState(null);
+
+    // Initialize selectedHost when user is available
+    useEffect(() => {
+        if (user && !selectedHost) {
+            setSelectedHost({
+                id: user._id,
+                type: 'User'
+            });
+        }
+    }, [user, selectedHost]);
 
     // authenticate user from old createEvent
     // UNCOMMENT WHEN MOVING TO LIVE
@@ -92,6 +105,22 @@ const CreateEventV2 = () => {
             maxAttendees: null
     });
 
+    // Update formData when selectedHost changes
+    useEffect(() => {
+        if (selectedHost) {
+            setFormData(prev => ({
+                ...prev,
+                hostingId: selectedHost.id,
+                hostingType: selectedHost.type
+            }));
+        }
+    }, [selectedHost]);
+
+    // Handle host selection change
+    const handleHostChange = (host) => {
+        setSelectedHost(host);
+    };
+
     // Default steps as fallback - always available
     const defaultSteps = [
         {
@@ -104,7 +133,7 @@ const CreateEventV2 = () => {
             id: 1,
             title: 'Location',
             description: 'Select a room for your event',
-            component: Where,
+            component: RoomSelectorV2,
         },
         {
             id: 2,
@@ -178,6 +207,7 @@ const CreateEventV2 = () => {
     }, [formConfigData.data]);
 
     const handleSubmit = async (formData) => {
+        try {
             // Handle create mode (existing logic)
             const submitData = new FormData();
 
@@ -185,8 +215,8 @@ const CreateEventV2 = () => {
             const data = {
                 name: formData.name,
                 type: formData.type,
-                hostingId: formData.hostingId || user?._id,
-                hostingType: formData.hostingType || (user ? 'User' : ''),
+                hostingId: selectedHost?.id || formData.hostingId || user?._id,
+                hostingType: selectedHost?.type || formData.hostingType || (user ? 'User' : ''),
                 going: formData.going || [],
                 location: formData.location,
                 start_time: formData.start_time,
@@ -200,7 +230,9 @@ const CreateEventV2 = () => {
                 rsvpEnabled: formData.rsvpEnabled || false,
                 rsvpRequired: formData.rsvpRequired || false,
                 rsvpDeadline: formData.rsvpDeadline || null,
-                maxAttendees: formData.maxAttendees || null
+                maxAttendees: formData.maxAttendees || null,
+                // Include orgId if creating as organization
+                orgId: selectedHost?.type === 'Org' ? selectedHost.id : null
             };
 
             // Append all data fields to FormData
@@ -208,6 +240,10 @@ const CreateEventV2 = () => {
                 if (data[key] !== null && data[key] !== undefined) {
                     if (data[key] instanceof Date) {
                         submitData.append(key, data[key].toISOString());
+                    } else if (Array.isArray(data[key])) {
+                        submitData.append(key, JSON.stringify(data[key]));
+                    } else if (typeof data[key] === 'object') {
+                        submitData.append(key, JSON.stringify(data[key]));
                     } else {
                         submitData.append(key, data[key]);
                     }
@@ -219,14 +255,12 @@ const CreateEventV2 = () => {
                 submitData.append('image', formData.image);
             }
 
-            const response = await axios.post("/api/events/create-event", submitData, {
-                headers: { 
-                    Authorization: `Bearer ${localStorage.getItem("token")}`,
-                    'Content-Type': 'multipart/form-data'
-                },
+            // Use apiRequest with the correct endpoint
+            const response = await apiRequest('/create-event', submitData, {
+                method: 'POST'
             });
             
-            if (response.data.success) {
+            if (response.success) {
                 addNotification({
                     title: 'Event Created',
                     message: `Your event has been created successfully, you'll be contacted shortly upon it's approval!`,
@@ -235,9 +269,12 @@ const CreateEventV2 = () => {
                 
                 navigate(`/events-dashboard`);
             } else {
-                throw new Error(response.data.message || 'Failed to create event');
+                throw new Error(response.message || response.error || 'Failed to create event');
             }
-        
+        } catch (error) {
+            console.error('Error creating event:', error);
+            throw error;
+        }
     };
 
     const handleError = (error) => {
@@ -368,6 +405,14 @@ const CreateEventV2 = () => {
             className="create-line-v2"
             formConfig={formConfig}
             getMissingFields={getMissingFields}
+            hostSelector={
+                user && (
+                    <HostSelector 
+                        selectedHost={selectedHost}
+                        onHostChange={handleHostChange}
+                    />
+                )
+            }
         />
     );
 };
