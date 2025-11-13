@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { Line } from 'react-chartjs-2';
-import axios from 'axios';
-import { format, addWeeks, addDays } from 'date-fns'; // Import date manipulation functions
+import apiRequest from '../../../utils/postRequest';
+import { format, addWeeks, addDays, subWeeks, subDays, subMonths, subYears } from 'date-fns'; // Import date manipulation functions
 import './AnalyticsChart.scss';
 import Stats from '../../../assets/Icons/Stats.svg';
 // removed per-chart date navigation
@@ -32,9 +32,10 @@ ChartJS.register(
   Decimation
 );
 
-const AnalyticsChart = ({endpoint, heading, color, externalViewMode, externalStartDate, externalCumulative}) => {
+const AnalyticsChart = ({endpoint, heading, color, externalViewMode, externalStartDate, externalCumulative, previousPeriodMode}) => {
     const [chartData, setChartData] = useState({});
     const [totalCount, setTotalCount] = useState(0);
+    const [previousTotalCount, setPreviousTotalCount] = useState(0);
     const [viewMode, setViewMode] = useState(externalViewMode || 'month'); // 'month'|'week'|'day'|'all'
     const [startDate, setStartDate] = useState(externalStartDate || new Date());
     // cumulative controlled globally
@@ -62,19 +63,63 @@ const AnalyticsChart = ({endpoint, heading, color, externalViewMode, externalSta
 
     // Per-chart date navigation removed; global controls manage range
       useEffect(() => {
-    if (chartRef.current) {
+    if (chartRef.current && chartData.datasets) {
       const chart = chartRef.current;
       const ctx = chart.ctx;
-      const gradient = ctx.createLinearGradient(0, 0, 0, 190); // Customize start/end points of the gradient
-      gradient.addColorStop(0, `rgba(${r}, ${g}, ${b}, 0.8)`);
-      gradient.addColorStop(1, `rgba(${r}, ${g}, ${b}, 0)`);
-
-      // Apply gradient to the chart
-      chart.data.datasets[0].backgroundColor = gradient;
+      
+      // Apply gradient to current period dataset
+      if (chartData.datasets[0]) {
+        const gradient = ctx.createLinearGradient(0, 0, 0, 190);
+        gradient.addColorStop(0, `rgba(${r}, ${g}, ${b}, 0.8)`);
+        gradient.addColorStop(1, `rgba(${r}, ${g}, ${b}, 0)`);
+        chart.data.datasets[0].backgroundColor = gradient;
+      }
+      
+      // Apply lighter gradient to previous period dataset if it exists
+      if (chartData.datasets[1]) {
+        const prevGradient = ctx.createLinearGradient(0, 0, 0, 190);
+        prevGradient.addColorStop(0, `rgba(${r}, ${g}, ${b}, 0.3)`);
+        prevGradient.addColorStop(1, `rgba(${r}, ${g}, ${b}, 0)`);
+        chart.data.datasets[1].backgroundColor = prevGradient;
+      }
+      
       chart.update();
     }
-  }, [chartData]);
+  }, [chartData, r, g, b]);
   
+    // Calculate previous period dates based on mode
+    const calculatePreviousPeriod = (mode, anchorDate, endDate) => {
+      if (!previousPeriodMode || previousPeriodMode === 'none') {
+        return null;
+      }
+
+      let prevStartDate, prevEndDate;
+
+      if (previousPeriodMode === 'lastYear') {
+        // This time last year - subtract exactly one year from both dates
+        prevStartDate = subYears(anchorDate, 1);
+        prevEndDate = subYears(endDate, 1);
+      } else if (previousPeriodMode === 'adjacent') {
+        // Adjacent previous period
+        if (mode === 'month') {
+          prevStartDate = subWeeks(anchorDate, 4);
+          prevEndDate = anchorDate;
+        } else if (mode === 'week') {
+          prevStartDate = subWeeks(anchorDate, 1);
+          prevEndDate = anchorDate;
+        } else if (mode === 'day') {
+          prevStartDate = subDays(anchorDate, 1);
+          prevEndDate = anchorDate;
+        } else {
+          return null;
+        }
+      } else {
+        return null;
+      }
+
+      return { prevStartDate, prevEndDate };
+    };
+
     // Fetch data based on viewMode
     const fetchVisitData = async (mode, anchorDate) => {
       let endDate;
@@ -97,9 +142,9 @@ const AnalyticsChart = ({endpoint, heading, color, externalViewMode, externalSta
       };
 
       try {
-        const response = await axios.get(`/${endpoint}-by-${routeSuffix}`, { params });
-        if (response.status === 200) {
-          const data = response.data;
+        // Fetch current period data
+        const data = await apiRequest(`/${endpoint}-by-${routeSuffix}`, null, { method: 'GET', params });
+        if (data && !data.error) {
           const labels = data.map(item => {
             if (routeSuffix === 'day') {
               const date = addDays(new Date(item.date + 'T00:00:00Z'), 1);
@@ -120,23 +165,85 @@ const AnalyticsChart = ({endpoint, heading, color, externalViewMode, externalSta
             let running = 0;
             counts = counts.map((v) => (running += v));
           }
+
+          // Fetch previous period data if enabled
+          let previousCounts = null;
+          let previousLabels = null;
+          if (previousPeriodMode && previousPeriodMode !== 'none' && mode !== 'all') {
+            const prevPeriod = calculatePreviousPeriod(mode, anchorDate, endDate);
+            if (prevPeriod) {
+              try {
+                // For hour-based queries, only pass startDate; for others, pass both dates
+                const prevParams = routeSuffix === 'hour' 
+                  ? { startDate: format(prevPeriod.prevStartDate, 'yyyy-MM-dd') }
+                  : {
+                      startDate: format(prevPeriod.prevStartDate, 'yyyy-MM-dd'),
+                      endDate: format(prevPeriod.prevEndDate, 'yyyy-MM-dd'),
+                    };
+                const prevData = await apiRequest(`/${endpoint}-by-${routeSuffix}`, null, { method: 'GET', params: prevParams });
+                if (prevData && !prevData.error) {
+                  previousLabels = prevData.map(item => {
+                    if (routeSuffix === 'day') {
+                      const date = addDays(new Date(item.date + 'T00:00:00Z'), 1);
+                      return format(date, 'MMM dd');
+                    } else if (routeSuffix === 'hour') {
+                      return format(new Date(item.hour), 'H:mm');
+                    }
+                    return '';
+                  });
+                  const prevRawCounts = prevData.map(item => item.count);
+                  setPreviousTotalCount(prevRawCounts.reduce((a, b) => a + b, 0));
+                  previousCounts = prevRawCounts.slice();
+                  if (externalCumulative && previousCounts.length) {
+                    let running = 0;
+                    previousCounts = previousCounts.map((v) => (running += v));
+                  }
+                }
+              } catch (prevErr) {
+                console.error('Error fetching previous period data', prevErr);
+              }
+            }
+          }
+
+          const datasets = [
+            {
+              label: 'Current',
+              data: counts,
+              fill: true,
+              backgroundColor: 'transparent',
+              borderColor: `rgba(${r}, ${g}, ${b}, 0.8)`,
+              pointBackgroundColor: `rgba(${r}, ${g}, ${b}, 1)`,
+              pointBorderColor: '#fff',
+              tension: 0.3,
+              borderWidth: 4,
+              pointRadius: 0,
+              pointHoverRadius: 6,
+              hitRadius: 20,
+            },
+          ];
+
+          // Add previous period dataset if available
+          if (previousCounts && previousCounts.length > 0) {
+            datasets.push({
+              label: previousPeriodMode === 'lastYear' ? 'Last Year' : 'Previous Period',
+              data: previousCounts,
+              fill: true,
+              backgroundColor: 'transparent',
+              borderColor: `rgba(${r}, ${g}, ${b}, 0.4)`,
+              pointBackgroundColor: `rgba(${r}, ${g}, ${b}, 0.6)`,
+              pointBorderColor: '#fff',
+              tension: 0.3,
+              borderWidth: 2,
+              borderDash: [5, 5],
+              pointRadius: 0,
+              pointHoverRadius: 6,
+              hitRadius: 20,
+            });
+          }
+
           setChartData({
             labels,
-            datasets: [
-              {
-                  data: counts,
-                  fill: true,
-                  backgroundColor: 'transparent',
-                  borderColor: `rgba(${r}, ${g}, ${b}, 0.8)`,
-                  pointBackgroundColor: `rgba(${r}, ${g}, ${b}, 1)`,
-                  pointBorderColor: '#fff',
-                  tension: 0.3,
-                  borderWidth: 4,
-                  pointRadius: 0,
-                  pointHoverRadius: 6,
-                  hitRadius: 20,
-              },
-            ],
+            datasets,
           });
           setLastRoute(routeSuffix);
         }
@@ -153,7 +260,7 @@ const AnalyticsChart = ({endpoint, heading, color, externalViewMode, externalSta
       setStartDate(sd);
       fetchVisitData(vm, sd);
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [externalViewMode, externalStartDate, externalCumulative, viewMode, startDate]);
+    }, [externalViewMode, externalStartDate, externalCumulative, previousPeriodMode, viewMode, startDate]);
   
     // View mode is controlled externally via DateRangeControls
   
@@ -167,7 +274,14 @@ const AnalyticsChart = ({endpoint, heading, color, externalViewMode, externalSta
               <div style={{ display: 'flex', gap: 12, alignItems: 'center' }} />
           </div>
           <div className="row">
-              <h3>{totalCount} {endpoint}</h3>
+              <h3>
+                {totalCount} {endpoint}
+                {previousPeriodMode && previousPeriodMode !== 'none' && previousTotalCount > 0 && (
+                  <span style={{ marginLeft: 12, fontSize: '0.7em', color: '#666', fontWeight: 'normal' }}>
+                    ({previousTotalCount} {previousPeriodMode === 'lastYear' ? 'last year' : 'previous'})
+                  </span>
+                )}
+              </h3>
           </div>
           <div className="chart-container">
             {chartData.labels ? (
@@ -263,13 +377,16 @@ const AnalyticsChart = ({endpoint, heading, color, externalViewMode, externalSta
                       samples: 250,
                     },
                     legend: {
-                        display: false,
+                        display: previousPeriodMode && previousPeriodMode !== 'none' && chartData.datasets && chartData.datasets.length > 1,
                         position: 'top',
                         labels: {
                           color: '#333',
                           font: {
-                            size: 14,
+                            size: 12,
+                            family: 'Inter',
                           },
+                          usePointStyle: true,
+                          padding: 12,
                         },
                       },
                       tooltip: {
