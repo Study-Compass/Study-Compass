@@ -3,7 +3,7 @@ import RightArrow from '../../assets/Icons/RightArrow.svg';
 import Switch from '../Switch/Switch';
 import { format, addWeeks, subWeeks, addDays, subDays, startOfWeek, endOfWeek } from 'date-fns';
 
-function DateRangeControls({ rangeMode, setRangeMode, startDate, setStartDate, cumulative, setCumulative }) {
+function DateRangeControls({ rangeMode, setRangeMode, startDate, setStartDate, cumulative, setCumulative, previousPeriodMode, setPreviousPeriodMode }) {
   const handlePrev = () => {
     if (rangeMode === 'month') setStartDate(prev => addWeeks(addWeeks(prev, -2), -2));
     if (rangeMode === 'week') setStartDate(prev => subWeeks(prev, 1));
@@ -29,6 +29,26 @@ function DateRangeControls({ rangeMode, setRangeMode, startDate, setStartDate, c
           <input type="checkbox" checked={cumulative} onChange={(e) => setCumulative(e.target.checked)} />
           cumulative
         </label>
+        {rangeMode !== 'all' && (
+          <select 
+            value={previousPeriodMode || 'adjacent'} 
+            onChange={(e) => setPreviousPeriodMode(e.target.value)}
+            style={{ 
+              padding: '4px 8px', 
+              borderRadius: '4px', 
+              border: '1px solid var(--lightborder)',
+              backgroundColor: 'var(--background)',
+              color: 'var(--text)',
+              fontFamily: 'Inter',
+              fontSize: '14px',
+              cursor: 'pointer'
+            }}
+          >
+            <option value="none">No comparison</option>
+            <option value="adjacent">Previous period</option>
+            <option value="lastYear">This time last year</option>
+          </select>
+        )}
       </div>
       {rangeMode !== 'all' && (
         <div className="dates" style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
