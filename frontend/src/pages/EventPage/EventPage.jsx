@@ -73,7 +73,7 @@ function EventPage() {
 
     // RSVP section now handled by RSVPSection component
 
-    if (eventLoading) {
+    if (eventLoading || !eventData) {
         return (
             <div className="event-page">
                 <div className="header">

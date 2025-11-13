@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import './MemberSettings.scss';
-import OrgGrad from '../../../../assets/Gradients/OrgGrad.png';
+import { useGradient } from '../../../../hooks/useGradient';
 import FormBuilder from '../../../../components/FormBuilder/FormBuilder';
 import FormViewer from '../../../../components/FormViewer/FormViewer';
 import apiRequest from '../../../../utils/postRequest';
@@ -19,7 +19,7 @@ function MemberSettings({org}){
     const [showFormBuilder, setShowFormBuilder] = useState(false);
     const [showFormViewer, setShowFormViewer] = useState(false);
     const [currentForm, setCurrentForm] = useState(null);
-
+    const {AtlasMain} = useGradient();
     const { checkUserPermissions } = useOrgPermissions(org);
     const { saveOrgSettings } = useOrgSave(org);
 
@@ -102,7 +102,7 @@ function MemberSettings({org}){
             <header className="header">
                 <h1>Member Settings</h1>
                 <p>Customize your organization's member settings</p>
-                <img src={OrgGrad} alt="" />
+                <img src={AtlasMain} alt="" />
             </header>
             <div className="member-settings-container">
                 <div className="settings-list">

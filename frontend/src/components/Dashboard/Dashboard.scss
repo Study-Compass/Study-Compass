@@ -428,12 +428,14 @@
                 justify-content: center;
                 
                 h1{
+                    position: relative;
                     z-index: 2;
                     padding-left:7%;
                     font-size: 30px;
                     margin-bottom:0;
                 }
                 p{
+                    position: relative;
                     padding-left: 7%;
                     z-index: 2;
                     font-family: 'Satoshi';

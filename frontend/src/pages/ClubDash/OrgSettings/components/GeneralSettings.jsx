@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useOrgPermissions, useOrgSave } from './settingsHelpers';
-import OrgGrad from '../../../../assets/Gradients/OrgGrad.png';
+import { useGradient } from '../../../../hooks/useGradient';
 import UnsavedChangesBanner from '../../../../components/UnsavedChangesBanner/UnsavedChangesBanner';
 import useUnsavedChanges from '../../../../hooks/useUnsavedChanges';
 
@@ -15,7 +15,7 @@ const GeneralSettings = ({ org, expandedClass }) => {
     const [permissionsChecked, setPermissionsChecked] = useState(false);
     const [canManageSettings, setCanManageSettings] = useState(false);
     const [hasAccess, setHasAccess] = useState(false);
-
+    const {AtlasMain} = useGradient();
     const { checkUserPermissions } = useOrgPermissions(org);
     const { saveOrgSettings } = useOrgSave(org);
 
@@ -119,7 +119,7 @@ const GeneralSettings = ({ org, expandedClass }) => {
             <header className="header">
                 <h1>General Settings</h1>
                 <p>Manage basic organization information</p>
-                <img src={OrgGrad} alt="" />
+                <img src={AtlasMain} alt="" />
             </header>
             <div className="settings-content">
                 
