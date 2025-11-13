@@ -31,6 +31,7 @@ import RootDash from './pages/RootDash/RootDash';
 import OrgManagement from './pages/FeatureAdmin/OrgManagement/Atlas';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
+import PrivacyPolicy from './pages/PrivacyPolicy/PrivacyPolicy';
 import SAMLCallback from './components/SAMLCallback/SAMLCallback';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './AuthContext';
@@ -133,6 +134,7 @@ function App() {
                                             <Route path="/register" element={<AnimatedPageWrapper><Register /></AnimatedPageWrapper>}/>
                                             <Route path="/login" element={<AnimatedPageWrapper><Login /></AnimatedPageWrapper>}/>
                                             <Route path="/contact" element={<AnimatedPageWrapper><Contact /></AnimatedPageWrapper>}/>
+                                            <Route path="/privacy-policy" element={<AnimatedPageWrapper><PrivacyPolicy /></AnimatedPageWrapper>}/>
                                             <Route path="/forgot-password" element={<AnimatedPageWrapper><ForgotPassword /></AnimatedPageWrapper>}/>
                                             <Route path="/reset-password" element={<AnimatedPageWrapper><ResetPassword /></AnimatedPageWrapper>}/>
                                             <Route path="/auth/saml/callback" element={<SAMLCallback />}/>
@@ -160,7 +162,7 @@ function App() {
                                             </Route>
 
                                             {/* features under development */}
-                                            <Route element={ <ProtectedRoute authorizedRoles={['user', 'admin', 'developer']}/> }>
+                                            <Route element={ <ProtectedRoute authorizedRoles={['admin', 'developer']}/> }>
                                                 <Route path="/events" element={<AnimatedPageWrapper><Events/></AnimatedPageWrapper>}/>
                                                 <Route path="/club-dashboard/:id" element={<AnimatedPageWrapper><ClubDash/></AnimatedPageWrapper>}/>
                                                 <Route path='/create-org' element={<AnimatedPageWrapper><CreateOrg/></AnimatedPageWrapper>}/>
