@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import DynamicFormField from '../DynamicFormField/DynamicFormField';
-import Where from '../../pages/CreateEventV2/Steps/Where/Where';
+import RoomSelectorV2 from '../../pages/CreateEventV2/Steps/Where/RoomSelectorV2/RoomSelectorV2';
 import When from '../../pages/CreateEventV2/Steps/When/When';
 import './DynamicStep.scss';
 
@@ -27,20 +27,21 @@ const DynamicStep = ({ step, formData, setFormData, onComplete, formConfig }) =>
         return stepId === 'location' || stepId === 'date-time';
     };
 
-    // Validate step - use refs to avoid dependency on formData object reference
-    const validateStep = useCallback(() => {
+    // Validate step - accepts optional formDataOverride to validate with updated data
+    const validateStep = useCallback((formDataOverride = null) => {
+        const dataToValidate = formDataOverride || formData;
         const newErrors = {};
         let valid = true;
 
         // Special validation for special steps
         if (step.id === 'location') {
-            valid = !!(formData.selectedRoomIds && formData.selectedRoomIds.length > 0);
+            valid = !!(dataToValidate.selectedRoomIds && dataToValidate.selectedRoomIds.length > 0);
         } else if (step.id === 'date-time') {
-            valid = !!(formData.start_time && formData.end_time);
+            valid = !!(dataToValidate.start_time && dataToValidate.end_time);
         } else {
             // Validate all fields in this step
             stepFields.forEach(field => {
-                const value = formData[field.name];
+                const value = dataToValidate[field.name];
                 const isRequired = field.isRequired || field.validation?.required;
 
                 if (isRequired) {
@@ -87,13 +88,15 @@ const DynamicStep = ({ step, formData, setFormData, onComplete, formConfig }) =>
         
         setIsValid(prevValid => {
             if (prevValid !== valid) {
-                // Only call onComplete if validity changed
-                onCompleteRef.current(valid);
+                // Defer onComplete call to avoid setState during render
+                setTimeout(() => {
+                    onCompleteRef.current(valid);
+                }, 0);
                 return valid;
             }
             return prevValid;
         });
-    }, [step.id, stepFields]);
+    }, [step.id, stepFields, formData]);
 
     // Validate step when relevant formData fields change
     useEffect(() => {
@@ -117,21 +120,31 @@ const DynamicStep = ({ step, formData, setFormData, onComplete, formConfig }) =>
     }, [formData, stepFields, step.id, validateStep]);
 
 
-    const handleFieldChange = (fieldName, value) => {
-        setFormData(prev => ({
-            ...prev,
-            [fieldName]: value
-        }));
-    };
+    const handleFieldChange = useCallback((fieldName, value) => {
+        // Update formData
+        setFormData(prev => {
+            const updated = {
+                ...prev,
+                [fieldName]: value
+            };
+            
+            // Defer validation to avoid setState during render
+            setTimeout(() => {
+                validateStep(updated);
+            }, 0);
+            
+            return updated;
+        });
+    }, [validateStep]);
 
-    // Render special steps
-    if (isSpecialStep(step.id)) {
-        if (step.id === 'location') {
-            return <Where formData={formData} setFormData={setFormData} onComplete={onComplete} />;
-        } else if (step.id === 'date-time') {
-            return <When formData={formData} setFormData={setFormData} onComplete={onComplete} />;
+        // Render special steps
+        if (isSpecialStep(step.id)) {
+            if (step.id === 'location') {
+                return <RoomSelectorV2 formData={formData} setFormData={setFormData} onComplete={onComplete} />;
+            } else if (step.id === 'date-time') {
+                return <When formData={formData} setFormData={setFormData} onComplete={onComplete} />;
+            }
         }
-    }
 
     // Render dynamic fields
     return (

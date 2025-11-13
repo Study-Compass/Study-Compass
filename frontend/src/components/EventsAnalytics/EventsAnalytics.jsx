@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Icon } from '@iconify-icon/react';
 import { useFetch } from '../../hooks/useFetch';
 import { useGradient } from '../../hooks/useGradient';
-import MetricCard from '../MetricCard';
+import KpiCard from '../Analytics/Dashboard/KpiCard';
 import './EventsAnalytics.scss';
 
 function EventsAnalytics() {
@@ -78,49 +78,39 @@ function EventsAnalytics() {
                 </div>
 
                 <div className="analytics-overview">
-                    <MetricCard
+                    <KpiCard
                         icon="mingcute:calendar-fill"
                         title="Total Events"
-                        value={data?.totalEvents || 0}
-                        label={getTimeRangeLabel(timeRange)}
-                        color="var(--secondary-color)"
-                        size="small"
+                        value={formatNumber(data?.totalEvents || 0)}
+                        subtitle={getTimeRangeLabel(timeRange)}
                     />
 
-                    <MetricCard
+                    <KpiCard
                         icon="mingcute:eye-fill"
                         title="Total Views"
-                        value={data?.totalViews || 0}
-                        label={`${formatNumber(data?.totalUniqueViews || 0)} unique logged-in`}
-                        color="var(--secondary-color)"
-                        size="small"
+                        value={formatNumber(data?.totalViews || 0)}
+                        subtitle={`${formatNumber(data?.totalUniqueViews || 0)} unique logged-in`}
                     />
 
-                    <MetricCard
+                    <KpiCard
                         icon="mdi:anonymous"
                         title="Anonymous Views"
-                        value={data?.totalAnonymousViews || 0}
-                        label={`${formatNumber(data?.totalUniqueAnonymousViews || 0)} unique anonymous`}
-                        color="var(--secondary-color)"
-                        size="small"
+                        value={formatNumber(data?.totalAnonymousViews || 0)}
+                        subtitle={`${formatNumber(data?.totalUniqueAnonymousViews || 0)} unique anonymous`}
                     />
 
-                    <MetricCard
+                    <KpiCard
                         icon="mingcute:user-add-fill"
                         title="Total RSVPs"
-                        value={data?.totalRsvps || 0}
-                        label={`${formatNumber(data?.totalUniqueRsvps || 0)} unique`}
-                        color="var(--secondary-color)"
-                        size="small"
+                        value={formatNumber(data?.totalRsvps || 0)}
+                        subtitle={`${formatNumber(data?.totalUniqueRsvps || 0)} unique`}
                     />
 
-                    <MetricCard
+                    <KpiCard
                         icon="mingcute:trending-up-fill"
                         title="Engagement Rate"
                         value={`${data?.engagementRate || 0}%`}
-                        label="RSVPs per view"
-                        color="var(--secondary-color)"  
-                        size="small"
+                        subtitle="RSVPs per view"
                     />
                 </div>
 
