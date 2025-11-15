@@ -240,6 +240,107 @@
         }
     }
 
+    // Responses List Container Styles
+    .responses-list-container {
+        width: 100%;
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 20px;
+        background: #f8f9fa;
+        border-radius: 12px;
+
+        .responses-list-header {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e0e0e0;
+
+            h3 {
+                font-size: 1.5rem;
+                font-weight: 600;
+                color: var(--text-primary, #333);
+                margin: 0;
+            }
+        }
+
+        .responses-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+
+            .response-list-item {
+                background: white;
+                border-radius: 10px;
+                padding: 20px;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                border: 2px solid transparent;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+
+                &:hover {
+                    transform: translateY(-2px);
+                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+                    border-color: var(--primary, #007bff);
+                }
+
+                .response-item-content {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    gap: 15px;
+
+                    .response-item-main {
+                        display: flex;
+                        flex-direction: column;
+                        gap: 10px;
+                        flex: 1;
+
+                        .response-item-name {
+                            display: flex;
+                            align-items: center;
+                            gap: 10px;
+                            font-size: 1.1rem;
+                            font-weight: 600;
+                            color: var(--text-primary, #333);
+
+                            .user-icon {
+                                font-size: 24px;
+                                color: var(--primary, #007bff);
+                            }
+
+                            .submitted-by-name {
+                                color: var(--text-primary, #333);
+                            }
+                        }
+
+                        .response-item-date {
+                            display: flex;
+                            align-items: center;
+                            gap: 8px;
+                            font-size: 0.9rem;
+                            color: var(--text-secondary, #666);
+
+                            .date-icon {
+                                font-size: 18px;
+                                color: var(--text-secondary, #888);
+                            }
+                        }
+                    }
+
+                    .chevron-icon {
+                        font-size: 24px;
+                        color: var(--text-secondary, #999);
+                        transition: transform 0.2s ease;
+                    }
+                }
+
+                &:hover .chevron-icon {
+                    transform: translateX(5px);
+                    color: var(--primary, #007bff);
+                }
+            }
+        }
+    }
+
     // Responses Viewer Container Styles
     .responses-viewer-container {
         width: 100%;
@@ -260,6 +361,31 @@
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
             flex-wrap: wrap;
             gap: 15px;
+
+            .back-btn {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                padding: 10px 16px;
+                background: var(--light, #f5f5f5);
+                color: var(--text, #333);
+                border: none;
+                border-radius: 6px;
+                cursor: pointer;
+                font-weight: 500;
+                font-size: 0.95rem;
+                transition: all 0.3s ease;
+
+                &:hover {
+                    background: var(--primary, #007bff);
+                    color: white;
+                    transform: translateX(-3px);
+                }
+
+                iconify-icon {
+                    font-size: 20px;
+                }
+            }
 
             .response-navigation {
                 display: flex;
@@ -356,6 +482,32 @@
 // Responsive design for responses viewer
 @media (max-width: 768px) {
     .club-forms {
+        .responses-list-container {
+            padding: 15px;
+
+            .responses-list-header h3 {
+                font-size: 1.2rem;
+            }
+
+            .responses-list {
+                .response-list-item {
+                    padding: 15px;
+
+                    .response-item-content {
+                        .response-item-main {
+                            .response-item-name {
+                                font-size: 1rem;
+                            }
+
+                            .response-item-date {
+                                font-size: 0.85rem;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         .responses-viewer-container {
             padding: 15px;
 
@@ -363,6 +515,12 @@
                 flex-direction: column;
                 align-items: stretch;
                 padding: 15px;
+                gap: 12px;
+
+                .back-btn {
+                    width: 100%;
+                    justify-content: center;
+                }
 
                 .response-navigation {
                     justify-content: center;

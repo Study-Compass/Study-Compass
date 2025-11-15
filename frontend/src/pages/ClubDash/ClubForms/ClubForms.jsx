@@ -9,6 +9,8 @@ import Popup from '../../../components/Popup/Popup';
 import apiRequest from '../../../utils/postRequest';
 import axios from 'axios';
 import { Icon } from '@iconify-icon/react';
+import { useDashboard } from '../../../contexts/DashboardContext';
+import FormResponses from './FormResponses';
 
 
 const ClubForms = ({ org }) => {
@@ -16,12 +18,12 @@ const ClubForms = ({ org }) => {
     const [showFormBuilder, setShowFormBuilder] = useState(false);
     const [showCopyNotification, setShowCopyNotification] = useState(false);
     const [showFormViewer, setShowFormViewer] = useState(false);
-    const [showResponsesViewer, setShowResponsesViewer] = useState(false);
     const [currentForm, setCurrentForm] = useState(null);
-    const [currentFormResponses, setCurrentFormResponses] = useState(null);
     const [selectedResponseIndex, setSelectedResponseIndex] = useState(0);
     const [viewMode, setViewMode] = useState('view'); // 'view' or 'edit'
     const [responsesLoading, setResponsesLoading] = useState(false);
+    const { showOverlay, hideOverlay } = useDashboard();
+    const [viewingResponseList, setViewingResponseList] = useState(true); // true = list view, false = detail view
     
     // Extract forms from the API response
     const forms = formsData?.forms || [];
@@ -103,13 +105,14 @@ const ClubForms = ({ org }) => {
             });
 
             if (responsesResponse.success) {
-                setCurrentFormResponses(responsesResponse.data.responses);
                 setCurrentForm(form);
                 setSelectedResponseIndex(0);
-                setShowResponsesViewer(true);
+                showOverlay(<FormResponses currentFormResponses={responsesResponse.responses} />);
+
+                
             } else {
-                console.error('Failed to load responses:', responsesResponse.data.message);
-                alert('Failed to load form responses: ' + (responsesResponse.data.message || 'Unknown error'));
+                console.error('Failed to load responses:', responsesResponse.message);
+                alert('Failed to load form responses: ' + (responsesResponse.message || 'Unknown error'));
             }
         } catch (error) {
             console.error('Error loading responses:', error);
@@ -186,60 +189,7 @@ const ClubForms = ({ org }) => {
                 )}
             </Popup>
 
-            {/* Form Responses Viewer Popup */}
-            <Popup
-                title={`Responses: ${currentForm?.title}`}
-                isOpen={showResponsesViewer}
-                onClose={() => {
-                    setShowResponsesViewer(false);
-                    setCurrentForm(null);
-                    setCurrentFormResponses(null);
-                    setSelectedResponseIndex(0);
-                }}
-                customClassName="wide-content"
-                defaultStyling={false}
-            >
-                {currentFormResponses && currentFormResponses.length > 0 ? (
-                    <div className="responses-viewer-container">
-                        <div className="responses-header">
-                            <div className="response-navigation">
-                                <button
-                                    className="nav-btn"
-                                    onClick={() => setSelectedResponseIndex(Math.max(0, selectedResponseIndex - 1))}
-                                    disabled={selectedResponseIndex === 0}
-                                >
-                                    <Icon icon="mdi:chevron-left" />
-                                </button>
-                                <span className="response-counter">
-                                    {selectedResponseIndex + 1} of {currentFormResponses.length}
-                                </span>
-                                <button
-                                    className="nav-btn"
-                                    onClick={() => setSelectedResponseIndex(Math.min(currentFormResponses.length - 1, selectedResponseIndex + 1))}
-                                    disabled={selectedResponseIndex === currentFormResponses.length - 1}
-                                >
-                                    <Icon icon="mdi:chevron-right" />
-                                </button>
-                            </div>
-                        </div>
-                        <FormResponseViewer formResponse={currentFormResponses[selectedResponseIndex]} />
-                            <div className="response-meta-info">
-                                {currentFormResponses[selectedResponseIndex].submittedBy && (
-                                    <span className="submitted-by">
-                                        Submitted by: {currentFormResponses[selectedResponseIndex].submittedBy.name || currentFormResponses[selectedResponseIndex].submittedBy.email}
-                                    </span>
-                                )}
-                                <span className="submitted-date">
-                                    {new Date(currentFormResponses[selectedResponseIndex].submittedAt).toLocaleString()}
-                                </span>
-                            </div>
-                    </div>
-                ) : (
-                    <div className="no-responses">
-                        <p>No responses yet for this form.</p>
-                    </div>
-                )}
-            </Popup>
+            
 
                 <header className="header">
                     <h1>Club Forms</h1>
