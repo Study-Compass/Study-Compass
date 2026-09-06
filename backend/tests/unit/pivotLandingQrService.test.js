@@ -372,9 +372,32 @@ describe('hopLandingQr (Task 5.2)', () => {
     expect(findOneAndUpdate.mock.calls[0][1].$inc.uniqueScans).toBeUndefined();
   });
 
+  it('maps and repairs a legacy Iowa QR tenant key to ic', async () => {
+    const existing = qrRow({ name: 'iowa-2', tenantKey: 'iowacity', isActive: true });
+    const findOneAndUpdate = jest.fn().mockResolvedValue({ ...existing, tenantKey: 'ic' });
+    getGlobalModels.mockReturnValue({
+      JustGoLandingQr: {
+        findOne: jest.fn().mockReturnValue({ lean: jest.fn().mockResolvedValue(existing) }),
+        findOneAndUpdate,
+      },
+    });
+
+    const result = await hopLandingQr(mockReq(), { name: 'iowa-2' });
+
+    expect(result.data.tenantKey).toBe('ic');
+    expect(result.data.redirectUrl).toMatch(/\/ic\?/);
+    expect(findOneAndUpdate).toHaveBeenCalledWith(
+      { _id: existing._id, isActive: true },
+      expect.objectContaining({
+        $set: expect.objectContaining({ tenantKey: 'ic' }),
+      }),
+      { new: true },
+    );
+  });
+
   it('attributes an SF poster QR in America/Chicago to the Iowa sibling row', async () => {
     const printed = qrRow({ _id: 'sf-qr', name: 'sf-1', tenantKey: 'sf', isActive: true });
-    const iowa = qrRow({ _id: 'iowa-qr', name: 'iowa-1', tenantKey: 'iowacity', isActive: true });
+    const iowa = qrRow({ _id: 'iowa-qr', name: 'iowa-1', tenantKey: 'ic', isActive: true });
     const findOne = jest.fn((filter = {}) => ({
       lean: jest.fn().mockResolvedValue(filter.name === 'iowa-1' ? iowa : printed),
     }));
@@ -393,9 +416,9 @@ describe('hopLandingQr (Task 5.2)', () => {
 
     expect(result.error).toBeUndefined();
     expect(result.data.name).toBe('iowa-1');
-    expect(result.data.tenantKey).toBe('iowacity');
+    expect(result.data.tenantKey).toBe('ic');
     expect(result.data.posterTzHop).toBe(true);
-    expect(result.data.redirectUrl).toMatch(/\/iowacity\?/);
+    expect(result.data.redirectUrl).toMatch(/\/ic\?/);
     expect(result.data.redirectUrl).toMatch(/qr=iowa-1/);
     expect(result.data.redirectUrl).not.toMatch(/qr=sf-1/);
     expect(create).not.toHaveBeenCalled();
@@ -403,7 +426,7 @@ describe('hopLandingQr (Task 5.2)', () => {
       { _id: 'iowa-qr' },
       expect.objectContaining({
         $inc: expect.objectContaining({ scans: 1, uniqueScans: 1 }),
-        $set: expect.objectContaining({ tenantKey: 'iowacity', isActive: true }),
+        $set: expect.objectContaining({ tenantKey: 'ic', isActive: true }),
       }),
       { new: true },
     );
@@ -411,7 +434,7 @@ describe('hopLandingQr (Task 5.2)', () => {
 
   it('creates a missing Iowa sibling QR then increments that row, not SF', async () => {
     const printed = qrRow({ _id: 'sf-qr', name: 'sf-1', tenantKey: 'sf', isActive: true });
-    const created = qrRow({ _id: 'iowa-qr', name: 'iowa-1', tenantKey: 'iowacity', isActive: true });
+    const created = qrRow({ _id: 'iowa-qr', name: 'iowa-1', tenantKey: 'ic', isActive: true });
     const findOne = jest.fn((filter = {}) => ({
       lean: jest.fn().mockResolvedValue(filter.name === 'iowa-1' ? null : printed),
     }));
@@ -427,10 +450,10 @@ describe('hopLandingQr (Task 5.2)', () => {
     });
 
     expect(result.data.name).toBe('iowa-1');
-    expect(result.data.tenantKey).toBe('iowacity');
+    expect(result.data.tenantKey).toBe('ic');
     expect(create).toHaveBeenCalledWith(expect.objectContaining({
       name: 'iowa-1',
-      tenantKey: 'iowacity',
+      tenantKey: 'ic',
       isActive: true,
     }));
     expect(findOneAndUpdate).toHaveBeenCalledWith(

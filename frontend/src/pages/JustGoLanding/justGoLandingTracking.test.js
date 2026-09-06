@@ -334,7 +334,7 @@ describe('justGoLandingTracking (Task 1.3)', () => {
 
     it('guesses sf-* and iowa-* poster names without a scan', () => {
       expect(guessLandingQrTenantKey('sf-1')).toBe('sf');
-      expect(guessLandingQrTenantKey('iowa-2')).toBe('iowacity');
+      expect(guessLandingQrTenantKey('iowa-2')).toBe('ic');
       expect(guessLandingQrTenantKey('poster-a')).toBe('');
       expect(guessLandingQrTenantKey('troy')).toBe('');
       expect(
@@ -351,7 +351,7 @@ describe('justGoLandingTracking (Task 1.3)', () => {
           justGoHost: true,
           timeZone: 'America/Chicago',
         }),
-      ).toBe('/iowacity?src=qr&qr=sf-1');
+      ).toBe('/ic?src=qr&qr=sf-1');
     });
 
     it('posts a unique scan once per visitor+code', async () => {
@@ -406,7 +406,7 @@ describe('justGoLandingTracking (Task 1.3)', () => {
       expect(hasSeenLandingQr('poster-a')).toBe(true);
     });
 
-    it('sends the phone timezone and remaps an SF poster QR in Central time to iowacity', async () => {
+    it('sends the phone timezone and remaps an SF poster QR in Central time to ic', async () => {
       mockApi.mockResolvedValue({
         success: true,
         data: { name: 'sf-1', tenantKey: 'sf', path: '/sf' },
@@ -417,7 +417,7 @@ describe('justGoLandingTracking (Task 1.3)', () => {
         timeZone: 'America/Chicago',
         utcOffsetMinutes: 300,
       });
-      expect(result.data.tenantKey).toBe('iowacity');
+      expect(result.data.tenantKey).toBe('ic');
       expect(result.data.name).toBe('iowa-1');
       expect(result.data.posterTzHop).toBe(true);
       expect(mockApi).toHaveBeenCalledWith(

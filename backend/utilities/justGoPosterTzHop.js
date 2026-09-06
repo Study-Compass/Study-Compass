@@ -9,7 +9,7 @@
  */
 
 const SF_TENANT_KEY = 'sf';
-const IOWA_TENANT_KEY = 'iowacity';
+const IOWA_TENANT_KEY = 'ic';
 const IOWA_QR_PREFIX = 'iowa';
 
 const IOWA_TIME_ZONES = new Set(['America/Chicago', 'US/Central']);

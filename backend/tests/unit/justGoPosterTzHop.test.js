@@ -24,7 +24,7 @@ describe('justGoPosterTzHop', () => {
   it('treats sf tenant and sf-* names as SF posters', () => {
     expect(isSfPosterQr({ tenantKey: 'sf', name: 'poster-a' })).toBe(true);
     expect(isSfPosterQr({ tenantKey: 'SF', name: 'sf-1' })).toBe(true);
-    expect(isSfPosterQr({ tenantKey: 'iowacity', name: 'sf-1' })).toBe(false);
+    expect(isSfPosterQr({ tenantKey: 'ic', name: 'sf-1' })).toBe(false);
     expect(isSfPosterQr({ name: 'sf-1' })).toBe(true);
     expect(isSfPosterQr({ tenantKey: 'nyc', name: 'poster-a' })).toBe(false);
   });
@@ -38,7 +38,7 @@ describe('justGoPosterTzHop', () => {
     expect(isIowaPosterTimeZone('', 420)).toBe(false);
   });
 
-  it('hops SF poster QRs in Central time to iowacity and leaves Pacific on sf', () => {
+  it('hops SF poster QRs in Central time to ic and leaves Pacific on sf', () => {
     expect(
       resolvePosterTzHopTenant({
         tenantKey: SF_TENANT_KEY,

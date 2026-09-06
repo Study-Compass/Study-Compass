@@ -435,12 +435,16 @@ async function hopLandingQr(req, body = {}) {
   if (!existing) return qrNotFound();
   if (existing.isActive === false) return qrInactive();
 
-  const hop = resolvePosterTzHop({
+  const resolvedHop = resolvePosterTzHop({
     tenantKey: existing.tenantKey,
     name: existing.name,
     timeZone: trimToNull(body.timeZone, 64),
     utcOffsetMinutes: body.utcOffsetMinutes,
   });
+  const isIowaNamedQr = /^iowa(?:-|$)/.test(existing.name);
+  const hop = isIowaNamedQr
+    ? { ...resolvedHop, tenantKey: IOWA_TENANT_KEY }
+    : resolvedHop;
 
   let target = existing;
   let attributed = hop;
@@ -460,6 +464,9 @@ async function hopLandingQr(req, body = {}) {
   if (unique) inc.uniqueScans = 1;
 
   const set = { lastScannedAt: at };
+  if (isIowaNamedQr && existing.tenantKey !== IOWA_TENANT_KEY) {
+    set.tenantKey = IOWA_TENANT_KEY;
+  }
   if (hop.remapped && attributed.name !== existing.name) {
     set.isActive = true;
     set.tenantKey = IOWA_TENANT_KEY;
