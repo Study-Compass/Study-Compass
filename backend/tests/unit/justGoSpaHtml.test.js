@@ -128,6 +128,7 @@ describe('justGoSpaHtml', () => {
     expect(html).toContain('property="og:type" content="event"');
     expect(html).toContain('property="og:url" content="https://justgo.lol/events/64f1234567890abcdef12345"');
     expect(html).toContain('property="og:image" content="https://images.example.test/event.jpg?a=1&amp;b=2"');
+    expect(html).toContain('property="og:image:alt" content="Movie Night &lt;Finale>"');
     expect(html).toContain('name="twitter:card" content="summary_large_image"');
     expect(html).toContain('name="twitter:title" content="Movie Night &lt;Finale> | Just &amp; Go"');
     expect(html).not.toContain('</script><script>alert(1)</script>');
@@ -145,6 +146,51 @@ describe('justGoSpaHtml', () => {
       location: { '@type': 'Place', name: event.venue.text },
       organizer: { '@type': 'Organization', name: event.organizer.name },
     });
+  });
+
+  it('uses the generated opengraph card when the event has no photo', async () => {
+    const event = {
+      id: '64f1234567890abcdef12345',
+      title: 'Open mic night',
+      description: 'Bring your best five minutes.',
+      image: null,
+      startsAt: '2026-09-05T02:00:00.000Z',
+      endsAt: '2026-09-05T04:30:00.000Z',
+      timezone: 'America/Los_Angeles',
+      venue: { text: 'Back Room' },
+      organizer: { name: 'Local Hosts', imageUrl: null, profileUrl: null },
+      lifecycleStatus: 'upcoming',
+      registrationCapability: 'none',
+      cityId: 'oakland',
+      canonicalUrl: 'https://justgo.lol/events/64f1234567890abcdef12345',
+      socialPreview: {
+        title: 'Open mic night',
+        description: 'Bring your best five minutes.',
+        imageUrl: null,
+      },
+    };
+    const html = await renderPublicEventIndexHtml(
+      INDEX_HTML,
+      req({ originalUrl: `/events/${event.id}` }),
+      {
+        loadPublicEvent: jest.fn().mockResolvedValue({ available: true, body: { data: event } }),
+        getPublicEventLanguage: jest.fn().mockResolvedValue({ language: null }),
+      },
+    );
+
+    expect(html).toContain(
+      'property="og:image" content="https://justgo.lol/api/public/events/64f1234567890abcdef12345/opengraph.png"',
+    );
+    expect(html).toContain(
+      'name="twitter:image" content="https://justgo.lol/api/public/events/64f1234567890abcdef12345/opengraph.png"',
+    );
+    expect(html).toContain('property="og:image:width" content="1200"');
+    expect(html).toContain('property="og:image:height" content="630"');
+    expect(html).toContain('property="og:image:alt" content="Open mic night"');
+    expect(html).toContain('name="twitter:image:alt" content="Open mic night"');
+    expect(html).not.toMatch(
+      /property="og:image" content="https:\/\/justgo\.lol\/justgo\/og\.jpg"/,
+    );
   });
 
   it.each([
