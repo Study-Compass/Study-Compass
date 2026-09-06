@@ -55,6 +55,7 @@ const JustGoCreatorNew = lazy(() => import('./pages/JustGoCreator/JustGoCreatorN
 const JustGoCreatorEventWorkspace = lazy(() => import('./pages/JustGoCreator/JustGoCreatorEventWorkspace'));
 const JustGoCreatorLogin = lazy(() => import('./pages/JustGoCreator/JustGoCreatorLogin'));
 const JustGoPublicEvent = lazy(() => import('./pages/JustGoPublicEvent/JustGoPublicEvent'));
+const JustGoZine = lazy(() => import('./pages/JustGoZine/JustGoZine'));
 const OIEDash = lazy(() => import('./pages/OIEDash/OIEDash'));
 const NewBadge = lazy(() => import('./pages/NewBadge/NewBadge'));
 const CreateOrg = lazy(() => import('./pages/CreateOrg/CreateOrg'));
@@ -273,6 +274,8 @@ function App() {
                                             <Route path="/mobile" element={<AnimatedPageWrapper><MobileLanding /></AnimatedPageWrapper>}/>
                                             <Route path="/invite" element={<AnimatedPageWrapper><InviteLanding /></AnimatedPageWrapper>}/>
                                             <Route path="/justgo/qr/:name" element={<JustGoQrHop />} />
+                                            {/* Concept surface — social zine frames. Static segment outranks :tenantKey. */}
+                                            <Route path="/justgo/zine" element={<JustGoZine />} />
                                             <Route path="/justgo/:tenantKey" element={<JustGoLanding />} />
                                             <Route path="/justgo" element={<JustGoLanding />} />
                                             {justGoHost ? (

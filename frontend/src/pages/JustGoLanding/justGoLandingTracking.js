@@ -271,7 +271,7 @@ export function markLandingQrSeen(name) {
  */
 export const JUSTGO_QR_NAME_CITY_PREFIXES = Object.freeze({
   sf: 'sf',
-  iowa: 'iowacity',
+  iowa: 'ic',
 });
 
 export function guessLandingQrTenantKey(name) {
