@@ -7,6 +7,10 @@ const JUSTGO_DESCRIPTION =
 const JUSTGO_THEME_COLOR = '#1E1A16';
 const JUSTGO_SITE_NAME = 'just go';
 const JUSTGO_OG_IMAGE_PATH = '/justgo/og.jpg';
+const JUSTGO_OG_IMAGE_WIDTH = 1200;
+const JUSTGO_OG_IMAGE_HEIGHT = 630;
+const JUSTGO_OG_IMAGE_ALT =
+  'just go wordmark — this week in your city. stop planning. swipe what\'s on in your city this week. just go.';
 const JUSTGO_ICON_PATH = '/justgo-icon.svg';
 const PUBLIC_EVENT_PATH = /^\/events\/([0-9a-f]{24})\/?$/;
 const ANY_PUBLIC_EVENT_PATH = /^\/events\/([^/]+)\/?$/;
@@ -228,6 +232,9 @@ function applyJustGoIndexHtml(html, req) {
   out = setMetaContent(out, 'property', 'og:title', JUSTGO_TITLE);
   out = setMetaContent(out, 'property', 'og:description', JUSTGO_DESCRIPTION);
   out = setMetaContent(out, 'property', 'og:image', image);
+  out = setMetaContent(out, 'property', 'og:image:width', String(JUSTGO_OG_IMAGE_WIDTH));
+  out = setMetaContent(out, 'property', 'og:image:height', String(JUSTGO_OG_IMAGE_HEIGHT));
+  out = setMetaContent(out, 'property', 'og:image:alt', JUSTGO_OG_IMAGE_ALT);
   out = setMetaContent(out, 'property', 'og:url', canonical);
   out = setMetaContent(out, 'property', 'og:type', 'website');
   out = setMetaContent(out, 'property', 'og:site_name', JUSTGO_SITE_NAME);
@@ -235,6 +242,7 @@ function applyJustGoIndexHtml(html, req) {
   out = setMetaContent(out, 'name', 'twitter:title', JUSTGO_TITLE);
   out = setMetaContent(out, 'name', 'twitter:description', JUSTGO_DESCRIPTION);
   out = setMetaContent(out, 'name', 'twitter:image', image);
+  out = setMetaContent(out, 'name', 'twitter:image:alt', JUSTGO_OG_IMAGE_ALT);
   out = setLinkHref(out, 'icon', icon);
   out = setLinkHref(out, 'apple-touch-icon', icon);
   return out;
@@ -244,6 +252,9 @@ module.exports = {
   JUSTGO_TITLE,
   JUSTGO_DESCRIPTION,
   JUSTGO_OG_IMAGE_PATH,
+  JUSTGO_OG_IMAGE_WIDTH,
+  JUSTGO_OG_IMAGE_HEIGHT,
+  JUSTGO_OG_IMAGE_ALT,
   wantsJustGoHtmlMeta,
   justGoCanonicalPath,
   applyJustGoIndexHtml,

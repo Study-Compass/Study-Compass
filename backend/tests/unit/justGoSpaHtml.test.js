@@ -3,6 +3,7 @@ const path = require('path');
 const {
   JUSTGO_TITLE,
   JUSTGO_DESCRIPTION,
+  JUSTGO_OG_IMAGE_ALT,
   wantsJustGoHtmlMeta,
   justGoCanonicalPath,
   applyJustGoIndexHtml,
@@ -56,7 +57,11 @@ describe('justGoSpaHtml', () => {
     expect(html).toContain('property="og:site_name" content="just go"');
     expect(html).toContain('property="og:url" content="https://justgo.lol"');
     expect(html).toContain('property="og:image" content="https://justgo.lol/justgo/og.jpg"');
+    expect(html).toContain('property="og:image:width" content="1200"');
+    expect(html).toContain('property="og:image:height" content="630"');
+    expect(html).toContain(`property="og:image:alt" content="${JUSTGO_OG_IMAGE_ALT}"`);
     expect(html).toContain('name="twitter:image" content="https://justgo.lol/justgo/og.jpg"');
+    expect(html).toContain(`name="twitter:image:alt" content="${JUSTGO_OG_IMAGE_ALT}"`);
     expect(html).toContain('name="theme-color" content="#1E1A16"');
     expect(html).toContain('href="https://justgo.lol/justgo-icon.svg"');
     expect(html).not.toMatch(/All of campus in one place/);
