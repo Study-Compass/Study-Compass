@@ -1,5 +1,6 @@
 const { isJustGoPublicHost } = require('./corsOrigins');
 const { justGoPublicUrl } = require('./justGoPublicUrl');
+const { formatPublicEventDate } = require('../services/justGoPublicEventShareImageService');
 
 const JUSTGO_TITLE = 'just go. this week in your city';
 const JUSTGO_DESCRIPTION =
@@ -20,6 +21,50 @@ function escapeAttr(value) {
     .replace(/&/g, '&amp;')
     .replace(/"/g, '&quot;')
     .replace(/</g, '&lt;');
+}
+
+function escapeHtml(value) {
+  return String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+
+function injectBeforeBodyClose(html, block) {
+  return String(html || '').replace(/<\/body>/i, `    ${block}\n  </body>`);
+}
+
+function buildPublicEventShareFallbackBlock(event, language = null) {
+  const venueLabel = resolveLanguageEntry(language, 'landing.web.event.venueLabel', 'where');
+  const organizerLabel = resolveLanguageEntry(
+    language,
+    'landing.web.event.organizerLabel',
+    'hosted by',
+  );
+  const dateSeparator = resolveLanguageEntry(language, 'landing.web.event.dateSeparator', 'to');
+  const when = formatPublicEventDate(event, 'en-US');
+  const lines = [
+    '<div id="justgo-share-fallback">',
+    `<h1>${escapeHtml(event.title)}</h1>`,
+  ];
+  if (when) {
+    lines.push(`<p>${escapeHtml(when.date)}</p>`);
+    lines.push(
+      `<p>${escapeHtml(when.startTime)} ${escapeHtml(dateSeparator)} ${escapeHtml(when.endTime)}</p>`,
+    );
+  }
+  const venueText = event.venue?.text;
+  if (typeof venueText === 'string' && venueText.trim()) {
+    lines.push(`<p>${escapeHtml(venueLabel)}: ${escapeHtml(venueText)}</p>`);
+  }
+  const organizerName = event.organizer?.name;
+  if (typeof organizerName === 'string' && organizerName.trim()) {
+    lines.push(`<p>${escapeHtml(organizerLabel)}: ${escapeHtml(organizerName)}</p>`);
+  }
+  const canonical = event.canonicalUrl;
+  lines.push(`<p><a href="${escapeAttr(canonical)}">${escapeHtml(canonical)}</a></p>`);
+  lines.push('</div>');
+  return lines.join('\n    ');
 }
 
 function requestPath(req) {
@@ -191,7 +236,8 @@ function applyPublicEventIndexHtml(html, req, event, language = null) {
   out = setMetaContent(out, 'name', 'twitter:description', description);
   out = setMetaContent(out, 'name', 'twitter:image', image);
   out = setMetaContent(out, 'name', 'twitter:image:alt', imageAlt);
-  return setJsonLd(out, publicEventStructuredData(event));
+  out = setJsonLd(out, publicEventStructuredData(event));
+  return injectBeforeBodyClose(out, buildPublicEventShareFallbackBlock(event, language));
 }
 
 function applyUnavailablePublicEventIndexHtml(html, req, language = null) {
@@ -289,4 +335,5 @@ module.exports = {
   applyUnavailablePublicEventIndexHtml,
   renderPublicEventIndexHtml,
   resolvePublicEventShareImage,
+  buildPublicEventShareFallbackBlock,
 };

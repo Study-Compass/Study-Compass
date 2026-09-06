@@ -10,6 +10,7 @@ const {
   isPublicEventRequest,
   renderPublicEventIndexHtml,
   applyUnavailablePublicEventIndexHtml,
+  buildPublicEventShareFallbackBlock,
 } = require('../../utilities/justGoSpaHtml');
 
 const INDEX_HTML = fs.readFileSync(
@@ -146,6 +147,15 @@ describe('justGoSpaHtml', () => {
       location: { '@type': 'Place', name: event.venue.text },
       organizer: { '@type': 'Organization', name: event.organizer.name },
     });
+    expect(html).toContain('id="justgo-share-fallback"');
+    expect(html).toContain('<h1>Movie Night &lt;Finale&gt;</h1>');
+    expect(html).toContain('where: Civic Center &lt;Lawn&gt;');
+    expect(html).toContain('hosted by: Night &amp; Owl');
+    expect(html).toContain(
+      '<a href="https://justgo.lol/events/64f1234567890abcdef12345">https://justgo.lol/events/64f1234567890abcdef12345</a>',
+    );
+    const fallback = html.match(/<div id="justgo-share-fallback">[\s\S]*?<\/div>/)[0];
+    expect(fallback).not.toContain('<script');
   });
 
   it('uses the generated opengraph card when the event has no photo', async () => {
@@ -191,6 +201,10 @@ describe('justGoSpaHtml', () => {
     expect(html).not.toMatch(
       /property="og:image" content="https:\/\/justgo\.lol\/justgo\/og\.jpg"/,
     );
+    expect(html).toContain('id="justgo-share-fallback"');
+    expect(html).toContain('<h1>Open mic night</h1>');
+    expect(html).toContain('where: Back Room');
+    expect(html).toContain('hosted by: Local Hosts');
   });
 
   it.each([
@@ -207,6 +221,7 @@ describe('justGoSpaHtml', () => {
     expect(html).toContain('<title>this event isn’t available</title>');
     expect(html).toContain('name="robots" content="noindex, nofollow"');
     expect(html).not.toContain('data-justgo-event>');
+    expect(html).not.toContain('id="justgo-share-fallback"');
     expect(html).not.toContain('database unavailable');
   });
 
@@ -258,5 +273,32 @@ describe('justGoSpaHtml', () => {
     expect(html).toContain('<title>Gone &lt;quietly></title>');
     expect(html).toContain('Find another plan in Just &amp; Tonight.');
     expect(html).not.toContain('{brand.name}');
+    expect(html).not.toContain('id="justgo-share-fallback"');
+  });
+
+  it('builds a crawler-visible share fallback block with escaped plain text', () => {
+    const event = {
+      title: 'Jazz & Blues <Night>',
+      startsAt: '2026-09-05T02:00:00.000Z',
+      endsAt: '2026-09-05T04:30:00.000Z',
+      timezone: 'America/Los_Angeles',
+      venue: { text: 'The <Basement>' },
+      organizer: { name: 'City & Sound' },
+      canonicalUrl: 'https://justgo.lol/events/64f1234567890abcdef12345',
+    };
+    const block = buildPublicEventShareFallbackBlock(event, {
+      entries: {
+        'landing.web.event.venueLabel': 'venue',
+        'landing.web.event.organizerLabel': 'by',
+        'landing.web.event.dateSeparator': 'until',
+      },
+      tokens: {},
+    });
+    expect(block).toContain('id="justgo-share-fallback"');
+    expect(block).toContain('<h1>Jazz &amp; Blues &lt;Night&gt;</h1>');
+    expect(block).toContain('venue: The &lt;Basement&gt;');
+    expect(block).toContain('by: City &amp; Sound');
+    expect(block).toContain(' until ');
+    expect(block).not.toContain('<script');
   });
 });
