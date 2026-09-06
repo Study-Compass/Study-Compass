@@ -1,0 +1,892 @@
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap');
+@import '../../components/PivotBranding/pivotBrandFonts.scss';
+
+/*
+ * "sorry u missed it" — Just Go zine register.
+ *
+ * Every value inside a frame is `cqw` (1cqw = 1% of frame width), so one
+ * definition renders identically at 1080px export and at gallery preview size.
+ * Nothing here introduces brand vocabulary that does not already exist in
+ * pivotTheme.ts / JustGoLanding.scss — the zine only spends it louder.
+ */
+
+/* ------------------------------------------------------------ light table */
+
+.jgz {
+  --jgz-ink: #1a1714;
+  --jgz-cream: #faf6ef;
+  --jgz-night: #15120f;
+  --jgz-night-raised: #1e1a16;
+  --jgz-accent: #ff4f1f;
+  --jgz-ticker: #4ab5ff;
+  --jgz-pop: #ffd23f;
+  --jgz-burst: #ff2a2a;
+  --jgz-sage: #5fd068;
+
+  --jgz-font-display: 'Instrument Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --jgz-font-mono: 'Space Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;
+  --jgz-font-flos: 'Les Flos Sans', 'Instrument Sans', 'Helvetica Neue', Helvetica, sans-serif;
+
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: clamp(1.25rem, 4vw, 3rem) clamp(1rem, 4vw, 3rem) 5rem;
+  background: #0f0d0b;
+  color: var(--jgz-cream);
+  font-family: var(--jgz-font-mono);
+  text-transform: lowercase;
+  color-scheme: dark;
+}
+
+.jgz__masthead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem 1.5rem;
+  padding-bottom: 0.9rem;
+  border-bottom: 2px solid var(--jgz-cream);
+}
+
+.jgz__title {
+  margin: 0;
+  font-family: var(--jgz-font-flos);
+  font-size: clamp(2rem, 5vw, 3.25rem);
+  line-height: 0.95;
+  letter-spacing: -0.01em;
+}
+
+.jgz__standfirst {
+  margin: 0.5rem 0 0;
+  max-width: 46ch;
+  font-size: 0.8rem;
+  line-height: 1.55;
+  color: rgba(250, 246, 239, 0.72);
+}
+
+.jgz__controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.jgz__switch {
+  display: flex;
+  border: 2px solid var(--jgz-cream);
+}
+
+.jgz__switch button {
+  appearance: none;
+  padding: 0.5rem 0.85rem;
+  border: 0;
+  background: transparent;
+  color: var(--jgz-cream);
+  font: inherit;
+  font-size: 0.72rem;
+  text-transform: lowercase;
+  cursor: pointer;
+
+  & + button {
+    border-left: 2px solid var(--jgz-cream);
+  }
+
+  &[aria-pressed='true'] {
+    background: var(--jgz-accent);
+    color: var(--jgz-cream);
+  }
+
+  &:focus-visible {
+    outline: 3px solid var(--jgz-pop);
+    outline-offset: -3px;
+  }
+}
+
+.jgz__note {
+  font-size: 0.68rem;
+  color: rgba(250, 246, 239, 0.48);
+}
+
+/* Contact-sheet gallery: frames sit on the table, captions live outside them. */
+.jgz__sheet {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 21rem), 1fr));
+  gap: clamp(1.5rem, 4vw, 2.75rem);
+  margin-top: clamp(1.75rem, 5vw, 3rem);
+  list-style: none;
+  padding: 0;
+}
+
+.jgz__slot {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.jgz__slot-caption {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  font-size: 0.68rem;
+  color: rgba(250, 246, 239, 0.62);
+
+  b {
+    font-weight: 700;
+    color: var(--jgz-cream);
+  }
+}
+
+.jgz__spec {
+  margin-top: clamp(2.5rem, 6vw, 4rem);
+  padding-top: 1.1rem;
+  border-top: 2px solid var(--jgz-cream);
+
+  h2 {
+    margin: 0 0 0.8rem;
+    font-family: var(--jgz-font-display);
+    font-size: 1rem;
+    font-weight: 700;
+  }
+
+  dl {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 16rem), 1fr));
+    gap: 0.9rem 2rem;
+    margin: 0;
+  }
+
+  dt {
+    font-size: 0.68rem;
+    color: var(--jgz-pop);
+  }
+
+  dd {
+    margin: 0.2rem 0 0;
+    font-size: 0.72rem;
+    line-height: 1.5;
+    color: rgba(250, 246, 239, 0.72);
+  }
+}
+
+/* ------------------------------------------------------------------ frame */
+
+.jgz-frame {
+  container-type: inline-size;
+  position: relative;
+  aspect-ratio: 4 / 5;
+  width: 100%;
+  overflow: hidden;
+  isolation: isolate;
+  font-family: var(--jgz-font-display);
+}
+
+.jgz-frame--night {
+  --jgz-ground: var(--jgz-night);
+  --jgz-plate: var(--jgz-night-raised);
+  --jgz-type: var(--jgz-cream);
+  --jgz-type-muted: rgba(250, 246, 239, 0.72);
+  --jgz-type-soft: rgba(250, 246, 239, 0.46);
+  --jgz-rule: var(--jgz-cream);
+  --jgz-shadow: rgba(0, 0, 0, 0.62);
+
+  background: var(--jgz-ground);
+  color: var(--jgz-type);
+}
+
+.jgz-frame--paper {
+  --jgz-ground: var(--jgz-cream);
+  --jgz-plate: #f0eae0;
+  --jgz-type: var(--jgz-ink);
+  --jgz-type-muted: rgba(26, 23, 20, 0.72);
+  --jgz-type-soft: rgba(26, 23, 20, 0.5);
+  --jgz-rule: var(--jgz-ink);
+  --jgz-shadow: rgba(26, 23, 20, 0.28);
+  --jgz-riso: var(--jgz-accent);
+
+  background: var(--jgz-ground);
+  color: var(--jgz-type);
+}
+
+/*
+ * Newsprint gets a faint laid-paper tooth so the cream is a stock, not a fill.
+ * `z-index: -1` inside the frame's own stacking context paints it above the
+ * frame background but under every child, so children need no z-index of their
+ * own and nothing here fights the per-frame layering below.
+ */
+.jgz-frame--paper::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.55;
+  background-image:
+    repeating-linear-gradient(90deg, rgba(26, 23, 20, 0.045) 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(0deg, rgba(26, 23, 20, 0.035) 0 1px, transparent 1px 4px);
+}
+
+/* -------------------------------------------------------------- primitives */
+
+.jgz-ticker {
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: 4;
+  overflow: hidden;
+  padding: 1.5cqw 0;
+  border-bottom: 0.55cqw solid var(--jgz-ink);
+  background: var(--jgz-ticker);
+  color: var(--jgz-ink);
+  font-family: var(--jgz-font-mono);
+  font-size: 2.5cqw;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.jgz-ticker--accent {
+  background: var(--jgz-accent);
+  color: var(--jgz-cream);
+  border-bottom-color: var(--jgz-ink);
+}
+
+.jgz-ticker__rail {
+  display: flex;
+  width: max-content;
+  animation: jgz-marquee 22s linear infinite;
+}
+
+@keyframes jgz-marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* Struck mark. Rotation under ~4deg reads as a crooked badge, which is worse. */
+.jgz-stamp {
+  position: absolute;
+  padding: 1.1cqw 2.4cqw 1.3cqw;
+  border: 0.62cqw solid currentColor;
+  outline: 0.28cqw solid currentColor;
+  outline-offset: 0.7cqw;
+  font-family: var(--jgz-font-mono);
+  font-weight: 700;
+  font-size: 4.4cqw;
+  line-height: 1;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  transform: rotate(var(--jgz-stamp-deg, -7deg));
+  animation: jgz-strike 320ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.jgz-stamp--burst {
+  color: var(--jgz-burst);
+}
+
+.jgz-stamp--ink {
+  color: var(--jgz-type);
+}
+
+@keyframes jgz-strike {
+  from {
+    opacity: 0;
+    transform: rotate(var(--jgz-stamp-deg, -7deg)) scale(1.35);
+  }
+}
+
+.jgz-knockout {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  width: 100%;
+  height: 100%;
+}
+
+.jgz-knockout__plate {
+  fill: var(--jgz-ground);
+}
+
+.jgz-knockout__edge {
+  fill: none;
+  stroke: var(--jgz-rule);
+  stroke-width: 5;
+  stroke-linejoin: miter;
+}
+
+.jgz-photo {
+  position: relative;
+  overflow: hidden;
+  background: #0f0d0b;
+
+  img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.jgz-photo__blank {
+  display: flex;
+  align-items: flex-end;
+  width: 100%;
+  height: 100%;
+  padding: 2.4cqw;
+  background-color: #0f0d0b;
+  background-image: repeating-linear-gradient(
+    -45deg,
+    rgba(250, 246, 239, 0.07) 0 1px,
+    transparent 1px 7px
+  );
+  color: rgba(250, 246, 239, 0.5);
+  font-family: var(--jgz-font-mono);
+  font-size: 2.4cqw;
+}
+
+.jgz-photo__grain {
+  position: absolute;
+  inset: 0;
+  background-image: url('../../assets/pivot/pivot-film-grain.webp');
+  background-size: 34cqw;
+  opacity: 0.24;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+}
+
+/*
+ * Newsprint edition prints photographs as a single misregistered ink plate —
+ * a riso artifact, not a filter effect. The offset is the point.
+ */
+.jgz-frame--paper .jgz-photo img {
+  filter: grayscale(1) contrast(1.1) brightness(1.24);
+}
+
+.jgz-frame--paper .jgz-photo::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--jgz-riso);
+  mix-blend-mode: multiply;
+  opacity: 0.8;
+  transform: translate(0.8cqw, -0.55cqw);
+  pointer-events: none;
+}
+
+.jgz-frame--paper .jgz-photo__grain {
+  mix-blend-mode: multiply;
+  opacity: 0.18;
+}
+
+.jgz-folio {
+  position: absolute;
+  inset: auto 5cqw 3.4cqw;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 2cqw;
+  font-family: var(--jgz-font-mono);
+  font-size: 2.2cqw;
+  letter-spacing: 0.04em;
+  color: var(--jgz-type-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.jgz-folio__rule {
+  flex: 1;
+  height: 0.28cqw;
+  background: currentColor;
+  opacity: 0.5;
+}
+
+.jgz-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.6cqw;
+}
+
+.jgz-chip {
+  padding: 1cqw 1.8cqw;
+  border: 0.38cqw solid var(--jgz-ink);
+  font-family: var(--jgz-font-mono);
+  font-size: 2.5cqw;
+  color: var(--jgz-ink);
+}
+
+.jgz-chip--when {
+  background: var(--jgz-ticker);
+}
+
+.jgz-chip--where {
+  background: var(--jgz-pop);
+}
+
+.jgz-eyebrow {
+  font-family: var(--jgz-font-mono);
+  font-size: 2.3cqw;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--jgz-type-soft);
+}
+
+.jgz-eyebrow--right {
+  text-align: right;
+}
+
+/* --------------------------------------------------------- 01 · the cover */
+
+.jgz-cover__photo {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.jgz-cover__wash {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background:
+    linear-gradient(180deg, rgba(14, 11, 9, 0.72) 0%, rgba(14, 11, 9, 0.12) 34%, rgba(14, 11, 9, 0.86) 88%),
+    radial-gradient(ellipse 70% 55% at 50% 44%, transparent 40%, rgba(14, 11, 9, 0.6) 100%);
+}
+
+.jgz-frame--paper .jgz-cover__wash {
+  background: linear-gradient(180deg, rgba(250, 246, 239, 0.1) 0%, rgba(250, 246, 239, 0.72) 62%, var(--jgz-cream) 92%);
+}
+
+.jgz-cover__body {
+  position: absolute;
+  inset: auto 0 26cqw 0;
+  z-index: 2;
+}
+
+/*
+ * The long line is set nowrap at a size that outruns the trim, so "missed it"
+ * is itself partly missing from the cover. The frame clips it — that is the
+ * joke, and it is the only place type is allowed to leave the page.
+ */
+.jgz-masthead {
+  margin: 0;
+  padding-left: 5cqw;
+  font-family: var(--jgz-font-flos);
+  font-size: 25cqw;
+  line-height: 0.8;
+  letter-spacing: -0.02em;
+  color: var(--jgz-cream);
+  text-shadow: 0.5cqw 0.7cqw 0 rgba(14, 11, 9, 0.55);
+
+  span {
+    display: block;
+    white-space: nowrap;
+  }
+}
+
+.jgz-frame--paper .jgz-masthead {
+  color: var(--jgz-ink);
+  text-shadow: none;
+}
+
+.jgz-masthead__bleed {
+  color: var(--jgz-accent);
+}
+
+.jgz-cover__stamp {
+  right: 8cqw;
+  bottom: 3cqw;
+  font-size: 5cqw;
+}
+
+.jgz-cover__foot {
+  position: absolute;
+  inset: auto 0 3.4cqw;
+  z-index: 5;
+  padding: 0 5cqw;
+}
+
+.jgz-cover__caption {
+  margin: 0 0 2.4cqw;
+  padding-bottom: 2.4cqw;
+  border-bottom: 0.55cqw solid var(--jgz-rule);
+  font-family: var(--jgz-font-mono);
+  font-size: 2.9cqw;
+  color: var(--jgz-type);
+}
+
+.jgz-cover__foot .jgz-folio {
+  position: static;
+  inset: auto;
+  padding: 0;
+}
+
+/* ---------------------------------------------------------- 02 · the wall */
+
+.jgz-sheet__head {
+  padding: 5cqw 5cqw 2.5cqw;
+}
+
+.jgz-sheet__title {
+  margin: 0;
+  font-family: var(--jgz-font-flos);
+  font-size: 10cqw;
+  line-height: 0.9;
+}
+
+.jgz-sheet__kicker {
+  margin: 1.4cqw 0 0;
+  font-family: var(--jgz-font-mono);
+  font-size: 2.5cqw;
+  color: var(--jgz-type-muted);
+}
+
+.jgz-sheet__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4cqw 3.5cqw;
+  padding: 2cqw 6cqw 0;
+}
+
+.jgz-posting {
+  position: relative;
+  border: 0.62cqw solid var(--jgz-rule);
+  background: var(--jgz-plate);
+  box-shadow: 0.9cqw 1.2cqw 0 var(--jgz-shadow);
+  transform: rotate(var(--jgz-deg)) translate(var(--jgz-x), var(--jgz-y));
+}
+
+/* Landscape crop keeps two rows of postings inside the 4:5 trim. */
+.jgz-posting__photo {
+  aspect-ratio: 5 / 4;
+}
+
+.jgz-posting__plate {
+  padding: 2cqw 2.2cqw 2.4cqw;
+  border-top: 0.62cqw solid var(--jgz-rule);
+}
+
+.jgz-posting__title {
+  margin: 0;
+  font-size: 3.4cqw;
+  font-weight: 700;
+  line-height: 1.08;
+  color: var(--jgz-type);
+}
+
+.jgz-posting__meta {
+  margin: 1.2cqw 0 0;
+  font-family: var(--jgz-font-mono);
+  font-size: 2.2cqw;
+  color: var(--jgz-type-muted);
+}
+
+.jgz-posting__x {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+
+  svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  path {
+    fill: none;
+    stroke: var(--jgz-burst);
+    stroke-width: 5;
+    opacity: 0.9;
+  }
+}
+
+.jgz-sheet__grid + .jgz-folio {
+  color: var(--jgz-type-muted);
+}
+
+/* -------------------------------------------------------- 03 · the notice */
+
+.jgz-notice__head {
+  display: flex;
+  justify-content: space-between;
+  padding: 4.5cqw 5cqw 2.5cqw;
+}
+
+.jgz-notice__plate {
+  position: relative;
+  margin: 0 5cqw;
+  border: 0.62cqw solid var(--jgz-rule);
+  box-shadow: 1cqw 1.3cqw 0 var(--jgz-shadow);
+  aspect-ratio: 16 / 10;
+  transform: rotate(-1.6deg);
+}
+
+.jgz-notice__photo {
+  position: absolute;
+  inset: 0;
+}
+
+.jgz-notice__cut {
+  position: absolute;
+  left: 50%;
+  top: 46%;
+  z-index: 4;
+  transform: translate(-50%, -50%) rotate(-3deg);
+  font-family: var(--jgz-font-mono);
+  font-size: 2.6cqw;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--jgz-type-soft);
+}
+
+.jgz-notice__body {
+  padding: 4cqw 5cqw 0;
+}
+
+.jgz-notice__title {
+  margin: 0;
+  font-size: 5.8cqw;
+  font-weight: 700;
+  line-height: 1.02;
+  letter-spacing: -0.01em;
+}
+
+.jgz-notice__host {
+  margin: 1.4cqw 0 3cqw;
+  font-family: var(--jgz-font-mono);
+  font-size: 2.6cqw;
+  color: var(--jgz-type-soft);
+}
+
+/* One large figure per issue. Rules, not boxes. */
+.jgz-tally {
+  display: flex;
+  align-items: baseline;
+  gap: 2.4cqw;
+  margin-top: 3cqw;
+  padding-top: 2.4cqw;
+  border-top: 0.55cqw solid var(--jgz-rule);
+}
+
+.jgz-tally__value {
+  font-family: var(--jgz-font-mono);
+  font-weight: 700;
+  font-size: 11cqw;
+  line-height: 0.86;
+  font-variant-numeric: tabular-nums;
+  color: var(--jgz-accent);
+}
+
+.jgz-tally__label {
+  font-family: var(--jgz-font-mono);
+  font-size: 2.6cqw;
+  color: var(--jgz-type-muted);
+}
+
+.jgz-notice__note {
+  margin: 2.6cqw 0 0;
+  max-width: 46cqw;
+  font-family: var(--jgz-font-mono);
+  font-size: 2.7cqw;
+  line-height: 1.5;
+  color: var(--jgz-type-muted);
+}
+
+/* ------------------------------------------------------- 04 · the receipt */
+
+.jgz-receipt {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 7cqw 6cqw;
+  background: var(--jgz-plate);
+}
+
+.jgz-receipt__slip {
+  width: 100%;
+  padding: 5.5cqw 5cqw 6cqw;
+  background: var(--jgz-cream);
+  color: var(--jgz-ink);
+  font-family: var(--jgz-font-mono);
+  box-shadow: 1cqw 1.4cqw 0 var(--jgz-shadow);
+  transform: rotate(-0.9deg);
+  mask-image:
+    radial-gradient(circle 1.1cqw at 50% 0, #0000 96%, #000 100%),
+    radial-gradient(circle 1.1cqw at 50% 100%, #0000 96%, #000 100%);
+  mask-size: 3.4cqw 100%;
+  mask-repeat: repeat-x;
+  mask-composite: intersect;
+}
+
+.jgz-receipt__head {
+  padding-bottom: 2.6cqw;
+  border-bottom: 0.38cqw dashed rgba(26, 23, 20, 0.45);
+  text-align: center;
+}
+
+.jgz-receipt__vendor {
+  margin: 0;
+  font-weight: 700;
+  font-size: 3.6cqw;
+  letter-spacing: 0.04em;
+}
+
+.jgz-receipt__doc {
+  margin: 1cqw 0 0;
+  font-size: 2.3cqw;
+  color: rgba(26, 23, 20, 0.62);
+}
+
+.jgz-receipt__lines {
+  margin: 2.8cqw 0 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    display: flex;
+    align-items: baseline;
+    gap: 1.2cqw;
+    padding: 0.95cqw 0;
+    font-size: 2.55cqw;
+  }
+}
+
+.jgz-receipt__leader {
+  flex: 1;
+  height: 0.3cqw;
+  background-image: linear-gradient(90deg, rgba(26, 23, 20, 0.4) 0 40%, transparent 40%);
+  background-size: 1.4cqw 0.3cqw;
+  background-repeat: repeat-x;
+}
+
+.jgz-receipt__when {
+  font-variant-numeric: tabular-nums;
+  color: rgba(26, 23, 20, 0.72);
+}
+
+.jgz-receipt__totals {
+  margin: 2.8cqw 0 0;
+  padding-top: 2.6cqw;
+  border-top: 0.55cqw solid var(--jgz-ink);
+
+  div {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 2cqw;
+    padding: 1cqw 0;
+  }
+
+  dt {
+    font-size: 2.55cqw;
+  }
+
+  dd {
+    margin: 0;
+    font-weight: 700;
+    font-size: 3.6cqw;
+    font-variant-numeric: tabular-nums;
+  }
+
+  div:nth-child(2) dd {
+    color: var(--jgz-burst);
+  }
+}
+
+.jgz-receipt__footer {
+  margin: 3cqw 0 0;
+  padding-top: 2.4cqw;
+  border-top: 0.38cqw dashed rgba(26, 23, 20, 0.45);
+  text-align: center;
+  font-size: 2.3cqw;
+  color: rgba(26, 23, 20, 0.62);
+}
+
+.jgz-receipt__stamp {
+  right: 6cqw;
+  bottom: 11cqw;
+  z-index: 3;
+  font-size: 3.6cqw;
+  color: var(--jgz-ink);
+}
+
+/* ---------------------------------------------------- 05 · the back cover */
+
+.jgz-back__body {
+  position: absolute;
+  inset: 15cqw 6cqw auto;
+  z-index: 2;
+  text-align: center;
+}
+
+.jgz-back__wordmark {
+  width: 54cqw;
+  height: auto;
+  transform: rotate(-1.2deg);
+  filter: drop-shadow(0.5cqw 0.7cqw 0 var(--jgz-shadow));
+}
+
+.jgz-back__burst {
+  position: absolute;
+  top: -6cqw;
+  right: 2cqw;
+  width: 14cqw;
+  transform: rotate(9deg);
+}
+
+.jgz-back__kicker {
+  margin: 7cqw 0 0;
+  font-family: var(--jgz-font-mono);
+  font-size: 2.4cqw;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--jgz-type-soft);
+}
+
+.jgz-back__line {
+  margin: 2cqw 0 0;
+  font-size: 7.4cqw;
+  font-weight: 700;
+  line-height: 1.02;
+  letter-spacing: -0.012em;
+}
+
+.jgz-back__sub {
+  margin: 2.6cqw auto 0;
+  max-width: 54cqw;
+  font-family: var(--jgz-font-mono);
+  font-size: 2.6cqw;
+  line-height: 1.5;
+  color: var(--jgz-type-muted);
+}
+
+.jgz-back__actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3.4cqw;
+  margin-top: 6cqw;
+}
+
+.jgz-cta {
+  display: inline-block;
+  padding: 2.4cqw 5.4cqw;
+  border: 0.62cqw solid var(--jgz-ink);
+  border-radius: 999px;
+  background: var(--jgz-accent);
+  box-shadow: 0.7cqw 1cqw 0 var(--jgz-shadow);
+  color: var(--jgz-cream);
+  font-size: 3.6cqw;
+  font-weight: 700;
+}
+
+.jgz-back__badge {
+  width: 34cqw;
+  height: auto;
+}
+
+/* ------------------------------------------------------------ quality floor */
+
+@media (prefers-reduced-motion: reduce) {
+  .jgz-ticker__rail {
+    animation: none;
+  }
+
+  .jgz-stamp {
+    animation: none;
+  }
+}
