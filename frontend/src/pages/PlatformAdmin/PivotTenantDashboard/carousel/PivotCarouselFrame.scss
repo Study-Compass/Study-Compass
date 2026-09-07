@@ -1,0 +1,48 @@
+/**
+ * The export surface.
+ *
+ * Exactly 1080×1350 with nothing else on the page — no shell, no scrollbars, no
+ * margin for a screenshot to include by accident. The window is sized to match,
+ * so what Chrome captures is the frame and only the frame.
+ *
+ * The table's own edge treatment is not here on purpose: the hairline and
+ * shadow that denote a slide sitting on a light table are chrome, and a posted
+ * JPEG must not carry them. They are scoped `.jgz .jgz-frame`, and this is not
+ * inside `.jgz`.
+ */
+
+.jgz-export {
+  width: 1080px;
+  height: 1350px;
+  margin: 0;
+  overflow: hidden;
+  background: #000;
+
+  > .jgz-frame {
+    width: 1080px;
+    height: 1350px;
+    /* Belt and braces: the ratio is already 4:5, but an export must not depend
+       on that arithmetic holding. */
+    aspect-ratio: auto;
+  }
+}
+
+.jgz-export--error {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem;
+  background: #1a1714;
+  color: #ff6a3d;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;
+  font-size: 20px;
+  text-align: center;
+}
+
+/* Nothing but the frame. The app shell paints a body background otherwise. */
+body:has(.jgz-export) {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background: #000;
+}

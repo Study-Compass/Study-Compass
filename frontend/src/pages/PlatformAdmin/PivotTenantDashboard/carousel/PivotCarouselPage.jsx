@@ -202,6 +202,31 @@ export default function PivotCarouselPage({ tenantKey, cityDisplayName }) {
     [draft, tenantKey, addNotification],
   );
 
+  /**
+   * Mint a token and hand back the command to run. The rendering happens on
+   * this machine against the export route, so nothing is uploaded and no
+   * browser is installed on a server for it.
+   */
+  const startExport = useCallback(async () => {
+    if (!draft?._id) return null;
+    const result = await authenticatedRequest(
+      `${decksPath(tenantKey)}/${draft._id}/export-token`,
+      { method: 'POST' },
+    );
+
+    if (!result.data?.success) {
+      addNotification({
+        title: 'Could not start the export',
+        message: result.data?.message || 'The request failed.',
+        type: 'error',
+      });
+      return null;
+    }
+
+    const { token, deckId, slideCount } = result.data.data;
+    return `./scripts/export-carousel.sh ${deckId} ${token} ${slideCount} ${window.location.origin}`;
+  }, [draft, tenantKey, addNotification]);
+
   const createDeck = useCallback(async () => {
     setSeeding(true);
     const result = await authenticatedRequest(decksPath(tenantKey), {
@@ -270,6 +295,7 @@ export default function PivotCarouselPage({ tenantKey, cityDisplayName }) {
             onSave={saveDeck}
             onSlotImage={setSlotImage}
             onVoiceSaved={load}
+            onExport={startExport}
           />
         ) : (
           <>

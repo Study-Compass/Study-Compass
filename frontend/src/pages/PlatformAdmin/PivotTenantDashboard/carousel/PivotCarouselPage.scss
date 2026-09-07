@@ -21,7 +21,17 @@
 
 /* ------------------------------------------------------------ light table */
 
-.jgz {
+/*
+ * Brand values and faces, on the table and on a frame alike.
+ *
+ * A frame renders outside the light table during export — one slide alone on a
+ * 1080x1350 page — and a custom property declared only on an ancestor that is
+ * not there resolves to nothing. Declaring them on the frame as well is what
+ * makes a frame self-sufficient: it carries its own palette wherever it is
+ * mounted, which is the property an export surface has to have.
+ */
+.jgz,
+.jgz-frame {
   --jgz-ink: #1a1714;
   --jgz-cream: #faf6ef;
   --jgz-night: #15120f;
@@ -35,7 +45,10 @@
   --jgz-font-display: 'Instrument Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
   --jgz-font-mono: 'Space Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;
   --jgz-font-flos: 'Les Flos Sans', 'Instrument Sans', 'Helvetica Neue', Helvetica, sans-serif;
+}
 
+/* The table's own surface ramp. Frames override these for their edition. */
+.jgz {
   /*
    * Chrome type is ink on the light table. The frames keep their own ramp —
    * a night-edition slide is dark on purpose — so these tokens describe the
@@ -1561,4 +1574,57 @@
   border-left: 2px solid var(--jgz-line);
   font-size: 0.66rem;
   color: var(--jgz-type-soft);
+}
+
+/* --------------------------------------------------------------- export */
+
+/*
+ * The command sits in the page rather than in a toast, because it has to stay
+ * put long enough to be copied and it carries a token nobody should retype.
+ */
+.jgz-export-line {
+  position: sticky;
+  bottom: 0;
+  z-index: 6;
+  margin-top: 1.5rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--jgz-ink);
+  background: #fff;
+  box-shadow: 0 -4px 20px rgba(26, 23, 20, 0.12);
+
+  p {
+    margin: 0 0 0.5rem;
+    font-size: 0.7rem;
+    color: var(--jgz-type-muted);
+  }
+
+  code {
+    display: block;
+    overflow-x: auto;
+    padding: 0.5rem 0.6rem;
+    background: #f2ede4;
+    color: var(--jgz-ink);
+    font-family: var(--jgz-font-mono);
+    font-size: 0.68rem;
+    white-space: pre;
+  }
+}
+
+.jgz-export-line__ops {
+  display: flex;
+  gap: 0.4rem;
+  margin-top: 0.5rem;
+
+  button {
+    appearance: none;
+    padding: 0.3rem 0.6rem;
+    border: 1px solid var(--jgz-line);
+    background: transparent;
+    color: var(--jgz-type-muted);
+    font-family: var(--jgz-font-mono);
+    font-size: 0.64rem;
+    cursor: pointer;
+
+    &:hover { border-color: var(--jgz-ink); color: var(--jgz-ink); }
+  }
 }

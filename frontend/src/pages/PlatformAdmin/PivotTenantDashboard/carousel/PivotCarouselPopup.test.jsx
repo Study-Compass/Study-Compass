@@ -105,3 +105,39 @@ describe('the slot placeholder', () => {
     expect(rule.slice(0, rule.indexOf('}'))).toMatch(/pointer-events:\s*none/);
   });
 });
+
+/**
+ * A frame must carry its own palette. Export mounts one slide alone, outside
+ * the light table, so anything declared only on `.jgz` resolves to nothing
+ * there — a cover set in the fallback face, an accent that is not orange.
+ */
+describe('a frame is self-sufficient', () => {
+  const sharedBlock = (() => {
+    const start = pageCss.indexOf('.jgz,\n.jgz-frame {');
+    return pageCss.slice(start, pageCss.indexOf('}', start));
+  })();
+
+  test('the palette and faces are declared on the frame, not only on the table', () => {
+    for (const token of [
+      '--jgz-ink', '--jgz-cream', '--jgz-accent', '--jgz-blue',
+      '--jgz-pop', '--jgz-burst',
+      '--jgz-font-display', '--jgz-font-mono', '--jgz-font-flos',
+    ]) {
+      expect(sharedBlock).toContain(token);
+    }
+  });
+
+  test('the export surface is exactly 1080x1350 with nothing around it', () => {
+    const frameCss = fs.readFileSync(path.join(__dirname, 'PivotCarouselFrame.scss'), 'utf8');
+    expect(frameCss).toMatch(/width:\s*1080px/);
+    expect(frameCss).toMatch(/height:\s*1350px/);
+    expect(frameCss).toMatch(/overflow:\s*hidden/);
+  });
+
+  test('the table edge treatment stays on the table, out of the export', () => {
+    // Scoped `.jgz .jgz-frame`, so a frame mounted alone gets no border.
+    expect(pageCss).toMatch(/\.jgz \.jgz-frame \{/);
+    const frameCss = fs.readFileSync(path.join(__dirname, 'PivotCarouselFrame.scss'), 'utf8');
+    expect(frameCss).not.toMatch(/box-shadow[^;]*rgba\(26, 23, 20/);
+  });
+});

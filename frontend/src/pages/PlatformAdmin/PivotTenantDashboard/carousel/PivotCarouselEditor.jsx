@@ -69,6 +69,7 @@ export default function PivotCarouselEditor({
   onSave,
   onSlotImage,
   onVoiceSaved,
+  onExport,
 }) {
   const [selected, setSelected] = useState(0);
   const [adding, setAdding] = useState(false);
@@ -79,6 +80,7 @@ export default function PivotCarouselEditor({
    * truth about what will print.
    */
   const [editing, setEditing] = useState(false);
+  const [exportLine, setExportLine] = useState(null);
   const [pickingSlot, setPickingSlot] = useState(null);
 
   const index = Math.min(selected, Math.max(deck.slides.length - 1, 0));
@@ -256,6 +258,15 @@ export default function PivotCarouselEditor({
           >
             {saving ? 'saving…' : 'save deck'}
           </button>
+          <button
+            type="button"
+            className="jgz__action"
+            onClick={async () => setExportLine(await onExport())}
+            disabled={dirty}
+            title={dirty ? 'Save first — the export renders what is stored' : undefined}
+          >
+            export…
+          </button>
         </div>
       </div>
 
@@ -400,6 +411,25 @@ export default function PivotCarouselEditor({
           </div>
         </div>
       </div>
+
+      {exportLine ? (
+        <div className="jgz-export-line" role="status">
+          <p>
+            Run this in the repo root. The token is good for ten minutes and for
+            this deck only.
+          </p>
+          <code>{exportLine}</code>
+          <div className="jgz-export-line__ops">
+            <button
+              type="button"
+              onClick={() => navigator.clipboard?.writeText(exportLine)}
+            >
+              copy
+            </button>
+            <button type="button" onClick={() => setExportLine(null)}>dismiss</button>
+          </div>
+        </div>
+      ) : null}
 
       <PivotCarouselAddSlide
         open={adding}

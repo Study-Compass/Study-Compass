@@ -15,6 +15,10 @@ const {
 const { searchCarouselCatalog } = require('../services/pivotCarouselCatalogService');
 const { setSlideImage } = require('../services/pivotCarouselDeckService');
 const { upload } = require('../services/imageUploadService');
+const {
+  mintExportToken,
+  readDeckForExport,
+} = require('../services/pivotCarouselExportService');
 const { requirePlatformAdmin } = require('../middlewares/requirePlatformAdmin');
 const {
   rebuildWeeklySnapshot,
@@ -472,6 +476,38 @@ router.delete(
     }
   },
 );
+
+/** Mint a short-lived, deck-scoped token for the local render script. */
+router.post(
+  '/tenants/:tenantKey/carousels/:deckId/export-token',
+  verifyToken,
+  requirePlatformAdmin,
+  async (req, res) => {
+    try {
+      const result = await mintExportToken(req, req.params.tenantKey, req.params.deckId);
+      return sendDeckResult(res, result, 201);
+    } catch (err) {
+      logPivotRouteError('POST carousel export-token', err, req);
+      return res.status(500).json({ success: false, message: 'Unable to start an export.' });
+    }
+  },
+);
+
+/*
+ * Deliberately not behind verifyToken: a headless Chrome started from a
+ * terminal has no session cookie, and a navigation cannot carry a header. The
+ * token in the query is the credential, and it is worth one deck for ten
+ * minutes.
+ */
+router.get('/carousel-export', async (req, res) => {
+  try {
+    const result = await readDeckForExport(req, req.query?.token, req.query?.deckId);
+    return sendDeckResult(res, result);
+  } catch (err) {
+    logPivotRouteError('GET /admin/pivot/carousel-export', err, req);
+    return res.status(500).json({ success: false, message: 'Unable to load the deck.' });
+  }
+});
 
 /**
  * Slot picker search. Published events only, newest first, paged — a deck
