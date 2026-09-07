@@ -31,6 +31,7 @@
  *   tags      — up to `max` short strings
  *   rows      — up to `max` records, each with the keys in `of`
  *   enum      — one of `values`
+ *   boolean   — on or off
  *
  * Every `max` is load-bearing rather than defensive. The frames are fixed 4:5
  * boxes with no scroll, so copy that overruns its slot does not wrap out of
@@ -51,7 +52,11 @@ const ZINE_SLIDE_TYPES = Object.freeze({
     // is uniform with every other type and cannot break.
     events: { min: 0, max: 1 },
     photo: 'flier|upload',
+    options: [
+      { key: 'stamp', kind: 'boolean', default: true, label: 'missed stamp' },
+    ],
     fields: [
+      { key: 'name', kind: 'line', max: 32, voice: 'zine.cover.name', shipped: 'sorry u missed it' },
       { key: 'tagline', kind: 'line', max: 52, voice: 'zine.cover.tagline', shipped: 'everything that happened while you were home' },
             /*
        * Derived until written. The cover line is built from the deck's own
@@ -68,6 +73,14 @@ const ZINE_SLIDE_TYPES = Object.freeze({
     blurb: 'three or four postings, struck through',
     events: { min: 3, max: 4 },
     photo: 'flier',
+    /*
+     * Postings are the smallest thing in the issue and four of them share one
+     * frame, so they carry a name and a time by default. Venue and tags are
+     * available but they overflow the plate on anything but short records.
+     */
+    options: [
+      { key: 'detail', kind: 'enum', values: ['minimal', 'full'], default: 'minimal', label: 'posting detail' },
+    ],
     fields: [
       { key: 'title', kind: 'line', max: 18, voice: 'zine.wall.title', shipped: 'the wall' },
       { key: 'kicker', kind: 'line', max: 48, optional: true },
@@ -82,6 +95,9 @@ const ZINE_SLIDE_TYPES = Object.freeze({
     blurb: 'photo is the frame, the listing sits on it',
     events: { exactly: 1 },
     photo: 'flier|upload',
+    options: [
+      { key: 'stamp', kind: 'boolean', default: true, label: 'missed stamp' },
+    ],
     fields: [
       { key: 'slug', kind: 'line', max: 20, voice: 'zine.card.slug', shipped: 'last night' },
     ],
@@ -101,7 +117,7 @@ const ZINE_SLIDE_TYPES = Object.freeze({
       { key: 'cut', kind: 'line', max: 24, voice: 'zine.notice.cut', shipped: 'you, not here' },
     ],
     options: [
-      { key: 'knockoutShape', kind: 'enum', values: [0, 1, 2], default: 0 },
+      { key: 'knockoutShape', kind: 'enum', values: [0, 1, 2], default: 0, label: 'cut shape' },
     ],
     perEvent: [
       { key: 'tags', kind: 'tags', max: 3, itemMax: 22, optional: true },
@@ -246,6 +262,9 @@ function coerceField(field, raw) {
           return out;
         })
         .filter((row) => field.of.some((key) => row[key]));
+
+    case 'boolean':
+      return typeof raw === 'boolean' ? raw : field.default;
 
     case 'enum':
       return field.values.includes(raw) ? raw : field.default;

@@ -174,6 +174,7 @@ describe('static copy is not editable on the slide', () => {
       'values.tagline', 'values.title', 'values.slug', 'values.cut',
       'values.insteadLabel', 'values.footer', 'values.stamp',
       'values.kicker', 'values.line', 'values.sub', 'values.url',
+      'values.name',
     ];
     for (const { slide, resolved } of slides) {
       const labels = editable(slide.type, slide, resolved.props);
@@ -415,5 +416,73 @@ describe('the cover line', () => {
   test('a derived slot is never marked empty, so it shows no placeholder', () => {
     const { container } = renderCover(coverSlide);
     expect(container.querySelector('.jgz-cover__heading.jgz-editable--empty')).toBeNull();
+  });
+});
+
+/**
+ * Per-slide options. The manifest declares them and the frame honours them;
+ * neither the editor nor these tests should need to know what they mean.
+ */
+describe('slide options', () => {
+  const render1 = (type, slide, props, options) => {
+    const Frame = FRAMES[type];
+    const { container } = render(<Frame {...props} options={options} />);
+    return container;
+  };
+
+  // Substrings lie here: the first demo tag is "free" and the first demo event
+  // is "free throw contest". Tags are counted as elements instead.
+  const tagCount = (container) => container.querySelectorAll('.jgz-tags li').length;
+
+  describe('the wall', () => {
+    const entry = slides.find((s) => s.slide.type === 'wall');
+    const first = entry.resolved.props.events[0];
+
+    test('a posting is a name and a time by default', () => {
+      const container = render1('wall', entry.slide, entry.resolved.props, {});
+      expect(container.textContent).toContain(first.title);
+      expect(container.textContent).toContain(first.when);
+      expect(container.textContent).not.toContain(first.where);
+      expect(tagCount(container)).toBe(0);
+    });
+
+    test('minimal is the same as no option at all', () => {
+      const bare = render1('wall', entry.slide, entry.resolved.props, {}).textContent;
+      const minimal = render1('wall', entry.slide, entry.resolved.props, { detail: 'minimal' }).textContent;
+      expect(minimal).toBe(bare);
+    });
+
+    test('full brings the venue and the tags back', () => {
+      const container = render1('wall', entry.slide, entry.resolved.props, { detail: 'full' });
+      expect(container.textContent).toContain(first.where);
+      expect(tagCount(container)).toBeGreaterThan(0);
+    });
+  });
+
+  describe('the missed stamp', () => {
+    test.each(['cover', 'card'])('%s shows it unless it is switched off', (type) => {
+      const entry = slides.find((s) => s.slide.type === type);
+      const on = render1(type, entry.slide, entry.resolved.props, {});
+      const off = render1(type, entry.slide, entry.resolved.props, { stamp: false });
+      expect(on.querySelectorAll('.jgz-stamp')).toHaveLength(1);
+      expect(off.querySelectorAll('.jgz-stamp')).toHaveLength(0);
+    });
+
+    test('switching it off changes nothing else on the slide', () => {
+      const entry = slides.find((s) => s.slide.type === 'card');
+      const on = render1('card', entry.slide, entry.resolved.props, {}).textContent;
+      const off = render1('card', entry.slide, entry.resolved.props, { stamp: false }).textContent;
+      expect(off).toBe(on.replace('missed', ''));
+    });
+  });
+
+  describe('the publication name', () => {
+    test('comes from the slide values, not from the component', () => {
+      const entry = slides.find((s) => s.slide.type === 'cover');
+      const props = { ...entry.resolved.props, values: { ...entry.resolved.props.values, name: 'a different masthead' } };
+      const text = render1('cover', entry.slide, props, {}).textContent;
+      expect(text).toContain('a different masthead');
+      expect(text).not.toContain('sorry u missed it');
+    });
   });
 });

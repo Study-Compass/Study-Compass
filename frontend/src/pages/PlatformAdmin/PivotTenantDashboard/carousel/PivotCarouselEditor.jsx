@@ -156,6 +156,21 @@ export default function PivotCarouselEditor({
     [manifest, onDeckChange, index],
   );
 
+  /** Per-slide options, whatever the manifest declares for this type. */
+  const setOption = useCallback(
+    (key, value) => {
+      onDeckChange((current) => {
+        const slides = [...current.slides];
+        slides[index] = {
+          ...slides[index],
+          options: { ...(slides[index].options || {}), [key]: value },
+        };
+        return { ...current, slides };
+      });
+    },
+    [onDeckChange, index],
+  );
+
   /** Drop a picked event into a slot, keeping the slots either side intact. */
   const fillSlot = useCallback(
     (slotIndex, entry) => {
@@ -319,6 +334,51 @@ export default function PivotCarouselEditor({
             ) : (
               <p className="jgz-editor__gaps jgz-editor__gaps--ok">every slot filled</p>
             )}
+
+            {(spec.options || []).length ? (
+              <div className="jgz-editor__options">
+                {spec.options.map((option) => {
+                  const current = slide.options?.[option.key] ?? option.default;
+                  const label = option.label || option.key;
+
+                  if (option.kind === 'boolean') {
+                    return (
+                      <label key={option.key} className="jgz-editor__option">
+                        <input
+                          type="checkbox"
+                          checked={current !== false}
+                          onChange={(event) => setOption(option.key, event.target.checked)}
+                        />
+                        <span>{label}</span>
+                      </label>
+                    );
+                  }
+
+                  return (
+                    <label key={option.key} className="jgz-editor__option">
+                      <span>{label}</span>
+                      <select
+                        value={String(current)}
+                        onChange={(event) => {
+                          // Options are declared with their real types, so a
+                          // select's string has to be put back to one.
+                          const picked = option.values.find(
+                            (value) => String(value) === event.target.value,
+                          );
+                          setOption(option.key, picked);
+                        }}
+                      >
+                        {option.values.map((value) => (
+                          <option key={String(value)} value={String(value)}>
+                            {String(value)}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                  );
+                })}
+              </div>
+            ) : null}
 
             {derived ? (
               <p className="jgz-editor__derived">
