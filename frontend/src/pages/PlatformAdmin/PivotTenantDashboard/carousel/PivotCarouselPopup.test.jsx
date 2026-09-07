@@ -39,3 +39,45 @@ describe('popup styles survive the portal', () => {
     expect(pageCss).toMatch(/\.jgz-editable\b/);
   });
 });
+
+/**
+ * The edit affordance must cost no layout. A box property on `.jgz-editable`
+ * overrides whatever padding the template had already set on that same element,
+ * and the slide silently reflows the moment editing is switched on — which is
+ * the one thing an edit mode may not do.
+ */
+describe('the edit affordance is layout-neutral', () => {
+  const block = (() => {
+    const start = pageCss.indexOf('.jgz-editable {');
+    // Scan from the opening brace, not the selector, or depth never rises.
+    let i = pageCss.indexOf('{', start);
+    let depth = 0;
+    do {
+      if (pageCss[i] === '{') depth += 1;
+      else if (pageCss[i] === '}') depth -= 1;
+      i += 1;
+    } while (depth > 0 && i < pageCss.length);
+    return pageCss.slice(start, i);
+  })();
+
+  // Everything inside ::before is the tint's own box, not the slot's.
+  const ownDeclarations = block.slice(0, block.indexOf('&::before'));
+
+  test.each([
+    'margin', 'padding', 'border', 'width', 'height',
+    'font-size', 'line-height', 'display',
+  ])('the slot itself declares no %s', (prop) => {
+    expect(ownDeclarations).not.toMatch(new RegExp(`(^|[;{\\s])${prop}\\s*:`, 'm'));
+  });
+
+  test('the tint is drawn by a pseudo-element that bleeds outward', () => {
+    expect(block).toMatch(/&::before/);
+    expect(block).toMatch(/inset:\s*-[\d.]+cqw\s+calc\(var\(--jgz-slot-bleed\)\s*\*\s*-1\)/);
+  });
+
+  test('containers whose padding differs from the trim set their own bleed', () => {
+    for (const sel of ['.jgz-posting__plate', '.jgz-card__plate', '.jgz-dispatch__instead']) {
+      expect(pageCss).toMatch(new RegExp(`\\${sel}\\s*\\{[^}]*--jgz-slot-bleed`));
+    }
+  });
+});
