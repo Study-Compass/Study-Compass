@@ -190,7 +190,7 @@ function ZineTags({ tags, limit = 3, path }) {
  * issue rewrites its own cover. Everything is set inside the trim — nothing
  * clips.
  */
-export function ZineCover({ issue, values, events }) {
+export function ZineCover({ issue, values, events, options = {} }) {
   const event = events[0] || {};
   const lead = values.lead || {};
 
@@ -200,7 +200,7 @@ export function ZineCover({ issue, values, events }) {
       <div className="jgz-cover__wash" aria-hidden="true" />
 
       <header className="jgz-cover__flag">
-        <h2 className="jgz-cover__name">sorry u missed it</h2>
+        <h2 className="jgz-cover__name">{values.name}</h2>
         <p className="jgz-cover__tagline">
           {values.tagline}
           {' · no. '}
@@ -209,7 +209,9 @@ export function ZineCover({ issue, values, events }) {
       </header>
 
       <div className="jgz-cover__body">
-        <ZineStamp label="missed" deg={-9} className="jgz-cover__stamp" />
+        {options.stamp === false ? null : (
+          <ZineStamp label="missed" deg={-9} className="jgz-cover__stamp" />
+        )}
         <p className="jgz-cover__eyebrow">{lead.eyebrow}</p>
         <ZineField
           as="h3"
@@ -240,7 +242,9 @@ export function ZineCover({ issue, values, events }) {
  * 02 — contact sheet. Four postings pinned at four different angles, the way
  * a flyer wall accretes. The grid is deliberately off-register.
  */
-export function ZineSheet({ issue, values, events }) {
+export function ZineSheet({ issue, values, events, options = {} }) {
+  const full = options.detail === 'full';
+
   const pins = [
     { deg: -3.4, x: 0, y: 0 },
     { deg: 2.6, x: 1.6, y: 2.4 },
@@ -286,12 +290,16 @@ export function ZineSheet({ issue, values, events }) {
                   <ZineField path={`events.${index}.snapshot.whenLabel`} max={24}>
                     {event.when}
                   </ZineField>
-                  {' — '}
-                  <ZineField path={`events.${index}.snapshot.location`} max={48}>
-                    {event.where}
-                  </ZineField>
+                  {full ? ' — ' : null}
+                  {full ? (
+                    <ZineField path={`events.${index}.snapshot.location`} max={48}>
+                      {event.where}
+                    </ZineField>
+                  ) : null}
                 </p>
-                <ZineTags tags={event.tags} limit={2} path={`events.${index}.values.tags`} />
+                {full ? (
+                  <ZineTags tags={event.tags} limit={2} path={`events.${index}.values.tags`} />
+                ) : null}
               </div>
               <span className="jgz-posting__x" aria-hidden="true">
                 <svg viewBox="0 0 100 100" preserveAspectRatio="none" focusable="false">
@@ -313,7 +321,7 @@ export function ZineSheet({ issue, values, events }) {
  * with the stamp struck across it. The one frame where the product's own
  * furniture appears, so the reader sees exactly what they did not open.
  */
-export function ZineCard({ issue, values, events }) {
+export function ZineCard({ issue, values, events, options = {} }) {
   const event = events[0] || {};
 
   return (
@@ -339,7 +347,9 @@ export function ZineCard({ issue, values, events }) {
         <ZineField as="p" className="jgz-card__note" path="events.0.values.note" max={84}>
           {event.note}
         </ZineField>
-        <ZineStamp label="missed" deg={-8} className="jgz-card__stamp" />
+        {options.stamp === false ? null : (
+          <ZineStamp label="missed" deg={-8} className="jgz-card__stamp" />
+        )}
       </article>
 
       <ZineFolio left={`no. ${issue.number}`} right="the card" />

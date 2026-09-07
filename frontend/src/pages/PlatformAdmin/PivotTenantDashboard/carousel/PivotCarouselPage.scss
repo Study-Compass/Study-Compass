@@ -1633,3 +1633,43 @@
     &:hover { border-color: var(--jgz-ink); color: var(--jgz-ink); }
   }
 }
+
+/* --------------------------------------------------------- slide options */
+
+/*
+ * Rendered from whatever the manifest declares for this type, so a new option
+ * appears here without the editor being told about it.
+ */
+.jgz-editor__options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  margin: 0 0 1.1rem;
+  padding-bottom: 0.9rem;
+  border-bottom: 1px solid var(--jgz-line);
+}
+
+.jgz-editor__option {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: var(--jgz-font-mono);
+  font-size: 0.66rem;
+  color: var(--jgz-type-muted);
+  cursor: pointer;
+
+  input[type='checkbox'] {
+    accent-color: var(--jgz-accent);
+    cursor: pointer;
+  }
+
+  select {
+    padding: 0.2rem 0.3rem;
+    border: 1px solid var(--jgz-line);
+    background: transparent;
+    color: var(--jgz-type);
+    font-family: var(--jgz-font-mono);
+    font-size: 0.66rem;
+    cursor: pointer;
+  }
+}
