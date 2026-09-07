@@ -294,6 +294,16 @@
  * own and nothing here fights the per-frame layering below.
  */
 .jgz-frame--paper::before {
+  /*
+   * Laid-paper tooth, at twice the weave it was drawn at — the original was a
+   * 1px hairline on a 336px column, which is a texture you have to go looking
+   * for once a slide fills the screen. Line and gap scale together, so this is
+   * the same stock seen closer rather than a coarser one.
+   */
+  --jgz-tooth-line: 0.6cqw;
+  --jgz-tooth-warp: 1.8cqw;
+  --jgz-tooth-weft: 2.4cqw;
+
   content: '';
   position: absolute;
   inset: 0;
@@ -301,8 +311,16 @@
   pointer-events: none;
   opacity: 0.55;
   background-image:
-    repeating-linear-gradient(90deg, rgba(26, 23, 20, 0.045) 0 0.3cqw, transparent 0.3cqw 0.9cqw),
-    repeating-linear-gradient(0deg, rgba(26, 23, 20, 0.035) 0 0.3cqw, transparent 0.3cqw 1.2cqw);
+    repeating-linear-gradient(
+      90deg,
+      rgba(26, 23, 20, 0.045) 0 var(--jgz-tooth-line),
+      transparent var(--jgz-tooth-line) var(--jgz-tooth-warp)
+    ),
+    repeating-linear-gradient(
+      0deg,
+      rgba(26, 23, 20, 0.035) 0 var(--jgz-tooth-line),
+      transparent var(--jgz-tooth-line) var(--jgz-tooth-weft)
+    );
 }
 
 /* -------------------------------------------------------------- primitives */
