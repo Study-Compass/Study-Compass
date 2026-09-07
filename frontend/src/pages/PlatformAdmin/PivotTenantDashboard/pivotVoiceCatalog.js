@@ -229,6 +229,17 @@ const VOICE_FAMILY_ORDER = [
     label: 'Web landing',
     sections: ['landing'],
   },
+  /*
+   * The carousel's static copy. Its rows never reach the copy pack — they are
+   * served by the carousel's own catalog endpoint — but grouping lives here
+   * because groupVoiceRows is shared by both editors.
+   */
+  {
+    id: 'zine',
+    label: 'Carousel',
+    hint: 'Copy that reads the same in every issue',
+    sections: ['zine'],
+  },
 ];
 
 const SECTION_LABELS = {
@@ -269,6 +280,17 @@ const SECTION_LABELS = {
   join: 'Join',
 };
 
+/** One group per slide template, so a key is found where its slide is. */
+const ZINE_SUBGROUP_LABELS = {
+  cover: 'Cover',
+  wall: 'The wall',
+  card: 'The card',
+  notice: 'The notice',
+  dispatch: 'The dispatch',
+  receipt: 'The receipt',
+  back: 'Back cover',
+};
+
 const CREW_SUBGROUP_LABELS = {
   overview: 'Overview',
   week: 'Week ritual',
@@ -303,6 +325,9 @@ const FAMILY_BY_SECTION = new Map(
 );
 
 function titleCaseSegment(segment, familyId) {
+  if (familyId === 'zine' && ZINE_SUBGROUP_LABELS[segment]) {
+    return ZINE_SUBGROUP_LABELS[segment];
+  }
   if (familyId === 'crew' && CREW_SUBGROUP_LABELS[segment]) {
     return CREW_SUBGROUP_LABELS[segment];
   }
@@ -319,6 +344,10 @@ function titleCaseSegment(segment, familyId) {
 
 function rowSubgroup(row) {
   const parts = String(row.path || '').split('.');
+  if (row.section === 'zine') {
+    // zine.dispatch.instead -> The dispatch
+    return parts.length >= 3 ? parts[1] : 'overview';
+  }
   if (row.section === 'crew') {
     if (parts.length >= 3) return parts[1];
     return 'overview';

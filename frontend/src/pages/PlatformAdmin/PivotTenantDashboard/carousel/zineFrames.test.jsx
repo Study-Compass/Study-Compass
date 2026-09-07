@@ -196,3 +196,48 @@ describe('static copy is not editable on the slide', () => {
     ]));
   });
 });
+
+/**
+ * Static copy resolves down three layers. The city layer is the one the panel
+ * writes, so if the resolver stopped consulting it the panel would appear to
+ * save and the slides would silently ignore it.
+ */
+describe('the voice layers', () => {
+  const MANIFEST = {
+    types: {
+      back: {
+        fields: [
+          { key: 'kicker', voice: 'zine.back.kicker', shipped: 'shipped kicker' },
+          { key: 'line', voice: 'zine.back.line', shipped: 'shipped line' },
+          { key: 'sub', voice: 'zine.back.sub', shipped: 'shipped sub' },
+          { key: 'url', voice: 'zine.back.url', shipped: 'shipped url' },
+        ],
+        events: { min: 0, max: 0 },
+      },
+    },
+  };
+
+  const backSlide = { type: 'back', values: {}, options: {}, events: [] };
+  const resolve = (deck, city) =>
+    resolveSlide(deck, backSlide, 0, MANIFEST, city).props.values;
+
+  test('falls back to what the manifest shipped', () => {
+    expect(resolve({ slides: [backSlide] }, {}).kicker).toBe('shipped kicker');
+  });
+
+  test('the city voice wins over shipped', () => {
+    const values = resolve({ slides: [backSlide] }, { 'zine.back.kicker': 'oakland kicker' });
+    expect(values.kicker).toBe('oakland kicker');
+    expect(values.line).toBe('shipped line');
+  });
+
+  test('a deck override wins over the city', () => {
+    const deck = { slides: [backSlide], voice: { entries: { 'zine.back.kicker': 'deck kicker' } } };
+    expect(resolve(deck, { 'zine.back.kicker': 'oakland kicker' }).kicker).toBe('deck kicker');
+  });
+
+  test('an empty override does not shadow the layer beneath it', () => {
+    const deck = { slides: [backSlide], voice: { entries: { 'zine.back.kicker': '   ' } } };
+    expect(resolve(deck, { 'zine.back.kicker': 'oakland kicker' }).kicker).toBe('oakland kicker');
+  });
+});

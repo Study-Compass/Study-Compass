@@ -61,6 +61,7 @@ export default function PivotCarouselPage({ tenantKey, cityDisplayName }) {
   const [deck, setDeck] = useState(null);
   const [draft, setDraft] = useState(null);
   const [manifest, setManifest] = useState(null);
+  const [cityVoice, setCityVoice] = useState(null);
   const [loading, setLoading] = useState(true);
   const [seeding, setSeeding] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -78,6 +79,7 @@ export default function PivotCarouselPage({ tenantKey, cityDisplayName }) {
       setDeck(null);
       setDraft(null);
       setManifest(null);
+      setCityVoice(null);
       setLoading(false);
       return;
     }
@@ -87,6 +89,7 @@ export default function PivotCarouselPage({ tenantKey, cityDisplayName }) {
       setDeck(full.data.data.deck);
       setDraft(full.data.data.deck);
       setManifest(full.data.data.manifest);
+      setCityVoice(full.data.data.cityVoice || {});
       setEdition(full.data.data.deck.edition || 'night');
     }
     setLoading(false);
@@ -219,8 +222,8 @@ export default function PivotCarouselPage({ tenantKey, cityDisplayName }) {
 
   /** Renders the reference issue read-only until a deck exists to edit. */
   const preview = useMemo(
-    () => resolveDeck({ ...ZINE_DEMO_DECK, edition }, manifest),
-    [edition, manifest],
+    () => resolveDeck({ ...ZINE_DEMO_DECK, edition }, manifest, cityVoice),
+    [edition, manifest, cityVoice],
   );
 
   const dirty = useMemo(
@@ -257,6 +260,7 @@ export default function PivotCarouselPage({ tenantKey, cityDisplayName }) {
           <PivotCarouselEditor
             deck={{ ...draft, edition }}
             manifest={manifest}
+            cityVoice={cityVoice}
             frames={FRAME_COMPONENTS}
             dirty={dirty}
             saving={saving}

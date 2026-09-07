@@ -26,10 +26,10 @@ function typeLabel(manifest, type) {
   return manifest?.types?.[type]?.label || type;
 }
 
-function SlideThumb({ deck, slide, index, manifest, frames, selected, onSelect }) {
+function SlideThumb({ deck, slide, index, manifest, cityVoice, frames, selected, onSelect }) {
   const resolved = useMemo(
-    () => resolveSlide(deck, slide, index, manifest),
-    [deck, slide, index, manifest],
+    () => resolveSlide(deck, slide, index, manifest, cityVoice),
+    [deck, slide, index, manifest, cityVoice],
   );
   const Frame = frames[slide.type];
   const gaps = slideGaps(slide, manifest);
@@ -58,6 +58,7 @@ function SlideThumb({ deck, slide, index, manifest, frames, selected, onSelect }
 export default function PivotCarouselEditor({
   deck,
   manifest,
+  cityVoice,
   frames,
   dirty,
   saving,
@@ -253,6 +254,7 @@ export default function PivotCarouselEditor({
                 slide={row}
                 index={i}
                 manifest={manifest}
+                cityVoice={cityVoice}
                 frames={frames}
                 selected={i === index}
                 onSelect={setSelected}
@@ -282,7 +284,7 @@ export default function PivotCarouselEditor({
         <div className="jgz-editor__canvas">
           <div className={`jgz-frame jgz-frame--${deck.edition}`}>
             <ZineEditProvider value={editContext}>
-              {Frame ? <Frame {...resolveSlide(deck, slide, index, manifest).props} /> : null}
+              {Frame ? <Frame {...resolveSlide(deck, slide, index, manifest, cityVoice).props} /> : null}
             </ZineEditProvider>
           </div>
 
@@ -403,7 +405,6 @@ export default function PivotCarouselEditor({
       <PivotCarouselVoicePanel
         tenantKey={tenantKey}
         cityDisplayName={cityDisplayName}
-        deckId={deck._id}
         open={voiceOpen}
         onClose={() => setVoiceOpen(false)}
         onSaved={onVoiceSaved}

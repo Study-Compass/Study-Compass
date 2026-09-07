@@ -55,13 +55,19 @@ function resolveImage(value) {
   return BUNDLED_ASSETS[value] || value;
 }
 
-/** Slide value first, then the deck's voice override, then what shipped. */
-function fieldValue(slide, field, deck) {
+/**
+ * Static copy resolves down the layers: this deck's own override, then the
+ * city's house voice, then what the manifest shipped. Dynamic copy has no
+ * layers — a slide value or nothing.
+ */
+function fieldValue(slide, field, deck, cityVoice) {
   const own = slide?.values?.[field.key];
   if (typeof own === 'string' && own.trim()) return own;
   if (field.voice) {
-    const override = deck?.voice?.entries?.[field.voice];
-    if (typeof override === 'string' && override.trim()) return override;
+    const deckValue = deck?.voice?.entries?.[field.voice];
+    if (typeof deckValue === 'string' && deckValue.trim()) return deckValue;
+    const cityValue = cityVoice?.[field.voice];
+    if (typeof cityValue === 'string' && cityValue.trim()) return cityValue;
     if (field.shipped) return field.shipped;
   }
   return typeof own === 'string' ? own : '';
@@ -182,11 +188,11 @@ function manifestFields(manifest, type) {
  * Resolve one slide into the props its frame takes. `manifest` is optional —
  * the reference deck fills every value explicitly, so it renders without one.
  */
-export function resolveSlide(deck, slide, index, manifest) {
+export function resolveSlide(deck, slide, index, manifest, cityVoice) {
   const values = { ...(slide.values || {}) };
 
   for (const field of manifestFields(manifest, slide.type)) {
-    values[field.key] = fieldValue(slide, field, deck);
+    values[field.key] = fieldValue(slide, field, deck, cityVoice);
   }
 
   const events = (slide.events || []).map(resolveEvent);
@@ -239,10 +245,12 @@ export function slideGaps(slide, manifest) {
 }
 
 /** The whole deck, ready to render. */
-export function resolveDeck(deck, manifest) {
+export function resolveDeck(deck, manifest, cityVoice) {
   return {
     edition: deck?.edition === 'paper' ? 'paper' : 'night',
     issue: deck?.issue || {},
-    slides: (deck?.slides || []).map((slide, i) => resolveSlide(deck, slide, i, manifest)),
+    slides: (deck?.slides || []).map(
+      (slide, i) => resolveSlide(deck, slide, i, manifest, cityVoice),
+    ),
   };
 }

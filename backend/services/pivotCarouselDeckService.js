@@ -173,9 +173,18 @@ async function getCarouselDeck(req, tenantKey, deckId) {
   const doc = await PivotCarouselDeck.findOne({ _id: deckId, tenantKey: gate.tenantKey }).lean();
   if (!doc) return { error: 'Deck not found.', status: 404, code: 'DECK_NOT_FOUND' };
 
+  /*
+   * The city's static copy rides alongside rather than inside the deck. Merging
+   * it into deck.voice would mean the next save wrote the city's values onto
+   * this deck, quietly turning a shared default into a private override.
+   */
+  const { PivotCarouselVoice } = getGlobalModels(req, 'PivotCarouselVoice');
+  const voiceDoc = await PivotCarouselVoice.findOne({ tenantKey: gate.tenantKey }).lean();
+
   return {
     data: {
       deck: serializeDeck(doc),
+      cityVoice: voiceDoc?.entries || {},
       // The editor gets the manifest with the deck so it never ships its own
       // copy of the slide contract.
       manifest: { types: ZINE_SLIDE_TYPES, addable: ZINE_ADDABLE_TYPES },
