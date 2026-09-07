@@ -1,11 +1,13 @@
 {
   "name": "meridian",
-  "engines": { "node": "20.x" },
-  "bin": { 
+  "engines": {
+    "node": "20.x"
+  },
+  "bin": {
     "meridian": "bin/meridian.js",
     "m": "bin/meridian.js",
     "mer": "bin/meridian.js"
-     },
+  },
   "dependencies": {
     "bcrypt": "^5.1.1",
     "dotenv": "^16.3.1",
@@ -19,7 +21,8 @@
   },
   "devDependencies": {
     "concurrently": "^8.2.2",
-    "nodemon": "^3.1.10"
+    "nodemon": "^3.1.10",
+    "playwright-core": "^1.63.0"
   },
   "scripts": {
     "setup": "node bin/meridian.js setup",
@@ -35,6 +38,7 @@
     "test:backend:routes": "npm --prefix backend run test:routes",
     "test:backend": "npm --prefix backend run test:coverage",
     "test:frontend": "npm --prefix frontend run test:coverage",
-    "test:ci": "npm run test:backend && npm run test:frontend"
+    "test:ci": "npm run test:backend && npm run test:frontend",
+    "export:carousel": "node scripts/export-carousel.js"
   }
 }

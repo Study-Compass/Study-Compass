@@ -224,7 +224,7 @@ export default function PivotCarouselPage({ tenantKey, cityDisplayName }) {
     }
 
     const { token, deckId, slideCount } = result.data.data;
-    return `./scripts/export-carousel.sh ${deckId} ${token} ${slideCount} ${window.location.origin}`;
+    return `node scripts/export-carousel.js ${deckId} ${token} ${slideCount} ${window.location.origin}`;
   }, [draft, tenantKey, addNotification]);
 
   const createDeck = useCallback(async () => {
