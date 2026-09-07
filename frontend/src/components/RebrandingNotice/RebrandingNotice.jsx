@@ -11,18 +11,24 @@ const RebrandingNotice = () => {
     const [isVisible, setIsVisible] = useState(true);
 
     useEffect(() => {
-        // Only show notice on study-compass.com domain (or localhost for development)
+        // Only the old domain. Localhost used to be included so the notice could
+        // be seen while working on it, but it dismisses itself by writing to
+        // localStorage — so anything with a fresh profile gets the redirect
+        // every time, and the carousel's render script starts a fresh headless
+        // Chrome per slide. ?test-rebranding=true is how to see it locally.
         const currentDomain = window.location.hostname;
-        const isStudyCompassDomain = currentDomain === 'study-compass.com' || 
-                                   currentDomain === 'www.study-compass.com' ||
-                                   currentDomain === 'localhost' || 
-                                   currentDomain.includes('127.0.0.1');
-        
+        const isStudyCompassDomain = currentDomain === 'study-compass.com' ||
+                                   currentDomain === 'www.study-compass.com';
+
         // Allow testing with ?test-rebranding=true query parameter
         const urlParams = new URLSearchParams(window.location.search);
         const isTestMode = urlParams.get('test-rebranding') === 'true';
-        
-        if (!isStudyCompassDomain && !isTestMode) {
+
+        // Surfaces that render an artifact rather than a page must never be
+        // covered by an interstitial, whatever the host.
+        const isRenderSurface = window.location.pathname.startsWith('/carousel-export/');
+
+        if (isRenderSurface || (!isStudyCompassDomain && !isTestMode)) {
             setIsVisible(false);
             return;
         }
