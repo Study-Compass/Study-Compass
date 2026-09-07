@@ -14,6 +14,15 @@
  * `.jgz` is deliberately not added. It would bring the light table's lowercase
  * transform and mono face with it, and a popup is chrome around the zine rather
  * than a part of it.
+ *
+ * Outside-click dismissal is off, and that is load-bearing rather than a
+ * preference. Popup closes on a document-level mousedown outside its own
+ * content node, and a nested Popup — the voice panel's save confirmation — is
+ * portaled to document.body, so it is outside by that test. Pressing Confirm
+ * would close this popup on mousedown and unmount the confirmation before its
+ * click ever landed: the save silently never happened. These are working
+ * surfaces besides, where a stray click should not discard a search or an edit.
+ * The close button is the way out.
  */
 
 import React from 'react';
@@ -24,7 +33,12 @@ export default function PivotCarouselPopup({ open, onClose, className = '', chil
   if (!open) return null;
 
   return (
-    <Popup isOpen={open} onClose={onClose} customClassName={`jgz-popup ${className}`}>
+    <Popup
+      isOpen={open}
+      onClose={onClose}
+      customClassName={`jgz-popup ${className}`}
+      disableOutsideClick
+    >
       <div className="pivot-ops jgz-popup__body">{children}</div>
     </Popup>
   );
