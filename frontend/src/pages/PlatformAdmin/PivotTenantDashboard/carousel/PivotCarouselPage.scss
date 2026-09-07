@@ -1,5 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap');
-@import '../../components/PivotBranding/pivotBrandFonts.scss';
+@import '../../../../components/PivotBranding/pivotBrandFonts.scss';
 
 /*
  * "sorry u missed it" — Just Go zine register.
@@ -18,7 +18,7 @@
   --jgz-night: #15120f;
   --jgz-night-raised: #1e1a16;
   --jgz-accent: #ff4f1f;
-  --jgz-ticker: #4ab5ff;
+  --jgz-blue: #4ab5ff;
   --jgz-pop: #ffd23f;
   --jgz-burst: #ff2a2a;
   --jgz-sage: #5fd068;
@@ -27,40 +27,83 @@
   --jgz-font-mono: 'Space Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;
   --jgz-font-flos: 'Les Flos Sans', 'Instrument Sans', 'Helvetica Neue', Helvetica, sans-serif;
 
-  min-height: 100vh;
-  min-height: 100dvh;
-  padding: clamp(1.25rem, 4vw, 3rem) clamp(1rem, 4vw, 3rem) 5rem;
+  --jgz-type: rgba(250, 246, 239, 0.94);
+  --jgz-type-muted: rgba(250, 246, 239, 0.76);
+  --jgz-type-soft: rgba(250, 246, 239, 0.56);
+
+  padding: clamp(1.25rem, 3vw, 2.25rem) clamp(1rem, 3vw, 2.25rem) clamp(2rem, 4vw, 3rem);
+  border: 2px solid var(--jgz-ink);
   background: #0f0d0b;
-  color: var(--jgz-cream);
+  color: var(--jgz-type);
   font-family: var(--jgz-font-mono);
   text-transform: lowercase;
   color-scheme: dark;
 }
 
-.jgz__masthead {
+.jgz__bar {
   display: flex;
   flex-wrap: wrap;
   align-items: flex-end;
   justify-content: space-between;
-  gap: 1rem 1.5rem;
-  padding-bottom: 0.9rem;
+  gap: 0.75rem 2rem;
+  padding-bottom: 1.1rem;
   border-bottom: 2px solid var(--jgz-cream);
 }
 
-.jgz__title {
-  margin: 0;
-  font-family: var(--jgz-font-flos);
-  font-size: clamp(2rem, 5vw, 3.25rem);
-  line-height: 0.95;
-  letter-spacing: -0.01em;
-}
-
 .jgz__standfirst {
-  margin: 0.5rem 0 0;
-  max-width: 46ch;
+  margin: 0;
+  max-width: 52ch;
   font-size: 0.8rem;
   line-height: 1.55;
-  color: rgba(250, 246, 239, 0.72);
+  color: var(--jgz-type-muted);
+}
+
+.jgz__state {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  white-space: nowrap;
+}
+
+/* Rules, not boxes — the flag states whether this deck exists in the database. */
+.jgz__flag {
+  font-size: 0.68rem;
+  letter-spacing: 0.04em;
+  padding: 0.25rem 0.5rem;
+  border: 1px solid var(--jgz-accent);
+  color: var(--jgz-accent);
+}
+
+.jgz__flag--saved {
+  border-color: var(--jgz-type-soft);
+  color: var(--jgz-type-soft);
+}
+
+.jgz__action {
+  appearance: none;
+  padding: 0.4rem 0.8rem;
+  border: 2px solid var(--jgz-cream);
+  background: transparent;
+  color: var(--jgz-cream);
+  font-family: var(--jgz-font-mono);
+  font-size: 0.7rem;
+  text-transform: lowercase;
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    background: var(--jgz-accent);
+    border-color: var(--jgz-accent);
+  }
+
+  &:disabled {
+    opacity: 0.45;
+    cursor: default;
+  }
+
+  &:focus-visible {
+    outline: 3px solid var(--jgz-pop);
+    outline-offset: 2px;
+  }
 }
 
 .jgz__controls {
@@ -72,38 +115,39 @@
 
 .jgz__switch {
   display: flex;
-  border: 2px solid var(--jgz-cream);
+  border: 2px solid #1a1714;
 }
 
 .jgz__switch button {
   appearance: none;
-  padding: 0.5rem 0.85rem;
+  padding: 0.45rem 0.8rem;
   border: 0;
   background: transparent;
-  color: var(--jgz-cream);
-  font: inherit;
+  color: #1a1714;
+  font-family: 'Space Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;
   font-size: 0.72rem;
   text-transform: lowercase;
   cursor: pointer;
 
   & + button {
-    border-left: 2px solid var(--jgz-cream);
+    border-left: 2px solid #1a1714;
   }
 
   &[aria-pressed='true'] {
-    background: var(--jgz-accent);
-    color: var(--jgz-cream);
+    background: #ff4f1f;
+    color: #faf6ef;
   }
 
   &:focus-visible {
-    outline: 3px solid var(--jgz-pop);
+    outline: 3px solid #ffd23f;
     outline-offset: -3px;
   }
 }
 
 .jgz__note {
+  font-family: 'Space Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;
   font-size: 0.68rem;
-  color: rgba(250, 246, 239, 0.48);
+  color: rgba(26, 23, 20, 0.55);
 }
 
 /* Contact-sheet gallery: frames sit on the table, captions live outside them. */
@@ -111,7 +155,7 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 21rem), 1fr));
   gap: clamp(1.5rem, 4vw, 2.75rem);
-  margin-top: clamp(1.75rem, 5vw, 3rem);
+  margin: clamp(1.75rem, 5vw, 3rem) 0 0;
   list-style: none;
   padding: 0;
 }
@@ -127,11 +171,11 @@
   justify-content: space-between;
   gap: 1rem;
   font-size: 0.68rem;
-  color: rgba(250, 246, 239, 0.62);
+  color: var(--jgz-type-soft);
 
   b {
     font-weight: 700;
-    color: var(--jgz-cream);
+    color: var(--jgz-type);
   }
 }
 
@@ -163,7 +207,7 @@
     margin: 0.2rem 0 0;
     font-size: 0.72rem;
     line-height: 1.5;
-    color: rgba(250, 246, 239, 0.72);
+    color: var(--jgz-type-muted);
   }
 }
 
@@ -182,9 +226,9 @@
 .jgz-frame--night {
   --jgz-ground: var(--jgz-night);
   --jgz-plate: var(--jgz-night-raised);
-  --jgz-type: var(--jgz-cream);
-  --jgz-type-muted: rgba(250, 246, 239, 0.72);
-  --jgz-type-soft: rgba(250, 246, 239, 0.46);
+  --jgz-type: rgba(250, 246, 239, 0.94);
+  --jgz-type-muted: rgba(250, 246, 239, 0.76);
+  --jgz-type-soft: rgba(250, 246, 239, 0.56);
   --jgz-rule: var(--jgz-cream);
   --jgz-shadow: rgba(0, 0, 0, 0.62);
 
@@ -195,9 +239,9 @@
 .jgz-frame--paper {
   --jgz-ground: var(--jgz-cream);
   --jgz-plate: #f0eae0;
-  --jgz-type: var(--jgz-ink);
-  --jgz-type-muted: rgba(26, 23, 20, 0.72);
-  --jgz-type-soft: rgba(26, 23, 20, 0.5);
+  --jgz-type: rgba(26, 23, 20, 0.92);
+  --jgz-type-muted: rgba(26, 23, 20, 0.74);
+  --jgz-type-soft: rgba(26, 23, 20, 0.54);
   --jgz-rule: var(--jgz-ink);
   --jgz-shadow: rgba(26, 23, 20, 0.28);
   --jgz-riso: var(--jgz-accent);
@@ -226,39 +270,6 @@
 
 /* -------------------------------------------------------------- primitives */
 
-.jgz-ticker {
-  position: absolute;
-  inset: 0 0 auto;
-  z-index: 4;
-  overflow: hidden;
-  padding: 1.5cqw 0;
-  border-bottom: 0.55cqw solid var(--jgz-ink);
-  background: var(--jgz-ticker);
-  color: var(--jgz-ink);
-  font-family: var(--jgz-font-mono);
-  font-size: 2.5cqw;
-  letter-spacing: 0.02em;
-  white-space: nowrap;
-}
-
-.jgz-ticker--accent {
-  background: var(--jgz-accent);
-  color: var(--jgz-cream);
-  border-bottom-color: var(--jgz-ink);
-}
-
-.jgz-ticker__rail {
-  display: flex;
-  width: max-content;
-  animation: jgz-marquee 22s linear infinite;
-}
-
-@keyframes jgz-marquee {
-  to {
-    transform: translateX(-50%);
-  }
-}
-
 /* Struck mark. Rotation under ~4deg reads as a crooked badge, which is worse. */
 .jgz-stamp {
   position: absolute;
@@ -273,7 +284,6 @@
   letter-spacing: 0.06em;
   text-transform: uppercase;
   transform: rotate(var(--jgz-stamp-deg, -7deg));
-  animation: jgz-strike 320ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 .jgz-stamp--burst {
@@ -282,13 +292,6 @@
 
 .jgz-stamp--ink {
   color: var(--jgz-type);
-}
-
-@keyframes jgz-strike {
-  from {
-    opacity: 0;
-    transform: rotate(var(--jgz-stamp-deg, -7deg)) scale(1.35);
-  }
 }
 
 .jgz-knockout {
@@ -335,7 +338,7 @@
     rgba(250, 246, 239, 0.07) 0 1px,
     transparent 1px 7px
   );
-  color: rgba(250, 246, 239, 0.5);
+  color: rgba(250, 246, 239, 0.56);
   font-family: var(--jgz-font-mono);
   font-size: 2.4cqw;
 }
@@ -343,7 +346,7 @@
 .jgz-photo__grain {
   position: absolute;
   inset: 0;
-  background-image: url('../../assets/pivot/pivot-film-grain.webp');
+  background-image: url('../../../../assets/pivot/pivot-film-grain.webp');
   background-size: 34cqw;
   opacity: 0.24;
   mix-blend-mode: overlay;
@@ -410,23 +413,75 @@
 }
 
 .jgz-chip--when {
-  background: var(--jgz-ticker);
+  background: var(--jgz-blue);
 }
 
 .jgz-chip--where {
   background: var(--jgz-pop);
 }
 
-.jgz-eyebrow {
-  font-family: var(--jgz-font-mono);
-  font-size: 2.3cqw;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--jgz-type-soft);
+/*
+ * The standing head. Lowercase, flush left, with the label in the display face
+ * and the date trailing in mono at reading size — no rule under it, no tracked
+ * caps, no split to both trims. Those three together are what made the old
+ * version read as chrome rather than as typography.
+ */
+.jgz-slug {
+  display: flex;
+  align-items: baseline;
+  gap: 2.2cqw;
+  margin: 0;
 }
 
-.jgz-eyebrow--right {
-  text-align: right;
+.jgz-slug__label {
+  font-size: 4.6cqw;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.01em;
+  color: var(--jgz-type);
+}
+
+.jgz-slug__value {
+  font-family: var(--jgz-font-mono);
+  font-size: 2.4cqw;
+  color: var(--jgz-type-soft);
+  font-variant-numeric: tabular-nums;
+}
+
+/*
+ * Vibe tags carry no listing data, so they are rules rather than filled chips —
+ * the pops stay reserved for when/where and nothing here competes with them.
+ */
+.jgz-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 1.4cqw;
+  margin: 1.8cqw 0 0;
+  padding: 0;
+  list-style: none;
+  font-family: var(--jgz-font-mono);
+  font-size: 2.3cqw;
+  color: var(--jgz-type-soft);
+
+  li {
+    position: relative;
+    padding-left: 1.4cqw;
+  }
+
+  li::before {
+    content: '/';
+    position: absolute;
+    left: 0;
+    opacity: 0.7;
+  }
+
+  li:first-child {
+    padding-left: 0;
+  }
+
+  li:first-child::before {
+    content: none;
+  }
 }
 
 /* --------------------------------------------------------- 01 · the cover */
@@ -442,54 +497,99 @@
   inset: 0;
   z-index: 1;
   background:
-    linear-gradient(180deg, rgba(14, 11, 9, 0.72) 0%, rgba(14, 11, 9, 0.12) 34%, rgba(14, 11, 9, 0.86) 88%),
-    radial-gradient(ellipse 70% 55% at 50% 44%, transparent 40%, rgba(14, 11, 9, 0.6) 100%);
+    linear-gradient(180deg, rgba(14, 11, 9, 0.86) 0%, rgba(14, 11, 9, 0.18) 26%, rgba(14, 11, 9, 0.9) 74%),
+    radial-gradient(ellipse 70% 55% at 50% 40%, transparent 40%, rgba(14, 11, 9, 0.6) 100%);
 }
 
 .jgz-frame--paper .jgz-cover__wash {
-  background: linear-gradient(180deg, rgba(250, 246, 239, 0.1) 0%, rgba(250, 246, 239, 0.72) 62%, var(--jgz-cream) 92%);
-}
-
-.jgz-cover__body {
-  position: absolute;
-  inset: auto 0 26cqw 0;
-  z-index: 2;
+  background: linear-gradient(
+    180deg,
+    rgba(250, 246, 239, 0.88) 0%,
+    rgba(250, 246, 239, 0.24) 26%,
+    rgba(250, 246, 239, 0.86) 72%,
+    var(--jgz-cream) 94%
+  );
 }
 
 /*
- * The long line is set nowrap at a size that outruns the trim, so "missed it"
- * is itself partly missing from the cover. The frame clips it — that is the
- * joke, and it is the only place type is allowed to leave the page.
+ * The flag. The publication's name is furniture, not the message — it is set
+ * once at the top at reading size, under a rule, with the tagline and the
+ * issue number on the same line. Nothing here competes with the cover line.
  */
-.jgz-masthead {
+.jgz-cover__flag {
+  position: absolute;
+  inset: 5.5cqw 5cqw auto;
+  z-index: 2;
+}
+
+.jgz-cover__name {
   margin: 0;
-  padding-left: 5cqw;
   font-family: var(--jgz-font-flos);
-  font-size: 25cqw;
-  line-height: 0.8;
-  letter-spacing: -0.02em;
-  color: var(--jgz-cream);
-  text-shadow: 0.5cqw 0.7cqw 0 rgba(14, 11, 9, 0.55);
-
-  span {
-    display: block;
-    white-space: nowrap;
-  }
+  font-size: 8.6cqw;
+  line-height: 0.92;
+  letter-spacing: -0.015em;
+  color: var(--jgz-type);
 }
 
-.jgz-frame--paper .jgz-masthead {
-  color: var(--jgz-ink);
-  text-shadow: none;
+.jgz-cover__tagline {
+  margin: 1.6cqw 0 0;
+  font-family: var(--jgz-font-mono);
+  font-size: 2.4cqw;
+  color: var(--jgz-type-muted);
+  font-variant-numeric: tabular-nums;
 }
 
-.jgz-masthead__bleed {
+/*
+ * The cover line. Bottom-anchored so a longer week grows it up into the
+ * photograph instead of down through the foot, and set in the display face
+ * with the count spelled out — Les Flos stays on the flag, mono stays on
+ * machine values, and no word is ever allowed past the trim.
+ */
+.jgz-cover__body {
+  position: absolute;
+  inset: auto 5cqw 20cqw;
+  z-index: 2;
+}
+
+.jgz-cover__eyebrow {
+  margin: 0 0 2.4cqw;
+  font-family: var(--jgz-font-mono);
+  font-size: 2.4cqw;
   color: var(--jgz-accent);
 }
 
+.jgz-cover__heading {
+  margin: 0;
+  font-size: 11.5cqw;
+  font-weight: 700;
+  line-height: 0.98;
+  letter-spacing: -0.022em;
+  color: var(--jgz-type);
+  text-shadow: 0.3cqw 0.45cqw 0 rgba(14, 11, 9, 0.5);
+  text-wrap: balance;
+}
+
+.jgz-cover__sub {
+  margin: 3cqw 0 0;
+  max-width: 62cqw;
+  font-family: var(--jgz-font-mono);
+  font-size: 2.7cqw;
+  line-height: 1.45;
+  color: var(--jgz-type-muted);
+}
+
+.jgz-frame--paper {
+  .jgz-cover__name,
+  .jgz-cover__heading {
+    text-shadow: none;
+  }
+}
+
+/* Struck on the bare photograph above the cover line, clear of both. */
 .jgz-cover__stamp {
-  right: 8cqw;
-  bottom: 3cqw;
-  font-size: 5cqw;
+  top: -13cqw;
+  right: 1cqw;
+  font-size: 4.6cqw;
 }
 
 .jgz-cover__foot {
@@ -504,7 +604,7 @@
   padding-bottom: 2.4cqw;
   border-bottom: 0.55cqw solid var(--jgz-rule);
   font-family: var(--jgz-font-mono);
-  font-size: 2.9cqw;
+  font-size: 2.6cqw;
   color: var(--jgz-type);
 }
 
@@ -517,13 +617,13 @@
 /* ---------------------------------------------------------- 02 · the wall */
 
 .jgz-sheet__head {
-  padding: 5cqw 5cqw 2.5cqw;
+  padding: 4.5cqw 5cqw 2cqw;
 }
 
 .jgz-sheet__title {
   margin: 0;
   font-family: var(--jgz-font-flos);
-  font-size: 10cqw;
+  font-size: 8.5cqw;
   line-height: 0.9;
 }
 
@@ -534,11 +634,16 @@
   color: var(--jgz-type-muted);
 }
 
+/*
+ * Two rows of tilted postings need every bit of the box. With no folio under
+ * them the grid gets the bottom back, which is what the second row was
+ * colliding with before.
+ */
 .jgz-sheet__grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 4cqw 3.5cqw;
-  padding: 2cqw 6cqw 0;
+  padding: 2cqw 6cqw 5cqw;
 }
 
 .jgz-posting {
@@ -549,9 +654,9 @@
   transform: rotate(var(--jgz-deg)) translate(var(--jgz-x), var(--jgz-y));
 }
 
-/* Landscape crop keeps two rows of postings inside the 4:5 trim. */
+/* Landscape crop buys the vertical room the vibe tags need on each posting. */
 .jgz-posting__photo {
-  aspect-ratio: 5 / 4;
+  aspect-ratio: 8 / 5;
 }
 
 .jgz-posting__plate {
@@ -574,6 +679,11 @@
   color: var(--jgz-type-muted);
 }
 
+.jgz-posting .jgz-tags {
+  margin-top: 1.2cqw;
+  font-size: 2cqw;
+}
+
 .jgz-posting__x {
   position: absolute;
   inset: 0;
@@ -592,16 +702,98 @@
   }
 }
 
-.jgz-sheet__grid + .jgz-folio {
+/* ---------------------------------------------------------- 03 · the card */
+
+/*
+ * The photograph is the frame — no plate, no margin, no crop. Everything else
+ * is the app's own card furniture set down on top of it, so the reader is
+ * looking at the listing they did not open rather than a poster about it.
+ */
+.jgz-card__photo {
+  position: absolute;
+  inset: 0;
+}
+
+/*
+ * A short top pass to seat the slug and a long bottom one to carry the plate.
+ * The middle of the picture stays uncovered — that is the part worth seeing.
+ */
+.jgz-card__scrim {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(14, 11, 9, 0.66) 0%, transparent 18%),
+    linear-gradient(0deg, rgba(14, 11, 9, 0.88) 0%, rgba(14, 11, 9, 0.5) 30%, transparent 58%);
+}
+
+.jgz-frame--paper .jgz-card__scrim {
+  background:
+    linear-gradient(180deg, rgba(250, 246, 239, 0.84) 0%, transparent 18%),
+    linear-gradient(0deg, rgba(250, 246, 239, 0.9) 0%, rgba(250, 246, 239, 0.5) 30%, transparent 58%);
+}
+
+.jgz-card__slug {
+  position: absolute;
+  inset: 5cqw 5cqw auto;
+  z-index: 2;
+}
+
+/*
+ * Bottom-anchored so a long title grows the plate upward into the picture
+ * rather than down through the folio. Nothing here can overflow the frame.
+ */
+.jgz-card__plate {
+  position: absolute;
+  inset: auto 6cqw 10.5cqw;
+  z-index: 2;
+  padding: 4cqw 4.2cqw 4.4cqw;
+  border: 0.62cqw solid var(--jgz-rule);
+  background: var(--jgz-plate);
+  box-shadow: 1cqw 1.4cqw 0 rgba(0, 0, 0, 0.5);
+  transform: rotate(-1.1deg);
+}
+
+.jgz-frame--paper .jgz-card__plate {
+  box-shadow: 1cqw 1.4cqw 0 var(--jgz-shadow);
+}
+
+.jgz-card__title {
+  margin: 0;
+  font-size: 6.2cqw;
+  font-weight: 700;
+  line-height: 1.02;
+  letter-spacing: -0.012em;
+  color: var(--jgz-type);
+}
+
+.jgz-card__host {
+  margin: 1.4cqw 0 2.8cqw;
+  font-family: var(--jgz-font-mono);
+  font-size: 2.6cqw;
+  color: var(--jgz-type-soft);
+}
+
+.jgz-card__note {
+  margin: 2.8cqw 0 0;
+  padding-top: 2.4cqw;
+  border-top: 0.38cqw solid var(--jgz-rule);
+  font-family: var(--jgz-font-mono);
+  font-size: 2.6cqw;
+  line-height: 1.45;
   color: var(--jgz-type-muted);
 }
 
-/* -------------------------------------------------------- 03 · the notice */
+/* Struck across the plate's corner, half off it, the way a stamp lands. */
+.jgz-card__stamp {
+  top: -4.5cqw;
+  right: -3cqw;
+  font-size: 4.2cqw;
+}
 
-.jgz-notice__head {
-  display: flex;
-  justify-content: space-between;
-  padding: 4.5cqw 5cqw 2.5cqw;
+/* -------------------------------------------------------- 04 · the notice */
+
+.jgz-notice__slug {
+  padding: 5cqw 5cqw 2.6cqw;
 }
 
 .jgz-notice__plate {
@@ -609,7 +801,7 @@
   margin: 0 5cqw;
   border: 0.62cqw solid var(--jgz-rule);
   box-shadow: 1cqw 1.3cqw 0 var(--jgz-shadow);
-  aspect-ratio: 16 / 10;
+  aspect-ratio: 5 / 3;
   transform: rotate(-1.6deg);
 }
 
@@ -626,8 +818,6 @@
   transform: translate(-50%, -50%) rotate(-3deg);
   font-family: var(--jgz-font-mono);
   font-size: 2.6cqw;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
   color: var(--jgz-type-soft);
 }
 
@@ -650,41 +840,120 @@
   color: var(--jgz-type-soft);
 }
 
-/* One large figure per issue. Rules, not boxes. */
-.jgz-tally {
-  display: flex;
-  align-items: baseline;
-  gap: 2.4cqw;
-  margin-top: 3cqw;
-  padding-top: 2.4cqw;
-  border-top: 0.55cqw solid var(--jgz-rule);
-}
-
-.jgz-tally__value {
-  font-family: var(--jgz-font-mono);
-  font-weight: 700;
-  font-size: 11cqw;
-  line-height: 0.86;
-  font-variant-numeric: tabular-nums;
-  color: var(--jgz-accent);
-}
-
-.jgz-tally__label {
-  font-family: var(--jgz-font-mono);
-  font-size: 2.6cqw;
-  color: var(--jgz-type-muted);
-}
-
 .jgz-notice__note {
-  margin: 2.6cqw 0 0;
-  max-width: 46cqw;
+  margin: 3cqw 0 0;
+  padding-top: 2.6cqw;
+  border-top: 0.55cqw solid var(--jgz-rule);
+  max-width: 58cqw;
   font-family: var(--jgz-font-mono);
   font-size: 2.7cqw;
   line-height: 1.5;
   color: var(--jgz-type-muted);
 }
 
-/* ------------------------------------------------------- 04 · the receipt */
+/* ------------------------------------------------------ 05 · the dispatch */
+
+.jgz-dispatch__slug {
+  padding: 5cqw 5cqw 0;
+}
+
+.jgz-dispatch__lede {
+  display: flex;
+  align-items: flex-start;
+  gap: 3cqw;
+  padding: 3.5cqw 5cqw 0;
+}
+
+.jgz-dispatch__thumb {
+  flex: 0 0 24cqw;
+  aspect-ratio: 1 / 1;
+  border: 0.62cqw solid var(--jgz-rule);
+  box-shadow: 0.7cqw 0.9cqw 0 var(--jgz-shadow);
+  transform: rotate(-2.4deg);
+
+  .jgz-photo {
+    width: 100%;
+    height: 100%;
+  }
+}
+
+.jgz-dispatch__title {
+  margin: 0;
+  font-size: 5.4cqw;
+  font-weight: 700;
+  line-height: 1.02;
+  letter-spacing: -0.01em;
+}
+
+.jgz-dispatch__venue {
+  margin: 1.4cqw 0 0;
+  font-family: var(--jgz-font-mono);
+  font-size: 2.5cqw;
+  color: var(--jgz-type-muted);
+}
+
+/* Rules, not boxes. The timestamp column is tabular so the night lines up. */
+.jgz-run {
+  margin: 4cqw 0 0;
+  padding: 0 5cqw;
+  list-style: none;
+  counter-reset: none;
+
+  li {
+    display: flex;
+    gap: 2.6cqw;
+    padding: 1.9cqw 0;
+    border-top: 0.28cqw solid var(--jgz-rule);
+    font-family: var(--jgz-font-mono);
+    font-size: 2.5cqw;
+    line-height: 1.3;
+  }
+
+  li:last-child {
+    border-bottom: 0.28cqw solid var(--jgz-rule);
+  }
+}
+
+.jgz-run__time {
+  flex: 0 0 9cqw;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--jgz-accent);
+}
+
+.jgz-run__what {
+  color: var(--jgz-type-muted);
+}
+
+.jgz-dispatch__scene {
+  margin: 3.5cqw 0 0;
+  padding: 0 5cqw;
+  font-size: 3cqw;
+  line-height: 1.5;
+  color: var(--jgz-type);
+}
+
+/* The counterpoint. The only sentence in the issue aimed straight at the reader. */
+.jgz-dispatch__instead {
+  margin: 3.5cqw 5cqw 0;
+  padding: 2.6cqw 3cqw;
+  background: var(--jgz-accent);
+  color: var(--jgz-cream);
+  font-size: 3.2cqw;
+  line-height: 1.28;
+  transform: rotate(-0.8deg);
+  box-shadow: 0.7cqw 0.9cqw 0 var(--jgz-shadow);
+
+  span {
+    display: block;
+    margin-bottom: 0.9cqw;
+    font-family: var(--jgz-font-mono);
+    font-size: 2.3cqw;
+    opacity: 0.78;
+  }
+}
+
+/* ------------------------------------------------------- 06 · the receipt */
 
 .jgz-receipt {
   position: relative;
@@ -699,8 +968,12 @@
 .jgz-receipt__slip {
   width: 100%;
   padding: 5.5cqw 5cqw 6cqw;
+  --jgz-type: rgba(26, 23, 20, 0.92);
+  --jgz-type-muted: rgba(26, 23, 20, 0.74);
+  --jgz-type-soft: rgba(26, 23, 20, 0.54);
+
   background: var(--jgz-cream);
-  color: var(--jgz-ink);
+  color: var(--jgz-type);
   font-family: var(--jgz-font-mono);
   box-shadow: 1cqw 1.4cqw 0 var(--jgz-shadow);
   transform: rotate(-0.9deg);
@@ -728,7 +1001,7 @@
 .jgz-receipt__doc {
   margin: 1cqw 0 0;
   font-size: 2.3cqw;
-  color: rgba(26, 23, 20, 0.62);
+  color: var(--jgz-type-muted);
 }
 
 .jgz-receipt__lines {
@@ -753,15 +1026,19 @@
   background-repeat: repeat-x;
 }
 
+.jgz-receipt__tag {
+  color: var(--jgz-type-soft);
+}
+
 .jgz-receipt__when {
   font-variant-numeric: tabular-nums;
-  color: rgba(26, 23, 20, 0.72);
+  color: var(--jgz-type-muted);
 }
 
 .jgz-receipt__totals {
   margin: 2.8cqw 0 0;
   padding-top: 2.6cqw;
-  border-top: 0.55cqw solid var(--jgz-ink);
+  border-top: 0.55cqw solid rgba(26, 23, 20, 0.55);
 
   div {
     display: flex;
@@ -793,7 +1070,7 @@
   border-top: 0.38cqw dashed rgba(26, 23, 20, 0.45);
   text-align: center;
   font-size: 2.3cqw;
-  color: rgba(26, 23, 20, 0.62);
+  color: var(--jgz-type-muted);
 }
 
 .jgz-receipt__stamp {
@@ -804,7 +1081,7 @@
   color: var(--jgz-ink);
 }
 
-/* ---------------------------------------------------- 05 · the back cover */
+/* ---------------------------------------------------- 07 · the back cover */
 
 .jgz-back__body {
   position: absolute;
@@ -820,20 +1097,10 @@
   filter: drop-shadow(0.5cqw 0.7cqw 0 var(--jgz-shadow));
 }
 
-.jgz-back__burst {
-  position: absolute;
-  top: -6cqw;
-  right: 2cqw;
-  width: 14cqw;
-  transform: rotate(9deg);
-}
-
 .jgz-back__kicker {
   margin: 7cqw 0 0;
   font-family: var(--jgz-font-mono);
-  font-size: 2.4cqw;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+  font-size: 2.5cqw;
   color: var(--jgz-type-soft);
 }
 
@@ -854,39 +1121,9 @@
   color: var(--jgz-type-muted);
 }
 
-.jgz-back__actions {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 3.4cqw;
-  margin-top: 6cqw;
-}
-
-.jgz-cta {
-  display: inline-block;
-  padding: 2.4cqw 5.4cqw;
-  border: 0.62cqw solid var(--jgz-ink);
-  border-radius: 999px;
-  background: var(--jgz-accent);
-  box-shadow: 0.7cqw 1cqw 0 var(--jgz-shadow);
-  color: var(--jgz-cream);
-  font-size: 3.6cqw;
-  font-weight: 700;
-}
-
 .jgz-back__badge {
-  width: 34cqw;
+  display: block;
+  width: 38cqw;
   height: auto;
-}
-
-/* ------------------------------------------------------------ quality floor */
-
-@media (prefers-reduced-motion: reduce) {
-  .jgz-ticker__rail {
-    animation: none;
-  }
-
-  .jgz-stamp {
-    animation: none;
-  }
+  margin: 7cqw auto 0;
 }

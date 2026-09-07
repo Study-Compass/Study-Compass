@@ -10,6 +10,7 @@ import PivotTenantJourneysPage from './PivotTenantJourneysPage';
 import PivotTenantDropDeckPage from './PivotTenantDropDeckPage';
 import PivotTenantCatalogPage from './PivotTenantCatalogPage';
 import PivotVoicePage from './PivotVoicePage';
+import PivotCarouselPage from './carousel/PivotCarouselPage';
 import PivotTenantLaunchPage from './PivotTenantLaunchPage';
 import PivotTenantLocationMigrationPage, {
   RICH_LOCATION_MIGRATION_UI_ENABLED,
@@ -88,6 +89,17 @@ function PivotTenantDashboard() {
         icon: 'mdi:clipboard-edit-outline',
         element: (
           <PivotTenantCurationPage
+            key={tenantKey}
+            tenantKey={tenantKey}
+            cityDisplayName={cityDisplayName}
+          />
+        ),
+      },
+      {
+        label: 'Carousel',
+        icon: 'mdi:image-multiple-outline',
+        element: (
+          <PivotCarouselPage
             key={tenantKey}
             tenantKey={tenantKey}
             cityDisplayName={cityDisplayName}
