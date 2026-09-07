@@ -53,7 +53,12 @@ const ZINE_SLIDE_TYPES = Object.freeze({
     photo: 'flier|upload',
     fields: [
       { key: 'tagline', kind: 'line', max: 52, voice: 'zine.cover.tagline', shipped: 'everything that happened while you were home' },
-            { key: 'coverLine', kind: 'line', max: 64, derived: 'coverLead' },
+            /*
+       * Derived until written. The cover line is built from the deck's own
+       * records so a new week rewrites its own cover, but it is an ordinary
+       * dynamic slot: type over it and the deck keeps what you typed.
+       */
+      { key: 'coverLine', kind: 'line', max: 72, optional: true, derived: 'coverLead' },
       { key: 'caption', kind: 'line', max: 72, optional: true },
     ],
   },

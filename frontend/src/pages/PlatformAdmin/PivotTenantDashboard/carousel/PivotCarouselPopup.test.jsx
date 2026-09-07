@@ -81,3 +81,27 @@ describe('the edit affordance is layout-neutral', () => {
     }
   });
 });
+
+/**
+ * The placeholder has to be driven by :empty, not by a class React computes.
+ * The field commits on blur and does not re-render while focused, so a class
+ * set at render time survives the first keystroke and the placeholder sits
+ * there while typed text piles up beside it.
+ */
+describe('the slot placeholder', () => {
+  test('is selected by :empty rather than by a rendered class', () => {
+    expect(pageCss).toMatch(/\.jgz-editable:empty::after/);
+    expect(pageCss).not.toMatch(/\.jgz-editable--empty::(before|after)/);
+  });
+
+  test('does not sit on ::before, which the tint owns', () => {
+    // Source SCSS, so the tint's rule is written nested as `&::before`.
+    expect(pageCss).toMatch(/&::before/);
+    expect(pageCss).not.toMatch(/\.jgz-editable:empty::before/);
+  });
+
+  test('cannot swallow a click meant for the field', () => {
+    const rule = pageCss.slice(pageCss.indexOf('.jgz-editable:empty::after'));
+    expect(rule.slice(0, rule.indexOf('}'))).toMatch(/pointer-events:\s*none/);
+  });
+});

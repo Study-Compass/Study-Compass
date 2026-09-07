@@ -8,7 +8,7 @@
  */
 
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { ZINE_DEMO_DECK } from './zineDemoDeck';
 import { resolveSlide, sampleSlideFor } from './zineDeck';
 import { ZineEditProvider } from './zineField';
@@ -349,4 +349,71 @@ describe('the edit toggle', () => {
       expect(text(true)).toBe(text(false));
     },
   );
+});
+
+/**
+ * A slot with a computed default. The cover line is built from the deck's own
+ * records until someone writes one, so it has to behave like any other dynamic
+ * field without losing that derivation the first time it is focused.
+ */
+describe('the cover line', () => {
+  const MANIFEST = {
+    types: {
+      cover: {
+        fields: [{ key: 'coverLine', kind: 'line', max: 72, optional: true }],
+        events: { min: 0, max: 1 },
+      },
+    },
+  };
+
+  const coverSlide = ZINE_DEMO_DECK.slides[0];
+  const deck = { ...ZINE_DEMO_DECK, slides: ZINE_DEMO_DECK.slides };
+
+  const renderCover = (slide, onChange = () => {}) => {
+    const resolved = resolveSlide({ ...deck, slides: [slide] }, slide, 0, MANIFEST, {});
+    const ctx = { editing: true, slide: { ...slide, issue: deck.issue }, onChange };
+    return render(
+      <ZineEditProvider value={ctx}>
+        <ZineCover {...resolved.props} />
+      </ZineEditProvider>,
+    );
+  };
+
+  test('is typable', () => {
+    renderCover(coverSlide);
+    expect(screen.getByLabelText('values.coverLine')).toBeTruthy();
+  });
+
+  test('editing starts from the derived line rather than from nothing', () => {
+    renderCover(coverSlide);
+    expect(screen.getByLabelText('values.coverLine').textContent).toMatch(/nights worth/);
+  });
+
+  test('a stored line replaces the derived one', () => {
+    const slide = { ...coverSlide, values: { ...coverSlide.values, coverLine: 'a week you missed' } };
+    renderCover(slide);
+    expect(screen.getByLabelText('values.coverLine').textContent).toBe('a week you missed');
+  });
+
+  test('committing the derived text unchanged stores nothing, so it stays derived', () => {
+    const writes = [];
+    renderCover(coverSlide, (path, value) => writes.push([path, value]));
+    const field = screen.getByLabelText('values.coverLine');
+    fireEvent.blur(field);
+    expect(writes).toEqual([['values.coverLine', '']]);
+  });
+
+  test('committing changed text stores it', () => {
+    const writes = [];
+    renderCover(coverSlide, (path, value) => writes.push([path, value]));
+    const field = screen.getByLabelText('values.coverLine');
+    field.textContent = 'six rooms you were not in';
+    fireEvent.blur(field);
+    expect(writes).toEqual([['values.coverLine', 'six rooms you were not in']]);
+  });
+
+  test('a derived slot is never marked empty, so it shows no placeholder', () => {
+    const { container } = renderCover(coverSlide);
+    expect(container.querySelector('.jgz-cover__heading.jgz-editable--empty')).toBeNull();
+  });
 });

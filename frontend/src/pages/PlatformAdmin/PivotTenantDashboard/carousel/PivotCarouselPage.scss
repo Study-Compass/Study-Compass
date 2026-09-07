@@ -254,6 +254,10 @@
   container-type: inline-size;
   position: relative;
   aspect-ratio: 4 / 5;
+
+  /* How far an edit tint reaches past its slot. Declared here so a container
+     can narrow it; declaring it on .jgz-editable would shadow every override. */
+  --jgz-slot-bleed: 5cqw;
   width: 100%;
   overflow: hidden;
   isolation: isolate;
@@ -1198,8 +1202,6 @@
  * inside the card and the postings.
  */
 .jgz-editable {
-  --jgz-slot-bleed: 5cqw;
-
   position: relative;
   /* Keeps the tint's z-index inside this element instead of dropping it behind
      whatever the template painted underneath. */
@@ -1211,7 +1213,7 @@
     content: '';
     position: absolute;
     z-index: -1;
-    inset: -0.7cqw calc(var(--jgz-slot-bleed) * -1);
+    inset: -1.1cqw calc(var(--jgz-slot-bleed) * -1);
     background: rgba(255, 79, 31, 0.16);
     border-bottom: 0.3cqw solid rgba(255, 79, 31, 0.5);
     pointer-events: none;
@@ -1225,17 +1227,24 @@
   }
 }
 
-/* The placeholder is content, so it stays on the element itself. */
-.jgz-editable--empty::after {
+/*
+ * :empty rather than a React-set class. The field commits on blur and does not
+ * re-render while it has focus, so a class computed at render time survives the
+ * first keystroke — the placeholder stayed put and typed text piled up beside
+ * it. The browser drops :empty the instant a character lands.
+ */
+.jgz-editable:empty::after {
   content: attr(data-placeholder);
   opacity: 0.5;
   font-style: italic;
+  pointer-events: none;
 }
 
 /* Containers whose inner padding is not the frame's 5cqw trim. */
 .jgz-posting__plate { --jgz-slot-bleed: 2.2cqw; }
 .jgz-card__plate { --jgz-slot-bleed: 4.2cqw; }
 .jgz-dispatch__instead { --jgz-slot-bleed: 3cqw; }
+.jgz-receipt__slip { --jgz-slot-bleed: 5cqw; }
 
 .jgz-rowdrop {
   appearance: none;

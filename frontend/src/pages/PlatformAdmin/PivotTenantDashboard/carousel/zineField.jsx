@@ -8,10 +8,13 @@
  *
  *   <ZineField path="values.slug">{values.slug}</ZineField>
  *
- * `children` is the resolved display value — which may be a voice default the
- * deck does not own. `path` is where a write lands. Editing shows the raw value
- * so you always edit what this deck actually stores, with the default behind it
- * as placeholder.
+ * `children` is the resolved display value; `path` is where a write lands.
+ *
+ * `fallback` is for a slot with a computed default — the cover line is built
+ * from the deck's own records until someone writes one. Editing starts from
+ * that computed text rather than from nothing, so turning editing on does not
+ * blank the slide, and committing text that still equals the default stores
+ * nothing, so the line stays derived until it is actually changed.
  */
 
 import React, { createContext, useCallback, useContext, useRef } from 'react';
@@ -51,6 +54,7 @@ export function ZineField({
   as: Tag = 'span',
   className = '',
   placeholder = '',
+  fallback = '',
   max,
   children,
 }) {
@@ -60,9 +64,11 @@ export function ZineField({
   const commit = useCallback(
     (event) => {
       const next = event.currentTarget.textContent.replace(/\s+/g, ' ').trim();
-      ctx.onChange(path, max ? next.slice(0, max) : next);
+      // Still the computed default: store nothing, so the slot stays derived.
+      const value = next === fallback.trim() ? '' : next;
+      ctx.onChange(path, max ? value.slice(0, max) : value);
     },
-    [ctx, path, max],
+    [ctx, path, max, fallback],
   );
 
   const guard = useCallback(
@@ -74,7 +80,7 @@ export function ZineField({
         return;
       }
       if (event.key === 'Escape') {
-        event.currentTarget.textContent = readPath(ctx.slide, path) || '';
+        event.currentTarget.textContent = readPath(ctx.slide, path) || fallback;
         event.currentTarget.blur();
         return;
       }
@@ -91,7 +97,7 @@ export function ZineField({
         event.preventDefault();
       }
     },
-    [ctx, path, max],
+    [ctx, path, max, fallback],
   );
 
   if (!ctx?.editing) {
@@ -100,11 +106,12 @@ export function ZineField({
 
   const raw = readPath(ctx.slide, path);
   const owned = typeof raw === 'string' && raw.trim();
+  const shown = owned ? raw : fallback;
 
   return (
     <Tag
       ref={ref}
-      className={`${className} jgz-editable${owned ? '' : ' jgz-editable--empty'}`}
+      className={`${className} jgz-editable${shown ? '' : ' jgz-editable--empty'}`}
       contentEditable
       suppressContentEditableWarning
       spellCheck={false}
@@ -115,7 +122,7 @@ export function ZineField({
       onBlur={commit}
       onKeyDown={guard}
     >
-      {owned ? raw : ''}
+      {shown}
     </Tag>
   );
 }

@@ -211,7 +211,15 @@ export function ZineCover({ issue, values, events }) {
       <div className="jgz-cover__body">
         <ZineStamp label="missed" deg={-9} className="jgz-cover__stamp" />
         <p className="jgz-cover__eyebrow">{lead.eyebrow}</p>
-        <h3 className="jgz-cover__heading">{lead.heading}</h3>
+        <ZineField
+          as="h3"
+          className="jgz-cover__heading"
+          path="values.coverLine"
+          max={72}
+          fallback={lead.heading}
+        >
+          {values.coverLine || lead.heading}
+        </ZineField>
         <p className="jgz-cover__sub">{lead.sub}</p>
       </div>
 
