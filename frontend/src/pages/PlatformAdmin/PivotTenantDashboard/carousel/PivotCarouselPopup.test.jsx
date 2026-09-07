@@ -170,3 +170,35 @@ describe('full-bleed overlays stay covered', () => {
     expect(block).not.toMatch(/transform/);
   });
 });
+
+/**
+ * Popup dismisses on a document-level mousedown outside its own content node,
+ * and a nested Popup is portaled to document.body — outside by that test. The
+ * voice panel's save confirmation is exactly that, so leaving dismissal on made
+ * Confirm close the panel on mousedown and unmount the confirmation before its
+ * click landed. The save silently never fired.
+ *
+ * Asserted against the source because Popup cannot be imported under jest:
+ * it pulls @iconify-icon in as untransformed ESM, which is why every suite that
+ * reaches it mocks it.
+ */
+describe('a popup that can contain another popup', () => {
+  const popupJsx = fs.readFileSync(path.join(__dirname, 'PivotCarouselPopup.jsx'), 'utf8');
+
+  test('does not dismiss on an outside click', () => {
+    expect(popupJsx).toMatch(/disableOutsideClick/);
+  });
+
+  test('still offers a way out, so disabling dismissal does not trap anyone', () => {
+    expect(popupJsx).not.toMatch(/hideCloseButton/);
+    expect(popupJsx).toMatch(/onClose=\{onClose\}/);
+  });
+
+  test('every carousel popup goes through this shell rather than Popup directly', () => {
+    for (const file of ['PivotCarouselVoicePanel.jsx', 'PivotCarouselEventPicker.jsx', 'PivotCarouselAddSlide.jsx']) {
+      const source = fs.readFileSync(path.join(__dirname, file), 'utf8');
+      expect(source).toMatch(/PivotCarouselPopup/);
+      expect(source).not.toMatch(/from '.*components\/Popup\/Popup'/);
+    }
+  });
+});
