@@ -6,6 +6,12 @@
  * reach for no module-level constants, which is what lets a new slide type be a
  * manifest entry plus one of these components and nothing else.
  *
+ * Text a person can author is wrapped in <ZineField path=…>. The frame declares
+ * which slot the run belongs to and keeps rendering its resolved value; the
+ * editor turns the same element typable in place. Anything not wrapped —
+ * the publication's name, the derived cover line, the receipt's tally — is not
+ * a slot and is deliberately not editable here.
+ *
  * Every frame is a fixed 4:5 box that establishes a container context, so all
  * interior geometry is expressed in `cqw` and the same markup renders
  * identically at 1080x1350 export size and at gallery preview size.
@@ -24,6 +30,7 @@
  */
 
 import React from 'react';
+import { ZineField, ZineRows } from './zineField';
 import justGoWordmark from '../../../../assets/pivot/just-go-wordmark.svg';
 import justGoWordmarkDark from '../../../../assets/pivot/just-go-wordmark-dark.svg';
 import appStoreBadge from '../../../../assets/pivot/download-on-the-app-store.svg';
@@ -101,11 +108,27 @@ function ZineFolio({ left, right }) {
 }
 
 /** Blue when / yellow where. Sharp, 1.5px-equivalent border, never a pill. */
-function ZineChips({ when, where }) {
+function ZineChips({ when, where, index = 0 }) {
   return (
     <div className="jgz-chips">
-      <span className="jgz-chip jgz-chip--when">{when}</span>
-      <span className="jgz-chip jgz-chip--where">{where}</span>
+      <ZineField
+        as="span"
+        className="jgz-chip jgz-chip--when"
+        path={`events.${index}.snapshot.whenLabel`}
+        max={24}
+        placeholder="when"
+      >
+        {when}
+      </ZineField>
+      <ZineField
+        as="span"
+        className="jgz-chip jgz-chip--where"
+        path={`events.${index}.snapshot.location`}
+        max={48}
+        placeholder="where"
+      >
+        {where}
+      </ZineField>
     </div>
   );
 }
@@ -116,11 +139,15 @@ function ZineChips({ when, where }) {
  * caps, and no split to both trims. It reads as a section head, which is what
  * it is, rather than as a band of chrome across the top of the frame.
  */
-function ZineSlug({ label, value, className = '' }) {
+function ZineSlug({ label, value, className = '', labelPath, valuePath }) {
   return (
     <p className={`jgz-slug ${className}`}>
-      <span className="jgz-slug__label">{label}</span>
-      <span className="jgz-slug__value">{value}</span>
+      <ZineField as="span" className="jgz-slug__label" path={labelPath} max={20}>
+        {label}
+      </ZineField>
+      <ZineField as="span" className="jgz-slug__value" path={valuePath} max={32}>
+        {value}
+      </ZineField>
     </p>
   );
 }
@@ -129,11 +156,19 @@ function ZineSlug({ label, value, className = '' }) {
  * How the room worked, in the room's own words. Unfilled and rule-bound so it
  * never competes with the when/where chips, which carry the listing data.
  */
-function ZineTags({ tags, limit = 3 }) {
+function ZineTags({ tags, limit = 3, path }) {
   return (
     <ul className="jgz-tags">
-      {tags.slice(0, limit).map((tag) => (
-        <li key={tag}>{tag}</li>
+      {tags.slice(0, limit).map((tag, index) => (
+        <ZineField
+          as="li"
+          key={`${tag}-${index}`}
+          path={`${path}.${index}`}
+          max={22}
+          placeholder="tag"
+        >
+          {tag}
+        </ZineField>
       ))}
     </ul>
   );
@@ -159,7 +194,9 @@ export function ZineCover({ issue, values, events }) {
       <header className="jgz-cover__flag">
         <h2 className="jgz-cover__name">sorry u missed it</h2>
         <p className="jgz-cover__tagline">
-          {values.weekLabel} · no. {issue.number}
+          <ZineField path="values.weekLabel" max={40}>{values.weekLabel}</ZineField>
+          {' · no. '}
+          <ZineField path="issue.number" max={8}>{issue.number}</ZineField>
         </p>
       </header>
 
@@ -172,7 +209,10 @@ export function ZineCover({ issue, values, events }) {
 
       <div className="jgz-cover__foot">
         <p className="jgz-cover__caption">
-          above: {event.title}, {event.where}
+          {'above: '}
+          <ZineField path="events.0.snapshot.name" max={64}>{event.title}</ZineField>
+          {', '}
+          <ZineField path="events.0.snapshot.location" max={48}>{event.where}</ZineField>
         </p>
         <ZineFolio left={issue.dateline} right={issue.city} />
       </div>
@@ -195,9 +235,13 @@ export function ZineSheet({ issue, values, events }) {
   return (
     <>
       <header className="jgz-sheet__head">
-        <h2 className="jgz-sheet__title">{values.title}</h2>
+        <ZineField as="h2" className="jgz-sheet__title" path="values.title" max={18}>
+          {values.title}
+        </ZineField>
         <p className="jgz-sheet__kicker">
-          {values.kicker}. {issue.dateline}, {issue.city}
+          <ZineField path="values.kicker" max={48}>{values.kicker}</ZineField>
+          {'. '}
+          <ZineField path="issue.dateline" max={32}>{issue.dateline}</ZineField>
         </p>
       </header>
 
@@ -216,11 +260,24 @@ export function ZineSheet({ issue, values, events }) {
             >
               <ZinePhoto src={event.cover} alt={event.title} className="jgz-posting__photo" />
               <div className="jgz-posting__plate">
-                <h3 className="jgz-posting__title">{event.title}</h3>
+                <ZineField
+                  as="h3"
+                  className="jgz-posting__title"
+                  path={`events.${index}.snapshot.name`}
+                  max={64}
+                >
+                  {event.title}
+                </ZineField>
                 <p className="jgz-posting__meta">
-                  {event.when} — {event.where}
+                  <ZineField path={`events.${index}.snapshot.whenLabel`} max={24}>
+                    {event.when}
+                  </ZineField>
+                  {' — '}
+                  <ZineField path={`events.${index}.snapshot.location`} max={48}>
+                    {event.where}
+                  </ZineField>
                 </p>
-                <ZineTags tags={event.tags} limit={2} />
+                <ZineTags tags={event.tags} limit={2} path={`events.${index}.values.tags`} />
               </div>
               <span className="jgz-posting__x" aria-hidden="true">
                 <svg viewBox="0 0 100 100" preserveAspectRatio="none" focusable="false">
@@ -252,16 +309,24 @@ export function ZineCard({ issue, values, events }) {
 
       <ZineSlug
         label={values.slug}
+        labelPath="values.slug"
         value={`${issue.dateline} · ${issue.city}`}
+        valuePath="issue.dateline"
         className="jgz-card__slug"
       />
 
       <article className="jgz-card__plate">
-        <h2 className="jgz-card__title">{event.title}</h2>
-        <p className="jgz-card__host">{event.host}</p>
+        <ZineField as="h2" className="jgz-card__title" path="events.0.snapshot.name" max={64}>
+          {event.title}
+        </ZineField>
+        <ZineField as="p" className="jgz-card__host" path="events.0.snapshot.host" max={48}>
+          {event.host}
+        </ZineField>
         <ZineChips when={event.when} where={event.where} />
-        <ZineTags tags={event.tags} />
-        <p className="jgz-card__note">{event.note}</p>
+        <ZineTags tags={event.tags} path="events.0.values.tags" />
+        <ZineField as="p" className="jgz-card__note" path="events.0.values.note" max={84}>
+          {event.note}
+        </ZineField>
         <ZineStamp label="missed" deg={-8} className="jgz-card__stamp" />
       </article>
 
@@ -280,20 +345,34 @@ export function ZineNotice({ issue, values, events, options }) {
 
   return (
     <>
-      <ZineSlug label={values.slug} value={issue.dateline} className="jgz-notice__slug" />
+      <ZineSlug
+        label={values.slug}
+        labelPath="values.slug"
+        value={issue.dateline}
+        valuePath="issue.dateline"
+        className="jgz-notice__slug"
+      />
 
       <figure className="jgz-notice__plate">
         <ZinePhoto src={event.cover} alt={event.title} className="jgz-notice__photo" />
         <ZineKnockout shape={shape} />
-        <figcaption className="jgz-notice__cut">{values.cut}</figcaption>
+        <ZineField as="figcaption" className="jgz-notice__cut" path="values.cut" max={24}>
+          {values.cut}
+        </ZineField>
       </figure>
 
       <div className="jgz-notice__body">
-        <h2 className="jgz-notice__title">{event.title}</h2>
-        <p className="jgz-notice__host">{event.host}</p>
+        <ZineField as="h2" className="jgz-notice__title" path="events.0.snapshot.name" max={64}>
+          {event.title}
+        </ZineField>
+        <ZineField as="p" className="jgz-notice__host" path="events.0.snapshot.host" max={48}>
+          {event.host}
+        </ZineField>
         <ZineChips when={event.when} where={event.where} />
-        <ZineTags tags={event.tags} />
-        <p className="jgz-notice__note">{event.note}</p>
+        <ZineTags tags={event.tags} path="events.0.values.tags" />
+        <ZineField as="p" className="jgz-notice__note" path="events.0.values.note" max={84}>
+          {event.note}
+        </ZineField>
       </div>
 
       <ZineFolio left={`no. ${issue.number}`} right={issue.city} />
@@ -311,36 +390,83 @@ export function ZineDispatch({ issue, values, events }) {
 
   return (
     <>
-      <ZineSlug label={values.slug} value={issue.dateline} className="jgz-dispatch__slug" />
+      <ZineSlug
+        label={values.slug}
+        labelPath="values.slug"
+        value={issue.dateline}
+        valuePath="issue.dateline"
+        className="jgz-dispatch__slug"
+      />
 
       <div className="jgz-dispatch__lede">
         <div className="jgz-dispatch__thumb">
           <ZinePhoto src={event.cover} alt={event.title} />
         </div>
         <div>
-          <h2 className="jgz-dispatch__title">{event.title}</h2>
+          <ZineField as="h2" className="jgz-dispatch__title" path="events.0.snapshot.name" max={64}>
+            {event.title}
+          </ZineField>
           <p className="jgz-dispatch__venue">
-            {event.where} · {event.when}
+            <ZineField path="events.0.snapshot.location" max={48}>{event.where}</ZineField>
+            {' · '}
+            <ZineField path="events.0.snapshot.whenLabel" max={24}>{event.when}</ZineField>
           </p>
-          <ZineTags tags={event.tags} />
+          <ZineTags tags={event.tags} path="events.0.values.tags" />
         </div>
       </div>
 
       {/* A run of show is a real sequence, so it is the one place numbering earns itself. */}
       <ol className="jgz-run">
-        {event.runOfShow.map((step) => (
-          <li key={step.t}>
-            <span className="jgz-run__time">{step.t}</span>
-            <span className="jgz-run__what">{step.what}</span>
-          </li>
-        ))}
+        <ZineRows path="events.0.values.runOfShow" rows={event.runOfShow} max={4}
+          render={(step, index, drop) => (
+            <li key={`run-${index}`}>
+              <ZineField
+                as="span"
+                className="jgz-run__time"
+                path={`events.0.values.runOfShow.${index}.t`}
+                max={8}
+                placeholder="00:00"
+              >
+                {step.t}
+              </ZineField>
+              <ZineField
+                as="span"
+                className="jgz-run__what"
+                path={`events.0.values.runOfShow.${index}.what`}
+                max={64}
+                placeholder="what turned"
+              >
+                {step.what}
+              </ZineField>
+              {drop}
+            </li>
+          )}
+        />
       </ol>
 
-      <p className="jgz-dispatch__scene">{event.scene}</p>
+      <ZineField
+        as="p"
+        className="jgz-dispatch__scene"
+        path="events.0.values.scene"
+        max={300}
+        placeholder="what it sounded and smelled like"
+      >
+        {event.scene}
+      </ZineField>
 
       <p className="jgz-dispatch__instead">
-        <span>{values.insteadLabel}</span>
-        {event.instead}
+        <ZineField as="span" path="values.insteadLabel" max={16}>
+          {values.insteadLabel}
+        </ZineField>
+        <ZineField
+          as="span"
+          className="jgz-dispatch__insteadText"
+          path="events.0.values.instead"
+          max={80}
+          placeholder="what you were doing at that hour"
+        >
+          {event.instead}
+        </ZineField>
       </p>
 
       <ZineFolio left={`no. ${issue.number}`} right={values.slug} />
@@ -357,7 +483,10 @@ export function ZineReceipt({ issue, values }) {
     <div className="jgz-receipt">
       <div className="jgz-receipt__slip">
         <header className="jgz-receipt__head">
-          <p className="jgz-receipt__vendor">just go — {issue.city}</p>
+          <p className="jgz-receipt__vendor">
+            {'just go — '}
+            <ZineField path="issue.city" max={40}>{issue.city}</ZineField>
+          </p>
           <p className="jgz-receipt__doc">
             issue {issue.number} · {issue.dateline}
           </p>
@@ -383,7 +512,9 @@ export function ZineReceipt({ issue, values }) {
           ))}
         </dl>
 
-        <p className="jgz-receipt__footer">{values.footer}</p>
+        <ZineField as="p" className="jgz-receipt__footer" path="values.footer" max={48}>
+          {values.footer}
+        </ZineField>
       </div>
 
       <ZineStamp label={values.stamp} tone="ink" deg={-11} className="jgz-receipt__stamp" />
@@ -405,9 +536,15 @@ export function ZineBack({ issue, values, paper }) {
           alt="just go"
           draggable={false}
         />
-        <p className="jgz-back__kicker">{values.kicker}</p>
-        <h2 className="jgz-back__line">{values.line}</h2>
-        <p className="jgz-back__sub">{values.sub}</p>
+        <ZineField as="p" className="jgz-back__kicker" path="values.kicker" max={44}>
+          {values.kicker}
+        </ZineField>
+        <ZineField as="h2" className="jgz-back__line" path="values.line" max={52}>
+          {values.line}
+        </ZineField>
+        <ZineField as="p" className="jgz-back__sub" path="values.sub" max={120}>
+          {values.sub}
+        </ZineField>
 
         {/* The badge is the only call to action: a real mark, not a tappable-looking one. */}
         <img className="jgz-back__badge" src={appStoreBadge} alt="Download on the App Store" />

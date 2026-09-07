@@ -5,10 +5,10 @@
  * avant-garde end of the design language, spent loudly because a social post
  * is not a surface anyone has to operate.
  *
- * Phase 02 reads and renders decks; it does not edit them. What it proves is
- * the data model — the same templates rendering from a saved document exactly
- * as they rendered from hard-coded demo records. The editor is phase 03, and
- * lands on top of this without the frames changing again.
+ * This page owns the deck: loading it, holding the working draft, and saving.
+ * PivotCarouselEditor owns the editing, and the frames own the rendering. A
+ * slot write goes draft → PATCH → reload, so what you see after a save is what
+ * the server actually stored rather than what the browser hoped it stored.
  *
  * Platform-admin only, reached from the tenant dashboard.
  */
@@ -17,6 +17,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { authenticatedRequest } from '../../../../hooks/useFetch';
 import { useNotification } from '../../../../NotificationContext';
 import PivotTenantPage from '../PivotTenantPage';
+import PivotCarouselEditor from './PivotCarouselEditor';
 import { ZINE_DEMO_DECK } from './zineDemoDeck';
 import { resolveDeck } from './zineDeck';
 import {
@@ -57,11 +58,12 @@ function decksPath(tenantKey) {
 export default function PivotCarouselPage({ tenantKey, cityDisplayName }) {
   const { addNotification } = useNotification();
 
-  const [decks, setDecks] = useState([]);
   const [deck, setDeck] = useState(null);
+  const [draft, setDraft] = useState(null);
   const [manifest, setManifest] = useState(null);
   const [loading, setLoading] = useState(true);
   const [seeding, setSeeding] = useState(false);
+  const [saving, setSaving] = useState(false);
   const [edition, setEdition] = useState('night');
 
   /** Load the deck list, then open the most recently touched one. */
@@ -71,10 +73,10 @@ export default function PivotCarouselPage({ tenantKey, cityDisplayName }) {
 
     const list = await authenticatedRequest(decksPath(tenantKey));
     const rows = list.data?.success ? list.data.data?.decks || [] : [];
-    setDecks(rows);
 
     if (!rows.length) {
       setDeck(null);
+      setDraft(null);
       setManifest(null);
       setLoading(false);
       return;
@@ -83,6 +85,7 @@ export default function PivotCarouselPage({ tenantKey, cityDisplayName }) {
     const full = await authenticatedRequest(`${decksPath(tenantKey)}/${rows[0]._id}`);
     if (full.data?.success) {
       setDeck(full.data.data.deck);
+      setDraft(full.data.data.deck);
       setManifest(full.data.data.manifest);
       setEdition(full.data.data.deck.edition || 'night');
     }
@@ -126,14 +129,71 @@ export default function PivotCarouselPage({ tenantKey, cityDisplayName }) {
     load();
   }, [tenantKey, addNotification, load]);
 
-  /** What renders: the saved deck, or the local reference until one is saved. */
-  const source = deck || ZINE_DEMO_DECK;
-  const resolved = useMemo(
-    () => resolveDeck({ ...source, edition }, manifest),
-    [source, edition, manifest],
+  const saveDeck = useCallback(async () => {
+    if (!draft) return;
+    setSaving(true);
+    const result = await authenticatedRequest(`${decksPath(tenantKey)}/${draft._id}`, {
+      method: 'PATCH',
+      data: {
+        title: draft.title,
+        edition,
+        issue: draft.issue,
+        voice: draft.voice,
+        slides: draft.slides,
+      },
+    });
+    setSaving(false);
+
+    if (!result.data?.success) {
+      addNotification({
+        title: 'Could not save the deck',
+        message: result.data?.message || 'The request failed.',
+        type: 'error',
+      });
+      return;
+    }
+
+    // Take the server's copy back, not the draft: a value the manifest trimmed
+    // has to show trimmed, or the next save silently reverts it.
+    const saved = result.data.data.deck;
+    const notes = result.data.data.notes || [];
+    setDeck(saved);
+    setDraft(saved);
+    addNotification({
+      title: 'Deck saved',
+      message: notes.length ? `${notes.length} value(s) trimmed to fit: ${notes[0]}` : 'All slots fit.',
+      type: notes.length ? 'warning' : 'success',
+    });
+  }, [draft, edition, tenantKey, addNotification]);
+
+  const createDeck = useCallback(async () => {
+    setSeeding(true);
+    const result = await authenticatedRequest(decksPath(tenantKey), {
+      method: 'POST',
+      data: { title: `issue — ${cityDisplayName || tenantKey}`, issue: { city: cityDisplayName || tenantKey } },
+    });
+    setSeeding(false);
+    if (result.data?.success) {
+      load();
+    } else {
+      addNotification({
+        title: 'Could not create the deck',
+        message: result.data?.message || 'The request failed.',
+        type: 'error',
+      });
+    }
+  }, [tenantKey, cityDisplayName, addNotification, load]);
+
+  /** Renders the reference issue read-only until a deck exists to edit. */
+  const preview = useMemo(
+    () => resolveDeck({ ...ZINE_DEMO_DECK, edition }, manifest),
+    [edition, manifest],
   );
 
-  const unsaved = !deck;
+  const dirty = useMemo(
+    () => Boolean(draft && deck && JSON.stringify(draft) !== JSON.stringify(deck)),
+    [draft, deck],
+  );
 
   return (
     <PivotTenantPage
@@ -159,17 +219,35 @@ export default function PivotCarouselPage({ tenantKey, cityDisplayName }) {
       }
     >
       <div className="jgz">
-        <div className="jgz__bar">
-          <p className="jgz__standfirst">
-            {loading
-              ? 'loading decks…'
-              : `${source.title} — ${resolved.slides.length} slides. every frame reports on an event that already happened, so the argument for the app is the reader’s own absence rather than a feature list.`}
-          </p>
+        {draft && manifest ? (
+          <PivotCarouselEditor
+            deck={{ ...draft, edition }}
+            manifest={manifest}
+            frames={FRAME_COMPONENTS}
+            dirty={dirty}
+            saving={saving}
+            onDeckChange={setDraft}
+            onSave={saveDeck}
+          />
+        ) : (
+          <>
+            <div className="jgz__bar">
+              <p className="jgz__standfirst">
+                {loading
+                  ? 'loading decks…'
+                  : 'no deck for this city yet. start an empty one, or save the reference issue to see the templates fully dressed and edit from there.'}
+              </p>
 
-          <div className="jgz__state">
-            {unsaved ? (
-              <>
-                <span className="jgz__flag">not saved</span>
+              <div className="jgz__state">
+                <span className="jgz__flag">nothing saved</span>
+                <button
+                  type="button"
+                  className="jgz__action"
+                  onClick={createDeck}
+                  disabled={seeding || loading}
+                >
+                  new deck
+                </button>
                 <button
                   type="button"
                   className="jgz__action"
@@ -178,38 +256,28 @@ export default function PivotCarouselPage({ tenantKey, cityDisplayName }) {
                 >
                   {seeding ? 'saving…' : 'save reference issue'}
                 </button>
-              </>
-            ) : (
-              <span className="jgz__flag jgz__flag--saved">
-                saved · {decks.length} deck{decks.length === 1 ? '' : 's'}
-              </span>
-            )}
-          </div>
-        </div>
+              </div>
+            </div>
 
-        <ul className="jgz__sheet">
-          {resolved.slides.map((slide, index) => {
-            const Frame = FRAME_COMPONENTS[slide.type];
-            if (!Frame) return null;
-            return (
-              <li className="jgz__slot" key={slide.id}>
-                <div className={`jgz-frame jgz-frame--${edition}`}>
-                  <Frame {...slide.props} />
-                </div>
-                <p className="jgz__slot-caption">
-                  <b>
-                    {String(index + 1).padStart(2, '0')} · {slide.type}
-                  </b>
-                  <span>
-                    {slide.props.events.length
-                      ? `${slide.props.events.length} event${slide.props.events.length === 1 ? '' : 's'}`
-                      : 'derived'}
-                  </span>
-                </p>
-              </li>
-            );
-          })}
-        </ul>
+            <ul className="jgz__sheet">
+              {preview.slides.map((slide, index) => {
+                const Frame = FRAME_COMPONENTS[slide.type];
+                if (!Frame) return null;
+                return (
+                  <li className="jgz__slot" key={slide.id}>
+                    <div className={`jgz-frame jgz-frame--${edition}`}>
+                      <Frame {...slide.props} />
+                    </div>
+                    <p className="jgz__slot-caption">
+                      <b>{String(index + 1).padStart(2, '0')} · {slide.type}</b>
+                      <span>reference</span>
+                    </p>
+                  </li>
+                );
+              })}
+            </ul>
+          </>
+        )}
       </div>
     </PivotTenantPage>
   );

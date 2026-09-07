@@ -199,6 +199,32 @@ export function resolveSlide(deck, slide, index, manifest) {
   };
 }
 
+/**
+ * Slots a slide still needs, read from the manifest the server sent. Mirrors
+ * slideGaps() in backend/constants/zineSlideTypes.js — the server decides what
+ * is stored, this only decides what the editor shows while you are typing.
+ */
+export function slideGaps(slide, manifest) {
+  const spec = manifest?.types?.[slide?.type];
+  if (!spec) return [];
+
+  const gaps = [];
+  for (const field of spec.fields || []) {
+    if (field.optional || field.derived) continue;
+    const own = slide?.values?.[field.key];
+    const shipped = field.shipped;
+    if (!String(own || shipped || '').trim()) gaps.push(field.key);
+  }
+
+  if (spec.events !== 'derived') {
+    const min = spec.events.exactly ?? spec.events.min ?? 0;
+    const filled = (slide?.events || []).filter((e) => e?.snapshot?.name).length;
+    if (filled < min) gaps.push(`${min - filled} more event${min - filled === 1 ? '' : 's'}`);
+  }
+
+  return gaps;
+}
+
 /** The whole deck, ready to render. */
 export function resolveDeck(deck, manifest) {
   return {

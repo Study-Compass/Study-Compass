@@ -1127,3 +1127,272 @@
   height: auto;
   margin: 7cqw auto 0;
 }
+
+/* ---------------------------------------------------------------- editor */
+
+/*
+ * Slots are edited in the frame's own geometry, so the affordance has to be
+ * something that costs no layout: a tinted ground and an underline, never a
+ * border or padding that would push the type off its measured position.
+ */
+.jgz-editable {
+  outline: none;
+  background: rgba(255, 79, 31, 0.14);
+  box-shadow: inset 0 -0.28cqw 0 rgba(255, 79, 31, 0.55);
+  cursor: text;
+
+  &:hover {
+    background: rgba(255, 79, 31, 0.22);
+  }
+
+  &:focus {
+    background: rgba(255, 79, 31, 0.3);
+    box-shadow: inset 0 -0.4cqw 0 var(--jgz-accent);
+  }
+
+  &--empty::before {
+    content: attr(data-placeholder);
+    opacity: 0.5;
+    font-style: italic;
+  }
+}
+
+.jgz-rowdrop {
+  appearance: none;
+  margin-left: auto;
+  padding: 0 1cqw;
+  border: 0;
+  background: transparent;
+  color: var(--jgz-burst);
+  font: inherit;
+  font-size: 3cqw;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.jgz-rowadd button {
+  appearance: none;
+  padding: 1cqw 0;
+  border: 0;
+  background: transparent;
+  color: var(--jgz-accent);
+  font-family: var(--jgz-font-mono);
+  font-size: 2.3cqw;
+  cursor: pointer;
+}
+
+.jgz-editor__bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid var(--jgz-cream);
+}
+
+.jgz-editor__title {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--jgz-type);
+}
+
+.jgz-editor__bar-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+/* Strip left, canvas right; stacks on narrow admin windows. */
+.jgz-editor__body {
+  display: grid;
+  grid-template-columns: minmax(0, 13rem) minmax(0, 1fr);
+  gap: clamp(1.25rem, 3vw, 2.5rem);
+  margin-top: 1.5rem;
+
+  @media (max-width: 60rem) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.jgz-strip {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  @media (max-width: 60rem) {
+    flex-direction: row;
+    overflow-x: auto;
+  }
+}
+
+.jgz-strip__button {
+  appearance: none;
+  display: block;
+  width: 100%;
+  min-width: 8rem;
+  padding: 0;
+  border: 2px solid transparent;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+
+  &.is-selected {
+    border-color: var(--jgz-accent);
+  }
+
+  &:focus-visible {
+    outline: 3px solid var(--jgz-pop);
+    outline-offset: 2px;
+  }
+
+  /* The thumbnail is the real frame at a smaller container width — cqw does
+     the scaling, so a preview cannot drift from what it previews. */
+  .jgz-frame {
+    display: block;
+    pointer-events: none;
+  }
+}
+
+.jgz-strip__caption {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  padding: 0.35rem 0.1rem 0;
+  font-size: 0.62rem;
+  color: var(--jgz-type-soft);
+
+  b { color: var(--jgz-type); }
+}
+
+.jgz-strip__gap {
+  margin-left: auto;
+  font-style: normal;
+  color: var(--jgz-accent);
+}
+
+.jgz-strip__add {
+  position: relative;
+  margin-top: 1rem;
+
+  > button {
+    appearance: none;
+    width: 100%;
+    padding: 0.5rem;
+    border: 2px dashed var(--jgz-type-soft);
+    background: transparent;
+    color: var(--jgz-type-muted);
+    font-family: var(--jgz-font-mono);
+    font-size: 0.7rem;
+    cursor: pointer;
+
+    &:hover { border-color: var(--jgz-accent); color: var(--jgz-accent); }
+  }
+}
+
+.jgz-strip__menu {
+  position: absolute;
+  z-index: 5;
+  left: 0;
+  right: 0;
+  margin: 0.35rem 0 0;
+  padding: 0;
+  list-style: none;
+  border: 2px solid var(--jgz-cream);
+  background: var(--jgz-night-raised);
+
+  button {
+    appearance: none;
+    display: block;
+    width: 100%;
+    padding: 0.5rem 0.6rem;
+    border: 0;
+    border-bottom: 1px solid rgba(250, 246, 239, 0.14);
+    background: transparent;
+    color: var(--jgz-type);
+    font: inherit;
+    font-size: 0.68rem;
+    text-align: left;
+    cursor: pointer;
+
+    &:hover { background: var(--jgz-accent); }
+
+    b { display: block; }
+    span { color: var(--jgz-type-soft); font-size: 0.62rem; }
+    &:hover span { color: var(--jgz-cream); }
+  }
+
+  li:last-child button { border-bottom: 0; }
+}
+
+.jgz-editor__canvas {
+  display: grid;
+  grid-template-columns: minmax(0, 26rem) minmax(0, 1fr);
+  gap: clamp(1.25rem, 3vw, 2.5rem);
+  align-items: start;
+
+  @media (max-width: 48rem) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.jgz-editor__slidename {
+  margin: 0 0 0.9rem;
+  font-size: 0.85rem;
+  color: var(--jgz-type);
+
+  span {
+    display: block;
+    margin-top: 0.2rem;
+    font-size: 0.68rem;
+    color: var(--jgz-type-soft);
+  }
+}
+
+.jgz-editor__gaps {
+  margin: 0 0 1.1rem;
+  padding: 0.4rem 0.55rem;
+  border-left: 2px solid var(--jgz-accent);
+  font-size: 0.68rem;
+  color: var(--jgz-type-muted);
+
+  &--ok {
+    border-left-color: var(--jgz-sage);
+  }
+}
+
+.jgz-editor__slideops {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+
+  button {
+    appearance: none;
+    padding: 0.35rem 0.6rem;
+    border: 1px solid var(--jgz-type-soft);
+    background: transparent;
+    color: var(--jgz-type-muted);
+    font-family: var(--jgz-font-mono);
+    font-size: 0.66rem;
+    cursor: pointer;
+
+    &:hover:not(:disabled) { border-color: var(--jgz-cream); color: var(--jgz-cream); }
+    &:disabled { opacity: 0.35; cursor: default; }
+  }
+}
+
+.jgz-editor__danger:hover:not(:disabled) {
+  border-color: var(--jgz-burst) !important;
+  color: var(--jgz-burst) !important;
+}
+
+.jgz-editor__fixed {
+  margin: 0.9rem 0 0;
+  font-size: 0.64rem;
+  color: var(--jgz-type-soft);
+}
