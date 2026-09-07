@@ -128,7 +128,10 @@ export function ZineRows({ path, rows, max, render }) {
   const ctx = useZineEdit();
   const list = Array.isArray(rows) ? rows : [];
 
-  if (!ctx?.editing) return list.map(render);
+  // Passing `render` straight to map would hand it the whole array as its third
+  // argument, which is the row-delete control's slot — and the array would then
+  // render as children. Read-only rows get no control at all.
+  if (!ctx?.editing) return list.map((row, index) => render(row, index, null));
 
   const addRow = () => {
     const current = readPath(ctx.slide, path) || [];
