@@ -141,3 +141,32 @@ describe('a frame is self-sufficient', () => {
     expect(frameCss).not.toMatch(/box-shadow[^;]*rgba\(26, 23, 20/);
   });
 });
+
+/**
+ * A full-bleed overlay that is also translated bares the edges it moves away
+ * from. That is invisible in a thumbnail and obvious in a 1080px export, which
+ * is the worst place to find it.
+ */
+describe('full-bleed overlays stay covered', () => {
+  const overlayBlocks = pageCss
+    .split(/\n(?=\.)/)
+    .filter((block) => /inset:\s*0\s*;/.test(block) && /position:\s*absolute/.test(block));
+
+  test('the stylesheet has overlays to check', () => {
+    expect(overlayBlocks.length).toBeGreaterThan(0);
+  });
+
+  test('none of them is translated away from an edge', () => {
+    const offenders = overlayBlocks
+      .filter((block) => /transform:\s*translate/.test(block))
+      .map((block) => block.split('\n')[0].trim());
+    expect(offenders).toEqual([]);
+  });
+
+  test('the newsprint ink plate covers the whole photograph', () => {
+    const start = pageCss.indexOf('.jgz-frame--paper .jgz-photo::after');
+    const block = pageCss.slice(start, pageCss.indexOf('}', start));
+    expect(block).toMatch(/inset:\s*0/);
+    expect(block).not.toMatch(/transform/);
+  });
+});

@@ -426,8 +426,14 @@
 }
 
 /*
- * Newsprint edition prints photographs as a single misregistered ink plate —
- * a riso artifact, not a filter effect. The offset is the point.
+ * Newsprint edition prints photographs through a single ink plate.
+ *
+ * This used to translate the plate, described as riso misregistration. It was
+ * not. The plate is a flat colour, and translating a flat colour changes
+ * nothing anywhere except at its own edges — so the entire visible effect was
+ * two unprinted margins, on the left and the bottom, in the direction the
+ * offset came from. Real misregistration needs the ink layer to carry the
+ * image, which is a second element rather than a transform.
  */
 .jgz-frame--paper .jgz-photo img {
   filter: grayscale(1) contrast(1.1) brightness(1.24);
@@ -440,7 +446,6 @@
   background: var(--jgz-riso);
   mix-blend-mode: multiply;
   opacity: 0.8;
-  transform: translate(0.8cqw, -0.55cqw);
   pointer-events: none;
 }
 
