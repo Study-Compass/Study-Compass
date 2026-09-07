@@ -10,7 +10,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { ZINE_DEMO_DECK } from './zineDemoDeck';
-import { resolveSlide } from './zineDeck';
+import { resolveSlide, sampleSlideFor } from './zineDeck';
 import { ZineEditProvider } from './zineField';
 import {
   ZineBack,
@@ -240,4 +240,113 @@ describe('the voice layers', () => {
     const deck = { slides: [backSlide], voice: { entries: { 'zine.back.kicker': '   ' } } };
     expect(resolve(deck, { 'zine.back.kicker': 'oakland kicker' }).kicker).toBe('oakland kicker');
   });
+});
+
+/**
+ * The add-slide previews render the real components, so a template that throws
+ * on placeholder data takes the whole picker down rather than showing a gap.
+ */
+describe('add-slide previews', () => {
+  const MANIFEST = {
+    addable: ['wall', 'card', 'notice', 'dispatch', 'receipt'],
+    types: {
+      wall: { label: 'the wall', blurb: 'b', events: { min: 3, max: 4 }, fields: [] },
+      card: { label: 'the card', blurb: 'b', events: { exactly: 1 }, fields: [] },
+      notice: {
+        label: 'the notice', blurb: 'b', events: { exactly: 1 }, fields: [],
+        options: [{ key: 'knockoutShape', default: 0 }],
+      },
+      dispatch: { label: 'the dispatch', blurb: 'b', events: { exactly: 1 }, fields: [] },
+      receipt: { label: 'the receipt', blurb: 'b', events: 'derived', fields: [] },
+    },
+  };
+
+  test.each(MANIFEST.addable)('%s previews without a React complaint', (type) => {
+    const slide = sampleSlideFor(type, MANIFEST);
+    const deck = { issue: { number: '000', city: 'oakland' }, slides: [slide] };
+    const resolved = resolveSlide(deck, slide, 0, MANIFEST, {});
+    const Frame = FRAMES[type];
+    const complaints = withStrictConsole(() => {
+      render(<Frame {...resolved.props} />);
+    });
+    expect(complaints).toEqual([]);
+  });
+
+  test('a preview fills every event slot the type takes', () => {
+    expect(sampleSlideFor('wall', MANIFEST).events).toHaveLength(4);
+    expect(sampleSlideFor('dispatch', MANIFEST).events).toHaveLength(1);
+    expect(sampleSlideFor('receipt', MANIFEST).events).toHaveLength(0);
+  });
+
+  test('option defaults are applied so a preview is not a broken variant', () => {
+    expect(sampleSlideFor('notice', MANIFEST).options).toEqual({ knockoutShape: 0 });
+  });
+});
+
+/**
+ * The edit affordance tints every slot, so a slide under it is not the slide.
+ * With editing off, a frame must render exactly as it prints.
+ */
+describe('the edit toggle', () => {
+  test('nothing is tinted or typable when editing is off', () => {
+    const entry = slides.find((s) => s.slide.type === 'dispatch');
+    const ctx = {
+      editing: false,
+      slide: { ...entry.slide, issue: ZINE_DEMO_DECK.issue },
+      onChange: () => {},
+    };
+    const { container } = render(
+      <ZineEditProvider value={ctx}>
+        <ZineDispatch {...entry.resolved.props} />
+      </ZineEditProvider>,
+    );
+    expect(container.querySelectorAll('.jgz-editable')).toHaveLength(0);
+    expect(container.querySelectorAll('[contenteditable]')).toHaveLength(0);
+    expect(container.querySelector('.jgz-rowdrop')).toBeNull();
+  });
+
+  test('the same slide with editing on is typable', () => {
+    const entry = slides.find((s) => s.slide.type === 'dispatch');
+    const ctx = {
+      editing: true,
+      slide: { ...entry.slide, issue: ZINE_DEMO_DECK.issue },
+      onChange: () => {},
+    };
+    const { container } = render(
+      <ZineEditProvider value={ctx}>
+        <ZineDispatch {...entry.resolved.props} />
+      </ZineEditProvider>,
+    );
+    expect(container.querySelectorAll('.jgz-editable').length).toBeGreaterThan(0);
+  });
+
+  /*
+   * The invariant that makes an edit toggle honest: turning it on may tint and
+   * outline, but it may not change a single character. A field bound to part of
+   * a composed string breaks this — it shows the whole string when reading and
+   * only its own slice when editing.
+   */
+  test.each(slides.map((s, i) => [`${i} ${s.slide.type}`, s]))(
+    'slide %s reads identically with editing on and off',
+    (_name, { slide, resolved }) => {
+      const text = (editing) => {
+        const ctx = {
+          editing,
+          slide: { ...slide, issue: ZINE_DEMO_DECK.issue },
+          onChange: () => {},
+        };
+        const Frame = FRAMES[slide.type];
+        const { container } = render(
+          <ZineEditProvider value={ctx}>
+            <Frame {...resolved.props} />
+          </ZineEditProvider>,
+        );
+        // Controls the editor adds are chrome, not copy; the slide's own words
+        // are what must not move.
+        container.querySelectorAll('[data-editor-chrome]').forEach((el) => el.remove());
+        return container.textContent;
+      };
+      expect(text(true)).toBe(text(false));
+    },
+  );
 });

@@ -152,6 +152,7 @@ export function ZineRows({ path, rows, max, render }) {
             <button
               type="button"
               className="jgz-rowdrop"
+              data-editor-chrome="true"
               onClick={() => dropRow(index)}
               aria-label={`Remove row ${index + 1}`}
             >
@@ -161,7 +162,7 @@ export function ZineRows({ path, rows, max, render }) {
         </React.Fragment>
       ))}
       {list.length < max ? (
-        <li className="jgz-rowadd">
+        <li className="jgz-rowadd" data-editor-chrome="true">
           <button type="button" onClick={addRow}>+ add row</button>
         </li>
       ) : null}

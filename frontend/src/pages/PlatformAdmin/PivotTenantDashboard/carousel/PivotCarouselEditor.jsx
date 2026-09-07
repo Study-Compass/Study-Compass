@@ -16,6 +16,7 @@ import { ZineEditProvider, writePath } from './zineField';
 import { resolveSlide, slideGaps } from './zineDeck';
 import PivotCarouselVoicePanel from './PivotCarouselVoicePanel';
 import PivotCarouselEventPicker from './PivotCarouselEventPicker';
+import PivotCarouselAddSlide from './PivotCarouselAddSlide';
 
 /** Fixed types cannot be added, removed or moved — they open and close the deck. */
 function isFixed(manifest, type) {
@@ -72,6 +73,12 @@ export default function PivotCarouselEditor({
   const [selected, setSelected] = useState(0);
   const [adding, setAdding] = useState(false);
   const [voiceOpen, setVoiceOpen] = useState(false);
+  /*
+   * Off by default. The editing affordance tints every slot, so a slide under
+   * it is not the slide — and the first thing this screen should show is the
+   * truth about what will print.
+   */
+  const [editing, setEditing] = useState(false);
   const [pickingSlot, setPickingSlot] = useState(null);
 
   const index = Math.min(selected, Math.max(deck.slides.length - 1, 0));
@@ -196,11 +203,11 @@ export default function PivotCarouselEditor({
 
   const editContext = useMemo(
     () => ({
-      editing: true,
+      editing,
       slide: { ...slide, issue: deck.issue },
       onChange: handleFieldChange,
     }),
-    [slide, deck.issue, handleFieldChange],
+    [editing, slide, deck.issue, handleFieldChange],
   );
 
   if (!slide) return null;
@@ -223,6 +230,14 @@ export default function PivotCarouselEditor({
       <div className="jgz-editor__bar">
         <p className="jgz-editor__title">{deck.title}</p>
         <div className="jgz-editor__bar-actions">
+          <button
+            type="button"
+            className={`jgz__action${editing ? ' is-on' : ''}`}
+            aria-pressed={editing}
+            onClick={() => setEditing((on) => !on)}
+          >
+            {editing ? 'editing' : 'edit slide'}
+          </button>
           <button
             type="button"
             className="jgz__action"
@@ -263,29 +278,21 @@ export default function PivotCarouselEditor({
           </ul>
 
           <div className="jgz-strip__add">
-            <button type="button" onClick={() => setAdding((v) => !v)} aria-expanded={adding}>
+            <button type="button" onClick={() => setAdding(true)}>
               + add slide
             </button>
-            {adding ? (
-              <ul className="jgz-strip__menu">
-                {manifest.addable.map((type) => (
-                  <li key={type}>
-                    <button type="button" onClick={() => addSlide(type)}>
-                      <b>{typeLabel(manifest, type)}</b>
-                      <span>{manifest.types[type].blurb}</span>
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            ) : null}
           </div>
         </div>
 
         <div className="jgz-editor__canvas">
-          <div className={`jgz-frame jgz-frame--${deck.edition}`}>
-            <ZineEditProvider value={editContext}>
-              {Frame ? <Frame {...resolveSlide(deck, slide, index, manifest, cityVoice).props} /> : null}
-            </ZineEditProvider>
+          <div className="jgz-editor__stage">
+            <div className={`jgz-frame jgz-frame--${deck.edition}`}>
+              <ZineEditProvider value={editContext}>
+                {Frame
+                  ? <Frame {...resolveSlide(deck, slide, index, manifest, cityVoice).props} />
+                  : null}
+              </ZineEditProvider>
+            </div>
           </div>
 
           <div className="jgz-editor__meta">
@@ -393,6 +400,17 @@ export default function PivotCarouselEditor({
           </div>
         </div>
       </div>
+
+      <PivotCarouselAddSlide
+        open={adding}
+        manifest={manifest}
+        frames={frames}
+        edition={deck.edition}
+        issue={deck.issue}
+        cityVoice={cityVoice}
+        onClose={() => setAdding(false)}
+        onAdd={addSlide}
+      />
 
       <PivotCarouselEventPicker
         tenantKey={tenantKey}

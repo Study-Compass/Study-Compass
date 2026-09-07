@@ -244,6 +244,57 @@ export function slideGaps(slide, manifest) {
   return gaps;
 }
 
+/**
+ * A slide of `type` with enough in it to be recognisable, for the add-slide
+ * previews. Static copy comes from the manifest so a preview shows the city's
+ * real house voice; the dynamic copy is obviously placeholder, because a
+ * preview that looked like real listing data would be read as one.
+ */
+const SAMPLE_EVENT = {
+  eventId: null,
+  label: null,
+  snapshot: {
+    name: 'the event goes here',
+    host: 'its host',
+    startTime: null,
+    whenLabel: '9:00 pm',
+    location: 'the venue',
+    image: null,
+  },
+  imageOverride: null,
+  values: {
+    tags: ['a tag', 'another'],
+    note: 'the line that lands after the listing.',
+    scene: 'what the room sounded like, in a sentence or three.',
+    instead: 'what you were doing at that hour',
+    runOfShow: [
+      { t: '21:00', what: 'doors' },
+      { t: '23:10', what: 'the room turned' },
+    ],
+  },
+};
+
+export function sampleSlideFor(type, manifest) {
+  const spec = manifest?.types?.[type];
+  if (!spec) return null;
+
+  const options = {};
+  for (const option of spec.options || []) {
+    if (option.default !== undefined) options[option.key] = option.default;
+  }
+
+  const count = spec.events === 'derived'
+    ? 0
+    : (spec.events.exactly ?? spec.events.max ?? 0);
+
+  return {
+    type,
+    values: {},
+    options,
+    events: Array.from({ length: count }, () => SAMPLE_EVENT),
+  };
+}
+
 /** The whole deck, ready to render. */
 export function resolveDeck(deck, manifest, cityVoice) {
   return {

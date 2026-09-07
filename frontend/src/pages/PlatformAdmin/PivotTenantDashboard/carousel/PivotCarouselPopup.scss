@@ -186,3 +186,69 @@
   font-size: 0.7rem;
   cursor: pointer;
 }
+
+/* ---------------------------------------------------------- add a slide */
+
+.jgz-add {
+  width: min(72rem, 92vw);
+  max-height: 84vh;
+  overflow-y: auto;
+  color: #1a1714;
+}
+
+.jgz-add__head {
+  margin-bottom: 1rem;
+
+  h2 { margin: 0; font-size: 1.05rem; }
+  p {
+    margin: 0.25rem 0 0;
+    font-size: 0.78rem;
+    color: rgba(26, 23, 20, 0.62);
+  }
+}
+
+/*
+ * Previews are real frames, so they size themselves from their own width —
+ * a wide enough column and the template reads exactly as it will print.
+ */
+.jgz-add__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 14rem), 1fr));
+  gap: 1.25rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  button {
+    display: block;
+    width: 100%;
+    padding: 0;
+    border: 2px solid transparent;
+    background: transparent;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+
+    &:hover { border-color: #ff4f1f; }
+    &:focus-visible { outline: 3px solid #ffd23f; outline-offset: 2px; }
+  }
+
+  .jgz-frame {
+    display: block;
+    pointer-events: none;
+    border: 1px solid rgba(26, 23, 20, 0.14);
+    box-shadow:
+      0 0.1cqw 0.2cqw rgba(26, 23, 20, 0.08),
+      0 0.8cqw 2.4cqw rgba(26, 23, 20, 0.14);
+  }
+}
+
+.jgz-add__caption {
+  display: block;
+  padding: 0.5rem 0.15rem 0;
+  font-family: 'Space Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;
+  font-size: 0.66rem;
+  color: rgba(26, 23, 20, 0.62);
+
+  b { display: block; color: #1a1714; font-size: 0.74rem; }
+}

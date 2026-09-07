@@ -145,13 +145,17 @@ function ZineChips({ when, where, index = 0 }) {
  * caps, and no split to both trims. It reads as a section head, which is what
  * it is, rather than as a band of chrome across the top of the frame.
  */
-function ZineSlug({ label, value, className = '', valuePath }) {
+/*
+ * The value is composed by the caller rather than passed as a string, because a
+ * single field cannot own two values. Binding "dateline · city" to issue.dateline
+ * showed the whole thing when reading and only the dateline when editing — the
+ * slide stopped being the slide the moment you tried to change it.
+ */
+function ZineSlug({ label, className = '', children }) {
   return (
     <p className={`jgz-slug ${className}`}>
       <span className="jgz-slug__label">{label}</span>
-      <ZineField as="span" className="jgz-slug__value" path={valuePath} max={32}>
-        {value}
-      </ZineField>
+      <span className="jgz-slug__value">{children}</span>
     </p>
   );
 }
@@ -309,12 +313,11 @@ export function ZineCard({ issue, values, events }) {
       <ZinePhoto src={event.cover} alt={event.title} className="jgz-card__photo" />
       <div className="jgz-card__scrim" aria-hidden="true" />
 
-      <ZineSlug
-        label={values.slug}
-        value={`${issue.dateline} · ${issue.city}`}
-        valuePath="issue.dateline"
-        className="jgz-card__slug"
-      />
+      <ZineSlug label={values.slug} className="jgz-card__slug">
+        <ZineField path="issue.dateline" max={32}>{issue.dateline}</ZineField>
+        {' · '}
+        <ZineField path="issue.city" max={40}>{issue.city}</ZineField>
+      </ZineSlug>
 
       <article className="jgz-card__plate">
         <ZineField as="h2" className="jgz-card__title" path="events.0.snapshot.name" max={64}>
@@ -346,12 +349,9 @@ export function ZineNotice({ issue, values, events, options }) {
 
   return (
     <>
-      <ZineSlug
-        label={values.slug}
-        value={issue.dateline}
-        valuePath="issue.dateline"
-        className="jgz-notice__slug"
-      />
+      <ZineSlug label={values.slug} className="jgz-notice__slug">
+        <ZineField path="issue.dateline" max={32}>{issue.dateline}</ZineField>
+      </ZineSlug>
 
       <figure className="jgz-notice__plate">
         <ZinePhoto src={event.cover} alt={event.title} className="jgz-notice__photo" />
@@ -388,12 +388,9 @@ export function ZineDispatch({ issue, values, events }) {
 
   return (
     <>
-      <ZineSlug
-        label={values.slug}
-        value={issue.dateline}
-        valuePath="issue.dateline"
-        className="jgz-dispatch__slug"
-      />
+      <ZineSlug label={values.slug} className="jgz-dispatch__slug">
+        <ZineField path="issue.dateline" max={32}>{issue.dateline}</ZineField>
+      </ZineSlug>
 
       <div className="jgz-dispatch__lede">
         <div className="jgz-dispatch__thumb">
