@@ -15,7 +15,13 @@ This component displays a notice to users visiting study-compass.com about the r
 
 The component is automatically included in the main App.js and will show when:
 - User visits study-compass.com or www.study-compass.com
-- User is on localhost (for development)
+- The URL carries `?test-rebranding=true` (how to see it locally)
+
+It deliberately does **not** trigger on localhost. It dismisses itself by
+writing to `localStorage`, so any browser with a fresh profile sees the
+redirect every time — which is what the carousel's render script uses. It is
+also suppressed on `/carousel-export/*`, where the page is an artifact rather
+than something a person reads.
 - User hasn't seen the notice before
 
 ## Testing

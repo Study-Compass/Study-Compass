@@ -1,5 +1,24 @@
 const express = require('express');
 const { verifyToken } = require('../middlewares/verifyToken');
+const {
+  listCarouselDecks,
+  getCarouselDeck,
+  createCarouselDeck,
+  updateCarouselDeck,
+  deleteCarouselDeck,
+} = require('../services/pivotCarouselDeckService');
+const {
+  voiceCatalog,
+  getCarouselVoiceLayers,
+  patchCarouselVoice,
+} = require('../services/pivotCarouselVoiceService');
+const { searchCarouselCatalog } = require('../services/pivotCarouselCatalogService');
+const { setSlideImage } = require('../services/pivotCarouselDeckService');
+const { upload } = require('../services/imageUploadService');
+const {
+  mintExportToken,
+  readDeckForExport,
+} = require('../services/pivotCarouselExportService');
 const { requirePlatformAdmin } = require('../middlewares/requirePlatformAdmin');
 const {
   rebuildWeeklySnapshot,
@@ -358,6 +377,239 @@ router.delete(
         success: false,
         message: 'Unable to reset tenant copy key.',
       });
+    }
+  },
+);
+
+/* ------------------------------------------------------- carousel decks */
+
+/**
+ * One handler shape for all five: the service returns { data } or
+ * { error, status, code }, exactly as the copy pack routes above do.
+ */
+function sendDeckResult(res, result, okStatus = 200) {
+  if (result.error) {
+    return res.status(result.status || 400).json({
+      success: false,
+      message: result.error,
+      code: result.code,
+    });
+  }
+  return res.status(okStatus).json({ success: true, data: result.data });
+}
+
+router.get(
+  '/tenants/:tenantKey/carousels',
+  verifyToken,
+  requirePlatformAdmin,
+  async (req, res) => {
+    try {
+      return sendDeckResult(res, await listCarouselDecks(req, req.params.tenantKey));
+    } catch (err) {
+      logPivotRouteError('GET /admin/pivot/tenants/:tenantKey/carousels', err, req);
+      return res.status(500).json({ success: false, message: 'Unable to load carousel decks.' });
+    }
+  },
+);
+
+router.post(
+  '/tenants/:tenantKey/carousels',
+  verifyToken,
+  requirePlatformAdmin,
+  async (req, res) => {
+    try {
+      const result = await createCarouselDeck(req, req.params.tenantKey, req.body);
+      return sendDeckResult(res, result, 201);
+    } catch (err) {
+      logPivotRouteError('POST /admin/pivot/tenants/:tenantKey/carousels', err, req);
+      return res.status(500).json({ success: false, message: 'Unable to create the deck.' });
+    }
+  },
+);
+
+router.get(
+  '/tenants/:tenantKey/carousels/:deckId',
+  verifyToken,
+  requirePlatformAdmin,
+  async (req, res) => {
+    try {
+      const result = await getCarouselDeck(req, req.params.tenantKey, req.params.deckId);
+      return sendDeckResult(res, result);
+    } catch (err) {
+      logPivotRouteError('GET /admin/pivot/tenants/:tenantKey/carousels/:deckId', err, req);
+      return res.status(500).json({ success: false, message: 'Unable to load the deck.' });
+    }
+  },
+);
+
+router.patch(
+  '/tenants/:tenantKey/carousels/:deckId',
+  verifyToken,
+  requirePlatformAdmin,
+  async (req, res) => {
+    try {
+      const result = await updateCarouselDeck(
+        req,
+        req.params.tenantKey,
+        req.params.deckId,
+        req.body,
+      );
+      return sendDeckResult(res, result);
+    } catch (err) {
+      logPivotRouteError('PATCH /admin/pivot/tenants/:tenantKey/carousels/:deckId', err, req);
+      return res.status(500).json({ success: false, message: 'Unable to save the deck.' });
+    }
+  },
+);
+
+router.delete(
+  '/tenants/:tenantKey/carousels/:deckId',
+  verifyToken,
+  requirePlatformAdmin,
+  async (req, res) => {
+    try {
+      const result = await deleteCarouselDeck(req, req.params.tenantKey, req.params.deckId);
+      return sendDeckResult(res, result);
+    } catch (err) {
+      logPivotRouteError('DELETE /admin/pivot/tenants/:tenantKey/carousels/:deckId', err, req);
+      return res.status(500).json({ success: false, message: 'Unable to delete the deck.' });
+    }
+  },
+);
+
+/** Mint a short-lived, deck-scoped token for the local render script. */
+router.post(
+  '/tenants/:tenantKey/carousels/:deckId/export-token',
+  verifyToken,
+  requirePlatformAdmin,
+  async (req, res) => {
+    try {
+      const result = await mintExportToken(req, req.params.tenantKey, req.params.deckId);
+      return sendDeckResult(res, result, 201);
+    } catch (err) {
+      logPivotRouteError('POST carousel export-token', err, req);
+      return res.status(500).json({ success: false, message: 'Unable to start an export.' });
+    }
+  },
+);
+
+/*
+ * Deliberately not behind verifyToken: a headless Chrome started from a
+ * terminal has no session cookie, and a navigation cannot carry a header. The
+ * token in the query is the credential, and it is worth one deck for ten
+ * minutes.
+ */
+router.get('/carousel-export', async (req, res) => {
+  try {
+    const result = await readDeckForExport(req, req.query?.token, req.query?.deckId);
+    return sendDeckResult(res, result);
+  } catch (err) {
+    logPivotRouteError('GET /admin/pivot/carousel-export', err, req);
+    return res.status(500).json({ success: false, message: 'Unable to load the deck.' });
+  }
+});
+
+/**
+ * Slot picker search. Published events only, newest first, paged — a deck
+ * reports on nights that already happened.
+ */
+router.get(
+  '/tenants/:tenantKey/carousel-catalog',
+  verifyToken,
+  requirePlatformAdmin,
+  async (req, res) => {
+    try {
+      const result = await searchCarouselCatalog(req, req.params.tenantKey, {
+        batchWeek: req.query?.batchWeek,
+        from: req.query?.from,
+        to: req.query?.to,
+        q: req.query?.q,
+        limit: req.query?.limit,
+        skip: req.query?.skip,
+      });
+      return sendDeckResult(res, result);
+    } catch (err) {
+      logPivotRouteError('GET /admin/pivot/tenants/:tenantKey/carousel-catalog', err, req);
+      return res.status(500).json({ success: false, message: 'Unable to search the catalog.' });
+    }
+  },
+);
+
+/** Replace or clear one event slot's photograph. No file is a clear. */
+router.post(
+  '/tenants/:tenantKey/carousels/:deckId/slides/:slideId/image',
+  verifyToken,
+  requirePlatformAdmin,
+  upload.single('image'),
+  async (req, res) => {
+    try {
+      const result = await setSlideImage(
+        req,
+        req.params.tenantKey,
+        req.params.deckId,
+        req.params.slideId,
+        req.body?.slotIndex,
+        req.file,
+      );
+      return sendDeckResult(res, result);
+    } catch (err) {
+      logPivotRouteError('POST carousel slide image', err, req);
+      return res.status(500).json({ success: false, message: 'Unable to set the image.' });
+    }
+  },
+);
+
+/* ------------------------------------------------- carousel static voice */
+
+/*
+ * Served in the copy pack's own payload shapes, because the carousel reuses
+ * PivotVoicePage as its editor. The catalog is derived from the slide manifest,
+ * so a field declaring a voice key needs nothing else to appear in the panel.
+ */
+router.get(
+  '/carousel-voice/catalog',
+  verifyToken,
+  requirePlatformAdmin,
+  async (req, res) => {
+    return res.status(200).json({ success: true, data: voiceCatalog() });
+  },
+);
+
+router.get(
+  '/tenants/:tenantKey/carousel-voice',
+  verifyToken,
+  requirePlatformAdmin,
+  async (req, res) => {
+    try {
+      const result = await getCarouselVoiceLayers(req, req.params.tenantKey, req.query?.deckId);
+      return sendDeckResult(res, result);
+    } catch (err) {
+      logPivotRouteError('GET /admin/pivot/tenants/:tenantKey/carousel-voice', err, req);
+      return res.status(500).json({ success: false, message: 'Unable to load carousel voice.' });
+    }
+  },
+);
+
+router.patch(
+  '/tenants/:tenantKey/carousel-voice',
+  verifyToken,
+  requirePlatformAdmin,
+  async (req, res) => {
+    try {
+      // The editor sends { key, value } or { keys: [...] } and knows nothing
+      // about which layer it is writing, so scope and deck ride on the query.
+      const scope = (req.query?.scope || req.body?.scope) === 'deck' ? 'deck' : 'city';
+      const result = await patchCarouselVoice(req, req.params.tenantKey, {
+        scope,
+        deckId: req.query?.deckId || req.body?.deckId,
+        key: req.body?.key,
+        value: req.body?.value,
+        reset: req.body?.keys || req.body?.reset,
+      });
+      return sendDeckResult(res, result);
+    } catch (err) {
+      logPivotRouteError('PATCH /admin/pivot/tenants/:tenantKey/carousel-voice', err, req);
+      return res.status(500).json({ success: false, message: 'Unable to save carousel voice.' });
     }
   },
 );

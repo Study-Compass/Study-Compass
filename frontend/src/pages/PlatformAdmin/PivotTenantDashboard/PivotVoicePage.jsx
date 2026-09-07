@@ -177,33 +177,49 @@ function VoiceCodeEditor({ value, onChange, onCaretChange, disabled, maxLength }
 /**
  * Search-first Just Go voice catalog. Platform pack or city overlay.
  */
+/**
+ * `source` lets a caller supply the catalog, the layers and the write path
+ * instead of the copy pack's. The carousel's static-copy panel uses it, which
+ * is why this component fetches nothing when one is given — useFetch no-ops on
+ * a null url. Without `source` the behaviour is exactly as before.
+ */
 function PivotVoicePage({
   scope = 'platform',
   tenantKey,
   cityDisplayName,
+  source = null,
+  scopeLabel = null,
+  embedded = false,
 }) {
   const { addNotification } = useNotification();
   const paths = useMemo(
-    () => pivotCopyAdminPaths(scope, tenantKey),
-    [scope, tenantKey],
+    () => source?.paths || pivotCopyAdminPaths(scope, tenantKey),
+    [source, scope, tenantKey],
   );
   const isPlatform = scope !== 'tenant';
-  const cityLabel = isPlatform
-    ? 'All cities'
-    : cityDisplayName || tenantKey || 'city';
+  const cityLabel = scopeLabel
+    || (isPlatform ? 'All cities' : cityDisplayName || tenantKey || 'city');
 
   const {
-    data: catalogResponse,
-    loading: catalogLoading,
-    error: catalogError,
-  } = useFetch(paths.catalog, { cache: NO_FETCH_CACHE });
+    data: fetchedCatalog,
+    loading: fetchedCatalogLoading,
+    error: fetchedCatalogError,
+  } = useFetch(source ? null : paths.catalog, { cache: NO_FETCH_CACHE });
 
   const {
-    data: layersResponse,
-    loading: layersLoading,
-    error: layersError,
-    refetch: refetchLayers,
-  } = useFetch(paths.layers, { cache: NO_FETCH_CACHE });
+    data: fetchedLayers,
+    loading: fetchedLayersLoading,
+    error: fetchedLayersError,
+    refetch: refetchFetchedLayers,
+  } = useFetch(source ? null : paths.layers, { cache: NO_FETCH_CACHE });
+
+  const catalogResponse = source ? source.catalogResponse : fetchedCatalog;
+  const layersResponse = source ? source.layersResponse : fetchedLayers;
+  const catalogLoading = source ? source.loading : fetchedCatalogLoading;
+  const layersLoading = source ? source.loading : fetchedLayersLoading;
+  const catalogError = source ? source.error : fetchedCatalogError;
+  const layersError = source ? source.error : fetchedLayersError;
+  const refetchLayers = source ? source.refetch : refetchFetchedLayers;
 
   const catalog = useMemo(
     () => catalogPayload(catalogResponse),
@@ -466,18 +482,13 @@ function PivotVoicePage({
   const loading = catalogLoading || layersLoading;
   const loadError = catalogError || layersError;
 
-  return (
-    <PivotTenantPage
-      className="pivot-voice-page"
-      title="Voice"
-      tenantKey={isPlatform ? '' : tenantKey}
-      cityDisplayName={cityLabel}
-      subtitle={
-        isPlatform
-            ? 'Platform pack — one key at a time. Open a group or search.'
-            : 'City overlay — tenant keys win over platform, then shipped. Open a group or search.'
-      }
-    >
+  /*
+   * The explorer and its save modal, with no page shell. A caller that already
+   * owns the surrounding chrome — the carousel's static-copy popup — asks for
+   * this instead, so it does not get a second page header inside a dialog.
+   */
+  const explorer = (
+    <>
       {loadError ? (
         <PivotOpsBanner tone="danger" title="Could not load voice catalog">
           {String(loadError)}
@@ -756,6 +767,24 @@ function PivotVoicePage({
         onClose={() => setPreviewOpen(false)}
         onConfirm={handleConfirmSave}
       />
+    </>
+  );
+
+  if (embedded) return explorer;
+
+  return (
+    <PivotTenantPage
+      className="pivot-voice-page"
+      title="Voice"
+      tenantKey={isPlatform ? '' : tenantKey}
+      cityDisplayName={cityLabel}
+      subtitle={
+        isPlatform
+          ? 'Platform pack — one key at a time. Open a group or search.'
+          : 'City overlay — tenant keys win over platform, then shipped. Open a group or search.'
+      }
+    >
+      {explorer}
     </PivotTenantPage>
   );
 }

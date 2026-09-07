@@ -27,6 +27,14 @@ function DevTenantSelector() {
     return null;
   }
 
+  /*
+   * Render surfaces produce an artifact, not a page. This badge sits in the
+   * corner of the viewport, which in an export is the corner of the image.
+   */
+  if (window.location.pathname.startsWith('/carousel-export/')) {
+    return null;
+  }
+
   const tenantKeys = getTenantKeys({ includeHidden: true, includePivot: true });
 
   const handleSelect = (value) => {

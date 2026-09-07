@@ -205,6 +205,11 @@ function createApp() {
     '/refresh-token',
     '/admin/platform',
     '/admin/pivot',
+    // Renders one carousel slide for the export script. Its credential is a
+    // signed, deck-scoped token, not a session on a tenant subdomain, so the
+    // www path lock has nothing to lock — and a redirect here is screenshotted
+    // as the slide. Mirrors WWW_ALLOWED_PATHS in the frontend's tenantRedirect.
+    '/carousel-export',
   ];
   app.use((req, res, next) => {
     // justgo.lol is public apex (city slugs, /qr, /pivot) — not campus www path lock.

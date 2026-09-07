@@ -48,6 +48,7 @@ const EventQRRedirect = lazy(() => import('./pages/QR/EventQRRedirect'));
 const Admin = lazy(() => import('./pages/Admin/Admin'));
 const PlatformAdmin = lazy(() => import('./pages/PlatformAdmin/PlatformAdmin'));
 const PivotTenantDashboard = lazy(() => import('./pages/PlatformAdmin/PivotTenantDashboard/PivotTenantDashboard'));
+const PivotCarouselFrame = lazy(() => import('./pages/PlatformAdmin/PivotTenantDashboard/carousel/PivotCarouselFrame'));
 const PivotFleetDashboard = lazy(() => import('./pages/PlatformAdmin/PivotTenantDashboard/PivotFleetDashboard'));
 const JustGoCreatorShell = lazy(() => import('./pages/JustGoCreator/JustGoCreatorShell'));
 const JustGoCreatorHome = lazy(() => import('./pages/JustGoCreator/JustGoCreatorHome'));
@@ -55,7 +56,6 @@ const JustGoCreatorNew = lazy(() => import('./pages/JustGoCreator/JustGoCreatorN
 const JustGoCreatorEventWorkspace = lazy(() => import('./pages/JustGoCreator/JustGoCreatorEventWorkspace'));
 const JustGoCreatorLogin = lazy(() => import('./pages/JustGoCreator/JustGoCreatorLogin'));
 const JustGoPublicEvent = lazy(() => import('./pages/JustGoPublicEvent/JustGoPublicEvent'));
-const JustGoZine = lazy(() => import('./pages/JustGoZine/JustGoZine'));
 const OIEDash = lazy(() => import('./pages/OIEDash/OIEDash'));
 const NewBadge = lazy(() => import('./pages/NewBadge/NewBadge'));
 const CreateOrg = lazy(() => import('./pages/CreateOrg/CreateOrg'));
@@ -252,6 +252,13 @@ function App() {
                                             <Route path="/forgot-password" element={<AnimatedPageWrapper><ForgotPassword /></AnimatedPageWrapper>}/>
                                             <Route path="/reset-password" element={<AnimatedPageWrapper><ResetPassword /></AnimatedPageWrapper>}/>
                                             <Route path="/tenant-status" element={<AnimatedPageWrapper><TenantStatus /></AnimatedPageWrapper>}/>
+                                            {/*
+                                              * Outside the platform-admin guard on purpose: the render
+                                              * script drives a headless Chrome with no session cookie, and
+                                              * a navigation cannot carry a header. A signed, deck-scoped,
+                                              * ten-minute token in the query is the credential instead.
+                                              */}
+                                            <Route path="/carousel-export/:deckId/:index" element={<PivotCarouselFrame />} />
                                             <Route element={<PlatformProtectedRoute />}>
                                                 <Route path="/platform-admin" element={<AnimatedPageWrapper><PlatformAdmin /></AnimatedPageWrapper>} />
                                                 <Route path="/platform-admin/pivot" element={<AnimatedPageWrapper><PivotFleetDashboard /></AnimatedPageWrapper>} />
@@ -274,8 +281,6 @@ function App() {
                                             <Route path="/mobile" element={<AnimatedPageWrapper><MobileLanding /></AnimatedPageWrapper>}/>
                                             <Route path="/invite" element={<AnimatedPageWrapper><InviteLanding /></AnimatedPageWrapper>}/>
                                             <Route path="/justgo/qr/:name" element={<JustGoQrHop />} />
-                                            {/* Concept surface — social zine frames. Static segment outranks :tenantKey. */}
-                                            <Route path="/justgo/zine" element={<JustGoZine />} />
                                             <Route path="/justgo/:tenantKey" element={<JustGoLanding />} />
                                             <Route path="/justgo" element={<JustGoLanding />} />
                                             {justGoHost ? (

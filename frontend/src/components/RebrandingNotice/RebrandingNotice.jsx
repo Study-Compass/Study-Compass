@@ -6,23 +6,33 @@ import { Icon } from '@iconify-icon/react';
 import GradientTR from '../../assets/Gradients/RebrandTR.png';
 import GradientBL from '../../assets/Gradients/RebrandBL.png';
 
+/** Surfaces that produce an artifact rather than a page. */
+const isRenderSurface = () =>
+    typeof window !== 'undefined' && window.location.pathname.startsWith('/carousel-export/');
+
 const RebrandingNotice = () => {
     const [countdown, setCountdown] = useState(10);
-    const [isVisible, setIsVisible] = useState(true);
+    // Computed rather than defaulted true, so a render surface never mounts it
+    // for a tick — a screenshot does not wait for an effect to run.
+    const [isVisible, setIsVisible] = useState(() => !isRenderSurface());
 
     useEffect(() => {
-        // Only show notice on study-compass.com domain (or localhost for development)
+        // Only the old domain. Localhost used to be included so the notice could
+        // be seen while working on it, but it dismisses itself by writing to
+        // localStorage — so anything with a fresh profile gets the redirect
+        // every time, and the carousel's render script starts a fresh headless
+        // Chrome per slide. ?test-rebranding=true is how to see it locally.
         const currentDomain = window.location.hostname;
-        const isStudyCompassDomain = currentDomain === 'study-compass.com' || 
-                                   currentDomain === 'www.study-compass.com' ||
-                                   currentDomain === 'localhost' || 
-                                   currentDomain.includes('127.0.0.1');
-        
+        const isStudyCompassDomain = currentDomain === 'study-compass.com' ||
+                                   currentDomain === 'www.study-compass.com';
+
         // Allow testing with ?test-rebranding=true query parameter
         const urlParams = new URLSearchParams(window.location.search);
         const isTestMode = urlParams.get('test-rebranding') === 'true';
-        
-        if (!isStudyCompassDomain && !isTestMode) {
+
+        // Surfaces that render an artifact rather than a page must never be
+        // covered by an interstitial, whatever the host.
+        if (isRenderSurface() || (!isStudyCompassDomain && !isTestMode)) {
             setIsVisible(false);
             return;
         }
