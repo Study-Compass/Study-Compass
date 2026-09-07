@@ -187,6 +187,10 @@ const WWW_ALLOWED_PATHS = [
   '/admin/pivot',
   '/justgo',
   '/login',
+  // Renders one carousel slide for the export script. It carries a signed,
+  // deck-scoped token instead of a session, so the institution gate has
+  // nothing to gate on — and a redirect here is screenshotted as the slide.
+  '/carousel-export',
 ];
 
 // /platform-admin/pivot/:tenantKey is covered by the '/platform-admin' prefix check in isPathAllowedOnWww.

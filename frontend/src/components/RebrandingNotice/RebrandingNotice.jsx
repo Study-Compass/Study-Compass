@@ -6,9 +6,15 @@ import { Icon } from '@iconify-icon/react';
 import GradientTR from '../../assets/Gradients/RebrandTR.png';
 import GradientBL from '../../assets/Gradients/RebrandBL.png';
 
+/** Surfaces that produce an artifact rather than a page. */
+const isRenderSurface = () =>
+    typeof window !== 'undefined' && window.location.pathname.startsWith('/carousel-export/');
+
 const RebrandingNotice = () => {
     const [countdown, setCountdown] = useState(10);
-    const [isVisible, setIsVisible] = useState(true);
+    // Computed rather than defaulted true, so a render surface never mounts it
+    // for a tick — a screenshot does not wait for an effect to run.
+    const [isVisible, setIsVisible] = useState(() => !isRenderSurface());
 
     useEffect(() => {
         // Only the old domain. Localhost used to be included so the notice could
@@ -26,9 +32,7 @@ const RebrandingNotice = () => {
 
         // Surfaces that render an artifact rather than a page must never be
         // covered by an interstitial, whatever the host.
-        const isRenderSurface = window.location.pathname.startsWith('/carousel-export/');
-
-        if (isRenderSurface || (!isStudyCompassDomain && !isTestMode)) {
+        if (isRenderSurface() || (!isStudyCompassDomain && !isTestMode)) {
             setIsVisible(false);
             return;
         }

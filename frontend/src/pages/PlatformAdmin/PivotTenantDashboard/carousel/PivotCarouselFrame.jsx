@@ -16,7 +16,6 @@
 
 import React, { useEffect, useMemo, useState } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
-import { authenticatedRequest } from '../../../../hooks/useFetch';
 import { resolveSlide } from './zineDeck';
 import {
   ZineBack,
@@ -67,13 +66,26 @@ export default function PivotCarouselFrame() {
     let cancelled = false;
     (async () => {
       const params = new URLSearchParams({ token: token || '', deckId: deckId || '' });
-      const res = await authenticatedRequest(`/admin/pivot/carousel-export?${params}`);
-      if (cancelled) return;
-      if (!res.data?.success) {
-        setError(res.data?.message || 'Could not load the deck.');
-        return;
+      try {
+        /*
+         * A plain fetch, not the app's authenticated request helper. This route
+         * carries a signed token and has no session; the helper would read the
+         * 401 as an expired login and start a refresh dance that cannot
+         * succeed, burying the actual reason in retries.
+         */
+        const response = await fetch(`/admin/pivot/carousel-export?${params}`, {
+          headers: { accept: 'application/json' },
+        });
+        const body = await response.json().catch(() => null);
+        if (cancelled) return;
+        if (!response.ok || !body?.success) {
+          setError(body?.message || `Could not load the deck (${response.status}).`);
+          return;
+        }
+        setPayload(body.data);
+      } catch (requestError) {
+        if (!cancelled) setError(requestError.message || 'Could not reach the server.');
       }
-      setPayload(res.data.data);
     })();
     return () => { cancelled = true; };
   }, [token, deckId]);
