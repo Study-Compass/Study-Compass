@@ -189,6 +189,7 @@ function PivotVoicePage({
   cityDisplayName,
   source = null,
   scopeLabel = null,
+  embedded = false,
 }) {
   const { addNotification } = useNotification();
   const paths = useMemo(
@@ -481,18 +482,13 @@ function PivotVoicePage({
   const loading = catalogLoading || layersLoading;
   const loadError = catalogError || layersError;
 
-  return (
-    <PivotTenantPage
-      className="pivot-voice-page"
-      title="Voice"
-      tenantKey={isPlatform ? '' : tenantKey}
-      cityDisplayName={cityLabel}
-      subtitle={
-        isPlatform
-            ? 'Platform pack — one key at a time. Open a group or search.'
-            : 'City overlay — tenant keys win over platform, then shipped. Open a group or search.'
-      }
-    >
+  /*
+   * The explorer and its save modal, with no page shell. A caller that already
+   * owns the surrounding chrome — the carousel's static-copy popup — asks for
+   * this instead, so it does not get a second page header inside a dialog.
+   */
+  const explorer = (
+    <>
       {loadError ? (
         <PivotOpsBanner tone="danger" title="Could not load voice catalog">
           {String(loadError)}
@@ -771,6 +767,24 @@ function PivotVoicePage({
         onClose={() => setPreviewOpen(false)}
         onConfirm={handleConfirmSave}
       />
+    </>
+  );
+
+  if (embedded) return explorer;
+
+  return (
+    <PivotTenantPage
+      className="pivot-voice-page"
+      title="Voice"
+      tenantKey={isPlatform ? '' : tenantKey}
+      cityDisplayName={cityLabel}
+      subtitle={
+        isPlatform
+          ? 'Platform pack — one key at a time. Open a group or search.'
+          : 'City overlay — tenant keys win over platform, then shipped. Open a group or search.'
+      }
+    >
+      {explorer}
     </PivotTenantPage>
   );
 }

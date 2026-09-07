@@ -197,6 +197,7 @@ export default function PivotCarouselPage({ tenantKey, cityDisplayName }) {
 
   return (
     <PivotTenantPage
+      className="pivot-carousel-page"
       title="Carousel"
       tenantKey={tenantKey}
       cityDisplayName={cityDisplayName}

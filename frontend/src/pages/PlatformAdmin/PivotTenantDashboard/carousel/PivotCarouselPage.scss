@@ -10,6 +10,15 @@
  * pivotTheme.ts / JustGoLanding.scss — the zine only spends it louder.
  */
 
+/*
+ * The tenant shell caps its body at 1200px, which is right for dashboards and
+ * wrong for a slide editor — the canvas wants every pixel. This is the one tab
+ * that opts out.
+ */
+.pivot-tenant-page.pivot-carousel-page > .pivot-tenant-page__body {
+  max-width: none;
+}
+
 /* ------------------------------------------------------------ light table */
 
 .jgz {
@@ -27,17 +36,32 @@
   --jgz-font-mono: 'Space Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;
   --jgz-font-flos: 'Les Flos Sans', 'Instrument Sans', 'Helvetica Neue', Helvetica, sans-serif;
 
-  --jgz-type: rgba(250, 246, 239, 0.94);
-  --jgz-type-muted: rgba(250, 246, 239, 0.76);
-  --jgz-type-soft: rgba(250, 246, 239, 0.56);
+  /*
+   * Chrome type is ink on the light table. The frames keep their own ramp —
+   * a night-edition slide is dark on purpose — so these tokens describe the
+   * surface around the slides, never what is inside one.
+   */
+  --jgz-type: rgba(26, 23, 20, 0.92);
+  --jgz-type-muted: rgba(26, 23, 20, 0.7);
+  --jgz-type-soft: rgba(26, 23, 20, 0.5);
+  --jgz-line: rgba(26, 23, 20, 0.14);
 
-  padding: clamp(1.25rem, 3vw, 2.25rem) clamp(1rem, 3vw, 2.25rem) clamp(2rem, 4vw, 3rem);
-  border: 2px solid var(--jgz-ink);
-  background: #0f0d0b;
+  padding: 0 0 clamp(2rem, 4vw, 3rem);
+  background: transparent;
   color: var(--jgz-type);
   font-family: var(--jgz-font-mono);
   text-transform: lowercase;
-  color-scheme: dark;
+}
+
+/*
+ * A slide is a physical thing on a table, so its edge is a hairline and a
+ * shadow rather than the surrounding darkness it used to be cut out of.
+ */
+.jgz .jgz-frame {
+  border: 1px solid var(--jgz-line);
+  box-shadow:
+    0 1px 2px rgba(26, 23, 20, 0.08),
+    0 8px 24px rgba(26, 23, 20, 0.14);
 }
 
 .jgz__bar {
@@ -47,7 +71,7 @@
   justify-content: space-between;
   gap: 0.75rem 2rem;
   padding-bottom: 1.1rem;
-  border-bottom: 2px solid var(--jgz-cream);
+  border-bottom: 1px solid var(--jgz-line);
 }
 
 .jgz__standfirst {
@@ -82,9 +106,9 @@
 .jgz__action {
   appearance: none;
   padding: 0.4rem 0.8rem;
-  border: 2px solid var(--jgz-cream);
+  border: 1px solid var(--jgz-ink);
   background: transparent;
-  color: var(--jgz-cream);
+  color: var(--jgz-ink);
   font-family: var(--jgz-font-mono);
   font-size: 0.7rem;
   text-transform: lowercase;
@@ -93,6 +117,7 @@
   &:hover:not(:disabled) {
     background: var(--jgz-accent);
     border-color: var(--jgz-accent);
+    color: var(--jgz-cream);
   }
 
   &:disabled {
@@ -182,7 +207,7 @@
 .jgz__spec {
   margin-top: clamp(2.5rem, 6vw, 4rem);
   padding-top: 1.1rem;
-  border-top: 2px solid var(--jgz-cream);
+  border-top: 1px solid var(--jgz-line);
 
   h2 {
     margin: 0 0 0.8rem;
@@ -1188,7 +1213,7 @@
   justify-content: space-between;
   gap: 0.75rem 1.5rem;
   padding-bottom: 1rem;
-  border-bottom: 2px solid var(--jgz-cream);
+  border-bottom: 1px solid var(--jgz-line);
 }
 
 .jgz-editor__title {
@@ -1206,7 +1231,7 @@
 /* Strip left, canvas right; stacks on narrow admin windows. */
 .jgz-editor__body {
   display: grid;
-  grid-template-columns: minmax(0, 13rem) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 11rem) minmax(0, 1fr);
   gap: clamp(1.25rem, 3vw, 2.5rem);
   margin-top: 1.5rem;
 
@@ -1284,7 +1309,7 @@
     appearance: none;
     width: 100%;
     padding: 0.5rem;
-    border: 2px dashed var(--jgz-type-soft);
+    border: 1px dashed var(--jgz-type-soft);
     background: transparent;
     color: var(--jgz-type-muted);
     font-family: var(--jgz-font-mono);
@@ -1303,8 +1328,9 @@
   margin: 0.35rem 0 0;
   padding: 0;
   list-style: none;
-  border: 2px solid var(--jgz-cream);
-  background: var(--jgz-night-raised);
+  border: 1px solid var(--jgz-ink);
+  background: #fff;
+  box-shadow: 0 8px 24px rgba(26, 23, 20, 0.16);
 
   button {
     appearance: none;
@@ -1312,7 +1338,7 @@
     width: 100%;
     padding: 0.5rem 0.6rem;
     border: 0;
-    border-bottom: 1px solid rgba(250, 246, 239, 0.14);
+    border-bottom: 1px solid var(--jgz-line);
     background: transparent;
     color: var(--jgz-type);
     font: inherit;
@@ -1320,7 +1346,7 @@
     text-align: left;
     cursor: pointer;
 
-    &:hover { background: var(--jgz-accent); }
+    &:hover { background: var(--jgz-accent); color: var(--jgz-cream); }
 
     b { display: block; }
     span { color: var(--jgz-type-soft); font-size: 0.62rem; }
@@ -1330,9 +1356,10 @@
   li:last-child button { border-bottom: 0; }
 }
 
+/* The slide gets the room; its meta column is a rail beside it, not a peer. */
 .jgz-editor__canvas {
   display: grid;
-  grid-template-columns: minmax(0, 26rem) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 17rem);
   gap: clamp(1.25rem, 3vw, 2.5rem);
   align-items: start;
 
@@ -1381,7 +1408,7 @@
     font-size: 0.66rem;
     cursor: pointer;
 
-    &:hover:not(:disabled) { border-color: var(--jgz-cream); color: var(--jgz-cream); }
+    &:hover:not(:disabled) { border-color: var(--jgz-ink); color: var(--jgz-ink); }
     &:disabled { opacity: 0.35; cursor: default; }
   }
 }

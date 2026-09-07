@@ -117,6 +117,7 @@ export default function PivotCarouselVoicePanel({
           cityDisplayName={cityDisplayName}
           source={source}
           scopeLabel={active.key === 'deck' ? 'This deck' : `${cityDisplayName || tenantKey} voice`}
+          embedded
         />
       </div>
     </Popup>
