@@ -17,6 +17,7 @@ const pivotSourceDiscoveryRunSchema = require('../schemas/pivotSourceDiscoveryRu
 const pivotContactHashSchema = require('../schemas/pivotContactHash');
 const pivotCreatorGrantSchema = require('../schemas/pivotCreatorGrant');
 const pivotCopyPackSchema = require('../schemas/pivotCopyPack');
+const pivotCarouselDeckSchema = require('../schemas/pivotCarouselDeck');
 const justGoLandingEventSchema = require('../schemas/justGoLandingEvent');
 const justGoWaitlistSchema = require('../schemas/justGoWaitlist');
 const justGoLandingQrSchema = require('../schemas/justGoLandingQr');
@@ -27,7 +28,7 @@ const justGoLandingQrSchema = require('../schemas/justGoLandingQr');
  * Requires req.globalDb to be set (see app.js middleware).
  *
  * @param {object} req - request with req.globalDb
- * @param {...string} names - model names including 'GlobalUser', 'PlatformRole', 'PlatformAdminInvite', 'PivotCitySource', 'PivotCreatorGrant', 'PivotCopyPack', 'JustGoLandingEvent', 'JustGoWaitlist', 'JustGoLandingQr', …
+ * @param {...string} names - model names including 'GlobalUser', 'PlatformRole', 'PlatformAdminInvite', 'PivotCitySource', 'PivotCreatorGrant', 'PivotCopyPack', 'PivotCarouselDeck', 'JustGoLandingEvent', 'JustGoWaitlist', 'JustGoLandingQr', …
  * @returns {object} map of requested models
  */
 const getGlobalModels = (req, ...names) => {
@@ -99,6 +100,11 @@ const getGlobalModels = (req, ...names) => {
             'PivotCopyPack',
             pivotCopyPackSchema,
             'pivot_copy_packs'
+        ),
+        PivotCarouselDeck: db.model(
+            'PivotCarouselDeck',
+            pivotCarouselDeckSchema,
+            'pivot_carousel_decks'
         ),
         JustGoLandingEvent: db.model(
             'JustGoLandingEvent',
