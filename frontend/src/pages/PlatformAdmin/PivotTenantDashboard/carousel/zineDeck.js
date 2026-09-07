@@ -37,6 +37,19 @@ export function spellCount(n) {
   return COUNT_WORDS[n] || String(n);
 }
 
+/**
+ * The zine sets times in lowercase with no leading zero — "11:00 pm", not
+ * "11:00 PM" — so a picked event's label matches copy typed by hand.
+ */
+export function formatWhenLabel(startTime) {
+  if (!startTime) return '';
+  const date = new Date(startTime);
+  if (Number.isNaN(date.getTime())) return '';
+  return date
+    .toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })
+    .toLowerCase();
+}
+
 function resolveImage(value) {
   if (!value) return null;
   return BUNDLED_ASSETS[value] || value;

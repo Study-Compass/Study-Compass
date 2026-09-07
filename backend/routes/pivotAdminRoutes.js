@@ -12,6 +12,9 @@ const {
   getCarouselVoiceLayers,
   patchCarouselVoice,
 } = require('../services/pivotCarouselVoiceService');
+const { searchCarouselCatalog } = require('../services/pivotCarouselCatalogService');
+const { setSlideImage } = require('../services/pivotCarouselDeckService');
+const { upload } = require('../services/imageUploadService');
 const { requirePlatformAdmin } = require('../middlewares/requirePlatformAdmin');
 const {
   rebuildWeeklySnapshot,
@@ -466,6 +469,56 @@ router.delete(
     } catch (err) {
       logPivotRouteError('DELETE /admin/pivot/tenants/:tenantKey/carousels/:deckId', err, req);
       return res.status(500).json({ success: false, message: 'Unable to delete the deck.' });
+    }
+  },
+);
+
+/**
+ * Slot picker search. Published events only, newest first, paged — a deck
+ * reports on nights that already happened.
+ */
+router.get(
+  '/tenants/:tenantKey/carousel-catalog',
+  verifyToken,
+  requirePlatformAdmin,
+  async (req, res) => {
+    try {
+      const result = await searchCarouselCatalog(req, req.params.tenantKey, {
+        batchWeek: req.query?.batchWeek,
+        from: req.query?.from,
+        to: req.query?.to,
+        q: req.query?.q,
+        limit: req.query?.limit,
+        skip: req.query?.skip,
+      });
+      return sendDeckResult(res, result);
+    } catch (err) {
+      logPivotRouteError('GET /admin/pivot/tenants/:tenantKey/carousel-catalog', err, req);
+      return res.status(500).json({ success: false, message: 'Unable to search the catalog.' });
+    }
+  },
+);
+
+/** Replace or clear one event slot's photograph. No file is a clear. */
+router.post(
+  '/tenants/:tenantKey/carousels/:deckId/slides/:slideId/image',
+  verifyToken,
+  requirePlatformAdmin,
+  upload.single('image'),
+  async (req, res) => {
+    try {
+      const result = await setSlideImage(
+        req,
+        req.params.tenantKey,
+        req.params.deckId,
+        req.params.slideId,
+        req.body?.slotIndex,
+        req.file,
+      );
+      return sendDeckResult(res, result);
+    } catch (err) {
+      logPivotRouteError('POST carousel slide image', err, req);
+      return res.status(500).json({ success: false, message: 'Unable to set the image.' });
     }
   },
 );

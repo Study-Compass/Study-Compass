@@ -122,3 +122,82 @@ describe('building a deck from empty', () => {
     expect(result.slide.events[0].values.note).toHaveLength(84);
   });
 });
+
+/**
+ * Phase 04 proof: an event picked from the catalog fills a slot and the result
+ * survives the server's coercion. Mirrors what the picker builds from a search
+ * row, so a change to either shape breaks here rather than on a slide.
+ */
+describe('filling a slot from the catalog', () => {
+  const { serializeForSlot } = require('../../services/pivotCarouselCatalogService');
+
+  const catalogRow = serializeForSlot({
+    _id: '507f1f77bcf86cd799439011',
+    name: 'basement set: dj oyinbo',
+    location: 'warehouse off 14th',
+    image: 'https://s3/flier.jpg',
+    start_time: new Date('2026-09-05T23:00:00Z'),
+    customFields: {
+      pivot: { host: { name: 'nadine' }, tags: ['no phones', 'cash at the door'] },
+    },
+  });
+
+  /** Mirrors pick() in PivotCarouselEventPicker.jsx. */
+  const asSlotEntry = (row) => ({
+    eventId: row._id,
+    label: null,
+    snapshot: {
+      name: row.name,
+      host: row.host,
+      startTime: row.startTime,
+      whenLabel: '11:00 pm',
+      location: row.location,
+      image: row.image,
+    },
+    imageOverride: null,
+    values: { tags: (row.tags || []).slice(0, 3) },
+  });
+
+  test('a picked event fills the slot and closes the slide gaps', () => {
+    const slide = emptySlideOf('card');
+    expect(slideGaps(slide).join(' ')).toMatch(/1 more event/);
+
+    const filled = {
+      ...writePath(slide, 'values.slug', 'last night'),
+      events: [asSlotEntry(catalogRow)],
+    };
+    expect(slideGaps(filled)).toEqual([]);
+  });
+
+  test('the picked entry survives coercion with nothing trimmed', () => {
+    const slide = { ...emptySlideOf('card'), events: [asSlotEntry(catalogRow)] };
+    const result = coerceSlide(slide);
+    expect(result.error).toBeUndefined();
+    expect(result.notes).toEqual([]);
+    expect(result.slide.events[0].snapshot.name).toBe('basement set: dj oyinbo');
+  });
+
+  test('the event id is kept as provenance and the copy is a snapshot', () => {
+    const entry = coerceSlide({
+      ...emptySlideOf('card'),
+      events: [asSlotEntry(catalogRow)],
+    }).slide.events[0];
+    expect(entry.eventId).toBe('507f1f77bcf86cd799439011');
+    expect(entry.snapshot.location).toBe('warehouse off 14th');
+  });
+
+  test('catalog tags seed the vibe tags but stay within the manifest cap', () => {
+    const wide = { ...catalogRow, tags: ['a', 'b', 'c', 'd', 'e'] };
+    const entry = coerceSlide({
+      ...emptySlideOf('card'),
+      events: [asSlotEntry(wide)],
+    }).slide.events[0];
+    expect(entry.values.tags).toEqual(['a', 'b', 'c']);
+  });
+
+  test('the flier is the photo until an override replaces it', () => {
+    const entry = asSlotEntry(catalogRow);
+    expect(entry.snapshot.image).toBe('https://s3/flier.jpg');
+    expect(entry.imageOverride).toBeNull();
+  });
+});

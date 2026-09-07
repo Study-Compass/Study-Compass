@@ -166,6 +166,39 @@ export default function PivotCarouselPage({ tenantKey, cityDisplayName }) {
     });
   }, [draft, edition, tenantKey, addNotification]);
 
+  /**
+   * An image upload writes straight through to the server rather than into the
+   * draft: the file cannot live in a JSON deck, and the reply carries the saved
+   * deck back with the override already on it.
+   */
+  const setSlotImage = useCallback(
+    async (slideId, slotIndex, file) => {
+      if (!draft?._id) return;
+      const form = new FormData();
+      form.append('image', file);
+      form.append('slotIndex', String(slotIndex));
+
+      const result = await authenticatedRequest(
+        `${decksPath(tenantKey)}/${draft._id}/slides/${slideId}/image`,
+        { method: 'POST', data: form },
+      );
+
+      if (!result.data?.success) {
+        addNotification({
+          title: 'Could not set the photo',
+          message: result.data?.message || 'The upload failed.',
+          type: 'error',
+        });
+        return;
+      }
+      const saved = result.data.data.deck;
+      setDeck(saved);
+      setDraft(saved);
+      addNotification({ title: 'Photo set', message: 'The slide uses it now.', type: 'success' });
+    },
+    [draft, tenantKey, addNotification],
+  );
+
   const createDeck = useCallback(async () => {
     setSeeding(true);
     const result = await authenticatedRequest(decksPath(tenantKey), {
@@ -231,6 +264,7 @@ export default function PivotCarouselPage({ tenantKey, cityDisplayName }) {
             cityDisplayName={cityDisplayName}
             onDeckChange={setDraft}
             onSave={saveDeck}
+            onSlotImage={setSlotImage}
             onVoiceSaved={load}
           />
         ) : (

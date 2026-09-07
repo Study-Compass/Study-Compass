@@ -15,6 +15,7 @@ import React, { useCallback, useMemo, useState } from 'react';
 import { ZineEditProvider, writePath } from './zineField';
 import { resolveSlide, slideGaps } from './zineDeck';
 import PivotCarouselVoicePanel from './PivotCarouselVoicePanel';
+import PivotCarouselEventPicker from './PivotCarouselEventPicker';
 
 /** Fixed types cannot be added, removed or moved — they open and close the deck. */
 function isFixed(manifest, type) {
@@ -64,11 +65,13 @@ export default function PivotCarouselEditor({
   cityDisplayName,
   onDeckChange,
   onSave,
+  onSlotImage,
   onVoiceSaved,
 }) {
   const [selected, setSelected] = useState(0);
   const [adding, setAdding] = useState(false);
   const [voiceOpen, setVoiceOpen] = useState(false);
+  const [pickingSlot, setPickingSlot] = useState(null);
 
   const index = Math.min(selected, Math.max(deck.slides.length - 1, 0));
   const slide = deck.slides[index];
@@ -143,6 +146,53 @@ export default function PivotCarouselEditor({
     [manifest, onDeckChange, index],
   );
 
+  /** Drop a picked event into a slot, keeping the slots either side intact. */
+  const fillSlot = useCallback(
+    (slotIndex, entry) => {
+      onDeckChange((current) => {
+        const slides = [...current.slides];
+        const events = [...(slides[index].events || [])];
+        events[slotIndex] = entry;
+        slides[index] = { ...slides[index], events };
+        return { ...current, slides };
+      });
+    },
+    [onDeckChange, index],
+  );
+
+  const clearSlot = useCallback(
+    (slotIndex) => {
+      fillSlot(slotIndex, {
+        eventId: null, label: null, snapshot: null, imageOverride: null, values: {},
+      });
+    },
+    [fillSlot],
+  );
+
+  /** Only where the type allows more than its minimum — the wall's fourth. */
+  const addSlot = useCallback(() => {
+    onDeckChange((current) => {
+      const slides = [...current.slides];
+      const events = [...(slides[index].events || []), {
+        eventId: null, label: null, snapshot: null, imageOverride: null, values: {},
+      }];
+      slides[index] = { ...slides[index], events };
+      return { ...current, slides };
+    });
+  }, [onDeckChange, index]);
+
+  const dropSlot = useCallback(
+    (slotIndex) => {
+      onDeckChange((current) => {
+        const slides = [...current.slides];
+        const events = (slides[index].events || []).filter((_, i) => i !== slotIndex);
+        slides[index] = { ...slides[index], events };
+        return { ...current, slides };
+      });
+    },
+    [onDeckChange, index],
+  );
+
   const editContext = useMemo(
     () => ({
       editing: true,
@@ -158,6 +208,14 @@ export default function PivotCarouselEditor({
   const gaps = slideGaps(slide, manifest);
   const fixed = isFixed(manifest, slide.type);
   const spec = manifest.types[slide.type];
+
+  // The manifest decides how many slots this type takes and whether the count
+  // can vary, so the slot rail never has to know which template it is showing.
+  const derived = spec.events === 'derived';
+  const slotMin = derived ? 0 : (spec.events.exactly ?? spec.events.min ?? 0);
+  const slotMax = derived ? 0 : (spec.events.exactly ?? spec.events.max ?? 0);
+  const slots = slide.events || [];
+  const acceptsUpload = String(spec.photo || '').includes('upload');
 
   return (
     <div className="jgz-editor">
@@ -242,6 +300,68 @@ export default function PivotCarouselEditor({
               <p className="jgz-editor__gaps jgz-editor__gaps--ok">every slot filled</p>
             )}
 
+            {derived ? (
+              <p className="jgz-editor__derived">
+                counts the whole issue — no events of its own
+              </p>
+            ) : (
+              <div className="jgz-editor__slots">
+                <p className="jgz-editor__slotshead">
+                  events
+                  <span>
+                    {slots.filter((e) => e.snapshot?.name).length} of {slotMax}
+                  </span>
+                </p>
+
+                <ul>
+                  {slots.map((entry, slotIndex) => (
+                    <li key={`slot-${slotIndex}`} className="jgz-editor__slot">
+                      <span className="jgz-editor__slotname">
+                        {entry.snapshot?.name || <em>empty slot</em>}
+                      </span>
+                      <span className="jgz-editor__slotops">
+                        <button type="button" onClick={() => setPickingSlot(slotIndex)}>
+                          {entry.snapshot?.name ? 'replace' : 'pick'}
+                        </button>
+                        {acceptsUpload && entry.snapshot ? (
+                          <label className="jgz-editor__upload">
+                            {entry.imageOverride?.url ? 'photo ✓' : 'photo'}
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={(event) => {
+                                const file = event.target.files?.[0];
+                                event.target.value = '';
+                                if (file) onSlotImage(slide._id, slotIndex, file);
+                              }}
+                            />
+                          </label>
+                        ) : null}
+                        {entry.snapshot?.name ? (
+                          <button type="button" onClick={() => clearSlot(slotIndex)}>clear</button>
+                        ) : null}
+                        {slots.length > slotMin ? (
+                          <button
+                            type="button"
+                            className="jgz-editor__danger"
+                            onClick={() => dropSlot(slotIndex)}
+                          >
+                            −
+                          </button>
+                        ) : null}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+
+                {slots.length < slotMax ? (
+                  <button type="button" className="jgz-editor__slotadd" onClick={addSlot}>
+                    + add event slot
+                  </button>
+                ) : null}
+              </div>
+            )}
+
             <div className="jgz-editor__slideops">
               <button type="button" onClick={() => move(index, index - 1)} disabled={fixed || index <= 1}>
                 move up
@@ -271,6 +391,14 @@ export default function PivotCarouselEditor({
           </div>
         </div>
       </div>
+
+      <PivotCarouselEventPicker
+        tenantKey={tenantKey}
+        open={pickingSlot !== null}
+        slotLabel={`${typeLabel(manifest, slide.type)} · slot ${(pickingSlot ?? 0) + 1}`}
+        onClose={() => setPickingSlot(null)}
+        onPick={(entry) => fillSlot(pickingSlot, entry)}
+      />
 
       <PivotCarouselVoicePanel
         tenantKey={tenantKey}

@@ -21,6 +21,7 @@ const {
   slideGaps,
 } = require('../constants/zineSlideTypes');
 const { isValidIsoWeek } = require('../utilities/pivotIsoWeek');
+const { uploadImageToS3 } = require('./imageUploadService');
 
 const TITLE_MAX = 80;
 const DECK_SLIDE_MAX = 20;
@@ -270,7 +271,50 @@ async function deleteCarouselDeck(req, tenantKey, deckId) {
   return { data: { deleted: true, deckId: String(deckId) } };
 }
 
+/**
+ * Replace one event slot's photograph. Slots default to the event's own flier,
+ * so this is only reached when someone deliberately supplies a better one; the
+ * override sits beside the snapshot rather than overwriting it, so clearing it
+ * falls back to the flier rather than to nothing.
+ */
+async function setSlideImage(req, tenantKey, deckId, slideId, slotIndex, file) {
+  const gate = await requirePivotTenant(req, tenantKey);
+  if (gate.error) return gate;
+
+  const { PivotCarouselDeck } = getGlobalModels(req, 'PivotCarouselDeck');
+  const doc = await PivotCarouselDeck.findOne({ _id: deckId, tenantKey: gate.tenantKey });
+  if (!doc) return { error: 'Deck not found.', status: 404, code: 'DECK_NOT_FOUND' };
+
+  const slide = doc.slides.id(slideId);
+  if (!slide) return { error: 'Slide not found.', status: 404, code: 'SLIDE_NOT_FOUND' };
+
+  const index = Number(slotIndex) || 0;
+  const entry = slide.events[index];
+  if (!entry) return { error: 'Event slot not found.', status: 404, code: 'SLOT_NOT_FOUND' };
+
+  if (!file) {
+    // No file is a clear, which is why it is not an error.
+    entry.imageOverride = { url: null, key: null };
+  } else {
+    let location;
+    try {
+      // Returns the S3 Location string; the generated key stays internal to the
+      // upload service, so there is nothing to record for a later delete.
+      location = await uploadImageToS3(file, `pivot-carousel/${gate.tenantKey}`);
+    } catch (err) {
+      return { error: err.message || 'Could not upload the image.', status: 400 };
+    }
+    entry.imageOverride = { url: location, key: null };
+  }
+
+  doc.updatedBy = req.user?.globalUserId || req.user?.userId || null;
+  await doc.save();
+
+  return { data: { deck: serializeDeck(doc) } };
+}
+
 module.exports = {
+  setSlideImage,
   listCarouselDecks,
   getCarouselDeck,
   createCarouselDeck,
