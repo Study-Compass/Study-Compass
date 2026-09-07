@@ -17,7 +17,7 @@
 
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { authenticatedRequest } from '../../../../hooks/useFetch';
-import Popup from '../../../../components/Popup/Popup';
+import PivotCarouselPopup from './PivotCarouselPopup';
 import PivotVoicePage from '../PivotVoicePage';
 
 export default function PivotCarouselVoicePanel({
@@ -83,7 +83,7 @@ export default function PivotCarouselVoicePanel({
   if (!open) return null;
 
   return (
-    <Popup isOpen={open} onClose={onClose} customClassName="jgz-voicepopup">
+    <PivotCarouselPopup open={open} onClose={onClose} className="jgz-voicepopup">
       <div className="jgz-voice">
         <PivotVoicePage
           scope="platform"
@@ -94,6 +94,6 @@ export default function PivotCarouselVoicePanel({
           embedded
         />
       </div>
-    </Popup>
+    </PivotCarouselPopup>
   );
 }

@@ -1424,15 +1424,85 @@
   color: var(--jgz-type-soft);
 }
 
-/* --------------------------------------------------- static copy panel */
+/* ------------------------------------------------------------ slot rail */
 
-/*
- * The popup holds the Voice page's own explorer, so it inherits that surface
- * wholesale and adds only the room to sit in. Anything styled here would be a
- * second look competing with the one it came from.
- */
-.jgz-voice {
-  width: min(72rem, 92vw);
-  max-height: 84vh;
-  overflow: auto;
+.jgz-editor__slots {
+  margin: 0 0 1.1rem;
+
+  ul { margin: 0; padding: 0; list-style: none; }
+}
+
+.jgz-editor__slotshead {
+  display: flex;
+  justify-content: space-between;
+  margin: 0 0 0.4rem;
+  font-size: 0.66rem;
+  color: var(--jgz-type-soft);
+}
+
+.jgz-editor__slot {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0;
+  border-top: 1px solid var(--jgz-line);
+  font-size: 0.7rem;
+
+  &:last-of-type { border-bottom: 1px solid var(--jgz-line); }
+
+  em { color: var(--jgz-type-soft); font-style: italic; }
+}
+
+.jgz-editor__slotname {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.jgz-editor__slotops {
+  display: flex;
+  gap: 0.3rem;
+  flex-shrink: 0;
+
+  button,
+  .jgz-editor__upload {
+    appearance: none;
+    padding: 0.2rem 0.4rem;
+    border: 1px solid var(--jgz-line);
+    background: transparent;
+    color: var(--jgz-type-muted);
+    font-family: var(--jgz-font-mono);
+    font-size: 0.62rem;
+    line-height: 1.4;
+    cursor: pointer;
+
+    &:hover { border-color: var(--jgz-ink); color: var(--jgz-ink); }
+  }
+
+  /* The file input is the label; a bare one cannot be styled to match. */
+  .jgz-editor__upload input { display: none; }
+}
+
+.jgz-editor__slotadd {
+  appearance: none;
+  margin-top: 0.5rem;
+  padding: 0.3rem 0.5rem;
+  border: 1px dashed var(--jgz-type-soft);
+  background: transparent;
+  color: var(--jgz-type-muted);
+  font-family: var(--jgz-font-mono);
+  font-size: 0.64rem;
+  cursor: pointer;
+
+  &:hover { border-color: var(--jgz-accent); color: var(--jgz-accent); }
+}
+
+.jgz-editor__derived {
+  margin: 0 0 1.1rem;
+  padding: 0.4rem 0.55rem;
+  border-left: 2px solid var(--jgz-line);
+  font-size: 0.66rem;
+  color: var(--jgz-type-soft);
 }

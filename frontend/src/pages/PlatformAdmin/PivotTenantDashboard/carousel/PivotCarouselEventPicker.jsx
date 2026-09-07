@@ -12,7 +12,7 @@
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { authenticatedRequest } from '../../../../hooks/useFetch';
-import Popup from '../../../../components/Popup/Popup';
+import PivotCarouselPopup from './PivotCarouselPopup';
 import { formatWhenLabel } from './zineDeck';
 
 const SEARCH_DEBOUNCE_MS = 260;
@@ -123,7 +123,7 @@ export default function PivotCarouselEventPicker({
   if (!open) return null;
 
   return (
-    <Popup isOpen={open} onClose={onClose} customClassName="jgz-pickerpopup">
+    <PivotCarouselPopup open={open} onClose={onClose} className="jgz-pickerpopup">
       <div className="jgz-picker">
         <header className="jgz-picker__head">
           <div>
@@ -216,6 +216,6 @@ export default function PivotCarouselEventPicker({
           </button>
         ) : null}
       </div>
-    </Popup>
+    </PivotCarouselPopup>
   );
 }

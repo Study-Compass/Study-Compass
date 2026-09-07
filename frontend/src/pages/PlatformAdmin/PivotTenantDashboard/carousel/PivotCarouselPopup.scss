@@ -1,0 +1,188 @@
+/**
+ * Popup content styling, imported by PivotCarouselPopup.
+ *
+ * These rules live with the component that renders them rather than with the
+ * page, because a portal detaches the markup from the page's DOM entirely.
+ * Nothing here reads a --jgz token: those are declared on `.jgz`, which no
+ * portal content is inside. The ops tokens do reach it, because
+ * PivotCarouselPopup re-declares `.pivot-ops` on the portal's own root.
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap');
+
+/* The wrapper only carries the token class; it must not become a layout box. */
+.jgz-popup__body {
+  display: contents;
+}
+
+/* --------------------------------------------------- static copy panel */
+
+/*
+ * The popup holds the Voice page's own explorer, so it inherits that surface
+ * wholesale and adds only the room to sit in. Anything styled here would be a
+ * second look competing with the one it came from.
+ */
+.jgz-voice {
+  width: min(72rem, 92vw);
+  max-height: 84vh;
+  overflow: auto;
+}
+
+/* -------------------------------------------------------------- picker */
+
+.jgz-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  width: min(46rem, 88vw);
+  max-height: 80vh;
+  color: #1a1714;
+  font-family: 'Space Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;
+}
+
+.jgz-picker__sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.jgz-picker__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+
+  h2 { margin: 0; font-size: 1rem; }
+  p { margin: 0.2rem 0 0; font-size: 0.72rem; color: rgba(26, 23, 20, 0.6); }
+}
+
+.jgz-picker__summary {
+  font-size: 0.68rem;
+  color: rgba(26, 23, 20, 0.6);
+  white-space: nowrap;
+}
+
+.jgz-picker__controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem 1rem;
+  padding-bottom: 0.8rem;
+  border-bottom: 1px solid rgba(26, 23, 20, 0.14);
+}
+
+.jgz-picker__search {
+  flex: 1 1 16rem;
+
+  input {
+    width: 100%;
+    padding: 0.45rem 0.6rem;
+    border: 1px solid rgba(26, 23, 20, 0.3);
+    background: #fff;
+    font: inherit;
+    font-size: 0.78rem;
+  }
+}
+
+.jgz-picker__ranges {
+  display: flex;
+
+  button {
+    appearance: none;
+    padding: 0.4rem 0.6rem;
+    border: 1px solid rgba(26, 23, 20, 0.3);
+    background: transparent;
+    font: inherit;
+    font-size: 0.68rem;
+    cursor: pointer;
+
+    & + button { border-left: 0; }
+    &[aria-pressed='true'] { background: #ff4f1f; border-color: #ff4f1f; color: #faf6ef; }
+  }
+}
+
+.jgz-picker__dates {
+  display: flex;
+  gap: 0.5rem;
+
+  label { display: flex; align-items: center; gap: 0.3rem; font-size: 0.66rem; }
+  input {
+    padding: 0.3rem 0.4rem;
+    border: 1px solid rgba(26, 23, 20, 0.3);
+    font: inherit;
+    font-size: 0.68rem;
+  }
+}
+
+.jgz-picker__results {
+  flex: 1;
+  overflow-y: auto;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  > li + li { border-top: 1px solid rgba(26, 23, 20, 0.1); }
+
+  button {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+    padding: 0.55rem 0.3rem;
+    border: 0;
+    background: transparent;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+
+    &:hover { background: rgba(255, 79, 31, 0.08); }
+    &:focus-visible { outline: 2px solid #ff4f1f; outline-offset: -2px; }
+  }
+}
+
+.jgz-picker__thumb {
+  flex: 0 0 3.5rem;
+  height: 2.6rem;
+  overflow: hidden;
+  background: #efe9df;
+
+  img { width: 100%; height: 100%; object-fit: cover; display: block; }
+}
+
+.jgz-picker__thumb-blank {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  font-size: 0.55rem;
+  color: rgba(26, 23, 20, 0.45);
+}
+
+.jgz-picker__row {
+  min-width: 0;
+
+  b { display: block; font-size: 0.8rem; }
+}
+
+.jgz-picker__meta,
+.jgz-picker__tags {
+  display: block;
+  font-size: 0.66rem;
+  color: rgba(26, 23, 20, 0.6);
+}
+
+.jgz-picker__tags { color: #ff4f1f; }
+
+.jgz-picker__more {
+  appearance: none;
+  align-self: center;
+  padding: 0.4rem 0.8rem;
+  border: 1px solid rgba(26, 23, 20, 0.3);
+  background: transparent;
+  font: inherit;
+  font-size: 0.7rem;
+  cursor: pointer;
+}
