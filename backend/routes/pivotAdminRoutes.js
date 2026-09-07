@@ -1,5 +1,12 @@
 const express = require('express');
 const { verifyToken } = require('../middlewares/verifyToken');
+const {
+  listCarouselDecks,
+  getCarouselDeck,
+  createCarouselDeck,
+  updateCarouselDeck,
+  deleteCarouselDeck,
+} = require('../services/pivotCarouselDeckService');
 const { requirePlatformAdmin } = require('../middlewares/requirePlatformAdmin');
 const {
   rebuildWeeklySnapshot,
@@ -358,6 +365,102 @@ router.delete(
         success: false,
         message: 'Unable to reset tenant copy key.',
       });
+    }
+  },
+);
+
+/* ------------------------------------------------------- carousel decks */
+
+/**
+ * One handler shape for all five: the service returns { data } or
+ * { error, status, code }, exactly as the copy pack routes above do.
+ */
+function sendDeckResult(res, result, okStatus = 200) {
+  if (result.error) {
+    return res.status(result.status || 400).json({
+      success: false,
+      message: result.error,
+      code: result.code,
+    });
+  }
+  return res.status(okStatus).json({ success: true, data: result.data });
+}
+
+router.get(
+  '/tenants/:tenantKey/carousels',
+  verifyToken,
+  requirePlatformAdmin,
+  async (req, res) => {
+    try {
+      return sendDeckResult(res, await listCarouselDecks(req, req.params.tenantKey));
+    } catch (err) {
+      logPivotRouteError('GET /admin/pivot/tenants/:tenantKey/carousels', err, req);
+      return res.status(500).json({ success: false, message: 'Unable to load carousel decks.' });
+    }
+  },
+);
+
+router.post(
+  '/tenants/:tenantKey/carousels',
+  verifyToken,
+  requirePlatformAdmin,
+  async (req, res) => {
+    try {
+      const result = await createCarouselDeck(req, req.params.tenantKey, req.body);
+      return sendDeckResult(res, result, 201);
+    } catch (err) {
+      logPivotRouteError('POST /admin/pivot/tenants/:tenantKey/carousels', err, req);
+      return res.status(500).json({ success: false, message: 'Unable to create the deck.' });
+    }
+  },
+);
+
+router.get(
+  '/tenants/:tenantKey/carousels/:deckId',
+  verifyToken,
+  requirePlatformAdmin,
+  async (req, res) => {
+    try {
+      const result = await getCarouselDeck(req, req.params.tenantKey, req.params.deckId);
+      return sendDeckResult(res, result);
+    } catch (err) {
+      logPivotRouteError('GET /admin/pivot/tenants/:tenantKey/carousels/:deckId', err, req);
+      return res.status(500).json({ success: false, message: 'Unable to load the deck.' });
+    }
+  },
+);
+
+router.patch(
+  '/tenants/:tenantKey/carousels/:deckId',
+  verifyToken,
+  requirePlatformAdmin,
+  async (req, res) => {
+    try {
+      const result = await updateCarouselDeck(
+        req,
+        req.params.tenantKey,
+        req.params.deckId,
+        req.body,
+      );
+      return sendDeckResult(res, result);
+    } catch (err) {
+      logPivotRouteError('PATCH /admin/pivot/tenants/:tenantKey/carousels/:deckId', err, req);
+      return res.status(500).json({ success: false, message: 'Unable to save the deck.' });
+    }
+  },
+);
+
+router.delete(
+  '/tenants/:tenantKey/carousels/:deckId',
+  verifyToken,
+  requirePlatformAdmin,
+  async (req, res) => {
+    try {
+      const result = await deleteCarouselDeck(req, req.params.tenantKey, req.params.deckId);
+      return sendDeckResult(res, result);
+    } catch (err) {
+      logPivotRouteError('DELETE /admin/pivot/tenants/:tenantKey/carousels/:deckId', err, req);
+      return res.status(500).json({ success: false, message: 'Unable to delete the deck.' });
     }
   },
 );
