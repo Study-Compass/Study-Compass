@@ -226,8 +226,11 @@ export default function PivotCarouselPage({ tenantKey, cityDisplayName }) {
             frames={FRAME_COMPONENTS}
             dirty={dirty}
             saving={saving}
+            tenantKey={tenantKey}
+            cityDisplayName={cityDisplayName}
             onDeckChange={setDraft}
             onSave={saveDeck}
+            onVoiceSaved={load}
           />
         ) : (
           <>

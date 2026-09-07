@@ -14,6 +14,7 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { ZineEditProvider, writePath } from './zineField';
 import { resolveSlide, slideGaps } from './zineDeck';
+import PivotCarouselVoicePanel from './PivotCarouselVoicePanel';
 
 /** Fixed types cannot be added, removed or moved — they open and close the deck. */
 function isFixed(manifest, type) {
@@ -59,11 +60,15 @@ export default function PivotCarouselEditor({
   frames,
   dirty,
   saving,
+  tenantKey,
+  cityDisplayName,
   onDeckChange,
   onSave,
+  onVoiceSaved,
 }) {
   const [selected, setSelected] = useState(0);
   const [adding, setAdding] = useState(false);
+  const [voiceOpen, setVoiceOpen] = useState(false);
 
   const index = Math.min(selected, Math.max(deck.slides.length - 1, 0));
   const slide = deck.slides[index];
@@ -159,6 +164,13 @@ export default function PivotCarouselEditor({
       <div className="jgz-editor__bar">
         <p className="jgz-editor__title">{deck.title}</p>
         <div className="jgz-editor__bar-actions">
+          <button
+            type="button"
+            className="jgz__action"
+            onClick={() => setVoiceOpen(true)}
+          >
+            static copy…
+          </button>
           <span className={`jgz-flag${dirty ? '' : ' jgz-flag--saved'}`}>
             {dirty ? 'unsaved changes' : 'saved'}
           </span>
@@ -259,6 +271,15 @@ export default function PivotCarouselEditor({
           </div>
         </div>
       </div>
+
+      <PivotCarouselVoicePanel
+        tenantKey={tenantKey}
+        cityDisplayName={cityDisplayName}
+        deckId={deck._id}
+        open={voiceOpen}
+        onClose={() => setVoiceOpen(false)}
+        onSaved={onVoiceSaved}
+      />
     </div>
   );
 }

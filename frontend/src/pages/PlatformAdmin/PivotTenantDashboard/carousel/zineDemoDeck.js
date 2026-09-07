@@ -32,8 +32,7 @@ export const ZINE_DEMO_DECK = {
     {
       "type": "cover",
       "values": {
-        "weekLabel": "week of 01–07 sep",
-        "scanned": "214",
+        "tagline": "everything that happened while you were home",
         "caption": "above: basement set: dj oyinbo, warehouse off 14th"
       },
       "options": {},

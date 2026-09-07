@@ -7,6 +7,11 @@ const {
   updateCarouselDeck,
   deleteCarouselDeck,
 } = require('../services/pivotCarouselDeckService');
+const {
+  voiceCatalog,
+  getCarouselVoiceLayers,
+  patchCarouselVoice,
+} = require('../services/pivotCarouselVoiceService');
 const { requirePlatformAdmin } = require('../middlewares/requirePlatformAdmin');
 const {
   rebuildWeeklySnapshot,
@@ -461,6 +466,61 @@ router.delete(
     } catch (err) {
       logPivotRouteError('DELETE /admin/pivot/tenants/:tenantKey/carousels/:deckId', err, req);
       return res.status(500).json({ success: false, message: 'Unable to delete the deck.' });
+    }
+  },
+);
+
+/* ------------------------------------------------- carousel static voice */
+
+/*
+ * Served in the copy pack's own payload shapes, because the carousel reuses
+ * PivotVoicePage as its editor. The catalog is derived from the slide manifest,
+ * so a field declaring a voice key needs nothing else to appear in the panel.
+ */
+router.get(
+  '/carousel-voice/catalog',
+  verifyToken,
+  requirePlatformAdmin,
+  async (req, res) => {
+    return res.status(200).json({ success: true, data: voiceCatalog() });
+  },
+);
+
+router.get(
+  '/tenants/:tenantKey/carousel-voice',
+  verifyToken,
+  requirePlatformAdmin,
+  async (req, res) => {
+    try {
+      const result = await getCarouselVoiceLayers(req, req.params.tenantKey, req.query?.deckId);
+      return sendDeckResult(res, result);
+    } catch (err) {
+      logPivotRouteError('GET /admin/pivot/tenants/:tenantKey/carousel-voice', err, req);
+      return res.status(500).json({ success: false, message: 'Unable to load carousel voice.' });
+    }
+  },
+);
+
+router.patch(
+  '/tenants/:tenantKey/carousel-voice',
+  verifyToken,
+  requirePlatformAdmin,
+  async (req, res) => {
+    try {
+      // The editor sends { key, value } or { keys: [...] } and knows nothing
+      // about which layer it is writing, so scope and deck ride on the query.
+      const scope = (req.query?.scope || req.body?.scope) === 'deck' ? 'deck' : 'city';
+      const result = await patchCarouselVoice(req, req.params.tenantKey, {
+        scope,
+        deckId: req.query?.deckId || req.body?.deckId,
+        key: req.body?.key,
+        value: req.body?.value,
+        reset: req.body?.keys || req.body?.reset,
+      });
+      return sendDeckResult(res, result);
+    } catch (err) {
+      logPivotRouteError('PATCH /admin/pivot/tenants/:tenantKey/carousel-voice', err, req);
+      return res.status(500).json({ success: false, message: 'Unable to save carousel voice.' });
     }
   },
 );

@@ -10,6 +10,20 @@
  * only by the type key, which is why this file can live on the server and be
  * served to the editor rather than duplicated into it.
  *
+ * Static or dynamic — the rule the whole editor hangs off:
+ *
+ *   A field carrying a `voice` key is STATIC house copy. It reads the same in
+ *   every issue ("dispatch", "meanwhile", "you, not here", the whole back
+ *   cover), it is edited only in the carousel voice panel, and it is never
+ *   typable on the slide.
+ *
+ *   Everything else is DYNAMIC — event names, venues, times, tags, the run of
+ *   show, the scene, the counterpoint, the issue number and dateline. It
+ *   changes every week and is typed directly on the slide.
+ *
+ * A slide type whose fields are all voice-keyed has nothing to edit on the
+ * slide at all. The back cover is exactly that, on purpose.
+ *
  * Field kinds:
  *   line      — one line of text, `max` characters
  *   paragraph — prose, `max` characters
@@ -38,9 +52,8 @@ const ZINE_SLIDE_TYPES = Object.freeze({
     events: { min: 0, max: 1 },
     photo: 'flier|upload',
     fields: [
-      { key: 'weekLabel', kind: 'line', max: 40, voice: 'zine.cover.week', shipped: 'week of' },
-      { key: 'scanned', kind: 'number', max: 6, voice: 'zine.cover.scanned', shipped: '' },
-      { key: 'coverLine', kind: 'line', max: 64, derived: 'coverLead' },
+      { key: 'tagline', kind: 'line', max: 52, voice: 'zine.cover.tagline', shipped: 'everything that happened while you were home' },
+            { key: 'coverLine', kind: 'line', max: 64, derived: 'coverLead' },
       { key: 'caption', kind: 'line', max: 72, optional: true },
     ],
   },

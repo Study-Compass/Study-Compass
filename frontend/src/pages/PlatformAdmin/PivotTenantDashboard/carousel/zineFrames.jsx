@@ -6,11 +6,17 @@
  * reach for no module-level constants, which is what lets a new slide type be a
  * manifest entry plus one of these components and nothing else.
  *
- * Text a person can author is wrapped in <ZineField path=…>. The frame declares
- * which slot the run belongs to and keeps rendering its resolved value; the
- * editor turns the same element typable in place. Anything not wrapped —
- * the publication's name, the derived cover line, the receipt's tally — is not
- * a slot and is deliberately not editable here.
+ * Only DYNAMIC text is wrapped in <ZineField path=…> — what changes every issue:
+ * event names, venues, times, tags, the run of show, the scene, the issue's own
+ * number and dateline. The frame declares which slot the run belongs to and the
+ * editor turns that element typable in place.
+ *
+ * STATIC house copy is rendered plainly and is deliberately not typable here.
+ * The section slugs, "meanwhile", "you, not here", the receipt footer and the
+ * whole back cover read the same in every issue, so they belong to the city's
+ * voice rather than to one deck, and they are edited in the voice panel. The
+ * manifest is the authority on which is which: a field with a `voice` key is
+ * static.
  *
  * Every frame is a fixed 4:5 box that establishes a container context, so all
  * interior geometry is expressed in `cqw` and the same markup renders
@@ -139,12 +145,10 @@ function ZineChips({ when, where, index = 0 }) {
  * caps, and no split to both trims. It reads as a section head, which is what
  * it is, rather than as a band of chrome across the top of the frame.
  */
-function ZineSlug({ label, value, className = '', labelPath, valuePath }) {
+function ZineSlug({ label, value, className = '', valuePath }) {
   return (
     <p className={`jgz-slug ${className}`}>
-      <ZineField as="span" className="jgz-slug__label" path={labelPath} max={20}>
-        {label}
-      </ZineField>
+      <span className="jgz-slug__label">{label}</span>
       <ZineField as="span" className="jgz-slug__value" path={valuePath} max={32}>
         {value}
       </ZineField>
@@ -194,7 +198,7 @@ export function ZineCover({ issue, values, events }) {
       <header className="jgz-cover__flag">
         <h2 className="jgz-cover__name">sorry u missed it</h2>
         <p className="jgz-cover__tagline">
-          <ZineField path="values.weekLabel" max={40}>{values.weekLabel}</ZineField>
+          {values.tagline}
           {' · no. '}
           <ZineField path="issue.number" max={8}>{issue.number}</ZineField>
         </p>
@@ -235,9 +239,7 @@ export function ZineSheet({ issue, values, events }) {
   return (
     <>
       <header className="jgz-sheet__head">
-        <ZineField as="h2" className="jgz-sheet__title" path="values.title" max={18}>
-          {values.title}
-        </ZineField>
+        <h2 className="jgz-sheet__title">{values.title}</h2>
         <p className="jgz-sheet__kicker">
           <ZineField path="values.kicker" max={48}>{values.kicker}</ZineField>
           {'. '}
@@ -309,7 +311,6 @@ export function ZineCard({ issue, values, events }) {
 
       <ZineSlug
         label={values.slug}
-        labelPath="values.slug"
         value={`${issue.dateline} · ${issue.city}`}
         valuePath="issue.dateline"
         className="jgz-card__slug"
@@ -347,7 +348,6 @@ export function ZineNotice({ issue, values, events, options }) {
     <>
       <ZineSlug
         label={values.slug}
-        labelPath="values.slug"
         value={issue.dateline}
         valuePath="issue.dateline"
         className="jgz-notice__slug"
@@ -356,9 +356,7 @@ export function ZineNotice({ issue, values, events, options }) {
       <figure className="jgz-notice__plate">
         <ZinePhoto src={event.cover} alt={event.title} className="jgz-notice__photo" />
         <ZineKnockout shape={shape} />
-        <ZineField as="figcaption" className="jgz-notice__cut" path="values.cut" max={24}>
-          {values.cut}
-        </ZineField>
+        <figcaption className="jgz-notice__cut">{values.cut}</figcaption>
       </figure>
 
       <div className="jgz-notice__body">
@@ -392,7 +390,6 @@ export function ZineDispatch({ issue, values, events }) {
     <>
       <ZineSlug
         label={values.slug}
-        labelPath="values.slug"
         value={issue.dateline}
         valuePath="issue.dateline"
         className="jgz-dispatch__slug"
@@ -455,9 +452,7 @@ export function ZineDispatch({ issue, values, events }) {
       </ZineField>
 
       <p className="jgz-dispatch__instead">
-        <ZineField as="span" path="values.insteadLabel" max={16}>
-          {values.insteadLabel}
-        </ZineField>
+        <span>{values.insteadLabel}</span>
         <ZineField
           as="span"
           className="jgz-dispatch__insteadText"
@@ -512,9 +507,7 @@ export function ZineReceipt({ issue, values }) {
           ))}
         </dl>
 
-        <ZineField as="p" className="jgz-receipt__footer" path="values.footer" max={48}>
-          {values.footer}
-        </ZineField>
+        <p className="jgz-receipt__footer">{values.footer}</p>
       </div>
 
       <ZineStamp label={values.stamp} tone="ink" deg={-11} className="jgz-receipt__stamp" />
@@ -536,15 +529,9 @@ export function ZineBack({ issue, values, paper }) {
           alt="just go"
           draggable={false}
         />
-        <ZineField as="p" className="jgz-back__kicker" path="values.kicker" max={44}>
-          {values.kicker}
-        </ZineField>
-        <ZineField as="h2" className="jgz-back__line" path="values.line" max={52}>
-          {values.line}
-        </ZineField>
-        <ZineField as="p" className="jgz-back__sub" path="values.sub" max={120}>
-          {values.sub}
-        </ZineField>
+        <p className="jgz-back__kicker">{values.kicker}</p>
+        <h2 className="jgz-back__line">{values.line}</h2>
+        <p className="jgz-back__sub">{values.sub}</p>
 
         {/* The badge is the only call to action: a real mark, not a tappable-looking one. */}
         <img className="jgz-back__badge" src={appStoreBadge} alt="Download on the App Store" />

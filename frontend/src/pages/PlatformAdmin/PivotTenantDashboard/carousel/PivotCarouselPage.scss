@@ -1396,3 +1396,36 @@
   font-size: 0.64rem;
   color: var(--jgz-type-soft);
 }
+
+/* --------------------------------------------------- static copy panel */
+
+.jgz-voice {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  min-width: min(64rem, 88vw);
+  max-height: 82vh;
+  overflow: auto;
+}
+
+.jgz-voice__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem 2rem;
+
+  h2 {
+    margin: 0;
+    font-size: 1.05rem;
+    color: #1a1714;
+  }
+
+  p {
+    margin: 0.3rem 0 0;
+    max-width: 46ch;
+    font-size: 0.78rem;
+    line-height: 1.5;
+    color: rgba(26, 23, 20, 0.66);
+  }
+}

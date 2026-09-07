@@ -116,9 +116,12 @@ describe('slot bindings', () => {
     expect(container.querySelector('.jgz-rowdrop')).toBeNull();
   });
 
-  test('a slot with no stored value shows its placeholder, not the default', () => {
+  test('a dynamic slot with no stored value shows its placeholder', () => {
     const entry = slides.find((s) => s.slide.type === 'card');
-    const stripped = { ...entry.slide, values: {} };
+    const stripped = {
+      ...entry.slide,
+      events: [{ ...entry.slide.events[0], values: {} }],
+    };
     const ctx = {
       editing: true,
       slide: { ...stripped, issue: ZINE_DEMO_DECK.issue },
@@ -130,5 +133,66 @@ describe('slot bindings', () => {
       </ZineEditProvider>,
     );
     expect(container.querySelector('.jgz-editable--empty')).toBeTruthy();
+  });
+});
+
+/**
+ * The rule the editor hangs off: a field carrying a `voice` key is static house
+ * copy, edited in the voice panel and never typable on the slide. This is the
+ * guard for it — the split is easy to lose one binding at a time.
+ */
+describe('static copy is not editable on the slide', () => {
+  const editable = (type, slide, props) => {
+    const ctx = {
+      editing: true,
+      slide: { ...slide, issue: ZINE_DEMO_DECK.issue },
+      onChange: () => {},
+    };
+    const Frame = FRAMES[type];
+    const { container } = render(
+      <ZineEditProvider value={ctx}>
+        <Frame {...props} />
+      </ZineEditProvider>,
+    );
+    return [...container.querySelectorAll('.jgz-editable')].map((el) =>
+      el.getAttribute('aria-label'),
+    );
+  };
+
+  test('the back cover has nothing typable at all', () => {
+    const entry = slides.find((s) => s.slide.type === 'back');
+    expect(editable('back', entry.slide, entry.resolved.props)).toEqual([]);
+  });
+
+  test('the receipt has nothing typable but the city it is addressed to', () => {
+    const entry = slides.find((s) => s.slide.type === 'receipt');
+    expect(editable('receipt', entry.slide, entry.resolved.props)).toEqual(['issue.city']);
+  });
+
+  test('no frame exposes a slot the manifest marks as voice copy', () => {
+    const VOICE_KEYS = [
+      'values.tagline', 'values.title', 'values.slug', 'values.cut',
+      'values.insteadLabel', 'values.footer', 'values.stamp',
+      'values.kicker', 'values.line', 'values.sub', 'values.url',
+    ];
+    for (const { slide, resolved } of slides) {
+      const labels = editable(slide.type, slide, resolved.props);
+      // The wall's kicker is dynamic and shares a name with the back cover's
+      // static one, so it is excluded by type rather than by key.
+      const forbidden = slide.type === 'wall'
+        ? VOICE_KEYS.filter((k) => k !== 'values.kicker')
+        : VOICE_KEYS;
+      expect(labels.filter((l) => forbidden.includes(l))).toEqual([]);
+    }
+  });
+
+  test('dynamic slots are still typable', () => {
+    const entry = slides.find((s) => s.slide.type === 'dispatch');
+    const labels = editable('dispatch', entry.slide, entry.resolved.props);
+    expect(labels).toEqual(expect.arrayContaining([
+      'events.0.snapshot.name',
+      'events.0.values.scene',
+      'events.0.values.instead',
+    ]));
   });
 });
