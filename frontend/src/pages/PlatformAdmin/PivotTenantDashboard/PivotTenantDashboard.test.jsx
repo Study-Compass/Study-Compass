@@ -46,6 +46,9 @@ jest.mock('./PivotTenantCurationPage', () => () => <div>curation-page</div>);
 jest.mock('./PivotTenantJourneysPage', () => () => <div>journeys-page</div>);
 jest.mock('./PivotTenantDropDeckPage', () => () => <div>drop-deck-page</div>);
 jest.mock('./PivotTenantCatalogPage', () => () => <div>catalog-page</div>);
+// Mocked like every other tab: its real graph reaches Popup, which imports
+// @iconify-icon as untransformed ESM and cannot be loaded under jest.
+jest.mock('./carousel/PivotCarouselPage', () => () => <div>carousel-page</div>);
 jest.mock('./PivotVoicePage', () => ({ scope, tenantKey }) => (
   <div>
     city-voice-page:{scope}:{tenantKey}

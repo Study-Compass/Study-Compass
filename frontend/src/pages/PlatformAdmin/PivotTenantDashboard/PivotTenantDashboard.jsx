@@ -96,17 +96,6 @@ function PivotTenantDashboard() {
         ),
       },
       {
-        label: 'Carousel',
-        icon: 'mdi:image-multiple-outline',
-        element: (
-          <PivotCarouselPage
-            key={tenantKey}
-            tenantKey={tenantKey}
-            cityDisplayName={cityDisplayName}
-          />
-        ),
-      },
-      {
         label: 'User journeys',
         icon: 'mdi:graph',
         element: (
@@ -180,6 +169,23 @@ function PivotTenantDashboard() {
         ),
       });
     }
+
+    /*
+     * Appended, not slotted in beside Curation where it belongs by subject.
+     * Menu position is the ?page= index, so inserting anywhere but the end
+     * renumbers every tab after it and breaks bookmarks people already hold.
+     */
+    items.push({
+      label: 'Carousel',
+      icon: 'mdi:image-multiple-outline',
+      element: (
+        <PivotCarouselPage
+          key={tenantKey}
+          tenantKey={tenantKey}
+          cityDisplayName={cityDisplayName}
+        />
+      ),
+    });
 
     return items;
   }, [tenantKey, cityDisplayName, tenant?.pivotDeckConfig, refetch]);
