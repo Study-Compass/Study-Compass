@@ -1,0 +1,60 @@
+{
+  "contractVersion": "1",
+  "jobId": "job:discovery-iowacity-001",
+  "scheduleOccurrenceId": null,
+  "kind": "city-source-discovery",
+  "cityKey": "iowacity",
+  "implementationRevision": "meridian-backend@2026.09.08",
+  "contextVersion": "ctx:iowacity.discovery.v3",
+  "snapshotAt": "2026-09-08T20:00:00.000Z",
+  "tenant": {
+    "cityKey": "iowacity",
+    "name": "Iowa City",
+    "location": "Iowa City, IA",
+    "timezone": "America/Chicago"
+  },
+  "discovery": {
+    "flow": "native-then-firecrawl",
+    "lumaSlug": "iowa-city",
+    "partifulSlug": null,
+    "runNative": true,
+    "runFirecrawl": true
+  },
+  "sources": [
+    {
+      "recordVersion": "rv:src-luma-1",
+      "host": "luma.com",
+      "url": "https://luma.com/iowa-city",
+      "label": "Luma Iowa City",
+      "provider": "luma",
+      "status": "qualified",
+      "enabled": true,
+      "seedTags": ["community"],
+      "rejectedReason": null
+    }
+  ],
+  "curationJobs": [
+    {
+      "recordVersion": "rv:job-luma-1",
+      "jobId": "507f1f77bcf86cd799439011",
+      "label": "Luma Iowa City",
+      "url": "https://luma.com/iowa-city",
+      "provider": "luma",
+      "enabled": true,
+      "defaultTags": ["community"],
+      "defaultBatchWeekStrategy": "next-drop"
+    }
+  ],
+  "organizers": [
+    {
+      "recordVersion": "rv:org-1",
+      "organizerId": "507f1f77bcf86cd799439013",
+      "normalizedName": "night owl cinema",
+      "aliases": ["Night Owl Cinema"]
+    }
+  ],
+  "providerCapabilities": {
+    "firecrawlConfigured": true,
+    "nativeProviders": ["luma", "partiful"]
+  }
+}

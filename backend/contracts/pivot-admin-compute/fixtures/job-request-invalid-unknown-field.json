@@ -1,0 +1,14 @@
+{
+  "contractVersion": "1",
+  "jobId": "job:discovery-invalid-001",
+  "scheduleOccurrenceId": null,
+  "kind": "city-source-discovery",
+  "cityKey": "iowacity",
+  "implementationRevision": "meridian-backend@2026.09.08",
+  "contextVersion": "ctx:iowacity.discovery.v3",
+  "requestedAt": "2026-09-08T20:00:00.000Z",
+  "options": {
+    "maxCandidates": 20,
+    "callbackUrl": "https://attacker.example.test/hook"
+  }
+}

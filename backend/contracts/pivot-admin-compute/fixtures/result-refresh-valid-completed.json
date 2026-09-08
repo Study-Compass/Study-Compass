@@ -1,0 +1,58 @@
+{
+  "contractVersion": "1",
+  "jobId": "job:refresh-iowacity-001",
+  "scheduleOccurrenceId": "sched:weekly-refresh@2026-09-08T06:00:00.000Z",
+  "kind": "city-curation-refresh",
+  "cityKey": "iowacity",
+  "implementationRevision": "relay-worker@2026.09.08",
+  "basedOnContextVersion": "ctx:iowacity.refresh.v7",
+  "completedAt": "2026-09-08T06:35:00.000Z",
+  "outcome": "completed",
+  "idempotencyKey": "idem:refresh-iowacity-001",
+  "proposals": {
+    "jobOutcomes": [
+      {
+        "jobId": "507f1f77bcf86cd799439011",
+        "outcome": "completed",
+        "basedOnRecordVersion": "rv:job-luma-1"
+      },
+      {
+        "jobId": "507f1f77bcf86cd799439012",
+        "outcome": "completed",
+        "basedOnRecordVersion": "rv:job-theatre-1"
+      }
+    ],
+    "events": [
+      {
+        "action": "upsert",
+        "sourceUrl": "https://luma.com/iowa-city/event-abc",
+        "batchWeek": "2026-W37",
+        "draft": {
+          "name": "Community Meetup",
+          "description": null,
+          "image": null,
+          "location": "Downtown Library",
+          "rawLocationText": null,
+          "start_time": "2026-09-10T23:00:00.000Z",
+          "end_time": null,
+          "sourceUrl": "https://luma.com/iowa-city/event-abc",
+          "hostName": "Iowa City Creators",
+          "hostProfileUrl": "https://luma.com/user/example",
+          "tags": ["community"]
+        },
+        "basedOnEventVersion": "rv:event-luma-abc",
+        "linkedJobId": "507f1f77bcf86cd799439011",
+        "evidence": {
+          "discoveredFromHost": "luma.com",
+          "provider": "luma"
+        }
+      }
+    ]
+  },
+  "summary": {
+    "jobsRun": 2,
+    "jobsFailed": 0,
+    "eventsProposed": 1,
+    "eventsRefreshed": 1
+  }
+}

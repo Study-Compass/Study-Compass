@@ -1,0 +1,348 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://justgo.lol/schemas/pivot-admin-compute/execution-result.v1.json",
+  "title": "Pivot admin compute execution result v1 (importable proposals only)",
+  "oneOf": [
+    { "$ref": "#/$defs/discoveryResult" },
+    { "$ref": "#/$defs/refreshResult" }
+  ],
+  "$defs": {
+    "resultEnvelope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contractVersion",
+        "jobId",
+        "scheduleOccurrenceId",
+        "kind",
+        "cityKey",
+        "implementationRevision",
+        "basedOnContextVersion",
+        "completedAt",
+        "outcome",
+        "idempotencyKey",
+        "proposals",
+        "summary"
+      ],
+      "properties": {
+        "contractVersion": { "const": "1" },
+        "jobId": { "type": "string", "minLength": 8, "maxLength": 128, "pattern": "^[a-zA-Z0-9:_-]+$" },
+        "scheduleOccurrenceId": {
+          "oneOf": [
+            { "type": "string", "pattern": "^sched:[a-z0-9-]+@[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9:.-]+Z$" },
+            { "type": "null" }
+          ]
+        },
+        "kind": { "enum": ["city-source-discovery", "city-curation-refresh"] },
+        "cityKey": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]{0,62}$" },
+        "implementationRevision": { "type": "string", "pattern": "^[a-zA-Z0-9@._+-]+$", "maxLength": 128 },
+        "basedOnContextVersion": { "type": "string", "pattern": "^ctx:[a-zA-Z0-9._-]+$" },
+        "completedAt": { "type": "string", "format": "date-time" },
+        "outcome": { "enum": ["completed", "failed", "cancelled"] },
+        "idempotencyKey": { "type": "string", "minLength": 8, "maxLength": 128, "pattern": "^[a-zA-Z0-9:_-]+$" },
+        "failure": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["code", "message"],
+          "properties": {
+            "code": { "type": "string", "minLength": 1, "maxLength": 64 },
+            "message": { "type": "string", "minLength": 1, "maxLength": 1000 }
+          }
+        }
+      }
+    },
+    "sourceEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "eventCount": { "type": "integer", "minimum": 0, "maximum": 10000 },
+        "indexUrl": { "type": "string", "format": "uri", "pattern": "^https://", "maxLength": 2048 },
+        "discoveredVia": { "type": "string", "maxLength": 500 }
+      }
+    },
+    "sourceProposal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["action", "host", "url", "provider", "status", "basedOnRecordVersion"],
+      "properties": {
+        "action": { "enum": ["create", "update"] },
+        "host": { "type": "string", "minLength": 1, "maxLength": 253 },
+        "url": { "type": "string", "format": "uri", "pattern": "^https://", "maxLength": 2048 },
+        "label": { "oneOf": [{ "type": "string", "maxLength": 300 }, { "type": "null" }] },
+        "provider": { "enum": ["partiful", "luma", "generic-site"] },
+        "status": { "enum": ["qualified", "rejected"] },
+        "enabled": { "type": "boolean" },
+        "seedTags": {
+          "type": "array",
+          "maxItems": 16,
+          "items": { "type": "string", "maxLength": 64 }
+        },
+        "rejectedReason": {
+          "oneOf": [
+            {
+              "enum": [
+                "no-events",
+                "below-threshold",
+                "scrape-failed",
+                "no-index-page",
+                "blocked-host"
+              ]
+            },
+            { "type": "null" }
+          ]
+        },
+        "basedOnRecordVersion": {
+          "oneOf": [
+            { "type": "string", "pattern": "^rv:[a-zA-Z0-9._-]+$" },
+            { "type": "null" }
+          ]
+        },
+        "evidence": { "$ref": "#/$defs/sourceEvidence" }
+      }
+    },
+    "curationJobProposal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["action", "label", "provider", "basedOnRecordVersion"],
+      "properties": {
+        "action": { "enum": ["create", "update"] },
+        "label": { "type": "string", "minLength": 1, "maxLength": 300 },
+        "url": { "oneOf": [{ "type": "string", "format": "uri", "pattern": "^https://", "maxLength": 2048 }, { "type": "null" }] },
+        "provider": { "enum": ["partiful", "luma", "generic-site"] },
+        "enabled": { "type": "boolean" },
+        "defaultTags": {
+          "type": "array",
+          "maxItems": 16,
+          "items": { "type": "string", "maxLength": 64 }
+        },
+        "basedOnRecordVersion": {
+          "oneOf": [
+            { "type": "string", "pattern": "^rv:[a-zA-Z0-9._-]+$" },
+            { "type": "null" }
+          ]
+        },
+        "linkedSourceHost": { "oneOf": [{ "type": "string", "maxLength": 253 }, { "type": "null" }] }
+      }
+    },
+    "eventDraft": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "sourceUrl", "start_time"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1, "maxLength": 500 },
+        "description": { "oneOf": [{ "type": "string", "maxLength": 5000 }, { "type": "null" }] },
+        "image": { "oneOf": [{ "type": "string", "format": "uri", "pattern": "^https://", "maxLength": 2048 }, { "type": "null" }] },
+        "location": { "oneOf": [{ "type": "string", "maxLength": 500 }, { "type": "null" }] },
+        "rawLocationText": { "oneOf": [{ "type": "string", "maxLength": 500 }, { "type": "null" }] },
+        "start_time": { "type": "string", "format": "date-time" },
+        "end_time": { "oneOf": [{ "type": "string", "format": "date-time" }, { "type": "null" }] },
+        "sourceUrl": { "type": "string", "format": "uri", "pattern": "^https://", "maxLength": 2048 },
+        "hostName": { "oneOf": [{ "type": "string", "maxLength": 300 }, { "type": "null" }] },
+        "hostProfileUrl": { "oneOf": [{ "type": "string", "format": "uri", "pattern": "^https://", "maxLength": 2048 }, { "type": "null" }] },
+        "tags": {
+          "type": "array",
+          "maxItems": 16,
+          "items": { "type": "string", "maxLength": 64 }
+        }
+      }
+    },
+    "eventProposal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["action", "sourceUrl", "batchWeek", "draft", "basedOnEventVersion"],
+      "properties": {
+        "action": { "const": "upsert" },
+        "sourceUrl": { "type": "string", "format": "uri", "pattern": "^https://", "maxLength": 2048 },
+        "batchWeek": { "type": "string", "pattern": "^[0-9]{4}-W[0-9]{2}$" },
+        "draft": { "$ref": "#/$defs/eventDraft" },
+        "basedOnEventVersion": {
+          "oneOf": [
+            { "type": "string", "pattern": "^rv:[a-zA-Z0-9._-]+$" },
+            { "type": "null" }
+          ]
+        },
+        "linkedJobId": { "oneOf": [{ "type": "string", "pattern": "^[0-9a-f]{24}$" }, { "type": "null" }] },
+        "evidence": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "discoveredFromHost": { "type": "string", "maxLength": 253 },
+            "provider": { "enum": ["partiful", "luma", "generic-site"] }
+          }
+        }
+      }
+    },
+    "discoveryProposals": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sources", "curationJobs", "events"],
+      "properties": {
+        "sources": {
+          "type": "array",
+          "maxItems": 100,
+          "items": { "$ref": "#/$defs/sourceProposal" }
+        },
+        "curationJobs": {
+          "type": "array",
+          "maxItems": 100,
+          "items": { "$ref": "#/$defs/curationJobProposal" }
+        },
+        "events": {
+          "type": "array",
+          "maxItems": 2000,
+          "items": { "$ref": "#/$defs/eventProposal" }
+        }
+      }
+    },
+    "discoverySummary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["searched", "qualified", "rejected", "eventsProposed"],
+      "properties": {
+        "searched": { "type": "integer", "minimum": 0, "maximum": 10000 },
+        "qualified": { "type": "integer", "minimum": 0, "maximum": 1000 },
+        "rejected": { "type": "integer", "minimum": 0, "maximum": 1000 },
+        "eventsProposed": { "type": "integer", "minimum": 0, "maximum": 10000 }
+      }
+    },
+    "jobRefreshOutcome": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["jobId", "outcome", "basedOnRecordVersion"],
+      "properties": {
+        "jobId": { "type": "string", "pattern": "^[0-9a-f]{24}$" },
+        "outcome": { "enum": ["completed", "failed", "skipped"] },
+        "basedOnRecordVersion": { "type": "string", "pattern": "^rv:[a-zA-Z0-9._-]+$" },
+        "failure": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["code", "message"],
+          "properties": {
+            "code": { "type": "string", "maxLength": 64 },
+            "message": { "type": "string", "maxLength": 1000 }
+          }
+        }
+      }
+    },
+    "refreshProposals": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["jobOutcomes", "events"],
+      "properties": {
+        "jobOutcomes": {
+          "type": "array",
+          "maxItems": 100,
+          "items": { "$ref": "#/$defs/jobRefreshOutcome" }
+        },
+        "events": {
+          "type": "array",
+          "maxItems": 5000,
+          "items": { "$ref": "#/$defs/eventProposal" }
+        }
+      }
+    },
+    "refreshSummary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["jobsRun", "jobsFailed", "eventsProposed", "eventsRefreshed"],
+      "properties": {
+        "jobsRun": { "type": "integer", "minimum": 0, "maximum": 1000 },
+        "jobsFailed": { "type": "integer", "minimum": 0, "maximum": 1000 },
+        "eventsProposed": { "type": "integer", "minimum": 0, "maximum": 10000 },
+        "eventsRefreshed": { "type": "integer", "minimum": 0, "maximum": 10000 }
+      }
+    },
+    "discoveryResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contractVersion",
+        "jobId",
+        "scheduleOccurrenceId",
+        "kind",
+        "cityKey",
+        "implementationRevision",
+        "basedOnContextVersion",
+        "completedAt",
+        "outcome",
+        "idempotencyKey",
+        "proposals",
+        "summary"
+      ],
+      "properties": {
+        "contractVersion": { "const": "1" },
+        "jobId": { "type": "string", "minLength": 8, "maxLength": 128, "pattern": "^[a-zA-Z0-9:_-]+$" },
+        "scheduleOccurrenceId": {
+          "oneOf": [
+            { "type": "string", "pattern": "^sched:[a-z0-9-]+@[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9:.-]+Z$" },
+            { "type": "null" }
+          ]
+        },
+        "kind": { "const": "city-source-discovery" },
+        "cityKey": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]{0,62}$" },
+        "implementationRevision": { "type": "string", "pattern": "^[a-zA-Z0-9@._+-]+$", "maxLength": 128 },
+        "basedOnContextVersion": { "type": "string", "pattern": "^ctx:[a-zA-Z0-9._-]+$" },
+        "completedAt": { "type": "string", "format": "date-time" },
+        "outcome": { "enum": ["completed", "failed", "cancelled"] },
+        "idempotencyKey": { "type": "string", "minLength": 8, "maxLength": 128, "pattern": "^[a-zA-Z0-9:_-]+$" },
+        "failure": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["code", "message"],
+          "properties": {
+            "code": { "type": "string", "maxLength": 64 },
+            "message": { "type": "string", "maxLength": 1000 }
+          }
+        },
+        "proposals": { "$ref": "#/$defs/discoveryProposals" },
+        "summary": { "$ref": "#/$defs/discoverySummary" }
+      }
+    },
+    "refreshResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contractVersion",
+        "jobId",
+        "scheduleOccurrenceId",
+        "kind",
+        "cityKey",
+        "implementationRevision",
+        "basedOnContextVersion",
+        "completedAt",
+        "outcome",
+        "idempotencyKey",
+        "proposals",
+        "summary"
+      ],
+      "properties": {
+        "contractVersion": { "const": "1" },
+        "jobId": { "type": "string", "minLength": 8, "maxLength": 128, "pattern": "^[a-zA-Z0-9:_-]+$" },
+        "scheduleOccurrenceId": {
+          "oneOf": [
+            { "type": "string", "pattern": "^sched:[a-z0-9-]+@[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9:.-]+Z$" },
+            { "type": "null" }
+          ]
+        },
+        "kind": { "const": "city-curation-refresh" },
+        "cityKey": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]{0,62}$" },
+        "implementationRevision": { "type": "string", "pattern": "^[a-zA-Z0-9@._+-]+$", "maxLength": 128 },
+        "basedOnContextVersion": { "type": "string", "pattern": "^ctx:[a-zA-Z0-9._-]+$" },
+        "completedAt": { "type": "string", "format": "date-time" },
+        "outcome": { "enum": ["completed", "failed", "cancelled"] },
+        "idempotencyKey": { "type": "string", "minLength": 8, "maxLength": 128, "pattern": "^[a-zA-Z0-9:_-]+$" },
+        "failure": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["code", "message"],
+          "properties": {
+            "code": { "type": "string", "maxLength": 64 },
+            "message": { "type": "string", "maxLength": 1000 }
+          }
+        },
+        "proposals": { "$ref": "#/$defs/refreshProposals" },
+        "summary": { "$ref": "#/$defs/refreshSummary" }
+      }
+    }
+  }
+}

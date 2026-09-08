@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://justgo.lol/schemas/pivot-admin-compute/worker-capability.v1.json",
+  "title": "Pivot admin compute worker capability v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contractVersion",
+    "workerId",
+    "implementationRevision",
+    "supportedContractVersions",
+    "supportedKinds",
+    "capabilities",
+    "advertisedAt"
+  ],
+  "properties": {
+    "contractVersion": { "const": "1" },
+    "workerId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9:_-]+$" },
+    "implementationRevision": { "type": "string", "pattern": "^[a-zA-Z0-9@._+-]+$", "maxLength": 128 },
+    "supportedContractVersions": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 8,
+      "items": { "const": "1" }
+    },
+    "supportedKinds": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 8,
+      "items": { "enum": ["city-source-discovery", "city-curation-refresh"] }
+    },
+    "capabilities": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["firecrawl", "nativeProviders", "executionModes"],
+      "properties": {
+        "firecrawl": { "type": "boolean" },
+        "nativeProviders": {
+          "type": "array",
+          "maxItems": 8,
+          "items": { "enum": ["luma", "partiful"] }
+        },
+        "executionModes": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 4,
+          "items": { "enum": ["artifact-only", "direct-database-dev"] }
+        }
+      }
+    },
+    "advertisedAt": { "type": "string", "format": "date-time" }
+  }
+}

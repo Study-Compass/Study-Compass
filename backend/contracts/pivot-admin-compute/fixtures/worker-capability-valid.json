@@ -1,0 +1,13 @@
+{
+  "contractVersion": "1",
+  "workerId": "relay-mini-1",
+  "implementationRevision": "relay-worker@2026.09.08",
+  "supportedContractVersions": ["1"],
+  "supportedKinds": ["city-source-discovery", "city-curation-refresh"],
+  "capabilities": {
+    "firecrawl": true,
+    "nativeProviders": ["luma", "partiful"],
+    "executionModes": ["artifact-only", "direct-database-dev"]
+  },
+  "advertisedAt": "2026-09-08T05:55:00.000Z"
+}
