@@ -5,10 +5,7 @@ const { resolvePivotTenant } = require('./pivotIngestPublishService');
 const { GENERIC_SITE_PROVIDER } = require('./pivotIngestPreviewService');
 const { isSiteScrapeConfigured } = require('./pivotSiteScrapeService');
 const {
-  executeCurationRun,
   resolveRunBatchWeek,
-  summarizeIngest,
-  emptyStats,
 } = require('./pivotCurationRunService');
 const {
   createDiscoveryRun,
@@ -19,6 +16,7 @@ const {
 } = require('./pivotDiscoveryRunRecorder');
 const { createRunGuard, runPool } = require('./pivotRunGuard');
 const { logPivot } = require('../utilities/pivotLogger');
+const { createDatabaseCurationRefreshSinks } = require('./pivotCurationRefreshSinks');
 
 /**
  * Run every curation job for a city as one narrated unit.
@@ -186,154 +184,31 @@ async function startCurationBatch(req, options = {}) {
 }
 
 /**
- * Crawl one job under batch control.
- *
- * Delegates to `executeCurationRun` and then reads the record back, so the batch
- * learns the outcome from the same document the per-job UI shows. Nothing about
- * how a job crawls is duplicated here.
+ * Crawl one job under batch control through the injected sink.
  */
-async function runOneJob(ctx, job) {
-  const { req, recorder, guard, tenantKey, batchWeek, forceBatchWeek, batchRunId } = ctx;
-  const { PivotCurationRun, PivotCurationJob } = getGlobalModels(
-    req,
-    'PivotCurationRun',
-    'PivotCurationJob',
-  );
-
-  const label = job.label || job.url || String(job._id);
-
-  recorder.step({
-    phase: 'crawling',
-    kind: 'job-start',
-    tone: 'info',
-    title: `Crawling ${label}`,
-    detail: job.defaultTags?.length ? `Tagged ${job.defaultTags.join(', ')}` : null,
-    url: job.url || null,
-  });
-
-  let runDoc;
-  try {
-    runDoc = await PivotCurationRun.create({
-      tenantKey,
-      jobId: job._id,
-      parentBatchId: batchRunId,
-      batchWeek,
-      forceBatchWeek,
-      status: 'queued',
-      maxEvents: null,
-      provider: job.provider,
-      url: job.url,
-      createdBy: ctx.actor,
-      stats: emptyStats(
-        forceBatchWeek
-          ? `All events forced into ${batchWeek}.`
-          : 'Events assigned to the ISO week of their start date.',
-      ),
-      failures: [],
-      events: [],
-    });
-
-    await PivotCurationJob.findByIdAndUpdate(job._id, {
-      $set: {
-        lastRunAt: new Date(),
-        lastRunStatus: 'queued',
-        lastRunStats: emptyStats(),
-        lastRunEvents: [],
-      },
-    });
-  } catch (err) {
-    guard.noteFailure({ code: 'RUN_CREATE_FAILED', error: err.message });
-    recorder.bumpCounters({ jobsFailed: 1 });
-    recorder.step({
-      phase: 'crawling',
-      kind: 'job-done',
-      tone: 'warn',
-      title: `Could not queue ${label}`,
-      detail: err.message,
-    });
-    return { failed: true };
-  }
-
-  await executeCurationRun(runDoc._id);
-
-  const finished = await PivotCurationRun.findById(runDoc._id).lean();
-  const stats = finished?.stats || {};
-  const summary = summarizeIngest(stats);
-  const { written: upserted, skipped, failed } = summary;
-
-  recorder.bumpCounters({
-    jobsRun: 1,
-    eventsUpserted: upserted,
-    eventsSkipped: skipped,
-    eventsFailed: failed,
-    eventsUpdated: summary.refreshed,
-    eventsUpdatedByFingerprint: summary.updatedByFingerprint,
-    scrapes: 1,
-  });
-
-  if (finished?.status === 'failed') {
-    // The per-job path already recorded the reason; the batch only needs to know
-    // whether it should keep going.
-    guard.noteFailure({ code: finished.errorCode, error: finished.error });
-    recorder.bumpCounters({ jobsFailed: 1 });
-    const stopping = guard.shouldStop();
-    recorder.step({
-      phase: 'crawling',
-      kind: 'job-done',
-      tone: stopping ? 'bad' : 'warn',
-      title: `${label} failed`,
-      detail: finished.error || 'Crawl failed.',
-      code: finished.errorCode || null,
-      url: job.url || null,
-    });
-    return { failed: true };
-  }
-
-  guard.noteSuccess();
-
-  const weeks = Object.keys(stats.byBatchWeek || {}).sort();
-  const detailParts = [];
-  if (weeks.length > 1) detailParts.push(`across ${weeks.length} weeks (${weeks.join(', ')})`);
-  else if (weeks.length === 1) detailParts.push(`into ${weeks[0]}`);
-  if (skipped) detailParts.push(`${skipped} already on the calendar`);
-  if (failed) detailParts.push(`${failed} could not be added`);
-
-  recorder.step({
-    phase: 'crawling',
-    kind: 'job-done',
-    tone: upserted > 0 ? 'good' : 'warn',
-    title: `${label} — ${summary.phrase}`,
-    detail: detailParts.length ? detailParts.join(' · ') : null,
-    url: job.url || null,
-    eventCount: summary.added,
-  });
-
-  return { upserted, skipped, failed, added: summary.added };
+async function runOneJob(ctx, job, sinks) {
+  return sinks.runJob(ctx, job);
 }
 
 /**
- * Run the batch. Assumes the recorder already exists so the caller could return
- * its id before any crawling started.
+ * Shared batch execution core. Database and artifact-only callers compose
+ * different sinks over the same scheduling and narration pipeline.
  */
-async function executeCurationBatch(options = {}) {
+async function executeCurationBatchCore(req, options = {}, sinks) {
   const tenantKey = trimString(options.tenantKey);
   const recorder = options.recorder;
   const guard = createRunGuard({ recorder, getPhase: () => 'crawling' });
 
-  const [globalDb, db] = await Promise.all([
-    connectToGlobalDatabase(),
-    connectToDatabase(tenantKey),
-  ]);
-  const req = {
-    globalDb,
-    db,
-    school: tenantKey,
-    user: options.actor ? { email: options.actor } : {},
-  };
-
-  const selected = await selectBatchJobs(req, { tenantKey, jobIds: options.jobIds });
-  const { jobs, skippedGenericSite } = jobsReadyForScrapeConfig(selected);
-  const skipped = skippedGenericSite || options.skippedGenericSite || 0;
+  let jobs;
+  let skipped = options.skippedGenericSite || 0;
+  if (Array.isArray(options.jobs)) {
+    jobs = options.jobs;
+  } else {
+    const selected = await selectBatchJobs(req, { tenantKey, jobIds: options.jobIds });
+    const ready = jobsReadyForScrapeConfig(selected);
+    jobs = ready.jobs;
+    skipped = ready.skippedGenericSite || skipped;
+  }
 
   recorder.step({
     phase: 'planning',
@@ -361,7 +236,7 @@ async function executeCurationBatch(options = {}) {
       detail: 'No enabled, crawlable jobs remained by the time the batch started',
     });
     await recorder.finish({ status: 'completed' });
-    return { jobsRun: 0, events: { upserted: 0, skipped: 0, failed: 0 } };
+    return { jobsRun: 0, events: { upserted: 0, skipped: 0, failed: 0, added: 0, refreshed: 0 } };
   }
 
   recorder.setPhase('crawling');
@@ -375,12 +250,14 @@ async function executeCurationBatch(options = {}) {
     forceBatchWeek: Boolean(options.forceBatchWeek),
     batchRunId: recorder.runId,
     actor: options.actor || null,
+    previewIngestUrl: options.previewIngestUrl,
+    timezone: options.timezone,
   };
 
   const results = await runPool(
     jobs,
     BATCH_CONCURRENCY,
-    (job) => runOneJob(ctx, job),
+    (job) => runOneJob(ctx, job, sinks),
     guard.shouldStop,
   );
 
@@ -390,11 +267,13 @@ async function executeCurationBatch(options = {}) {
       acc.added += row?.added || 0;
       acc.skipped += row?.skipped || 0;
       acc.failed += row?.failed || 0;
+      acc.refreshed += row?.refreshed || 0;
       return acc;
     },
-    { upserted: 0, added: 0, skipped: 0, failed: 0 },
+    { upserted: 0, added: 0, skipped: 0, failed: 0, refreshed: 0 },
   );
   const jobsRun = results.filter((row) => row && !row.failed).length;
+  const jobsFailed = results.filter((row) => row?.failed).length;
 
   if (guard.aborted) {
     recorder.step({
@@ -416,8 +295,8 @@ async function executeCurationBatch(options = {}) {
       ? `Done — ${totals.added} new event(s) from ${jobsRun} source(s)`
       : `Done — nothing new from ${jobsRun} source(s)`,
     detail: [
-      totals.upserted - totals.added > 0
-        ? `${totals.upserted - totals.added} existing event(s) refreshed`
+      totals.refreshed > totals.added
+        ? `${totals.refreshed - totals.added} existing event(s) refreshed`
         : null,
       missed > 0 ? `${missed} source(s) did not complete` : null,
     ]
@@ -430,7 +309,31 @@ async function executeCurationBatch(options = {}) {
     aborted: guard.aborted || undefined,
   });
 
-  return { jobsRun, events: totals, aborted: guard.aborted };
+  return {
+    jobsRun,
+    jobsFailed,
+    events: totals,
+    aborted: guard.aborted,
+  };
+}
+
+async function executeCurationBatch(options = {}) {
+  const tenantKey = trimString(options.tenantKey);
+  const recorder = options.recorder;
+
+  const [globalDb, db] = await Promise.all([
+    connectToGlobalDatabase(),
+    connectToDatabase(tenantKey),
+  ]);
+  const req = {
+    globalDb,
+    db,
+    school: tenantKey,
+    user: options.actor ? { email: options.actor } : {},
+  };
+
+  const sinks = options.sinks || createDatabaseCurationRefreshSinks();
+  return executeCurationBatchCore(req, options, sinks);
 }
 
 function scheduleCurationBatch(options = {}) {
@@ -494,9 +397,11 @@ async function getLatestCurationBatch(req, options = {}) {
 module.exports = {
   startCurationBatch,
   executeCurationBatch,
+  executeCurationBatchCore,
   scheduleCurationBatch,
   selectBatchJobs,
   getCurationBatch,
   getLatestCurationBatch,
+  isCrawlable,
   BATCH_CONCURRENCY,
 };
