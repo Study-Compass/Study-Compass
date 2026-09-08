@@ -59,7 +59,7 @@ describe('emptySlideOf', () => {
   });
 
   test('applies declared option defaults', () => {
-    expect(emptySlideOf('notice').options).toEqual({ knockoutShape: 0 });
+    expect(emptySlideOf('notice').options).toMatchObject({ knockoutShape: 0 });
   });
 
   test('returns null for an unknown type', () => {
@@ -123,7 +123,7 @@ describe('coerceSlide', () => {
 
   test('falls back to the default for an out-of-range enum', () => {
     expect(coerceSlide({ type: 'notice', options: { knockoutShape: 9 } }).slide.options)
-      .toEqual({ knockoutShape: 0 });
+      .toMatchObject({ knockoutShape: 0 });
   });
 
   test('keeps eventId as provenance without reading it back', () => {

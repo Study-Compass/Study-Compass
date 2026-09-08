@@ -604,6 +604,35 @@ describe('text over the photo', () => {
     expect(html).toContain(`jgz-cover__body jgz-tone--${tone}`);
   });
 
+  test.each(['light', 'dark'])('%s marks the notice caption, which sits on the picture', (tone) => {
+    const notice = slides.find((s) => s.slide.type === 'notice');
+    const Frame = FRAMES.notice;
+    const { container } = render(
+      <Frame {...notice.resolved.props} options={{ ...notice.resolved.props.options, photoText: tone }} />,
+    );
+    expect(container.querySelector(`.jgz-notice__cut.jgz-tone--${tone}`)).toBeTruthy();
+  });
+
+  test('the notice renders with no options at all', () => {
+    const notice = slides.find((s) => s.slide.type === 'notice');
+    const Frame = FRAMES.notice;
+    const complaints = withStrictConsole(() => {
+      render(<Frame {...notice.resolved.props} options={undefined} />);
+    });
+    expect(complaints).toEqual([]);
+  });
+
+  test('every frame with type on a photograph offers the control', () => {
+    // The dispatch's thumb carries no type, and the wall's postings put their
+    // text on a plate — so neither needs one.
+    const withTypeOnPhoto = ['cover', 'card', 'notice'];
+    for (const type of withTypeOnPhoto) {
+      const entry = slides.find((s) => s.slide.type === type);
+      const html = classesFor(entry, { photoText: 'light' });
+      expect(html).toContain('jgz-tone--light');
+    }
+  });
+
   test.each(['light', 'dark'])('%s marks the card’s scrim and slug', (tone) => {
     const html = classesFor(card, { photoText: tone });
     expect(html).toContain(`jgz-card__scrim jgz-tone--${tone}`);

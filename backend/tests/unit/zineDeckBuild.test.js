@@ -69,7 +69,9 @@ describe('building a deck from empty', () => {
     const wall = addSlide(emptyDeck(), 'wall', 0).slides[1];
     expect(wall.events).toHaveLength(3);
     const notice = addSlide(emptyDeck(), 'notice', 0).slides[1];
-    expect(notice.options).toEqual({ knockoutShape: 0 });
+    // The key, not the whole set: a type gains options over time and this
+    // assertion is about defaults being applied, not about how many there are.
+    expect(notice.options).toMatchObject({ knockoutShape: 0 });
   });
 
   test('a slot edit writes through a dotted path without touching its siblings', () => {
