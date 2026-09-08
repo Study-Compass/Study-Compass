@@ -54,6 +54,17 @@ const ZINE_SLIDE_TYPES = Object.freeze({
     photo: 'flier|upload',
     options: [
       { key: 'stamp', kind: 'boolean', default: true, label: 'missed stamp' },
+      /*
+       * Type sitting directly on a photograph. `auto` follows the edition —
+       * light on night, dark on newsprint — which is right until a picture is
+       * unusually bright or dark in the corner the type lands in. Setting it
+       * also flips the scrim, because light type over a pale wash is not a
+       * choice anyone means to make.
+       */
+      { key: 'photoText', kind: 'enum', values: ['auto', 'light', 'dark'], default: 'auto', label: 'text over photo' },
+      // The line naming what the cover photograph is. Off when the picture is
+      // doing the work on its own and does not want a label.
+      { key: 'photoCredit', kind: 'boolean', default: true, label: 'name the photo' },
     ],
     fields: [
       { key: 'name', kind: 'line', max: 32, voice: 'zine.cover.name', shipped: 'sorry u missed it' },
@@ -64,7 +75,35 @@ const ZINE_SLIDE_TYPES = Object.freeze({
        * dynamic slot: type over it and the deck keeps what you typed.
        */
       { key: 'coverLine', kind: 'line', max: 72, optional: true, derived: 'coverLead' },
-      { key: 'caption', kind: 'line', max: 72, optional: true },
+      /*
+       * The line under the cover line: the curation claim, in numbers. A
+       * template rather than a string, because the figures come from the deck
+       * and only the wording around them is anyone's to choose.
+       *
+       * Two of them, because a deck that has not recorded how many listings it
+       * read cannot say it read them. One key with an ICU select would spare a
+       * row in the panel and cost anyone editing it a fight with the syntax.
+       */
+      {
+        key: 'sub',
+        kind: 'template',
+        max: 160,
+        voice: 'zine.cover.sub',
+        params: ['scanned', 'kept'],
+        // The editor previews a template against these, so it shows a sentence
+        // rather than a row of empty braces.
+        sampleArgs: { scanned: '214', kept: '6' },
+        shipped: 'we read {scanned} listings this week and kept {kept}. you made none of them.',
+      },
+      {
+        key: 'subUncounted',
+        kind: 'template',
+        max: 160,
+        voice: 'zine.cover.subUncounted',
+        params: ['kept'],
+        sampleArgs: { kept: '6' },
+        shipped: 'we kept {kept} of everything on this week. you made none of them.',
+      },
     ],
   },
 
@@ -97,6 +136,14 @@ const ZINE_SLIDE_TYPES = Object.freeze({
     photo: 'flier|upload',
     options: [
       { key: 'stamp', kind: 'boolean', default: true, label: 'missed stamp' },
+      /*
+       * Type sitting directly on a photograph. `auto` follows the edition —
+       * light on night, dark on newsprint — which is right until a picture is
+       * unusually bright or dark in the corner the type lands in. Setting it
+       * also flips the scrim, because light type over a pale wash is not a
+       * choice anyone means to make.
+       */
+      { key: 'photoText', kind: 'enum', values: ['auto', 'light', 'dark'], default: 'auto', label: 'text over photo' },
     ],
     fields: [
       { key: 'slug', kind: 'line', max: 20, voice: 'zine.card.slug', shipped: 'last night' },
@@ -207,6 +254,11 @@ function zineVoiceKeys() {
         field: field.key,
         max: field.max,
         shipped: field.shipped ?? '',
+        // A template's params drive the editor's interpolator affordance and
+        // its preview; a plain string has none.
+        kind: field.kind === 'template' ? 'template' : 'string',
+        params: field.params || [],
+        sampleArgs: field.sampleArgs || undefined,
       });
     }
   }

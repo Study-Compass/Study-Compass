@@ -825,7 +825,7 @@ router.post('/get-user-by-username', verifyToken, async (req, res) => {
 // Register push notification token
 router.post('/register-push-token', verifyToken, async (req, res) => {
     const { User } = getModels(req, 'User');
-    const { pushToken, appEdition } = req.body;
+    const { pushToken, appEdition, appProduct } = req.body;
     
     try {
         if (!pushToken) {
@@ -845,14 +845,22 @@ router.post('/register-push-token', verifyToken, async (req, res) => {
 
         user.pushToken = pushToken;
         user.pushAppEdition = appEdition === 'pivot' ? 'pivot' : 'campus';
+        // X-App-Product is already sent by released mobile builds; accept the
+        // body too so registration remains explicit and easy to test.
+        const requestedProduct = String(
+            appProduct || req.headers?.['x-app-product'] || ''
+        ).toLowerCase();
+        user.pushAppProduct = requestedProduct === 'justgo' ? 'justgo' : 'campus';
+        user.pushTokenUpdatedAt = new Date();
         await user.save();
 
-        console.log(`POST: /register-push-token ${req.user.userId} successful (edition=${user.pushAppEdition})`);
+        console.log(`POST: /register-push-token ${req.user.userId} successful (edition=${user.pushAppEdition}, product=${user.pushAppProduct})`);
         return res.status(200).json({
             success: true,
             message: 'Push token registered successfully',
             data: {
                 appEdition: user.pushAppEdition,
+                appProduct: user.pushAppProduct,
             },
         });
     } catch (error) {

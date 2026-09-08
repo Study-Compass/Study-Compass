@@ -12,6 +12,7 @@ const {
   resolveEventEarliestStart,
   resolveEventLatestEnd,
 } = require('../utilities/pivotTimeSlots');
+const { scoreEventSimilarity } = require('../utilities/pivotEventSimilarityUtils');
 
 const INGEST_RANK = Object.freeze({
   published: 3,
@@ -35,6 +36,98 @@ function pickRicherText(left, right) {
   if (!a) return b || '';
   if (!b) return a;
   return b.length > a.length ? b : a;
+}
+
+/*
+ * Distinctness thresholds for the manual path only.
+ *
+ * Ingest refuses to merge things it is not sure about, because nobody is
+ * watching. A person selecting rows has looked at them, so nothing here blocks
+ * — these decide what to say out loud before the work is done. Rolling two
+ * unrelated listings together is allowed; it just should not be silent.
+ */
+const DISTINCT = Object.freeze({
+  title: 0.45,
+  venue: 0.4,
+  spanDays: 14,
+});
+
+const MS_PER_DAY = 86_400_000;
+
+/*
+ * Two levels, and the difference matters.
+ *
+ * `warning` is the one that was asked for: these listings do not look like the
+ * same thing. It is still allowed — a person may know better than a similarity
+ * score — but it has to be acknowledged, so nobody rolls two unrelated events
+ * together without being told.
+ *
+ * `notice` is everything else worth saying and nothing to argue with. Spanning
+ * catalog weeks is a supported roll-up, not a mistake, and warning about it
+ * would only train people to click through warnings.
+ */
+function warn(code, message) {
+  return { code, level: 'warning', message };
+}
+
+function notice(code, message) {
+  return { code, level: 'notice', message };
+}
+
+/** What is odd about this collapse, in the order a person would notice it. */
+function collapseWarnings(survivor, absorbed, slots) {
+  const warnings = [];
+
+  for (const event of absorbed) {
+    const scored = scoreEventSimilarity(survivor, event);
+    if (scored.title < DISTINCT.title) {
+      warnings.push(warn(
+        'distinct-title',
+        `“${event.name}” does not read like the same listing as “${survivor.name}”.`,
+      ));
+    }
+    if (
+      trimString(event.location)
+      && trimString(survivor.location)
+      && scored.venue < DISTINCT.venue
+    ) {
+      warnings.push(warn(
+        'distinct-venue',
+        `“${event.name}” is at ${event.location}, not ${survivor.location}.`,
+      ));
+    }
+  }
+
+  const weeks = new Set(
+    [survivor, ...absorbed]
+      .map((event) => event.customFields?.pivot?.batchWeek)
+      .filter(Boolean),
+  );
+  if (weeks.size > 1) {
+    warnings.push(notice(
+      'mixed-weeks',
+      `These span ${weeks.size} catalog weeks; the roll-up will sit in the earliest.`,
+    ));
+  }
+
+  if (slots.length < 2) {
+    warnings.push(notice(
+      'single-showtime',
+      'These start at the same minute, so the result has one showtime — this is a merge, not a roll-up.',
+    ));
+  }
+
+  if (slots.length >= 2) {
+    const span = (slots[slots.length - 1].start_time - slots[0].start_time) / MS_PER_DAY;
+    if (span > DISTINCT.spanDays) {
+      warnings.push(notice(
+        'wide-span',
+        `The showtimes span ${Math.round(span)} days.`,
+      ));
+    }
+  }
+
+  return warnings;
 }
 
 function normalizeEventIds(raw) {
@@ -111,6 +204,100 @@ function serializeStoredSlots(slots) {
   }));
 }
 
+/**
+ * Everything the collapse will produce, computed without writing anything.
+ *
+ * Preview renders this and execute applies it, so the two cannot describe
+ * different outcomes — the whole point of showing someone a result before they
+ * agree to it is that the result is the one they get.
+ */
+function planCollapse(events, keepEventId) {
+  const survivor = pickSurvivorEvent(events, keepEventId);
+  const absorbed = events.filter((event) => String(event._id) !== String(survivor._id));
+  const slots = unionPivotTimeSlots(...events.map((event) => slotsFromCatalogEvent(event)));
+
+  const pivot = { ...(survivor.customFields?.pivot || {}) };
+  const host = { ...(pivot.host || {}) };
+  host.name = events.reduce(
+    (best, event) => pickRicherText(best, event.customFields?.pivot?.host?.name),
+    host.name,
+  );
+  host.imageUrl = host.imageUrl
+    || events.find((event) => event.customFields?.pivot?.host?.imageUrl)?.customFields.pivot.host.imageUrl;
+  host.profileUrl = host.profileUrl
+    || events.find((event) => event.customFields?.pivot?.host?.profileUrl)?.customFields.pivot.host.profileUrl;
+  host.identities = unionHostIdentities(
+    ...events.map((event) => event.customFields?.pivot?.host?.identities),
+  );
+  const organizerIds = uniqueOrganizerIds(
+    ...events.map((event) => event.customFields?.pivot?.host?.organizerIds),
+  );
+  if (organizerIds.length) host.organizerIds = organizerIds;
+
+  // The roll-up sits in the week of whichever night came first.
+  const earliestEvent = [...events].sort((left, right) => {
+    const leftStart = left.start_time ? new Date(left.start_time).getTime() : Infinity;
+    const rightStart = right.start_time ? new Date(right.start_time).getTime() : Infinity;
+    return leftStart - rightStart;
+  })[0];
+
+  pivot.host = host;
+  pivot.batchWeek = earliestEvent?.customFields?.pivot?.batchWeek || pivot.batchWeek;
+  pivot.timeSlots = serializeStoredSlots(slots);
+  pivot.tags = [...new Set(events.flatMap((event) => event.customFields?.pivot?.tags || []))];
+  pivot.duplicateRollup = {
+    kind: 'showtime',
+    count: events.length,
+    collapsedEventIds: absorbed.map((event) => String(event._id)),
+  };
+
+  return {
+    survivor,
+    absorbed,
+    slots,
+    pivot,
+    name: survivor.name,
+    start_time: resolveEventEarliestStart({ timeSlots: slots }, survivor.start_time) || survivor.start_time,
+    end_time: resolveEventLatestEnd({ timeSlots: slots }, survivor.end_time) || survivor.end_time,
+    description: events.reduce((best, event) => pickRicherText(best, event.description), ''),
+    location: events.reduce((best, event) => pickRicherText(best, event.location), ''),
+    image: survivor.image || events.find((event) => event.image)?.image || null,
+    warnings: collapseWarnings(survivor, absorbed, slots),
+  };
+}
+
+/** The plan as the review screen needs it: no documents, just the outcome. */
+function serializePlan(plan, intentCounts) {
+  return {
+    survivor: {
+      _id: String(plan.survivor._id),
+      name: plan.survivor.name,
+      ingestStatus: plan.survivor.customFields?.pivot?.ingestStatus || null,
+    },
+    absorbed: plan.absorbed.map((event) => ({
+      _id: String(event._id),
+      name: event.name,
+      start_time: event.start_time,
+      location: event.location || '',
+    })),
+    result: {
+      name: plan.name,
+      start_time: plan.start_time,
+      end_time: plan.end_time,
+      location: plan.location,
+      description: plan.description,
+      image: plan.image,
+      tags: plan.pivot.tags || [],
+      host: plan.pivot.host?.name || '',
+      batchWeek: plan.pivot.batchWeek || null,
+      showtimes: serializeStoredSlots(plan.slots),
+    },
+    warnings: plan.warnings,
+    deletes: plan.absorbed.length,
+    ...(intentCounts ? { intents: intentCounts } : {}),
+  };
+}
+
 async function migrateAbsorbedIntents(PivotEventIntent, survivorId, absorbed, slotIdByEventId) {
   if (!PivotEventIntent) return { migrated: 0, merged: 0 };
 
@@ -156,7 +343,7 @@ async function migrateAbsorbedIntents(PivotEventIntent, survivorId, absorbed, sl
  * Fold selected catalog rows into one event with `customFields.pivot.timeSlots`.
  * Extra rows are deleted after intents are pointed at the survivor.
  */
-async function collapseCatalogEventsToShowtimes(req, options = {}) {
+async function loadSelection(req, options) {
   const idsResult = normalizeEventIds(options.eventIds);
   if (idsResult.error) return idsResult;
 
@@ -166,9 +353,8 @@ async function collapseCatalogEventsToShowtimes(req, options = {}) {
   const tenantKey = tenantResult.tenant.tenantKey;
   const db = await connectToDatabase(tenantKey);
   const models = getModels({ db }, 'Event', 'PivotEventIntent');
-  const { Event, PivotEventIntent } = models;
 
-  const events = await Event.find({
+  const events = await models.Event.find({
     _id: { $in: idsResult.eventIds },
     'customFields.pivot': { $exists: true },
     isDeleted: { $ne: true },
@@ -182,60 +368,78 @@ async function collapseCatalogEventsToShowtimes(req, options = {}) {
     };
   }
 
-  const survivor = pickSurvivorEvent(events, options.keepEventId);
-  const absorbed = events.filter((event) => String(event._id) !== String(survivor._id));
-  const slots = unionPivotTimeSlots(...events.map((event) => slotsFromCatalogEvent(event)));
+  return { models, events };
+}
 
-  if (slots.length < 2) {
+/**
+ * Show what a collapse would do. Reads only — nothing here writes, so a person
+ * can look at the outcome, change the survivor, and look again.
+ */
+async function previewCatalogShowtimeCollapse(req, options = {}) {
+  const loaded = await loadSelection(req, options);
+  if (loaded.error) return loaded;
+
+  const plan = planCollapse(loaded.events, options.keepEventId);
+  const absorbedIds = plan.absorbed.map((event) => event._id);
+  const intentCount = loaded.models.PivotEventIntent
+    ? await loaded.models.PivotEventIntent.countDocuments({ eventId: { $in: absorbedIds } })
+    : 0;
+
+  return {
+    data: {
+      ...serializePlan(plan),
+      intents: { toMigrate: intentCount },
+      // Every event, so the review screen can offer any of them as survivor.
+      candidates: loaded.events.map((event) => ({
+        _id: String(event._id),
+        name: event.name,
+        start_time: event.start_time,
+        location: event.location || '',
+        ingestStatus: event.customFields?.pivot?.ingestStatus || null,
+        showtimes: slotsFromCatalogEvent(event).length,
+      })),
+    },
+  };
+}
+
+async function collapseCatalogEventsToShowtimes(req, options = {}) {
+  const loaded = await loadSelection(req, options);
+  if (loaded.error) return loaded;
+
+  const { models, events } = loaded;
+  const { Event, PivotEventIntent } = models;
+
+  const plan = planCollapse(events, options.keepEventId);
+  const { survivor, absorbed, slots, pivot } = plan;
+
+  /*
+   * Warnings do not block, but they must be seen. The caller says which ones it
+   * was shown; anything raised since is a plan that changed after review, and
+   * that is worth stopping for rather than applying silently.
+   */
+  const acknowledged = new Set(
+    Array.isArray(options.acknowledgedWarnings) ? options.acknowledgedWarnings : [],
+  );
+  const unacknowledged = plan.warnings.filter(
+    (entry) => entry.level === 'warning' && !acknowledged.has(entry.code),
+  );
+  if (unacknowledged.length) {
     return {
-      error: 'Those events share the same start time, so they cannot become showtimes. Delete the extra copy instead.',
-      status: 400,
-      code: 'NEED_DISTINCT_TIMES',
+      error: 'Review the warnings on this roll-up before applying it.',
+      status: 409,
+      code: 'WARNINGS_NOT_ACKNOWLEDGED',
+      data: { ...serializePlan(plan), unacknowledged },
     };
   }
-
-  const pivot = { ...(survivor.customFields?.pivot || {}) };
-  const host = { ...(pivot.host || {}) };
-  host.name = events.reduce((best, event) => pickRicherText(best, event.customFields?.pivot?.host?.name), host.name);
-  host.imageUrl =
-    host.imageUrl || events.find((event) => event.customFields?.pivot?.host?.imageUrl)?.customFields.pivot.host.imageUrl;
-  host.profileUrl =
-    host.profileUrl ||
-    events.find((event) => event.customFields?.pivot?.host?.profileUrl)?.customFields.pivot.host.profileUrl;
-  host.identities = unionHostIdentities(
-    ...events.map((event) => event.customFields?.pivot?.host?.identities),
-  );
-  const organizerIds = uniqueOrganizerIds(
-    ...events.map((event) => event.customFields?.pivot?.host?.organizerIds),
-  );
-  if (organizerIds.length) host.organizerIds = organizerIds;
-
-  const earliest = resolveEventEarliestStart({ timeSlots: slots }, survivor.start_time);
-  const latest = resolveEventLatestEnd({ timeSlots: slots }, survivor.end_time);
-  const earliestEvent = [...events].sort((left, right) => {
-    const leftStart = left.start_time ? new Date(left.start_time).getTime() : Infinity;
-    const rightStart = right.start_time ? new Date(right.start_time).getTime() : Infinity;
-    return leftStart - rightStart;
-  })[0];
-  pivot.host = host;
-  pivot.batchWeek = earliestEvent?.customFields?.pivot?.batchWeek || pivot.batchWeek;
-  pivot.timeSlots = serializeStoredSlots(slots);
-  pivot.tags = [...new Set(events.flatMap((event) => event.customFields?.pivot?.tags || []))];
-  pivot.duplicateRollup = {
-    kind: 'showtime',
-    count: events.length,
-    collapsedEventIds: absorbed.map((event) => String(event._id)),
-  };
-
   const updated = await Event.findByIdAndUpdate(
     survivor._id,
     {
       $set: {
-        start_time: earliest || survivor.start_time,
-        end_time: latest || survivor.end_time,
-        description: events.reduce((best, event) => pickRicherText(best, event.description), ''),
-        location: events.reduce((best, event) => pickRicherText(best, event.location), ''),
-        image: survivor.image || events.find((event) => event.image)?.image || null,
+        start_time: plan.start_time,
+        end_time: plan.end_time,
+        description: plan.description,
+        location: plan.location,
+        image: plan.image,
         'customFields.pivot': pivot,
       },
     },
@@ -268,6 +472,9 @@ async function collapseCatalogEventsToShowtimes(req, options = {}) {
 }
 
 module.exports = {
+  previewCatalogShowtimeCollapse,
+  planCollapse,
+  collapseWarnings,
   collapseCatalogEventsToShowtimes,
   pickSurvivorEvent,
   slotsFromCatalogEvent,

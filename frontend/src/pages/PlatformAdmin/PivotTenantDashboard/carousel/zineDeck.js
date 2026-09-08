@@ -12,6 +12,7 @@
  *   - `asset:` tokens: the reference deck's bundled photographs
  */
 
+import { formatPivotCopyTemplate } from '../pivotCopyFormat';
 import canopy from '../../../../assets/pivot/pivot-hero-canopy.webp';
 import coast from '../../../../assets/pivot/pivot-hero-coast.jpg';
 import court from '../../../../assets/pivot/pivot-hero-court.jpg';
@@ -96,23 +97,44 @@ function resolveEvent(entry, index) {
   };
 }
 
+/*
+ * Shipped defaults for the cover's sub-line, used when no manifest is on hand —
+ * the reference deck renders without one. The manifest is the authority when it
+ * is available; these only stop the preview from showing an empty line.
+ */
+const COVER_SUB_FALLBACK = 'we read {scanned} listings this week and kept {kept}. you made none of them.';
+const COVER_SUB_UNCOUNTED_FALLBACK = 'we kept {kept} of everything on this week. you made none of them.';
+
 /**
  * The cover line is derived, not written: change the week's slides and the
  * cover rewrites itself. It leads on the curation — what was read, what was
  * kept — and leaves the publication's own name to the flag.
+ *
+ * The sub-line is a voice template. The figures come from the deck and only the
+ * wording around them is anyone's to choose, so the numbers are interpolated
+ * rather than typed.
  */
-export function buildCoverLead(deck, slides) {
+export function buildCoverLead(deck, slides, values = {}) {
   const issue = deck?.issue || {};
   const kept = countEventSlides(slides);
   const week = issue.week || '';
   const city = issue.city || '';
 
+  const counted = Boolean(String(issue.scanned || '').trim());
+  const template = counted
+    ? (values.sub || COVER_SUB_FALLBACK)
+    : (values.subUncounted || COVER_SUB_UNCOUNTED_FALLBACK);
+
   return {
     eyebrow: [week, city].filter(Boolean).join(' · '),
     heading: `${spellCount(kept)} nights worth leaving the house for`,
-    sub: issue.scanned
-      ? `we read ${issue.scanned} listings this week and kept ${kept}. you made none of them.`
-      : `we kept ${kept} of everything on this week. you made none of them.`,
+    // The formatter reports rather than throws: a broken template comes back
+    // as its own raw text, so bad wording shows the wording instead of a blank
+    // line or a crashed slide.
+    sub: formatPivotCopyTemplate(template, {
+      scanned: issue.scanned || '',
+      kept: String(kept),
+    }).text,
   };
 }
 
@@ -188,6 +210,19 @@ function manifestFields(manifest, type) {
  * Resolve one slide into the props its frame takes. `manifest` is optional —
  * the reference deck fills every value explicitly, so it renders without one.
  */
+/**
+ * The folio's issue number, ready to print.
+ *
+ * Empty when the deck is unnumbered or the number has not been set — so a deck
+ * with no number shows nothing rather than a bare "no." with a gap after it,
+ * which is what a blank value used to render.
+ */
+function folioNumber(deck) {
+  const number = String(deck?.issue?.number || '').trim();
+  if (!number || deck?.showIssueNumber === false) return '';
+  return `no. ${number}`;
+}
+
 export function resolveSlide(deck, slide, index, manifest, cityVoice) {
   const values = { ...(slide.values || {}) };
 
@@ -199,7 +234,8 @@ export function resolveSlide(deck, slide, index, manifest, cityVoice) {
   const slides = deck?.slides || [];
 
   if (slide.type === 'cover') {
-    values.lead = buildCoverLead(deck, slides);
+    // After the manifest loop, so the resolved voice templates are in `values`.
+    values.lead = buildCoverLead(deck, slides, values);
   }
   if (slide.type === 'receipt') {
     Object.assign(values, buildReceipt(deck, slides));
@@ -209,7 +245,7 @@ export function resolveSlide(deck, slide, index, manifest, cityVoice) {
     id: slide._id || `slide-${index}`,
     type: slide.type,
     props: {
-      issue: deck?.issue || {},
+      issue: { ...(deck?.issue || {}), folio: folioNumber(deck) },
       values,
       events,
       options: slide.options || {},
@@ -242,6 +278,19 @@ export function slideGaps(slide, manifest) {
   }
 
   return gaps;
+}
+
+/**
+ * The class list for a frame. One helper because four places render frames —
+ * the light table, the strip, the canvas and the export route — and a slide
+ * that prints differently from its own thumbnail is the bug this prevents.
+ */
+export function frameClass(deck) {
+  const edition = deck?.edition === 'paper' ? 'paper' : 'night';
+  // The ink plate only exists on newsprint, so the modifier is only meaningful
+  // there; adding it on night would be a class that never matches anything.
+  const noInk = edition === 'paper' && deck?.inkPlate === false;
+  return `jgz-frame jgz-frame--${edition}${noInk ? ' jgz-frame--noink' : ''}`;
 }
 
 /**

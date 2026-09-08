@@ -86,6 +86,25 @@ const pivotCarouselDeckSchema = new mongoose.Schema(
       enum: EDITIONS,
       default: 'night',
     },
+    /*
+     * The newsprint ink plate: a flat orange multiplied over every photograph.
+     * It belongs to the issue rather than to a slide — an issue with the wash
+     * on some pictures and not others is not a printing decision, it is a
+     * mistake — so it sits beside the edition and not in slide options.
+     */
+    inkPlate: {
+      type: Boolean,
+      default: true,
+    },
+    /*
+     * Whether the issue number is printed at all. An issue that is not numbered
+     * is a real editorial choice, and it has to be all-or-nothing: a folio on
+     * five slides and not the sixth reads as a missing value, not a decision.
+     */
+    showIssueNumber: {
+      type: Boolean,
+      default: true,
+    },
     // The issue's own identity — what the folio, masthead and dateline read.
     issue: {
       number: { type: String, default: '', trim: true },

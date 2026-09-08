@@ -13,13 +13,14 @@
 
 import React, { useMemo } from 'react';
 import PivotCarouselPopup from './PivotCarouselPopup';
-import { resolveSlide, sampleSlideFor } from './zineDeck';
+import { frameClass, resolveSlide, sampleSlideFor } from './zineDeck';
 
 export default function PivotCarouselAddSlide({
   open,
   manifest,
   frames,
   edition,
+  inkPlate,
   issue,
   cityVoice,
   onClose,
@@ -31,7 +32,7 @@ export default function PivotCarouselAddSlide({
       .map((type) => {
         const slide = sampleSlideFor(type, manifest);
         if (!slide) return null;
-        const deck = { issue, edition, slides: [slide], voice: { entries: {} } };
+        const deck = { issue, edition, inkPlate, slides: [slide], voice: { entries: {} } };
         return {
           type,
           spec: manifest.types[type],
@@ -39,7 +40,7 @@ export default function PivotCarouselAddSlide({
         };
       })
       .filter(Boolean);
-  }, [manifest, issue, edition, cityVoice]);
+  }, [manifest, issue, edition, inkPlate, cityVoice]);
 
   if (!open) return null;
 
@@ -58,7 +59,7 @@ export default function PivotCarouselAddSlide({
             return (
               <li key={type}>
                 <button type="button" onClick={() => { onAdd(type); onClose(); }}>
-                  <span className={`jgz-frame jgz-frame--${edition}`} aria-hidden="true">
+                  <span className={frameClass({ edition, inkPlate })} aria-hidden="true">
                     <Frame {...resolved.props} />
                   </span>
                   <span className="jgz-add__caption">

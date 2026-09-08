@@ -194,6 +194,21 @@
   }
 }
 
+.jgz__ink {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-family: 'Space Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;
+  font-size: 0.68rem;
+  color: var(--jgz-ink);
+  cursor: pointer;
+
+  input {
+    accent-color: var(--jgz-accent);
+    cursor: pointer;
+  }
+}
+
 .jgz__note {
   font-family: 'Space Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;
   font-size: 0.68rem;
@@ -437,6 +452,10 @@
  */
 .jgz-frame--paper .jgz-photo img {
   filter: grayscale(1) contrast(1.1) brightness(1.24);
+}
+
+.jgz-frame--noink .jgz-photo::after {
+  content: none;
 }
 
 .jgz-frame--paper .jgz-photo::after {
@@ -1632,6 +1651,62 @@
 
     &:hover { border-color: var(--jgz-ink); color: var(--jgz-ink); }
   }
+}
+
+/* -------------------------------------------------------------- photo tone */
+
+/*
+ * Type sitting directly on a photograph. The ramp is inherited, so setting the
+ * three tokens on a container recolours everything inside it — no rule here
+ * needs to know which elements the frame happens to use.
+ *
+ * The scrim flips with the type. Light type over a pale wash is not a choice
+ * anyone means to make, so choosing a tone chooses the ground it sits on too.
+ */
+.jgz-tone--light {
+  --jgz-type: rgba(250, 246, 239, 0.94);
+  --jgz-type-muted: rgba(250, 246, 239, 0.76);
+  --jgz-type-soft: rgba(250, 246, 239, 0.56);
+}
+
+.jgz-tone--dark {
+  --jgz-type: rgba(26, 23, 20, 0.92);
+  --jgz-type-muted: rgba(26, 23, 20, 0.74);
+  --jgz-type-soft: rgba(26, 23, 20, 0.54);
+}
+
+.jgz-cover__wash.jgz-tone--light {
+  background:
+    linear-gradient(180deg, rgba(14, 11, 9, 0.86) 0%, rgba(14, 11, 9, 0.18) 26%, rgba(14, 11, 9, 0.9) 74%),
+    radial-gradient(ellipse 70% 55% at 50% 40%, transparent 40%, rgba(14, 11, 9, 0.6) 100%);
+}
+
+.jgz-cover__wash.jgz-tone--dark {
+  background: linear-gradient(
+    180deg,
+    rgba(250, 246, 239, 0.88) 0%,
+    rgba(250, 246, 239, 0.24) 26%,
+    rgba(250, 246, 239, 0.86) 72%,
+    var(--jgz-cream) 94%
+  );
+}
+
+.jgz-card__scrim.jgz-tone--light {
+  background:
+    linear-gradient(180deg, rgba(14, 11, 9, 0.66) 0%, transparent 18%),
+    linear-gradient(0deg, rgba(14, 11, 9, 0.88) 0%, rgba(14, 11, 9, 0.5) 30%, transparent 58%);
+}
+
+.jgz-card__scrim.jgz-tone--dark {
+  background:
+    linear-gradient(180deg, rgba(250, 246, 239, 0.84) 0%, transparent 18%),
+    linear-gradient(0deg, rgba(250, 246, 239, 0.9) 0%, rgba(250, 246, 239, 0.5) 30%, transparent 58%);
+}
+
+/* The masthead's own shadow is a night device; it muddies dark type. */
+.jgz-cover__flag.jgz-tone--dark .jgz-cover__name,
+.jgz-cover__body.jgz-tone--dark .jgz-cover__heading {
+  text-shadow: none;
 }
 
 /* --------------------------------------------------------- slide options */

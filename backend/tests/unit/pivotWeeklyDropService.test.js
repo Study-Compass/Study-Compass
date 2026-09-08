@@ -55,8 +55,18 @@ describe('pivotWeeklyDropService', () => {
         find: jest.fn().mockReturnValue({
           select: jest.fn().mockReturnValue({
             lean: jest.fn().mockResolvedValue([
-              { _id: '1', pushToken: 'ExponentPushToken[a]' },
-              { _id: '2', pushToken: 'ExponentPushToken[b]' },
+              {
+                _id: '1',
+                pushToken: 'ExponentPushToken[a]',
+                pushAppEdition: 'pivot',
+                pushAppProduct: 'justgo',
+              },
+              {
+                _id: '2',
+                pushToken: 'ExponentPushToken[b]',
+                pushAppEdition: 'pivot',
+                pushAppProduct: 'justgo',
+              },
             ]),
           }),
         }),
@@ -89,6 +99,18 @@ describe('pivotWeeklyDropService', () => {
             lean: jest.fn().mockResolvedValue([]),
           }),
         }),
+      },
+      PivotDropPushRun: {
+        find: jest.fn().mockReturnValue({
+          sort: jest.fn().mockReturnValue({
+            limit: jest.fn().mockReturnValue({
+              select: jest.fn().mockReturnValue({
+                lean: jest.fn().mockResolvedValue([]),
+              }),
+            }),
+          }),
+        }),
+        create: jest.fn().mockResolvedValue({}),
       },
     }));
   });
@@ -445,6 +467,84 @@ describe('pivotWeeklyDropService', () => {
     expect(result.sent).toBe(2);
     expect(result.snapshotRebuilt).toBe(true);
     expect(rebuildWeeklySnapshot).toHaveBeenCalledWith(req, { batchWeek: '2026-W23' });
+  });
+
+  it('separates known Meridian and Just Go tokens before calling Expo', async () => {
+    getTenantByKey.mockResolvedValue(nycTenant);
+    getModels.mockImplementation(() => ({
+      Event: { countDocuments: jest.fn().mockResolvedValue(3) },
+      User: {
+        find: jest.fn().mockReturnValue({
+          select: jest.fn().mockReturnValue({
+            lean: jest.fn().mockResolvedValue([
+              {
+                _id: '1',
+                pushToken: 'ExponentPushToken[a]',
+                pushAppEdition: 'pivot',
+                pushAppProduct: 'campus',
+              },
+              {
+                _id: '2',
+                pushToken: 'ExponentPushToken[b]',
+                pushAppEdition: 'pivot',
+                pushAppProduct: 'justgo',
+              },
+            ]),
+          }),
+        }),
+      },
+      PivotCrewMembership: { find: jest.fn().mockReturnValue({ select: jest.fn().mockReturnValue({ lean: jest.fn().mockResolvedValue([]) }) }) },
+      PivotCrewWeekState: { find: jest.fn().mockReturnValue({ select: jest.fn().mockReturnValue({ lean: jest.fn().mockResolvedValue([]) }) }) },
+      PivotEventIntent: {
+        distinct: jest.fn().mockResolvedValue([]),
+        find: jest.fn().mockReturnValue({ select: jest.fn().mockReturnValue({ lean: jest.fn().mockResolvedValue([]) }) }),
+      },
+      PivotDeckSnapshot: { find: jest.fn().mockReturnValue({ select: jest.fn().mockReturnValue({ lean: jest.fn().mockResolvedValue([]) }) }) },
+      PivotDropPushRun: {
+        create: jest.fn().mockResolvedValue({}),
+      },
+    }));
+    axios.post
+      .mockResolvedValueOnce({ data: { data: { status: 'ok' } } })
+      .mockResolvedValueOnce({ data: { data: { status: 'ok' } } });
+    rebuildWeeklySnapshot.mockResolvedValue({ data: { batchWeek: '2026-W23' } });
+
+    const result = await sendWeeklyDropPush({}, 'nyc', {
+      batchWeek: '2026-W23',
+      force: true,
+    });
+
+    expect(axios.post).toHaveBeenCalledTimes(2);
+    expect(axios.post.mock.calls[0][1]).toHaveLength(1);
+    expect(axios.post.mock.calls[1][1]).toHaveLength(1);
+    expect(result.sent).toBe(2);
+    expect(result.failed).toBe(0);
+  });
+
+  it('reports an isolated Expo rejection without throwing the whole send', async () => {
+    getTenantByKey.mockResolvedValue(nycTenant);
+    axios.post
+      .mockRejectedValueOnce({ response: { status: 400, data: {} } })
+      .mockResolvedValueOnce({ data: { data: { status: 'ok' } } })
+      .mockRejectedValueOnce({
+        message: 'Request failed with status code 400',
+        response: {
+          status: 400,
+          data: {
+            errors: [{ message: 'Device is not registered' }],
+          },
+        },
+      });
+    rebuildWeeklySnapshot.mockResolvedValue({ data: { batchWeek: '2026-W23' } });
+
+    const result = await sendWeeklyDropPush({}, 'nyc', {
+      batchWeek: '2026-W23',
+      force: true,
+    });
+
+    expect(result.sent).toBe(1);
+    expect(result.failed).toBe(1);
+    expect(result.errors).toContain('Device is not registered');
   });
 
   it('sendWeeklyDropPush still reports the send when snapshot rebuild fails', async () => {

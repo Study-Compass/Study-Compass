@@ -10,7 +10,7 @@
 import React from 'react';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { ZINE_DEMO_DECK } from './zineDemoDeck';
-import { resolveSlide, sampleSlideFor } from './zineDeck';
+import { frameClass, resolveSlide, sampleSlideFor } from './zineDeck';
 import { ZineEditProvider } from './zineField';
 import {
   ZineBack,
@@ -484,5 +484,234 @@ describe('slide options', () => {
       expect(text).toContain('a different masthead');
       expect(text).not.toContain('sorry u missed it');
     });
+  });
+});
+
+/**
+ * The ink plate is the whole visible difference of the newsprint edition, and
+ * it belongs to the issue rather than to a slide — a deck with the wash on some
+ * photographs and not others is not a printing decision. One helper builds the
+ * class for all four places that render a frame, so a slide cannot print
+ * differently from its own thumbnail.
+ */
+describe('the newsprint ink plate', () => {
+  test('night has no ink modifier, because there is no plate to switch off', () => {
+    expect(frameClass({ edition: 'night' })).toBe('jgz-frame jgz-frame--night');
+    expect(frameClass({ edition: 'night', inkPlate: false })).toBe('jgz-frame jgz-frame--night');
+  });
+
+  test('newsprint carries the plate by default', () => {
+    expect(frameClass({ edition: 'paper' })).toBe('jgz-frame jgz-frame--paper');
+    expect(frameClass({ edition: 'paper', inkPlate: true })).toBe('jgz-frame jgz-frame--paper');
+  });
+
+  test('switching it off adds the modifier the stylesheet keys on', () => {
+    expect(frameClass({ edition: 'paper', inkPlate: false }))
+      .toBe('jgz-frame jgz-frame--paper jgz-frame--noink');
+  });
+
+  test('an unknown or missing edition falls back to night rather than nothing', () => {
+    expect(frameClass({})).toBe('jgz-frame jgz-frame--night');
+    expect(frameClass(null)).toBe('jgz-frame jgz-frame--night');
+    expect(frameClass({ edition: 'letterpress' })).toBe('jgz-frame jgz-frame--night');
+  });
+});
+
+/**
+ * The folio's issue number.
+ *
+ * It belongs to the deck, so it prints on most slides and is set from any of
+ * them. A deck with no number set used to print a bare "no." with a gap after
+ * it on every slide — a blank value looking exactly like a bug, because it was.
+ */
+describe('the issue number', () => {
+  const deck = (overrides) => ({
+    ...ZINE_DEMO_DECK,
+    ...overrides,
+    issue: { ...ZINE_DEMO_DECK.issue, ...(overrides?.issue || {}) },
+  });
+
+  const resolveCover = (d) => {
+    const slide = d.slides[0];
+    return resolveSlide(d, slide, 0, null, {});
+  };
+
+  test('prints when the deck has one', () => {
+    expect(resolveCover(deck()).props.issue.folio).toBe('no. 014');
+  });
+
+  test('prints nothing at all when the number is blank', () => {
+    expect(resolveCover(deck({ issue: { number: '' } })).props.issue.folio).toBe('');
+  });
+
+  test('prints nothing when the deck is unnumbered on purpose', () => {
+    expect(resolveCover(deck({ showIssueNumber: false })).props.issue.folio).toBe('');
+  });
+
+  test('a blank number leaves no stray "no." on a slide', () => {
+    const d = deck({ issue: { number: '' } });
+    for (const [index, slide] of d.slides.entries()) {
+      const resolved = resolveSlide(d, slide, index, null, {});
+      const Frame = FRAMES[slide.type];
+      const { container } = render(<Frame {...resolved.props} />);
+      expect(container.textContent).not.toMatch(/no\.\s*(·|$)/);
+    }
+  });
+
+  test('switching it off removes it from every slide that shows one', () => {
+    const on = deck();
+    const off = deck({ showIssueNumber: false });
+    let seenOn = 0;
+
+    for (const [index, slide] of on.slides.entries()) {
+      const withNumber = render(
+        React.createElement(FRAMES[slide.type], resolveSlide(on, slide, index, null, {}).props),
+      ).container.textContent;
+      const without = render(
+        React.createElement(FRAMES[slide.type], resolveSlide(off, slide, index, null, {}).props),
+      ).container.textContent;
+
+      if (withNumber.includes('no. 014')) seenOn += 1;
+      expect(without).not.toContain('no. 014');
+    }
+    expect(seenOn).toBeGreaterThan(0);
+  });
+});
+
+/**
+ * Type sitting on a photograph. `auto` must change nothing, or every deck that
+ * never touches the setting shifts the day it is added.
+ */
+describe('text over the photo', () => {
+  const cover = slides.find((s) => s.slide.type === 'cover');
+  const card = slides.find((s) => s.slide.type === 'card');
+
+  const classesFor = (entry, options) => {
+    const Frame = FRAMES[entry.slide.type];
+    const { container } = render(<Frame {...entry.resolved.props} options={options} />);
+    return container.innerHTML;
+  };
+
+  test('auto adds no tone class, and is the same as no option', () => {
+    expect(classesFor(cover, { photoText: 'auto' })).toBe(classesFor(cover, {}));
+    expect(classesFor(cover, {})).not.toContain('jgz-tone--');
+  });
+
+  test.each(['light', 'dark'])('%s marks the cover’s type and its wash', (tone) => {
+    const html = classesFor(cover, { photoText: tone });
+    expect(html).toContain(`jgz-cover__wash jgz-tone--${tone}`);
+    expect(html).toContain(`jgz-cover__flag jgz-tone--${tone}`);
+    expect(html).toContain(`jgz-cover__body jgz-tone--${tone}`);
+  });
+
+  test.each(['light', 'dark'])('%s marks the card’s scrim and slug', (tone) => {
+    const html = classesFor(card, { photoText: tone });
+    expect(html).toContain(`jgz-card__scrim jgz-tone--${tone}`);
+    expect(html).toContain(`jgz-tone--${tone}`);
+  });
+
+  test('an unknown value is ignored rather than emitting a broken class', () => {
+    expect(classesFor(cover, { photoText: 'chartreuse' })).not.toContain('jgz-tone--');
+  });
+});
+
+describe('the cover photo credit', () => {
+  const cover = slides.find((s) => s.slide.type === 'cover');
+  const text = (options) => render(
+    <ZineCover {...cover.resolved.props} options={options} />,
+  ).container.textContent;
+
+  test('names the photograph by default', () => {
+    expect(text({})).toContain('above:');
+  });
+
+  test('switching it off leaves the picture to speak for itself', () => {
+    expect(text({ photoCredit: false })).not.toContain('above:');
+  });
+
+  test('switching it off removes nothing else', () => {
+    expect(text({ photoCredit: false }).length).toBeLessThan(text({}).length);
+    expect(text({ photoCredit: false })).toContain(cover.resolved.props.values.name);
+  });
+});
+
+/**
+ * The cover's sub-line is a voice template. The figures come from the deck and
+ * only the wording around them is anyone's to choose, so the numbers are
+ * interpolated rather than typed — a city can reword the claim without being
+ * able to misstate what it counted.
+ */
+describe('the cover sub-line', () => {
+  const MANIFEST = {
+    types: {
+      cover: {
+        events: { min: 0, max: 1 },
+        fields: [
+          {
+            key: 'sub',
+            kind: 'template',
+            voice: 'zine.cover.sub',
+            shipped: 'we read {scanned} listings this week and kept {kept}. you made none of them.',
+          },
+          {
+            key: 'subUncounted',
+            kind: 'template',
+            voice: 'zine.cover.subUncounted',
+            shipped: 'we kept {kept} of everything on this week. you made none of them.',
+          },
+        ],
+      },
+    },
+  };
+
+  const sub = (deckOverrides, cityVoice = {}) => {
+    const deck = {
+      ...ZINE_DEMO_DECK,
+      ...deckOverrides,
+      issue: { ...ZINE_DEMO_DECK.issue, ...(deckOverrides?.issue || {}) },
+    };
+    return resolveSlide(deck, deck.slides[0], 0, MANIFEST, cityVoice).props.values.lead.sub;
+  };
+
+  test('interpolates the deck’s own figures', () => {
+    expect(sub()).toBe('we read 214 listings this week and kept 6. you made none of them.');
+  });
+
+  test('a city can reword it and keep the numbers', () => {
+    const reworded = sub({}, { 'zine.cover.sub': 'sifted {scanned}, kept {kept}.' });
+    expect(reworded).toBe('sifted 214, kept 6.');
+  });
+
+  test('a deck override beats the city', () => {
+    const deckVoice = { voice: { entries: { 'zine.cover.sub': 'this week: {kept}.' } } };
+    expect(sub(deckVoice, { 'zine.cover.sub': 'city wording {kept}' })).toBe('this week: 6.');
+  });
+
+  test('a deck that counted nothing uses the other line', () => {
+    expect(sub({ issue: { scanned: '' } }))
+      .toBe('we kept 6 of everything on this week. you made none of them.');
+  });
+
+  test('the uncounted line is separately rewordable', () => {
+    const out = sub({ issue: { scanned: '' } }, { 'zine.cover.subUncounted': 'kept {kept}, counted nothing.' });
+    expect(out).toBe('kept 6, counted nothing.');
+  });
+
+  test('wording with no placeholders is left alone', () => {
+    expect(sub({}, { 'zine.cover.sub': 'you missed all of it.' })).toBe('you missed all of it.');
+  });
+
+  test('a broken template shows its own text rather than blanking the line', () => {
+    // The formatter reports instead of throwing, and hands back the raw source.
+    // Seeing the braces on the slide is how you find out the wording is wrong;
+    // a silently empty line is not.
+    const out = sub({}, { 'zine.cover.sub': 'kept {kept} of {nonsense}.' });
+    expect(out).toBe('kept {kept} of {nonsense}.');
+  });
+
+  test('renders without a manifest, so the reference preview still reads', () => {
+    const deck = ZINE_DEMO_DECK;
+    const out = resolveSlide(deck, deck.slides[0], 0, null, {}).props.values.lead.sub;
+    expect(out).toBe('we read 214 listings this week and kept 6. you made none of them.');
   });
 });

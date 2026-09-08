@@ -37,8 +37,11 @@ function voiceCatalog() {
   return {
     keys: zineVoiceKeys().map((row) => ({
       path: row.path,
-      kind: 'string',
-      params: [],
+      // Carried through rather than flattened to 'string': the editor keys its
+      // interpolator filter and its live preview off these.
+      kind: row.kind,
+      params: row.params,
+      ...(row.sampleArgs ? { sampleArgs: row.sampleArgs } : {}),
       usesTokens: false,
       shipped: row.shipped,
     })),

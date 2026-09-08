@@ -63,7 +63,7 @@ function clampNumber(value, fieldName, { min, max, integer = false } = {}) {
 }
 
 function validateWeightsPatch(patch) {
-  if (patch === undefined) return { ok: true, patch: undefined };
+  if (patch === undefined || patch === null) return { ok: true, patch: undefined };
   if (!isPlainObject(patch)) {
     return { error: 'weights must be an object.' };
   }
@@ -73,14 +73,16 @@ function validateWeightsPatch(patch) {
   const scoreFields = ['friendGoing', 'friendInterested', 'negativeTag'];
 
   for (const field of unitFields) {
-    if (patch[field] === undefined) continue;
+    // Mongoose materializes omitted fields in this sparse subdocument as null.
+    // Treat those storage placeholders as absent rather than coercing null to 0.
+    if (patch[field] === undefined || patch[field] === null) continue;
     const result = clampNumber(patch[field], `weights.${field}`, { min: 0, max: 1 });
     if (result.error) return { error: result.error };
     out[field] = result.value;
   }
 
   for (const field of scoreFields) {
-    if (patch[field] === undefined) continue;
+    if (patch[field] === undefined || patch[field] === null) continue;
     const result = clampNumber(patch[field], `weights.${field}`, {
       min: 0,
       max: SCORE_WEIGHT_MAX,
@@ -103,7 +105,7 @@ function validatePivotDeckConfigPatch(body = {}) {
     return { error: 'pivotDeckConfig must be an object.' };
   }
 
-  if (body.version !== undefined) {
+  if (body.version !== undefined && body.version !== null) {
     const version = Number(body.version);
     if (!Number.isInteger(version) || version < 1 || version > PIVOT_DECK_CONFIG_VERSION) {
       return {
@@ -114,7 +116,7 @@ function validatePivotDeckConfigPatch(body = {}) {
 
   const out = {};
 
-  if (body.softMax !== undefined) {
+  if (body.softMax !== undefined && body.softMax !== null) {
     const result = clampNumber(body.softMax, 'softMax', {
       min: DECK_SIZE_MIN,
       max: DECK_SIZE_MAX,
@@ -124,7 +126,7 @@ function validatePivotDeckConfigPatch(body = {}) {
     out.softMax = result.value;
   }
 
-  if (body.hardMax !== undefined) {
+  if (body.hardMax !== undefined && body.hardMax !== null) {
     const result = clampNumber(body.hardMax, 'hardMax', {
       min: DECK_SIZE_MIN,
       max: DECK_SIZE_MAX,
@@ -140,13 +142,13 @@ function validatePivotDeckConfigPatch(body = {}) {
     return { error: 'softMax must be less than or equal to hardMax.' };
   }
 
-  if (body.leewayRatio !== undefined) {
+  if (body.leewayRatio !== undefined && body.leewayRatio !== null) {
     const result = clampNumber(body.leewayRatio, 'leewayRatio', { min: 0, max: 1 });
     if (result.error) return result;
     out.leewayRatio = result.value;
   }
 
-  if (body.highScoreFloor !== undefined) {
+  if (body.highScoreFloor !== undefined && body.highScoreFloor !== null) {
     const result = clampNumber(body.highScoreFloor, 'highScoreFloor', {
       min: 0,
       max: SCORE_WEIGHT_MAX,

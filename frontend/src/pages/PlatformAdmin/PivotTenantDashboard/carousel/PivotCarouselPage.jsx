@@ -19,7 +19,7 @@ import { useNotification } from '../../../../NotificationContext';
 import PivotTenantPage from '../PivotTenantPage';
 import PivotCarouselEditor from './PivotCarouselEditor';
 import { ZINE_DEMO_DECK } from './zineDemoDeck';
-import { resolveDeck } from './zineDeck';
+import { frameClass, resolveDeck } from './zineDeck';
 import {
   ZineBack,
   ZineCard,
@@ -66,6 +66,8 @@ export default function PivotCarouselPage({ tenantKey, cityDisplayName }) {
   const [seeding, setSeeding] = useState(false);
   const [saving, setSaving] = useState(false);
   const [edition, setEdition] = useState('night');
+  const [inkPlate, setInkPlate] = useState(true);
+  const [showIssueNumber, setShowIssueNumber] = useState(true);
 
   /** Load the deck list, then open the most recently touched one. */
   const load = useCallback(async () => {
@@ -91,6 +93,8 @@ export default function PivotCarouselPage({ tenantKey, cityDisplayName }) {
       setManifest(full.data.data.manifest);
       setCityVoice(full.data.data.cityVoice || {});
       setEdition(full.data.data.deck.edition || 'night');
+      setInkPlate(full.data.data.deck.inkPlate !== false);
+      setShowIssueNumber(full.data.data.deck.showIssueNumber !== false);
     }
     setLoading(false);
   }, [tenantKey]);
@@ -140,6 +144,8 @@ export default function PivotCarouselPage({ tenantKey, cityDisplayName }) {
       data: {
         title: draft.title,
         edition,
+        inkPlate,
+        showIssueNumber,
         issue: draft.issue,
         voice: draft.voice,
         slides: draft.slides,
@@ -167,7 +173,10 @@ export default function PivotCarouselPage({ tenantKey, cityDisplayName }) {
       message: notes.length ? `${notes.length} value(s) trimmed to fit: ${notes[0]}` : 'All slots fit.',
       type: notes.length ? 'warning' : 'success',
     });
-  }, [draft, edition, tenantKey, addNotification]);
+    // inkPlate is in the payload, so it has to be in the deps: without it this
+    // callback closes over the value from the render before the toggle and
+    // saves the setting you just changed away from.
+  }, [draft, edition, inkPlate, showIssueNumber, tenantKey, addNotification]);
 
   /**
    * An image upload writes straight through to the server rather than into the
@@ -247,13 +256,20 @@ export default function PivotCarouselPage({ tenantKey, cityDisplayName }) {
 
   /** Renders the reference issue read-only until a deck exists to edit. */
   const preview = useMemo(
-    () => resolveDeck({ ...ZINE_DEMO_DECK, edition }, manifest, cityVoice),
-    [edition, manifest, cityVoice],
+    () => resolveDeck({ ...ZINE_DEMO_DECK, edition, inkPlate, showIssueNumber }, manifest, cityVoice),
+    [edition, inkPlate, showIssueNumber, manifest, cityVoice],
   );
 
   const dirty = useMemo(
-    () => Boolean(draft && deck && JSON.stringify(draft) !== JSON.stringify(deck)),
-    [draft, deck],
+    () => Boolean(
+      draft && deck && (
+        JSON.stringify(draft) !== JSON.stringify(deck)
+        || edition !== deck.edition
+        || inkPlate !== (deck.inkPlate !== false)
+        || showIssueNumber !== (deck.showIssueNumber !== false)
+      ),
+    ),
+    [draft, deck, edition, inkPlate, showIssueNumber],
   );
 
   return (
@@ -276,6 +292,25 @@ export default function PivotCarouselPage({ tenantKey, cityDisplayName }) {
               </button>
             ))}
           </div>
+          <label className="jgz__ink">
+            <input
+              type="checkbox"
+              checked={showIssueNumber}
+              onChange={(event) => setShowIssueNumber(event.target.checked)}
+            />
+            <span>issue no.</span>
+          </label>
+          {/* Only newsprint has an ink plate, so the control appears with it. */}
+          {edition === 'paper' ? (
+            <label className="jgz__ink">
+              <input
+                type="checkbox"
+                checked={inkPlate}
+                onChange={(event) => setInkPlate(event.target.checked)}
+              />
+              <span>ink plate</span>
+            </label>
+          ) : null}
           <span className="jgz__note">4:5 · 1080×1350</span>
         </div>
       }
@@ -283,7 +318,7 @@ export default function PivotCarouselPage({ tenantKey, cityDisplayName }) {
       <div className="jgz">
         {draft && manifest ? (
           <PivotCarouselEditor
-            deck={{ ...draft, edition }}
+            deck={{ ...draft, edition, inkPlate, showIssueNumber }}
             manifest={manifest}
             cityVoice={cityVoice}
             frames={FRAME_COMPONENTS}
@@ -333,7 +368,7 @@ export default function PivotCarouselPage({ tenantKey, cityDisplayName }) {
                 if (!Frame) return null;
                 return (
                   <li className="jgz__slot" key={slide.id}>
-                    <div className={`jgz-frame jgz-frame--${edition}`}>
+                    <div className={frameClass({ edition, inkPlate })}>
                       <Frame {...slide.props} />
                     </div>
                     <p className="jgz__slot-caption">

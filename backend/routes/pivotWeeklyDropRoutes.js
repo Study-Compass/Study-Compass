@@ -62,6 +62,7 @@ router.post(
         force: req.body?.force === true,
         pushTitle: req.body?.pushTitle,
         pushBody: req.body?.pushBody,
+        triggeredBy: req.user.globalUserId || req.user.userId || null,
       });
       if (result.error) {
         return res.status(result.status || 400).json({
@@ -73,8 +74,17 @@ router.post(
       }
       res.json({ success: true, data: result });
     } catch (err) {
-      console.error('POST pivot-weekly-drop/send failed:', err);
-      res.status(500).json({ success: false, message: err.message });
+      const expoResponse = err?.response?.data;
+      console.error('POST pivot-weekly-drop/send failed:', {
+        message: err?.message,
+        status: err?.response?.status,
+        expoResponse,
+      });
+      res.status(500).json({
+        success: false,
+        message: expoResponse?.message || err.message,
+        errors: Array.isArray(expoResponse?.errors) ? expoResponse.errors : undefined,
+      });
     }
   }
 );

@@ -12,6 +12,7 @@ import PivotTenantCatalogPage from './PivotTenantCatalogPage';
 import PivotVoicePage from './PivotVoicePage';
 import PivotCarouselPage from './carousel/PivotCarouselPage';
 import PivotTenantLaunchPage from './PivotTenantLaunchPage';
+import PivotWeeklyDropPage from '../PivotWeeklyDrop/PivotWeeklyDropPage';
 import PivotTenantLocationMigrationPage, {
   RICH_LOCATION_MIGRATION_UI_ENABLED,
 } from './PivotTenantLocationMigrationPage';
@@ -187,8 +188,20 @@ function PivotTenantDashboard() {
       ),
     });
 
+    items.push({
+      label: 'Weekly drop',
+      icon: 'mdi:bell-ring-outline',
+      element: (
+        <PivotWeeklyDropPage
+          key={tenantKey}
+          tenantKey={tenantKey}
+          tenant={tenant}
+        />
+      ),
+    });
+
     return items;
-  }, [tenantKey, cityDisplayName, tenant?.pivotDeckConfig, refetch]);
+  }, [tenantKey, cityDisplayName, tenant, refetch]);
 
   if (!tenantKey) {
     return (
