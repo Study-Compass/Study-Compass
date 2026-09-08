@@ -67,6 +67,7 @@ export default function PivotCarouselPage({ tenantKey, cityDisplayName }) {
   const [saving, setSaving] = useState(false);
   const [edition, setEdition] = useState('night');
   const [inkPlate, setInkPlate] = useState(true);
+  const [showIssueNumber, setShowIssueNumber] = useState(true);
 
   /** Load the deck list, then open the most recently touched one. */
   const load = useCallback(async () => {
@@ -93,6 +94,7 @@ export default function PivotCarouselPage({ tenantKey, cityDisplayName }) {
       setCityVoice(full.data.data.cityVoice || {});
       setEdition(full.data.data.deck.edition || 'night');
       setInkPlate(full.data.data.deck.inkPlate !== false);
+      setShowIssueNumber(full.data.data.deck.showIssueNumber !== false);
     }
     setLoading(false);
   }, [tenantKey]);
@@ -143,6 +145,7 @@ export default function PivotCarouselPage({ tenantKey, cityDisplayName }) {
         title: draft.title,
         edition,
         inkPlate,
+        showIssueNumber,
         issue: draft.issue,
         voice: draft.voice,
         slides: draft.slides,
@@ -173,7 +176,7 @@ export default function PivotCarouselPage({ tenantKey, cityDisplayName }) {
     // inkPlate is in the payload, so it has to be in the deps: without it this
     // callback closes over the value from the render before the toggle and
     // saves the setting you just changed away from.
-  }, [draft, edition, inkPlate, tenantKey, addNotification]);
+  }, [draft, edition, inkPlate, showIssueNumber, tenantKey, addNotification]);
 
   /**
    * An image upload writes straight through to the server rather than into the
@@ -253,8 +256,8 @@ export default function PivotCarouselPage({ tenantKey, cityDisplayName }) {
 
   /** Renders the reference issue read-only until a deck exists to edit. */
   const preview = useMemo(
-    () => resolveDeck({ ...ZINE_DEMO_DECK, edition, inkPlate }, manifest, cityVoice),
-    [edition, inkPlate, manifest, cityVoice],
+    () => resolveDeck({ ...ZINE_DEMO_DECK, edition, inkPlate, showIssueNumber }, manifest, cityVoice),
+    [edition, inkPlate, showIssueNumber, manifest, cityVoice],
   );
 
   const dirty = useMemo(
@@ -263,9 +266,10 @@ export default function PivotCarouselPage({ tenantKey, cityDisplayName }) {
         JSON.stringify(draft) !== JSON.stringify(deck)
         || edition !== deck.edition
         || inkPlate !== (deck.inkPlate !== false)
+        || showIssueNumber !== (deck.showIssueNumber !== false)
       ),
     ),
-    [draft, deck, edition, inkPlate],
+    [draft, deck, edition, inkPlate, showIssueNumber],
   );
 
   return (
@@ -288,6 +292,14 @@ export default function PivotCarouselPage({ tenantKey, cityDisplayName }) {
               </button>
             ))}
           </div>
+          <label className="jgz__ink">
+            <input
+              type="checkbox"
+              checked={showIssueNumber}
+              onChange={(event) => setShowIssueNumber(event.target.checked)}
+            />
+            <span>issue no.</span>
+          </label>
           {/* Only newsprint has an ink plate, so the control appears with it. */}
           {edition === 'paper' ? (
             <label className="jgz__ink">
@@ -306,7 +318,7 @@ export default function PivotCarouselPage({ tenantKey, cityDisplayName }) {
       <div className="jgz">
         {draft && manifest ? (
           <PivotCarouselEditor
-            deck={{ ...draft, edition, inkPlate }}
+            deck={{ ...draft, edition, inkPlate, showIssueNumber }}
             manifest={manifest}
             cityVoice={cityVoice}
             frames={FRAME_COMPONENTS}

@@ -33,8 +33,7 @@ export const ZINE_DEMO_DECK = {
       "type": "cover",
       "values": {
         "name": "sorry u missed it",
-        "tagline": "everything that happened while you were home",
-        "caption": "above: basement set: dj oyinbo, warehouse off 14th"
+        "tagline": "everything that happened while you were home"
       },
       "options": {},
       "events": [

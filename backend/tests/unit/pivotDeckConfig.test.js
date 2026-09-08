@@ -5,6 +5,7 @@ const {
   mergePivotDeckConfigOverrides,
   validatePivotDeckConfigPatch,
 } = require('../../utilities/pivotDeckConfig');
+const { normalizeTenantOverride } = require('../../constants/defaultTenants');
 
 describe('pivotDeckConfig', () => {
   describe('mergePivotDeckConfig', () => {
@@ -73,6 +74,48 @@ describe('pivotDeckConfig', () => {
         hardMax: 16,
         weights: { personalInterest: 0.8 },
       });
+    });
+
+    it('ignores null placeholders materialized by Mongoose for sparse overrides', () => {
+      const result = validatePivotDeckConfigPatch({
+        version: null,
+        softMax: null,
+        hardMax: null,
+        leewayRatio: null,
+        highScoreFloor: null,
+        weights: {
+          friendGoing: 2,
+          friendInterested: null,
+          personalInterest: null,
+          crewSignal: null,
+          negativeTag: null,
+        },
+      });
+
+      expect(result).toEqual({
+        ok: true,
+        patch: { weights: { friendGoing: 2 } },
+      });
+    });
+
+    it('keeps a custom tenant row when its sparse deck subdocument contains null placeholders', () => {
+      const result = normalizeTenantOverride({
+        tenantKey: 'nyc',
+        name: 'New York City',
+        subdomain: 'nyc',
+        tenantType: 'pivot',
+        pivotDeckConfig: {
+          softMax: null,
+          hardMax: null,
+          weights: { friendGoing: 2, crewSignal: null },
+        },
+      });
+
+      expect(result).toEqual(expect.objectContaining({
+        tenantKey: 'nyc',
+        subdomain: 'nyc',
+        pivotDeckConfig: { weights: { friendGoing: 2 } },
+      }));
     });
 
     it('rejects softMax greater than hardMax when both are provided', () => {

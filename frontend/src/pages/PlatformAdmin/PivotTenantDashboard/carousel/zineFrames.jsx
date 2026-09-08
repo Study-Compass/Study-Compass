@@ -103,6 +103,31 @@ function ZinePhoto({ src, alt, className = '' }) {
   );
 }
 
+/**
+ * Class for type sitting on a photograph. Empty on `auto`, so a deck that never
+ * touches this keeps the edition's own behaviour untouched.
+ */
+function photoTone(options) {
+  const tone = options?.photoText;
+  return tone === 'light' || tone === 'dark' ? ` jgz-tone--${tone}` : '';
+}
+
+/**
+ * The issue number where the folio prints it. Editable in place, because the
+ * number belongs to the deck rather than the slide — setting it on any slide
+ * sets it on all of them, which is the only sane behaviour for a folio.
+ * Renders nothing at all when the deck is unnumbered.
+ */
+function ZineFolioNumber({ issue }) {
+  if (!issue?.folio) return null;
+  return (
+    <>
+      {'no. '}
+      <ZineField path="issue.number" max={8}>{issue.number}</ZineField>
+    </>
+  );
+}
+
 function ZineFolio({ left, right }) {
   return (
     <div className="jgz-folio">
@@ -193,22 +218,25 @@ function ZineTags({ tags, limit = 3, path }) {
 export function ZineCover({ issue, values, events, options = {} }) {
   const event = events[0] || {};
   const lead = values.lead || {};
+  const tone = photoTone(options);
 
   return (
     <>
       <ZinePhoto src={event.cover} alt={event.title} className="jgz-cover__photo" />
-      <div className="jgz-cover__wash" aria-hidden="true" />
+      <div className={`jgz-cover__wash${tone}`} aria-hidden="true" />
 
-      <header className="jgz-cover__flag">
+      <header className={`jgz-cover__flag${tone}`}>
         <h2 className="jgz-cover__name">{values.name}</h2>
         <p className="jgz-cover__tagline">
           {values.tagline}
-          {' · no. '}
-          <ZineField path="issue.number" max={8}>{issue.number}</ZineField>
+          {issue.folio ? ' · ' : null}
+          {issue.folio ? (
+            <ZineField path="issue.number" max={8}>{issue.number}</ZineField>
+          ) : null}
         </p>
       </header>
 
-      <div className="jgz-cover__body">
+      <div className={`jgz-cover__body${tone}`}>
         {options.stamp === false ? null : (
           <ZineStamp label="missed" deg={-9} className="jgz-cover__stamp" />
         )}
@@ -225,13 +253,15 @@ export function ZineCover({ issue, values, events, options = {} }) {
         <p className="jgz-cover__sub">{lead.sub}</p>
       </div>
 
-      <div className="jgz-cover__foot">
-        <p className="jgz-cover__caption">
-          {'above: '}
-          <ZineField path="events.0.snapshot.name" max={64}>{event.title}</ZineField>
-          {', '}
-          <ZineField path="events.0.snapshot.location" max={48}>{event.where}</ZineField>
-        </p>
+      <div className={`jgz-cover__foot${tone}`}>
+        {options.photoCredit === false ? null : (
+          <p className="jgz-cover__caption">
+            {'above: '}
+            <ZineField path="events.0.snapshot.name" max={64}>{event.title}</ZineField>
+            {', '}
+            <ZineField path="events.0.snapshot.location" max={48}>{event.where}</ZineField>
+          </p>
+        )}
         <ZineFolio left={issue.dateline} right={issue.city} />
       </div>
     </>
@@ -323,13 +353,14 @@ export function ZineSheet({ issue, values, events, options = {} }) {
  */
 export function ZineCard({ issue, values, events, options = {} }) {
   const event = events[0] || {};
+  const tone = photoTone(options);
 
   return (
     <>
       <ZinePhoto src={event.cover} alt={event.title} className="jgz-card__photo" />
-      <div className="jgz-card__scrim" aria-hidden="true" />
+      <div className={`jgz-card__scrim${tone}`} aria-hidden="true" />
 
-      <ZineSlug label={values.slug} className="jgz-card__slug">
+      <ZineSlug label={values.slug} className={`jgz-card__slug${tone}`}>
         <ZineField path="issue.dateline" max={32}>{issue.dateline}</ZineField>
         {' · '}
         <ZineField path="issue.city" max={40}>{issue.city}</ZineField>
@@ -352,7 +383,7 @@ export function ZineCard({ issue, values, events, options = {} }) {
         )}
       </article>
 
-      <ZineFolio left={`no. ${issue.number}`} right="the card" />
+      <ZineFolio left={<ZineFolioNumber issue={issue} />} right="the card" />
     </>
   );
 }
@@ -391,7 +422,7 @@ export function ZineNotice({ issue, values, events, options }) {
         </ZineField>
       </div>
 
-      <ZineFolio left={`no. ${issue.number}`} right={issue.city} />
+      <ZineFolio left={<ZineFolioNumber issue={issue} />} right={issue.city} />
     </>
   );
 }
@@ -479,7 +510,7 @@ export function ZineDispatch({ issue, values, events }) {
         </ZineField>
       </p>
 
-      <ZineFolio left={`no. ${issue.number}`} right={values.slug} />
+      <ZineFolio left={<ZineFolioNumber issue={issue} />} right={values.slug} />
     </>
   );
 }
@@ -498,7 +529,7 @@ export function ZineReceipt({ issue, values }) {
             <ZineField path="issue.city" max={40}>{issue.city}</ZineField>
           </p>
           <p className="jgz-receipt__doc">
-            issue {issue.number} · {issue.dateline}
+            {issue.folio ? `${issue.folio} · ` : ''}{issue.dateline}
           </p>
         </header>
 
@@ -552,7 +583,7 @@ export function ZineBack({ issue, values, paper }) {
         <img className="jgz-back__badge" src={appStoreBadge} alt="Download on the App Store" />
       </div>
 
-      <ZineFolio left={values.url} right={`no. ${issue.number} · end`} />
+      <ZineFolio left={values.url} right={issue.folio ? `${issue.folio} · end` : 'end'} />
     </>
   );
 }
