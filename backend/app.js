@@ -331,6 +331,8 @@ function createApp() {
   const noticeRoutes = require('./routes/noticeRoutes.js');
   const pivotRoutes = require('./routes/pivotRoutes.js');
   const pivotAdminRoutes = require('./routes/pivotAdminRoutes.js');
+  const { createPivotComputeWorkerRouter } = require('./routes/pivotComputeWorkerRoutes.js');
+  const pivotAdminComputeJobsRoutes = require('./routes/pivotAdminComputeJobsRoutes.js');
   const publicEventRoutes = require('./routes/publicEventRoutes.js');
 
   app.use(authRoutes);
@@ -372,6 +374,8 @@ function createApp() {
   app.use('/api/notice', noticeRoutes);
   app.use('/pivot', pivotRoutes);
   app.use('/admin/pivot', pivotAdminRoutes);
+  app.use('/admin/pivot/compute-jobs', pivotAdminComputeJobsRoutes);
+  app.use('/worker/pivot/compute/v1', createPivotComputeWorkerRouter());
   app.use('/verify-affiliated-email', affiliatedEmailRoutes);
   app.use('/proxy-image', require('./routes/proxyImageRoutes.js'));
 

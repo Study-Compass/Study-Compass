@@ -22,6 +22,8 @@ const pivotCarouselVoiceSchema = require('../schemas/pivotCarouselVoice');
 const justGoLandingEventSchema = require('../schemas/justGoLandingEvent');
 const justGoWaitlistSchema = require('../schemas/justGoWaitlist');
 const justGoLandingQrSchema = require('../schemas/justGoLandingQr');
+const pivotComputeJobSchema = require('../schemas/pivotComputeJob');
+const pivotComputeJobAttemptSchema = require('../schemas/pivotComputeJobAttempt');
 
 /**
  * Get models from the global/platform DB (cross-tenant data).
@@ -126,6 +128,16 @@ const getGlobalModels = (req, ...names) => {
             'JustGoLandingQr',
             justGoLandingQrSchema,
             'justgo_landing_qrs'
+        ),
+        PivotComputeJob: db.model(
+            'PivotComputeJob',
+            pivotComputeJobSchema,
+            'pivot_compute_jobs'
+        ),
+        PivotComputeJobAttempt: db.model(
+            'PivotComputeJobAttempt',
+            pivotComputeJobAttemptSchema,
+            'pivot_compute_job_attempts'
         ),
     };
 
