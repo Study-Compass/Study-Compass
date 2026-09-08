@@ -392,9 +392,10 @@ export function ZineCard({ issue, values, events, options = {} }) {
  * 04 — the notice. One event at full weight with the knockout punched through
  * it. With no figure competing, the photograph carries the frame.
  */
-export function ZineNotice({ issue, values, events, options }) {
+export function ZineNotice({ issue, values, events, options = {} }) {
   const event = events[0] || {};
   const shape = options.knockoutShape || 0;
+  const tone = photoTone(options);
 
   return (
     <>
@@ -405,7 +406,7 @@ export function ZineNotice({ issue, values, events, options }) {
       <figure className="jgz-notice__plate">
         <ZinePhoto src={event.cover} alt={event.title} className="jgz-notice__photo" />
         <ZineKnockout shape={shape} />
-        <figcaption className="jgz-notice__cut">{values.cut}</figcaption>
+        <figcaption className={`jgz-notice__cut${tone}`}>{values.cut}</figcaption>
       </figure>
 
       <div className="jgz-notice__body">

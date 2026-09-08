@@ -165,6 +165,9 @@ const ZINE_SLIDE_TYPES = Object.freeze({
     ],
     options: [
       { key: 'knockoutShape', kind: 'enum', values: [0, 1, 2], default: 0, label: 'cut shape' },
+      // The caption inside the cut sits on the photograph, so it needs the same
+      // control the cover and the card have.
+      { key: 'photoText', kind: 'enum', values: ['auto', 'light', 'dark'], default: 'auto', label: 'text over photo' },
     ],
     perEvent: [
       { key: 'tags', kind: 'tags', max: 3, itemMax: 22, optional: true },
