@@ -57,6 +57,9 @@ jest.mock('./PivotVoicePage', () => ({ scope, tenantKey }) => (
 jest.mock('./PivotTenantLaunchPage', () => ({ tenantKey }) => (
   <div>city-launch-page:{tenantKey}</div>
 ));
+jest.mock('../PivotWeeklyDrop/PivotWeeklyDropPage', () => ({ tenantKey }) => (
+  <div>city-weekly-drop-page:{tenantKey}</div>
+));
 jest.mock('./PivotTenantLocationMigrationPage', () => ({
   __esModule: true,
   default: ({ tenantKey }) => <div>city-location-migration-page:{tenantKey}</div>,
@@ -169,5 +172,16 @@ describe('PivotTenantDashboard city operations shell', () => {
     expect(screen.getByText('overview-page')).toBeInTheDocument();
     expect(screen.queryByText(/city-launch-page/)).toBeNull();
     expect(screen.queryByText(/\+1/)).toBeNull();
+  });
+
+  it('appends the tenant weekly drop panel without renumbering existing pages', () => {
+    renderDashboard('/platform-admin/pivot/nyc?page=9');
+
+    expect(screen.getByText('city-weekly-drop-page:nyc')).toBeInTheDocument();
+    expect(screen.getByTestId('menu-9')).toHaveTextContent('Weekly drop');
+    expect(screen.getByTestId('menu-9')).toHaveAttribute(
+      'data-icon',
+      'mdi:bell-ring-outline',
+    );
   });
 });

@@ -93,7 +93,10 @@ const {
   listLocationReviewCandidates,
   reviewLocationCandidate,
 } = require('../services/pivotLocationReviewService');
-const { collapseCatalogEventsToShowtimes } = require('../services/pivotCatalogShowtimeCollapseService');
+const {
+  collapseCatalogEventsToShowtimes,
+  previewCatalogShowtimeCollapse,
+} = require('../services/pivotCatalogShowtimeCollapseService');
 const { enrichPivotEventRichData } = require('../services/pivotRichDataEnrichmentService');
 const {
   purgePivotCatalog,
@@ -2693,9 +2696,10 @@ router.post('/ingest', verifyToken, requirePlatformAdmin, async (req, res) => {
   }
 });
 
-router.post('/ingest/collapse-showtimes', verifyToken, requirePlatformAdmin, async (req, res) => {
+/** Read-only: what a collapse would produce, so it can be reviewed first. */
+router.post('/ingest/collapse-showtimes/preview', verifyToken, requirePlatformAdmin, async (req, res) => {
   try {
-    const result = await collapseCatalogEventsToShowtimes(req, {
+    const result = await previewCatalogShowtimeCollapse(req, {
       tenantKey: req.body?.tenantKey,
       eventIds: req.body?.eventIds,
       keepEventId: req.body?.keepEventId,
@@ -2705,6 +2709,34 @@ router.post('/ingest/collapse-showtimes', verifyToken, requirePlatformAdmin, asy
         success: false,
         message: result.error,
         code: result.code,
+      });
+    }
+    return res.status(200).json({ success: true, data: result.data });
+  } catch (err) {
+    logPivotRouteError('POST /admin/pivot/ingest/collapse-showtimes/preview', err, req);
+    return res.status(500).json({
+      success: false,
+      message: 'Unable to preview the roll-up.',
+    });
+  }
+});
+
+router.post('/ingest/collapse-showtimes', verifyToken, requirePlatformAdmin, async (req, res) => {
+  try {
+    const result = await collapseCatalogEventsToShowtimes(req, {
+      tenantKey: req.body?.tenantKey,
+      eventIds: req.body?.eventIds,
+      keepEventId: req.body?.keepEventId,
+      acknowledgedWarnings: req.body?.acknowledgedWarnings,
+    });
+    if (result.error) {
+      return res.status(result.status || 400).json({
+        success: false,
+        message: result.error,
+        code: result.code,
+        // A refusal over unreviewed warnings carries the plan back, so the
+        // caller can show what changed rather than just failing.
+        ...(result.data ? { data: result.data } : {}),
       });
     }
 

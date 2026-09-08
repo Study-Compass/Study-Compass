@@ -470,11 +470,34 @@ describe('PivotTenantCatalogPage', () => {
         refetch: refetchDetail,
       };
     });
-    postRequest.mockResolvedValue({
-      success: true,
-      data: { event: { name: 'Derrick Stroup' }, showtimeCount: 2, collapsedCount: 1 },
-    });
-    window.confirm = jest.fn(() => true);
+    // Preview first, then apply — the roll-up is reviewed before it happens.
+    const plan = {
+      survivor: { _id: 'evt-1', name: 'Derrick Stroup', ingestStatus: 'staged' },
+      absorbed: [{ _id: 'evt-2', name: 'Derrick Stroup', start_time: '2026-08-28T02:30:00.000Z', location: '' }],
+      candidates: [
+        { _id: 'evt-1', name: 'Derrick Stroup', start_time: '2026-08-29T02:00:00.000Z', location: '', ingestStatus: 'staged', showtimes: 1 },
+        { _id: 'evt-2', name: 'Derrick Stroup', start_time: '2026-08-28T02:30:00.000Z', location: '', ingestStatus: 'staged', showtimes: 1 },
+      ],
+      result: {
+        name: 'Derrick Stroup',
+        host: 'Cobbs',
+        location: "Cobb's Comedy Club",
+        batchWeek: '2026-W35',
+        tags: [],
+        showtimes: [
+          { id: '202608280230', start_time: '2026-08-28T02:30:00.000Z' },
+          { id: '202608290200', start_time: '2026-08-29T02:00:00.000Z' },
+        ],
+      },
+      warnings: [],
+      deletes: 1,
+      intents: { toMigrate: 0 },
+    };
+    postRequest.mockImplementation((url) => Promise.resolve(
+      url.endsWith('/preview')
+        ? { success: true, data: plan }
+        : { success: true, data: { event: { name: 'Derrick Stroup' }, showtimeCount: 2, collapsedCount: 1 } },
+    ));
 
     render(
       <MemoryRouter initialEntries={['/platform-admin/pivot/nyc?page=4&organizerId=org-1']}>
@@ -484,15 +507,35 @@ describe('PivotTenantCatalogPage', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Collapse 2 nights' }));
 
+    // Opening asks what would happen; it must not write anything yet.
+    await waitFor(() => {
+      expect(postRequest).toHaveBeenCalledWith('/admin/pivot/ingest/collapse-showtimes/preview', {
+        tenantKey: 'nyc',
+        eventIds: ['evt-1', 'evt-2'],
+      });
+    });
+    expect(postRequest).not.toHaveBeenCalledWith(
+      '/admin/pivot/ingest/collapse-showtimes',
+      expect.anything(),
+    );
+    expect(refetchDetail).not.toHaveBeenCalled();
+
+    // Wait for the plan itself, not just the dialog: the apply button is inert
+    // until there is an outcome to agree to.
+    await screen.findByText('Which listing survives');
+    fireEvent.click(screen.getByRole('button', { name: /Roll up 2/ }));
+
     await waitFor(() => {
       expect(postRequest).toHaveBeenCalledWith('/admin/pivot/ingest/collapse-showtimes', {
         tenantKey: 'nyc',
         eventIds: ['evt-1', 'evt-2'],
+        keepEventId: 'evt-1',
+        acknowledgedWarnings: [],
       });
       expect(refetchDetail).toHaveBeenCalled();
     });
     expect(mockAddNotification).toHaveBeenCalledWith(
-      expect.objectContaining({ title: 'Collapsed into showtimes', type: 'success' }),
+      expect.objectContaining({ title: 'Rolled up into showtimes', type: 'success' }),
     );
   });
 });

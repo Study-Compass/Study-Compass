@@ -10,7 +10,7 @@
 import React from 'react';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { ZINE_DEMO_DECK } from './zineDemoDeck';
-import { resolveSlide, sampleSlideFor } from './zineDeck';
+import { frameClass, resolveSlide, sampleSlideFor } from './zineDeck';
 import { ZineEditProvider } from './zineField';
 import {
   ZineBack,
@@ -484,5 +484,35 @@ describe('slide options', () => {
       expect(text).toContain('a different masthead');
       expect(text).not.toContain('sorry u missed it');
     });
+  });
+});
+
+/**
+ * The ink plate is the whole visible difference of the newsprint edition, and
+ * it belongs to the issue rather than to a slide — a deck with the wash on some
+ * photographs and not others is not a printing decision. One helper builds the
+ * class for all four places that render a frame, so a slide cannot print
+ * differently from its own thumbnail.
+ */
+describe('the newsprint ink plate', () => {
+  test('night has no ink modifier, because there is no plate to switch off', () => {
+    expect(frameClass({ edition: 'night' })).toBe('jgz-frame jgz-frame--night');
+    expect(frameClass({ edition: 'night', inkPlate: false })).toBe('jgz-frame jgz-frame--night');
+  });
+
+  test('newsprint carries the plate by default', () => {
+    expect(frameClass({ edition: 'paper' })).toBe('jgz-frame jgz-frame--paper');
+    expect(frameClass({ edition: 'paper', inkPlate: true })).toBe('jgz-frame jgz-frame--paper');
+  });
+
+  test('switching it off adds the modifier the stylesheet keys on', () => {
+    expect(frameClass({ edition: 'paper', inkPlate: false }))
+      .toBe('jgz-frame jgz-frame--paper jgz-frame--noink');
+  });
+
+  test('an unknown or missing edition falls back to night rather than nothing', () => {
+    expect(frameClass({})).toBe('jgz-frame jgz-frame--night');
+    expect(frameClass(null)).toBe('jgz-frame jgz-frame--night');
+    expect(frameClass({ edition: 'letterpress' })).toBe('jgz-frame jgz-frame--night');
   });
 });

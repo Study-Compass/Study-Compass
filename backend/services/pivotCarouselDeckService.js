@@ -72,6 +72,7 @@ function serializeDeck(doc, { withSlides = true } = {}) {
     title: row.title,
     batchWeek: row.batchWeek || null,
     edition: row.edition || 'night',
+    inkPlate: row.inkPlate !== false,
     issue: row.issue || {},
     slideCount: (row.slides || []).length,
     lastExportedAt: row.lastExportedAt || null,
@@ -219,6 +220,7 @@ async function createCarouselDeck(req, tenantKey, body = {}) {
     title,
     batchWeek,
     edition: body.edition === 'paper' ? 'paper' : 'night',
+    inkPlate: body.inkPlate !== false,
     issue: coerceIssue(body.issue),
     voice: coerceVoice(body.voice),
     slides,
@@ -254,6 +256,7 @@ async function updateCarouselDeck(req, tenantKey, deckId, body = {}) {
   }
 
   if (body.edition !== undefined) doc.edition = body.edition === 'paper' ? 'paper' : 'night';
+  if (body.inkPlate !== undefined) doc.inkPlate = body.inkPlate !== false;
   if (body.issue !== undefined) doc.issue = coerceIssue(body.issue);
   if (body.voice !== undefined) doc.voice = coerceVoice(body.voice);
 

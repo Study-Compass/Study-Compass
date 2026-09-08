@@ -224,6 +224,18 @@ const userSchema = new mongoose.Schema({
         enum: ['campus', 'pivot'],
         default: 'campus',
     },
+    /** Store binary that issued the Expo token; distinct from runtime edition. */
+    pushAppProduct: {
+        type: String,
+        enum: ['campus', 'justgo'],
+        required: false,
+        default: null,
+    },
+    pushTokenUpdatedAt: {
+        type: Date,
+        required: false,
+        default: null,
+    },
     /** When true, password login and API access (verifyToken) are blocked for this tenant user. */
     accessSuspended: {
         type: Boolean,

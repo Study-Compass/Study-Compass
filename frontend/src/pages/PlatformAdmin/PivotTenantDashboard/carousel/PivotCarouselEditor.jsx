@@ -13,7 +13,7 @@
 
 import React, { useCallback, useMemo, useState } from 'react';
 import { ZineEditProvider, writePath } from './zineField';
-import { resolveSlide, slideGaps } from './zineDeck';
+import { frameClass, resolveSlide, slideGaps } from './zineDeck';
 import PivotCarouselVoicePanel from './PivotCarouselVoicePanel';
 import PivotCarouselEventPicker from './PivotCarouselEventPicker';
 import PivotCarouselAddSlide from './PivotCarouselAddSlide';
@@ -43,7 +43,7 @@ function SlideThumb({ deck, slide, index, manifest, cityVoice, frames, selected,
         aria-current={selected}
         onClick={() => onSelect(index)}
       >
-        <span className={`jgz-frame jgz-frame--${deck.edition}`} aria-hidden="true">
+        <span className={frameClass(deck)} aria-hidden="true">
           {Frame ? <Frame {...resolved.props} /> : null}
         </span>
         <span className="jgz-strip__caption">
@@ -312,7 +312,7 @@ export default function PivotCarouselEditor({
 
         <div className="jgz-editor__canvas">
           <div className="jgz-editor__stage">
-            <div className={`jgz-frame jgz-frame--${deck.edition}`}>
+            <div className={frameClass(deck)}>
               <ZineEditProvider value={editContext}>
                 {Frame
                   ? <Frame {...resolveSlide(deck, slide, index, manifest, cityVoice).props} />
@@ -496,6 +496,7 @@ export default function PivotCarouselEditor({
         manifest={manifest}
         frames={frames}
         edition={deck.edition}
+        inkPlate={deck.inkPlate}
         issue={deck.issue}
         cityVoice={cityVoice}
         onClose={() => setAdding(false)}

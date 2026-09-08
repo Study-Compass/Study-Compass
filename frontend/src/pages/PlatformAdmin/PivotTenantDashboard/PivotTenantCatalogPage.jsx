@@ -9,6 +9,7 @@ import {
   PivotOpsSection,
 } from '../../../components/PivotOps';
 import PivotTenantPage from './PivotTenantPage';
+import PivotRollupReviewModal from './PivotRollupReviewModal';
 import {
   CatalogBackfillBar,
   CatalogMergeForm,
@@ -412,7 +413,13 @@ function PivotTenantCatalogPage({ tenantKey, cityDisplayName }) {
   const [backfillBusy, setBackfillBusy] = useState(false);
   const [backfillError, setBackfillError] = useState('');
   const [mergeBusy, setMergeBusy] = useState(false);
-  const [collapseBusyKey, setCollapseBusyKey] = useState(null);
+  const [rollupOpen, setRollupOpen] = useState(false);
+  const [rollupClusterKey, setRollupClusterKey] = useState(null);
+  const [rollupIds, setRollupIds] = useState([]);
+  const [rollupPlan, setRollupPlan] = useState(null);
+  const [rollupLoading, setRollupLoading] = useState(false);
+  const [rollupApplying, setRollupApplying] = useState(false);
+  const [rollupError, setRollupError] = useState(null);
   const [dismissedProposals, setDismissedProposals] = useState(() => new Set());
 
   const debouncedQuery = useDebouncedValue(searchQuery.trim(), SEARCH_DEBOUNCE_MS);
@@ -623,42 +630,75 @@ function PivotTenantCatalogPage({ tenantKey, cityDisplayName }) {
     [handleMerge],
   );
 
-  const handleCollapseShowtimes = useCallback(
-    async (events) => {
-      if (!tenantKey || collapseBusyKey || !Array.isArray(events) || events.length < 2) return;
-      if (
-        !window.confirm(
-          `Collapse ${events.length} nights of “${events[0]?.name || 'this event'}” into one listing with showtimes? Extra catalog rows will be removed.`,
-        )
-      ) {
-        return;
-      }
-
-      const key = eventNameKey(events[0]?.name) || events[0]?.id;
-      setCollapseBusyKey(key);
-      const result = await postRequest('/admin/pivot/ingest/collapse-showtimes', {
+  /**
+   * Ask the server what a roll-up would do. Called on open and again whenever
+   * the survivor changes, because the survivor decides what is kept and which
+   * warnings apply — a stale preview would describe a different outcome.
+   */
+  const loadRollupPlan = useCallback(
+    async (eventIds, keepEventId) => {
+      setRollupLoading(true);
+      setRollupError(null);
+      const result = await postRequest('/admin/pivot/ingest/collapse-showtimes/preview', {
         tenantKey,
-        eventIds: events.map((event) => event.id),
+        eventIds,
+        ...(keepEventId ? { keepEventId } : {}),
       });
-      setCollapseBusyKey(null);
+      setRollupLoading(false);
 
       if (result?.error) {
-        addNotification({
-          title: 'Could not collapse showtimes',
-          message: result.error,
-          type: 'error',
-        });
+        setRollupError(result.error);
+        setRollupPlan(null);
+        return;
+      }
+      setRollupPlan(result?.data || null);
+    },
+    [tenantKey],
+  );
+
+  const openRollup = useCallback(
+    (events) => {
+      if (!tenantKey || !Array.isArray(events) || events.length < 2) return;
+      setRollupClusterKey(eventNameKey(events[0]?.name) || events[0]?.id);
+      const ids = events.map((event) => event.id);
+      setRollupIds(ids);
+      setRollupPlan(null);
+      setRollupOpen(true);
+      loadRollupPlan(ids);
+    },
+    [loadRollupPlan, tenantKey],
+  );
+
+  const applyRollup = useCallback(
+    async (acknowledgedWarnings) => {
+      if (!rollupIds.length || rollupApplying) return;
+      setRollupApplying(true);
+      setRollupError(null);
+      const result = await postRequest('/admin/pivot/ingest/collapse-showtimes', {
+        tenantKey,
+        eventIds: rollupIds,
+        keepEventId: rollupPlan?.survivor?._id,
+        acknowledgedWarnings,
+      });
+      setRollupApplying(false);
+
+      if (result?.error) {
+        // A refusal carries the plan back when it changed under review.
+        if (result?.data) setRollupPlan(result.data);
+        setRollupError(result.error);
         return;
       }
 
+      setRollupOpen(false);
+      setRollupPlan(null);
       refetchDetail();
       addNotification({
-        title: 'Collapsed into showtimes',
-        message: `${result?.data?.event?.name || events[0]?.name} now has ${result?.data?.showtimeCount ?? events.length} showtimes.`,
+        title: 'Rolled up into showtimes',
+        message: `${result?.data?.event?.name || 'The listing'} now has ${result?.data?.showtimeCount ?? ''} showtimes.`.replace('  ', ' '),
         type: 'success',
       });
     },
-    [addNotification, collapseBusyKey, refetchDetail, tenantKey],
+    [addNotification, refetchDetail, rollupApplying, rollupIds, rollupPlan, tenantKey],
   );
 
   const openOrganizer = useCallback(
@@ -699,10 +739,24 @@ function PivotTenantCatalogPage({ tenantKey, cityDisplayName }) {
           loading={detailLoading}
           error={detailMessage}
           onBack={closeOrganizer}
-          onCollapseShowtimes={handleCollapseShowtimes}
-          collapseBusyKey={collapseBusyKey}
+          onCollapseShowtimes={openRollup}
+          collapseBusyKey={rollupOpen ? rollupClusterKey : null}
         />
       ) : null}
+
+      <PivotRollupReviewModal
+        isOpen={rollupOpen}
+        plan={rollupPlan}
+        loading={rollupLoading}
+        applying={rollupApplying}
+        error={rollupError}
+        onPickSurvivor={(keepEventId) => loadRollupPlan(rollupIds, keepEventId)}
+        onApply={applyRollup}
+        onClose={() => {
+          setRollupOpen(false);
+          setRollupError(null);
+        }}
+      />
       {organizerId ? null : (
       <PivotOpsSection
         title={

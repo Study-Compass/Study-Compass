@@ -16,7 +16,7 @@
 
 import React, { useEffect, useMemo, useState } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
-import { resolveSlide } from './zineDeck';
+import { frameClass, resolveSlide } from './zineDeck';
 import {
   ZineBack,
   ZineCard,
@@ -137,7 +137,7 @@ export default function PivotCarouselFrame() {
 
   return (
     <div className="jgz-export" data-ready={ready ? '1' : undefined} data-slide={slide.type}>
-      <div className={`jgz-frame jgz-frame--${payload.deck.edition || 'night'}`}>
+      <div className={frameClass(payload.deck)}>
         <Frame {...slide.props} />
       </div>
     </div>

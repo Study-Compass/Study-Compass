@@ -384,16 +384,6 @@ async function countPublishedEvents(tenantKey, batchWeek) {
   });
 }
 
-async function countPivotPushRecipients(tenantKey) {
-  const db = await connectionsManager.connectToDatabase(tenantKey);
-  const req = { db, school: tenantKey };
-  const { User } = getModels(req, 'User');
-  return User.countDocuments({
-    pushToken: { $exists: true, $nin: [null, ''] },
-    pushAppEdition: 'pivot',
-  });
-}
-
 async function loadPivotPushRecipients(tenantKey) {
   const db = await connectionsManager.connectToDatabase(tenantKey);
   const req = { db, school: tenantKey };
@@ -402,7 +392,68 @@ async function loadPivotPushRecipients(tenantKey) {
     pushToken: { $exists: true, $nin: [null, ''] },
     pushAppEdition: 'pivot',
   })
-    .select('_id pushToken')
+    .select('_id pushToken pushAppProduct pushTokenUpdatedAt username name createdAt')
+    .lean();
+}
+
+function summarizePushAudience(users = []) {
+  const summary = {
+    totalUsers: users.length,
+    eligible: 0,
+    noToken: 0,
+    otherEdition: 0,
+    products: { justgo: 0, campus: 0, legacy: 0 },
+    users: [],
+  };
+
+  for (const user of users) {
+    const hasToken = typeof user?.pushToken === 'string' && user.pushToken.trim();
+    const eligible = Boolean(hasToken && user.pushAppEdition === 'pivot');
+    if (!hasToken) summary.noToken += 1;
+    else if (!eligible) summary.otherEdition += 1;
+    if (!eligible) continue;
+
+    summary.eligible += 1;
+    const product = user.pushAppProduct === 'justgo' || user.pushAppProduct === 'campus'
+      ? user.pushAppProduct
+      : 'legacy';
+    summary.products[product] += 1;
+    summary.users.push({
+      id: user._id?.toString?.() || String(user._id || ''),
+      username: user.username || null,
+      name: user.name || null,
+      product,
+      tokenRegisteredAt: user.pushTokenUpdatedAt || null,
+      joinedAt: user.createdAt || null,
+    });
+  }
+
+  summary.users.sort((a, b) => {
+    const aTime = new Date(a.tokenRegisteredAt || a.joinedAt || 0).getTime();
+    const bTime = new Date(b.tokenRegisteredAt || b.joinedAt || 0).getTime();
+    return bTime - aTime;
+  });
+  return summary;
+}
+
+async function loadPushAudience(tenantKey) {
+  const db = await connectionsManager.connectToDatabase(tenantKey);
+  const req = { db, school: tenantKey };
+  const { User } = getModels(req, 'User');
+  const users = await User.find({})
+    .select('_id username name createdAt pushToken pushAppEdition pushAppProduct pushTokenUpdatedAt')
+    .lean();
+  return summarizePushAudience(users);
+}
+
+async function loadRecentPushRuns(tenantKey, limit = 8) {
+  const db = await connectionsManager.connectToDatabase(tenantKey);
+  const req = { db, school: tenantKey };
+  const { PivotDropPushRun } = getModels(req, 'PivotDropPushRun');
+  return PivotDropPushRun.find({ tenantKey })
+    .sort({ createdAt: -1 })
+    .limit(limit)
+    .select('-__v')
     .lean();
 }
 
@@ -493,16 +544,19 @@ async function getWeeklyDropStatus(req, tenantKey, batchWeekInput) {
     return { status: 400, error: 'batchWeek must be YYYY-Www.' };
   }
 
-  const [publishedEventCount, pivotPushRecipientCount] = await Promise.all([
+  const [publishedEventCount, audience, recentRuns] = await Promise.all([
     countPublishedEvents(tenantKey, batchWeek),
-    countPivotPushRecipients(tenantKey),
+    loadPushAudience(tenantKey),
+    loadRecentPushRuns(tenantKey),
   ]);
 
   return {
     tenant: serializeTenantForAdmin(tenant),
     dropSchedule: serializeDropSchedule(tenant, batchWeek),
     publishedEventCount,
-    pivotPushRecipientCount,
+    pivotPushRecipientCount: audience.eligible,
+    audience,
+    recentRuns,
     dayNames: DAY_NAMES,
   };
 }
@@ -538,13 +592,48 @@ async function updateWeeklyDropConfig(req, tenantKey, body, updatedBy) {
 }
 
 async function sendExpoBatch(messages) {
-  const response = await axios.post(EXPO_PUSH_URL, messages, {
-    headers: {
-      'Content-Type': 'application/json',
-      Accept: 'application/json',
-      'Accept-Encoding': 'gzip, deflate',
-    },
-  });
+  let response;
+  try {
+    response = await axios.post(EXPO_PUSH_URL, messages, {
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+        'Accept-Encoding': 'gzip, deflate',
+      },
+    });
+  } catch (error) {
+    /*
+     * A pivot audience can contain tokens issued by both the Meridian and the
+     * standalone Just Go Expo projects. Expo rejects a request containing
+     * multiple projects with HTTP 400. The token itself is opaque, so split a
+     * rejected batch until each request contains one known-safe token. Expo's
+     * 4xx response rejects the entire request, which makes these retries safe.
+     */
+    if (messages.length > 1 && error?.response?.status === 400) {
+      const middle = Math.ceil(messages.length / 2);
+      const [left, right] = await Promise.all([
+        sendExpoBatch(messages.slice(0, middle)),
+        sendExpoBatch(messages.slice(middle)),
+      ]);
+      return {
+        sent: left.sent + right.sent,
+        failed: left.failed + right.failed,
+        errors: [...left.errors, ...right.errors],
+      };
+    }
+
+    const expoErrors = error?.response?.data?.errors;
+    const messagesFromExpo = Array.isArray(expoErrors)
+      ? expoErrors.map((row) => row?.message || row?.code).filter(Boolean)
+      : [];
+    const fallbackMessage =
+      error?.response?.data?.message || error?.message || 'Expo push request failed.';
+    return {
+      sent: 0,
+      failed: messages.length,
+      errors: messagesFromExpo.length ? messagesFromExpo : [fallbackMessage],
+    };
+  }
 
   const tickets = Array.isArray(response.data?.data)
     ? response.data.data
@@ -647,12 +736,56 @@ async function sendWeeklyDropPush(req, tenantKey, options = {}) {
   let failed = 0;
   const errors = [];
 
-  for (let index = 0; index < messages.length; index += EXPO_BATCH_SIZE) {
-    const batch = messages.slice(index, index + EXPO_BATCH_SIZE);
-    const result = await sendExpoBatch(batch);
-    sent += result.sent;
-    failed += result.failed;
-    errors.push(...result.errors);
+  const messagesByProduct = new Map();
+  messages.forEach((message, index) => {
+    const product = recipients[index]?.pushAppProduct;
+    // Legacy tokens have no product metadata. Keep each isolated until the app
+    // next launches and re-registers it with pushAppProduct.
+    const key = product === 'campus' || product === 'justgo'
+      ? product
+      : `legacy-${index}`;
+    const group = messagesByProduct.get(key) || [];
+    group.push(message);
+    messagesByProduct.set(key, group);
+  });
+
+  for (const productMessages of messagesByProduct.values()) {
+    for (let index = 0; index < productMessages.length; index += EXPO_BATCH_SIZE) {
+      const batch = productMessages.slice(index, index + EXPO_BATCH_SIZE);
+      const result = await sendExpoBatch(batch);
+      sent += result.sent;
+      failed += result.failed;
+      errors.push(...result.errors);
+    }
+  }
+
+  const audience = {
+    campus: recipients.filter((row) => row.pushAppProduct === 'campus').length,
+    justgo: recipients.filter((row) => row.pushAppProduct === 'justgo').length,
+    legacy: recipients.filter(
+      (row) => row.pushAppProduct !== 'campus' && row.pushAppProduct !== 'justgo',
+    ).length,
+  };
+
+  try {
+    const db = await connectionsManager.connectToDatabase(tenantKey);
+    const runReq = { db, school: tenantKey };
+    const { PivotDropPushRun } = getModels(runReq, 'PivotDropPushRun');
+    await PivotDropPushRun.create({
+      tenantKey,
+      batchWeek,
+      title: pushCopy.title,
+      body: pushCopy.body,
+      attempted: recipients.length,
+      accepted: sent,
+      failed,
+      audience,
+      errors: errors.slice(0, 20),
+      forced: force,
+      triggeredBy: options.triggeredBy || null,
+    });
+  } catch (error) {
+    console.error('[pivotWeeklyDrop] failed to persist push run:', error?.message || error);
   }
 
   // Best-effort: freeze this week's metrics right after the drop so Lab trends
@@ -677,6 +810,7 @@ async function sendWeeklyDropPush(req, tenantKey, options = {}) {
     pivotPushRecipientCount: recipients.length,
     sent,
     failed,
+    audience,
     snapshotRebuilt,
     warnings,
     errors: errors.slice(0, 5),

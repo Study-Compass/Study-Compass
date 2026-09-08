@@ -152,7 +152,7 @@ function emptyJobForm() {
   return {
     label: '',
     url: '',
-    provider: 'partiful',
+    provider: 'generic-site',
     defaultBatchWeekStrategy: 'next-drop',
     defaultTags: [],
     enabled: true,
@@ -731,7 +731,9 @@ function PivotTenantCurationPage({ tenantKey, cityDisplayName }) {
     setJobForm({
       label: job.label || '',
       url: job.url || '',
-      provider: job.provider || 'partiful',
+      // A saved job without a provider predates the field; read it off the URL
+      // rather than assuming, so editing one cannot relabel it by accident.
+      provider: job.provider || detectProviderFromUrl(job.url) || 'generic-site',
       defaultBatchWeekStrategy: job.defaultBatchWeekStrategy || 'next-drop',
       defaultTags: Array.isArray(job.defaultTags) ? [...job.defaultTags] : [],
       enabled: job.enabled !== false,
@@ -754,7 +756,8 @@ function PivotTenantCurationPage({ tenantKey, cityDisplayName }) {
     let provider = jobForm.provider;
     const url = jobForm.url.trim();
     if (!provider && url) {
-      provider = detectProviderFromUrl(url) || 'partiful';
+      // A host the detector does not recognise is a website, not a Partiful.
+      provider = detectProviderFromUrl(url) || 'generic-site';
     }
     if (provider !== 'manual-json' && !url) {
       addNotification({
@@ -1625,7 +1628,7 @@ function PivotTenantCurationPage({ tenantKey, cityDisplayName }) {
     if (mode === 'batch') {
       // Prefer saving as a job for explore URLs.
       const provider =
-        preview.data.data?.provider || detectProviderFromUrl(url) || 'partiful';
+        preview.data.data?.provider || detectProviderFromUrl(url) || 'generic-site';
       setJobForm({
         ...emptyJobForm(),
         label: preview.data.data?.listLabel || `${provider} explore`,
@@ -2281,110 +2284,11 @@ function PivotTenantCurationPage({ tenantKey, cityDisplayName }) {
             ) : null}
 
             {jobsError ? <p className="pivot-lab__error">{jobsError}</p> : null}
-            {jobsLoading ? (
-              <p className="pivot-lab__empty">Loading jobs…</p>
-            ) : jobs.length ? (
-              <div className="pivot-lab__table-wrap">
-                <table className="pivot-lab__table">
-                  <thead>
-                    <tr>
-                      <th scope="col">Label</th>
-                      <th scope="col">Provider</th>
-                      <th scope="col">URL</th>
-                      <th scope="col">Strategy</th>
-                      <th scope="col">Last run</th>
-                      <th scope="col">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {jobs.map((job) => (
-                      <tr
-                        key={job._id}
-                        className={job.enabled === false ? 'is-disabled' : undefined}
-                      >
-                        <td>
-                          <strong>{job.label}</strong>
-                          {job.enabled === false ? (
-                            <span className="pivot-lab__pill pivot-lab__pill--muted">
-                              {' '}
-                              Disabled
-                            </span>
-                          ) : null}
-                        </td>
-                        <td>{job.provider}</td>
-                        <td className="pivot-tenant-curation__url-cell">
-                          {job.url ? (
-                            <a href={job.url} target="_blank" rel="noreferrer">
-                              {job.url}
-                            </a>
-                          ) : (
-                            '—'
-                          )}
-                        </td>
-                        <td>{job.defaultBatchWeekStrategy || 'next-drop'}</td>
-                        <td>
-                          {job.lastRunStatus ? (
-                            <>
-                              <RunStatusPill status={job.lastRunStatus} />{' '}
-                              <span className="pivot-tenant-curation__muted">
-                                {job.lastRunStats
-                                  ? `${job.lastRunStats.upserted ?? 0}/${
-                                      job.lastRunStats.discovered ?? 0
-                                    }`
-                                  : ''}
-                              </span>
-                            </>
-                          ) : (
-                            '—'
-                          )}
-                        </td>
-                        <td>
-                          <div className="pivot-tenant-curation__row-actions">
-                            <button
-                              type="button"
-                              className="linear-btn linear-btn--primary"
-                              disabled={
-                                job.provider === 'manual-json'
-                                || job.enabled === false
-                                || !batchWeekValid
-                                || !weekSettled
-                                || busyKey === `job-run-${job._id}`
-                                || Boolean(runInFlight)
-                              }
-                              onClick={() => handleRunJob(job)}
-                            >
-                              {busyKey === `job-run-${job._id}`
-                                ? 'Starting…'
-                                : `Run for ${committedWeek}`}
-                            </button>
-                            <button
-                              type="button"
-                              className="linear-btn linear-btn--ghost"
-                              onClick={() => openEditJob(job)}
-                            >
-                              Edit
-                            </button>
-                            <button
-                              type="button"
-                              className="linear-btn linear-btn--ghost"
-                              disabled={busyKey === `job-delete-${job._id}`}
-                              onClick={() => handleDeleteJob(job)}
-                            >
-                              Delete
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            ) : (
-              <p className="pivot-lab__empty">
-                No saved jobs yet. Add a Partiful or Luma explore URL to crawl into this week.
-              </p>
-            )}
-
+            {/*
+             * Above the table, not below it. This is where a job is added and
+             * where one is edited, and a city with a long list put both a
+             * scroll away from the button that opens them.
+             */}
             {jobFormOpen ? (
               <div className="pivot-tenant-curation__job-form" role="region" aria-label="Job form">
                 <h3 className="pivot-tenant-curation__job-form-title">
@@ -2509,6 +2413,111 @@ function PivotTenantCurationPage({ tenantKey, cityDisplayName }) {
                 </div>
               </div>
             ) : null}
+
+            {jobsLoading ? (
+              <p className="pivot-lab__empty">Loading jobs…</p>
+            ) : jobs.length ? (
+              <div className="pivot-lab__table-wrap">
+                <table className="pivot-lab__table">
+                  <thead>
+                    <tr>
+                      <th scope="col">Label</th>
+                      <th scope="col">Provider</th>
+                      <th scope="col">URL</th>
+                      <th scope="col">Strategy</th>
+                      <th scope="col">Last run</th>
+                      <th scope="col">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {jobs.map((job) => (
+                      <tr
+                        key={job._id}
+                        className={job.enabled === false ? 'is-disabled' : undefined}
+                      >
+                        <td>
+                          <strong>{job.label}</strong>
+                          {job.enabled === false ? (
+                            <span className="pivot-lab__pill pivot-lab__pill--muted">
+                              {' '}
+                              Disabled
+                            </span>
+                          ) : null}
+                        </td>
+                        <td>{job.provider}</td>
+                        <td className="pivot-tenant-curation__url-cell">
+                          {job.url ? (
+                            <a href={job.url} target="_blank" rel="noreferrer">
+                              {job.url}
+                            </a>
+                          ) : (
+                            '—'
+                          )}
+                        </td>
+                        <td>{job.defaultBatchWeekStrategy || 'next-drop'}</td>
+                        <td>
+                          {job.lastRunStatus ? (
+                            <>
+                              <RunStatusPill status={job.lastRunStatus} />{' '}
+                              <span className="pivot-tenant-curation__muted">
+                                {job.lastRunStats
+                                  ? `${job.lastRunStats.upserted ?? 0}/${
+                                      job.lastRunStats.discovered ?? 0
+                                    }`
+                                  : ''}
+                              </span>
+                            </>
+                          ) : (
+                            '—'
+                          )}
+                        </td>
+                        <td>
+                          <div className="pivot-tenant-curation__row-actions">
+                            <button
+                              type="button"
+                              className="linear-btn linear-btn--primary"
+                              disabled={
+                                job.provider === 'manual-json'
+                                || job.enabled === false
+                                || !batchWeekValid
+                                || !weekSettled
+                                || busyKey === `job-run-${job._id}`
+                                || Boolean(runInFlight)
+                              }
+                              onClick={() => handleRunJob(job)}
+                            >
+                              {busyKey === `job-run-${job._id}`
+                                ? 'Starting…'
+                                : `Run for ${committedWeek}`}
+                            </button>
+                            <button
+                              type="button"
+                              className="linear-btn linear-btn--ghost"
+                              onClick={() => openEditJob(job)}
+                            >
+                              Edit
+                            </button>
+                            <button
+                              type="button"
+                              className="linear-btn linear-btn--ghost"
+                              disabled={busyKey === `job-delete-${job._id}`}
+                              onClick={() => handleDeleteJob(job)}
+                            >
+                              Delete
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <p className="pivot-lab__empty">
+                No saved jobs yet. Add a listing URL — a website, or a Partiful or
+                Luma explore page — to crawl into this week.
+              </p>
+            )}
           </>
         ) : null}
       </section>

@@ -194,6 +194,21 @@
   }
 }
 
+.jgz__ink {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-family: 'Space Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;
+  font-size: 0.68rem;
+  color: var(--jgz-ink);
+  cursor: pointer;
+
+  input {
+    accent-color: var(--jgz-accent);
+    cursor: pointer;
+  }
+}
+
 .jgz__note {
   font-family: 'Space Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;
   font-size: 0.68rem;
@@ -437,6 +452,10 @@
  */
 .jgz-frame--paper .jgz-photo img {
   filter: grayscale(1) contrast(1.1) brightness(1.24);
+}
+
+.jgz-frame--noink .jgz-photo::after {
+  content: none;
 }
 
 .jgz-frame--paper .jgz-photo::after {

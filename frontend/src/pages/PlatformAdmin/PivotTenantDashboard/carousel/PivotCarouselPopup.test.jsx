@@ -202,3 +202,24 @@ describe('a popup that can contain another popup', () => {
     }
   });
 });
+
+/**
+ * Every place that renders a frame must build its class the same way, or a
+ * slide prints differently from the thumbnail it was approved in.
+ */
+describe('frame classes come from one place', () => {
+  test.each([
+    'PivotCarouselPage.jsx',
+    'PivotCarouselEditor.jsx',
+    'PivotCarouselFrame.jsx',
+    'PivotCarouselAddSlide.jsx',
+  ])('%s builds its class with the helper', (file) => {
+    const source = fs.readFileSync(path.join(__dirname, file), 'utf8');
+    expect(source).toMatch(/frameClass\(/);
+    expect(source).not.toMatch(/`jgz-frame jgz-frame--\$\{/);
+  });
+
+  test('the stylesheet keys the switch on the modifier the helper emits', () => {
+    expect(pageCss).toMatch(/\.jgz-frame--noink \.jgz-photo::after/);
+  });
+});

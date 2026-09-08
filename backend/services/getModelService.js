@@ -79,6 +79,7 @@ const pivotLocationBackfillWeekRunSchema = require('../schemas/pivotLocationBack
 const pivotLocationMigrationLeaseSchema = require('../schemas/pivotLocationMigrationLease');
 const pivotSafetyReportSchema = require('../schemas/pivotSafetyReport');
 const pivotUserBlockSchema = require('../schemas/pivotUserBlock');
+const pivotDropPushRunSchema = require('../schemas/pivotDropPushRun');
 const registeredConnections = new WeakSet();
 const MODEL_DEFINITIONS = Object.freeze({
     BadgeGrant: { modelName: 'BadgeGrant', schema: badgeGrantSchema, collection: 'badgegrants' },
@@ -215,6 +216,11 @@ const MODEL_DEFINITIONS = Object.freeze({
         modelName: 'PivotUserBlock',
         schema: pivotUserBlockSchema,
         collection: 'pivotUserBlocks',
+    },
+    PivotDropPushRun: {
+        modelName: 'PivotDropPushRun',
+        schema: pivotDropPushRunSchema,
+        collection: 'pivotDropPushRuns',
     },
     ResourcesConfig: { modelName: 'ResourcesConfig', schema: resourcesConfigSchema, collection: 'resourcesConfigs' },
     ShuttleConfig: { modelName: 'ShuttleConfig', schema: shuttleConfigSchema, collection: 'shuttleConfigs' },

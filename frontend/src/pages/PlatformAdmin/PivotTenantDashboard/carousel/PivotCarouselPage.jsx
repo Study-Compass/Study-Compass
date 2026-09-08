@@ -19,7 +19,7 @@ import { useNotification } from '../../../../NotificationContext';
 import PivotTenantPage from '../PivotTenantPage';
 import PivotCarouselEditor from './PivotCarouselEditor';
 import { ZINE_DEMO_DECK } from './zineDemoDeck';
-import { resolveDeck } from './zineDeck';
+import { frameClass, resolveDeck } from './zineDeck';
 import {
   ZineBack,
   ZineCard,
@@ -66,6 +66,7 @@ export default function PivotCarouselPage({ tenantKey, cityDisplayName }) {
   const [seeding, setSeeding] = useState(false);
   const [saving, setSaving] = useState(false);
   const [edition, setEdition] = useState('night');
+  const [inkPlate, setInkPlate] = useState(true);
 
   /** Load the deck list, then open the most recently touched one. */
   const load = useCallback(async () => {
@@ -91,6 +92,7 @@ export default function PivotCarouselPage({ tenantKey, cityDisplayName }) {
       setManifest(full.data.data.manifest);
       setCityVoice(full.data.data.cityVoice || {});
       setEdition(full.data.data.deck.edition || 'night');
+      setInkPlate(full.data.data.deck.inkPlate !== false);
     }
     setLoading(false);
   }, [tenantKey]);
@@ -140,6 +142,7 @@ export default function PivotCarouselPage({ tenantKey, cityDisplayName }) {
       data: {
         title: draft.title,
         edition,
+        inkPlate,
         issue: draft.issue,
         voice: draft.voice,
         slides: draft.slides,
@@ -247,13 +250,19 @@ export default function PivotCarouselPage({ tenantKey, cityDisplayName }) {
 
   /** Renders the reference issue read-only until a deck exists to edit. */
   const preview = useMemo(
-    () => resolveDeck({ ...ZINE_DEMO_DECK, edition }, manifest, cityVoice),
-    [edition, manifest, cityVoice],
+    () => resolveDeck({ ...ZINE_DEMO_DECK, edition, inkPlate }, manifest, cityVoice),
+    [edition, inkPlate, manifest, cityVoice],
   );
 
   const dirty = useMemo(
-    () => Boolean(draft && deck && JSON.stringify(draft) !== JSON.stringify(deck)),
-    [draft, deck],
+    () => Boolean(
+      draft && deck && (
+        JSON.stringify(draft) !== JSON.stringify(deck)
+        || edition !== deck.edition
+        || inkPlate !== (deck.inkPlate !== false)
+      ),
+    ),
+    [draft, deck, edition, inkPlate],
   );
 
   return (
@@ -276,6 +285,17 @@ export default function PivotCarouselPage({ tenantKey, cityDisplayName }) {
               </button>
             ))}
           </div>
+          {/* Only newsprint has an ink plate, so the control appears with it. */}
+          {edition === 'paper' ? (
+            <label className="jgz__ink">
+              <input
+                type="checkbox"
+                checked={inkPlate}
+                onChange={(event) => setInkPlate(event.target.checked)}
+              />
+              <span>ink plate</span>
+            </label>
+          ) : null}
           <span className="jgz__note">4:5 · 1080×1350</span>
         </div>
       }
@@ -283,7 +303,7 @@ export default function PivotCarouselPage({ tenantKey, cityDisplayName }) {
       <div className="jgz">
         {draft && manifest ? (
           <PivotCarouselEditor
-            deck={{ ...draft, edition }}
+            deck={{ ...draft, edition, inkPlate }}
             manifest={manifest}
             cityVoice={cityVoice}
             frames={FRAME_COMPONENTS}
@@ -333,7 +353,7 @@ export default function PivotCarouselPage({ tenantKey, cityDisplayName }) {
                 if (!Frame) return null;
                 return (
                   <li className="jgz__slot" key={slide.id}>
-                    <div className={`jgz-frame jgz-frame--${edition}`}>
+                    <div className={frameClass({ edition, inkPlate })}>
                       <Frame {...slide.props} />
                     </div>
                     <p className="jgz__slot-caption">

@@ -245,6 +245,19 @@ export function slideGaps(slide, manifest) {
 }
 
 /**
+ * The class list for a frame. One helper because four places render frames —
+ * the light table, the strip, the canvas and the export route — and a slide
+ * that prints differently from its own thumbnail is the bug this prevents.
+ */
+export function frameClass(deck) {
+  const edition = deck?.edition === 'paper' ? 'paper' : 'night';
+  // The ink plate only exists on newsprint, so the modifier is only meaningful
+  // there; adding it on night would be a class that never matches anything.
+  const noInk = edition === 'paper' && deck?.inkPlate === false;
+  return `jgz-frame jgz-frame--${edition}${noInk ? ' jgz-frame--noink' : ''}`;
+}
+
+/**
  * A slide of `type` with enough in it to be recognisable, for the add-slide
  * previews. Static copy comes from the manifest so a preview shows the city's
  * real house voice; the dynamic copy is obviously placeholder, because a

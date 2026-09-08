@@ -199,13 +199,15 @@ describe('user route outcome tests', () => {
     const response = await request(app)
       .post('/register-push-token')
       .set('Authorization', `Bearer ${accessToken}`)
-      .send({pushToken: 'ExponentPushToken[test]', appEdition: 'pivot'});
+      .send({pushToken: 'ExponentPushToken[test]', appEdition: 'pivot', appProduct: 'justgo'});
 
     expect(response.statusCode).toBe(200);
     expect(response.body.data.appEdition).toBe('pivot');
+    expect(response.body.data.appProduct).toBe('justgo');
 
     const updated = await User.findById(alice._id).lean();
     expect(updated.pushToken).toBe('ExponentPushToken[test]');
     expect(updated.pushAppEdition).toBe('pivot');
+    expect(updated.pushAppProduct).toBe('justgo');
   });
 });
