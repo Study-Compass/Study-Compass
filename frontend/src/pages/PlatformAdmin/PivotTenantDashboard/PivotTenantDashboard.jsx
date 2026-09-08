@@ -13,6 +13,7 @@ import PivotVoicePage from './PivotVoicePage';
 import PivotCarouselPage from './carousel/PivotCarouselPage';
 import PivotTenantLaunchPage from './PivotTenantLaunchPage';
 import PivotWeeklyDropPage from '../PivotWeeklyDrop/PivotWeeklyDropPage';
+import PivotComputeJobs from './PivotComputeJobs';
 import PivotTenantLocationMigrationPage, {
   RICH_LOCATION_MIGRATION_UI_ENABLED,
 } from './PivotTenantLocationMigrationPage';
@@ -196,6 +197,18 @@ function PivotTenantDashboard() {
           key={tenantKey}
           tenantKey={tenantKey}
           tenant={tenant}
+        />
+      ),
+    });
+
+    items.push({
+      label: 'Compute jobs',
+      icon: 'mdi:server-network-outline',
+      element: (
+        <PivotComputeJobs
+          key={tenantKey}
+          tenantKey={tenantKey}
+          cityDisplayName={cityDisplayName}
         />
       ),
     });

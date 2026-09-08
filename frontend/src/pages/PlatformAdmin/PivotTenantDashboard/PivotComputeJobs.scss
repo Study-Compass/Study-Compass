@@ -1,0 +1,239 @@
+.pivot-compute-jobs {
+  .pivot-compute-jobs__filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 16px;
+    align-items: flex-end;
+    margin-bottom: 16px;
+  }
+
+  .pivot-compute-jobs__filter {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 0.875rem;
+
+    select {
+      min-width: 180px;
+    }
+  }
+
+  .pivot-compute-jobs__clear {
+    margin-left: auto;
+  }
+
+  .pivot-compute-jobs__controls-title {
+    margin: 0 0 8px;
+    font-size: 1rem;
+  }
+
+  .pivot-compute-jobs__create {
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  }
+
+  .pivot-compute-jobs__create-fields,
+  .pivot-compute-jobs__controls-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 16px;
+    align-items: flex-end;
+  }
+
+  .pivot-compute-jobs__create-context input {
+    min-width: 240px;
+  }
+
+  .pivot-compute-jobs__controls {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
+  }
+
+  .pivot-compute-jobs__table {
+    th,
+    td {
+      vertical-align: top;
+    }
+
+    tr.is-selected {
+      background: rgba(255, 79, 31, 0.08);
+    }
+  }
+
+  .pivot-compute-jobs__row-button {
+    appearance: none;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    padding: 0;
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  .pivot-compute-jobs__mono {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', monospace;
+    font-size: 0.85em;
+    word-break: break-word;
+  }
+
+  .pivot-compute-jobs__detail-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px 20px;
+    margin: 0;
+  }
+
+  .pivot-compute-jobs__detail-field {
+    dt {
+      margin: 0 0 4px;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      opacity: 0.72;
+    }
+
+    dd {
+      margin: 0;
+      font-size: 0.9375rem;
+    }
+  }
+
+  .pivot-compute-jobs__detail-section {
+    margin-top: 20px;
+  }
+
+  .pivot-compute-jobs__detail-heading {
+    margin: 0 0 12px;
+    font-size: 1rem;
+  }
+
+  .pivot-compute-jobs__attempts-table {
+    td:nth-child(6) {
+      max-width: 220px;
+    }
+  }
+}
+
+.pivot-compute-review {
+  .pivot-compute-review__upload {
+    display: grid;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+
+  .pivot-compute-review__file-label,
+  .pivot-compute-review__textarea-label {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 0.875rem;
+  }
+
+  .pivot-compute-review__textarea {
+    width: 100%;
+    min-height: 160px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', monospace;
+    font-size: 0.85rem;
+  }
+
+  .pivot-compute-review__errors {
+    margin: 0 0 16px;
+    padding-left: 1.2rem;
+    color: #b42318;
+  }
+
+  .pivot-compute-review__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  .pivot-compute-review__preview,
+  .pivot-compute-review__apply-panel {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
+  }
+
+  .pivot-compute-review__preview-heading {
+    margin: 0 0 4px;
+    font-weight: 600;
+  }
+
+  .pivot-compute-review__summary-block {
+    margin: 16px 0;
+  }
+
+  .pivot-compute-review__summary-title {
+    margin: 0 0 8px;
+    font-size: 0.9375rem;
+  }
+
+  .pivot-compute-review__summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 8px 16px;
+    margin: 0;
+  }
+
+  .pivot-compute-review__summary-item {
+    dt {
+      margin: 0;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      opacity: 0.72;
+    }
+
+    dd {
+      margin: 2px 0 0;
+      font-size: 1rem;
+      font-weight: 600;
+    }
+  }
+
+  .pivot-compute-review__blocked {
+    margin: 12px 0;
+    color: #b54708;
+  }
+
+  .pivot-compute-review__ready {
+    margin: 12px 0;
+    color: #027a48;
+  }
+
+  .pivot-compute-review__rows-table {
+    td:nth-child(3),
+    td:nth-child(4),
+    td:nth-child(5),
+    td:nth-child(7) {
+      max-width: 240px;
+      word-break: break-word;
+    }
+  }
+
+  .pivot-compute-review__apply-title {
+    margin: 0 0 8px;
+    font-size: 1rem;
+  }
+
+  .pivot-compute-review__confirm {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    margin: 12px 0;
+    max-width: 720px;
+  }
+}
+
+.platform-admin--dark .pivot-compute-jobs {
+  .pivot-compute-jobs__table tr.is-selected {
+    background: rgba(255, 79, 31, 0.14);
+  }
+}
