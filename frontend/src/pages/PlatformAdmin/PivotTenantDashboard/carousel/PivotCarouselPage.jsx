@@ -170,7 +170,10 @@ export default function PivotCarouselPage({ tenantKey, cityDisplayName }) {
       message: notes.length ? `${notes.length} value(s) trimmed to fit: ${notes[0]}` : 'All slots fit.',
       type: notes.length ? 'warning' : 'success',
     });
-  }, [draft, edition, tenantKey, addNotification]);
+    // inkPlate is in the payload, so it has to be in the deps: without it this
+    // callback closes over the value from the render before the toggle and
+    // saves the setting you just changed away from.
+  }, [draft, edition, inkPlate, tenantKey, addNotification]);
 
   /**
    * An image upload writes straight through to the server rather than into the
