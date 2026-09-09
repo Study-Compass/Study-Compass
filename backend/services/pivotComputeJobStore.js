@@ -332,13 +332,13 @@ async function claimNextPendingJob(req, {
   const normalizedCityKey = trimString(cityKey).toLowerCase();
   const normalizedWorkerId = trimString(workerId);
   const normalizedCapability = normalizeLeaseCapability(capability);
-  assertKnownKind(normalizedKind);
+  if (normalizedKind) assertKnownKind(normalizedKind);
   if (!normalizedWorkerId) {
     const error = new Error('workerId is required to claim a compute job');
     error.code = 'INVALID_COMPUTE_JOB_CLAIM';
     throw error;
   }
-  if (normalizedCapability && !isJobCompatibleWithCapability({ kind: normalizedKind, contractVersion: CONTRACT_VERSION }, normalizedCapability)) {
+  if (normalizedKind && normalizedCapability && !isJobCompatibleWithCapability({ kind: normalizedKind, contractVersion: CONTRACT_VERSION }, normalizedCapability)) {
     const error = new Error('Worker capability is incompatible with requested compute job kind');
     error.code = 'COMPUTE_WORKER_CAPABILITY_INCOMPATIBLE';
     throw error;
@@ -355,7 +355,11 @@ async function claimNextPendingJob(req, {
   for (let attempt = 0; attempt < 3; attempt += 1) {
     const candidate = await PivotComputeJob.findOne({
       status: 'pending',
-      kind: normalizedKind,
+      kind: normalizedKind || {
+        $in: normalizedCapability?.supportedKinds?.length
+          ? normalizedCapability.supportedKinds
+          : COMPUTE_JOB_KINDS,
+      },
       ...(normalizedExternalJobId ? { externalJobId: normalizedExternalJobId } : {}),
       ...(normalizedCapability
         ? { contractVersion: { $in: normalizedCapability.supportedContractVersions } }

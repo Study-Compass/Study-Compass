@@ -19,6 +19,8 @@ const {
   retryComputeJob,
   createManualUploadReviewJob,
 } = require('./pivotComputeJobStore');
+const { notifyComputeWorkerWake } = require('./pivotComputeWakeService');
+const { logPivot } = require('../utilities/pivotLogger');
 
 const MAX_LIST_LIMIT = 100;
 const MAX_OPTIONS_KEYS = 20;
@@ -146,10 +148,25 @@ function jobRequestToCreateInput(request, actor) {
   };
 }
 
+async function wakePendingComputeJob(job, notifyWake) {
+  if (!job || job.status !== 'pending') return;
+  try {
+    await notifyWake({ externalJobId: job.externalJobId });
+  } catch (error) {
+    // Wake is only a latency hint. The durable pending job and periodic worker
+    // reconciliation remain authoritative when delivery or injected seams fail.
+    logPivot('warn', 'compute worker wake threw unexpectedly', {
+      code: error?.code || 'COMPUTE_WAKE_FAILED',
+      message: error?.message || String(error),
+    });
+  }
+}
+
 async function createAdminComputeJob(req, {
   request: requestInput,
   actor = null,
   now = new Date(),
+  notifyWake = notifyComputeWorkerWake,
 } = {}) {
   const request = validateAdminJobRequest(requestInput);
   const payload = jobRequestToCreateInput(request, actor);
@@ -157,6 +174,7 @@ async function createAdminComputeJob(req, {
     ...payload,
     requestedAt: payload.requestedAt || now.toISOString(),
   });
+  await wakePendingComputeJob(job, notifyWake);
   return { job: serializeAdminJob(job), created };
 }
 
@@ -251,12 +269,14 @@ async function retryAdminComputeJob(req, {
   externalJobId,
   contextVersion = null,
   now = new Date(),
+  notifyWake = notifyComputeWorkerWake,
 } = {}) {
   const job = await findJobByExternalId(req, externalJobId);
   if (!job) {
     throw serviceError('Compute job not found', 'COMPUTE_JOB_NOT_FOUND', 404);
   }
   if (job.status === 'pending') {
+    await wakePendingComputeJob(job, notifyWake);
     return { job: serializeAdminJob(job), duplicate: true };
   }
   if (!canTransitionComputeJob(job.status, 'pending')) {
@@ -271,6 +291,7 @@ async function retryAdminComputeJob(req, {
     contextVersion: trimString(contextVersion) || null,
     now,
   });
+  await wakePendingComputeJob(retried, notifyWake);
   return { job: serializeAdminJob(retried), duplicate: false };
 }
 

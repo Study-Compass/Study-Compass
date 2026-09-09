@@ -257,13 +257,49 @@ describe('pivotComputeWorkerRoutes outcomes', () => {
     const response = await workerAuth(request(app)
       .post('/worker/pivot/compute/v1/jobs/claim'))
       .send({
-        kind: 'city-curation-refresh',
         capability: workerCapability({
           supportedKinds: ['city-curation-refresh'],
         }),
       });
 
     expect(response.status).toBe(204);
+  });
+
+  it('claims the oldest pending job supported by the worker when kind is omitted', async () => {
+    await createComputeJob(req, {
+      externalJobId: 'job:unsupported-discovery-001',
+      kind: 'city-source-discovery',
+      cityKey: 'iowacity',
+      contractVersion: '1',
+      contextVersion: 'ctx:iowacity.discovery.v1',
+      createIdempotencyKey: 'idem:unsupported-discovery-001',
+      requestedAt: '2026-09-08T19:00:00.000Z',
+      origin: { type: 'admin' },
+      options: {},
+    });
+    await createComputeJob(req, {
+      externalJobId: 'job:supported-refresh-001',
+      kind: 'city-curation-refresh',
+      cityKey: 'iowacity',
+      contractVersion: '1',
+      contextVersion: 'ctx:iowacity.refresh.v1',
+      createIdempotencyKey: 'idem:supported-refresh-001',
+      requestedAt: '2026-09-08T20:00:00.000Z',
+      origin: { type: 'admin' },
+      options: {},
+    });
+
+    const response = await workerAuth(request(app)
+      .post('/worker/pivot/compute/v1/jobs/claim'))
+      .send({
+        capability: workerCapability({
+          supportedKinds: ['city-curation-refresh'],
+        }),
+      });
+
+    expect(response.status).toBe(200);
+    expect(response.body.job.externalJobId).toBe('job:supported-refresh-001');
+    expect(response.body.job.kind).toBe('city-curation-refresh');
   });
 
   it('rejects unknown request fields before parsing business logic', async () => {

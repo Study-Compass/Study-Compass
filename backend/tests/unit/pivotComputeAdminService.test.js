@@ -37,16 +37,31 @@ describe('pivotComputeAdminService', () => {
 
   it('creates and lists admin compute jobs with redacted lease tokens', async () => {
     const jobRequest = loadFixture('job-request-discovery-valid.json');
+    const notifyWake = jest.fn().mockResolvedValue({ status: 'accepted' });
     const created = await createAdminComputeJob(req, {
       request: jobRequest,
       actor: 'admin@example.com',
+      notifyWake,
     });
     expect(created.created).toBe(true);
     expect(created.job.status).toBe('pending');
+    expect(notifyWake).toHaveBeenCalledWith({ externalJobId: jobRequest.jobId });
 
     const listed = await listAdminComputeJobs(req, { cityKey: 'iowacity' });
     expect(listed.jobs).toHaveLength(1);
     expect(listed.jobs[0].externalJobId).toBe(jobRequest.jobId);
+  });
+
+  it('keeps a newly created job pending when wake delivery throws', async () => {
+    const jobRequest = loadFixture('job-request-discovery-valid.json');
+    const created = await createAdminComputeJob(req, {
+      request: jobRequest,
+      actor: 'admin@example.com',
+      notifyWake: jest.fn().mockRejectedValue(new Error('Mini unavailable')),
+    });
+
+    expect(created.created).toBe(true);
+    expect(created.job.status).toBe('pending');
   });
 
   it('submits manual results for review and preserves duplicate idempotency', async () => {
@@ -123,11 +138,14 @@ describe('pivotComputeAdminService', () => {
       { $set: { status: 'retryable' } },
     );
 
+    const notifyWake = jest.fn().mockResolvedValue({ status: 'accepted' });
     const retried = await retryAdminComputeJob(req, {
       externalJobId: manual.jobId,
       contextVersion: 'ctx:iowacity.discovery.v9',
+      notifyWake,
     });
     expect(retried.job.status).toBe('pending');
     expect(retried.job.contextVersion).toBe('ctx:iowacity.discovery.v9');
+    expect(notifyWake).toHaveBeenCalledWith({ externalJobId: manual.jobId });
   });
 });
