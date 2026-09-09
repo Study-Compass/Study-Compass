@@ -325,10 +325,10 @@ async function reportRetryableJobFailure(req, {
   }
 
   const emptyProposals = job.kind === 'city-curation-refresh'
-    ? { jobs: [], events: [] }
+    ? { jobOutcomes: [], events: [] }
     : { sources: [], curationJobs: [], events: [] };
   const summary = job.kind === 'city-curation-refresh'
-    ? { jobsRun: 0, jobsFailed: 1, eventsProposed: 0 }
+    ? { jobsRun: 0, jobsFailed: 1, eventsProposed: 0, eventsRefreshed: 0 }
     : { searched: 0, qualified: 0, rejected: 0, eventsProposed: 0 };
 
   const result = {

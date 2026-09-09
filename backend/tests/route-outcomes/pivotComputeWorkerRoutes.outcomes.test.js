@@ -253,6 +253,54 @@ describe('pivotComputeWorkerRoutes outcomes', () => {
     expect(failure.body.job.failure.retryable).toBe(true);
   });
 
+  it('reports contract-valid refresh failures and releases the active lease', async () => {
+    await createComputeJob(req, {
+      externalJobId: 'job:refresh-retry-001',
+      kind: 'city-curation-refresh',
+      cityKey: 'iowacity',
+      contractVersion: '1',
+      contextVersion: 'ctx:iowacity.refresh.v1',
+      createIdempotencyKey: 'idem:refresh-retry-001',
+      requestedAt: FIXED_NOW.toISOString(),
+      origin: { type: 'admin' },
+      options: {},
+    });
+
+    const claim = await workerAuth(request(app)
+      .post('/worker/pivot/compute/v1/jobs/claim'))
+      .send({
+        kind: 'city-curation-refresh',
+        capability: workerCapability(),
+      });
+    const leaseToken = claim.body.lease.leaseToken;
+    const externalJobId = claim.body.job.externalJobId;
+
+    await workerAuth(request(app)
+      .post(`/worker/pivot/compute/v1/jobs/${externalJobId}/start`))
+      .send({ leaseToken, capability: workerCapability() });
+
+    const failure = await workerAuth(request(app)
+      .post(`/worker/pivot/compute/v1/jobs/${externalJobId}/retryable-failure`))
+      .send({
+        leaseToken,
+        capability: workerCapability(),
+        idempotencyKey: 'idem:refresh-failure-001',
+        basedOnContextVersion: 'ctx:iowacity.refresh.v1',
+        failure: { code: 'PREVIEW_FAILED', message: 'Refresh extraction failed' },
+      });
+
+    expect(failure.status).toBe(200);
+    expect(failure.body.job.status).toBe('retryable');
+    expect(failure.body.job.lease).toBeNull();
+    expect(failure.body.job.result.embedded.proposals).toEqual({ jobOutcomes: [], events: [] });
+    expect(failure.body.job.result.embedded.summary).toEqual({
+      jobsRun: 0,
+      jobsFailed: 1,
+      eventsProposed: 0,
+      eventsRefreshed: 0,
+    });
+  });
+
   it('returns 204 when no compatible pending job is available', async () => {
     const response = await workerAuth(request(app)
       .post('/worker/pivot/compute/v1/jobs/claim'))

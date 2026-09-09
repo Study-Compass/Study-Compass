@@ -248,6 +248,10 @@ describe('pivotOffloadedCurationRefreshService (Phase 2, Step 2.3)', () => {
     expect(PivotCurationRun.create).not.toHaveBeenCalled();
     expect(PivotCurationJob.findByIdAndUpdate).not.toHaveBeenCalled();
     expect(previewIngestUrl).toHaveBeenCalledTimes(2);
+    for (const [previewOptions] of previewIngestUrl.mock.calls) {
+      expect(previewOptions).not.toHaveProperty('tenantKey');
+      expect(previewOptions).toHaveProperty('timezone', 'America/Chicago');
+    }
   });
 
   it('records failed job outcomes without proposing events when preview fails', async () => {

@@ -230,7 +230,6 @@ function createArtifactCurationRefreshSinks(contextSnapshot, collector) {
       const preview = await ctx.previewIngestUrl({
         url: job.url,
         provider: job.provider,
-        tenantKey: contextSnapshot.cityKey,
         timezone: contextSnapshot.tenant.timezone,
       });
 
