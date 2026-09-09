@@ -161,7 +161,8 @@ async function executeOffloadedCitySourceDiscovery(options = {}) {
     };
   }
 
-  if (contextSnapshot.discovery.runFirecrawl && contextSnapshot.providerCapabilities?.firecrawlConfigured === false) {
+  const workerCapabilities = options.workerCapabilities || contextSnapshot.providerCapabilities || {};
+  if (contextSnapshot.discovery.runFirecrawl && workerCapabilities.firecrawlConfigured === false) {
     return {
       error: 'Generic-site discovery requires Firecrawl, which is not configured.',
       status: 503,
@@ -203,6 +204,7 @@ async function executeOffloadedCitySourceDiscovery(options = {}) {
       sinks,
       knownHosts,
       recorder,
+      shouldCancel: options.shouldCancel,
       options: {
         tenantKey: contextSnapshot.cityKey,
         tags: runOptions.tags,

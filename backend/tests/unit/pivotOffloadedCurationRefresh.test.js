@@ -298,4 +298,28 @@ describe('pivotOffloadedCurationRefreshService (Phase 2, Step 2.3)', () => {
     expect(result.status).toBe(409);
     expect(result.code).toBe('REFRESH_CONTEXT_STALE');
   });
+
+  it('uses actual worker capabilities instead of trusting production provider flags', async () => {
+    const result = await runRefresh({
+      contextSnapshot: {
+        ...contextSnapshot,
+        jobs: [contextSnapshot.jobs[1]],
+      },
+      workerCapabilities: {
+        firecrawlConfigured: false,
+        nativeProviders: ['luma', 'partiful'],
+      },
+    });
+
+    expect(result.status).toBe(503);
+    expect(result.code).toBe('SITE_SCRAPE_NOT_CONFIGURED');
+    expect(previewIngestUrl).not.toHaveBeenCalled();
+  });
+
+  it('returns a cancelled artifact when the worker cancellation signal is set', async () => {
+    const result = await runRefresh({ shouldCancel: () => true });
+
+    expect(result.data.result.outcome).toBe('cancelled');
+    expect(previewIngestUrl).not.toHaveBeenCalled();
+  });
 });

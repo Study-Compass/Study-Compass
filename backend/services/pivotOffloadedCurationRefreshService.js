@@ -157,8 +157,12 @@ async function executeOffloadedCityCurationRefresh(options = {}) {
     };
   }
 
+  const workerContext = {
+    ...contextSnapshot,
+    providerCapabilities: options.workerCapabilities || contextSnapshot.providerCapabilities,
+  };
   const { jobs, skippedGenericSite } = jobsReadyFromContext(
-    contextSnapshot,
+    workerContext,
     options.runOptions || {},
   );
   if (!jobs.length && skippedGenericSite > 0) {
@@ -179,7 +183,7 @@ async function executeOffloadedCityCurationRefresh(options = {}) {
   }
 
   const collector = createRefreshProposalCollector();
-  const sinks = createArtifactCurationRefreshSinks(contextSnapshot, collector);
+  const sinks = createArtifactCurationRefreshSinks(workerContext, collector);
   const recorder = createProgressRecorder(options.progressRecorder);
   const completedAt = isoTimestamp(options.now) || new Date().toISOString();
   const implementationRevision = options.implementationRevision || resolveImplementationRevision();
@@ -196,6 +200,7 @@ async function executeOffloadedCityCurationRefresh(options = {}) {
       record: false,
       previewIngestUrl,
       timezone: contextSnapshot.tenant.timezone,
+      shouldCancel: options.shouldCancel,
     },
     sinks,
   );

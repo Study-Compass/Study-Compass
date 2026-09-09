@@ -197,7 +197,11 @@ async function runOneJob(ctx, job, sinks) {
 async function executeCurationBatchCore(req, options = {}, sinks) {
   const tenantKey = trimString(options.tenantKey);
   const recorder = options.recorder;
-  const guard = createRunGuard({ recorder, getPhase: () => 'crawling' });
+  const guard = createRunGuard({
+    recorder,
+    getPhase: () => 'crawling',
+    shouldCancel: options.shouldCancel,
+  });
 
   let jobs;
   let skipped = options.skippedGenericSite || 0;

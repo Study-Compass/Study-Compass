@@ -13,6 +13,7 @@ const pivotPosterTemplateSchema = require('../schemas/pivotPosterTemplate');
 const pivotCurationJobSchema = require('../schemas/pivotCurationJob');
 const pivotCurationRunSchema = require('../schemas/pivotCurationRun');
 const pivotCitySourceSchema = require('../schemas/pivotCitySource');
+const pivotOrganizerSchema = require('../schemas/pivotOrganizer');
 const pivotSourceDiscoveryRunSchema = require('../schemas/pivotSourceDiscoveryRun');
 const pivotContactHashSchema = require('../schemas/pivotContactHash');
 const pivotCreatorGrantSchema = require('../schemas/pivotCreatorGrant');
@@ -83,6 +84,11 @@ const getGlobalModels = (req, ...names) => {
             'PivotCitySource',
             pivotCitySourceSchema,
             'pivot_city_sources'
+        ),
+        PivotOrganizer: db.model(
+            'PivotOrganizer',
+            pivotOrganizerSchema,
+            'pivot_organizers'
         ),
         PivotSourceDiscoveryRun: db.model(
             'PivotSourceDiscoveryRun',

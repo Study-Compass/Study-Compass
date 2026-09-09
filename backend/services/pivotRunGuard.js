@@ -47,7 +47,7 @@ const RATE_LIMIT_CODE = 'SITE_SCRAPE_RATE_LIMITED';
  * @returns {{failures: Array, noteFailure: Function, noteSuccess: Function,
  *   onRetry: Function, shouldStop: Function, getAborted: Function}}
  */
-function createRunGuard({ recorder, getPhase = () => null } = {}) {
+function createRunGuard({ recorder, getPhase = () => null, shouldCancel = () => false } = {}) {
   const guard = {
     aborted: null,
     failures: [],
@@ -94,7 +94,15 @@ function createRunGuard({ recorder, getPhase = () => null } = {}) {
     });
   };
 
-  guard.shouldStop = () => Boolean(guard.aborted);
+  guard.shouldStop = () => {
+    if (!guard.aborted && shouldCancel()) {
+      guard.aborted = {
+        code: 'CANCELLED',
+        error: 'Stopped by operator',
+      };
+    }
+    return Boolean(guard.aborted);
+  };
 
   return guard;
 }

@@ -303,4 +303,24 @@ describe('pivotOffloadedDiscoveryService (Phase 2, Step 2.2)', () => {
     expect(result.status).toBe(503);
     expect(result.code).toBe('SITE_SCRAPE_NOT_CONFIGURED');
   });
+
+  it('uses actual worker capabilities instead of trusting production provider flags', async () => {
+    const result = await runDiscovery({
+      workerCapabilities: {
+        firecrawlConfigured: false,
+        nativeProviders: ['luma', 'partiful'],
+      },
+    });
+
+    expect(result.status).toBe(503);
+    expect(result.code).toBe('SITE_SCRAPE_NOT_CONFIGURED');
+    expect(searchSites).not.toHaveBeenCalled();
+  });
+
+  it('returns a cancelled artifact when the worker cancellation signal is set', async () => {
+    const result = await runDiscovery({ shouldCancel: () => true });
+
+    expect(result.data.result.outcome).toBe('cancelled');
+    expect(searchSites).not.toHaveBeenCalled();
+  });
 });

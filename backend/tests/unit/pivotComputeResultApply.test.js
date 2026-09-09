@@ -22,6 +22,7 @@ const pivotCitySourceSchema = require('../../schemas/pivotCitySource');
 const pivotCurationJobSchema = require('../../schemas/pivotCurationJob');
 const eventSchema = require('../../events/schemas/event');
 const tenantConfigSchema = require('../../schemas/tenantConfig');
+const offloadedDiscoveryContextService = require('../../services/pivotOffloadedDiscoveryContextService');
 
 jest.mock('../../services/pivotIngestPublishService', () => ({
   resolvePivotTenant: jest.fn(),
@@ -93,6 +94,8 @@ describe('pivotComputeResultApplyService', () => {
     persistOutcome.mockResolvedValue({});
     createCurationJob.mockResolvedValue({ data: { job: { _id: 'job-1' } } });
     updateCurationJob.mockResolvedValue({ data: { job: { _id: 'job-1' } } });
+    jest.spyOn(offloadedDiscoveryContextService, 'buildCityDiscoveryContextSnapshot')
+      .mockResolvedValue({ data: { snapshot: { contextVersion: 'ctx:iowacity.discovery.v3' } } });
   });
 
   afterAll(async () => {
@@ -228,6 +231,22 @@ describe('pivotComputeResultApplyService', () => {
       expect(persistOutcome).toHaveBeenCalled();
       expect(createCurationJob).toHaveBeenCalled();
       expect(publishIngestEvent).toHaveBeenCalled();
+    });
+
+    it('rejects a browser-modified preview even when aggregate counts are unchanged', async () => {
+      const result = loadFixture('result-discovery-valid-completed.json');
+      const preview = await previewComputeResult(req, result, {
+        currentContextVersion: result.basedOnContextVersion,
+      });
+      const tampered = structuredClone(preview);
+      tampered.rows[0].key = 'host:attacker.example';
+
+      await expect(applyComputeResult(req, {
+        result,
+        preview: tampered,
+        idempotencyKey: 'apply:tampered-preview',
+        actor: 'admin@example.com',
+      })).rejects.toMatchObject({ code: 'PREVIEW_STALE' });
     });
 
     it('returns the stored outcome for duplicate apply idempotency keys', async () => {

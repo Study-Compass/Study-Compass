@@ -1219,7 +1219,11 @@ async function executeCitySourceDiscoveryCore(req, coreOptions = {}) {
     : 0;
 
   const state = Object.assign(
-    createRunGuard({ recorder, getPhase: () => state.phase }),
+    createRunGuard({
+      recorder,
+      getPhase: () => state.phase,
+      shouldCancel: coreOptions.shouldCancel,
+    }),
     {
       location,
       timezone: trimString(tenant.pivotDropTimezone) || 'UTC',

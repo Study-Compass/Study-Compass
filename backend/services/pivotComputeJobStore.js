@@ -319,6 +319,7 @@ function isJobCompatibleWithCapability(job, capability) {
 }
 
 async function claimNextPendingJob(req, {
+  externalJobId,
   kind,
   cityKey,
   workerId,
@@ -327,6 +328,7 @@ async function claimNextPendingJob(req, {
   now = new Date(),
 } = {}) {
   const normalizedKind = trimString(kind);
+  const normalizedExternalJobId = trimString(externalJobId);
   const normalizedCityKey = trimString(cityKey).toLowerCase();
   const normalizedWorkerId = trimString(workerId);
   const normalizedCapability = normalizeLeaseCapability(capability);
@@ -342,6 +344,10 @@ async function claimNextPendingJob(req, {
     throw error;
   }
 
+  // Claim is the authoritative recovery point. A worker disappearing must not
+  // strand work in leased/running forever waiting for a separate cron process.
+  await reclaimExpiredComputeJobLeases(req, { now, limit: 50 });
+
   const { PivotComputeJob, PivotComputeJobAttempt } = await getModels(req);
   const leaseExpiresAt = new Date(now.getTime() + leaseMs);
   const leaseToken = randomUUID();
@@ -350,6 +356,7 @@ async function claimNextPendingJob(req, {
     const candidate = await PivotComputeJob.findOne({
       status: 'pending',
       kind: normalizedKind,
+      ...(normalizedExternalJobId ? { externalJobId: normalizedExternalJobId } : {}),
       ...(normalizedCapability
         ? { contractVersion: { $in: normalizedCapability.supportedContractVersions } }
         : {}),
@@ -632,6 +639,18 @@ async function cancelComputeJob(req, {
     return serializeJob(job);
   }
 
+  if (ACTIVE_LEASE_STATUSES.includes(job.status) && job.lease) {
+    // Retain the active lease until the worker observes the request and submits
+    // a cancelled result. Clearing it here makes the observation endpoint
+    // reject the only worker that can stop the provider work.
+    job.cancelRequested = true;
+    if (actor && job.origin) {
+      job.origin.requestedBy = trimString(actor) || job.origin.requestedBy;
+    }
+    await job.save();
+    return serializeJob(job);
+  }
+
   assertComputeJobTransition(job.status, 'cancelled');
 
   const attemptId = job.lease?.attemptId ?? null;
@@ -724,33 +743,55 @@ async function expireComputeJobLease(req, {
     throw error;
   }
 
-  const nextStatus = releaseToPending ? 'pending' : 'expired';
+  const nextStatus = job.cancelRequested
+    ? 'cancelled'
+    : releaseToPending ? 'pending' : 'expired';
   assertComputeJobTransition(job.status, nextStatus);
 
   const attemptId = job.lease?.attemptId ?? null;
-  job.status = nextStatus;
-  job.lease = null;
-  if (!releaseToPending) {
-    job.completedAt = now;
-    job.failure = {
-      code: 'LEASE_EXPIRED',
-      message: 'Compute job lease expired',
-      retryable: true,
+  const failure = nextStatus === 'pending'
+    ? null
+    : {
+      code: nextStatus === 'cancelled' ? 'CANCELLED' : 'LEASE_EXPIRED',
+      message: nextStatus === 'cancelled' ? 'Compute job cancelled' : 'Compute job lease expired',
+      retryable: nextStatus !== 'cancelled',
     };
+  const updates = {
+    status: nextStatus,
+    lease: null,
+  };
+  if (nextStatus !== 'pending') {
+    updates.completedAt = now;
+    updates.failure = failure;
   } else {
-    job.leasedAt = null;
-    job.startedAt = null;
+    updates.leasedAt = null;
+    updates.startedAt = null;
+    updates.failure = null;
   }
-  await job.save();
+  const updated = await PivotComputeJob.findOneAndUpdate(
+    {
+      _id: job._id,
+      status: job.status,
+      'lease.token': job.lease.token,
+      'lease.expiresAt': { $lte: now },
+    },
+    { $set: updates },
+    { new: true },
+  );
+  if (!updated) {
+    const current = await PivotComputeJob.findById(job._id);
+    if (current) return serializeJob(current);
+    throw new Error('Compute job disappeared during lease expiry');
+  }
 
   if (attemptId) {
     await PivotComputeJobAttempt.updateOne(
       { _id: attemptId, finishedAt: null },
       {
         $set: {
-          status: 'expired',
+          status: nextStatus === 'cancelled' ? 'cancelled' : 'expired',
           finishedAt: now,
-          failure: job.failure ?? {
+          failure: failure ?? {
             code: 'LEASE_EXPIRED',
             message: 'Compute job lease expired',
             retryable: true,
@@ -760,7 +801,23 @@ async function expireComputeJobLease(req, {
     );
   }
 
-  return serializeJob(job);
+  return serializeJob(updated);
+}
+
+async function reclaimExpiredComputeJobLeases(req, {
+  now = new Date(),
+  limit = 50,
+} = {}) {
+  const expired = await listExpiredLeaseJobs(req, { now, limit });
+  const reclaimed = [];
+  for (const job of expired) {
+    reclaimed.push(await expireComputeJobLease(req, {
+      externalJobId: job.externalJobId,
+      releaseToPending: true,
+      now,
+    }));
+  }
+  return reclaimed;
 }
 
 async function beginComputeJobApply(req, {
@@ -771,28 +828,11 @@ async function beginComputeJobApply(req, {
   now = new Date(),
 } = {}) {
   const { PivotComputeJob } = await getModels(req);
-  const job = await PivotComputeJob.findOne({ externalJobId: trimString(externalJobId) });
-  if (!job) {
-    const error = new Error('Compute job not found');
-    error.code = 'COMPUTE_JOB_NOT_FOUND';
-    throw error;
-  }
-
-  if (job.status === 'applying') {
-    return serializeJob(job);
-  }
-
-  assertComputeJobTransition(job.status, 'applying');
-  if (!job.result) {
-    const error = new Error('Compute job has no stored result to apply');
-    error.code = 'COMPUTE_JOB_RESULT_MISSING';
-    throw error;
-  }
-
-  job.status = 'applying';
-  job.applicationAudit = {
+  const normalizedExternalJobId = trimString(externalJobId);
+  const normalizedKey = trimString(idempotencyKey);
+  const applicationAudit = {
     previewId: trimString(previewId) || null,
-    idempotencyKey: trimString(idempotencyKey),
+    idempotencyKey: normalizedKey,
     appliedAt: null,
     appliedBy: trimString(actor) || null,
     summary: {
@@ -804,8 +844,27 @@ async function beginComputeJobApply(req, {
       rejected: 0,
     },
   };
-  await job.save();
-  return serializeJob(job);
+  const job = await PivotComputeJob.findOneAndUpdate(
+    { externalJobId: normalizedExternalJobId, status: 'review-required', result: { $ne: null } },
+    { $set: { status: 'applying', applicationAudit } },
+    { new: true },
+  );
+  if (job) return serializeJob(job);
+
+  const existing = await PivotComputeJob.findOne({ externalJobId: normalizedExternalJobId });
+  if (!existing) {
+    const error = new Error('Compute job not found');
+    error.code = 'COMPUTE_JOB_NOT_FOUND';
+    throw error;
+  }
+  if (!existing.result) {
+    const error = new Error('Compute job has no stored result to apply');
+    error.code = 'COMPUTE_JOB_RESULT_MISSING';
+    throw error;
+  }
+  const error = new Error(`Compute job apply cannot start from status: ${existing.status}`);
+  error.code = existing.status === 'applying' ? 'COMPUTE_JOB_APPLY_IN_PROGRESS' : 'ILLEGAL_COMPUTE_JOB_TRANSITION';
+  throw error;
 }
 
 async function completeComputeJobApply(req, {
@@ -1017,6 +1076,7 @@ module.exports = {
   cancelComputeJob,
   retryComputeJob,
   expireComputeJobLease,
+  reclaimExpiredComputeJobLeases,
   beginComputeJobApply,
   completeComputeJobApply,
   listComputeJobAttempts,

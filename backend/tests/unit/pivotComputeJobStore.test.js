@@ -318,6 +318,23 @@ describe('pivotComputeJobStore', () => {
       expect(cancelled.failure.code).toBe('CANCELLED');
     });
 
+    it('retains an active lease so the worker can observe cancellation', async () => {
+      await createComputeJob(req, buildCreateInput());
+      const claim = await claimNextPendingJob(req, {
+        kind: 'city-source-discovery',
+        workerId: 'worker-mini-1',
+        now: new Date('2026-09-08T20:05:00.000Z'),
+      });
+      const cancelled = await cancelComputeJob(req, {
+        externalJobId: claim.job.externalJobId,
+        actor: 'admin@example.com',
+        now: new Date('2026-09-08T20:05:01.000Z'),
+      });
+      expect(cancelled.status).toBe('leased');
+      expect(cancelled.cancelRequested).toBe(true);
+      expect(cancelled.lease.token).toBe(claim.job.lease.token);
+    });
+
     it('applies a reviewed result and records bounded application audit', async () => {
       await createComputeJob(req, buildCreateInput());
       const claim = await claimNextPendingJob(req, {
@@ -347,6 +364,12 @@ describe('pivotComputeJobStore', () => {
         now: new Date('2026-09-08T20:20:00.000Z'),
       });
       expect(applying.status).toBe('applying');
+      await expect(beginComputeJobApply(req, {
+        externalJobId: claim.job.externalJobId,
+        actor: 'other-admin@example.com',
+        previewId: 'preview-002',
+        idempotencyKey: 'apply:concurrent',
+      })).rejects.toMatchObject({ code: 'COMPUTE_JOB_APPLY_IN_PROGRESS' });
 
       const completed = await completeComputeJobApply(req, {
         externalJobId: claim.job.externalJobId,
@@ -452,6 +475,25 @@ describe('pivotComputeJobStore', () => {
       });
       expect(released.status).toBe('pending');
       expect(released.lease).toBeNull();
+    });
+
+    it('automatically reclaims expired work before the next claim', async () => {
+      await createComputeJob(req, buildCreateInput());
+      const first = await claimNextPendingJob(req, {
+        kind: 'city-source-discovery',
+        workerId: 'worker-mini-1',
+        leaseMs: 1000,
+        now: new Date('2026-09-08T20:05:00.000Z'),
+      });
+      const second = await claimNextPendingJob(req, {
+        kind: 'city-source-discovery',
+        workerId: 'worker-mini-2',
+        leaseMs: 1000,
+        now: new Date('2026-09-08T20:06:00.000Z'),
+      });
+      expect(second.job.externalJobId).toBe(first.job.externalJobId);
+      expect(second.job.lease.workerId).toBe('worker-mini-2');
+      expect(second.job.attemptCount).toBe(2);
     });
   });
 });

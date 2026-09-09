@@ -147,14 +147,31 @@ async function registerScheduleOccurrence(req, {
     options: boundedOptions(body.options),
   });
 
-  const context = await buildAuthorizedContext(req, job, workerId);
-  const updatedJob = await updateComputeJobContextVersion(req, job.externalJobId, context.contextVersion);
+  const claim = await claimNextPendingJob(req, {
+    externalJobId: job.externalJobId,
+    kind: job.kind,
+    cityKey: job.cityKey,
+    workerId,
+    capability: body.capability,
+    now,
+  });
+
+  if (!claim.job) {
+    throw serviceError(
+      'Schedule occurrence could not be leased to the registering worker',
+      'SCHEDULE_OCCURRENCE_LEASE_UNAVAILABLE',
+      409,
+    );
+  }
+  const context = await buildAuthorizedContext(req, claim.job, workerId);
+  const updatedJob = await updateComputeJobContextVersion(req, claim.job.externalJobId, context.contextVersion);
 
   return {
     created,
     job: updatedJob,
     context,
-    lease: null,
+    attempt: claim.attempt,
+    lease: buildLeaseBinding(claim.job, claim.attempt),
   };
 }
 

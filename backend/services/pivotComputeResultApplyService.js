@@ -55,6 +55,18 @@ function summarizePreviewRows(rows) {
   return summary;
 }
 
+function comparablePreview(preview) {
+  return JSON.stringify({
+    jobId: preview?.jobId,
+    contextVersion: preview?.contextVersion,
+    basedOnContextVersion: preview?.basedOnContextVersion,
+    applyAllowed: preview?.applyAllowed,
+    blockingReasons: preview?.blockingReasons,
+    rows: preview?.rows,
+    summary: preview?.summary,
+  });
+}
+
 function sourceRowKey(host) {
   return `host:${trimString(host).toLowerCase()}`;
 }
@@ -584,26 +596,23 @@ async function applyComputeResult(req, {
     throw serviceError('Preview does not allow apply.', 'PREVIEW_APPLY_BLOCKED', 409);
   }
 
-  const freshPreview = await previewComputeResult(req, result, {
-    now,
-    currentContextVersion: preview.contextVersion,
-  });
-  if (freshPreview.basedOnContextVersion !== preview.basedOnContextVersion
-    || freshPreview.contextVersion !== preview.contextVersion
-    || freshPreview.summary.creates !== preview.summary.creates
-    || freshPreview.summary.updates !== preview.summary.updates) {
+  const freshPreview = await previewComputeResult(req, result, { now });
+  if (comparablePreview(freshPreview) !== comparablePreview(preview)) {
     throw serviceError('Preview is stale relative to current production state.', 'PREVIEW_STALE', 409);
+  }
+  if (!freshPreview.applyAllowed) {
+    throw serviceError('Fresh preview does not allow apply.', 'PREVIEW_APPLY_BLOCKED', 409);
   }
 
   const identities = await loadProductionIdentities(req, result);
-  const applicable = preview.rows.filter((row) => row.action === 'create' || row.action === 'update');
+  const applicable = freshPreview.rows.filter((row) => row.action === 'create' || row.action === 'update');
   const summary = {
     creates: 0,
     updates: 0,
-    unchanged: preview.summary.unchanged,
+    unchanged: freshPreview.summary.unchanged,
     conflicts: 0,
     stale: 0,
-    rejected: preview.summary.rejected,
+    rejected: freshPreview.summary.rejected,
   };
 
   try {
@@ -634,7 +643,7 @@ async function applyComputeResult(req, {
     throw error;
   }
 
-  return { summary, preview };
+  return { summary, preview: freshPreview };
 }
 
 async function previewStoredComputeJob(req, externalJobId, options = {}) {

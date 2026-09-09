@@ -103,7 +103,7 @@ describe('pivotComputeWorkerRoutes outcomes', () => {
     expect(response.body.code).toBe('COMPUTE_WORKER_AUTH_REQUIRED');
   });
 
-  it('registers a schedule occurrence and returns context only after the job is recorded', async () => {
+  it('registers and leases a schedule occurrence before returning its context', async () => {
     const occurrenceId = 'sched:discovery-iowacity@2026-09-08T12:00:00.000Z';
     buildCityDiscoveryContextSnapshot.mockImplementation(async (_req, options) => {
       expect(options.authorize).toEqual(expect.any(Function));
@@ -131,7 +131,9 @@ describe('pivotComputeWorkerRoutes outcomes', () => {
 
     expect(response.status).toBe(201);
     expect(response.body.created).toBe(true);
-    expect(response.body.job.status).toBe('pending');
+    expect(response.body.job.status).toBe('leased');
+    expect(response.body.lease.leaseToken).toBeTruthy();
+    expect(response.body.lease.workerId).toBe(WORKER_ID);
     expect(response.body.job.contextVersion).toBe('ctx:iowacity.discovery.worker-test');
     expect(response.body.context.contextVersion).toBe('ctx:iowacity.discovery.worker-test');
     expect(buildCityDiscoveryContextSnapshot).toHaveBeenCalled();
