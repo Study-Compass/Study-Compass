@@ -16,7 +16,8 @@ const {
   handleWorkerServiceError,
 } = require('../services/pivotComputeWorkerService');
 
-const MAX_WORKER_BODY_BYTES = 512 * 1024;
+// Result submissions wrap an up-to-8 MiB result with lease/capability metadata.
+const MAX_WORKER_BODY_BYTES = 9 * 1024 * 1024;
 
 function createPivotComputeWorkerRouter({
   verifyWorkerCredential = resolveWorkerCredentialVerifier(),

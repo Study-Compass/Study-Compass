@@ -130,6 +130,115 @@ function matchesSchema(value, node, root = node) {
   return true;
 }
 
+const MAX_SCHEMA_ERRORS = 25;
+
+function schemaTypeLabel(node) {
+  if (node?.oneOf) return 'one allowed shape';
+  if (node?.enum) return `one of ${node.enum.map((entry) => JSON.stringify(entry)).join(', ')}`;
+  if (Object.prototype.hasOwnProperty.call(node || {}, 'const')) return JSON.stringify(node.const);
+  return node?.type || 'the required shape';
+}
+
+function discriminatorMatch(candidate, value, root) {
+  const resolved = candidate?.$ref ? resolveRef(root, candidate.$ref) : candidate;
+  const nodes = resolved?.allOf || [resolved];
+  for (const node of nodes) {
+    const materialized = node?.$ref ? resolveRef(root, node.$ref) : node;
+    const kind = materialized?.properties?.kind;
+    if (kind?.const !== undefined) return kind.const === value?.kind;
+    if (kind?.enum) return kind.enum.includes(value?.kind);
+  }
+  return false;
+}
+
+function collectSchemaErrors(value, node, root = node, trail = '$', found = []) {
+  if (found.length >= MAX_SCHEMA_ERRORS || !node || typeof node !== 'object') return found;
+  if (node.$ref) return collectSchemaErrors(value, resolveRef(root, node.$ref), root, trail, found);
+  if (node.allOf) {
+    node.allOf.forEach((candidate) => collectSchemaErrors(value, candidate, root, trail, found));
+    return found;
+  }
+  if (node.oneOf) {
+    const matches = node.oneOf.filter((candidate) => matchesSchema(value, candidate, root));
+    if (matches.length === 1) return found;
+    const discriminated = value && typeof value === 'object'
+      ? node.oneOf.find((candidate) => discriminatorMatch(candidate, value, root))
+      : null;
+    if (discriminated) return collectSchemaErrors(value, discriminated, root, trail, found);
+    found.push(`${trail}: expected ${schemaTypeLabel(node)}`);
+    return found;
+  }
+  if (Object.prototype.hasOwnProperty.call(node, 'const') && value !== node.const) {
+    found.push(`${trail}: expected ${JSON.stringify(node.const)}`);
+    return found;
+  }
+  if (node.enum && !node.enum.includes(value)) {
+    found.push(`${trail}: expected ${schemaTypeLabel(node)}`);
+    return found;
+  }
+  if (node.type === 'null') {
+    if (value !== null) found.push(`${trail}: expected null`);
+    return found;
+  }
+  if (node.type === 'boolean') {
+    if (typeof value !== 'boolean') found.push(`${trail}: expected boolean`);
+    return found;
+  }
+  if (node.type === 'integer') {
+    if (!Number.isInteger(value)) found.push(`${trail}: expected integer`);
+    else if (node.minimum != null && value < node.minimum) found.push(`${trail}: must be at least ${node.minimum}`);
+    else if (node.maximum != null && value > node.maximum) found.push(`${trail}: must be at most ${node.maximum}`);
+    return found;
+  }
+  if (node.type === 'array') {
+    if (!Array.isArray(value)) {
+      found.push(`${trail}: expected array`);
+      return found;
+    }
+    if (node.minItems != null && value.length < node.minItems) found.push(`${trail}: requires at least ${node.minItems} items`);
+    if (node.maxItems != null && value.length > node.maxItems) found.push(`${trail}: allows at most ${node.maxItems} items`);
+    if (node.items) value.forEach((item, index) => collectSchemaErrors(item, node.items, root, `${trail}[${index}]`, found));
+    return found;
+  }
+  if (node.type === 'object') {
+    if (!value || typeof value !== 'object' || Array.isArray(value)) {
+      found.push(`${trail}: expected object`);
+      return found;
+    }
+    const keys = Object.keys(value);
+    for (const key of node.required || []) {
+      if (!Object.prototype.hasOwnProperty.call(value, key)) found.push(`${trail}.${key}: required`);
+    }
+    if (node.additionalProperties === false) {
+      for (const key of keys) {
+        if (!node.properties?.[key]) found.push(`${trail}.${key}: unknown field`);
+      }
+    }
+    for (const key of keys) {
+      if (node.properties?.[key]) collectSchemaErrors(value[key], node.properties[key], root, `${trail}.${key}`, found);
+    }
+    return found;
+  }
+  if (node.type === 'string') {
+    if (typeof value !== 'string') {
+      found.push(`${trail}: expected string`);
+      return found;
+    }
+    if (node.minLength != null && value.length < node.minLength) found.push(`${trail}: must contain at least ${node.minLength} characters`);
+    if (node.maxLength != null && value.length > node.maxLength) found.push(`${trail}: exceeds ${node.maxLength} characters`);
+    if (node.pattern && !new RegExp(node.pattern).test(value)) found.push(`${trail}: invalid format`);
+    if (node.format === 'date-time' && Number.isNaN(Date.parse(value))) found.push(`${trail}: invalid date-time`);
+    if (node.format === 'uri') {
+      try {
+        new URL(value);
+      } catch {
+        found.push(`${trail}: invalid URI`);
+      }
+    }
+  }
+  return found;
+}
+
 function collectForbiddenImportableViolations(value, trail = 'root', found = []) {
   if (!value || typeof value !== 'object') return found;
   if (Array.isArray(value)) {
@@ -153,7 +262,8 @@ function collectForbiddenImportableViolations(value, trail = 'root', found = [])
 function validateWithSchema(schema, value, { importable = false } = {}) {
   const errors = [];
   if (!matchesSchema(value, schema)) {
-    errors.push('schema mismatch');
+    errors.push(...collectSchemaErrors(value, schema));
+    if (!errors.length) errors.push('schema mismatch');
   }
   if (importable) {
     const forbidden = collectForbiddenImportableViolations(value);
@@ -210,6 +320,7 @@ module.exports = {
   SCHEMAS,
   FIXTURES_DIR,
   matchesSchema,
+  collectSchemaErrors,
   collectForbiddenImportableViolations,
   validateJobRequest,
   validateContextSnapshot,

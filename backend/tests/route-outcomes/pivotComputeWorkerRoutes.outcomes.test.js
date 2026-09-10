@@ -245,12 +245,19 @@ describe('pivotComputeWorkerRoutes outcomes', () => {
         capability: workerCapability(),
         idempotencyKey: 'idem:retry-001',
         basedOnContextVersion: 'ctx:iowacity.discovery.v1',
-        failure: { code: 'PROVIDER_TIMEOUT', message: 'Firecrawl timed out' },
+        failure: {
+          code: 'PROVIDER_TIMEOUT',
+          message: 'Firecrawl timed out',
+          details: ['$.proposals.events[12].draft.description: exceeds 5000 characters'],
+        },
       });
 
     expect(failure.status).toBe(200);
     expect(failure.body.job.status).toBe('retryable');
     expect(failure.body.job.failure.retryable).toBe(true);
+    expect(failure.body.job.failure.details).toEqual([
+      '$.proposals.events[12].draft.description: exceeds 5000 characters',
+    ]);
   });
 
   it('reports contract-valid refresh failures and releases the active lease', async () => {

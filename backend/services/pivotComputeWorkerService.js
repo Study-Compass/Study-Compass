@@ -320,6 +320,12 @@ async function reportRetryableJobFailure(req, {
   const failure = body.failure || {};
   const code = trimString(failure.code) || 'WORKER_RETRYABLE_FAILURE';
   const message = trimString(failure.message) || 'Compute worker reported a retryable failure';
+  const details = Array.isArray(failure.details)
+    ? failure.details
+      .map((entry) => trimString(entry).replace(/[\u0000-\u001F]/g, ' ').slice(0, 240))
+      .filter(Boolean)
+      .slice(0, 12)
+    : [];
   if (!idempotencyKey) {
     throw serviceError('Retryable failure idempotencyKey is required', 'INVALID_RETRYABLE_FAILURE');
   }
@@ -354,6 +360,7 @@ async function reportRetryableJobFailure(req, {
     result,
     retryable: true,
     requiresReview: false,
+    failureDetails: details,
     now,
   });
   return { job: updated };

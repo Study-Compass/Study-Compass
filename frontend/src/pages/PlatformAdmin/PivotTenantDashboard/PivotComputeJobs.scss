@@ -13,8 +13,21 @@
     gap: 4px;
     font-size: 0.875rem;
 
-    select {
+    select,
+    input,
+    textarea {
       min-width: 180px;
+      border: 1px solid rgba(0, 0, 0, 0.18);
+      border-radius: 8px;
+      background: transparent;
+      color: inherit;
+      padding: 8px 10px;
+      font: inherit;
+    }
+
+    textarea {
+      min-height: 74px;
+      resize: vertical;
     }
   }
 
@@ -43,6 +56,38 @@
 
   .pivot-compute-jobs__create-context input {
     min-width: 240px;
+  }
+
+  .pivot-compute-jobs__advanced {
+    margin-top: 16px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    padding: 12px 14px;
+
+    summary {
+      cursor: pointer;
+      font-weight: 600;
+    }
+  }
+
+  .pivot-compute-jobs__advanced-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 14px 16px;
+    align-items: end;
+    margin-top: 12px;
+  }
+
+  .pivot-compute-jobs__job-ids {
+    grid-column: span 2;
+  }
+
+  .pivot-compute-jobs__check {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    min-height: 38px;
+    font-size: 0.875rem;
   }
 
   .pivot-compute-jobs__controls {
@@ -105,6 +150,60 @@
 
   .pivot-compute-jobs__detail-section {
     margin-top: 20px;
+  }
+
+  .pivot-compute-jobs__failure {
+    display: grid;
+    gap: 10px;
+    margin-top: 20px;
+    padding: 16px;
+    border: 1px solid rgba(180, 35, 24, 0.34);
+    border-radius: 10px;
+    background: rgba(180, 35, 24, 0.07);
+  }
+
+  .pivot-compute-jobs__failure-code,
+  .pivot-compute-jobs__failure-message,
+  .pivot-compute-jobs__failure-recourse {
+    margin: 0;
+  }
+
+  .pivot-compute-jobs__failure-code {
+    color: #b42318;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', monospace;
+    font-weight: 700;
+  }
+
+  .pivot-compute-jobs__failure-message {
+    margin-top: 4px;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  .pivot-compute-jobs__failure-details {
+    margin: 12px 0 0;
+    padding-left: 20px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', monospace;
+    font-size: 0.82rem;
+    word-break: break-word;
+  }
+
+  .pivot-compute-jobs__failure-recourse {
+    font-size: 0.875rem;
+    opacity: 0.78;
+  }
+
+  .pivot-compute-jobs__json {
+    max-height: 320px;
+    overflow: auto;
+    margin: 0;
+    padding: 14px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    background: rgba(0, 0, 0, 0.025);
+    font-size: 0.82rem;
+    white-space: pre-wrap;
+    word-break: break-word;
   }
 
   .pivot-compute-jobs__detail-heading {
@@ -235,5 +334,17 @@
 .platform-admin--dark .pivot-compute-jobs {
   .pivot-compute-jobs__table tr.is-selected {
     background: rgba(255, 79, 31, 0.14);
+  }
+
+  .pivot-compute-jobs__filter select,
+  .pivot-compute-jobs__filter input,
+  .pivot-compute-jobs__filter textarea,
+  .pivot-compute-jobs__advanced,
+  .pivot-compute-jobs__json {
+    border-color: rgba(255, 255, 255, 0.16);
+  }
+
+  .pivot-compute-jobs__json {
+    background: rgba(255, 255, 255, 0.04);
   }
 }

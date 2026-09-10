@@ -18,7 +18,9 @@ const PIVOT_COMPUTE_JOB_INDEX_NAMES = Object.freeze([
 const MAX_PROGRESS_MESSAGE_LENGTH = 500;
 const MAX_PROGRESS_PHASE_LENGTH = 64;
 const MAX_PROGRESS_COUNTER_KEYS = 20;
-const MAX_EMBEDDED_RESULT_BYTES = 512 * 1024;
+// Keep embedded results below MongoDB's 16 MiB document ceiling while leaving
+// room for job metadata and context. Full-city refreshes commonly exceed 512 KiB.
+const MAX_EMBEDDED_RESULT_BYTES = 8 * 1024 * 1024;
 const MAX_ARTIFACT_REF_KEY_LENGTH = 256;
 const MAX_OPTIONS_BYTES = 16 * 1024;
 
@@ -126,6 +128,16 @@ const jobFailureSchema = new mongoose.Schema(
   {
     code: { type: String, required: true, trim: true, maxlength: 64 },
     message: { type: String, required: true, trim: true, maxlength: 1000 },
+    details: {
+      type: [String],
+      default: undefined,
+      validate: [
+        (values) => !values || (
+          values.length <= 12 && values.every((value) => String(value).length <= 240)
+        ),
+        'failure details exceed safe bounds',
+      ],
+    },
     retryable: { type: Boolean, default: false },
   },
   { _id: false },

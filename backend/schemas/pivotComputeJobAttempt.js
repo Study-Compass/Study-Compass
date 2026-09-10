@@ -14,6 +14,16 @@ const attemptFailureSchema = new mongoose.Schema(
   {
     code: { type: String, required: true, trim: true, maxlength: 64 },
     message: { type: String, required: true, trim: true, maxlength: 1000 },
+    details: {
+      type: [String],
+      default: undefined,
+      validate: [
+        (values) => !values || (
+          values.length <= 12 && values.every((value) => String(value).length <= 240)
+        ),
+        'failure details exceed safe bounds',
+      ],
+    },
     retryable: { type: Boolean, default: false },
   },
   { _id: false },

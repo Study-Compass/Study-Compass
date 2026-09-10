@@ -177,6 +177,9 @@ export function summarizeStoredResult(result) {
     submittedAt: result.submittedAt || null,
     resultIdempotencyKey: result.resultIdempotencyKey || null,
     hasEmbeddedResult: Boolean(result.hasEmbeddedResult || result.embedded),
+    embeddedByteSize: result.embeddedByteSize
+      ?? (result.embedded ? new Blob([JSON.stringify(result.embedded)]).size : null),
+    embeddedSummary: result.embeddedSummary ?? result.embedded?.summary ?? null,
     artifactRef: result.artifactRef
       ? {
         storage: result.artifactRef.storage,

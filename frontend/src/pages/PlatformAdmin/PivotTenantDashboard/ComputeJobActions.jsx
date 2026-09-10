@@ -16,14 +16,40 @@ export function ComputeJobCreateForm({ tenantKey, onCreated }) {
   const { addNotification } = useNotification();
   const [kind, setKind] = useState('city-source-discovery');
   const [contextVersion, setContextVersion] = useState('');
+  const [tags, setTags] = useState('');
+  const [maxQueries, setMaxQueries] = useState('');
+  const [maxCandidates, setMaxCandidates] = useState(20);
+  const [minEvents, setMinEvents] = useState(1);
+  const [createJobs, setCreateJobs] = useState(true);
+  const [recheckRejected, setRecheckRejected] = useState(false);
+  const [batchWeek, setBatchWeek] = useState('');
+  const [forceBatchWeek, setForceBatchWeek] = useState(false);
+  const [jobIds, setJobIds] = useState('');
   const [loading, setLoading] = useState(false);
   const [feedback, setFeedback] = useState(null);
 
   const handleCreate = useCallback(async () => {
+    const parsedTags = tags.split(/[\n,]/).map((value) => value.trim()).filter(Boolean);
+    const parsedJobIds = jobIds.split(/[\s,]+/).map((value) => value.trim()).filter(Boolean);
+    const invalidJobIds = parsedJobIds.filter((value) => !/^[0-9a-f]{24}$/.test(value));
+    if (kind === 'city-curation-refresh' && invalidJobIds.length) {
+      setFeedback({
+        tone: 'error',
+        message: `Invalid curation job id${invalidJobIds.length === 1 ? '' : 's'}: ${invalidJobIds.slice(0, 3).join(', ')}`,
+      });
+      return;
+    }
+    if (kind === 'city-curation-refresh' && batchWeek && !/^\d{4}-W\d{2}$/.test(batchWeek)) {
+      setFeedback({ tone: 'error', message: 'Batch week must use YYYY-WNN format, for example 2026-W37.' });
+      return;
+    }
     const request = buildAdminCreateJobRequest({
       tenantKey,
       kind,
       contextVersion,
+      options: kind === 'city-source-discovery'
+        ? { tags: parsedTags, maxQueries, maxCandidates, minEvents, createJobs, recheckRejected }
+        : { batchWeek, forceBatchWeek, jobIds: parsedJobIds },
     });
     setLoading(true);
     setFeedback(null);
@@ -44,7 +70,22 @@ export function ComputeJobCreateForm({ tenantKey, onCreated }) {
       message: result.message,
     });
     onCreated?.(data?.job || null, { created: Boolean(data?.created) });
-  }, [tenantKey, kind, contextVersion, addNotification, onCreated]);
+  }, [
+    tenantKey,
+    kind,
+    contextVersion,
+    tags,
+    maxQueries,
+    maxCandidates,
+    minEvents,
+    createJobs,
+    recheckRejected,
+    batchWeek,
+    forceBatchWeek,
+    jobIds,
+    addNotification,
+    onCreated,
+  ]);
 
   return (
     <section
@@ -92,6 +133,55 @@ export function ComputeJobCreateForm({ tenantKey, onCreated }) {
           {loading ? 'Creating…' : 'Create job'}
         </button>
       </div>
+      <details className="pivot-compute-jobs__advanced">
+        <summary>Run controls</summary>
+        <p className="pivot-lab__section-hint">
+          Use these bounds to make a smaller recovery run or isolate problematic inputs. Defaults are safe for routine runs.
+        </p>
+        {kind === 'city-source-discovery' ? (
+          <div className="pivot-compute-jobs__advanced-grid">
+            <label className="pivot-compute-jobs__filter">
+              <span>Tags (comma or line separated)</span>
+              <textarea aria-label="Discovery tags" value={tags} onChange={(event) => setTags(event.target.value)} disabled={loading} />
+            </label>
+            <label className="pivot-compute-jobs__filter">
+              <span>Max queries (optional)</span>
+              <input aria-label="Max queries" type="number" min="1" max="50" value={maxQueries} onChange={(event) => setMaxQueries(event.target.value)} placeholder="All generated queries" disabled={loading} />
+            </label>
+            <label className="pivot-compute-jobs__filter">
+              <span>Max candidates</span>
+              <input aria-label="Max candidates" type="number" min="1" max="50" value={maxCandidates} onChange={(event) => setMaxCandidates(event.target.value)} disabled={loading} />
+            </label>
+            <label className="pivot-compute-jobs__filter">
+              <span>Minimum events</span>
+              <input aria-label="Minimum events" type="number" min="1" max="50" value={minEvents} onChange={(event) => setMinEvents(event.target.value)} disabled={loading} />
+            </label>
+            <label className="pivot-compute-jobs__check">
+              <input type="checkbox" checked={createJobs} onChange={(event) => setCreateJobs(event.target.checked)} disabled={loading} />
+              Create curation jobs
+            </label>
+            <label className="pivot-compute-jobs__check">
+              <input type="checkbox" checked={recheckRejected} onChange={(event) => setRecheckRejected(event.target.checked)} disabled={loading} />
+              Recheck rejected sources
+            </label>
+          </div>
+        ) : (
+          <div className="pivot-compute-jobs__advanced-grid">
+            <label className="pivot-compute-jobs__filter">
+              <span>Batch week (optional)</span>
+              <input aria-label="Batch week" type="text" value={batchWeek} onChange={(event) => setBatchWeek(event.target.value)} placeholder="2026-W37" disabled={loading} />
+            </label>
+            <label className="pivot-compute-jobs__filter pivot-compute-jobs__job-ids">
+              <span>Curation job IDs (optional, one per line)</span>
+              <textarea aria-label="Curation job IDs" value={jobIds} onChange={(event) => setJobIds(event.target.value)} placeholder="507f1f77bcf86cd799439011" disabled={loading} />
+            </label>
+            <label className="pivot-compute-jobs__check">
+              <input type="checkbox" checked={forceBatchWeek} onChange={(event) => setForceBatchWeek(event.target.checked)} disabled={loading} />
+              Force every event into this batch week
+            </label>
+          </div>
+        )}
+      </details>
       {feedback ? (
         <p
           className={feedback.tone === 'error' ? 'pivot-lab__error' : 'pivot-lab__section-hint'}

@@ -555,6 +555,7 @@ async function submitComputeJobResult(req, {
   result,
   retryable = false,
   requiresReview = true,
+  failureDetails = [],
   now = new Date(),
 } = {}) {
   const { PivotComputeJob, PivotComputeJobAttempt } = await getModels(req);
@@ -594,6 +595,7 @@ async function submitComputeJobResult(req, {
     ? {
       code: trimString(result.failure?.code) || 'EXECUTION_FAILED',
       message: trimString(result.failure?.message) || 'Compute execution failed',
+      ...(failureDetails.length ? { details: failureDetails } : {}),
       retryable: Boolean(retryable),
     }
     : null;

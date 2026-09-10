@@ -81,11 +81,16 @@ function createApp() {
   // Other middleware
   const defaultJsonParser = express.json();
   app.use((req, res, next) => {
-    // The compute-worker router owns a separately bounded 512 KiB parser for
-    // result artifacts. Letting the default 100 KiB parser run first would make
-    // that route-specific contract unreachable in the assembled application.
-    const workerBasePath = '/worker/pivot/compute/v1';
-    if (req.path === workerBasePath || req.path.startsWith(`${workerBasePath}/`)) return next();
+    // Compute-result routers own separately bounded parsers for multi-megabyte
+    // artifacts. Letting the default 100 KiB parser run first would make those
+    // route-specific contracts unreachable in the assembled application.
+    const largeJsonBasePaths = [
+      '/worker/pivot/compute/v1',
+      '/admin/pivot/compute-jobs',
+    ];
+    if (largeJsonBasePaths.some((basePath) => (
+      req.path === basePath || req.path.startsWith(`${basePath}/`)
+    ))) return next();
     return defaultJsonParser(req, res, next);
   });
   app.use(express.urlencoded({ extended: true }));

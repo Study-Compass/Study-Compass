@@ -75,6 +75,13 @@ function DetailField({ label, value, mono = false }) {
   );
 }
 
+function formatBytes(value) {
+  if (!Number.isFinite(value)) return '—';
+  if (value < 1024) return `${value} B`;
+  if (value < 1024 * 1024) return `${(value / 1024).toFixed(1)} KiB`;
+  return `${(value / (1024 * 1024)).toFixed(2)} MiB`;
+}
+
 function ComputeJobDetail({
   job,
   attempts,
@@ -95,6 +102,8 @@ function ComputeJobDetail({
   const resultSummary = summarizeStoredResult(job.result);
   const safeJob = redactSensitiveFields(job);
   const visibleAttempts = Array.isArray(attempts) ? attempts.slice(0, MAX_ATTEMPTS_SHOWN) : [];
+  const failure = safeJob.failure;
+  const canRetry = safeJob.status === 'retryable';
 
   return (
     <div className="pivot-compute-jobs__detail" data-testid="compute-job-detail">
@@ -131,8 +140,31 @@ function ComputeJobDetail({
         />
         <DetailField label="Requested" value={formatTimestamp(safeJob.requestedAt)} />
         <DetailField label="Updated" value={formatTimestamp(safeJob.updatedAt)} />
-        <DetailField label="Failure" value={formatFailure(safeJob.failure)} />
       </dl>
+
+      {failure ? (
+        <section className="pivot-compute-jobs__failure" role="alert" aria-label="Failure and recovery">
+          <div>
+            <p className="pivot-compute-jobs__failure-code">{failure.code || 'JOB_FAILED'}</p>
+            <p className="pivot-compute-jobs__failure-message">{failure.message || 'The job failed without a message.'}</p>
+            {Array.isArray(failure.details) && failure.details.length ? (
+              <ul className="pivot-compute-jobs__failure-details">
+                {failure.details.map((detail) => <li key={detail}>{detail}</li>)}
+              </ul>
+            ) : null}
+          </div>
+          <p className="pivot-compute-jobs__failure-recourse">
+            {canRetry
+              ? 'This attempt is retryable. Retry uses the same request and a fresh lease; use Run controls above to create a smaller replacement instead.'
+              : 'This failure is terminal. Use Run controls above to create a corrected or smaller replacement job.'}
+          </p>
+        </section>
+      ) : null}
+
+      <section className="pivot-compute-jobs__detail-section" aria-label="Request options">
+        <h3 className="pivot-compute-jobs__detail-heading">Request options</h3>
+        <pre className="pivot-compute-jobs__json">{JSON.stringify(safeJob.options || {}, null, 2)}</pre>
+      </section>
 
       {resultSummary ? (
         <section className="pivot-compute-jobs__detail-section" aria-label="Stored result summary">
@@ -149,6 +181,10 @@ function ComputeJobDetail({
               label="Embedded payload"
               value={resultSummary.hasEmbeddedResult ? 'Present (not shown)' : 'Not stored inline'}
             />
+            <DetailField label="Payload size" value={formatBytes(resultSummary.embeddedByteSize)} />
+            {Object.entries(resultSummary.embeddedSummary || {}).map(([key, value]) => (
+              <DetailField key={key} label={key.replace(/([A-Z])/g, ' $1')} value={String(value)} />
+            ))}
           </dl>
         </section>
       ) : null}

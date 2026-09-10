@@ -148,6 +148,19 @@ describe('Pivot admin compute job contracts v1 (Phase 1, Step 1.2)', () => {
       expect(refresh.proposals.jobOutcomes).toBeDefined();
       expect(refresh.proposals.sources).toBeUndefined();
     });
+
+    it('returns bounded field paths for invalid execution results', () => {
+      const refresh = loadFixture('result-refresh-valid-completed.json');
+      refresh.proposals.events[0].draft.description = 'x'.repeat(5001);
+      refresh.proposals.events[0].draft.image = 'http://unsafe.example.test/poster.jpg';
+
+      const validation = validateExecutionResult(refresh);
+      expect(validation.valid).toBe(false);
+      expect(validation.errors).toEqual(expect.arrayContaining([
+        expect.stringContaining('$.proposals.events[0].draft.description'),
+        expect.stringContaining('$.proposals.events[0].draft.image'),
+      ]));
+    });
   });
 
   describe('diagnostic export', () => {

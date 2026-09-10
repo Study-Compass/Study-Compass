@@ -75,6 +75,7 @@ function serializeAdminJob(job, { includeEmbeddedResult = false } = {}) {
     };
   }
   if (!includeEmbeddedResult && serialized.result?.embedded) {
+    const embeddedByteSize = Buffer.byteLength(JSON.stringify(serialized.result.embedded), 'utf8');
     serialized.result = {
       mode: serialized.result.mode,
       artifactRef: serialized.result.artifactRef ?? null,
@@ -82,6 +83,8 @@ function serializeAdminJob(job, { includeEmbeddedResult = false } = {}) {
       submittedAt: serialized.result.submittedAt,
       contractVersion: serialized.result.contractVersion,
       hasEmbeddedResult: true,
+      embeddedByteSize,
+      embeddedSummary: serialized.result.embedded.summary ?? null,
     };
   }
   return serialized;
@@ -213,7 +216,9 @@ async function getAdminComputeJob(req, externalJobId, { includeAttempts = true }
     throw serviceError('Compute job not found', 'COMPUTE_JOB_NOT_FOUND', 404);
   }
   const payload = {
-    job: serializeAdminJob(job, { includeEmbeddedResult: true }),
+    // Preview has a dedicated endpoint; avoid transferring multi-megabyte result
+    // payloads just to render operational metadata.
+    job: serializeAdminJob(job),
   };
   if (includeAttempts) {
     payload.attempts = (await listComputeJobAttempts(req, externalJobId)).map((attempt) => ({
@@ -236,7 +241,7 @@ async function submitManualComputeResult(req, {
     now,
   });
   return {
-    job: serializeAdminJob(submitted.job, { includeEmbeddedResult: true }),
+    job: serializeAdminJob(submitted.job),
     created: submitted.created,
     duplicate: submitted.duplicate,
   };

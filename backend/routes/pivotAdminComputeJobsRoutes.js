@@ -17,7 +17,7 @@ const {
   handleAdminServiceError,
 } = require('../services/pivotComputeAdminService');
 
-const MAX_MANUAL_RESULT_BYTES = 512 * 1024;
+const MAX_MANUAL_RESULT_BYTES = 9 * 1024 * 1024;
 const router = express.Router();
 
 router.use(express.json({

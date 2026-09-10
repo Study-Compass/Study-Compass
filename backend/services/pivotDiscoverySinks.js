@@ -20,6 +20,22 @@ function isoTimestamp(value) {
   return null;
 }
 
+function boundedString(value, maxLength) {
+  const normalized = trimString(value);
+  return normalized ? normalized.slice(0, maxLength) : null;
+}
+
+function safeHttpsUrl(value, maxLength = 2048) {
+  const normalized = trimString(value);
+  if (!normalized || normalized.length > maxLength) return null;
+  try {
+    const parsed = new URL(normalized);
+    return parsed.protocol === 'https:' ? normalized : null;
+  } catch {
+    return null;
+  }
+}
+
 function createProposalCollector() {
   return {
     sources: [],
@@ -86,16 +102,16 @@ function buildEventProposalFromEntry(entry, {
   basedOnEventVersion,
 }) {
   const draft = entry?.draft || entry;
-  const sourceUrl = trimString(draft?.sourceUrl || entry?.sourceUrl);
-  const name = trimString(draft?.name);
+  const sourceUrl = safeHttpsUrl(draft?.sourceUrl || entry?.sourceUrl);
+  const name = boundedString(draft?.name, 500);
   const startTime = draft?.start_time;
   if (!sourceUrl || !name || !startTime) return null;
-  if (!/^https:\/\//i.test(sourceUrl)) return null;
-
   const startIso = isoTimestamp(startTime);
   if (!startIso) return null;
 
-  const tags = sortedTags([...(defaultTags || []), ...(draft?.tags || [])]);
+  const tags = sortedTags([...(defaultTags || []), ...(draft?.tags || [])])
+    .map((tag) => tag.slice(0, 64))
+    .slice(0, 16);
   const resolvedBatchWeek = forceBatchWeek && batchWeek
     ? batchWeek
     : toIsoWeek(new Date(startIso));
@@ -109,21 +125,21 @@ function buildEventProposalFromEntry(entry, {
     batchWeek: resolvedBatchWeek,
     draft: {
       name,
-      description: trimString(draft.description) || null,
-      image: trimString(draft.image) || null,
-      location: trimString(draft.location) || null,
-      rawLocationText: trimString(draft.rawLocationText) || null,
+      description: boundedString(draft.description, 5000),
+      image: safeHttpsUrl(draft.image),
+      location: boundedString(draft.location, 500),
+      rawLocationText: boundedString(draft.rawLocationText, 500),
       start_time: startIso,
       end_time: draft.end_time ? isoTimestamp(draft.end_time) : null,
       sourceUrl,
-      hostName: trimString(draft.hostName || draft.host?.name) || null,
-      hostProfileUrl: trimString(draft.hostProfileUrl || draft.host?.profileUrl) || null,
+      hostName: boundedString(draft.hostName || draft.host?.name, 300),
+      hostProfileUrl: safeHttpsUrl(draft.hostProfileUrl || draft.host?.profileUrl),
       tags,
     },
     basedOnEventVersion: basedOnEventVersion || null,
     linkedJobId: safeLinkedJobId,
     evidence: {
-      discoveredFromHost: host,
+      ...(boundedString(host, 253) ? { discoveredFromHost: boundedString(host, 253) } : {}),
       provider,
     },
   };

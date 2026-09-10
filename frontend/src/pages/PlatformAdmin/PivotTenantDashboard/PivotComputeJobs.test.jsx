@@ -102,6 +102,7 @@ const SAMPLE_JOBS = [
     failure: {
       code: 'PROVIDER_TIMEOUT',
       message: 'Firecrawl request timed out after 120s',
+      details: ['$.proposals.events[12].draft.description: exceeds 5000 characters'],
       retryable: true,
     },
     requestedAt: '2026-09-07T18:00:00.000Z',
@@ -339,6 +340,58 @@ describe('PivotComputeJobs', () => {
     });
   });
 
+  it('can create a targeted refresh replacement with explicit run controls', async () => {
+    mockAuthenticatedRequest.mockResolvedValue({
+      data: { created: true, job: { externalJobId: 'job:refresh-iowacity-new', status: 'pending' } },
+    });
+    renderComputeJobs();
+
+    fireEvent.change(screen.getByLabelText('Create job kind'), {
+      target: { value: 'city-curation-refresh' },
+    });
+    fireEvent.click(screen.getByText('Run controls'));
+    fireEvent.change(screen.getByLabelText('Batch week'), { target: { value: '2026-W37' } });
+    fireEvent.change(screen.getByLabelText('Curation job IDs'), {
+      target: { value: '507f1f77bcf86cd799439011\n507f1f77bcf86cd799439012' },
+    });
+    fireEvent.click(screen.getByLabelText('Force every event into this batch week'));
+    fireEvent.click(screen.getByRole('button', { name: 'Create job' }));
+
+    await waitFor(() => expect(mockAuthenticatedRequest).toHaveBeenCalledWith(
+      '/admin/pivot/compute-jobs',
+      expect.objectContaining({
+        data: expect.objectContaining({
+          request: expect.objectContaining({
+            kind: 'city-curation-refresh',
+            options: {
+              batchWeek: '2026-W37',
+              forceBatchWeek: true,
+              jobIds: ['507f1f77bcf86cd799439011', '507f1f77bcf86cd799439012'],
+            },
+          }),
+        }),
+      }),
+    ));
+  });
+
+  it('shows a failed job with explicit recovery guidance', async () => {
+    mockAuthenticatedRequest.mockResolvedValue({
+      data: {
+        job: SAMPLE_JOBS[2],
+        attempts: [],
+      },
+    });
+    renderComputeJobs({
+      path: '/platform-admin/pivot/iowacity?page=10&computeJobId=job:manual-iowacity-001',
+    });
+
+    const recovery = await screen.findByRole('alert', { name: 'Failure and recovery' });
+    expect(recovery).toHaveTextContent('PROVIDER_TIMEOUT');
+    expect(recovery).toHaveTextContent('$.proposals.events[12].draft.description');
+    expect(recovery).toHaveTextContent(/retry uses the same request/i);
+    expect(screen.getByRole('button', { name: 'Retry job' })).toBeInTheDocument();
+  });
+
   it('shows state-specific detail controls for review, retryable, and running jobs', async () => {
     mockAuthenticatedRequest.mockImplementation((url) => {
       if (url.includes('job%3Arefresh-iowacity-001')) {
@@ -442,7 +495,7 @@ describe('PivotComputeJobs', () => {
 
     const applyButton = screen.getByRole('button', { name: 'Apply stored preview' });
     expect(applyButton).toBeDisabled();
-    fireEvent.click(screen.getByRole('checkbox'));
+    fireEvent.click(screen.getByLabelText(/I reviewed the stored preview/i));
     fireEvent.click(applyButton);
 
     await waitFor(() => {

@@ -48,6 +48,7 @@ export function buildAdminCreateJobRequest({
   tenantKey,
   kind,
   contextVersion = '',
+  options = {},
 }) {
   const normalizedKind = COMPUTE_JOB_KINDS.includes(kind) ? kind : 'city-source-discovery';
   const slug = normalizedKind === 'city-source-discovery' ? 'discovery' : 'refresh';
@@ -67,15 +68,61 @@ export function buildAdminCreateJobRequest({
     requestedAt: new Date(stamp).toISOString(),
     idempotencyKey: `idem:admin-${slug}-${cityKey}-${stamp}`,
     options: normalizedKind === 'city-source-discovery'
-      ? {
-        maxCandidates: 20,
-        minEvents: 1,
-        createJobs: true,
-        recheckRejected: false,
-      }
-      : {
-        forceBatchWeek: false,
-      },
+      ? normalizeDiscoveryOptions(options)
+      : normalizeRefreshOptions(options),
+  };
+}
+
+function boundedInteger(value, fallback, minimum = 1, maximum = 50) {
+  const parsed = Number(value);
+  if (!Number.isInteger(parsed)) return fallback;
+  return Math.min(maximum, Math.max(minimum, parsed));
+}
+
+function boundedOptionalInteger(value, minimum = 1, maximum = 50) {
+  if (value === '' || value == null) return undefined;
+  return boundedInteger(value, undefined, minimum, maximum);
+}
+
+function normalizeStringList(values, { maximumItems, maximumLength, pattern } = {}) {
+  const seen = new Set();
+  const normalized = [];
+  for (const value of Array.isArray(values) ? values : []) {
+    const item = String(value || '').trim();
+    if (!item || item.length > maximumLength || (pattern && !pattern.test(item)) || seen.has(item)) {
+      continue;
+    }
+    seen.add(item);
+    normalized.push(item);
+    if (normalized.length >= maximumItems) break;
+  }
+  return normalized;
+}
+
+function normalizeDiscoveryOptions(options) {
+  const tags = normalizeStringList(options.tags, { maximumItems: 16, maximumLength: 64 });
+  const maxQueries = boundedOptionalInteger(options.maxQueries);
+  return {
+    ...(tags.length ? { tags } : {}),
+    ...(maxQueries ? { maxQueries } : {}),
+    maxCandidates: boundedInteger(options.maxCandidates, 20),
+    minEvents: boundedInteger(options.minEvents, 1),
+    createJobs: options.createJobs !== false,
+    recheckRejected: Boolean(options.recheckRejected),
+  };
+}
+
+function normalizeRefreshOptions(options) {
+  const batchWeek = String(options.batchWeek || '').trim();
+  const jobIds = normalizeStringList(options.jobIds, {
+    maximumItems: 100,
+    maximumLength: 24,
+    pattern: /^[0-9a-f]{24}$/,
+  });
+  return {
+    ...(batchWeek ? { batchWeek } : {}),
+    forceBatchWeek: Boolean(options.forceBatchWeek),
+    ...(jobIds.length ? { jobIds } : {}),
   };
 }
 

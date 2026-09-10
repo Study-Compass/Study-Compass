@@ -64,6 +64,8 @@ describe('pivotComputeJobsFormat', () => {
       submittedAt: '2026-09-08T20:10:00.000Z',
       resultIdempotencyKey: 'res:001',
       hasEmbeddedResult: true,
+      embeddedByteSize: 16,
+      embeddedSummary: null,
       artifactRef: null,
     });
   });

@@ -12,6 +12,13 @@ function trimString(value) {
   return typeof value === 'string' ? value.trim() : '';
 }
 
+function boundedFailure(error, fallbackCode = 'PREVIEW_FAILED', fallbackMessage = 'Crawl failed.') {
+  const rawCode = trimString(error?.code) || fallbackCode;
+  const safeCode = rawCode.replace(/[^a-zA-Z0-9._-]/g, '_').slice(0, 64) || fallbackCode;
+  const safeMessage = (trimString(error?.error || error?.message) || fallbackMessage).slice(0, 1000);
+  return { code: safeCode, message: safeMessage };
+}
+
 function createRefreshProposalCollector() {
   return {
     jobOutcomes: [],
@@ -235,24 +242,22 @@ function createArtifactCurationRefreshSinks(contextSnapshot, collector) {
 
       const parsed = entriesFromPreview(preview, job.url);
       if (parsed.error) {
+        const failure = boundedFailure(parsed.error);
         collector.jobOutcomes.push({
           jobId: String(job._id),
           outcome: 'failed',
           basedOnRecordVersion,
-          failure: {
-            code: parsed.error.code || 'PREVIEW_FAILED',
-            message: parsed.error.error || 'Crawl failed.',
-          },
+          failure,
         });
-        guard.noteFailure({ code: parsed.error.code, error: parsed.error.error });
+        guard.noteFailure({ code: failure.code, error: failure.message });
         recorder.bumpCounters({ jobsFailed: 1 });
         recorder.step({
           phase: 'crawling',
           kind: 'job-done',
           tone: 'warn',
           title: `${label} failed`,
-          detail: parsed.error.error || 'Crawl failed.',
-          code: parsed.error.code || null,
+          detail: failure.message,
+          code: failure.code,
           url: job.url || null,
         });
         return { failed: true };
@@ -310,4 +315,5 @@ module.exports = {
   contextJobToRuntime,
   entriesFromPreview,
   hostFromJob,
+  boundedFailure,
 };

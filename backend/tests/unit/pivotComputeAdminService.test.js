@@ -72,7 +72,9 @@ describe('pivotComputeAdminService', () => {
     });
     expect(first.created).toBe(true);
     expect(first.job.status).toBe('review-required');
-    expect(first.job.result.embedded).toBeTruthy();
+    expect(first.job.result.embedded).toBeUndefined();
+    expect(first.job.result.hasEmbeddedResult).toBe(true);
+    expect(first.job.result.embeddedByteSize).toBeGreaterThan(0);
 
     const second = await submitManualComputeResult(req, {
       result,

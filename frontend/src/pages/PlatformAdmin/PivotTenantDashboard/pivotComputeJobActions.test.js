@@ -38,6 +38,44 @@ describe('pivotComputeJobActions', () => {
     expect(request.options).toEqual({ forceBatchWeek: false });
   });
 
+  it('preserves bounded discovery controls and refresh subsets', () => {
+    const discovery = buildAdminCreateJobRequest({
+      tenantKey: 'iowacity',
+      kind: 'city-source-discovery',
+      options: {
+        tags: ['music', 'markets'],
+        maxQueries: 4,
+        maxCandidates: 12,
+        minEvents: 3,
+        createJobs: false,
+        recheckRejected: true,
+      },
+    });
+    expect(discovery.options).toEqual({
+      tags: ['music', 'markets'],
+      maxQueries: 4,
+      maxCandidates: 12,
+      minEvents: 3,
+      createJobs: false,
+      recheckRejected: true,
+    });
+
+    const refresh = buildAdminCreateJobRequest({
+      tenantKey: 'iowacity',
+      kind: 'city-curation-refresh',
+      options: {
+        batchWeek: '2026-W37',
+        forceBatchWeek: true,
+        jobIds: ['507f1f77bcf86cd799439011', 'invalid'],
+      },
+    });
+    expect(refresh.options).toEqual({
+      batchWeek: '2026-W37',
+      forceBatchWeek: true,
+      jobIds: ['507f1f77bcf86cd799439011'],
+    });
+  });
+
   it('describes duplicate mutation outcomes without implying fresh success', () => {
     expect(mutationFeedback('cancel', { duplicate: true }).tone).toBe('info');
     expect(mutationFeedback('apply', { duplicate: true }).message).toMatch(/already recorded/i);

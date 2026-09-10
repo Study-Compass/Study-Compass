@@ -254,6 +254,42 @@ describe('pivotOffloadedCurationRefreshService (Phase 2, Step 2.3)', () => {
     }
   });
 
+  it('normalizes provider fields to the portable result contract', async () => {
+    previewIngestUrl.mockResolvedValueOnce({
+      data: {
+        mode: 'single',
+        draft: {
+          name: `Long event ${'n'.repeat(600)}`,
+          description: 'd'.repeat(6000),
+          image: 'http://insecure.example.test/poster.jpg',
+          location: 'l'.repeat(600),
+          rawLocationText: 'r'.repeat(600),
+          start_time: '2026-09-09T19:00:00.000Z',
+          sourceUrl: 'https://luma.com/iowa-city/long-event',
+          hostName: 'h'.repeat(400),
+          hostProfileUrl: 'not a URL',
+          tags: Array.from({ length: 24 }, (_, index) => `tag-${index}-${'x'.repeat(70)}`),
+        },
+      },
+    });
+
+    const response = await runRefresh({
+      contextSnapshot: { ...contextSnapshot, jobs: [contextSnapshot.jobs[0]] },
+    });
+    const [proposal] = response.data.result.proposals.events;
+
+    expect(validateExecutionResult(response.data.result)).toEqual({ valid: true });
+    expect(proposal.draft.name).toHaveLength(500);
+    expect(proposal.draft.description).toHaveLength(5000);
+    expect(proposal.draft.image).toBeNull();
+    expect(proposal.draft.location).toHaveLength(500);
+    expect(proposal.draft.rawLocationText).toHaveLength(500);
+    expect(proposal.draft.hostName).toHaveLength(300);
+    expect(proposal.draft.hostProfileUrl).toBeNull();
+    expect(proposal.draft.tags).toHaveLength(16);
+    expect(proposal.draft.tags.every((tag) => tag.length <= 64)).toBe(true);
+  });
+
   it('records failed job outcomes without proposing events when preview fails', async () => {
     previewIngestUrl.mockImplementationOnce(async () => ({
       error: 'Extraction failed.',
@@ -276,6 +312,23 @@ describe('pivotOffloadedCurationRefreshService (Phase 2, Step 2.3)', () => {
     ]);
     expect(result.data.result.proposals.events).toEqual([]);
     expect(PivotCurationRun.create).not.toHaveBeenCalled();
+  });
+
+  it('bounds provider failure fields so one failed source cannot invalidate the full result', async () => {
+    previewIngestUrl.mockResolvedValueOnce({
+      error: `Provider response ${'x'.repeat(1400)}`,
+      code: `INVALID PROVIDER CODE ${'z'.repeat(100)}`,
+    });
+
+    const response = await runRefresh({
+      contextSnapshot: { ...contextSnapshot, jobs: [contextSnapshot.jobs[0]] },
+    });
+    const [outcome] = response.data.result.proposals.jobOutcomes;
+
+    expect(validateExecutionResult(response.data.result)).toEqual({ valid: true });
+    expect(outcome.failure.code).toHaveLength(64);
+    expect(outcome.failure.code).toMatch(/^[a-zA-Z0-9._-]+$/);
+    expect(outcome.failure.message).toHaveLength(1000);
   });
 
   it('skips generic-site jobs when Firecrawl is unavailable in context', async () => {
