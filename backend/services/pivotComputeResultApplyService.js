@@ -8,6 +8,7 @@ const {
   isStaleContextPreview,
 } = require('../utilities/pivotAdminComputeJobContract');
 const { recordVersion, isoTimestamp } = require('../utilities/pivotComputeContextVersion');
+const { resolveEventBatchWeek } = require('../utilities/pivotIsoWeek');
 const {
   findJobByExternalId,
   beginComputeJobApply,
@@ -187,6 +188,202 @@ function materialChanges(currentMaterial, proposalMaterial) {
   return changes;
 }
 
+const REVIEW_WARNING_COPY = {
+  STALE_EVENT: {
+    title: 'Stale production records',
+    message: 'Production changed after the worker snapshot, so these proposals need a fresh review.',
+  },
+  EVENT_CONFLICT: {
+    title: 'Event conflicts',
+    message: 'These proposals conflict with the current production state.',
+  },
+  PUBLISHED_EVENT_UPDATE: {
+    title: 'Published events changing',
+    message: 'Applying will immediately change events that are already visible in the feed.',
+  },
+  PAST_EVENT: {
+    title: 'Events starting in the past',
+    message: 'These proposed events have a start time earlier than this review.',
+  },
+  MATERIAL_EVENT_UPDATE: {
+    title: 'Material event updates',
+    message: 'These updates change identity, time, week, or location fields.',
+  },
+  HIGH_VOLUME_SOURCE: {
+    title: 'High-volume sources',
+    message: 'These sources produced an unusually large set of mutations.',
+  },
+  CURATION_JOB_INCOMPLETE: {
+    title: 'Incomplete curation jobs',
+    message: 'These curation jobs failed or were skipped during the refresh.',
+  },
+};
+
+function aggregateReviewWarnings(attention) {
+  const warnings = new Map();
+  for (const item of attention) {
+    const copy = REVIEW_WARNING_COPY[item.code] || {
+      title: item.title || 'Review warning',
+      message: item.message || 'Review these results before applying.',
+    };
+    const warning = warnings.get(item.code) || {
+      code: item.code,
+      title: copy.title,
+      message: copy.message,
+      severity: item.severity || 'attention',
+      count: 0,
+      samples: [],
+    };
+    warning.count += 1;
+    if (item.severity === 'high') warning.severity = 'high';
+    const candidates = item.samples?.length ? item.samples : [{
+      title: item.title,
+      sourceUrl: item.sourceUrl,
+      jobLabel: item.jobLabel,
+      provider: item.provider,
+    }];
+    for (const sample of candidates) {
+      if (warning.samples.length >= 3 || !sample?.title) break;
+      if (!warning.samples.some((current) => current.title === sample.title
+        && current.sourceUrl === sample.sourceUrl)) {
+        warning.samples.push({
+          title: sample.title,
+          sourceUrl: sample.sourceUrl || null,
+          jobLabel: sample.jobLabel || item.jobLabel || null,
+          provider: sample.provider || item.provider || null,
+        });
+      }
+    }
+    warnings.set(item.code, warning);
+  }
+  return [...warnings.values()].sort((a, b) =>
+    (a.severity === b.severity ? 0 : (a.severity === 'high' ? -1 : 1))
+    || (b.count - a.count)
+    || a.title.localeCompare(b.title));
+}
+
+function buildCurationQuality(result) {
+  const proposals = result.proposals?.events || [];
+  const tagCounts = new Map();
+  const batchWeekCounts = new Map();
+  const missing = {
+    untagged: { key: 'untagged', label: 'No tags', count: 0, samples: [] },
+    missingHost: { key: 'missing-host', label: 'Missing host', count: 0, samples: [] },
+    missingDescription: { key: 'missing-description', label: 'Missing description', count: 0, samples: [] },
+    missingImage: { key: 'missing-image', label: 'Missing image', count: 0, samples: [] },
+    missingLocation: { key: 'missing-location', label: 'Missing location', count: 0, samples: [] },
+  };
+  const eventsMissingAny = new Set();
+
+  const markMissing = (bucket, proposal, index) => {
+    bucket.count += 1;
+    eventsMissingAny.add(index);
+    if (bucket.samples.length < 3) {
+      bucket.samples.push({
+        title: trimString(proposal.draft?.name) || proposal.sourceUrl,
+        sourceUrl: proposal.sourceUrl,
+      });
+    }
+  };
+
+  proposals.forEach((proposal, index) => {
+    const draft = proposal.draft || {};
+    const tags = sortedStrings(draft.tags);
+    if (!tags.length) markMissing(missing.untagged, proposal, index);
+    for (const tag of tags) tagCounts.set(tag, (tagCounts.get(tag) || 0) + 1);
+
+    if (!trimString(draft.hostName)) markMissing(missing.missingHost, proposal, index);
+    if (!trimString(draft.description)) markMissing(missing.missingDescription, proposal, index);
+    if (!trimString(draft.image)) markMissing(missing.missingImage, proposal, index);
+    if (!trimString(draft.location)) markMissing(missing.missingLocation, proposal, index);
+
+    const batchWeek = trimString(proposal.batchWeek);
+    if (batchWeek) batchWeekCounts.set(batchWeek, (batchWeekCounts.get(batchWeek) || 0) + 1);
+  });
+
+  const batchWeeks = [...batchWeekCounts.entries()]
+    .map(([batchWeek, count]) => ({ batchWeek, count }))
+    .sort((a, b) => a.batchWeek.localeCompare(b.batchWeek));
+  const missingMetadata = Object.values(missing).filter((item) => item.count > 0);
+
+  return {
+    eventCount: proposals.length,
+    metadataComplete: proposals.length - eventsMissingAny.size,
+    eventsMissingMetadata: eventsMissingAny.size,
+    needsRichData: proposals.filter((proposal) =>
+      !trimString(proposal.draft?.description) || !trimString(proposal.draft?.image)).length,
+    resolvedBatchWeek: batchWeeks.length === 1 ? batchWeeks[0].batchWeek : null,
+    batchWeeks,
+    tagBreakdown: [...tagCounts.entries()]
+      .map(([tag, count]) => ({ tag, count }))
+      .sort((a, b) => (b.count - a.count) || a.tag.localeCompare(b.tag)),
+    missingMetadata,
+  };
+}
+
+function buildApplyPlan(result, identities, preview, now = new Date()) {
+  const rowByKey = new Map(preview.rows.map((row) => [row.key, row]));
+  const destinationCounts = new Map();
+  const batchWeekCounts = new Map();
+  const batchWeekSourceCounts = new Map();
+
+  for (const proposal of result.proposals?.events || []) {
+    const row = rowByKey.get(eventRowKey(proposal.sourceUrl));
+    if (row?.action !== 'create' && row?.action !== 'update') continue;
+
+    const currentDoc = identities.eventDocBySourceUrl.get(proposal.sourceUrl) || null;
+    const currentStatus = trimString(currentDoc?.customFields?.pivot?.ingestStatus);
+    const status = row.action === 'create'
+      ? 'staged'
+      : (['draft', 'staged', 'published'].includes(currentStatus) ? currentStatus : 'staged');
+    const destinationKey = `${row.action}:${status}`;
+    const destination = destinationCounts.get(destinationKey) || {
+      action: row.action,
+      status,
+      count: 0,
+    };
+    destination.count += 1;
+    destinationCounts.set(destinationKey, destination);
+
+    const week = resolveEventBatchWeek({
+      batchWeek: proposal.batchWeek,
+      startTime: proposal.draft?.start_time,
+      timeSlots: proposal.draft?.timeSlots,
+      now,
+    });
+    if (!week.error) {
+      batchWeekCounts.set(week.batchWeek, (batchWeekCounts.get(week.batchWeek) || 0) + 1);
+      batchWeekSourceCounts.set(week.source, (batchWeekSourceCounts.get(week.source) || 0) + 1);
+    }
+  }
+
+  const entityRows = (entityType) => preview.rows.filter((row) =>
+    row.entityType === entityType && (row.action === 'create' || row.action === 'update'));
+  const summarizeEntityRows = (entityType) => {
+    const rows = entityRows(entityType);
+    return {
+      creates: rows.filter((row) => row.action === 'create').length,
+      updates: rows.filter((row) => row.action === 'update').length,
+    };
+  };
+
+  return {
+    eventDestinations: [...destinationCounts.values()].sort((a, b) =>
+      ['published', 'staged', 'draft'].indexOf(a.status) - ['published', 'staged', 'draft'].indexOf(b.status)
+      || a.action.localeCompare(b.action)),
+    batchWeeks: [...batchWeekCounts.entries()]
+      .map(([batchWeek, count]) => ({ batchWeek, count }))
+      .sort((a, b) => a.batchWeek.localeCompare(b.batchWeek)),
+    batchWeekSources: [...batchWeekSourceCounts.entries()]
+      .map(([source, count]) => ({ source, count }))
+      .sort((a, b) => (b.count - a.count) || a.source.localeCompare(b.source)),
+    sources: summarizeEntityRows('source'),
+    curationJobs: result.kind === 'city-source-discovery'
+      ? summarizeEntityRows('curationJob')
+      : { creates: 0, updates: 0 },
+  };
+}
+
 function buildComputeReview(result, identities, preview, now = new Date()) {
   const rowByKey = new Map(preview.rows.map((row) => [row.key, row]));
   const jobGroups = new Map();
@@ -364,6 +561,9 @@ function buildComputeReview(result, identities, preview, now = new Date()) {
     },
     attention: attention.slice(0, 500),
     attentionTotal: attention.length,
+    warningGroups: aggregateReviewWarnings(attention),
+    curationQuality: buildCurationQuality(result),
+    applyPlan: buildApplyPlan(result, identities, preview, now),
     groups: [...jobGroups.values()].sort((a, b) =>
       (b.attention - a.attention)
       || ((b.creates + b.updates) - (a.creates + a.updates))
@@ -734,6 +934,24 @@ function buildPreviewEnvelope(result, currentContextVersion, rows, now = new Dat
   return preview;
 }
 
+function blockPreviewForMissingEventFields(result, preview) {
+  const rowByKey = new Map(preview.rows.map((row) => [row.key, row]));
+  const invalid = (result.proposals?.events || []).filter((proposal) => {
+    const action = rowByKey.get(eventRowKey(proposal.sourceUrl))?.action;
+    return (action === 'create' || action === 'update')
+      && requiredEventFieldsMissing(proposal).length > 0;
+  });
+  if (!invalid.length) return preview;
+
+  const fields = sortedStrings(invalid.flatMap((proposal) => requiredEventFieldsMissing(proposal)));
+  preview.applyAllowed = false;
+  preview.blockingReasons.push({
+    code: 'MISSING_REQUIRED_EVENT_FIELDS',
+    message: `${invalid.length} event proposal${invalid.length === 1 ? '' : 's'} must be fixed before apply. Missing: ${fields.join(', ')}.`,
+  });
+  return preview;
+}
+
 async function previewComputeResult(req, resultInput, {
   currentContextVersion = null,
   now = new Date(),
@@ -746,7 +964,10 @@ async function previewComputeResult(req, resultInput, {
   const rows = result.kind === 'city-curation-refresh'
     ? previewRefreshProposals(result, identities)
     : previewDiscoveryProposals(result, identities);
-  return buildPreviewEnvelope(result, contextVersion, rows, now);
+  return blockPreviewForMissingEventFields(
+    result,
+    buildPreviewEnvelope(result, contextVersion, rows, now),
+  );
 }
 
 async function previewComputeResultWithReview(req, resultInput, {
@@ -761,7 +982,10 @@ async function previewComputeResultWithReview(req, resultInput, {
   const rows = result.kind === 'city-curation-refresh'
     ? previewRefreshProposals(result, identities)
     : previewDiscoveryProposals(result, identities);
-  const preview = buildPreviewEnvelope(result, contextVersion, rows, now);
+  const preview = blockPreviewForMissingEventFields(
+    result,
+    buildPreviewEnvelope(result, contextVersion, rows, now),
+  );
   return {
     preview,
     review: buildComputeReview(result, identities, preview, now),
@@ -830,6 +1054,16 @@ async function applyEventRow(req, result, proposal) {
   }
 }
 
+function requiredEventFieldsMissing(proposal) {
+  const draft = proposal?.draft || {};
+  const missing = [];
+  if (!trimString(draft.hostName)) missing.push('hostName');
+  if (!trimString(draft.name)) missing.push('name');
+  if (!trimString(draft.location)) missing.push('location');
+  if (!trimString(draft.start_time) && !draft.timeSlots?.length) missing.push('start_time');
+  return missing;
+}
+
 async function applyComputeResult(req, {
   result: resultInput,
   preview,
@@ -868,8 +1102,38 @@ async function applyComputeResult(req, {
     rejected: freshPreview.summary.rejected,
   };
 
+  const validationIssues = applicable
+    .filter((row) => row.entityType === 'event')
+    .map((row) => {
+      const proposal = (result.proposals.events || [])
+        .find((item) => eventRowKey(item.sourceUrl) === row.key);
+      const missingFields = requiredEventFieldsMissing(proposal);
+      return missingFields.length ? {
+        entityType: 'event',
+        key: row.key,
+        title: trimString(proposal?.draft?.name) || proposal?.sourceUrl || row.key,
+        sourceUrl: proposal?.sourceUrl || null,
+        missingFields,
+      } : null;
+    })
+    .filter(Boolean);
+  if (validationIssues.length) {
+    const fields = sortedStrings(validationIssues.flatMap((issue) => issue.missingFields));
+    const error = serviceError(
+      `${validationIssues.length} event proposal${validationIssues.length === 1 ? '' : 's'} cannot be applied. Missing required fields: ${fields.join(', ')}.`,
+      'COMPUTE_APPLY_VALIDATION_FAILED',
+      422,
+    );
+    error.validationIssues = validationIssues.slice(0, 100);
+    error.failedRow = validationIssues[0];
+    error.partialSummary = summary;
+    throw error;
+  }
+
+  let activeRow = null;
   try {
     for (const row of applicable) {
+      activeRow = row;
       if (row.entityType === 'source') {
         const proposal = (result.proposals.sources || []).find((item) => sourceRowKey(item.host) === row.key);
         if (!proposal) continue;
@@ -893,6 +1157,11 @@ async function applyComputeResult(req, {
     }
   } catch (error) {
     error.partialSummary = summary;
+    error.failedRow = error.failedRow || (activeRow ? {
+      entityType: activeRow.entityType,
+      key: activeRow.key,
+      action: activeRow.action,
+    } : null);
     throw error;
   }
 
@@ -960,14 +1229,31 @@ async function applyStoredComputeJob(req, externalJobId, {
     });
     return { job: completed, duplicate: false, summary: applied.summary };
   } catch (error) {
-    await completeComputeJobApply(req, {
+    const partialSummary = error.partialSummary || {
+      creates: 0,
+      updates: 0,
+      unchanged: 0,
+      conflicts: 0,
+      stale: 0,
+      rejected: 0,
+    };
+    const appliedCount = (Number(partialSummary.creates) || 0) + (Number(partialSummary.updates) || 0);
+    const outcome = appliedCount > 0 ? 'partial' : 'rejected';
+    const reviewedJob = await completeComputeJobApply(req, {
       externalJobId,
       actor,
       idempotencyKey: trimString(idempotencyKey) || `apply-failed:${externalJobId}`,
-      summary: error.partialSummary || preview?.summary || {},
-      outcome: 'partial',
+      summary: partialSummary,
+      outcome,
       now,
     });
+    error.applyResult = {
+      outcome,
+      job: reviewedJob,
+      summary: partialSummary,
+      failedRow: error.failedRow || null,
+      validationIssues: error.validationIssues || [],
+    };
     throw error;
   }
 }

@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { authenticatedRequest } from '../../../hooks/useFetch';
 import { useNotification } from '../../../NotificationContext';
+import Popup from '../../../components/Popup/Popup';
 import { ComputeResultPreviewPanel } from './PivotComputeJobReview';
 import { formatComputeJobKind, COMPUTE_JOB_KINDS } from './pivotComputeJobsFormat';
 import {
@@ -194,6 +195,130 @@ export function ComputeJobCreateForm({ tenantKey, onCreated }) {
   );
 }
 
+function StoredResultPopupSurface({ children }) {
+  return (
+    <div
+      className="pivot-ops pivot-compute-review-popup__surface"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="stored-result-review-title"
+    >
+      {children}
+    </div>
+  );
+}
+
+function applyDestinationCopy({ action, status, count }) {
+  const eventWord = count === 1 ? 'event' : 'events';
+  if (action === 'create' && status === 'staged') {
+    return `${count} new ${eventWord} will be added to Curation as staged and remain hidden from the live feed.`;
+  }
+  if (status === 'published') {
+    return `${count} published ${eventWord} will be updated in place and remain live.`;
+  }
+  return `${count} existing ${eventWord} will be updated in place and remain ${status}.`;
+}
+
+function StoredApplyPlan({ review }) {
+  const plan = review?.applyPlan || {};
+  const destinations = Array.isArray(plan.eventDestinations) ? plan.eventDestinations : [];
+  const batchWeeks = Array.isArray(plan.batchWeeks) ? plan.batchWeeks : [];
+  const sourceCreates = plan.sources?.creates || 0;
+  const sourceUpdates = plan.sources?.updates || 0;
+  const jobCreates = plan.curationJobs?.creates || 0;
+  const jobUpdates = plan.curationJobs?.updates || 0;
+
+  return (
+    <div className="pivot-compute-review__apply-plan" aria-label="Planned production changes">
+      <h5>This apply will</h5>
+      <ul>
+        {destinations.map((destination) => (
+          <li key={`${destination.action}:${destination.status}`}>
+            {applyDestinationCopy(destination)}
+          </li>
+        ))}
+        {sourceCreates || sourceUpdates ? (
+          <li>{sourceCreates} sources will be created and {sourceUpdates} will be updated.</li>
+        ) : null}
+        {jobCreates || jobUpdates ? (
+          <li>{jobCreates} curation jobs will be created and {jobUpdates} will be updated.</li>
+        ) : null}
+      </ul>
+      {batchWeeks.length ? (
+        <p>
+          <strong>Batch destination:</strong>
+          {' '}
+          {batchWeeks.map((item) => `${item.batchWeek} (${item.count})`).join(' · ')}.
+          {' '}
+          Weeks are resolved from event start dates, with the proposed week used only when no event date is available.
+        </p>
+      ) : null}
+      <p className="pivot-compute-review__apply-note">
+        Curation-job outcome records are not changed. The server rechecks production before writing; writes run
+        sequentially, so completed rows remain if a later row fails.
+      </p>
+    </div>
+  );
+}
+
+function StoredApplyResult({ result, onClose }) {
+  const summary = result?.summary || {};
+  const creates = Number(summary.creates) || 0;
+  const updates = Number(summary.updates) || 0;
+  const applied = creates + updates;
+  const completed = result?.outcome === 'completed';
+  const partial = result?.outcome === 'partial';
+  const title = completed
+    ? 'Apply completed'
+    : (partial ? 'Apply partially completed' : 'Nothing was applied');
+  const status = result?.job?.status || (completed ? 'completed' : 'review-required');
+  const issues = Array.isArray(result?.validationIssues) ? result.validationIssues : [];
+
+  return (
+    <footer
+      className={`pivot-compute-review__apply-panel pivot-compute-review__apply-result is-${completed ? 'success' : 'error'}`}
+      data-testid="compute-apply-result"
+      role={completed ? 'status' : 'alert'}
+    >
+      <div className="pivot-compute-review__apply-result-head">
+        <div>
+          <span className="pivot-compute-review__result-label">Apply result</span>
+          <h4>{title}</h4>
+        </div>
+        <span className="pivot-lab__pill">{status.replace(/-/g, ' ')}</span>
+      </div>
+      <p>
+        {completed
+          ? `${creates} records created and ${updates} updated. This job no longer requires approval.`
+          : partial
+            ? `${applied} production changes succeeded before the failure (${creates} created, ${updates} updated). The job returned to Review required.`
+            : 'Preflight stopped the apply before any production writes. The job remains Review required.'}
+      </p>
+      {!completed && result?.message ? (
+        <p className="pivot-compute-review__result-error"><strong>{result.code}</strong> · {result.message}</p>
+      ) : null}
+      {issues.length ? (
+        <ul className="pivot-compute-review__result-issues">
+          {issues.slice(0, 10).map((issue) => (
+            <li key={issue.key}>
+              <strong>{issue.title}</strong>
+              <span>Missing {issue.missingFields?.join(', ') || 'required metadata'}</span>
+            </li>
+          ))}
+        </ul>
+      ) : null}
+      {!completed && result?.failedRow && !issues.length ? (
+        <p className="pivot-compute-review__apply-note">
+          Failed at {result.failedRow.entityType || 'record'} <span className="pivot-compute-jobs__mono">{result.failedRow.key}</span>.
+        </p>
+      ) : null}
+      <button type="button" className="linear-btn linear-btn--secondary" onClick={onClose}>
+        Close result
+      </button>
+    </footer>
+  );
+}
+
 export function ComputeJobDetailActions({
   job,
   onJobUpdated,
@@ -205,38 +330,47 @@ export function ComputeJobDetailActions({
   const [actionLoading, setActionLoading] = useState(null);
   const [actionFeedback, setActionFeedback] = useState(null);
   const [applyConfirmed, setApplyConfirmed] = useState(false);
+  const [applyResult, setApplyResult] = useState(null);
 
   const externalJobId = job?.externalJobId || '';
   const showPreview = canPreviewStoredComputeJob(job);
   const showCancel = canCancelComputeJob(job);
   const showRetry = canRetryComputeJob(job);
-  const showApply = canApplyStoredComputeJob(job, preview);
+  const applyInProgress = actionLoading === 'apply';
+  const showApply = applyInProgress || canApplyStoredComputeJob(job, preview);
 
   const resetPreview = useCallback(() => {
     setPreview(null);
     setReview(null);
     setApplyConfirmed(false);
+    setApplyResult(null);
   }, []);
 
   useEffect(() => {
     resetPreview();
-  }, [job?.externalJobId, job?.status, resetPreview]);
+  }, [job?.externalJobId, resetPreview]);
 
   const runMutation = useCallback(async (action, request) => {
     setActionLoading(action);
     setActionFeedback(null);
-    const { data, error } = await request();
+    const response = await request();
+    const {
+      data,
+      error,
+      errorCode = null,
+      errorData = null,
+    } = response;
     setActionLoading(null);
     const feedback = mutationFeedback(action, data, error);
     setActionFeedback(feedback);
-    if (error) return null;
+    if (error) return { ok: false, error, errorCode, errorData };
     addNotification({
       type: feedback.tone === 'error' ? 'error' : (feedback.tone === 'success' ? 'success' : 'info'),
       title: action.charAt(0).toUpperCase() + action.slice(1),
       message: feedback.message,
     });
     onJobUpdated?.(data?.job || job, { action, duplicate: Boolean(data?.duplicate) });
-    return data;
+    return { ok: true, data };
   }, [addNotification, onJobUpdated, job]);
 
   const handlePreview = useCallback(async () => {
@@ -246,6 +380,7 @@ export function ComputeJobDetailActions({
     setPreview(null);
     setReview(null);
     setApplyConfirmed(false);
+    setApplyResult(null);
 
     const { data, error } = await authenticatedRequest(
       `/admin/pivot/compute-jobs/${encodeURIComponent(externalJobId)}/preview`,
@@ -284,7 +419,8 @@ export function ComputeJobDetailActions({
 
   const handleApply = useCallback(async () => {
     if (!showApply || !applyConfirmed || !preview || !externalJobId) return;
-    const data = await runMutation('apply', () => authenticatedRequest(
+    onJobUpdated?.({ ...job, status: 'applying' }, { action: 'apply', optimistic: true });
+    const result = await runMutation('apply', () => authenticatedRequest(
       `/admin/pivot/compute-jobs/${encodeURIComponent(externalJobId)}/apply`,
       {
         method: 'POST',
@@ -294,18 +430,47 @@ export function ComputeJobDetailActions({
         },
       },
     ));
-    if (data) resetPreview();
-  }, [showApply, applyConfirmed, preview, externalJobId, runMutation, resetPreview]);
+    if (result?.ok) {
+      setApplyResult({
+        outcome: 'completed',
+        job: result.data?.job || null,
+        summary: result.data?.summary || {},
+      });
+      setApplyConfirmed(false);
+    } else {
+      const failedResult = result?.errorData?.result || null;
+      setApplyResult({
+        outcome: failedResult?.outcome || 'rejected',
+        job: failedResult?.job || job,
+        summary: failedResult?.summary || {},
+        failedRow: failedResult?.failedRow || null,
+        validationIssues: failedResult?.validationIssues || [],
+        code: result?.errorCode || 'COMPUTE_APPLY_FAILED',
+        message: result?.error || 'The apply did not complete.',
+      });
+      onJobUpdated?.(failedResult?.job || job, { action: 'apply', rollback: true });
+    }
+  }, [
+    showApply,
+    applyConfirmed,
+    preview,
+    externalJobId,
+    onJobUpdated,
+    job,
+    runMutation,
+    resetPreview,
+  ]);
 
   const controls = useMemo(() => {
     const items = [];
     if (showPreview) items.push('preview');
     if (showCancel) items.push('cancel');
     if (showRetry) items.push('retry');
+    if (applyInProgress) items.push('apply');
     return items;
-  }, [showPreview, showCancel, showRetry]);
+  }, [showPreview, showCancel, showRetry, applyInProgress]);
 
-  if (!job || controls.length === 0) {
+  if (!job || (controls.length === 0 && !preview && !applyResult)) {
     return null;
   }
 
@@ -363,42 +528,59 @@ export function ComputeJobDetailActions({
         </p>
       ) : null}
 
-      {preview ? (
-        <>
-          <ComputeResultPreviewPanel preview={preview} parsedResult={null} review={review} />
-          {showApply ? (
-            <div className="pivot-compute-review__apply-panel" data-testid="compute-stored-apply-panel">
-              <h4 className="pivot-compute-review__apply-title">Apply stored result</h4>
-              <label className="pivot-compute-review__confirm">
-                <input
-                  type="checkbox"
-                  checked={applyConfirmed}
-                  onChange={(event) => setApplyConfirmed(event.target.checked)}
-                  disabled={actionLoading === 'apply'}
-                />
-                <span>
-                  I reviewed the stored preview and confirm applying production mutations for
-                  {' '}
-                  {preview.jobId}. Apply is sequential and all-or-nothing selection is not available; if a later
-                  row fails, earlier writes remain applied and the job returns to review.
-                </span>
-              </label>
-              <button
-                type="button"
-                className="linear-btn"
-                onClick={handleApply}
-                disabled={!applyConfirmed || actionLoading === 'apply'}
-              >
-                {actionLoading === 'apply' ? 'Applying…' : 'Apply stored preview'}
-              </button>
-            </div>
-          ) : (
-            <p className="pivot-compute-review__blocked" role="status">
-              Apply is unavailable until blocking preview issues are resolved.
-            </p>
-          )}
-        </>
-      ) : null}
+      <Popup
+        isOpen={Boolean(preview || applyResult)}
+        onClose={resetPreview}
+        customClassName="wide-content pivot-compute-review-popup"
+        overlayClassName="pivot-compute-review-popup__overlay"
+        hideCloseButton={applyInProgress}
+        disableOutsideClick={applyInProgress}
+      >
+        <StoredResultPopupSurface>
+          <header className="pivot-compute-review-popup__header">
+            <span className="pivot-compute-jobs__eyebrow">Production review</span>
+            <h2 id="stored-result-review-title">Stored result preview</h2>
+            <p>Review curation quality, aggregate warnings, and mutations before applying this result.</p>
+          </header>
+          {preview ? (
+            <>
+              <div className="pivot-compute-review-popup__content">
+                <ComputeResultPreviewPanel preview={preview} parsedResult={null} review={review} />
+              </div>
+              {applyResult ? (
+                <StoredApplyResult result={applyResult} onClose={resetPreview} />
+              ) : showApply ? (
+                <footer className="pivot-compute-review__apply-panel" data-testid="compute-stored-apply-panel">
+                  <StoredApplyPlan review={review} />
+                  <label className="pivot-compute-review__confirm">
+                    <input
+                      type="checkbox"
+                      checked={applyConfirmed}
+                      onChange={(event) => setApplyConfirmed(event.target.checked)}
+                      disabled={actionLoading === 'apply'}
+                    />
+                    <span>
+                      I confirm the status, batch-week, and production changes shown above for {preview.jobId}.
+                    </span>
+                  </label>
+                  <button
+                    type="button"
+                    className="linear-btn"
+                    onClick={handleApply}
+                    disabled={!applyConfirmed || actionLoading === 'apply'}
+                  >
+                    {actionLoading === 'apply' ? 'Applying…' : 'Confirm and apply'}
+                  </button>
+                </footer>
+              ) : (
+                <p className="pivot-compute-review__blocked pivot-compute-review__apply-panel" role="status">
+                  Apply is unavailable until blocking preview issues are resolved.
+                </p>
+              )}
+            </>
+          ) : null}
+        </StoredResultPopupSurface>
+      </Popup>
     </section>
   );
 }

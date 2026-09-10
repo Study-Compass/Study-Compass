@@ -33,6 +33,7 @@ jest.mock('../../services/pivotComputeAdminService', () => ({
   handleAdminServiceError: jest.fn((res, error) => res.status(error.status || 500).json({
     error: error.message,
     code: error.code || 'COMPUTE_JOB_ADMIN_ERROR',
+    ...(error.applyResult ? { result: error.applyResult } : {}),
   })),
 }));
 
@@ -284,6 +285,43 @@ describe('pivotAdminComputeJobs routes outcomes', () => {
 
     expect(response.status).toBe(409);
     expect(response.body.code).toBe('PREVIEW_APPLY_BLOCKED');
+  });
+
+  it('returns a structured apply result when validation rejects production writes', async () => {
+    const error = new Error('1 event proposal cannot be applied. Missing required fields: hostName, location.');
+    error.code = 'COMPUTE_APPLY_VALIDATION_FAILED';
+    error.status = 422;
+    error.applyResult = {
+      outcome: 'rejected',
+      job: { externalJobId: 'job:refresh-iowacity-invalid', status: 'review-required' },
+      summary: { creates: 0, updates: 0, unchanged: 0, rejected: 0 },
+      failedRow: { entityType: 'event', key: 'sourceUrl:https://example.com/event' },
+      validationIssues: [{
+        entityType: 'event',
+        key: 'sourceUrl:https://example.com/event',
+        title: 'Incomplete event',
+        missingFields: ['hostName', 'location'],
+      }],
+    };
+    applyStoredComputeJob.mockRejectedValue(error);
+
+    const response = await request(app)
+      .post('/admin/pivot/compute-jobs/job:refresh-iowacity-invalid/apply')
+      .send({
+        idempotencyKey: 'apply:invalid-001',
+        preview: loadFixture('result-preview-valid.json'),
+      });
+
+    expect(response.status).toBe(422);
+    expect(response.body).toMatchObject({
+      code: 'COMPUTE_APPLY_VALIDATION_FAILED',
+      result: {
+        outcome: 'rejected',
+        job: { status: 'review-required' },
+        summary: { creates: 0, updates: 0 },
+        validationIssues: [expect.objectContaining({ missingFields: ['hostName', 'location'] })],
+      },
+    });
   });
 
   it('returns actionable errors when retry is not allowed', async () => {

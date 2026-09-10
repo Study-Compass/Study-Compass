@@ -75,6 +75,65 @@ function DetailField({ label, value, mono = false }) {
   );
 }
 
+function SummaryCard({ label, value, hint, tone = 'neutral' }) {
+  return (
+    <div className={`pivot-compute-jobs__summary-card is-${tone}`}>
+      <span className="pivot-compute-jobs__summary-label">{label}</span>
+      <strong className="pivot-compute-jobs__summary-value">{value}</strong>
+      <span className="pivot-compute-jobs__summary-hint">{hint}</span>
+    </div>
+  );
+}
+
+function ComputeJobListItem({ job, isSelected, nowMs, onSelect }) {
+  const progress = formatProgress(job.progress);
+  const failure = formatFailure(job.failure, { maxLength: 112 });
+  const worker = resolveWorkerId(job);
+  const scheduleOccurrence = resolveScheduleOccurrenceId(job);
+  const age = formatAge(job.requestedAt || job.createdAt, nowMs);
+  const statusLabel = formatComputeJobStatus(job.status).label;
+
+  return (
+    <li className="pivot-compute-jobs__queue-item">
+      <button
+        type="button"
+        className={`pivot-compute-jobs__job-card${isSelected ? ' is-selected' : ''}`}
+        onClick={onSelect}
+        aria-pressed={isSelected}
+        aria-label={`${formatComputeJobKind(job.kind)} — ${formatComputeJobOrigin(job.origin)} — ${statusLabel}`}
+      >
+        <span className="pivot-compute-jobs__job-card-head">
+          <span>
+            <strong className="pivot-compute-jobs__job-kind">{formatComputeJobKind(job.kind)}</strong>
+            <span className="pivot-compute-jobs__job-origin">{formatComputeJobOrigin(job.origin)}</span>
+          </span>
+          <ComputeJobStatusPill status={job.status} />
+        </span>
+
+        <span className={`pivot-compute-jobs__job-progress${progress === '—' ? ' is-empty' : ''}`}>
+          {progress === '—' ? 'No progress update yet' : progress}
+        </span>
+
+        {failure !== '—' ? (
+          <span className="pivot-compute-jobs__job-failure">{failure}</span>
+        ) : null}
+
+        <span className="pivot-compute-jobs__job-meta">
+          <span>{age === '—' ? 'Age unavailable' : `${age} ago`}</span>
+          <span>Attempt {job.attemptCount ?? job.lease?.attemptNumber ?? 0}</span>
+          {worker !== '—' ? <span className="pivot-compute-jobs__mono">{worker}</span> : null}
+          {scheduleOccurrence !== '—' ? (
+            <span className="pivot-compute-jobs__mono" title="Schedule occurrence">{scheduleOccurrence}</span>
+          ) : null}
+        </span>
+        <span className="pivot-compute-jobs__job-version pivot-compute-jobs__mono">
+          {job.contextVersion || 'No context version'}
+        </span>
+      </button>
+    </li>
+  );
+}
+
 function formatBytes(value) {
   if (!Number.isFinite(value)) return '—';
   if (value < 1024) return `${value} B`;
@@ -104,45 +163,23 @@ function ComputeJobDetail({
   const visibleAttempts = Array.isArray(attempts) ? attempts.slice(0, MAX_ATTEMPTS_SHOWN) : [];
   const failure = safeJob.failure;
   const canRetry = safeJob.status === 'retryable';
+  const jobAge = formatAge(safeJob.requestedAt || safeJob.createdAt, nowMs);
   const repairCandidatePreserved = Array.isArray(failure?.details)
     && failure.details.some((detail) => String(detail).includes('Repair candidate preserved'));
 
   return (
     <div className="pivot-compute-jobs__detail" data-testid="compute-job-detail">
-      <dl className="pivot-compute-jobs__detail-grid">
-        <DetailField label="Job id" value={safeJob.externalJobId} mono />
-        <DetailField label="Origin" value={formatComputeJobOrigin(safeJob.origin)} />
-        <DetailField label="Kind" value={formatComputeJobKind(safeJob.kind)} />
-        <DetailField label="City" value={safeJob.cityKey || '—'} mono />
-        <DetailField
-          label="Schedule occurrence"
-          value={resolveScheduleOccurrenceId(safeJob)}
-          mono
-        />
-        <DetailField label="Worker" value={resolveWorkerId(safeJob)} mono />
-        <DetailField
-          label="Attempt"
-          value={String(safeJob.attemptCount ?? safeJob.lease?.attemptNumber ?? 0)}
-        />
-        <DetailField label="Context version" value={safeJob.contextVersion || '—'} mono />
-        <DetailField label="Contract version" value={safeJob.contractVersion || '—'} mono />
-        <DetailField
-          label="Implementation"
-          value={safeJob.implementationRevision || '—'}
-          mono
-        />
-        <DetailField
-          label="Status"
-          value={<ComputeJobStatusPill status={safeJob.status} />}
-        />
-        <DetailField label="Progress" value={formatProgress(safeJob.progress)} />
-        <DetailField
-          label="Age"
-          value={formatAge(safeJob.requestedAt || safeJob.createdAt, nowMs)}
-        />
-        <DetailField label="Requested" value={formatTimestamp(safeJob.requestedAt)} />
-        <DetailField label="Updated" value={formatTimestamp(safeJob.updatedAt)} />
-      </dl>
+      <div className="pivot-compute-jobs__detail-hero">
+        <div>
+          <p className="pivot-compute-jobs__detail-kicker">{formatComputeJobOrigin(safeJob.origin)}</p>
+          <h3 className="pivot-compute-jobs__detail-title">{formatComputeJobKind(safeJob.kind)}</h3>
+          <p className="pivot-compute-jobs__detail-progress">{formatProgress(safeJob.progress)}</p>
+        </div>
+        <div className="pivot-compute-jobs__detail-state">
+          <ComputeJobStatusPill status={safeJob.status} />
+          <span>{jobAge === '—' ? 'Age unavailable' : `${jobAge} old`}</span>
+        </div>
+      </div>
 
       {failure ? (
         <section className="pivot-compute-jobs__failure" role="alert" aria-label="Failure and recovery">
@@ -165,10 +202,35 @@ function ComputeJobDetail({
         </section>
       ) : null}
 
-      <section className="pivot-compute-jobs__detail-section" aria-label="Request options">
-        <h3 className="pivot-compute-jobs__detail-heading">Request options</h3>
-        <pre className="pivot-compute-jobs__json">{JSON.stringify(safeJob.options || {}, null, 2)}</pre>
+      <section className="pivot-compute-jobs__detail-section" aria-label="Execution summary">
+        <h3 className="pivot-compute-jobs__detail-heading">Execution</h3>
+        <dl className="pivot-compute-jobs__detail-grid">
+          <DetailField label="Worker" value={resolveWorkerId(safeJob)} mono />
+          <DetailField
+            label="Attempt"
+            value={String(safeJob.attemptCount ?? safeJob.lease?.attemptNumber ?? 0)}
+          />
+          <DetailField label="Requested" value={formatTimestamp(safeJob.requestedAt)} />
+          <DetailField label="Last update" value={formatTimestamp(safeJob.updatedAt)} />
+        </dl>
       </section>
+
+      <details className="pivot-compute-jobs__detail-disclosure">
+        <summary>Identifiers &amp; versions</summary>
+        <dl className="pivot-compute-jobs__detail-grid">
+          <DetailField label="Job id" value={safeJob.externalJobId} mono />
+          <DetailField label="City" value={safeJob.cityKey || '—'} mono />
+          <DetailField label="Schedule occurrence" value={resolveScheduleOccurrenceId(safeJob)} mono />
+          <DetailField label="Context version" value={safeJob.contextVersion || '—'} mono />
+          <DetailField label="Contract version" value={safeJob.contractVersion || '—'} mono />
+          <DetailField label="Implementation" value={safeJob.implementationRevision || '—'} mono />
+        </dl>
+      </details>
+
+      <details className="pivot-compute-jobs__detail-disclosure">
+        <summary>Request options</summary>
+        <pre className="pivot-compute-jobs__json">{JSON.stringify(safeJob.options || {}, null, 2)}</pre>
+      </details>
 
       {resultSummary ? (
         <section className="pivot-compute-jobs__detail-section" aria-label="Stored result summary">
@@ -196,10 +258,22 @@ function ComputeJobDetail({
       {safeJob.applicationAudit ? (
         <section className="pivot-compute-jobs__detail-section" aria-label="Application audit">
           <h3 className="pivot-compute-jobs__detail-heading">Application audit</h3>
+          {safeJob.applicationAudit.outcome === 'partial' ? (
+            <p className="pivot-compute-review__blocked">
+              Some production writes succeeded before the apply failed. This job requires review again.
+            </p>
+          ) : null}
+          {safeJob.applicationAudit.outcome === 'rejected' ? (
+            <p className="pivot-compute-review__blocked">
+              Preflight rejected this apply before any production writes.
+            </p>
+          ) : null}
           <dl className="pivot-compute-jobs__detail-grid">
             <DetailField label="Outcome" value={safeJob.applicationAudit.outcome || '—'} />
             <DetailField label="Applied by" value={safeJob.applicationAudit.appliedBy || '—'} />
             <DetailField label="Applied at" value={formatTimestamp(safeJob.applicationAudit.appliedAt)} />
+            <DetailField label="Records created" value={String(safeJob.applicationAudit.summary?.creates ?? 0)} />
+            <DetailField label="Records updated" value={String(safeJob.applicationAudit.summary?.updates ?? 0)} />
           </dl>
         </section>
       ) : null}
@@ -281,7 +355,7 @@ function PivotComputeJobs({ tenantKey, cityDisplayName }) {
     cache: NO_FETCH_CACHE,
   });
 
-  const jobs = listResponse?.jobs || [];
+  const jobs = useMemo(() => listResponse?.jobs || [], [listResponse?.jobs]);
   const shouldPollList = hasActiveComputeJobs(jobs);
 
   const updateSearchParam = useCallback((key, value) => {
@@ -306,6 +380,16 @@ function PivotComputeJobs({ tenantKey, cityDisplayName }) {
   const clearSelection = useCallback(() => {
     updateSearchParam('computeJobId', null);
   }, [updateSearchParam]);
+
+  const resetFilters = useCallback(() => {
+    setSearchParams((current) => {
+      const next = new URLSearchParams(current);
+      next.delete('computeStatus');
+      next.delete('computeKind');
+      next.set('page', String(PIVOT_TENANT_COMPUTE_JOBS_PAGE));
+      return next;
+    }, { replace: true });
+  }, [setSearchParams]);
 
   const loadDetail = useCallback(async ({ silent = false } = {}) => {
     if (!selectedJobId) {
@@ -364,10 +448,15 @@ function PivotComputeJobs({ tenantKey, cityDisplayName }) {
     return () => window.clearInterval(timer);
   }, [selectedJobId, detailJob, loadDetail]);
 
-  const selectedListJob = useMemo(
-    () => jobs.find((job) => job.externalJobId === selectedJobId) || null,
-    [jobs, selectedJobId],
-  );
+  const jobSummary = useMemo(() => jobs.reduce((summary, job) => {
+    if (isActiveComputeJob(job)) summary.active += 1;
+    if (job.status === 'review-required') summary.review += 1;
+    if (job.status === 'retryable' || job.status === 'failed') summary.recovery += 1;
+    if (job.status === 'completed') summary.completed += 1;
+    return summary;
+  }, { active: 0, review: 0, recovery: 0, completed: 0 }), [jobs]);
+
+  const hasFilters = statusFilter !== 'all' || kindFilter !== 'all';
 
   return (
     <PivotTenantPage
@@ -377,17 +466,14 @@ function PivotComputeJobs({ tenantKey, cityDisplayName }) {
       subtitle="Offloaded discovery and curation refresh work for this city."
       className="pivot-compute-jobs"
     >
-      <section className="linear-section pivot-lab__section" aria-labelledby="compute-jobs-list">
-        <div className="pivot-lab__section-head">
-          <div>
-            <h2 id="compute-jobs-list" className="linear-section__title">Jobs</h2>
-            <p className="pivot-lab__section-hint">
-              Production-requested, scheduled, and manual-upload compute jobs. Worker credentials and
-              private diagnostics are never shown here.
-            </p>
-          </div>
-        </div>
+      <section className="pivot-compute-jobs__summary" aria-label="Compute job health">
+        <SummaryCard label="Active" value={jobSummary.active} hint="Queued or processing" tone="info" />
+        <SummaryCard label="Review" value={jobSummary.review} hint="Ready for a decision" tone="warn" />
+        <SummaryCard label="Recovery" value={jobSummary.recovery} hint="Retry or investigate" tone="danger" />
+        <SummaryCard label="Completed" value={jobSummary.completed} hint="Finished in this view" tone="success" />
+      </section>
 
+      <section className="pivot-compute-jobs__composer pivot-lab__panel" aria-label="Start a compute run">
         <ComputeJobCreateForm
           tenantKey={tenantKey}
           onCreated={(job) => {
@@ -395,147 +481,148 @@ function PivotComputeJobs({ tenantKey, cityDisplayName }) {
             if (job?.externalJobId) selectJob(job.externalJobId);
           }}
         />
-
-        <div className="pivot-compute-jobs__filters">
-          <label className="pivot-compute-jobs__filter">
-            <span>Status</span>
-            <select
-              aria-label="Filter by status"
-              value={statusFilter}
-              onChange={(event) => updateSearchParam('computeStatus', event.target.value)}
-            >
-              {STATUS_FILTER_OPTIONS.map((option) => (
-                <option key={option.value} value={option.value}>{option.label}</option>
-              ))}
-            </select>
-          </label>
-          <label className="pivot-compute-jobs__filter">
-            <span>Kind</span>
-            <select
-              aria-label="Filter by kind"
-              value={kindFilter}
-              onChange={(event) => updateSearchParam('computeKind', event.target.value)}
-            >
-              {KIND_FILTER_OPTIONS.map((option) => (
-                <option key={option.value} value={option.value}>{option.label}</option>
-              ))}
-            </select>
-          </label>
-          {selectedJobId ? (
-            <button
-              type="button"
-              className="linear-btn linear-btn--secondary pivot-compute-jobs__clear"
-              onClick={clearSelection}
-            >
-              Clear selection
-            </button>
-          ) : null}
-        </div>
-
-        {listError ? (
-          <p className="pivot-lab__error" role="alert">{listError}</p>
-        ) : null}
-
-        {listLoading && jobs.length === 0 ? (
-          <p className="pivot-lab__empty">Loading compute jobs…</p>
-        ) : null}
-
-        {!listLoading && jobs.length === 0 && !listError ? (
-          <p className="pivot-lab__empty">No compute jobs match these filters.</p>
-        ) : null}
-
-        {jobs.length > 0 ? (
-          <div className="pivot-lab__table-wrap">
-            <table className="pivot-lab__table pivot-compute-jobs__table" aria-label="Compute jobs">
-              <thead>
-                <tr>
-                  <th scope="col">Origin</th>
-                  <th scope="col">Kind</th>
-                  <th scope="col">City</th>
-                  <th scope="col">Schedule occurrence</th>
-                  <th scope="col">Worker</th>
-                  <th scope="col">Attempt</th>
-                  <th scope="col">Context version</th>
-                  <th scope="col">Status</th>
-                  <th scope="col">Progress</th>
-                  <th scope="col">Age</th>
-                  <th scope="col">Failure</th>
-                </tr>
-              </thead>
-              <tbody>
-                {jobs.map((job) => {
-                  const isSelected = job.externalJobId === selectedJobId;
-                  return (
-                    <tr
-                      key={job.externalJobId}
-                      className={isSelected ? 'is-selected' : undefined}
-                    >
-                      <td>
-                        <button
-                          type="button"
-                          className="pivot-compute-jobs__row-button"
-                          onClick={() => selectJob(job.externalJobId)}
-                          aria-pressed={isSelected}
-                        >
-                          {formatComputeJobOrigin(job.origin)}
-                        </button>
-                      </td>
-                      <td>{formatComputeJobKind(job.kind)}</td>
-                      <td className="pivot-compute-jobs__mono">{job.cityKey}</td>
-                      <td className="pivot-compute-jobs__mono">
-                        {resolveScheduleOccurrenceId(job)}
-                      </td>
-                      <td className="pivot-compute-jobs__mono">{resolveWorkerId(job)}</td>
-                      <td>{job.attemptCount ?? job.lease?.attemptNumber ?? 0}</td>
-                      <td className="pivot-compute-jobs__mono">{job.contextVersion || '—'}</td>
-                      <td><ComputeJobStatusPill status={job.status} /></td>
-                      <td>{formatProgress(job.progress)}</td>
-                      <td>{formatAge(job.requestedAt || job.createdAt, nowMs)}</td>
-                      <td>{formatFailure(job.failure, { maxLength: 80 })}</td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        ) : null}
-
-        {shouldPollList ? (
-          <p className="pivot-lab__section-hint">Refreshing while jobs are active…</p>
-        ) : null}
       </section>
 
-      {selectedJobId ? (
-        <section
-          className="linear-section pivot-lab__section"
-          aria-labelledby="compute-job-detail-heading"
-        >
-          <div className="pivot-lab__section-head">
-            <div>
-              <h2 id="compute-job-detail-heading" className="linear-section__title">Job detail</h2>
-              <p className="pivot-lab__section-hint">
-                {selectedListJob
-                  ? `${formatComputeJobKind(selectedListJob.kind)} · ${selectedJobId}`
-                  : selectedJobId}
-              </p>
-            </div>
+      <section className="pivot-compute-jobs__activity" aria-labelledby="compute-jobs-list">
+        <div className="pivot-compute-jobs__activity-head">
+          <div>
+            <span className="pivot-compute-jobs__eyebrow">Operations queue</span>
+            <h2 id="compute-jobs-list" className="pivot-compute-jobs__activity-title">Recent activity</h2>
+            <p className="pivot-lab__section-hint">
+              {jobs.length} job{jobs.length === 1 ? '' : 's'}{hasFilters ? ' matching filters' : ' in the latest window'}
+              {shouldPollList ? ' · Live updates on' : ''}
+            </p>
           </div>
-          <ComputeJobDetail
-            job={detailJob}
-            attempts={detailAttempts}
-            loading={detailLoading}
-            error={detailError}
-            nowMs={nowMs}
-          />
-          <ComputeJobDetailActions
-            job={detailJob}
-            onJobUpdated={() => {
-              refetchList({ silent: true });
-              loadDetail({ silent: true });
-            }}
-          />
-        </section>
-      ) : null}
+          <div className="pivot-compute-jobs__filters" aria-label="Job filters">
+            <label className="pivot-compute-jobs__filter pivot-compute-jobs__filter--inline">
+              <span>Status</span>
+              <select
+                aria-label="Filter by status"
+                value={statusFilter}
+                onChange={(event) => updateSearchParam('computeStatus', event.target.value)}
+              >
+                {STATUS_FILTER_OPTIONS.map((option) => (
+                  <option key={option.value} value={option.value}>{option.label}</option>
+                ))}
+              </select>
+            </label>
+            <label className="pivot-compute-jobs__filter pivot-compute-jobs__filter--inline">
+              <span>Kind</span>
+              <select
+                aria-label="Filter by kind"
+                value={kindFilter}
+                onChange={(event) => updateSearchParam('computeKind', event.target.value)}
+              >
+                {KIND_FILTER_OPTIONS.map((option) => (
+                  <option key={option.value} value={option.value}>{option.label}</option>
+                ))}
+              </select>
+            </label>
+            {hasFilters ? (
+              <button
+                type="button"
+                className="pivot-compute-jobs__reset-filters"
+                onClick={resetFilters}
+              >
+                Reset
+              </button>
+            ) : null}
+          </div>
+        </div>
+
+        <div className="pivot-compute-jobs__workspace">
+          <div className="pivot-compute-jobs__queue" aria-label="Compute jobs">
+            {listError ? (
+              <p className="pivot-lab__error pivot-compute-jobs__state" role="alert">{listError}</p>
+            ) : null}
+
+            {listLoading && jobs.length === 0 ? (
+              <p className="pivot-lab__empty pivot-compute-jobs__state">Loading compute jobs…</p>
+            ) : null}
+
+            {!listLoading && jobs.length === 0 && !listError ? (
+              <div className="pivot-compute-jobs__state">
+                <strong>No jobs in this view</strong>
+                <p className="pivot-lab__empty">No compute jobs match these filters.</p>
+              </div>
+            ) : null}
+
+            {jobs.length > 0 ? (
+              <ul className="pivot-compute-jobs__queue-list">
+                {jobs.map((job) => (
+                  <ComputeJobListItem
+                    key={job.externalJobId}
+                    job={job}
+                    isSelected={job.externalJobId === selectedJobId}
+                    nowMs={nowMs}
+                    onSelect={() => selectJob(job.externalJobId)}
+                  />
+                ))}
+              </ul>
+            ) : null}
+          </div>
+
+          <aside className="pivot-compute-jobs__inspector" aria-labelledby="compute-job-detail-heading">
+            <div className="pivot-compute-jobs__inspector-head">
+              <div>
+                <span className="pivot-compute-jobs__eyebrow">Inspector</span>
+                <h2 id="compute-job-detail-heading" className="pivot-compute-jobs__inspector-title">
+                  {selectedJobId ? 'Job detail' : 'Select a job'}
+                </h2>
+                {selectedJobId ? (
+                  <p className="pivot-compute-jobs__inspector-id pivot-compute-jobs__mono">
+                    {selectedJobId}
+                  </p>
+                ) : null}
+              </div>
+              {selectedJobId ? (
+                <button
+                  type="button"
+                  className="pivot-compute-jobs__close"
+                  onClick={clearSelection}
+                  aria-label="Clear selection"
+                  title="Close inspector"
+                >
+                  ×
+                </button>
+              ) : null}
+            </div>
+
+            {selectedJobId ? (
+              <>
+                <ComputeJobDetail
+                  job={detailJob}
+                  attempts={detailAttempts}
+                  loading={detailLoading}
+                  error={detailError}
+                  nowMs={nowMs}
+                />
+                <ComputeJobDetailActions
+                  job={detailJob}
+                  onJobUpdated={(updatedJob) => {
+                    if (updatedJob?.externalJobId === selectedJobId) {
+                      setDetailJob(updatedJob);
+                      setDetailError(null);
+                    }
+                    refetchList({ silent: true });
+                  }}
+                />
+              </>
+            ) : (
+              <div className="pivot-compute-jobs__inspector-empty">
+                <span className="pivot-compute-jobs__inspector-glyph" aria-hidden="true">↗</span>
+                <strong>Choose a run to inspect</strong>
+                <p>Open a job to see its execution history, recovery guidance, result state, and available actions.</p>
+              </div>
+            )}
+          </aside>
+        </div>
+      </section>
+
+      <section className="pivot-compute-jobs__privacy-note" aria-label="Security note">
+        <span aria-hidden="true">●</span>
+        Worker credentials and private diagnostics are redacted from this workspace.
+      </section>
 
       <PivotComputeJobReview
         tenantKey={tenantKey}

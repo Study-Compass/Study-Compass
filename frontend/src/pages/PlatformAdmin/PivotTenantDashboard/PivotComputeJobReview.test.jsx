@@ -231,6 +231,39 @@ describe('PivotComputeJobReview', () => {
       },
       timezone: 'America/Chicago',
       attentionTotal: 2,
+      curationQuality: {
+        eventCount: 474,
+        metadataComplete: 430,
+        eventsMissingMetadata: 44,
+        needsRichData: 32,
+        resolvedBatchWeek: '2026-W37',
+        batchWeeks: [{ batchWeek: '2026-W37', count: 474 }],
+        tagBreakdown: [{ tag: 'community', count: 210 }, { tag: 'music', count: 88 }],
+        missingMetadata: [
+          { key: 'untagged', label: 'No tags', count: 12 },
+          { key: 'missing-host', label: 'Missing host', count: 7 },
+          { key: 'missing-description', label: 'Missing description', count: 32 },
+          { key: 'missing-image', label: 'Missing image', count: 19 },
+        ],
+      },
+      warningGroups: [
+        {
+          code: 'PUBLISHED_EVENT_UPDATE',
+          severity: 'high',
+          title: 'Published events changing',
+          message: 'Applying will immediately change events that are already visible in the feed.',
+          count: 3,
+          samples: [{ title: 'Community Meetup', sourceUrl: 'https://luma.com/event-1' }],
+        },
+        {
+          code: 'HIGH_VOLUME_SOURCE',
+          severity: 'attention',
+          title: 'High-volume sources',
+          message: 'These sources produced an unusually large set of mutations.',
+          count: 1,
+          samples: [{ title: 'Sample dance night', sourceUrl: 'https://luma.com/sample-dance-night' }],
+        },
+      ],
       attention: [
         {
           code: 'PUBLISHED_EVENT_UPDATE',
@@ -277,8 +310,15 @@ describe('PivotComputeJobReview', () => {
     const risk = screen.getByTestId('compute-risk-review');
     expect(risk).toHaveTextContent('What will change in production');
     expect(risk).toHaveTextContent('Published events affected');
+    expect(risk).toHaveTextContent('Curation quality');
+    expect(risk).toHaveTextContent('2026-W37');
+    expect(risk).toHaveTextContent('Tag breakdown');
+    expect(risk).toHaveTextContent('community');
+    expect(risk).toHaveTextContent('Missing host');
+    expect(risk).toHaveTextContent('Aggregate warnings');
+    expect(risk).toHaveTextContent('Published events changing');
+    expect(risk).toHaveTextContent('3 affected');
     expect(risk).toHaveTextContent('Community Meetup');
-    expect(risk).toHaveTextContent('September 9');
     expect(risk).toHaveTextContent('Failed jobs');
     expect(risk).toHaveTextContent('health signals only');
     expect(risk).toHaveTextContent('America/Chicago');

@@ -1,10 +1,341 @@
 .pivot-compute-jobs {
+  .pivot-tenant-page__body {
+    max-width: 1360px;
+  }
+
+  .pivot-compute-jobs__summary {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  .pivot-compute-jobs__summary-card {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 3px 12px;
+    min-width: 0;
+    padding: 14px 16px;
+    border: 1px solid var(--pivot-ops-border);
+    border-radius: var(--pivot-ops-radius-card);
+    background: var(--pivot-ops-surface);
+    overflow: hidden;
+
+    &::before {
+      content: '';
+      position: absolute;
+      inset: 0 auto 0 0;
+      width: 3px;
+      background: var(--pivot-ops-border-strong);
+    }
+
+    &.is-info::before { background: var(--pivot-ops-info); }
+    &.is-warn::before { background: var(--pivot-ops-warn); }
+    &.is-danger::before { background: var(--pivot-ops-danger); }
+    &.is-success::before { background: var(--pivot-ops-success); }
+  }
+
+  .pivot-compute-jobs__summary-label {
+    align-self: end;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--pivot-ops-ink-muted);
+  }
+
+  .pivot-compute-jobs__summary-value {
+    grid-row: span 2;
+    font-size: 28px;
+    font-weight: 650;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .pivot-compute-jobs__summary-hint {
+    font-size: 11px;
+    color: var(--pivot-ops-ink-soft);
+  }
+
+  .pivot-compute-jobs__composer {
+    margin-bottom: 12px;
+    padding: 16px 18px;
+  }
+
+  .pivot-compute-jobs__activity {
+    margin-bottom: 12px;
+  }
+
+  .pivot-compute-jobs__activity-head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 10px;
+    padding: 0 2px;
+  }
+
+  .pivot-compute-jobs__eyebrow {
+    display: block;
+    margin-bottom: 2px;
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--pivot-ops-accent);
+  }
+
+  .pivot-compute-jobs__activity-title,
+  .pivot-compute-jobs__inspector-title {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 650;
+    line-height: 1.2;
+    color: var(--pivot-ops-ink);
+  }
+
+  .pivot-compute-jobs__workspace {
+    display: grid;
+    grid-template-columns: minmax(360px, 0.88fr) minmax(430px, 1.12fr);
+    gap: 12px;
+    align-items: start;
+  }
+
+  .pivot-compute-jobs__queue,
+  .pivot-compute-jobs__inspector {
+    min-width: 0;
+    border: 1px solid var(--pivot-ops-border);
+    border-radius: var(--pivot-ops-radius-card);
+    background: var(--pivot-ops-surface);
+  }
+
+  .pivot-compute-jobs__queue {
+    overflow: hidden;
+  }
+
+  .pivot-compute-jobs__queue-list {
+    display: grid;
+    gap: 0;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .pivot-compute-jobs__queue-item + .pivot-compute-jobs__queue-item {
+    border-top: 1px solid var(--pivot-ops-border);
+  }
+
+  .pivot-compute-jobs__job-card {
+    appearance: none;
+    display: block;
+    width: 100%;
+    padding: 15px 16px;
+    border: 0;
+    border-left: 3px solid transparent;
+    border-radius: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+    transition: background var(--pivot-ops-dur) ease, border-color var(--pivot-ops-dur) ease;
+
+    &:hover { background: var(--pivot-ops-hover); }
+
+    &:focus-visible {
+      position: relative;
+      z-index: 1;
+      outline: 2px solid var(--pivot-ops-accent);
+      outline-offset: -2px;
+    }
+
+    &.is-selected {
+      border-left-color: var(--pivot-ops-accent);
+      background: var(--pivot-ops-accent-soft);
+    }
+  }
+
+  .pivot-compute-jobs__job-card-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .pivot-compute-jobs__job-kind {
+    display: block;
+    font-size: 14px;
+    font-weight: 650;
+  }
+
+  .pivot-compute-jobs__job-origin {
+    display: block;
+    margin-top: 2px;
+    font-size: 11px;
+    color: var(--pivot-ops-ink-soft);
+  }
+
+  .pivot-compute-jobs__job-progress {
+    display: block;
+    margin-top: 10px;
+    font-size: 13px;
+    line-height: 1.4;
+    color: var(--pivot-ops-ink-muted);
+
+    &.is-empty { color: var(--pivot-ops-ink-soft); }
+  }
+
+  .pivot-compute-jobs__job-failure {
+    display: block;
+    margin-top: 9px;
+    padding: 8px 10px;
+    border-radius: 10px;
+    background: var(--pivot-ops-danger-soft);
+    color: var(--pivot-ops-danger);
+    font-size: 11px;
+    line-height: 1.35;
+  }
+
+  .pivot-compute-jobs__job-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px 12px;
+    margin-top: 11px;
+    font-size: 11px;
+    color: var(--pivot-ops-ink-muted);
+  }
+
+  .pivot-compute-jobs__job-version {
+    display: block;
+    margin-top: 5px;
+    color: var(--pivot-ops-ink-soft);
+  }
+
+  .pivot-compute-jobs__inspector {
+    position: sticky;
+    top: 74px;
+    max-height: calc(100vh - 104px);
+    overflow: auto;
+  }
+
+  .pivot-compute-jobs__inspector-head {
+    position: sticky;
+    top: 0;
+    z-index: 3;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 16px 18px 14px;
+    border-bottom: 1px solid var(--pivot-ops-border);
+    background: var(--pivot-ops-surface);
+  }
+
+  .pivot-compute-jobs__inspector-id {
+    max-width: 48ch;
+    margin: 5px 0 0;
+    color: var(--pivot-ops-ink-soft);
+  }
+
+  .pivot-compute-jobs__close {
+    appearance: none;
+    display: grid;
+    place-items: center;
+    width: 30px;
+    height: 30px;
+    padding: 0 0 2px;
+    border: 1px solid var(--pivot-ops-border);
+    border-radius: 50%;
+    background: var(--pivot-ops-surface-subtle);
+    color: var(--pivot-ops-ink-muted);
+    font: inherit;
+    font-size: 20px;
+    cursor: pointer;
+  }
+
+  .pivot-compute-jobs__inspector-empty {
+    display: grid;
+    place-items: center;
+    min-height: 390px;
+    padding: 42px;
+    text-align: center;
+    color: var(--pivot-ops-ink-muted);
+
+    p {
+      max-width: 38ch;
+      margin: 7px 0 0;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+  }
+
+  .pivot-compute-jobs__inspector-glyph {
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    margin-bottom: 14px;
+    border-radius: 16px;
+    background: var(--pivot-ops-accent-soft);
+    color: var(--pivot-ops-accent);
+    font-size: 23px;
+  }
+
+  .pivot-compute-jobs__detail {
+    padding: 18px;
+  }
+
+  .pivot-compute-jobs__detail-hero {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .pivot-compute-jobs__detail-kicker {
+    margin: 0 0 3px;
+    font-size: 11px;
+    color: var(--pivot-ops-ink-soft);
+  }
+
+  .pivot-compute-jobs__detail-title {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 650;
+    letter-spacing: -0.015em;
+  }
+
+  .pivot-compute-jobs__detail-progress {
+    margin: 7px 0 0;
+    font-size: 13px;
+    line-height: 1.45;
+    color: var(--pivot-ops-ink-muted);
+  }
+
+  .pivot-compute-jobs__detail-state {
+    display: grid;
+    justify-items: end;
+    gap: 5px;
+    flex: 0 0 auto;
+    font-size: 11px;
+    color: var(--pivot-ops-ink-soft);
+  }
+
+  .pivot-compute-jobs__state {
+    display: grid;
+    place-items: center;
+    min-height: 260px;
+    padding: 24px;
+    text-align: center;
+
+    p { margin: 5px 0 0; }
+  }
+
   .pivot-compute-jobs__filters {
     display: flex;
     flex-wrap: wrap;
-    gap: 12px 16px;
-    align-items: flex-end;
-    margin-bottom: 16px;
+    gap: 8px;
+    align-items: center;
   }
 
   .pivot-compute-jobs__filter {
@@ -31,8 +362,28 @@
     }
   }
 
-  .pivot-compute-jobs__clear {
-    margin-left: auto;
+  .pivot-compute-jobs__filter--inline {
+    flex-direction: row;
+    align-items: center;
+    gap: 7px;
+    font-size: 12px;
+
+    select {
+      min-width: 132px;
+      padding: 7px 28px 7px 9px;
+      background: var(--pivot-ops-surface);
+    }
+  }
+
+  .pivot-compute-jobs__reset-filters {
+    appearance: none;
+    border: 0;
+    background: transparent;
+    color: var(--pivot-ops-accent);
+    font: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
   }
 
   .pivot-compute-jobs__controls-title {
@@ -41,9 +392,7 @@
   }
 
   .pivot-compute-jobs__create {
-    margin-bottom: 20px;
-    padding-bottom: 20px;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    margin: 0;
   }
 
   .pivot-compute-jobs__create-fields,
@@ -91,33 +440,9 @@
   }
 
   .pivot-compute-jobs__controls {
-    margin-top: 20px;
-    padding-top: 20px;
-    border-top: 1px solid rgba(0, 0, 0, 0.08);
-  }
-
-  .pivot-compute-jobs__table {
-    th,
-    td {
-      vertical-align: top;
-    }
-
-    tr.is-selected {
-      background: rgba(255, 79, 31, 0.08);
-    }
-  }
-
-  .pivot-compute-jobs__row-button {
-    appearance: none;
-    border: 0;
-    background: transparent;
-    color: inherit;
-    font: inherit;
-    text-align: left;
-    padding: 0;
-    cursor: pointer;
-    text-decoration: underline;
-    text-underline-offset: 2px;
+    margin: 0;
+    padding: 0 18px 18px;
+    border-top: 0;
   }
 
   .pivot-compute-jobs__mono {
@@ -128,7 +453,7 @@
 
   .pivot-compute-jobs__detail-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 12px 20px;
     margin: 0;
   }
@@ -150,6 +475,25 @@
 
   .pivot-compute-jobs__detail-section {
     margin-top: 20px;
+  }
+
+  .pivot-compute-jobs__detail-disclosure {
+    margin-top: 18px;
+    padding: 12px 14px;
+    border: 1px solid var(--pivot-ops-border);
+    border-radius: var(--pivot-ops-radius-control);
+    background: var(--pivot-ops-surface-subtle);
+
+    summary {
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 650;
+    }
+
+    .pivot-compute-jobs__detail-grid,
+    .pivot-compute-jobs__json {
+      margin-top: 14px;
+    }
   }
 
   .pivot-compute-jobs__failure {
@@ -216,10 +560,41 @@
       max-width: 220px;
     }
   }
+
+  .pivot-compute-jobs__privacy-note {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 2px 2px 16px;
+    font-size: 11px;
+    color: var(--pivot-ops-ink-soft);
+
+    span { color: var(--pivot-ops-success); }
+  }
+}
+
+@media (max-width: 1050px) {
+  .pivot-compute-jobs {
+    .pivot-compute-jobs__workspace { grid-template-columns: 1fr; }
+    .pivot-compute-jobs__inspector { position: static; max-height: none; }
+  }
+}
+
+@media (max-width: 720px) {
+  .pivot-compute-jobs {
+    .pivot-compute-jobs__summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .pivot-compute-jobs__activity-head { align-items: flex-start; flex-direction: column; }
+    .pivot-compute-jobs__filters { width: 100%; }
+    .pivot-compute-jobs__filter--inline { flex: 1 1 150px; }
+    .pivot-compute-jobs__filter--inline select { min-width: 0; width: 100%; }
+    .pivot-compute-jobs__detail-grid { grid-template-columns: 1fr; }
+    .pivot-compute-jobs__job-ids { grid-column: auto; }
+  }
 }
 
 .pivot-compute-review,
-.pivot-compute-jobs__controls {
+.pivot-compute-jobs__controls,
+.pivot-compute-review-popup__surface {
   .pivot-compute-review__upload {
     display: grid;
     gap: 16px;
@@ -324,6 +699,136 @@
     margin: 20px 0;
   }
 
+  .pivot-compute-review__quality {
+    padding: 16px 0;
+    border-top: 1px solid var(--pivot-ops-border, rgba(0, 0, 0, 0.1));
+    border-bottom: 1px solid var(--pivot-ops-border, rgba(0, 0, 0, 0.1));
+  }
+
+  .pivot-compute-review__section-heading .pivot-lab__section-hint {
+    margin: 4px 0 0;
+  }
+
+  .pivot-compute-review__quality-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px;
+    margin-top: 18px;
+  }
+
+  .pivot-compute-review__quality-card {
+    min-width: 0;
+  }
+
+  .pivot-compute-review__quality-label {
+    display: block;
+    margin-bottom: 5px;
+    color: var(--pivot-ops-ink-muted, #667085);
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  .pivot-compute-review__quality-card > strong {
+    font-size: 18px;
+    font-weight: 650;
+  }
+
+  .pivot-compute-review__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 10px;
+
+    span {
+      padding: 4px 7px;
+      border: 1px solid var(--pivot-ops-border, rgba(0, 0, 0, 0.1));
+      border-radius: 5px;
+      color: var(--pivot-ops-ink-muted, #667085);
+      font-size: 12px;
+    }
+
+    b {
+      margin-left: 4px;
+      color: var(--pivot-ops-ink, inherit);
+    }
+  }
+
+  .pivot-compute-review__metadata-list {
+    display: grid;
+    gap: 7px;
+    margin: 10px 0 0;
+    padding: 0;
+    list-style: none;
+
+    li {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      padding-bottom: 7px;
+      border-bottom: 1px solid var(--pivot-ops-border, rgba(0, 0, 0, 0.08));
+    }
+
+    small {
+      display: block;
+      max-width: 40ch;
+      margin-top: 2px;
+      overflow: hidden;
+      color: var(--pivot-ops-ink-soft, #98a2b3);
+      font-size: 11px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+
+  .pivot-compute-review__tags {
+    margin-top: 22px;
+
+    h5 { margin: 0; }
+
+    .pivot-compute-review__section-heading > span {
+      color: var(--pivot-ops-ink-soft, #98a2b3);
+      font-size: 12px;
+    }
+
+    ul {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px 24px;
+      margin: 12px 0 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    li {
+      display: grid;
+      grid-template-columns: minmax(80px, 1fr) minmax(70px, 2fr) 30px;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+      font-size: 12px;
+    }
+
+    li > span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    i {
+      height: 3px;
+      background: var(--pivot-ops-border, rgba(0, 0, 0, 0.1));
+    }
+
+    i b {
+      display: block;
+      height: 100%;
+      background: var(--pivot-ops-accent, #667085);
+    }
+
+    li > strong { text-align: right; }
+  }
+
   .pivot-compute-review__window {
     display: flex;
     flex-wrap: wrap;
@@ -354,21 +859,20 @@
   }
 
   .pivot-compute-review__attention-card {
-    padding: 14px;
-    border: 1px solid rgba(181, 71, 8, 0.24);
-    border-left: 4px solid #f79009;
-    border-radius: 10px;
-    background: rgba(247, 144, 9, 0.06);
+    padding: 13px 0;
+    border-top: 1px solid rgba(181, 71, 8, 0.24);
 
     &.is-high {
       border-color: rgba(180, 35, 24, 0.28);
-      border-left-color: #d92d20;
-      background: rgba(217, 45, 32, 0.06);
     }
 
     p {
       margin: 8px 0 0;
     }
+  }
+
+  .pivot-compute-review__warning-samples {
+    overflow-wrap: anywhere;
   }
 
   .pivot-compute-review__risk-code {
@@ -449,6 +953,33 @@
     font-size: 1rem;
   }
 
+  .pivot-compute-review__apply-plan {
+    h5 {
+      margin: 0 0 7px;
+      font-size: 13px;
+    }
+
+    ul {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 4px 24px;
+      margin: 0;
+      padding-left: 18px;
+      font-size: 12px;
+      line-height: 1.4;
+    }
+
+    p {
+      margin: 8px 0 0;
+      font-size: 12px;
+      line-height: 1.4;
+    }
+  }
+
+  .pivot-compute-review__apply-note {
+    color: var(--pivot-ops-ink-muted, #667085);
+  }
+
   .pivot-compute-review__confirm {
     display: flex;
     gap: 10px;
@@ -458,11 +989,157 @@
   }
 }
 
-.platform-admin--dark .pivot-compute-jobs {
-  .pivot-compute-jobs__table tr.is-selected {
-    background: rgba(255, 79, 31, 0.14);
+.popup-overlay.pivot-compute-review-popup__overlay {
+  background: rgba(15, 23, 42, 0.56);
+}
+
+.popup-overlay .popup-content.pivot-compute-review-popup {
+  width: min(1040px, calc(100vw - 32px));
+  max-width: 1040px;
+  height: min(90vh, 900px);
+  max-height: 90vh;
+  padding: 0;
+  border-radius: 12px;
+  overflow: hidden;
+  font-family: inherit;
+  background: var(--background, #fff);
+}
+
+.pivot-compute-review-popup__surface {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+  color: var(--pivot-ops-ink, inherit);
+  font-family: inherit;
+  background: var(--pivot-ops-surface, #fff);
+}
+
+.pivot-compute-review-popup__header {
+  padding: 22px 28px 18px;
+  border-bottom: 1px solid var(--pivot-ops-border, rgba(0, 0, 0, 0.1));
+
+  h2 {
+    margin: 2px 44px 5px 0;
+    font-size: 22px;
+    font-weight: 650;
+    letter-spacing: -0.015em;
   }
 
+  p {
+    margin: 0;
+    color: var(--pivot-ops-ink-muted, #667085);
+    font-size: 13px;
+  }
+}
+
+.pivot-compute-review-popup__content {
+  flex: 1 1 auto;
+  min-height: 0;
+  padding: 0 28px 28px;
+  overflow-y: auto;
+}
+
+.pivot-compute-review-popup__surface > .pivot-compute-review__apply-panel {
+  position: sticky;
+  bottom: 0;
+  z-index: 4;
+  flex: 0 0 auto;
+  margin: 0;
+  padding: 16px 28px 18px;
+  border-top: 1px solid var(--pivot-ops-border, rgba(0, 0, 0, 0.12));
+  background: var(--pivot-ops-surface, #fff);
+  box-shadow: 0 -10px 24px rgba(26, 23, 20, 0.06);
+
+  .pivot-compute-review__confirm {
+    margin: 10px 0;
+    max-width: none;
+    font-size: 12px;
+  }
+}
+
+.pivot-compute-review__apply-result {
+  border-top-width: 3px !important;
+
+  &.is-success { border-top-color: var(--pivot-ops-success, #0f766e) !important; }
+  &.is-error { border-top-color: var(--pivot-ops-danger, #dc2626) !important; }
+
+  > p {
+    margin: 8px 0 0;
+    font-size: 12px;
+    line-height: 1.45;
+  }
+
+  > button { margin-top: 12px; }
+}
+
+.pivot-compute-review__apply-result-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+
+  h4 {
+    margin: 2px 0 0;
+    font-size: 16px;
+  }
+}
+
+.pivot-compute-review__result-label {
+  color: var(--pivot-ops-ink-soft, #667085);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.pivot-compute-review__result-error {
+  color: var(--pivot-ops-danger, #dc2626);
+}
+
+.pivot-compute-review__result-issues {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px 20px;
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    min-width: 0;
+    padding-top: 6px;
+    border-top: 1px solid var(--pivot-ops-border, rgba(0, 0, 0, 0.1));
+  }
+
+  strong,
+  span { display: block; }
+
+  span {
+    margin-top: 2px;
+    color: var(--pivot-ops-ink-muted, #667085);
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 720px) {
+  .pivot-compute-review-popup__header { padding: 20px 20px 16px; }
+  .pivot-compute-review-popup__content { padding: 0 20px 20px; }
+
+  .pivot-compute-review-popup__surface {
+    .pivot-compute-review__quality-grid,
+    .pivot-compute-review__tags ul,
+    .pivot-compute-review__apply-plan ul,
+    .pivot-compute-review__result-issues { grid-template-columns: 1fr; }
+  }
+
+  .pivot-compute-review-popup__surface > .pivot-compute-review__apply-panel {
+    padding: 14px 20px 16px;
+    max-height: 44vh;
+    overflow-y: auto;
+  }
+}
+
+.platform-admin--dark .pivot-compute-jobs {
   .pivot-compute-jobs__filter select,
   .pivot-compute-jobs__filter input,
   .pivot-compute-jobs__filter textarea,

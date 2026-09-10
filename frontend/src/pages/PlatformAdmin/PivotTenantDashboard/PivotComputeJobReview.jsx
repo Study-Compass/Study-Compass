@@ -45,12 +45,6 @@ function SummaryGrid({ title, entries }) {
   );
 }
 
-function formatReviewValue(value) {
-  if (value == null || value === '') return '—';
-  if (Array.isArray(value)) return value.join(', ') || '—';
-  return String(value);
-}
-
 function formatReviewTimestamp(value, timeZone) {
   const parsed = new Date(value);
   if (Number.isNaN(parsed.getTime())) return '—';
@@ -59,6 +53,31 @@ function formatReviewTimestamp(value, timeZone) {
   } catch {
     return formatTimestamp(value);
   }
+}
+
+function aggregateAttentionItems(attention) {
+  const grouped = new Map();
+  attention.forEach((item) => {
+    const current = grouped.get(item.code) || {
+      code: item.code,
+      title: item.title,
+      message: item.message,
+      severity: item.severity,
+      count: 0,
+      samples: [],
+    };
+    current.count += 1;
+    const samples = item.samples?.length ? item.samples : [{
+      title: item.title,
+      sourceUrl: item.sourceUrl,
+      jobLabel: item.jobLabel,
+    }];
+    samples.forEach((sample) => {
+      if (current.samples.length < 3 && sample?.title) current.samples.push(sample);
+    });
+    grouped.set(item.code, current);
+  });
+  return [...grouped.values()];
 }
 
 function PreviewRowsTable({ rows }) {
@@ -98,8 +117,15 @@ function ExceptionDrivenReview({ review }) {
   const impact = review?.impact || {};
   const sourceHealth = review?.sourceHealth || {};
   const attention = Array.isArray(review?.attention) ? review.attention : [];
+  const warnings = Array.isArray(review?.warningGroups)
+    ? review.warningGroups
+    : aggregateAttentionItems(attention);
   const groups = Array.isArray(review?.groups) ? review.groups : [];
-  const visibleAttention = attention.slice(0, 100);
+  const quality = review?.curationQuality || null;
+  const missingMetadata = Array.isArray(quality?.missingMetadata) ? quality.missingMetadata : [];
+  const tagBreakdown = Array.isArray(quality?.tagBreakdown) ? quality.tagBreakdown : [];
+  const batchWeeks = Array.isArray(quality?.batchWeeks) ? quality.batchWeeks : [];
+  const maxTagCount = Math.max(1, ...tagBreakdown.map((item) => item.count));
 
   return (
     <div className="pivot-compute-review__risk-review" data-testid="compute-risk-review">
@@ -138,22 +164,102 @@ function ExceptionDrivenReview({ review }) {
         </span>
       </div>
 
+      {quality ? (
+        <section className="pivot-compute-review__quality" aria-labelledby="curation-quality-heading">
+          <div className="pivot-compute-review__section-heading">
+            <div>
+              <h4 id="curation-quality-heading">Curation quality</h4>
+              <p className="pivot-lab__section-hint">
+                The same metadata checks used by the curation queue, evaluated across this result.
+              </p>
+            </div>
+            <span className={`pivot-lab__pill${quality.eventsMissingMetadata ? ' pivot-lab__pill--warn' : ''}`}>
+              {quality.eventsMissingMetadata || 0} need review
+            </span>
+          </div>
+
+          <SummaryGrid
+            title="Metadata coverage"
+            entries={[
+              ['Events reviewed', quality.eventCount ?? 0],
+              ['Metadata complete', quality.metadataComplete ?? 0],
+              ['Missing metadata', quality.eventsMissingMetadata ?? 0],
+              ['Missing rich data', quality.needsRichData ?? 0],
+            ]}
+          />
+
+          <div className="pivot-compute-review__quality-grid">
+            <div className="pivot-compute-review__quality-card">
+              <span className="pivot-compute-review__quality-label">Resolved batch week</span>
+              <strong>{quality.resolvedBatchWeek || (batchWeeks.length ? 'Multiple weeks' : 'Not resolved')}</strong>
+              {batchWeeks.length ? (
+                <div className="pivot-compute-review__chips" aria-label="Batch week breakdown">
+                  {batchWeeks.map((item) => (
+                    <span key={item.batchWeek}>{item.batchWeek} <b>{item.count}</b></span>
+                  ))}
+                </div>
+              ) : <p className="pivot-lab__section-hint">No batch week was returned.</p>}
+            </div>
+
+            <div className="pivot-compute-review__quality-card">
+              <span className="pivot-compute-review__quality-label">Events missing metadata</span>
+              {missingMetadata.length ? (
+                <ul className="pivot-compute-review__metadata-list">
+                  {missingMetadata.map((item) => (
+                    <li key={item.key}>
+                      <span>
+                        {item.label}
+                        {item.samples?.length ? (
+                          <small>{item.samples.map((sample) => sample.title).join(' · ')}</small>
+                        ) : null}
+                      </span>
+                      <strong>{item.count}</strong>
+                    </li>
+                  ))}
+                </ul>
+              ) : <p className="pivot-compute-review__ready">No metadata gaps detected.</p>}
+            </div>
+          </div>
+
+          <div className="pivot-compute-review__tags">
+            <div className="pivot-compute-review__section-heading">
+              <h5>Tag breakdown</h5>
+              <span>{tagBreakdown.length} distinct</span>
+            </div>
+            {tagBreakdown.length ? (
+              <ul>
+                {tagBreakdown.map((item) => (
+                  <li key={item.tag}>
+                    <span>{item.tag}</span>
+                    <i aria-hidden="true"><b style={{ width: `${(item.count / maxTagCount) * 100}%` }} /></i>
+                    <strong>{item.count}</strong>
+                  </li>
+                ))}
+              </ul>
+            ) : <p className="pivot-lab__empty">No tags were proposed.</p>}
+          </div>
+        </section>
+      ) : null}
+
       <section className="pivot-compute-review__attention" aria-label="Needs attention">
         <div className="pivot-compute-review__section-heading">
-          <h4>Needs attention</h4>
+          <div>
+            <h4>Aggregate warnings</h4>
+            <p className="pivot-lab__section-hint">Grouped across the complete result so systemic issues stand out.</p>
+          </div>
           <span className="pivot-lab__pill pivot-lab__pill--warn">
             {review?.attentionTotal ?? attention.length}
           </span>
         </div>
-        {visibleAttention.length === 0 ? (
+        {warnings.length === 0 ? (
           <p className="pivot-compute-review__ready">
-            No published-event changes, incomplete sources, temporal anomalies, stale rows, or conflicts detected.
+            No aggregate warnings detected across published events, sources, dates, stale rows, or conflicts.
           </p>
         ) : (
           <div className="pivot-compute-review__attention-list">
-            {visibleAttention.map((item, index) => (
+            {warnings.map((item) => (
               <article
-                key={`${item.code}:${item.key}:${index}`}
+                key={item.code}
                 className={`pivot-compute-review__attention-card is-${item.severity || 'attention'}`}
               >
                 <div className="pivot-compute-review__attention-header">
@@ -162,50 +268,19 @@ function ExceptionDrivenReview({ review }) {
                     <h5>{item.title}</h5>
                   </div>
                   <span className="pivot-lab__pill pivot-lab__pill--warn">
-                    {item.ingestStatus || item.provider || 'review'}
+                    {item.count} affected
                   </span>
                 </div>
                 <p>{item.message}</p>
-                <p className="pivot-lab__section-hint">
-                  {[item.jobLabel, item.sourceUrl].filter(Boolean).join(' · ')}
-                </p>
-                {item.changes?.length ? (
-                  <dl className="pivot-compute-review__changes">
-                    {item.changes.map((change) => (
-                      <div key={change.field}>
-                        <dt>{change.field}</dt>
-                        <dd>
-                          <span>{formatReviewValue(change.before)}</span>
-                          <span aria-hidden="true">→</span>
-                          <strong>{formatReviewValue(change.after)}</strong>
-                        </dd>
-                      </div>
-                    ))}
-                  </dl>
-                ) : null}
                 {item.samples?.length ? (
-                  <ul className="pivot-compute-review__samples" aria-label={`${item.title} sample events`}>
-                    {item.samples.map((sample) => (
-                      <li key={sample.sourceUrl}>
-                        <strong>{sample.title}</strong>
-                        <span>
-                          {sample.action || 'proposed'}
-                          {' · '}
-                          {formatReviewTimestamp(sample.start, review.timezone)}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
+                  <p className="pivot-lab__section-hint pivot-compute-review__warning-samples">
+                    Examples: {item.samples.map((sample) => sample.title).filter(Boolean).join(' · ')}
+                  </p>
                 ) : null}
               </article>
             ))}
           </div>
         )}
-        {(review?.attentionTotal ?? 0) > visibleAttention.length ? (
-          <p className="pivot-lab__section-hint">
-            Showing the first {visibleAttention.length} of {review.attentionTotal} attention items.
-          </p>
-        ) : null}
       </section>
 
       <details className="pivot-compute-review__routine">

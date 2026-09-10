@@ -313,6 +313,7 @@ const STATUS_BY_CODE = Object.freeze({
   PREVIEW_APPLY_BLOCKED: 409,
   PREVIEW_REQUIRED: 409,
   PREVIEW_STALE: 409,
+  COMPUTE_APPLY_VALIDATION_FAILED: 422,
   INVALID_COMPUTE_JOB_REQUEST: 400,
   INVALID_COMPUTE_EXECUTION_RESULT: 400,
   INVALID_STATUS_FILTER: 400,
@@ -331,6 +332,7 @@ function handleAdminServiceError(res, error) {
   return res.status(status).json({
     error: error.message || 'Compute job admin request failed',
     code: error.code || 'COMPUTE_JOB_ADMIN_ERROR',
+    ...(error.applyResult ? { result: error.applyResult } : {}),
   });
 }
 

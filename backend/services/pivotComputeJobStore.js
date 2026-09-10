@@ -903,7 +903,7 @@ async function completeComputeJobApply(req, {
     throw error;
   }
 
-  const nextStatus = outcome === 'partial' ? 'review-required' : 'completed';
+  const nextStatus = outcome === 'completed' ? 'completed' : 'review-required';
   assertComputeJobTransition(job.status, nextStatus);
 
   job.status = nextStatus;

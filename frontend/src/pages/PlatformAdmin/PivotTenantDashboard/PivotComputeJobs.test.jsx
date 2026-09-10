@@ -1,7 +1,8 @@
 import React from 'react';
-import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import PivotComputeJobs, { PIVOT_TENANT_COMPUTE_JOBS_PAGE } from './PivotComputeJobs';
+import { ComputeJobDetailActions } from './ComputeJobActions';
 
 const mockUseFetch = jest.fn();
 const mockAuthenticatedRequest = jest.fn();
@@ -152,23 +153,22 @@ describe('PivotComputeJobs', () => {
     expect(PIVOT_TENANT_COMPUTE_JOBS_PAGE).toBe(10);
   });
 
-  it('lists compute jobs scoped to the tenant city with required columns', () => {
+  it('presents a tenant-scoped operations queue with health summaries', () => {
     renderComputeJobs();
 
     expect(screen.getByRole('heading', { name: 'Compute jobs' })).toBeInTheDocument();
     expect(screen.getByTestId('compute-jobs-city')).toHaveTextContent('Iowa City');
-    expect(screen.getByRole('columnheader', { name: 'Origin' })).toBeInTheDocument();
-    expect(screen.getByRole('columnheader', { name: 'Schedule occurrence' })).toBeInTheDocument();
-    expect(screen.getByRole('columnheader', { name: 'Context version' })).toBeInTheDocument();
-    expect(screen.getByRole('columnheader', { name: 'Failure' })).toBeInTheDocument();
-
-    const table = screen.getByRole('table', { name: 'Compute jobs' });
-    expect(table).toBeInTheDocument();
+    const queue = screen.getByRole('generic', { name: 'Compute jobs' });
+    expect(queue).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Recent activity' })).toBeInTheDocument();
+    expect(screen.getByText('Queued or processing')).toBeInTheDocument();
+    expect(screen.getByText('Ready for a decision')).toBeInTheDocument();
+    expect(screen.getByText('Retry or investigate')).toBeInTheDocument();
     expect(screen.getByText('Admin request · admin@example.com')).toBeInTheDocument();
-    expect(within(table).getAllByText('Source discovery')).toHaveLength(2);
-    expect(within(table).getByText('ctx:iowacity.discovery.v3')).toBeInTheDocument();
-    expect(within(table).getByText('relay-mini-1')).toBeInTheDocument();
-    expect(within(table).getByText('PROVIDER_TIMEOUT: Firecrawl request timed out after 120s')).toBeInTheDocument();
+    expect(within(queue).getAllByText('Source discovery')).toHaveLength(2);
+    expect(within(queue).getByText('ctx:iowacity.discovery.v3')).toBeInTheDocument();
+    expect(within(queue).getByText('relay-mini-1')).toBeInTheDocument();
+    expect(within(queue).getByText('PROVIDER_TIMEOUT: Firecrawl request timed out after 120s')).toBeInTheDocument();
 
     expect(mockUseFetch).toHaveBeenCalledWith(
       '/admin/pivot/compute-jobs',
@@ -302,7 +302,7 @@ describe('PivotComputeJobs', () => {
     mockAuthenticatedRequest.mockResolvedValue({ data: { job: SAMPLE_JOBS[2], attempts: [] } });
     renderComputeJobs();
 
-    fireEvent.click(screen.getByRole('button', { name: 'Manual upload · ops@example.com' }));
+    fireEvent.click(screen.getByRole('button', { name: /Manual upload · ops@example.com/ }));
 
     expect(await screen.findByRole('heading', { name: 'Job detail' })).toBeInTheDocument();
 
@@ -459,14 +459,14 @@ describe('PivotComputeJobs', () => {
     expect(screen.queryByRole('button', { name: 'Retry job' })).not.toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: 'Clear selection' }));
-    fireEvent.click(screen.getByRole('button', { name: 'Manual upload · ops@example.com' }));
+    fireEvent.click(screen.getByRole('button', { name: /Manual upload · ops@example.com/ }));
     expect(await screen.findByTestId('compute-job-detail')).toBeInTheDocument();
     expect(await screen.findByTestId('compute-job-detail-actions')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Retry job' })).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Preview stored result' })).not.toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: 'Clear selection' }));
-    fireEvent.click(screen.getByRole('button', { name: 'Admin request · admin@example.com' }));
+    fireEvent.click(screen.getByRole('button', { name: /Admin request · admin@example.com/ }));
     expect(await screen.findByTestId('compute-job-detail')).toBeInTheDocument();
     expect(await screen.findByTestId('compute-job-detail-actions')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Cancel job' })).toBeInTheDocument();
@@ -474,6 +474,10 @@ describe('PivotComputeJobs', () => {
   });
 
   it('previews and applies stored results with explicit confirmation', async () => {
+    let resolveApply;
+    const applyResponse = new Promise((resolve) => {
+      resolveApply = resolve;
+    });
     const preview = {
       contractVersion: '1',
       jobId: 'job:refresh-iowacity-001',
@@ -515,6 +519,17 @@ describe('PivotComputeJobs', () => {
         earliestStart: '2026-09-09T20:00:00.000Z',
         latestStart: '2026-10-01T20:00:00.000Z',
       },
+      applyPlan: {
+        eventDestinations: [
+          { action: 'create', status: 'staged', count: 434 },
+          { action: 'update', status: 'published', count: 3 },
+          { action: 'update', status: 'staged', count: 37 },
+        ],
+        batchWeeks: [{ batchWeek: '2026-W37', count: 474 }],
+        batchWeekSources: [{ source: 'event-date', count: 474 }],
+        sources: { creates: 0, updates: 0 },
+        curationJobs: { creates: 0, updates: 0 },
+      },
       attentionTotal: 1,
       attention: [{
         code: 'PUBLISHED_EVENT_UPDATE',
@@ -544,9 +559,7 @@ describe('PivotComputeJobs', () => {
         return Promise.resolve({ data: { preview, review } });
       }
       if (url.includes('/apply')) {
-        return Promise.resolve({
-          data: { job: { externalJobId: preview.jobId, status: 'completed' }, duplicate: false },
-        });
+        return applyResponse;
       }
       return Promise.resolve({
         data: {
@@ -565,15 +578,25 @@ describe('PivotComputeJobs', () => {
 
     expect(await screen.findByRole('button', { name: 'Preview stored result' })).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Preview stored result' }));
+    expect(await screen.findByRole('dialog', { name: 'Stored result preview' })).toBeInTheDocument();
     expect(await screen.findByTestId('compute-result-preview')).toHaveTextContent(preview.jobId);
     expect(screen.getByTestId('compute-risk-review')).toHaveTextContent('Community Meetup');
     expect(screen.getByTestId('compute-risk-review')).toHaveTextContent('jobsFailed');
 
-    const applyButton = screen.getByRole('button', { name: 'Apply stored preview' });
+    expect(screen.getByTestId('compute-stored-apply-panel')).toHaveTextContent(
+      '434 new events will be added to Curation as staged and remain hidden from the live feed',
+    );
+    expect(screen.getByTestId('compute-stored-apply-panel')).toHaveTextContent(
+      '3 published events will be updated in place and remain live',
+    );
+    expect(screen.getByTestId('compute-stored-apply-panel')).toHaveTextContent('2026-W37 (474)');
+
+    const applyButton = screen.getByRole('button', { name: 'Confirm and apply' });
     expect(applyButton).toBeDisabled();
-    fireEvent.click(screen.getByLabelText(/I reviewed the stored preview/i));
+    fireEvent.click(screen.getByLabelText(/I confirm the status, batch-week, and production changes/i));
     fireEvent.click(applyButton);
 
+    expect(within(screen.getByTestId('compute-job-detail')).getByText('Applying')).toBeInTheDocument();
     await waitFor(() => {
       expect(mockAuthenticatedRequest).toHaveBeenCalledWith(
         `/admin/pivot/compute-jobs/${encodeURIComponent(preview.jobId)}/apply`,
@@ -586,6 +609,30 @@ describe('PivotComputeJobs', () => {
         }),
       );
     });
+
+    await act(async () => {
+      resolveApply({
+        data: {
+          job: {
+            ...SAMPLE_JOBS[1],
+            status: 'completed',
+            completedAt: '2026-09-08T21:01:00.000Z',
+            applicationAudit: {
+              outcome: 'completed',
+              appliedBy: 'admin@example.com',
+              appliedAt: '2026-09-08T21:01:00.000Z',
+            },
+          },
+          duplicate: false,
+        },
+      });
+    });
+    await waitFor(() => {
+      expect(within(screen.getByTestId('compute-job-detail')).getByText('Completed')).toBeInTheDocument();
+    });
+    expect(screen.getByTestId('compute-apply-result')).toHaveTextContent('Apply completed');
+    expect(screen.getByTestId('compute-apply-result')).toHaveTextContent('This job no longer requires approval');
+    expect(screen.queryByRole('button', { name: 'Preview stored result' })).not.toBeInTheDocument();
   });
 
   it('surfaces server action errors without implying success', async () => {
@@ -607,5 +654,66 @@ describe('PivotComputeJobs', () => {
     fireEvent.click(await screen.findByRole('button', { name: 'Retry job' }));
     expect(await screen.findByTestId('compute-job-action-feedback')).toHaveTextContent(/cannot be retried/i);
     expect(mockAddNotification).not.toHaveBeenCalled();
+  });
+
+  it('shows a semantic result when apply preflight rejects missing event metadata', async () => {
+    const job = {
+      ...SAMPLE_JOBS[1],
+      result: { hasEmbeddedResult: true, mode: 'embedded' },
+    };
+    const preview = {
+      jobId: job.externalJobId,
+      kind: job.kind,
+      applyAllowed: true,
+      rows: [],
+      summary: {},
+    };
+    const reviewedJob = {
+      ...job,
+      status: 'review-required',
+      applicationAudit: {
+        outcome: 'rejected',
+        summary: { creates: 0, updates: 0 },
+      },
+    };
+    const onJobUpdated = jest.fn();
+    mockAuthenticatedRequest.mockImplementation((url) => {
+      if (url.includes('/preview')) return Promise.resolve({ data: { preview, review: {} } });
+      if (url.includes('/apply')) {
+        return Promise.resolve({
+          error: '1 event proposal cannot be applied. Missing required fields: hostName, location.',
+          errorCode: 'COMPUTE_APPLY_VALIDATION_FAILED',
+          errorData: {
+            result: {
+              outcome: 'rejected',
+              job: reviewedJob,
+              summary: { creates: 0, updates: 0 },
+              validationIssues: [{
+                key: 'sourceUrl:https://example.com/incomplete',
+                title: 'Incomplete event',
+                missingFields: ['hostName', 'location'],
+              }],
+            },
+          },
+        });
+      }
+      return Promise.resolve({ data: null });
+    });
+
+    render(<ComputeJobDetailActions job={job} onJobUpdated={onJobUpdated} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Preview stored result' }));
+    await screen.findByTestId('compute-result-preview');
+    fireEvent.click(screen.getByLabelText(/I confirm the status, batch-week, and production changes/i));
+    fireEvent.click(screen.getByRole('button', { name: 'Confirm and apply' }));
+
+    const result = await screen.findByTestId('compute-apply-result');
+    expect(result).toHaveTextContent('Nothing was applied');
+    expect(result).toHaveTextContent('Preflight stopped the apply before any production writes');
+    expect(result).toHaveTextContent('Incomplete event');
+    expect(result).toHaveTextContent('Missing hostName, location');
+    expect(onJobUpdated).toHaveBeenLastCalledWith(
+      expect.objectContaining({ status: 'review-required' }),
+      expect.objectContaining({ action: 'apply', rollback: true }),
+    );
   });
 });

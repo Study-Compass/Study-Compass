@@ -225,6 +225,28 @@ describe('pivotComputeResultApplyService', () => {
       ]));
       expect(review.attention.find((row) => row.code === 'PUBLISHED_EVENT_UPDATE').changes)
         .toEqual(expect.arrayContaining([expect.objectContaining({ field: 'name' })]));
+      expect(review.warningGroups).toEqual(expect.arrayContaining([
+        expect.objectContaining({ code: 'PUBLISHED_EVENT_UPDATE', count: 1 }),
+        expect.objectContaining({ code: 'CURATION_JOB_INCOMPLETE', count: 1 }),
+      ]));
+      expect(review.curationQuality).toMatchObject({
+        eventCount: 1,
+        metadataComplete: 0,
+        eventsMissingMetadata: 1,
+        needsRichData: 1,
+        resolvedBatchWeek: '2026-W37',
+        batchWeeks: [{ batchWeek: '2026-W37', count: 1 }],
+        tagBreakdown: [{ tag: 'community', count: 1 }],
+      });
+      expect(review.curationQuality.missingMetadata).toEqual(expect.arrayContaining([
+        expect.objectContaining({ key: 'missing-description', count: 1 }),
+        expect.objectContaining({ key: 'missing-image', count: 1 }),
+      ]));
+      expect(review.applyPlan).toMatchObject({
+        eventDestinations: [{ action: 'update', status: 'published', count: 1 }],
+        batchWeeks: [{ batchWeek: '2026-W37', count: 1 }],
+        batchWeekSources: [{ source: 'event-date', count: 1 }],
+      });
     });
 
     it('flags source groups with a large production blast radius', () => {
@@ -269,6 +291,12 @@ describe('pivotComputeResultApplyService', () => {
       expect(review.groups[0]).toMatchObject({ creates: 50, attention: 1 });
       expect(review.attention.find((row) => row.code === 'HIGH_VOLUME_SOURCE').samples)
         .toHaveLength(3);
+      expect(review.warningGroups).toEqual(expect.arrayContaining([
+        expect.objectContaining({ code: 'HIGH_VOLUME_SOURCE', count: 1 }),
+      ]));
+      expect(review.applyPlan.eventDestinations).toEqual([
+        { action: 'create', status: 'staged', count: 50 },
+      ]);
     });
 
     it('builds an applyable discovery preview against empty production state', async () => {
@@ -330,6 +358,34 @@ describe('pivotComputeResultApplyService', () => {
   });
 
   describe('applyComputeResult', () => {
+    it('blocks missing required event metadata before any production writes', async () => {
+      const result = loadFixture('result-discovery-valid-completed.json');
+      result.proposals.events[0].draft.hostName = null;
+      result.proposals.events[0].draft.location = null;
+      const preview = await previewComputeResult(req, result, {
+        currentContextVersion: result.basedOnContextVersion,
+      });
+      const persistCallsBefore = persistOutcome.mock.calls.length;
+      const publishCallsBefore = publishIngestEvent.mock.calls.length;
+
+      expect(preview.applyAllowed).toBe(false);
+      expect(preview.blockingReasons).toEqual(expect.arrayContaining([
+        expect.objectContaining({
+          code: 'MISSING_REQUIRED_EVENT_FIELDS',
+          message: expect.stringContaining('hostName, location'),
+        }),
+      ]));
+
+      await expect(applyComputeResult(req, {
+        result,
+        preview,
+        idempotencyKey: 'apply:missing-fields',
+        actor: 'admin@example.com',
+      })).rejects.toMatchObject({ code: 'PREVIEW_APPLY_BLOCKED' });
+      expect(persistOutcome.mock.calls).toHaveLength(persistCallsBefore);
+      expect(publishIngestEvent.mock.calls).toHaveLength(publishCallsBefore);
+    });
+
     it('applies create rows through existing source, job, and event seams without replaying discovery', async () => {
       const result = loadFixture('result-discovery-valid-completed.json');
       const preview = await previewComputeResult(req, result, {
