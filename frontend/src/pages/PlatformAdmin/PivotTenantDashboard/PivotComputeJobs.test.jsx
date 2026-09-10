@@ -181,6 +181,75 @@ describe('PivotComputeJobs', () => {
     );
   });
 
+  it('presents an unscoped fleet queue with a transparent tenant-first creation flow', async () => {
+    mockUseFetch.mockImplementation((url) => {
+      if (url?.includes('/tenants/iowacity/ops')) {
+        return {
+          data: {
+            success: true,
+            data: {
+              overview: {
+                kpis: {
+                  eventCount: 30,
+                  eventCountsByStatus: { total: 38, published: 30, staged: 4, draft: 3, other: 1 },
+                },
+              },
+            },
+          },
+          loading: false,
+          error: null,
+          refetch: jest.fn(),
+        };
+      }
+      return listFetchValue();
+    });
+    mockAuthenticatedRequest.mockResolvedValue({
+      data: { job: SAMPLE_JOBS[0], created: true },
+    });
+    render(
+      <MemoryRouter initialEntries={['/platform-admin/pivot?page=3']}>
+        <PivotComputeJobs
+          scope="fleet"
+          cityDisplayName="All cities"
+          pageIndex={3}
+          tenants={[{ tenantKey: 'iowacity', location: 'Iowa City' }]}
+        />
+      </MemoryRouter>,
+    );
+
+    expect(mockUseFetch).toHaveBeenCalledWith(
+      '/admin/pivot/compute-jobs',
+      expect.objectContaining({
+        params: expect.not.objectContaining({ cityKey: expect.anything() }),
+      }),
+    );
+    expect(screen.getByTestId('compute-jobs-city')).toHaveTextContent('All cities');
+    expect(screen.getAllByText('iowacity').length).toBeGreaterThan(0);
+    expect(screen.getByRole('region', { name: 'Start a compute run' })).toBeInTheDocument();
+    expect(screen.getByText(/Select a tenant to see its latest job/i)).toBeInTheDocument();
+    fireEvent.change(screen.getByLabelText('Job tenant'), { target: { value: 'iowacity' } });
+
+    expect(await screen.findByRole('heading', { name: '2. Configure the run' })).toBeInTheDocument();
+    expect(screen.getByLabelText('Selected tenant context')).toHaveTextContent('Iowa City');
+    expect(screen.getByLabelText('Selected tenant context')).toHaveTextContent('38 events total');
+    expect(screen.getByLabelText('Selected tenant context')).toHaveTextContent('30 published');
+    expect(screen.getByLabelText('Selected tenant context')).toHaveTextContent('4 staged · 3 draft · 1 other');
+
+    fireEvent.click(screen.getByRole('button', { name: 'Create job' }));
+    await waitFor(() => {
+      expect(mockAuthenticatedRequest).toHaveBeenCalledWith(
+        '/admin/pivot/compute-jobs',
+        expect.objectContaining({
+          method: 'POST',
+          data: expect.objectContaining({
+            request: expect.objectContaining({ cityKey: 'iowacity' }),
+          }),
+        }),
+      );
+    });
+    expect(screen.queryByTestId('compute-job-review-stub')).not.toBeInTheDocument();
+  });
+
   it('filters jobs by status and kind through query params', () => {
     renderComputeJobs({
       path: '/platform-admin/pivot/iowacity?page=10&computeStatus=failed&computeKind=city-curation-refresh',
@@ -605,6 +674,7 @@ describe('PivotComputeJobs', () => {
           data: expect.objectContaining({
             idempotencyKey: `apply:${preview.jobId}`,
             preview,
+            tenantKey: 'iowacity',
           }),
         }),
       );
@@ -700,7 +770,7 @@ describe('PivotComputeJobs', () => {
       return Promise.resolve({ data: null });
     });
 
-    render(<ComputeJobDetailActions job={job} onJobUpdated={onJobUpdated} />);
+    render(<ComputeJobDetailActions job={job} tenantKey="iowacity" onJobUpdated={onJobUpdated} />);
     fireEvent.click(screen.getByRole('button', { name: 'Preview stored result' }));
     await screen.findByTestId('compute-result-preview');
     fireEvent.click(screen.getByLabelText(/I confirm the status, batch-week, and production changes/i));

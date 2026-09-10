@@ -1185,11 +1185,25 @@ async function previewStoredComputeJob(req, externalJobId, options = {}) {
 async function applyStoredComputeJob(req, externalJobId, {
   idempotencyKey,
   preview,
+  tenantKey,
   actor = null,
   now = new Date(),
 } = {}) {
   const job = await findJobByExternalId(req, externalJobId);
   if (!job) throw serviceError('Compute job not found.', 'COMPUTE_JOB_NOT_FOUND', 404);
+  const requestedTenantKey = trimString(tenantKey).toLowerCase();
+  if (!requestedTenantKey) {
+    throw serviceError('A tenantKey is required to apply a compute job.', 'APPLY_TENANT_REQUIRED', 400);
+  }
+  const jobTenantKey = trimString(job.tenantKey || job.cityKey).toLowerCase();
+  const resultTenantKey = trimString(job.result?.embedded?.cityKey || job.cityKey).toLowerCase();
+  if (requestedTenantKey !== jobTenantKey || requestedTenantKey !== resultTenantKey) {
+    throw serviceError(
+      `Compute job belongs to tenant ${jobTenantKey || 'unknown'}, not ${requestedTenantKey}.`,
+      'COMPUTE_JOB_TENANT_MISMATCH',
+      409,
+    );
+  }
   if (job.status === 'completed') {
     if (job.applicationAudit?.idempotencyKey === trimString(idempotencyKey)) {
       return { job, duplicate: true };

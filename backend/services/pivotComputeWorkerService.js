@@ -70,12 +70,16 @@ async function buildAuthorizedContext(req, job, workerId) {
     kind: job.kind,
     scheduleOccurrenceId: job.scheduleOccurrenceId,
   });
+  const jobOptions = boundedOptions(job.options);
   const contextOptions = {
+    ...jobOptions,
     cityKey: job.cityKey,
     jobId: job.externalJobId,
     scheduleOccurrenceId: job.scheduleOccurrenceId,
     authorize,
-    options: job.options,
+    // Discovery configuration is intentionally portable. The snapshot builder
+    // resolves these request-time overrides against the tenant defaults.
+    discoveryOverrides: jobOptions,
   };
 
   if (job.kind === 'city-source-discovery') {

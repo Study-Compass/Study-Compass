@@ -108,6 +108,11 @@ describe('pivotComputeWorkerRoutes outcomes', () => {
     buildCityDiscoveryContextSnapshot.mockImplementation(async (_req, options) => {
       expect(options.authorize).toEqual(expect.any(Function));
       expect(options.jobId).toBe('job:scheduled-discovery-001');
+      expect(options.tags).toEqual(['live-music']);
+      expect(options.discoveryOverrides).toMatchObject({
+        flow: 'native-only',
+        lumaSlug: 'iowa-city',
+      });
       return {
         data: {
           snapshot: discoveryContextSnapshot('job:scheduled-discovery-001'),
@@ -125,7 +130,11 @@ describe('pivotComputeWorkerRoutes outcomes', () => {
         cityKey: 'iowacity',
         contractVersion: '1',
         idempotencyKey: 'idem:scheduled-discovery-001',
-        options: { tags: ['live-music'] },
+        options: {
+          tags: ['live-music'],
+          flow: 'native-only',
+          lumaSlug: 'iowa-city',
+        },
         capability: workerCapability(),
       });
 

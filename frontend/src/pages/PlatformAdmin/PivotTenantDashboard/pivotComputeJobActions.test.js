@@ -49,6 +49,9 @@ describe('pivotComputeJobActions', () => {
         minEvents: 3,
         createJobs: false,
         recheckRejected: true,
+        flow: 'native-only',
+        lumaSlug: 'iowa-city',
+        partifulSlug: 'iowa-city-events',
       },
     });
     expect(discovery.options).toEqual({
@@ -58,6 +61,9 @@ describe('pivotComputeJobActions', () => {
       minEvents: 3,
       createJobs: false,
       recheckRejected: true,
+      flow: 'native-only',
+      lumaSlug: 'iowa-city',
+      partifulSlug: 'iowa-city-events',
     });
 
     const refresh = buildAdminCreateJobRequest({

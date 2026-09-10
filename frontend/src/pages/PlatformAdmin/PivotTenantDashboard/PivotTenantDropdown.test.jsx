@@ -152,6 +152,14 @@ describe('PivotTenantDropdown switcher remap', () => {
     );
   });
 
+  it('maps Compute jobs between the fleet and city shells', () => {
+    renderSwitcher('/platform-admin/pivot?page=3');
+    switchTo(/New York/i);
+    expect(screen.getByTestId('path').textContent).toBe(
+      '/platform-admin/pivot/nyc?page=10',
+    );
+  });
+
   it('keeps NYC Catalog → Brooklyn Catalog at page=4', () => {
     renderSwitcher('/platform-admin/pivot/nyc?page=4');
     switchTo(/Brooklyn/i);

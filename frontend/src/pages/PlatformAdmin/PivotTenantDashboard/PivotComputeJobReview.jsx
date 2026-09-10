@@ -547,6 +547,7 @@ function PivotComputeJobReview({ tenantKey, onSubmitted, onApplied }) {
         data: {
           idempotencyKey: `apply:${preview.jobId}`,
           preview,
+          tenantKey,
         },
       },
     );
@@ -571,6 +572,7 @@ function PivotComputeJobReview({ tenantKey, onSubmitted, onApplied }) {
     jsonText,
     syncValidation,
     submittedJobId,
+    tenantKey,
     addNotification,
     onApplied,
   ]);

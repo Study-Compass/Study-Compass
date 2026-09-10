@@ -102,6 +102,11 @@ function normalizeStringList(values, { maximumItems, maximumLength, pattern } = 
 function normalizeDiscoveryOptions(options) {
   const tags = normalizeStringList(options.tags, { maximumItems: 16, maximumLength: 64 });
   const maxQueries = boundedOptionalInteger(options.maxQueries);
+  const flow = ['native-then-firecrawl', 'native-only', 'firecrawl-only'].includes(options.flow)
+    ? options.flow
+    : undefined;
+  const lumaSlug = String(options.lumaSlug || '').trim().slice(0, 128);
+  const partifulSlug = String(options.partifulSlug || '').trim().slice(0, 128);
   return {
     ...(tags.length ? { tags } : {}),
     ...(maxQueries ? { maxQueries } : {}),
@@ -109,6 +114,9 @@ function normalizeDiscoveryOptions(options) {
     minEvents: boundedInteger(options.minEvents, 1),
     createJobs: options.createJobs !== false,
     recheckRejected: Boolean(options.recheckRejected),
+    ...(flow ? { flow } : {}),
+    ...(lumaSlug ? { lumaSlug } : {}),
+    ...(partifulSlug ? { partifulSlug } : {}),
   };
 }
 

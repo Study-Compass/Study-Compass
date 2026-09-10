@@ -1,31 +1,14 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ThinkingOrb } from 'thinking-orbs';
 import { Icon } from '@iconify-icon/react';
 import { useFetch, authenticatedRequest } from '../../../hooks/useFetch';
 import { useNotification } from '../../../NotificationContext';
-import useAdminDashboardTheme from '../../../hooks/useAdminDashboardTheme';
 import PivotTagMultiSelect from '../PivotLab/PivotTagMultiSelect';
-import Popup from '../../../components/Popup/Popup';
-import PivotDiscoveryConsole, {
-  orbStateFor,
-  formatClock,
-  phaseLabel,
-  OrbTint,
-} from './PivotDiscoveryConsole';
+import { buildAdminCreateJobRequest } from './pivotComputeJobActions';
+import PivotComputeJobRunStatus, { useTenantComputeJob } from './PivotComputeJobRunStatus';
 import './PivotTenantSourcesPanel.scss';
 
 const NO_FETCH_CACHE = { enabled: false };
 const EMPTY_LIST = [];
-
-/** Discovery runs in the background, so the registry is polled while one is in flight. */
-const POLL_MS = 4000;
-/**
- * Cadence for checking whether a run exists at all while none is known to be in
- * flight. Slow, but not never: a run can be started from another tab, by the CLI,
- * or eventually by a scheduler, and the panel should not claim the city is idle
- * just because *this* page did not start the work.
- */
-const IDLE_POLL_MS = 30000;
 
 const STATUS_OPTIONS = [
   { value: 'all', label: 'All' },
@@ -72,17 +55,6 @@ function defaultOptions() {
   };
 }
 
-function formatAgo(iso) {
-  const then = Date.parse(iso);
-  if (!Number.isFinite(then)) return null;
-  const mins = Math.round((Date.now() - then) / 60000);
-  if (mins < 1) return 'just now';
-  if (mins < 60) return `${mins}m ago`;
-  const hours = Math.round(mins / 60);
-  if (hours < 24) return `${hours}h ago`;
-  return `${Math.round(hours / 24)}d ago`;
-}
-
 function SourceStatusCell({ source }) {
   if (source.status === 'qualified') {
     return <span className="pivot-lab__pill pivot-lab__pill--ok">Qualified</span>;
@@ -101,30 +73,21 @@ function SourceStatusCell({ source }) {
  * Autonomous source discovery for a city.
  *
  * Discovery finds and registers sources (native indexes first, then venue
- * sites). It sits upstream of Saved jobs. A qualifying scrape already returns
- * the whole page, so a run publishes those events itself and the job it creates
- * is the weekly refresh mechanism — recrawl those jobs with Refresh all, do not
- * re-run discovery expecting a Luma update. Rejected hosts are shown too —
+ * sites). It sits upstream of Saved jobs. The Mini returns proposed sources,
+ * jobs, and events for review here; applying the reviewed result updates the
+ * city. Saved jobs become the weekly refresh mechanism — recrawl those jobs
+ * with Refresh all, rather than re-running discovery for a Luma update. Rejected hosts are shown too —
  * they are the reason a second run is cheaper than the first, and hiding them
  * would make the registry look like it had simply missed things.
  */
 function PivotTenantSourcesPanel({ tenantKey, cityDisplayName, catalogTags = EMPTY_LIST, onJobsChanged }) {
   const { addNotification } = useNotification();
-  const { isDark } = useAdminDashboardTheme();
-  const orbTheme = isDark ? 'dark' : 'light';
   const [statusFilter, setStatusFilter] = useState('all');
   const [optionsOpen, setOptionsOpen] = useState(false);
   const [sitesExpanded, setSitesExpanded] = useState(false);
   const [options, setOptions] = useState(defaultOptions);
   const [starting, setStarting] = useState(false);
   const [savingConfig, setSavingConfig] = useState(false);
-  const [stopping, setStopping] = useState(false);
-  const [consoleRunId, setConsoleRunId] = useState(null);
-  const [consoleOpen, setConsoleOpen] = useState(false);
-  const [now, setNow] = useState(() => Date.now());
-  /** Completion is announced once per run, whoever notices it first. */
-  const notifiedRunIdRef = useRef(null);
-  const previousRunRef = useRef(null);
   const hydratedFlowRef = useRef(false);
 
   const sourcesUrl = tenantKey
@@ -140,23 +103,6 @@ function PivotTenantSourcesPanel({ tenantKey, cityDisplayName, catalogTags = EMP
     error: sourcesError,
     refetch: refetchSources,
   } = useFetch(sourcesUrl, { params: sourcesParams, cache: NO_FETCH_CACHE });
-
-  /**
-   * Whether a run is in flight is the server's fact, not this component's.
-   *
-   * It used to be local state set when you pressed the button, which meant a
-   * refresh, a second tab, or a run started from the CLI all showed an idle panel
-   * while the work was actually churning. Steps are excluded: this poll only needs
-   * status, phase, and counters.
-   */
-  const latestRunUrl = tenantKey
-    ? `/admin/pivot/tenants/${encodeURIComponent(tenantKey)}/discovery-runs/latest`
-    : null;
-  const { data: latestRunResponse, refetch: refetchLatestRun } = useFetch(latestRunUrl, {
-    cache: NO_FETCH_CACHE,
-  });
-  const latestRun = latestRunResponse?.success ? latestRunResponse.data?.run : null;
-  const running = latestRun?.status === 'running';
 
   // The plan is resolved server-side so the ceiling shown here comes from the
   // same seed logic the run will use.
@@ -192,6 +138,31 @@ function PivotTenantSourcesPanel({ tenantKey, cityDisplayName, catalogTags = EMP
   const plan = planResponse?.success ? planResponse.data?.plan : null;
   const planError = planResponse && !planResponse.success ? planResponse.message : null;
 
+  const handleComputeFinished = useCallback((job) => {
+    refetchSources();
+    onJobsChanged?.();
+    addNotification({
+      title: job.status === 'review-required' ? 'Discovery ready for review' : 'Discovery job finished',
+      message: job.status === 'review-required'
+        ? 'The Mini returned a stored result. Open review here before applying it to Curation.'
+        : job.failure?.message || `The job finished with status ${job.status}.`,
+      type: job.status === 'review-required' ? 'success' : 'warning',
+    });
+  }, [addNotification, onJobsChanged, refetchSources]);
+  const discoveryCompute = useTenantComputeJob({
+    tenantKey,
+    kind: 'city-source-discovery',
+    onFinished: handleComputeFinished,
+  });
+  const running = discoveryCompute.active;
+  const handleDiscoveryJobUpdated = useCallback((job, meta) => {
+    discoveryCompute.updateJob(job);
+    if (meta?.action === 'apply' && !meta?.optimistic) {
+      refetchSources();
+      onJobsChanged?.();
+    }
+  }, [discoveryCompute, onJobsChanged, refetchSources]);
+
   useEffect(() => {
     if (!plan || hydratedFlowRef.current) return;
     hydratedFlowRef.current = true;
@@ -218,85 +189,45 @@ function PivotTenantSourcesPanel({ tenantKey, cityDisplayName, catalogTags = EMP
     return { qualified, rejected, events };
   }, [sources]);
 
-  // Progress comes from the run record rather than the registry, which only gains
-  // rows at the very end and so reads as "nothing happening" for most of a run.
-  const runCounters = latestRun?.counters || {};
-  const runCallsMade =
-    (runCounters.searches || 0) + (runCounters.maps || 0) + (runCounters.scrapes || 0);
-  const runElapsed = latestRun?.startedAt
-    ? (latestRun.finishedAt ? Date.parse(latestRun.finishedAt) : now) -
-      Date.parse(latestRun.startedAt)
-    : 0;
-
-  useEffect(() => {
-    if (!latestRunUrl) return undefined;
-    const timer = setInterval(
-      () => {
-        refetchLatestRun();
-        if (running) refetchSources();
-      },
-      running ? POLL_MS : IDLE_POLL_MS,
-    );
-    return () => clearInterval(timer);
-  }, [latestRunUrl, refetchLatestRun, refetchSources, running]);
-
-  // Only ticks while something is in flight; the elapsed clock is the one thing
-  // here that has to move on its own.
-  useEffect(() => {
-    if (!running) return undefined;
-    const timer = setInterval(() => setNow(Date.now()), 1000);
-    return () => clearInterval(timer);
-  }, [running]);
-
-  // Newly created curation jobs only show up in Saved jobs after the parent
-  // refetches, so nudge it as the registry grows.
-  useEffect(() => {
-    if (!running) return;
-    onJobsChanged?.();
-  }, [counts.qualified, onJobsChanged, running]);
-
   const handleDiscover = useCallback(async () => {
     if (!tenantKey) return;
 
     setStarting(true);
     const { data, error } = await authenticatedRequest(
-      `/admin/pivot/tenants/${encodeURIComponent(tenantKey)}/sources/discover`,
+      '/admin/pivot/compute-jobs',
       {
         method: 'POST',
         data: {
-          tags: options.tags.length ? options.tags : undefined,
-          maxCandidates: options.maxCandidates,
-          minEvents: options.minEvents,
-          createJobs: options.createJobs,
-          recheckRejected: options.recheckRejected,
-          flow: options.flow,
-          lumaSlug: options.lumaSlug || undefined,
-          partifulSlug: options.partifulSlug || undefined,
+          request: buildAdminCreateJobRequest({
+            tenantKey,
+            kind: 'city-source-discovery',
+            options,
+          }),
         },
       },
     );
     setStarting(false);
 
-    if (error || !data?.success) {
+    if (error || !data?.job) {
       addNotification({
         title: 'Discovery failed to start',
-        message: error || data?.message || 'Could not start source discovery.',
+        message: error || data?.message || 'Could not create the discovery job.',
         type: 'error',
       });
       return;
     }
 
     setOptionsOpen(false);
-    refetchSources();
-    // The run document exists before this response returns, so the banner appears
-    // on the next poll without needing an optimistic guess here.
-    refetchLatestRun();
-
-    // Open the console rather than announcing the run: watching the decisions is
-    // the point on an unproven city, and a toast cannot show them.
-    setConsoleRunId(data.data?.runId || null);
-    setConsoleOpen(true);
-  }, [addNotification, options, refetchLatestRun, refetchSources, tenantKey]);
+    discoveryCompute.trackCreated(data);
+    const wakeAccepted = data?.wake?.status === 'accepted';
+    addNotification({
+      title: data?.created ? 'Discovery job created' : 'Discovery job already queued',
+      message: wakeAccepted
+        ? 'The job is stored and the Mini accepted the wake request. This panel will confirm when execution starts.'
+        : 'The job is stored in the durable queue. The Mini will collect it on its next poll.',
+      type: 'success',
+    });
+  }, [addNotification, discoveryCompute, options, tenantKey]);
 
   const toggleEnabled = useCallback(
     async (source) => {
@@ -351,109 +282,6 @@ function PivotTenantSourcesPanel({ tenantKey, cityDisplayName, catalogTags = EMP
   const notConfigured = Boolean(plan) && plan.runFirecrawl !== false && plan.configured === false;
   const nativeWarning = Boolean(plan) && plan.nativeWarning;
 
-  const handleRunFinished = useCallback(
-    (run) => {
-      if (!run?._id || notifiedRunIdRef.current === run._id) return;
-      notifiedRunIdRef.current = run._id;
-
-      // A rehearsal touches neither the registry nor the jobs, so refetching or
-      // reporting counts would be misleading.
-      if (run.rehearsal) {
-        addNotification({
-          title: 'Rehearsal complete',
-          message: 'Nothing was fetched or saved. Add a Firecrawl key to run it for real.',
-          type: 'info',
-        });
-        return;
-      }
-
-      refetchSources();
-      onJobsChanged?.();
-      addNotification({
-        title: run?.aborted ? 'Discovery stopped early' : 'Discovery finished',
-        message: run?.aborted
-          ? run.aborted.error
-          : `${run?.counters?.qualified || 0} source(s) registered and ${
-              run?.counters?.eventsUpserted || 0
-            } event(s) saved from ${run?.counters?.evaluated || 0} site(s) checked.`,
-        type: run?.aborted ? 'warning' : 'success',
-      });
-    },
-    [addNotification, onJobsChanged, refetchSources],
-  );
-
-  // Catches a run finishing while the console is shut, which is the common case
-  // now that the panel knows about runs it did not start.
-  useEffect(() => {
-    const previous = previousRunRef.current;
-    previousRunRef.current = latestRun ? { _id: latestRun._id, status: latestRun.status } : null;
-
-    if (!latestRun || !previous) return;
-    if (previous._id === latestRun._id && previous.status === 'running' && !running) {
-      handleRunFinished(latestRun);
-    }
-  }, [handleRunFinished, latestRun, running]);
-
-  const openConsole = useCallback((runIdToShow = null) => {
-    setConsoleRunId(runIdToShow);
-    setConsoleOpen(true);
-  }, []);
-
-  const handleRehearse = useCallback(async () => {
-    if (!tenantKey) return;
-
-    setStarting(true);
-    const { data, error } = await authenticatedRequest(
-      `/admin/pivot/tenants/${encodeURIComponent(tenantKey)}/sources/rehearse`,
-      {
-        method: 'POST',
-        data: {
-          tags: options.tags.length ? options.tags : undefined,
-          maxCandidates: options.maxCandidates,
-        },
-      },
-    );
-    setStarting(false);
-
-    if (error || !data?.success) {
-      addNotification({
-        title: 'Rehearsal failed to start',
-        message: error || data?.message || 'Could not start a rehearsal.',
-        type: 'error',
-      });
-      return;
-    }
-
-    setOptionsOpen(false);
-    refetchLatestRun();
-    setConsoleRunId(data.data?.runId || null);
-    setConsoleOpen(true);
-  }, [addNotification, options, refetchLatestRun, tenantKey]);
-
-  const handleStop = useCallback(async () => {
-    if (!tenantKey || !latestRun?._id || !running) return;
-
-    setStopping(true);
-    const { data, error } = await authenticatedRequest(
-      `/admin/pivot/tenants/${encodeURIComponent(tenantKey)}/discovery-runs/${encodeURIComponent(
-        latestRun._id,
-      )}/stop`,
-      { method: 'POST' },
-    );
-    setStopping(false);
-
-    if (error || !data?.success) {
-      addNotification({
-        title: 'Could not stop agent',
-        message: error || data?.message || 'Stop request failed.',
-        type: 'error',
-      });
-      return;
-    }
-
-    refetchLatestRun();
-  }, [addNotification, latestRun?._id, refetchLatestRun, running, tenantKey]);
-
   return (
     <section className="linear-section pivot-lab__section pivot-sources" aria-labelledby="curation-sources">
       <div
@@ -463,15 +291,7 @@ function PivotTenantSourcesPanel({ tenantKey, cityDisplayName, catalogTags = EMP
       >
         <div className="pivot-sources__agent-main">
           <span className="pivot-sources__agent-orb" aria-hidden="true">
-            <OrbTint />
-            <ThinkingOrb
-              className="pivot-orb--brand"
-              state={running ? orbStateFor(latestRun, null) : 'weaving'}
-              size={20}
-              speed={0.45}
-              theme={orbTheme}
-              paused={false}
-            />
+            <Icon icon={running ? 'mdi:server-network' : 'mdi:radar'} />
           </span>
           <div className="pivot-sources__agent-copy">
             <div className="pivot-sources__agent-title-row">
@@ -481,7 +301,7 @@ function PivotTenantSourcesPanel({ tenantKey, cityDisplayName, catalogTags = EMP
               <span className="pivot-sources__agent-city">{cityDisplayName || tenantKey}</span>
               {running ? (
                 <span className="pivot-sources__agent-status pivot-sources__agent-status--live">
-                  {latestRun.rehearsal ? 'Rehearsing' : 'Running'} · {phaseLabel(latestRun.phase)}
+                  {discoveryCompute.job?.status === 'running' ? 'Running on Mini' : 'Queued for Mini'}
                 </span>
               ) : (
                 <span className="pivot-sources__agent-status">Idle</span>
@@ -490,21 +310,8 @@ function PivotTenantSourcesPanel({ tenantKey, cityDisplayName, catalogTags = EMP
             <p className="pivot-sources__agent-meta">
               {running ? (
                 <>
-                  {runCounters.qualified} qualified · {runCounters.rejected} ruled out ·{' '}
-                  {formatClock(runElapsed)} elapsed
-                </>
-              ) : latestRun ? (
-                <>
-                  {latestRun.rehearsal ? 'Last rehearsal' : 'Last run'}
-                  {latestRun.finishedAt ? ` ${formatAgo(latestRun.finishedAt)}` : ''}
-                  {' — '}
-                  {latestRun.aborted
-                    ? latestRun.aborted.error
-                    : latestRun.error
-                      ? latestRun.error
-                      : `${latestRun.counters?.qualified || 0} qualified · ${
-                          latestRun.counters?.eventsUpserted || 0
-                        } events saved`}
+                  The request is stored in the durable queue. This page will confirm when the Mini
+                  collects it, starts execution, and returns a reviewable result.
                 </>
               ) : plan && !planError ? (
                 <>
@@ -529,7 +336,7 @@ function PivotTenantSourcesPanel({ tenantKey, cityDisplayName, catalogTags = EMP
             ) : null}
             {notConfigured ? (
               <p className="pivot-lab__error">
-                FIRECRAWL_API_KEY is not set — rehearse for free, or add a key for a real run.
+                Website discovery is not configured. Add the Firecrawl key or choose Native only.
               </p>
             ) : null}
             {nativeWarning ? (
@@ -541,46 +348,23 @@ function PivotTenantSourcesPanel({ tenantKey, cityDisplayName, catalogTags = EMP
             {planError ? <p className="pivot-lab__error">{planError}</p> : null}
           </div>
           <div className="pivot-sources__agent-actions">
-            {running ? (
-              <button
-                type="button"
-                className="linear-btn linear-btn--secondary linear-btn--icon pivot-sources__stop-btn"
-                onClick={handleStop}
-                disabled={stopping || !latestRun?._id}
-                aria-label={stopping ? 'Stopping' : 'Stop agent'}
-                title={stopping ? 'Stopping…' : 'Stop agent'}
-              >
-                <Icon icon={stopping ? 'mdi:loading' : 'mdi:stop'} aria-hidden="true" />
-              </button>
-            ) : (
-              <button
-                type="button"
-                className="linear-btn linear-btn--primary"
-                onClick={handleDiscover}
-                disabled={starting || running || notConfigured || !tenantKey}
-                title="Find and register sources. Recrawl Luma, Partiful, and saved sites with Refresh all on Saved jobs."
-              >
-                {starting ? 'Starting…' : 'Discover'}
-              </button>
-            )}
+            <button
+              type="button"
+              className="linear-btn linear-btn--primary"
+              onClick={handleDiscover}
+              disabled={starting || running || notConfigured || !tenantKey}
+              title="Create an offloaded discovery job for the Mini."
+            >
+              {starting ? 'Creating job…' : running ? 'Discovery queued' : 'Discover'}
+            </button>
             <button
               type="button"
               className="linear-btn linear-btn--secondary"
-              onClick={handleRehearse}
-              disabled={starting || running || !tenantKey}
-              title="Walk the same pipeline with example hosts — no pages fetched, nothing saved, no credits"
+              disabled
+              title="Rehearsal is temporarily unavailable while discovery is offloaded to the Mini."
             >
               Rehearse
             </button>
-            {latestRun ? (
-              <button
-                type="button"
-                className="linear-btn linear-btn--ghost"
-                onClick={() => openConsole(latestRun._id)}
-              >
-                {running ? 'Watch' : 'Transcript'}
-              </button>
-            ) : null}
             <button
               type="button"
               className="linear-btn linear-btn--ghost"
@@ -727,6 +511,14 @@ function PivotTenantSourcesPanel({ tenantKey, cityDisplayName, catalogTags = EMP
             </div>
           </div>
         ) : null}
+
+        <PivotComputeJobRunStatus
+          job={discoveryCompute.job}
+          wake={discoveryCompute.wake}
+          error={discoveryCompute.error}
+          tenantKey={tenantKey}
+          onJobUpdated={handleDiscoveryJobUpdated}
+        />
       </div>
 
       <div className="pivot-sources__registry">
@@ -866,18 +658,6 @@ function PivotTenantSourcesPanel({ tenantKey, cityDisplayName, catalogTags = EMP
         ) : null}
       </div>
 
-      <Popup
-        isOpen={consoleOpen}
-        onClose={() => setConsoleOpen(false)}
-        customClassName="pivot-discovery-popup"
-      >
-        <PivotDiscoveryConsole
-          tenantKey={tenantKey}
-          runId={consoleRunId}
-          cityDisplayName={cityDisplayName}
-          onFinished={handleRunFinished}
-        />
-      </Popup>
     </section>
   );
 }

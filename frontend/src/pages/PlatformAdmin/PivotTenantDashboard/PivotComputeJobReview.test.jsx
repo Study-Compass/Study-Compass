@@ -396,6 +396,7 @@ describe('PivotComputeJobReview', () => {
           data: {
             idempotencyKey: `apply:${VALID_RESULT.jobId}`,
             preview: VALID_PREVIEW,
+            tenantKey: 'iowacity',
           },
         },
       );

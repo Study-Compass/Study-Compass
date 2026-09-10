@@ -1,9 +1,15 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { authenticatedRequest } from '../../../hooks/useFetch';
+import { authenticatedRequest, useFetch } from '../../../hooks/useFetch';
 import { useNotification } from '../../../NotificationContext';
+import { toIsoWeek } from '../../../utils/pivotIsoWeek';
 import Popup from '../../../components/Popup/Popup';
 import { ComputeResultPreviewPanel } from './PivotComputeJobReview';
-import { formatComputeJobKind, COMPUTE_JOB_KINDS } from './pivotComputeJobsFormat';
+import {
+  formatComputeJobKind,
+  formatComputeJobStatus,
+  formatTimestamp,
+  COMPUTE_JOB_KINDS,
+} from './pivotComputeJobsFormat';
 import {
   buildAdminCreateJobRequest,
   canApplyStoredComputeJob,
@@ -13,7 +19,14 @@ import {
   mutationFeedback,
 } from './pivotComputeJobActions';
 
-export function ComputeJobCreateForm({ tenantKey, onCreated }) {
+const NO_FETCH_CACHE = { enabled: false };
+
+export function ComputeJobCreateForm({
+  tenantKey,
+  onCreated,
+  heading = 'Request compute job',
+  description = 'Enqueue bounded discovery or refresh work for this city. Schedule configuration stays on the Mini.',
+}) {
   const { addNotification } = useNotification();
   const [kind, setKind] = useState('city-source-discovery');
   const [contextVersion, setContextVersion] = useState('');
@@ -95,10 +108,10 @@ export function ComputeJobCreateForm({ tenantKey, onCreated }) {
       data-testid="compute-job-create"
     >
       <h3 id="compute-job-create-heading" className="pivot-compute-jobs__controls-title">
-        Request compute job
+        {heading}
       </h3>
       <p className="pivot-lab__section-hint">
-        Enqueue bounded discovery or refresh work for this city. Schedule configuration stays on the Mini.
+        {description}
       </p>
       <div className="pivot-compute-jobs__create-fields">
         <label className="pivot-compute-jobs__filter">
@@ -192,6 +205,123 @@ export function ComputeJobCreateForm({ tenantKey, onCreated }) {
         </p>
       ) : null}
     </section>
+  );
+}
+
+function tenantOptionLabel(tenant) {
+  return tenant?.location || tenant?.name || tenant?.tenantKey || '';
+}
+
+export function FleetComputeJobCreateForm({ tenants = [], onCreated }) {
+  const [tenantKey, setTenantKey] = useState('');
+  const batchWeek = useMemo(() => toIsoWeek(), []);
+  const tenantOptions = useMemo(() => (tenants || [])
+    .filter((tenant) => tenant?.tenantKey)
+    .slice()
+    .sort((a, b) => tenantOptionLabel(a).localeCompare(tenantOptionLabel(b))), [tenants]);
+  const selectedTenant = tenantOptions.find((tenant) => tenant.tenantKey === tenantKey) || null;
+
+  const {
+    data: lastJobResponse,
+    loading: lastJobLoading,
+    error: lastJobError,
+    refetch: refetchLastJob,
+  } = useFetch(
+    tenantKey ? '/admin/pivot/compute-jobs' : null,
+    {
+      params: { cityKey: tenantKey, limit: 1 },
+      cache: NO_FETCH_CACHE,
+    },
+  );
+  const { data: opsResponse, loading: opsLoading, error: opsError } = useFetch(
+    tenantKey ? `/admin/pivot/tenants/${encodeURIComponent(tenantKey)}/ops` : null,
+    {
+      params: { batchWeek, include: 'overview' },
+      cache: NO_FETCH_CACHE,
+    },
+  );
+
+  const lastJob = lastJobResponse?.jobs?.[0] || null;
+  const overview = opsResponse?.success ? opsResponse.data?.overview : null;
+  const eventCounts = overview?.kpis?.eventCountsByStatus || null;
+  const totalEvents = eventCounts?.total ?? overview?.kpis?.eventCount ?? null;
+  const handleCreated = useCallback((job, metadata) => {
+    refetchLastJob?.({ silent: true });
+    onCreated?.(job, metadata);
+  }, [onCreated, refetchLastJob]);
+
+  return (
+    <div className="pivot-compute-jobs__fleet-create" data-testid="fleet-compute-job-create">
+      <div className="pivot-compute-jobs__fleet-create-head">
+        <div>
+          <span className="pivot-compute-jobs__eyebrow">New run</span>
+          <h2>Choose a city before adding work to the shared queue</h2>
+          <p>Review the city’s current workload and catalog before configuring the job.</p>
+        </div>
+        <label className="pivot-compute-jobs__filter pivot-compute-jobs__tenant-picker">
+          <span>1. Tenant</span>
+          <select
+            aria-label="Job tenant"
+            value={tenantKey}
+            onChange={(event) => setTenantKey(event.target.value)}
+          >
+            <option value="">Select a city</option>
+            {tenantOptions.map((tenant) => (
+              <option key={tenant.tenantKey} value={tenant.tenantKey}>
+                {tenantOptionLabel(tenant)} · {tenant.tenantKey}
+              </option>
+            ))}
+          </select>
+        </label>
+      </div>
+
+      {tenantKey ? (
+        <div className="pivot-compute-jobs__tenant-context" aria-label="Selected tenant context">
+          <div>
+            <span>Tenant</span>
+            <strong>{tenantOptionLabel(selectedTenant) || tenantKey}</strong>
+            <small>{tenantKey}</small>
+          </div>
+          <div>
+            <span>Latest compute job</span>
+            {lastJobLoading ? <strong>Loading…</strong> : lastJob ? (
+              <>
+                <strong>{formatComputeJobStatus(lastJob.status).label}</strong>
+                <small>{formatComputeJobKind(lastJob.kind)} · {formatTimestamp(lastJob.requestedAt || lastJob.createdAt)}</small>
+              </>
+            ) : <strong>{lastJobError ? 'Unavailable' : 'No previous jobs'}</strong>}
+          </div>
+          <div>
+            <span>Current batch</span>
+            <strong>{batchWeek}</strong>
+            <small>{opsLoading
+              ? 'Loading event count…'
+              : opsError || overview?.error
+                ? 'Event count unavailable'
+                : `${totalEvents ?? 0} events total`}</small>
+          </div>
+          <div>
+            <span>Batch status</span>
+            <strong>{eventCounts ? `${eventCounts.published ?? 0} published` : '—'}</strong>
+            <small>{eventCounts
+              ? `${eventCounts.staged ?? 0} staged · ${eventCounts.draft ?? 0} draft${eventCounts.other ? ` · ${eventCounts.other} other` : ''}`
+              : 'Status breakdown unavailable'}</small>
+          </div>
+        </div>
+      ) : (
+        <p className="pivot-compute-jobs__tenant-prompt">Select a tenant to see its latest job and current batch inventory.</p>
+      )}
+
+      {tenantKey ? (
+        <ComputeJobCreateForm
+          key={tenantKey}
+          tenantKey={tenantKey}
+          heading="2. Configure the run"
+          description="Choose the work type and bounds. The resulting job will remain tied to this tenant through execution, review, and apply."
+          onCreated={handleCreated}
+        />
+      ) : null}
+    </div>
   );
 }
 
@@ -321,7 +451,10 @@ function StoredApplyResult({ result, onClose }) {
 
 export function ComputeJobDetailActions({
   job,
+  tenantKey,
   onJobUpdated,
+  allowManagementActions = true,
+  previewButtonLabel = 'Preview stored result',
 }) {
   const { addNotification } = useNotification();
   const [preview, setPreview] = useState(null);
@@ -334,8 +467,8 @@ export function ComputeJobDetailActions({
 
   const externalJobId = job?.externalJobId || '';
   const showPreview = canPreviewStoredComputeJob(job);
-  const showCancel = canCancelComputeJob(job);
-  const showRetry = canRetryComputeJob(job);
+  const showCancel = allowManagementActions && canCancelComputeJob(job);
+  const showRetry = allowManagementActions && canRetryComputeJob(job);
   const applyInProgress = actionLoading === 'apply';
   const showApply = applyInProgress || canApplyStoredComputeJob(job, preview);
 
@@ -427,6 +560,7 @@ export function ComputeJobDetailActions({
         data: {
           idempotencyKey: `apply:${preview.jobId}`,
           preview,
+          tenantKey,
         },
       },
     ));
@@ -455,10 +589,10 @@ export function ComputeJobDetailActions({
     applyConfirmed,
     preview,
     externalJobId,
+    tenantKey,
     onJobUpdated,
     job,
     runMutation,
-    resetPreview,
   ]);
 
   const controls = useMemo(() => {
@@ -493,7 +627,7 @@ export function ComputeJobDetailActions({
             onClick={handlePreview}
             disabled={previewLoading || Boolean(actionLoading)}
           >
-            {previewLoading ? 'Previewing…' : 'Preview stored result'}
+            {previewLoading ? 'Opening…' : previewButtonLabel}
           </button>
         ) : null}
         {showCancel ? (

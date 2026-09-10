@@ -22,7 +22,11 @@ import {
 import './PivotTenantPage.scss';
 import './PivotComputeJobs.scss';
 import PivotComputeJobReview from './PivotComputeJobReview';
-import { ComputeJobCreateForm, ComputeJobDetailActions } from './ComputeJobActions';
+import {
+  ComputeJobCreateForm,
+  ComputeJobDetailActions,
+  FleetComputeJobCreateForm,
+} from './ComputeJobActions';
 
 const NO_FETCH_CACHE = { enabled: false };
 const LIST_POLL_MS = 5000;
@@ -34,6 +38,7 @@ const MAX_ATTEMPTS_SHOWN = 20;
  * Appended after Weekly drop — do not insert earlier pages.
  */
 export const PIVOT_TENANT_COMPUTE_JOBS_PAGE = 10;
+export const PIVOT_FLEET_COMPUTE_JOBS_PAGE = 3;
 
 const STATUS_FILTER_OPTIONS = [
   { value: 'all', label: 'All statuses' },
@@ -85,7 +90,7 @@ function SummaryCard({ label, value, hint, tone = 'neutral' }) {
   );
 }
 
-function ComputeJobListItem({ job, isSelected, nowMs, onSelect }) {
+function ComputeJobListItem({ job, isSelected, nowMs, onSelect, showCity = false }) {
   const progress = formatProgress(job.progress);
   const failure = formatFailure(job.failure, { maxLength: 112 });
   const worker = resolveWorkerId(job);
@@ -119,6 +124,7 @@ function ComputeJobListItem({ job, isSelected, nowMs, onSelect }) {
         ) : null}
 
         <span className="pivot-compute-jobs__job-meta">
+          {showCity ? <span className="pivot-compute-jobs__mono">{job.cityKey || job.tenantKey || 'Unknown city'}</span> : null}
           <span>{age === '—' ? 'Age unavailable' : `${age} ago`}</span>
           <span>Attempt {job.attemptCount ?? job.lease?.attemptNumber ?? 0}</span>
           {worker !== '—' ? <span className="pivot-compute-jobs__mono">{worker}</span> : null}
@@ -323,7 +329,14 @@ function ComputeJobDetail({
   );
 }
 
-function PivotComputeJobs({ tenantKey, cityDisplayName }) {
+function PivotComputeJobs({
+  tenantKey = null,
+  cityDisplayName,
+  scope = 'tenant',
+  pageIndex = PIVOT_TENANT_COMPUTE_JOBS_PAGE,
+  tenants = [],
+}) {
+  const isFleet = scope === 'fleet';
   const [searchParams, setSearchParams] = useSearchParams();
   const [nowMs, setNowMs] = useState(() => Date.now());
   const [detailLoading, setDetailLoading] = useState(false);
@@ -337,13 +350,13 @@ function PivotComputeJobs({ tenantKey, cityDisplayName }) {
 
   const listParams = useMemo(() => {
     const params = {
-      cityKey: tenantKey,
       limit: 50,
     };
+    if (!isFleet && tenantKey) params.cityKey = tenantKey;
     if (statusFilter !== 'all') params.status = statusFilter;
     if (kindFilter !== 'all') params.kind = kindFilter;
     return params;
-  }, [tenantKey, statusFilter, kindFilter]);
+  }, [isFleet, tenantKey, statusFilter, kindFilter]);
 
   const {
     data: listResponse,
@@ -366,12 +379,12 @@ function PivotComputeJobs({ tenantKey, cityDisplayName }) {
       } else {
         next.set(key, value);
       }
-      if (next.get('page') !== String(PIVOT_TENANT_COMPUTE_JOBS_PAGE)) {
-        next.set('page', String(PIVOT_TENANT_COMPUTE_JOBS_PAGE));
+      if (next.get('page') !== String(pageIndex)) {
+        next.set('page', String(pageIndex));
       }
       return next;
     }, { replace: true });
-  }, [setSearchParams]);
+  }, [pageIndex, setSearchParams]);
 
   const selectJob = useCallback((externalJobId) => {
     updateSearchParam('computeJobId', externalJobId);
@@ -386,10 +399,10 @@ function PivotComputeJobs({ tenantKey, cityDisplayName }) {
       const next = new URLSearchParams(current);
       next.delete('computeStatus');
       next.delete('computeKind');
-      next.set('page', String(PIVOT_TENANT_COMPUTE_JOBS_PAGE));
+      next.set('page', String(pageIndex));
       return next;
     }, { replace: true });
-  }, [setSearchParams]);
+  }, [pageIndex, setSearchParams]);
 
   const loadDetail = useCallback(async ({ silent = false } = {}) => {
     if (!selectedJobId) {
@@ -463,7 +476,9 @@ function PivotComputeJobs({ tenantKey, cityDisplayName }) {
       title="Compute jobs"
       tenantKey={tenantKey}
       cityDisplayName={cityDisplayName}
-      subtitle="Offloaded discovery and curation refresh work for this city."
+      subtitle={isFleet
+        ? 'Monitor offloaded discovery and curation refresh work across every city.'
+        : 'Offloaded discovery and curation refresh work for this city.'}
       className="pivot-compute-jobs"
     >
       <section className="pivot-compute-jobs__summary" aria-label="Compute job health">
@@ -474,13 +489,23 @@ function PivotComputeJobs({ tenantKey, cityDisplayName }) {
       </section>
 
       <section className="pivot-compute-jobs__composer pivot-lab__panel" aria-label="Start a compute run">
-        <ComputeJobCreateForm
-          tenantKey={tenantKey}
-          onCreated={(job) => {
-            refetchList({ silent: true });
-            if (job?.externalJobId) selectJob(job.externalJobId);
-          }}
-        />
+        {isFleet ? (
+          <FleetComputeJobCreateForm
+            tenants={tenants}
+            onCreated={(job) => {
+              refetchList({ silent: true });
+              if (job?.externalJobId) selectJob(job.externalJobId);
+            }}
+          />
+        ) : (
+          <ComputeJobCreateForm
+            tenantKey={tenantKey}
+            onCreated={(job) => {
+              refetchList({ silent: true });
+              if (job?.externalJobId) selectJob(job.externalJobId);
+            }}
+          />
+        )}
       </section>
 
       <section className="pivot-compute-jobs__activity" aria-labelledby="compute-jobs-list">
@@ -555,6 +580,7 @@ function PivotComputeJobs({ tenantKey, cityDisplayName }) {
                     job={job}
                     isSelected={job.externalJobId === selectedJobId}
                     nowMs={nowMs}
+                    showCity={isFleet}
                     onSelect={() => selectJob(job.externalJobId)}
                   />
                 ))}
@@ -599,6 +625,7 @@ function PivotComputeJobs({ tenantKey, cityDisplayName }) {
                 />
                 <ComputeJobDetailActions
                   job={detailJob}
+                  tenantKey={isFleet ? detailJob?.tenantKey || detailJob?.cityKey : tenantKey}
                   onJobUpdated={(updatedJob) => {
                     if (updatedJob?.externalJobId === selectedJobId) {
                       setDetailJob(updatedJob);
@@ -624,14 +651,16 @@ function PivotComputeJobs({ tenantKey, cityDisplayName }) {
         Worker credentials and private diagnostics are redacted from this workspace.
       </section>
 
-      <PivotComputeJobReview
-        tenantKey={tenantKey}
-        onSubmitted={() => refetchList({ silent: true })}
-        onApplied={() => {
-          refetchList({ silent: true });
-          if (selectedJobId) loadDetail({ silent: true });
-        }}
-      />
+      {!isFleet ? (
+        <PivotComputeJobReview
+          tenantKey={tenantKey}
+          onSubmitted={() => refetchList({ silent: true })}
+          onApplied={() => {
+            refetchList({ silent: true });
+            if (selectedJobId) loadDetail({ silent: true });
+          }}
+        />
+      ) : null}
     </PivotTenantPage>
   );
 }

@@ -152,9 +152,10 @@ function jobRequestToCreateInput(request, actor) {
 }
 
 async function wakePendingComputeJob(job, notifyWake) {
-  if (!job || job.status !== 'pending') return;
+  if (!job || job.status !== 'pending') return { status: 'not-requested' };
   try {
-    await notifyWake({ externalJobId: job.externalJobId });
+    const wake = await notifyWake({ externalJobId: job.externalJobId });
+    return wake && typeof wake === 'object' ? wake : { status: 'unknown' };
   } catch (error) {
     // Wake is only a latency hint. The durable pending job and periodic worker
     // reconciliation remain authoritative when delivery or injected seams fail.
@@ -162,6 +163,10 @@ async function wakePendingComputeJob(job, notifyWake) {
       code: error?.code || 'COMPUTE_WAKE_FAILED',
       message: error?.message || String(error),
     });
+    return {
+      status: 'failed',
+      code: error?.code || 'COMPUTE_WAKE_FAILED',
+    };
   }
 }
 
@@ -177,8 +182,8 @@ async function createAdminComputeJob(req, {
     ...payload,
     requestedAt: payload.requestedAt || now.toISOString(),
   });
-  await wakePendingComputeJob(job, notifyWake);
-  return { job: serializeAdminJob(job), created };
+  const wake = await wakePendingComputeJob(job, notifyWake);
+  return { job: serializeAdminJob(job), created, wake };
 }
 
 async function listAdminComputeJobs(req, {
@@ -314,6 +319,8 @@ const STATUS_BY_CODE = Object.freeze({
   PREVIEW_REQUIRED: 409,
   PREVIEW_STALE: 409,
   COMPUTE_APPLY_VALIDATION_FAILED: 422,
+  APPLY_TENANT_REQUIRED: 400,
+  COMPUTE_JOB_TENANT_MISMATCH: 409,
   INVALID_COMPUTE_JOB_REQUEST: 400,
   INVALID_COMPUTE_EXECUTION_RESULT: 400,
   INVALID_STATUS_FILTER: 400,

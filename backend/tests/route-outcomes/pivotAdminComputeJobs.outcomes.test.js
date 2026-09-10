@@ -211,6 +211,7 @@ describe('pivotAdminComputeJobs routes outcomes', () => {
     const response = await request(app)
       .post('/admin/pivot/compute-jobs/job:discovery-iowacity-001/apply')
       .send({
+        tenantKey: 'iowacity',
         idempotencyKey: 'apply:discovery-iowacity-001',
         preview,
       });
@@ -222,6 +223,7 @@ describe('pivotAdminComputeJobs routes outcomes', () => {
       'job:discovery-iowacity-001',
       expect.objectContaining({
         idempotencyKey: 'apply:discovery-iowacity-001',
+        tenantKey: 'iowacity',
         preview,
         actor: 'admin@example.com',
       }),
@@ -279,6 +281,7 @@ describe('pivotAdminComputeJobs routes outcomes', () => {
     const response = await request(app)
       .post('/admin/pivot/compute-jobs/job:refresh-iowacity-stale/apply')
       .send({
+        tenantKey: 'iowacity',
         idempotencyKey: 'apply:stale-001',
         preview: loadFixture('result-preview-stale.json'),
       });
@@ -308,6 +311,7 @@ describe('pivotAdminComputeJobs routes outcomes', () => {
     const response = await request(app)
       .post('/admin/pivot/compute-jobs/job:refresh-iowacity-invalid/apply')
       .send({
+        tenantKey: 'iowacity',
         idempotencyKey: 'apply:invalid-001',
         preview: loadFixture('result-preview-valid.json'),
       });

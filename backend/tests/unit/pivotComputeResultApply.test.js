@@ -459,7 +459,16 @@ describe('pivotComputeResultApplyService', () => {
         currentContextVersion: result.basedOnContextVersion,
       });
 
+      await expect(applyStoredComputeJob(req, externalJobId, {
+        tenantKey: 'nyc',
+        idempotencyKey: 'apply:wrong-tenant',
+        preview,
+        actor: 'admin@example.com',
+      })).rejects.toMatchObject({ code: 'COMPUTE_JOB_TENANT_MISMATCH' });
+      expect(await findJobByExternalId(req, externalJobId)).toMatchObject({ status: 'review-required' });
+
       const first = await applyStoredComputeJob(req, externalJobId, {
+        tenantKey: 'iowacity',
         idempotencyKey: 'apply:dup-001',
         preview,
         actor: 'admin@example.com',
@@ -467,6 +476,7 @@ describe('pivotComputeResultApplyService', () => {
       expect(first.job.status).toBe('completed');
 
       const second = await applyStoredComputeJob(req, externalJobId, {
+        tenantKey: 'iowacity',
         idempotencyKey: 'apply:dup-001',
         preview,
         actor: 'admin@example.com',

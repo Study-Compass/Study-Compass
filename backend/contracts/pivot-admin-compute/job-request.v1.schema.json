@@ -21,7 +21,13 @@
         "maxCandidates": { "type": "integer", "minimum": 1, "maximum": 50 },
         "minEvents": { "type": "integer", "minimum": 1, "maximum": 50 },
         "createJobs": { "type": "boolean" },
-        "recheckRejected": { "type": "boolean" }
+        "recheckRejected": { "type": "boolean" },
+        "flow": {
+          "type": "string",
+          "enum": ["native-then-firecrawl", "native-only", "firecrawl-only"]
+        },
+        "lumaSlug": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "partifulSlug": { "type": "string", "minLength": 1, "maxLength": 128 }
       }
     },
     "refreshOptions": {

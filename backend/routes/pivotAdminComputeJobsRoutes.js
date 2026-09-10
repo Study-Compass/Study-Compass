@@ -116,10 +116,11 @@ router.post('/:externalJobId/preview', verifyToken, requirePlatformAdmin, async 
 
 router.post('/:externalJobId/apply', verifyToken, requirePlatformAdmin, async (req, res) => {
   try {
-    rejectUnknownFields(req.body, ['idempotencyKey', 'preview']);
+    rejectUnknownFields(req.body, ['idempotencyKey', 'preview', 'tenantKey']);
     const payload = await applyStoredComputeJob(req, req.params.externalJobId, {
       idempotencyKey: req.body?.idempotencyKey,
       preview: req.body?.preview,
+      tenantKey: req.body?.tenantKey,
       actor: actorFromRequest(req),
       now: new Date(),
     });

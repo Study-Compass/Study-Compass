@@ -45,6 +45,7 @@ describe('pivotComputeAdminService', () => {
     });
     expect(created.created).toBe(true);
     expect(created.job.status).toBe('pending');
+    expect(created.wake).toEqual({ status: 'accepted' });
     expect(notifyWake).toHaveBeenCalledWith({ externalJobId: jobRequest.jobId });
 
     const listed = await listAdminComputeJobs(req, { cityKey: 'iowacity' });
@@ -62,6 +63,7 @@ describe('pivotComputeAdminService', () => {
 
     expect(created.created).toBe(true);
     expect(created.job.status).toBe('pending');
+    expect(created.wake).toEqual({ status: 'failed', code: 'COMPUTE_WAKE_FAILED' });
   });
 
   it('submits manual results for review and preserves duplicate idempotency', async () => {

@@ -61,6 +61,84 @@
     padding: 16px 18px;
   }
 
+  .pivot-compute-jobs__fleet-create {
+    display: grid;
+    gap: 18px;
+  }
+
+  .pivot-compute-jobs__fleet-create-head {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(260px, 360px);
+    gap: 24px;
+    align-items: end;
+
+    h2 {
+      margin: 2px 0 4px;
+      color: var(--pivot-ops-ink);
+      font-size: 18px;
+      font-weight: 650;
+      letter-spacing: -0.01em;
+    }
+
+    p {
+      margin: 0;
+      color: var(--pivot-ops-ink-muted);
+      font-size: 13px;
+    }
+  }
+
+  .pivot-compute-jobs__tenant-picker select {
+    width: 100%;
+  }
+
+  .pivot-compute-jobs__tenant-context {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    border-block: 1px solid var(--pivot-ops-border);
+
+    > div {
+      display: grid;
+      align-content: start;
+      gap: 3px;
+      min-width: 0;
+      padding: 13px 16px;
+    }
+
+    > div + div { border-left: 1px solid var(--pivot-ops-border); }
+
+    span {
+      color: var(--pivot-ops-ink-soft);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    strong {
+      color: var(--pivot-ops-ink);
+      font-size: 14px;
+      font-weight: 650;
+    }
+
+    small {
+      color: var(--pivot-ops-ink-muted);
+      font-size: 11px;
+      line-height: 1.35;
+    }
+  }
+
+  .pivot-compute-jobs__tenant-prompt {
+    margin: 0;
+    padding: 16px;
+    border-block: 1px solid var(--pivot-ops-border);
+    color: var(--pivot-ops-ink-muted);
+    font-size: 13px;
+  }
+
+  .pivot-compute-jobs__fleet-create > .pivot-compute-jobs__create {
+    padding-top: 2px;
+  }
+
   .pivot-compute-jobs__activity {
     margin-bottom: 12px;
   }
@@ -577,6 +655,9 @@
   .pivot-compute-jobs {
     .pivot-compute-jobs__workspace { grid-template-columns: 1fr; }
     .pivot-compute-jobs__inspector { position: static; max-height: none; }
+    .pivot-compute-jobs__tenant-context { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .pivot-compute-jobs__tenant-context > div:nth-child(3) { border-left: 0; }
+    .pivot-compute-jobs__tenant-context > div:nth-child(n + 3) { border-top: 1px solid var(--pivot-ops-border); }
   }
 }
 
@@ -589,6 +670,9 @@
     .pivot-compute-jobs__filter--inline select { min-width: 0; width: 100%; }
     .pivot-compute-jobs__detail-grid { grid-template-columns: 1fr; }
     .pivot-compute-jobs__job-ids { grid-column: auto; }
+    .pivot-compute-jobs__fleet-create-head { grid-template-columns: 1fr; }
+    .pivot-compute-jobs__tenant-context { grid-template-columns: 1fr; }
+    .pivot-compute-jobs__tenant-context > div + div { border-left: 0; border-top: 1px solid var(--pivot-ops-border); }
   }
 }
 
