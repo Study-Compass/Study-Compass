@@ -89,7 +89,7 @@ function serializeEventIdentity(eventDoc) {
     id: String(row._id || ''),
     sourceUrl,
     name,
-    startTime: row.startTime instanceof Date ? row.startTime.toISOString() : isoTimestamp(row.startTime),
+    startTime: row.start_time instanceof Date ? row.start_time.toISOString() : isoTimestamp(row.start_time),
     batchWeek: trimString(row?.customFields?.pivot?.batchWeek) || null,
     location: trimString(row?.location) || null,
     tags: sortedStrings(row?.customFields?.pivot?.tags),
@@ -133,11 +133,241 @@ function eventProposalMaterial(proposal) {
     draft: {
       name: draft.name,
       description: draft.description ?? null,
+      image: draft.image ?? null,
       location: draft.location ?? null,
+      rawLocationText: draft.rawLocationText ?? null,
       start_time: draft.start_time,
       end_time: draft.end_time ?? null,
+      hostName: draft.hostName ?? null,
+      hostProfileUrl: draft.hostProfileUrl ?? null,
       tags: sortedStrings(draft.tags),
     },
+  };
+}
+
+function boundedReviewValue(value) {
+  if (value == null) return null;
+  if (Array.isArray(value)) return value.slice(0, 12).map((item) => boundedReviewValue(item));
+  if (typeof value === 'string') return value.length > 240 ? `${value.slice(0, 237)}…` : value;
+  if (typeof value === 'number' || typeof value === 'boolean') return value;
+  return null;
+}
+
+function materialChanges(currentMaterial, proposalMaterial) {
+  const current = currentMaterial?.draft || {};
+  const proposed = proposalMaterial?.draft || {};
+  const fields = [
+    'name',
+    'start_time',
+    'end_time',
+    'location',
+    'rawLocationText',
+    'hostName',
+    'hostProfileUrl',
+    'tags',
+    'image',
+    'description',
+  ];
+  const changes = [];
+  if (currentMaterial?.batchWeek !== proposalMaterial?.batchWeek) {
+    changes.push({
+      field: 'batchWeek',
+      before: boundedReviewValue(currentMaterial?.batchWeek),
+      after: boundedReviewValue(proposalMaterial?.batchWeek),
+    });
+  }
+  for (const field of fields) {
+    if (JSON.stringify(current[field] ?? null) === JSON.stringify(proposed[field] ?? null)) continue;
+    changes.push({
+      field,
+      before: boundedReviewValue(current[field]),
+      after: boundedReviewValue(proposed[field]),
+    });
+  }
+  return changes;
+}
+
+function buildComputeReview(result, identities, preview, now = new Date()) {
+  const rowByKey = new Map(preview.rows.map((row) => [row.key, row]));
+  const jobGroups = new Map();
+  const attention = [];
+  const impact = {
+    eventCreates: 0,
+    eventUpdates: 0,
+    publishedEventUpdates: 0,
+    stagedEventUpdates: 0,
+    unchangedEvents: 0,
+    sourceMutations: preview.rows.filter((row) => row.entityType === 'source'
+      && (row.action === 'create' || row.action === 'update')).length,
+    curationJobMutations: result.kind === 'city-source-discovery'
+      ? preview.rows.filter((row) => row.entityType === 'curationJob'
+        && (row.action === 'create' || row.action === 'update')).length
+      : 0,
+  };
+
+  for (const proposal of result.proposals?.events || []) {
+    const key = eventRowKey(proposal.sourceUrl);
+    const row = rowByKey.get(key);
+    const currentDoc = identities.eventDocBySourceUrl.get(proposal.sourceUrl) || null;
+    const currentMaterial = currentDoc ? eventDocToProposalMaterial(currentDoc) : null;
+    const proposalMaterial = eventProposalMaterial(proposal);
+    const ingestStatus = trimString(currentDoc?.customFields?.pivot?.ingestStatus) || null;
+    const job = proposal.linkedJobId ? identities.jobById.get(proposal.linkedJobId) : null;
+    const groupKey = proposal.linkedJobId || proposal.evidence?.discoveredFromHost || 'unattributed';
+    const group = jobGroups.get(groupKey) || {
+      key: groupKey,
+      jobId: proposal.linkedJobId || null,
+      label: job?.label || proposal.evidence?.discoveredFromHost || 'Unattributed events',
+      provider: job?.provider || proposal.evidence?.provider || null,
+      host: job?.linkedSourceHost || proposal.evidence?.discoveredFromHost || null,
+      creates: 0,
+      updates: 0,
+      unchanged: 0,
+      attention: 0,
+      samples: [],
+    };
+    if (row?.action === 'create') {
+      impact.eventCreates += 1;
+      group.creates += 1;
+    } else if (row?.action === 'update') {
+      impact.eventUpdates += 1;
+      group.updates += 1;
+      if (ingestStatus === 'published') impact.publishedEventUpdates += 1;
+      else impact.stagedEventUpdates += 1;
+    } else if (row?.action === 'unchanged') {
+      impact.unchangedEvents += 1;
+      group.unchanged += 1;
+    }
+    if (group.samples.length < 3 && row?.action !== 'unchanged') {
+      group.samples.push({
+        title: proposal.draft?.name || proposal.sourceUrl,
+        start: proposal.draft?.start_time || null,
+        action: row?.action || null,
+        sourceUrl: proposal.sourceUrl,
+      });
+    }
+
+    const changes = currentMaterial ? materialChanges(currentMaterial, proposalMaterial) : [];
+    const proposedStart = Date.parse(proposal.draft?.start_time);
+    let risk = null;
+    if (row?.action === 'stale' || row?.action === 'conflict') {
+      risk = {
+        code: row.action === 'stale' ? 'STALE_EVENT' : 'EVENT_CONFLICT',
+        severity: 'high',
+        message: row.message || 'Production no longer matches the worker snapshot.',
+      };
+    } else if (row?.action === 'update' && ingestStatus === 'published') {
+      risk = {
+        code: 'PUBLISHED_EVENT_UPDATE',
+        severity: 'high',
+        message: 'Applying this row changes an event that is already visible in the feed.',
+      };
+    } else if (Number.isFinite(proposedStart) && proposedStart < now.getTime()) {
+      risk = {
+        code: 'PAST_EVENT',
+        severity: 'attention',
+        message: 'The proposed event start is already in the past.',
+      };
+    } else if (row?.action === 'update' && changes.some((change) => [
+      'name', 'start_time', 'end_time', 'location', 'batchWeek',
+    ].includes(change.field))) {
+      risk = {
+        code: 'MATERIAL_EVENT_UPDATE',
+        severity: 'attention',
+        message: 'This update changes identity, time, week, or location fields.',
+      };
+    }
+    if (risk) {
+      group.attention += 1;
+      attention.push({
+        ...risk,
+        key,
+        title: proposal.draft?.name || proposal.sourceUrl,
+        sourceUrl: proposal.sourceUrl,
+        jobId: proposal.linkedJobId || null,
+        jobLabel: group.label,
+        provider: group.provider,
+        ingestStatus,
+        changes: changes.slice(0, 12),
+      });
+    }
+    jobGroups.set(groupKey, group);
+  }
+
+  for (const group of jobGroups.values()) {
+    const mutationCount = group.creates + group.updates;
+    if (mutationCount < 50) continue;
+    group.attention += 1;
+    attention.push({
+      code: 'HIGH_VOLUME_SOURCE',
+      severity: 'attention',
+      key: `group:${group.key}`,
+      title: group.label,
+      sourceUrl: group.host ? `https://${group.host}` : null,
+      jobId: group.jobId,
+      jobLabel: group.label,
+      provider: group.provider,
+      ingestStatus: null,
+      message: `${mutationCount} event mutations came from this curation job. Review its source health and sample its dates before applying.`,
+      changes: [],
+      samples: group.samples,
+    });
+  }
+
+  const outcomes = (result.proposals?.jobOutcomes || []).map((outcome) => {
+    const job = identities.jobById.get(outcome.jobId) || null;
+    const row = rowByKey.get(curationJobRowKey({ jobId: outcome.jobId }));
+    const entry = {
+      jobId: outcome.jobId,
+      label: job?.label || outcome.jobId,
+      provider: job?.provider || null,
+      host: job?.linkedSourceHost || null,
+      outcome: outcome.outcome,
+      message: outcome.failure?.message || row?.message || null,
+    };
+    if (outcome.outcome !== 'completed') {
+      attention.push({
+        code: 'CURATION_JOB_INCOMPLETE',
+        severity: 'high',
+        key: `jobId:${outcome.jobId}`,
+        title: entry.label,
+        jobId: outcome.jobId,
+        jobLabel: entry.label,
+        provider: entry.provider,
+        sourceUrl: null,
+        ingestStatus: null,
+        message: entry.message || `Curation job ${outcome.outcome}.`,
+        changes: [],
+      });
+    }
+    return entry;
+  });
+
+  const starts = (result.proposals?.events || [])
+    .map((proposal) => proposal.draft?.start_time)
+    .filter((value) => !Number.isNaN(Date.parse(value)))
+    .sort();
+
+  return {
+    executionSummary: result.summary || {},
+    timezone: trimString(identities.tenant?.pivotDropTimezone) || 'UTC',
+    impact,
+    sourceHealth: {
+      completed: outcomes.filter((row) => row.outcome === 'completed').length,
+      failed: outcomes.filter((row) => row.outcome === 'failed').length,
+      skipped: outcomes.filter((row) => row.outcome === 'skipped').length,
+      outcomes,
+    },
+    eventWindow: {
+      earliestStart: starts[0] || null,
+      latestStart: starts[starts.length - 1] || null,
+    },
+    attention: attention.slice(0, 500),
+    attentionTotal: attention.length,
+    groups: [...jobGroups.values()].sort((a, b) =>
+      (b.attention - a.attention)
+      || ((b.creates + b.updates) - (a.creates + a.updates))
+      || a.label.localeCompare(b.label)),
   };
 }
 
@@ -360,9 +590,13 @@ function eventDocToProposalMaterial(eventDoc) {
     draft: {
       name: row?.name,
       description: row?.description ?? null,
+      image: row?.image ?? null,
       location: row?.location ?? null,
-      start_time: row?.startTime instanceof Date ? row.startTime.toISOString() : row?.startTime,
-      end_time: row?.endTime instanceof Date ? row.endTime.toISOString() : row?.endTime ?? null,
+      rawLocationText: row?.customFields?.pivot?.rawLocationText ?? null,
+      start_time: row?.start_time instanceof Date ? row.start_time.toISOString() : row?.start_time,
+      end_time: row?.end_time instanceof Date ? row.end_time.toISOString() : row?.end_time ?? null,
+      hostName: row?.customFields?.pivot?.host?.name ?? null,
+      hostProfileUrl: row?.customFields?.pivot?.host?.profileUrl ?? null,
       tags: row?.customFields?.pivot?.tags,
     },
   });
@@ -515,6 +749,25 @@ async function previewComputeResult(req, resultInput, {
   return buildPreviewEnvelope(result, contextVersion, rows, now);
 }
 
+async function previewComputeResultWithReview(req, resultInput, {
+  currentContextVersion = null,
+  now = new Date(),
+  authorize = null,
+} = {}) {
+  const result = validateComputeExecutionResult(resultInput);
+  const contextVersion = currentContextVersion
+    || await resolveCurrentContextVersion(req, result, { authorize });
+  const identities = await loadProductionIdentities(req, result);
+  const rows = result.kind === 'city-curation-refresh'
+    ? previewRefreshProposals(result, identities)
+    : previewDiscoveryProposals(result, identities);
+  const preview = buildPreviewEnvelope(result, contextVersion, rows, now);
+  return {
+    preview,
+    review: buildComputeReview(result, identities, preview, now),
+  };
+}
+
 async function applySourceRow(req, result, proposal) {
   const { persistOutcome } = require('./pivotSourceDiscoveryService');
   const outcome = {
@@ -652,8 +905,12 @@ async function previewStoredComputeJob(req, externalJobId, options = {}) {
   if (!job.result?.embedded) {
     throw serviceError('Compute job has no stored result to preview.', 'COMPUTE_JOB_RESULT_MISSING', 409);
   }
-  const preview = await previewComputeResult(req, job.result.embedded, options);
-  return { job, preview };
+  const { preview, review } = await previewComputeResultWithReview(
+    req,
+    job.result.embedded,
+    options,
+  );
+  return { job, preview, review };
 }
 
 async function applyStoredComputeJob(req, externalJobId, {
@@ -727,6 +984,7 @@ module.exports = {
   classifyVersionedProposal,
   summarizePreviewRows,
   buildPreviewEnvelope,
+  buildComputeReview,
   validateComputeExecutionResult,
   previewComputeResult,
   previewStoredComputeJob,

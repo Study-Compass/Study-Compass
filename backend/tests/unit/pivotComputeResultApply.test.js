@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const {
   classifyVersionedProposal,
   summarizePreviewRows,
+  buildComputeReview,
   validateComputeExecutionResult,
   previewComputeResult,
   applyComputeResult,
@@ -155,6 +156,121 @@ describe('pivotComputeResultApplyService', () => {
   });
 
   describe('previewComputeResult', () => {
+    it('surfaces published mutations, field changes, and incomplete curation jobs', () => {
+      const result = loadFixture('result-refresh-valid-completed.json');
+      result.proposals.jobOutcomes[0] = {
+        ...result.proposals.jobOutcomes[0],
+        outcome: 'failed',
+        failure: { code: 'SCRAPE_FAILED', message: 'Provider timed out.' },
+      };
+      const proposal = result.proposals.events[0];
+      const preview = {
+        rows: [
+          {
+            entityType: 'curationJob',
+            action: 'rejected',
+            key: `jobId:${result.proposals.jobOutcomes[0].jobId}`,
+            message: 'Provider timed out.',
+          },
+          {
+            entityType: 'event',
+            action: 'update',
+            key: `sourceUrl:${proposal.sourceUrl}`,
+          },
+        ],
+      };
+      const currentEvent = {
+        name: 'Old meetup name',
+        start_time: new Date('2026-09-09T23:00:00.000Z'),
+        end_time: new Date('2026-09-10T01:00:00.000Z'),
+        location: 'Old venue',
+        description: null,
+        customFields: {
+          pivot: {
+            sourceUrl: proposal.sourceUrl,
+            batchWeek: proposal.batchWeek,
+            ingestStatus: 'published',
+            tags: ['community'],
+            rawLocationText: 'Old venue, Iowa City',
+            host: {
+              name: 'Old host',
+              profileUrl: 'https://luma.com/user/old',
+            },
+          },
+        },
+      };
+      const identities = {
+        tenant: { pivotDropTimezone: 'America/Chicago' },
+        eventDocBySourceUrl: new Map([[proposal.sourceUrl, currentEvent]]),
+        jobById: new Map([[proposal.linkedJobId, {
+          jobId: proposal.linkedJobId,
+          label: 'Luma Iowa City',
+          provider: 'luma',
+          linkedSourceHost: 'luma.com',
+        }]]),
+      };
+
+      const review = buildComputeReview(result, identities, preview, new Date('2026-09-08T20:00:00.000Z'));
+
+      expect(review.impact).toMatchObject({
+        eventUpdates: 1,
+        publishedEventUpdates: 1,
+        eventCreates: 0,
+      });
+      expect(review.sourceHealth.failed).toBe(1);
+      expect(review.timezone).toBe('America/Chicago');
+      expect(review.attention).toEqual(expect.arrayContaining([
+        expect.objectContaining({ code: 'PUBLISHED_EVENT_UPDATE', title: 'Community Meetup' }),
+        expect.objectContaining({ code: 'CURATION_JOB_INCOMPLETE', title: 'Luma Iowa City' }),
+      ]));
+      expect(review.attention.find((row) => row.code === 'PUBLISHED_EVENT_UPDATE').changes)
+        .toEqual(expect.arrayContaining([expect.objectContaining({ field: 'name' })]));
+    });
+
+    it('flags source groups with a large production blast radius', () => {
+      const result = loadFixture('result-refresh-valid-completed.json');
+      const template = result.proposals.events[0];
+      result.proposals.events = Array.from({ length: 50 }, (_, index) => ({
+        ...template,
+        sourceUrl: `https://luma.com/iowa-city/event-${index}`,
+        draft: {
+          ...template.draft,
+          sourceUrl: `https://luma.com/iowa-city/event-${index}`,
+        },
+        basedOnEventVersion: null,
+      }));
+      const preview = {
+        rows: result.proposals.events.map((proposal) => ({
+          entityType: 'event',
+          action: 'create',
+          key: `sourceUrl:${proposal.sourceUrl}`,
+        })),
+      };
+      const identities = {
+        tenant: { pivotDropTimezone: 'America/Chicago' },
+        eventDocBySourceUrl: new Map(),
+        jobById: new Map([[template.linkedJobId, {
+          jobId: template.linkedJobId,
+          label: 'Luma Iowa City',
+          provider: 'luma',
+          linkedSourceHost: 'luma.com',
+        }]]),
+      };
+
+      const review = buildComputeReview(result, identities, preview, new Date('2026-09-08T20:00:00.000Z'));
+
+      expect(review.attention).toEqual(expect.arrayContaining([
+        expect.objectContaining({
+          code: 'HIGH_VOLUME_SOURCE',
+          title: 'Luma Iowa City',
+          message: expect.stringContaining('50 event mutations'),
+        }),
+      ]));
+      expect(review.groups[0]).toMatchObject({ creates: 50, attention: 1 });
+      expect(review.attention.find((row) => row.code === 'HIGH_VOLUME_SOURCE').samples)
+        .toHaveLength(3);
+    });
+
     it('builds an applyable discovery preview against empty production state', async () => {
       const result = loadFixture('result-discovery-valid-completed.json');
       const preview = await previewComputeResult(req, result, {

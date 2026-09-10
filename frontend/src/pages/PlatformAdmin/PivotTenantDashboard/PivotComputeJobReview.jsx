@@ -45,7 +45,220 @@ function SummaryGrid({ title, entries }) {
   );
 }
 
-export function ComputeResultPreviewPanel({ preview, parsedResult }) {
+function formatReviewValue(value) {
+  if (value == null || value === '') return '—';
+  if (Array.isArray(value)) return value.join(', ') || '—';
+  return String(value);
+}
+
+function formatReviewTimestamp(value, timeZone) {
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) return '—';
+  try {
+    return parsed.toLocaleString([], timeZone ? { timeZone, timeZoneName: 'short' } : undefined);
+  } catch {
+    return formatTimestamp(value);
+  }
+}
+
+function PreviewRowsTable({ rows }) {
+  return (
+    <div className="pivot-lab__table-wrap">
+      <table className="pivot-lab__table pivot-compute-review__rows-table" aria-label="Preview rows">
+        <thead>
+          <tr>
+            <th scope="col">Entity</th>
+            <th scope="col">Action</th>
+            <th scope="col">Key</th>
+            <th scope="col">Based on</th>
+            <th scope="col">Current</th>
+            <th scope="col">Message</th>
+            <th scope="col">Evidence</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((row) => (
+            <tr key={`${row.entityType}:${row.key}:${row.action}`}>
+              <td>{formatPreviewEntityType(row.entityType)}</td>
+              <td><PreviewActionPill action={row.action} /></td>
+              <td className="pivot-compute-jobs__mono">{row.key}</td>
+              <td className="pivot-compute-jobs__mono">{row.basedOnRecordVersion || '—'}</td>
+              <td className="pivot-compute-jobs__mono">{row.currentRecordVersion || '—'}</td>
+              <td>{row.message || '—'}</td>
+              <td>{formatEvidence(row.evidence)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+function ExceptionDrivenReview({ review }) {
+  const impact = review?.impact || {};
+  const sourceHealth = review?.sourceHealth || {};
+  const attention = Array.isArray(review?.attention) ? review.attention : [];
+  const groups = Array.isArray(review?.groups) ? review.groups : [];
+  const visibleAttention = attention.slice(0, 100);
+
+  return (
+    <div className="pivot-compute-review__risk-review" data-testid="compute-risk-review">
+      <SummaryGrid
+        title="What will change in production"
+        entries={[
+          ['New staged events', impact.eventCreates ?? 0],
+          ['Existing event updates', impact.eventUpdates ?? 0],
+          ['Published events affected', impact.publishedEventUpdates ?? 0],
+          ['Staged/draft events affected', impact.stagedEventUpdates ?? 0],
+          ['Source changes', impact.sourceMutations ?? 0],
+          ['Curation job changes', impact.curationJobMutations ?? 0],
+        ]}
+      />
+
+      <SummaryGrid
+        title="Curation run health"
+        entries={[
+          ['Completed jobs', sourceHealth.completed ?? 0],
+          ['Failed jobs', sourceHealth.failed ?? 0],
+          ['Skipped jobs', sourceHealth.skipped ?? 0],
+          ['Events unchanged', impact.unchangedEvents ?? 0],
+        ]}
+      />
+
+      <div className="pivot-compute-review__window">
+        <strong>Event window</strong>
+        <span>
+          {review?.eventWindow?.earliestStart
+            ? [
+              formatReviewTimestamp(review.eventWindow.earliestStart, review.timezone),
+              formatReviewTimestamp(review.eventWindow.latestStart, review.timezone),
+            ].join(' → ')
+            : 'No event dates proposed'}
+          {review?.timezone ? ` · ${review.timezone}` : ''}
+        </span>
+      </div>
+
+      <section className="pivot-compute-review__attention" aria-label="Needs attention">
+        <div className="pivot-compute-review__section-heading">
+          <h4>Needs attention</h4>
+          <span className="pivot-lab__pill pivot-lab__pill--warn">
+            {review?.attentionTotal ?? attention.length}
+          </span>
+        </div>
+        {visibleAttention.length === 0 ? (
+          <p className="pivot-compute-review__ready">
+            No published-event changes, incomplete sources, temporal anomalies, stale rows, or conflicts detected.
+          </p>
+        ) : (
+          <div className="pivot-compute-review__attention-list">
+            {visibleAttention.map((item, index) => (
+              <article
+                key={`${item.code}:${item.key}:${index}`}
+                className={`pivot-compute-review__attention-card is-${item.severity || 'attention'}`}
+              >
+                <div className="pivot-compute-review__attention-header">
+                  <div>
+                    <span className="pivot-compute-review__risk-code">{item.code}</span>
+                    <h5>{item.title}</h5>
+                  </div>
+                  <span className="pivot-lab__pill pivot-lab__pill--warn">
+                    {item.ingestStatus || item.provider || 'review'}
+                  </span>
+                </div>
+                <p>{item.message}</p>
+                <p className="pivot-lab__section-hint">
+                  {[item.jobLabel, item.sourceUrl].filter(Boolean).join(' · ')}
+                </p>
+                {item.changes?.length ? (
+                  <dl className="pivot-compute-review__changes">
+                    {item.changes.map((change) => (
+                      <div key={change.field}>
+                        <dt>{change.field}</dt>
+                        <dd>
+                          <span>{formatReviewValue(change.before)}</span>
+                          <span aria-hidden="true">→</span>
+                          <strong>{formatReviewValue(change.after)}</strong>
+                        </dd>
+                      </div>
+                    ))}
+                  </dl>
+                ) : null}
+                {item.samples?.length ? (
+                  <ul className="pivot-compute-review__samples" aria-label={`${item.title} sample events`}>
+                    {item.samples.map((sample) => (
+                      <li key={sample.sourceUrl}>
+                        <strong>{sample.title}</strong>
+                        <span>
+                          {sample.action || 'proposed'}
+                          {' · '}
+                          {formatReviewTimestamp(sample.start, review.timezone)}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                ) : null}
+              </article>
+            ))}
+          </div>
+        )}
+        {(review?.attentionTotal ?? 0) > visibleAttention.length ? (
+          <p className="pivot-lab__section-hint">
+            Showing the first {visibleAttention.length} of {review.attentionTotal} attention items.
+          </p>
+        ) : null}
+      </section>
+
+      <details className="pivot-compute-review__routine">
+        <summary>Routine changes by curation job ({groups.length})</summary>
+        {groups.length ? (
+          <div className="pivot-lab__table-wrap">
+            <table className="pivot-lab__table" aria-label="Routine changes by curation job">
+              <thead>
+                <tr>
+                  <th scope="col">Curation job</th>
+                  <th scope="col">Provider</th>
+                  <th scope="col">New</th>
+                  <th scope="col">Updates</th>
+                  <th scope="col">Unchanged</th>
+                  <th scope="col">Attention</th>
+                  <th scope="col">Sample</th>
+                </tr>
+              </thead>
+              <tbody>
+                {groups.map((group) => (
+                  <tr key={group.key}>
+                    <td>{group.label}</td>
+                    <td>{group.provider || '—'}</td>
+                    <td>{group.creates}</td>
+                    <td>{group.updates}</td>
+                    <td>{group.unchanged}</td>
+                    <td>{group.attention}</td>
+                    <td>{group.samples?.map((sample) => sample.title).join(' · ') || '—'}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : <p className="pivot-lab__empty">No event groups returned.</p>}
+      </details>
+
+      <p className="pivot-lab__section-hint">
+        Refresh curation-job outcomes are health signals only; applying this result does not modify those job records.
+      </p>
+      <p className="pivot-lab__section-hint">
+        Proposed creates use exact source URLs in this preview. Production ingest performs its final duplicate
+        checks during apply, so a create can still resolve to an existing event or fail validation.
+      </p>
+      {impact.publishedEventUpdates > 0 ? (
+        <p className="pivot-compute-review__blocked" role="alert">
+          Applying will immediately change {impact.publishedEventUpdates} published event{impact.publishedEventUpdates === 1 ? '' : 's'}.
+        </p>
+      ) : null}
+    </div>
+  );
+}
+
+export function ComputeResultPreviewPanel({ preview, parsedResult, review = null }) {
   const { rows, total, truncated } = visiblePreviewRows(preview);
 
   return (
@@ -63,11 +276,19 @@ export function ComputeResultPreviewPanel({ preview, parsedResult }) {
 
       <SummaryGrid
         title="Worker diagnostic summary"
-        entries={formatExecutionSummary(parsedResult)}
+        entries={formatExecutionSummary(parsedResult || (
+          review ? { kind: preview.kind, summary: review.executionSummary } : null
+        ))}
       />
       <SummaryGrid
-        title="Application preview summary"
-        entries={formatPreviewSummary(preview.summary)}
+        title={review ? 'Safety checks' : 'Application preview summary'}
+        entries={review
+          ? [
+            ['Conflicts', preview.summary?.conflicts ?? 0],
+            ['Stale', preview.summary?.stale ?? 0],
+            ['Rejected', preview.summary?.rejected ?? 0],
+          ]
+          : formatPreviewSummary(preview.summary)}
       />
 
       {!preview.applyAllowed ? (
@@ -80,37 +301,17 @@ export function ComputeResultPreviewPanel({ preview, parsedResult }) {
         </p>
       )}
 
+      {review ? <ExceptionDrivenReview review={review} /> : null}
+
       {rows.length === 0 ? (
         <p className="pivot-lab__empty">No preview rows returned.</p>
+      ) : review ? (
+        <details className="pivot-compute-review__raw-rows">
+          <summary>Raw mutation rows ({total})</summary>
+          <PreviewRowsTable rows={rows} />
+        </details>
       ) : (
-        <div className="pivot-lab__table-wrap">
-          <table className="pivot-lab__table pivot-compute-review__rows-table" aria-label="Preview rows">
-            <thead>
-              <tr>
-                <th scope="col">Entity</th>
-                <th scope="col">Action</th>
-                <th scope="col">Key</th>
-                <th scope="col">Based on</th>
-                <th scope="col">Current</th>
-                <th scope="col">Message</th>
-                <th scope="col">Evidence</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((row) => (
-                <tr key={`${row.entityType}:${row.key}:${row.action}`}>
-                  <td>{formatPreviewEntityType(row.entityType)}</td>
-                  <td><PreviewActionPill action={row.action} /></td>
-                  <td className="pivot-compute-jobs__mono">{row.key}</td>
-                  <td className="pivot-compute-jobs__mono">{row.basedOnRecordVersion || '—'}</td>
-                  <td className="pivot-compute-jobs__mono">{row.currentRecordVersion || '—'}</td>
-                  <td>{row.message || '—'}</td>
-                  <td>{formatEvidence(row.evidence)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <PreviewRowsTable rows={rows} />
       )}
 
       {truncated ? (

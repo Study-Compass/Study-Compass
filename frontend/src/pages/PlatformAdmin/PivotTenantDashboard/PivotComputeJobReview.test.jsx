@@ -212,6 +212,83 @@ describe('PivotComputeJobReview', () => {
     expect(within(preview).getAllByText(/example-theatre.org\/events\/show-1/).length).toBeGreaterThan(0);
   });
 
+  it('prioritizes production impact and exceptions while collapsing raw rows', () => {
+    const review = {
+      executionSummary: { jobsRun: 28, jobsFailed: 1, eventsProposed: 474, eventsRefreshed: 40 },
+      impact: {
+        eventCreates: 434,
+        eventUpdates: 40,
+        publishedEventUpdates: 3,
+        stagedEventUpdates: 37,
+        unchangedEvents: 0,
+        sourceMutations: 0,
+        curationJobMutations: 0,
+      },
+      sourceHealth: { completed: 27, failed: 1, skipped: 0, outcomes: [] },
+      eventWindow: {
+        earliestStart: '2026-09-09T20:00:00.000Z',
+        latestStart: '2026-10-01T20:00:00.000Z',
+      },
+      timezone: 'America/Chicago',
+      attentionTotal: 2,
+      attention: [
+        {
+          code: 'PUBLISHED_EVENT_UPDATE',
+          severity: 'high',
+          key: 'sourceUrl:https://luma.com/event-1',
+          title: 'Community Meetup',
+          sourceUrl: 'https://luma.com/event-1',
+          jobLabel: 'Luma',
+          provider: 'luma',
+          ingestStatus: 'published',
+          message: 'Applying this row changes an event that is already visible in the feed.',
+          changes: [{ field: 'start_time', before: 'September 9', after: 'September 10' }],
+        },
+        {
+          code: 'HIGH_VOLUME_SOURCE',
+          severity: 'attention',
+          key: 'group:luma',
+          title: 'Luma',
+          provider: 'luma',
+          message: '474 event mutations came from this curation job.',
+          changes: [],
+          samples: [{
+            title: 'Sample dance night',
+            action: 'create',
+            start: '2026-09-12T01:00:00.000Z',
+            sourceUrl: 'https://luma.com/sample-dance-night',
+          }],
+        },
+      ],
+      groups: [{
+        key: 'luma',
+        label: 'Luma',
+        provider: 'luma',
+        creates: 434,
+        updates: 40,
+        unchanged: 0,
+        attention: 1,
+        samples: [{ title: 'Sample dance night' }],
+      }],
+    };
+
+    render(<ComputeResultPreviewPanel preview={VALID_PREVIEW} parsedResult={null} review={review} />);
+
+    const risk = screen.getByTestId('compute-risk-review');
+    expect(risk).toHaveTextContent('What will change in production');
+    expect(risk).toHaveTextContent('Published events affected');
+    expect(risk).toHaveTextContent('Community Meetup');
+    expect(risk).toHaveTextContent('September 9');
+    expect(risk).toHaveTextContent('Failed jobs');
+    expect(risk).toHaveTextContent('health signals only');
+    expect(risk).toHaveTextContent('America/Chicago');
+    expect(risk).toHaveTextContent('HIGH_VOLUME_SOURCE');
+    expect(risk).toHaveTextContent('Sample dance night');
+    expect(risk).toHaveTextContent('final duplicate checks');
+    expect(screen.getByText(`Raw mutation rows (${VALID_PREVIEW.rows.length})`)).toBeInTheDocument();
+    expect(screen.getByRole('table', { name: 'Preview rows', hidden: true })).not.toBeVisible();
+  });
+
   it('shows stale blocking reasons without offering apply', async () => {
     mockAuthenticatedRequest.mockResolvedValue({ data: { preview: STALE_PREVIEW } });
     renderReview();

@@ -218,7 +218,8 @@
   }
 }
 
-.pivot-compute-review {
+.pivot-compute-review,
+.pivot-compute-jobs__controls {
   .pivot-compute-review__upload {
     display: grid;
     gap: 16px;
@@ -314,6 +315,132 @@
     td:nth-child(7) {
       max-width: 240px;
       word-break: break-word;
+    }
+  }
+
+  .pivot-compute-review__risk-review {
+    display: grid;
+    gap: 16px;
+    margin: 20px 0;
+  }
+
+  .pivot-compute-review__window {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 8px 16px;
+    padding: 12px 14px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+  }
+
+  .pivot-compute-review__section-heading,
+  .pivot-compute-review__attention-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .pivot-compute-review__section-heading h4,
+  .pivot-compute-review__attention-header h5 {
+    margin: 0;
+  }
+
+  .pivot-compute-review__attention-list {
+    display: grid;
+    gap: 10px;
+    margin-top: 10px;
+  }
+
+  .pivot-compute-review__attention-card {
+    padding: 14px;
+    border: 1px solid rgba(181, 71, 8, 0.24);
+    border-left: 4px solid #f79009;
+    border-radius: 10px;
+    background: rgba(247, 144, 9, 0.06);
+
+    &.is-high {
+      border-color: rgba(180, 35, 24, 0.28);
+      border-left-color: #d92d20;
+      background: rgba(217, 45, 32, 0.06);
+    }
+
+    p {
+      margin: 8px 0 0;
+    }
+  }
+
+  .pivot-compute-review__risk-code {
+    display: block;
+    margin-bottom: 3px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    opacity: 0.72;
+  }
+
+  .pivot-compute-review__changes {
+    display: grid;
+    gap: 6px;
+    margin: 12px 0 0;
+
+    div {
+      display: grid;
+      grid-template-columns: minmax(90px, 0.35fr) 1fr;
+      gap: 8px;
+    }
+
+    dt {
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+
+    dd {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin: 0;
+      overflow-wrap: anywhere;
+    }
+  }
+
+  .pivot-compute-review__samples {
+    display: grid;
+    gap: 6px;
+    margin: 12px 0 0;
+    padding-left: 18px;
+
+    li {
+      padding-left: 2px;
+    }
+
+    strong,
+    span {
+      display: block;
+    }
+
+    span {
+      margin-top: 2px;
+      font-size: 0.78rem;
+      opacity: 0.72;
+    }
+  }
+
+  .pivot-compute-review__routine,
+  .pivot-compute-review__raw-rows {
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    padding: 12px 14px;
+
+    summary {
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .pivot-lab__table-wrap {
+      margin-top: 12px;
     }
   }
 

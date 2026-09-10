@@ -200,6 +200,7 @@ export function ComputeJobDetailActions({
 }) {
   const { addNotification } = useNotification();
   const [preview, setPreview] = useState(null);
+  const [review, setReview] = useState(null);
   const [previewLoading, setPreviewLoading] = useState(false);
   const [actionLoading, setActionLoading] = useState(null);
   const [actionFeedback, setActionFeedback] = useState(null);
@@ -213,6 +214,7 @@ export function ComputeJobDetailActions({
 
   const resetPreview = useCallback(() => {
     setPreview(null);
+    setReview(null);
     setApplyConfirmed(false);
   }, []);
 
@@ -242,6 +244,7 @@ export function ComputeJobDetailActions({
     setPreviewLoading(true);
     setActionFeedback(null);
     setPreview(null);
+    setReview(null);
     setApplyConfirmed(false);
 
     const { data, error } = await authenticatedRequest(
@@ -255,6 +258,7 @@ export function ComputeJobDetailActions({
       return;
     }
     setPreview(data?.preview || null);
+    setReview(data?.review || null);
   }, [showPreview, externalJobId]);
 
   const handleCancel = useCallback(async () => {
@@ -361,7 +365,7 @@ export function ComputeJobDetailActions({
 
       {preview ? (
         <>
-          <ComputeResultPreviewPanel preview={preview} parsedResult={null} />
+          <ComputeResultPreviewPanel preview={preview} parsedResult={null} review={review} />
           {showApply ? (
             <div className="pivot-compute-review__apply-panel" data-testid="compute-stored-apply-panel">
               <h4 className="pivot-compute-review__apply-title">Apply stored result</h4>
@@ -375,7 +379,8 @@ export function ComputeJobDetailActions({
                 <span>
                   I reviewed the stored preview and confirm applying production mutations for
                   {' '}
-                  {preview.jobId}.
+                  {preview.jobId}. Apply is sequential and all-or-nothing selection is not available; if a later
+                  row fails, earlier writes remain applied and the job returns to review.
                 </span>
               </label>
               <button

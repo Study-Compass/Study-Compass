@@ -27,8 +27,11 @@ jest.mock('./PivotTenantPage', () => ({
 jest.mock('./PivotComputeJobReview', () => ({
   __esModule: true,
   default: () => <div data-testid="compute-job-review-stub" />,
-  ComputeResultPreviewPanel: ({ preview }) => (
-    <div data-testid="compute-result-preview">{preview.jobId}</div>
+  ComputeResultPreviewPanel: ({ preview, review }) => (
+    <div data-testid="compute-result-preview">
+      {preview.jobId}
+      {review ? <span data-testid="compute-risk-review">{JSON.stringify(review)}</span> : null}
+    </div>
   ),
 }));
 
@@ -491,10 +494,54 @@ describe('PivotComputeJobs', () => {
         stale: 0,
       },
     };
+    const review = {
+      executionSummary: {
+        jobsRun: 28,
+        jobsFailed: 1,
+        eventsProposed: 474,
+        eventsRefreshed: 40,
+      },
+      impact: {
+        eventCreates: 434,
+        eventUpdates: 40,
+        publishedEventUpdates: 3,
+        stagedEventUpdates: 37,
+        unchangedEvents: 0,
+        sourceMutations: 0,
+        curationJobMutations: 0,
+      },
+      sourceHealth: { completed: 27, failed: 1, skipped: 0, outcomes: [] },
+      eventWindow: {
+        earliestStart: '2026-09-09T20:00:00.000Z',
+        latestStart: '2026-10-01T20:00:00.000Z',
+      },
+      attentionTotal: 1,
+      attention: [{
+        code: 'PUBLISHED_EVENT_UPDATE',
+        severity: 'high',
+        key: 'sourceUrl:https://luma.com/event-1',
+        title: 'Community Meetup',
+        sourceUrl: 'https://luma.com/event-1',
+        jobLabel: 'Luma',
+        provider: 'luma',
+        ingestStatus: 'published',
+        message: 'Applying this row changes an event that is already visible in the feed.',
+        changes: [{ field: 'start_time', before: '2026-09-09T20:00:00.000Z', after: '2026-09-10T20:00:00.000Z' }],
+      }],
+      groups: [{
+        key: 'luma',
+        label: 'Luma',
+        provider: 'luma',
+        creates: 434,
+        updates: 40,
+        unchanged: 0,
+        attention: 1,
+      }],
+    };
 
     mockAuthenticatedRequest.mockImplementation((url, options = {}) => {
       if (url.includes('/preview')) {
-        return Promise.resolve({ data: { preview } });
+        return Promise.resolve({ data: { preview, review } });
       }
       if (url.includes('/apply')) {
         return Promise.resolve({
@@ -519,6 +566,8 @@ describe('PivotComputeJobs', () => {
     expect(await screen.findByRole('button', { name: 'Preview stored result' })).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Preview stored result' }));
     expect(await screen.findByTestId('compute-result-preview')).toHaveTextContent(preview.jobId);
+    expect(screen.getByTestId('compute-risk-review')).toHaveTextContent('Community Meetup');
+    expect(screen.getByTestId('compute-risk-review')).toHaveTextContent('jobsFailed');
 
     const applyButton = screen.getByRole('button', { name: 'Apply stored preview' });
     expect(applyButton).toBeDisabled();
