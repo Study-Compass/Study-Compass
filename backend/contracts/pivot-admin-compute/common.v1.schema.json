@@ -1,0 +1,126 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://justgo.lol/schemas/pivot-admin-compute/common.v1.json",
+  "$defs": {
+    "contractVersion": {
+      "const": "1"
+    },
+    "cityKey": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]{0,62}$"
+    },
+    "jobId": {
+      "type": "string",
+      "minLength": 8,
+      "maxLength": 128,
+      "pattern": "^[a-zA-Z0-9:_-]+$"
+    },
+    "scheduleOccurrenceId": {
+      "type": "string",
+      "minLength": 8,
+      "maxLength": 160,
+      "pattern": "^sched:[a-z0-9-]+@[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9:.-]+Z$"
+    },
+    "nullableScheduleOccurrenceId": {
+      "oneOf": [
+        { "$ref": "#/$defs/scheduleOccurrenceId" },
+        { "type": "null" }
+      ]
+    },
+    "implementationRevision": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^[a-zA-Z0-9@._+-]+$"
+    },
+    "contextVersion": {
+      "type": "string",
+      "minLength": 8,
+      "maxLength": 128,
+      "pattern": "^ctx:[a-zA-Z0-9._-]+$"
+    },
+    "recordVersion": {
+      "type": "string",
+      "minLength": 4,
+      "maxLength": 128,
+      "pattern": "^rv:[a-zA-Z0-9._-]+$"
+    },
+    "nullableRecordVersion": {
+      "oneOf": [
+        { "$ref": "#/$defs/recordVersion" },
+        { "type": "null" }
+      ]
+    },
+    "isoDateTime": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "computeJobKind": {
+      "enum": ["city-source-discovery", "city-curation-refresh"]
+    },
+    "executionOutcome": {
+      "enum": ["completed", "failed", "cancelled"]
+    },
+    "proposalAction": {
+      "enum": ["create", "update", "upsert"]
+    },
+    "previewAction": {
+      "enum": ["create", "update", "unchanged", "conflict", "rejected", "stale"]
+    },
+    "sourceProvider": {
+      "enum": ["partiful", "luma", "generic-site"]
+    },
+    "curationProvider": {
+      "enum": ["partiful", "luma", "generic-site", "manual-json"]
+    },
+    "sourceStatus": {
+      "enum": ["qualified", "rejected"]
+    },
+    "rejectionReason": {
+      "enum": [
+        "no-events",
+        "below-threshold",
+        "scrape-failed",
+        "no-index-page",
+        "blocked-host"
+      ]
+    },
+    "tagList": {
+      "type": "array",
+      "maxItems": 16,
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 64
+      }
+    },
+    "httpsUrl": {
+      "type": "string",
+      "format": "uri",
+      "pattern": "^https://",
+      "maxLength": 2048
+    },
+    "envelope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contractVersion",
+        "jobId",
+        "scheduleOccurrenceId",
+        "kind",
+        "cityKey",
+        "implementationRevision",
+        "contextVersion"
+      ],
+      "properties": {
+        "contractVersion": { "$ref": "#/$defs/contractVersion" },
+        "jobId": { "$ref": "#/$defs/jobId" },
+        "scheduleOccurrenceId": { "$ref": "#/$defs/nullableScheduleOccurrenceId" },
+        "kind": { "$ref": "#/$defs/computeJobKind" },
+        "cityKey": { "$ref": "#/$defs/cityKey" },
+        "implementationRevision": { "$ref": "#/$defs/implementationRevision" },
+        "contextVersion": { "$ref": "#/$defs/contextVersion" }
+      }
+    }
+  }
+}

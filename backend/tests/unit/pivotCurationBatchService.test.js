@@ -373,7 +373,7 @@ describe('pivotCurationBatchService', () => {
       });
 
       expect(result.jobsRun).toBe(2);
-      expect(result.events).toEqual({ upserted: 6, added: 6, skipped: 2, failed: 0 });
+      expect(result.events).toEqual({ upserted: 6, added: 6, skipped: 2, failed: 0, refreshed: 0 });
       expect(recorder.counters.eventsUpserted).toBe(6);
       expect(recorder.finished.status).toBe('completed');
     });

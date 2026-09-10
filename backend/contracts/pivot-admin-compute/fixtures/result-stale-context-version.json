@@ -1,0 +1,22 @@
+{
+  "contractVersion": "1",
+  "jobId": "job:refresh-iowacity-stale",
+  "scheduleOccurrenceId": "sched:weekly-refresh@2026-09-08T06:00:00.000Z",
+  "kind": "city-curation-refresh",
+  "cityKey": "iowacity",
+  "implementationRevision": "relay-worker@2026.09.08",
+  "basedOnContextVersion": "ctx:iowacity.refresh.v6",
+  "completedAt": "2026-09-08T06:35:00.000Z",
+  "outcome": "completed",
+  "idempotencyKey": "idem:refresh-iowacity-stale",
+  "proposals": {
+    "jobOutcomes": [],
+    "events": []
+  },
+  "summary": {
+    "jobsRun": 0,
+    "jobsFailed": 0,
+    "eventsProposed": 0,
+    "eventsRefreshed": 0
+  }
+}

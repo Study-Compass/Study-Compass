@@ -1,0 +1,40 @@
+{
+  "contractVersion": "1",
+  "jobId": "job:refresh-iowacity-stale",
+  "scheduleOccurrenceId": "sched:weekly-refresh@2026-09-08T06:00:00.000Z",
+  "kind": "city-curation-refresh",
+  "cityKey": "iowacity",
+  "implementationRevision": "meridian-backend@2026.09.08",
+  "contextVersion": "ctx:iowacity.refresh.v7",
+  "basedOnContextVersion": "ctx:iowacity.refresh.v6",
+  "previewedAt": "2026-09-08T06:40:00.000Z",
+  "applyAllowed": false,
+  "blockingReasons": [
+    {
+      "code": "STALE_CONTEXT",
+      "message": "Result was computed against ctx:iowacity.refresh.v6 but production is now ctx:iowacity.refresh.v7."
+    }
+  ],
+  "rows": [
+    {
+      "entityType": "event",
+      "action": "stale",
+      "key": "sourceUrl:https://luma.com/iowa-city/event-abc",
+      "basedOnRecordVersion": "rv:event-luma-abc",
+      "currentRecordVersion": "rv:event-luma-abc-v2",
+      "message": "Event changed after the worker started.",
+      "evidence": {
+        "sourceUrl": "https://luma.com/iowa-city/event-abc",
+        "jobId": "507f1f77bcf86cd799439011"
+      }
+    }
+  ],
+  "summary": {
+    "creates": 0,
+    "updates": 0,
+    "unchanged": 0,
+    "conflicts": 0,
+    "rejected": 0,
+    "stale": 1
+  }
+}

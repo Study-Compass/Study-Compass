@@ -1,0 +1,58 @@
+{
+  "contractVersion": "1",
+  "jobId": "job:discovery-iowacity-001",
+  "scheduleOccurrenceId": null,
+  "kind": "city-source-discovery",
+  "cityKey": "iowacity",
+  "implementationRevision": "meridian-backend@2026.09.08",
+  "contextVersion": "ctx:iowacity.discovery.v3",
+  "basedOnContextVersion": "ctx:iowacity.discovery.v3",
+  "previewedAt": "2026-09-08T21:00:00.000Z",
+  "applyAllowed": true,
+  "blockingReasons": [],
+  "rows": [
+    {
+      "entityType": "source",
+      "action": "create",
+      "key": "host:example-theatre.org",
+      "basedOnRecordVersion": null,
+      "currentRecordVersion": null,
+      "message": null,
+      "evidence": {
+        "host": "example-theatre.org",
+        "sourceUrl": "https://example-theatre.org/events/show-1"
+      }
+    },
+    {
+      "entityType": "curationJob",
+      "action": "create",
+      "key": "provider:generic-site|url:https://example-theatre.org/events",
+      "basedOnRecordVersion": null,
+      "currentRecordVersion": null,
+      "message": null,
+      "evidence": {
+        "host": "example-theatre.org"
+      }
+    },
+    {
+      "entityType": "event",
+      "action": "create",
+      "key": "sourceUrl:https://example-theatre.org/events/show-1",
+      "basedOnRecordVersion": null,
+      "currentRecordVersion": null,
+      "message": null,
+      "evidence": {
+        "sourceUrl": "https://example-theatre.org/events/show-1",
+        "host": "example-theatre.org"
+      }
+    }
+  ],
+  "summary": {
+    "creates": 3,
+    "updates": 0,
+    "unchanged": 0,
+    "conflicts": 0,
+    "rejected": 0,
+    "stale": 0
+  }
+}

@@ -21,8 +21,16 @@ function buildFetchCacheKey(url, options) {
 }
 
 function authErrorFromAxios(err) {
-  const message = err.response?.data?.message || err.response?.data?.error || err.message;
-  return { error: message, code: err.response?.status };
+  const errorData = err.response?.data;
+  const message = errorData?.message || errorData?.error || err.message;
+  return {
+    error: message,
+    code: err.response?.status,
+    ...(errorData?.result ? {
+      errorCode: errorData.code || null,
+      errorData,
+    } : {}),
+  };
 }
 
 function refreshFailureResult(refreshError) {

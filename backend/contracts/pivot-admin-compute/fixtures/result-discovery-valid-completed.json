@@ -1,0 +1,77 @@
+{
+  "contractVersion": "1",
+  "jobId": "job:discovery-iowacity-001",
+  "scheduleOccurrenceId": null,
+  "kind": "city-source-discovery",
+  "cityKey": "iowacity",
+  "implementationRevision": "relay-worker@2026.09.08",
+  "basedOnContextVersion": "ctx:iowacity.discovery.v3",
+  "completedAt": "2026-09-08T20:45:00.000Z",
+  "outcome": "completed",
+  "idempotencyKey": "idem:discovery-iowacity-001",
+  "proposals": {
+    "sources": [
+      {
+        "action": "create",
+        "host": "example-theatre.org",
+        "url": "https://example-theatre.org/events",
+        "label": "Example Theatre Events",
+        "provider": "generic-site",
+        "status": "qualified",
+        "enabled": true,
+        "seedTags": ["live-music"],
+        "rejectedReason": null,
+        "basedOnRecordVersion": null,
+        "evidence": {
+          "eventCount": 9,
+          "indexUrl": "https://example-theatre.org/events",
+          "discoveredVia": "Iowa City live music events calendar"
+        }
+      }
+    ],
+    "curationJobs": [
+      {
+        "action": "create",
+        "label": "Example Theatre Events",
+        "url": "https://example-theatre.org/events",
+        "provider": "generic-site",
+        "enabled": true,
+        "defaultTags": ["live-music"],
+        "basedOnRecordVersion": null,
+        "linkedSourceHost": "example-theatre.org"
+      }
+    ],
+    "events": [
+      {
+        "action": "upsert",
+        "sourceUrl": "https://example-theatre.org/events/show-1",
+        "batchWeek": "2026-W37",
+        "draft": {
+          "name": "Jazz Night",
+          "description": "Live jazz on the main stage.",
+          "image": "https://example-theatre.org/images/jazz.jpg",
+          "location": "Example Theatre",
+          "rawLocationText": null,
+          "start_time": "2026-09-12T01:00:00.000Z",
+          "end_time": null,
+          "sourceUrl": "https://example-theatre.org/events/show-1",
+          "hostName": "Example Theatre",
+          "hostProfileUrl": null,
+          "tags": ["live-music"]
+        },
+        "basedOnEventVersion": null,
+        "linkedJobId": null,
+        "evidence": {
+          "discoveredFromHost": "example-theatre.org",
+          "provider": "generic-site"
+        }
+      }
+    ]
+  },
+  "summary": {
+    "searched": 8,
+    "qualified": 1,
+    "rejected": 2,
+    "eventsProposed": 1
+  }
+}

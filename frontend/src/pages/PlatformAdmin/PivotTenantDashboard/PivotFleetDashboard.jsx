@@ -3,9 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import Dashboard from '../../../components/Dashboard/Dashboard';
 import { useFetch } from '../../../hooks/useFetch';
 import useAdminDashboardTheme from '../../../hooks/useAdminDashboardTheme';
+import { isPivotTenant } from '../TenantManagement/tenantPivotUtils';
 import PivotFleetOverviewPage from './PivotFleetOverviewPage';
 import PivotVoicePage from './PivotVoicePage';
 import PivotFleetLaunchPage from './PivotFleetLaunchPage';
+import PivotComputeJobs, { PIVOT_FLEET_COMPUTE_JOBS_PAGE } from './PivotComputeJobs';
 import PivotTenantDropdown from './PivotTenantDropdown';
 import PivotJustGoLogo from './PivotJustGoLogo';
 import '../../Admin/Admin.scss';
@@ -29,6 +31,7 @@ function PivotFleetDashboard() {
   });
 
   const tenants = data?.success ? data.data?.tenants || [] : [];
+  const pivotTenants = useMemo(() => tenants.filter(isPivotTenant), [tenants]);
 
   const menuItems = useMemo(
     () => [
@@ -47,8 +50,20 @@ function PivotFleetDashboard() {
         icon: 'mdi:rocket-launch-outline',
         element: <PivotFleetLaunchPage />,
       },
+      {
+        label: 'Compute jobs',
+        icon: 'mdi:server-network-outline',
+        element: (
+          <PivotComputeJobs
+            scope="fleet"
+            cityDisplayName="All cities"
+            pageIndex={PIVOT_FLEET_COMPUTE_JOBS_PAGE}
+            tenants={pivotTenants}
+          />
+        ),
+      },
     ],
-    [],
+    [pivotTenants],
   );
 
   return (

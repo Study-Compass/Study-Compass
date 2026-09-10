@@ -1,10 +1,8 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { ThinkingOrb } from 'thinking-orbs';
 import { useFetch, authenticatedRequest } from '../../../hooks/useFetch';
 import { useNotification } from '../../../NotificationContext';
 import { useDashboard } from '../../../contexts/DashboardContext';
-import useAdminDashboardTheme from '../../../hooks/useAdminDashboardTheme';
 import {
   toIsoWeek,
   isValidIsoWeek,
@@ -32,7 +30,8 @@ import PivotCurationMonitorPanel from './PivotCurationMonitorPanel';
 import PivotCurationQueue from './PivotCurationQueue';
 import PivotRichDataEnrichmentPopup from './PivotRichDataEnrichmentPopup';
 import PivotTenantSourcesPanel from './PivotTenantSourcesPanel';
-import PivotDiscoveryConsole, { orbStateFor, phaseLabel, OrbTint } from './PivotDiscoveryConsole';
+import PivotComputeJobRunStatus, { useTenantComputeJob } from './PivotComputeJobRunStatus';
+import { buildAdminCreateJobRequest } from './pivotComputeJobActions';
 import Popup from '../../../components/Popup/Popup';
 import PivotTenantPage from './PivotTenantPage';
 import PivotBatchWeekPicker from './PivotBatchWeekPicker';
@@ -51,12 +50,6 @@ import './PivotTenantPage.scss';
 
 const NO_FETCH_CACHE = { enabled: false };
 const EMPTY_LIST = [];
-const RUN_POLL_MS = 2500;
-/**
- * Cadence for noticing a batch that this page did not start — discovery chains
- * one for native sources, and another tab or the CLI can start one too.
- */
-const BATCH_IDLE_POLL_MS = 30000;
 const MONITOR_EVENTS_LIMIT = 100;
 const MAX_RICH_ENRICH_EVENTS = 50;
 const FILTER_OPTIONS = [
@@ -189,8 +182,6 @@ function RunStatusPill({ status }) {
  */
 function PivotTenantCurationPage({ tenantKey, cityDisplayName }) {
   const { addNotification } = useNotification();
-  const { isDark } = useAdminDashboardTheme();
-  const orbTheme = isDark ? 'dark' : 'light';
   const { showOverlay } = useDashboard();
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -221,12 +212,7 @@ function PivotTenantCurationPage({ tenantKey, cityDisplayName }) {
   const [selectedIds, setSelectedIds] = useState(() => new Set());
   const [bulkTags, setBulkTags] = useState([]);
   const [busyKey, setBusyKey] = useState(null);
-  const [activeRunId, setActiveRunId] = useState(null);
-  const [batchConsoleOpen, setBatchConsoleOpen] = useState(false);
   const [batchStarting, setBatchStarting] = useState(false);
-  /** Completion is announced once per batch, however this page notices it. */
-  const batchNotifiedRef = useRef(null);
-  const previousBatchRef = useRef(null);
   const [jobFormOpen, setJobFormOpen] = useState(false);
   const [jobsExpanded, setJobsExpanded] = useState(false);
   const [editingJobId, setEditingJobId] = useState(null);
@@ -411,6 +397,27 @@ function PivotTenantCurationPage({ tenantKey, cityDisplayName }) {
   const jobsLoading = opsLoading && canPublishCatalog && !ops?.jobs;
   const jobsError = ops?.jobs?.error || opsError || null;
 
+  const handleRefreshComputeFinished = useCallback((job) => {
+    refetchOps();
+    addNotification({
+      title: job.status === 'review-required' ? 'Refresh ready for review' : 'Refresh job finished',
+      message: job.status === 'review-required'
+        ? 'The Mini returned a stored result. Review the event changes and warnings before applying them.'
+        : job.failure?.message || `The refresh finished with status ${job.status}.`,
+      type: job.status === 'review-required' ? 'success' : 'warning',
+    });
+  }, [addNotification, refetchOps]);
+  const refreshCompute = useTenantComputeJob({
+    tenantKey,
+    kind: 'city-curation-refresh',
+    onFinished: handleRefreshComputeFinished,
+  });
+  const refreshRunning = refreshCompute.active;
+  const handleRefreshJobUpdated = useCallback((job, meta) => {
+    refreshCompute.updateJob(job);
+    if (meta?.action === 'apply' && !meta?.optimistic) refetchOps();
+  }, [refetchOps, refreshCompute]);
+
   const events =
     ops?.catalog && !ops.catalog.error
       ? (ops.catalog.events ?? EMPTY_LIST)
@@ -428,34 +435,9 @@ function PivotTenantCurationPage({ tenantKey, cityDisplayName }) {
     ops?.readiness && !ops.readiness.error ? ops.readiness : null;
   const readinessLoading = opsLoading && canPublishCatalog && !ops?.readiness;
 
-  const runUrl =
-    tenantKey && activeRunId
-      ? `/admin/pivot/tenants/${encodeURIComponent(tenantKey)}/curation-runs/${encodeURIComponent(activeRunId)}`
-      : null;
-  const {
-    data: runResponse,
-    refetch: refetchRun,
-  } = useFetch(runUrl, { cache: NO_FETCH_CACHE });
-
-  /**
-   * Whether a batch is in flight is the server's fact, not this page's, so a
-   * refresh or a second tab still shows it. Steps are excluded: this only needs
-   * status and counters.
-   */
-  const latestBatchUrl = tenantKey
-    ? `/admin/pivot/tenants/${encodeURIComponent(tenantKey)}/curation-batches/latest`
-    : null;
-  const { data: latestBatchResponse, refetch: refetchLatestBatch } = useFetch(latestBatchUrl, {
-    cache: NO_FETCH_CACHE,
-  });
-  const latestBatch = latestBatchResponse?.success ? latestBatchResponse.data?.run : null;
-  const batchRunning = latestBatch?.status === 'running';
-
   const catalogTags = tagsResponse?.success
     ? (tagsResponse.data?.tags ?? EMPTY_LIST)
     : EMPTY_LIST;
-  const activeRun = runResponse?.success ? runResponse.data?.run : null;
-
   const hostCreatedCount = useMemo(
     () => events.filter((event) => isHostCreatedEvent(event)).length,
     [events],
@@ -512,54 +494,6 @@ function PivotTenantCurationPage({ tenantKey, cityDisplayName }) {
     setEditingEvent(match);
   }, [urlEventId, events, eventsLoading]);
 
-  // Poll active run until terminal.
-  useEffect(() => {
-    if (!activeRunId || !activeRun) return undefined;
-    const status = activeRun.status;
-    if (status === 'completed' || status === 'failed') {
-      refetchOps();
-      return undefined;
-    }
-    const timer = setInterval(() => {
-      refetchRun();
-    }, RUN_POLL_MS);
-    return () => clearInterval(timer);
-  }, [activeRun, activeRunId, refetchOps, refetchRun]);
-
-  // Poll the batch faster while it runs, but never stop entirely — one can be
-  // started from another tab or chained by a discovery run.
-  useEffect(() => {
-    if (!latestBatchUrl) return undefined;
-    const timer = setInterval(
-      () => {
-        refetchLatestBatch();
-        if (batchRunning) refetchOps();
-      },
-      batchRunning ? RUN_POLL_MS : BATCH_IDLE_POLL_MS,
-    );
-    return () => clearInterval(timer);
-  }, [batchRunning, latestBatchUrl, refetchLatestBatch, refetchOps]);
-
-  useEffect(() => {
-    const previous = previousBatchRef.current;
-    previousBatchRef.current = latestBatch;
-
-    if (!latestBatch || !previous) return;
-    if (previous._id !== latestBatch._id || previous.status !== 'running' || batchRunning) return;
-    if (batchNotifiedRef.current === latestBatch._id) return;
-    batchNotifiedRef.current = latestBatch._id;
-
-    refetchOps();
-    const saved = latestBatch.counters?.eventsUpserted || 0;
-    addNotification({
-      title: latestBatch.aborted ? 'Refresh stopped early' : 'Refresh complete',
-      message: latestBatch.aborted
-        ? latestBatch.aborted.error
-        : `${saved} event(s) saved from ${latestBatch.counters?.jobsRun || 0} source(s).`,
-      type: latestBatch.aborted ? 'warning' : 'success',
-    });
-  }, [addNotification, batchRunning, latestBatch, refetchOps]);
-
   // Clear selection when week/filter changes.
   useEffect(() => {
     setSelectedIds(new Set());
@@ -577,8 +511,7 @@ function PivotTenantCurationPage({ tenantKey, cityDisplayName }) {
 
   const refreshAll = useCallback(() => {
     refetchOps();
-    if (activeRunId) refetchRun();
-  }, [activeRunId, refetchOps, refetchRun]);
+  }, [refetchOps]);
 
   const handleJsonStaged = useCallback(
     (result) => {
@@ -847,34 +780,39 @@ function PivotTenantCurationPage({ tenantKey, cityDisplayName }) {
 
       setBusyKey(`job-run-${job._id}`);
       const { data, error } = await authenticatedRequest(
-        `/admin/pivot/tenants/${encodeURIComponent(tenantKey)}/curation-jobs/${encodeURIComponent(job._id)}/run`,
+        '/admin/pivot/compute-jobs',
         {
           method: 'POST',
           data: {
-            batchWeek: committedWeek,
-            forceBatchWeek,
+            request: buildAdminCreateJobRequest({
+              tenantKey,
+              kind: 'city-curation-refresh',
+              options: {
+                batchWeek: committedWeek,
+                forceBatchWeek,
+                jobIds: [String(job._id)],
+              },
+            }),
           },
         },
       );
       setBusyKey(null);
 
-      if (error || !data?.success) {
+      if (error || !data?.job) {
         addNotification({
-          title: 'Run failed',
-          message: error || data?.message || 'Could not start crawl run.',
+          title: 'Refresh job not created',
+          message: error || data?.message || 'Could not create the offloaded refresh job.',
           type: 'error',
         });
         return;
       }
 
-      const run = data.data?.run;
-      setActiveRunId(run?._id || null);
-      refetchOps();
+      refreshCompute.trackCreated(data);
       addNotification({
-        title: 'Crawl started',
-        message: forceBatchWeek
-          ? `Running “${job.label}” — all events forced into ${committedWeek}.`
-          : `Running “${job.label}” — events land in the week of their start date (may span multiple weeks).`,
+        title: data.created ? 'Refresh job created' : 'Refresh job already queued',
+        message: data?.wake?.status === 'accepted'
+          ? `“${job.label}” is queued for ${committedWeek}, and the Mini accepted the wake request.`
+          : `“${job.label}” is safely queued for ${committedWeek}. The Mini will collect it on its next poll.`,
         type: 'success',
       });
     },
@@ -883,47 +821,49 @@ function PivotTenantCurationPage({ tenantKey, cityDisplayName }) {
       committedWeek,
       batchWeekValid,
       forceBatchWeek,
-      refetchOps,
+      refreshCompute,
       tenantKey,
       weekSettled,
     ],
   );
 
   /**
-   * Refresh every enabled job in one orchestrated run.
-   *
-   * The alternative is clicking Run on each job and waiting for it, which does
-   * not scale past a handful of sources and gives no single place to watch. The
-   * orchestrator also holds one rate-limit budget across the whole city rather
-   * than letting each job hit the wall independently.
+   * Refresh every enabled job through the same durable queue used by Compute Jobs.
    */
   const handleRunAllJobs = useCallback(async () => {
     if (!tenantKey || !batchWeekValid || !weekSettled) return;
 
     setBatchStarting(true);
     const { data, error } = await authenticatedRequest(
-      `/admin/pivot/tenants/${encodeURIComponent(tenantKey)}/curation-batches`,
+      '/admin/pivot/compute-jobs',
       {
         method: 'POST',
-        data: { batchWeek: committedWeek, forceBatchWeek },
+        data: {
+          request: buildAdminCreateJobRequest({
+            tenantKey,
+            kind: 'city-curation-refresh',
+            options: { batchWeek: committedWeek, forceBatchWeek },
+          }),
+        },
       },
     );
     setBatchStarting(false);
 
-    if (error || !data?.success) {
+    if (error || !data?.job) {
       addNotification({
-        title: 'Refresh failed',
-        message: error || data?.message || 'Could not start the refresh.',
+        title: 'Refresh job not created',
+        message: error || data?.message || 'Could not create the offloaded refresh job.',
         type: 'error',
       });
       return;
     }
 
-    refetchLatestBatch();
-    setBatchConsoleOpen(true);
+    refreshCompute.trackCreated(data);
     addNotification({
-      title: 'Refresh started',
-      message: `Crawling ${data.data?.jobs ?? 0} source(s) in the background.`,
+      title: data.created ? 'Refresh job created' : 'Refresh job already queued',
+      message: data?.wake?.status === 'accepted'
+        ? `${runnableJobCount} source(s) are queued for ${committedWeek}, and the Mini accepted the wake request.`
+        : `${runnableJobCount} source(s) are safely queued for ${committedWeek}. The Mini will collect the job on its next poll.`,
       type: 'success',
     });
   }, [
@@ -931,7 +871,8 @@ function PivotTenantCurationPage({ tenantKey, cityDisplayName }) {
     batchWeekValid,
     committedWeek,
     forceBatchWeek,
-    refetchLatestBatch,
+    refreshCompute,
+    runnableJobCount,
     tenantKey,
     weekSettled,
   ]);
@@ -1749,8 +1690,7 @@ function PivotTenantCurationPage({ tenantKey, cityDisplayName }) {
       queue.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   }, []);
-  const runInFlight =
-    activeRun && (activeRun.status === 'queued' || activeRun.status === 'running');
+  const runInFlight = refreshRunning;
   const releaseBusy =
     busyKey === 'release' ||
     busyKey === 'bulk-release' ||
@@ -2116,56 +2056,6 @@ function PivotTenantCurationPage({ tenantKey, cityDisplayName }) {
         loading={readinessLoading}
       />
 
-      {activeRun ? (
-        <div
-          className={`pivot-tenant-curation__run-banner pivot-tenant-curation__run-banner--${activeRun.status}`}
-          role="status"
-        >
-          <div>
-            <strong>Crawl {activeRun.status}</strong>
-            {activeRun.forceBatchWeek ? (
-              <span> · forced into {activeRun.batchWeek}</span>
-            ) : (
-              <span> · by event date</span>
-            )}
-            {activeRun.stats ? (
-              <span>
-                {' '}
-                · discovered {activeRun.stats.discovered ?? 0}, upserted{' '}
-                {activeRun.stats.upserted ?? 0}, skipped {activeRun.stats.skipped ?? 0}, failed{' '}
-                {activeRun.stats.failed ?? 0}
-              </span>
-            ) : null}
-            {activeRun.stats?.byBatchWeek &&
-            Object.keys(activeRun.stats.byBatchWeek).length > 0 ? (
-              <span className="pivot-tenant-curation__run-msg">
-                {' '}
-                · weeks{' '}
-                {Object.keys(activeRun.stats.byBatchWeek)
-                  .sort()
-                  .map((w) => `${w} (${activeRun.stats.byBatchWeek[w]})`)
-                  .join(', ')}
-              </span>
-            ) : null}
-            {activeRun.stats?.message ? (
-              <span className="pivot-tenant-curation__run-msg"> — {activeRun.stats.message}</span>
-            ) : null}
-            {activeRun.error ? (
-              <span className="pivot-tenant-curation__run-msg"> — {activeRun.error}</span>
-            ) : null}
-          </div>
-          {(activeRun.status === 'completed' || activeRun.status === 'failed') && (
-            <button
-              type="button"
-              className="linear-btn linear-btn--ghost"
-              onClick={() => setActiveRunId(null)}
-            >
-              Dismiss
-            </button>
-          )}
-        </div>
-      ) : null}
-
       {/* Upstream of Saved jobs: discovery finds sources; Refresh all recrawls them. */}
       <PivotTenantSourcesPanel
         tenantKey={tenantKey}
@@ -2202,19 +2092,18 @@ function PivotTenantCurationPage({ tenantKey, cityDisplayName }) {
               className="linear-btn linear-btn--primary"
               disabled={
                 batchStarting
-                || batchRunning
+                || refreshRunning
                 || !batchWeekValid
                 || !weekSettled
-                || Boolean(runInFlight)
                 || !runnableJobCount
               }
               onClick={handleRunAllJobs}
               title="Recrawl saved jobs for this week. Discovery above finds new sources — it is not the weekly refresh."
             >
               {batchStarting
-                ? 'Starting…'
-                : batchRunning
-                  ? 'Refreshing…'
+                ? 'Creating job…'
+                : refreshRunning
+                  ? 'Refresh queued'
                   : `Refresh all ${runnableJobCount || ''}`.trim()}
             </button>
             <button
@@ -2227,6 +2116,14 @@ function PivotTenantCurationPage({ tenantKey, cityDisplayName }) {
           </div>
         </div>
 
+        <PivotComputeJobRunStatus
+          job={refreshCompute.job}
+          wake={refreshCompute.wake}
+          error={refreshCompute.error}
+          tenantKey={tenantKey}
+          onJobUpdated={handleRefreshJobUpdated}
+        />
+
         {jobsExpanded ? (
           <>
             <p className="pivot-lab__section-hint pivot-tenant-curation__collapse-hint">
@@ -2236,52 +2133,6 @@ function PivotTenantCurationPage({ tenantKey, cityDisplayName }) {
               week of its start date. Enable “Force into review week” to pin everything to{' '}
               {committedWeek}.
             </p>
-
-            {latestBatch ? (
-              <div
-                className={`pivot-tenant-curation__batch${
-                  latestBatch.aborted ? ' pivot-tenant-curation__batch--warn' : ''
-                }`}
-              >
-                <span className="pivot-tenant-curation__batch-orb" aria-hidden="true">
-                  <OrbTint />
-                  <ThinkingOrb
-                    className="pivot-orb--brand"
-                    state={orbStateFor(latestBatch, null)}
-                    size={20}
-                    theme={orbTheme}
-                    paused={!batchRunning}
-                  />
-                </span>
-                <span className="pivot-tenant-curation__batch-text">
-                  {batchRunning ? (
-                    <>
-                      <strong>{phaseLabel(latestBatch.phase)}</strong>
-                      {' — '}
-                      {latestBatch.counters?.jobsRun || 0} of {latestBatch.plan?.jobs || 0}{' '}
-                      source(s), {latestBatch.counters?.eventsUpserted || 0} event(s) saved
-                    </>
-                  ) : (
-                    <>
-                      <strong>Last refresh</strong>
-                      {' — '}
-                      {latestBatch.aborted
-                        ? latestBatch.aborted.error
-                        : `${latestBatch.counters?.eventsUpserted || 0} event(s) saved from ${
-                            latestBatch.counters?.jobsRun || 0
-                          } source(s)`}
-                    </>
-                  )}
-                </span>
-                <button
-                  type="button"
-                  className="linear-btn linear-btn--ghost"
-                  onClick={() => setBatchConsoleOpen(true)}
-                >
-                  {batchRunning ? 'Watch' : 'View'}
-                </button>
-              </div>
-            ) : null}
 
             {jobsError ? <p className="pivot-lab__error">{jobsError}</p> : null}
             {/*
@@ -2487,7 +2338,7 @@ function PivotTenantCurationPage({ tenantKey, cityDisplayName }) {
                               onClick={() => handleRunJob(job)}
                             >
                               {busyKey === `job-run-${job._id}`
-                                ? 'Starting…'
+                                ? 'Creating job…'
                                 : `Run for ${committedWeek}`}
                             </button>
                             <button
@@ -2779,18 +2630,6 @@ function PivotTenantCurationPage({ tenantKey, cityDisplayName }) {
         tagSuggestLoading={tagSuggestLoadingKey === 'manual-import'}
       />
 
-      <Popup
-        isOpen={batchConsoleOpen}
-        onClose={() => setBatchConsoleOpen(false)}
-        customClassName="pivot-discovery-popup"
-      >
-        <PivotDiscoveryConsole
-          tenantKey={tenantKey}
-          kind="curation-batch"
-          cityDisplayName={displayCity}
-          handleClose={() => setBatchConsoleOpen(false)}
-        />
-      </Popup>
     </PivotTenantPage>
   );
 }

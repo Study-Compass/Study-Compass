@@ -13,6 +13,7 @@ const pivotPosterTemplateSchema = require('../schemas/pivotPosterTemplate');
 const pivotCurationJobSchema = require('../schemas/pivotCurationJob');
 const pivotCurationRunSchema = require('../schemas/pivotCurationRun');
 const pivotCitySourceSchema = require('../schemas/pivotCitySource');
+const pivotOrganizerSchema = require('../schemas/pivotOrganizer');
 const pivotSourceDiscoveryRunSchema = require('../schemas/pivotSourceDiscoveryRun');
 const pivotContactHashSchema = require('../schemas/pivotContactHash');
 const pivotCreatorGrantSchema = require('../schemas/pivotCreatorGrant');
@@ -22,6 +23,8 @@ const pivotCarouselVoiceSchema = require('../schemas/pivotCarouselVoice');
 const justGoLandingEventSchema = require('../schemas/justGoLandingEvent');
 const justGoWaitlistSchema = require('../schemas/justGoWaitlist');
 const justGoLandingQrSchema = require('../schemas/justGoLandingQr');
+const pivotComputeJobSchema = require('../schemas/pivotComputeJob');
+const pivotComputeJobAttemptSchema = require('../schemas/pivotComputeJobAttempt');
 
 /**
  * Get models from the global/platform DB (cross-tenant data).
@@ -82,6 +85,11 @@ const getGlobalModels = (req, ...names) => {
             pivotCitySourceSchema,
             'pivot_city_sources'
         ),
+        PivotOrganizer: db.model(
+            'PivotOrganizer',
+            pivotOrganizerSchema,
+            'pivot_organizers'
+        ),
         PivotSourceDiscoveryRun: db.model(
             'PivotSourceDiscoveryRun',
             pivotSourceDiscoveryRunSchema,
@@ -126,6 +134,16 @@ const getGlobalModels = (req, ...names) => {
             'JustGoLandingQr',
             justGoLandingQrSchema,
             'justgo_landing_qrs'
+        ),
+        PivotComputeJob: db.model(
+            'PivotComputeJob',
+            pivotComputeJobSchema,
+            'pivot_compute_jobs'
+        ),
+        PivotComputeJobAttempt: db.model(
+            'PivotComputeJobAttempt',
+            pivotComputeJobAttemptSchema,
+            'pivot_compute_job_attempts'
         ),
     };
 

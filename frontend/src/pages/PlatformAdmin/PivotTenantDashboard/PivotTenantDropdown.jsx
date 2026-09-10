@@ -22,8 +22,10 @@ export const PIVOT_OPS_PAGES = Object.freeze({
   overview: 0,
   fleetVoice: 1,
   fleetLaunch: 2,
+  fleetCompute: 3,
   cityVoice: 5,
   cityLaunch: 6,
+  cityCompute: 10,
 });
 
 function parsePageParam(searchParams) {
@@ -39,6 +41,8 @@ function pageLabelForShell(shell, page) {
   if (shell === 'city' && page === PIVOT_OPS_PAGES.cityVoice) return 'voice';
   if (shell === 'fleet' && page === PIVOT_OPS_PAGES.fleetLaunch) return 'launch';
   if (shell === 'city' && page === PIVOT_OPS_PAGES.cityLaunch) return 'launch';
+  if (shell === 'fleet' && page === PIVOT_OPS_PAGES.fleetCompute) return 'compute';
+  if (shell === 'city' && page === PIVOT_OPS_PAGES.cityCompute) return 'compute';
   return null;
 }
 
@@ -48,6 +52,9 @@ function pageForLabel(shell, label) {
   }
   if (label === 'launch') {
     return shell === 'fleet' ? PIVOT_OPS_PAGES.fleetLaunch : PIVOT_OPS_PAGES.cityLaunch;
+  }
+  if (label === 'compute') {
+    return shell === 'fleet' ? PIVOT_OPS_PAGES.fleetCompute : PIVOT_OPS_PAGES.cityCompute;
   }
   return PIVOT_OPS_PAGES.overview;
 }

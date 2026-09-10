@@ -1,0 +1,1294 @@
+const mongoose = require('mongoose');
+const getGlobalModels = require('./getGlobalModelService');
+const getModels = require('./getModelService');
+const {
+  CONTRACT_VERSION,
+  validateExecutionResult,
+  validateResultPreview,
+  isStaleContextPreview,
+} = require('../utilities/pivotAdminComputeJobContract');
+const { recordVersion, isoTimestamp } = require('../utilities/pivotComputeContextVersion');
+const { resolveEventBatchWeek } = require('../utilities/pivotIsoWeek');
+const {
+  findJobByExternalId,
+  beginComputeJobApply,
+  completeComputeJobApply,
+} = require('./pivotComputeJobStore');
+
+const MAX_PREVIEW_ROWS = 5000;
+
+function trimString(value) {
+  return typeof value === 'string' ? value.trim() : '';
+}
+
+function serviceError(message, code, status = 400) {
+  const error = new Error(message);
+  error.code = code;
+  error.status = status;
+  return error;
+}
+
+function sortedStrings(values) {
+  return [...new Set((values || []).map((value) => trimString(value)).filter(Boolean))].sort();
+}
+
+function summarizePreviewRows(rows) {
+  const summary = {
+    creates: 0,
+    updates: 0,
+    unchanged: 0,
+    conflicts: 0,
+    rejected: 0,
+    stale: 0,
+  };
+  const actionToSummaryKey = {
+    create: 'creates',
+    update: 'updates',
+    unchanged: 'unchanged',
+    conflict: 'conflicts',
+    rejected: 'rejected',
+    stale: 'stale',
+  };
+  for (const row of rows) {
+    const summaryKey = actionToSummaryKey[row.action];
+    if (summaryKey && summary[summaryKey] != null) summary[summaryKey] += 1;
+  }
+  return summary;
+}
+
+function comparablePreview(preview) {
+  return JSON.stringify({
+    jobId: preview?.jobId,
+    contextVersion: preview?.contextVersion,
+    basedOnContextVersion: preview?.basedOnContextVersion,
+    applyAllowed: preview?.applyAllowed,
+    blockingReasons: preview?.blockingReasons,
+    rows: preview?.rows,
+    summary: preview?.summary,
+  });
+}
+
+function sourceRowKey(host) {
+  return `host:${trimString(host).toLowerCase()}`;
+}
+
+function curationJobRowKey(proposal) {
+  if (proposal.jobId) return `jobId:${proposal.jobId}`;
+  return `provider:${proposal.provider}|url:${proposal.url || ''}`;
+}
+
+function eventRowKey(sourceUrl) {
+  return `sourceUrl:${trimString(sourceUrl)}`;
+}
+
+function serializeEventIdentity(eventDoc) {
+  const row = eventDoc?.toObject ? eventDoc.toObject() : eventDoc;
+  const sourceUrl = trimString(row?.customFields?.pivot?.sourceUrl);
+  const name = trimString(row?.name);
+  if (!sourceUrl || !name) return null;
+  const material = {
+    id: String(row._id || ''),
+    sourceUrl,
+    name,
+    startTime: row.start_time instanceof Date ? row.start_time.toISOString() : isoTimestamp(row.start_time),
+    batchWeek: trimString(row?.customFields?.pivot?.batchWeek) || null,
+    location: trimString(row?.location) || null,
+    tags: sortedStrings(row?.customFields?.pivot?.tags),
+    updatedAt: isoTimestamp(row?.updatedAt),
+  };
+  return {
+    recordVersion: recordVersion('event', material),
+    sourceUrl,
+    eventId: String(row._id),
+  };
+}
+
+function sourceProposalMaterial(proposal) {
+  return {
+    host: proposal.host,
+    url: proposal.url,
+    label: proposal.label ?? null,
+    provider: proposal.provider,
+    status: proposal.status,
+    enabled: proposal.enabled !== false,
+    seedTags: sortedStrings(proposal.seedTags),
+    rejectedReason: proposal.rejectedReason ?? null,
+  };
+}
+
+function curationJobProposalMaterial(proposal) {
+  return {
+    label: proposal.label,
+    url: proposal.url ?? null,
+    provider: proposal.provider,
+    enabled: proposal.enabled !== false,
+    defaultTags: sortedStrings(proposal.defaultTags),
+  };
+}
+
+function eventProposalMaterial(proposal) {
+  const draft = proposal.draft || {};
+  return {
+    sourceUrl: proposal.sourceUrl,
+    batchWeek: proposal.batchWeek,
+    draft: {
+      name: draft.name,
+      description: draft.description ?? null,
+      image: draft.image ?? null,
+      location: draft.location ?? null,
+      rawLocationText: draft.rawLocationText ?? null,
+      start_time: draft.start_time,
+      end_time: draft.end_time ?? null,
+      hostName: draft.hostName ?? null,
+      hostProfileUrl: draft.hostProfileUrl ?? null,
+      tags: sortedStrings(draft.tags),
+    },
+  };
+}
+
+function boundedReviewValue(value) {
+  if (value == null) return null;
+  if (Array.isArray(value)) return value.slice(0, 12).map((item) => boundedReviewValue(item));
+  if (typeof value === 'string') return value.length > 240 ? `${value.slice(0, 237)}…` : value;
+  if (typeof value === 'number' || typeof value === 'boolean') return value;
+  return null;
+}
+
+function materialChanges(currentMaterial, proposalMaterial) {
+  const current = currentMaterial?.draft || {};
+  const proposed = proposalMaterial?.draft || {};
+  const fields = [
+    'name',
+    'start_time',
+    'end_time',
+    'location',
+    'rawLocationText',
+    'hostName',
+    'hostProfileUrl',
+    'tags',
+    'image',
+    'description',
+  ];
+  const changes = [];
+  if (currentMaterial?.batchWeek !== proposalMaterial?.batchWeek) {
+    changes.push({
+      field: 'batchWeek',
+      before: boundedReviewValue(currentMaterial?.batchWeek),
+      after: boundedReviewValue(proposalMaterial?.batchWeek),
+    });
+  }
+  for (const field of fields) {
+    if (JSON.stringify(current[field] ?? null) === JSON.stringify(proposed[field] ?? null)) continue;
+    changes.push({
+      field,
+      before: boundedReviewValue(current[field]),
+      after: boundedReviewValue(proposed[field]),
+    });
+  }
+  return changes;
+}
+
+const REVIEW_WARNING_COPY = {
+  STALE_EVENT: {
+    title: 'Stale production records',
+    message: 'Production changed after the worker snapshot, so these proposals need a fresh review.',
+  },
+  EVENT_CONFLICT: {
+    title: 'Event conflicts',
+    message: 'These proposals conflict with the current production state.',
+  },
+  PUBLISHED_EVENT_UPDATE: {
+    title: 'Published events changing',
+    message: 'Applying will immediately change events that are already visible in the feed.',
+  },
+  PAST_EVENT: {
+    title: 'Events starting in the past',
+    message: 'These proposed events have a start time earlier than this review.',
+  },
+  MATERIAL_EVENT_UPDATE: {
+    title: 'Material event updates',
+    message: 'These updates change identity, time, week, or location fields.',
+  },
+  HIGH_VOLUME_SOURCE: {
+    title: 'High-volume sources',
+    message: 'These sources produced an unusually large set of mutations.',
+  },
+  CURATION_JOB_INCOMPLETE: {
+    title: 'Incomplete curation jobs',
+    message: 'These curation jobs failed or were skipped during the refresh.',
+  },
+};
+
+function aggregateReviewWarnings(attention) {
+  const warnings = new Map();
+  for (const item of attention) {
+    const copy = REVIEW_WARNING_COPY[item.code] || {
+      title: item.title || 'Review warning',
+      message: item.message || 'Review these results before applying.',
+    };
+    const warning = warnings.get(item.code) || {
+      code: item.code,
+      title: copy.title,
+      message: copy.message,
+      severity: item.severity || 'attention',
+      count: 0,
+      samples: [],
+    };
+    warning.count += 1;
+    if (item.severity === 'high') warning.severity = 'high';
+    const candidates = item.samples?.length ? item.samples : [{
+      title: item.title,
+      sourceUrl: item.sourceUrl,
+      jobLabel: item.jobLabel,
+      provider: item.provider,
+    }];
+    for (const sample of candidates) {
+      if (warning.samples.length >= 3 || !sample?.title) break;
+      if (!warning.samples.some((current) => current.title === sample.title
+        && current.sourceUrl === sample.sourceUrl)) {
+        warning.samples.push({
+          title: sample.title,
+          sourceUrl: sample.sourceUrl || null,
+          jobLabel: sample.jobLabel || item.jobLabel || null,
+          provider: sample.provider || item.provider || null,
+        });
+      }
+    }
+    warnings.set(item.code, warning);
+  }
+  return [...warnings.values()].sort((a, b) =>
+    (a.severity === b.severity ? 0 : (a.severity === 'high' ? -1 : 1))
+    || (b.count - a.count)
+    || a.title.localeCompare(b.title));
+}
+
+function buildCurationQuality(result) {
+  const proposals = result.proposals?.events || [];
+  const tagCounts = new Map();
+  const batchWeekCounts = new Map();
+  const missing = {
+    untagged: { key: 'untagged', label: 'No tags', count: 0, samples: [] },
+    missingHost: { key: 'missing-host', label: 'Missing host', count: 0, samples: [] },
+    missingDescription: { key: 'missing-description', label: 'Missing description', count: 0, samples: [] },
+    missingImage: { key: 'missing-image', label: 'Missing image', count: 0, samples: [] },
+    missingLocation: { key: 'missing-location', label: 'Missing location', count: 0, samples: [] },
+  };
+  const eventsMissingAny = new Set();
+
+  const markMissing = (bucket, proposal, index) => {
+    bucket.count += 1;
+    eventsMissingAny.add(index);
+    if (bucket.samples.length < 3) {
+      bucket.samples.push({
+        title: trimString(proposal.draft?.name) || proposal.sourceUrl,
+        sourceUrl: proposal.sourceUrl,
+      });
+    }
+  };
+
+  proposals.forEach((proposal, index) => {
+    const draft = proposal.draft || {};
+    const tags = sortedStrings(draft.tags);
+    if (!tags.length) markMissing(missing.untagged, proposal, index);
+    for (const tag of tags) tagCounts.set(tag, (tagCounts.get(tag) || 0) + 1);
+
+    if (!trimString(draft.hostName)) markMissing(missing.missingHost, proposal, index);
+    if (!trimString(draft.description)) markMissing(missing.missingDescription, proposal, index);
+    if (!trimString(draft.image)) markMissing(missing.missingImage, proposal, index);
+    if (!trimString(draft.location)) markMissing(missing.missingLocation, proposal, index);
+
+    const batchWeek = trimString(proposal.batchWeek);
+    if (batchWeek) batchWeekCounts.set(batchWeek, (batchWeekCounts.get(batchWeek) || 0) + 1);
+  });
+
+  const batchWeeks = [...batchWeekCounts.entries()]
+    .map(([batchWeek, count]) => ({ batchWeek, count }))
+    .sort((a, b) => a.batchWeek.localeCompare(b.batchWeek));
+  const missingMetadata = Object.values(missing).filter((item) => item.count > 0);
+
+  return {
+    eventCount: proposals.length,
+    metadataComplete: proposals.length - eventsMissingAny.size,
+    eventsMissingMetadata: eventsMissingAny.size,
+    needsRichData: proposals.filter((proposal) =>
+      !trimString(proposal.draft?.description) || !trimString(proposal.draft?.image)).length,
+    resolvedBatchWeek: batchWeeks.length === 1 ? batchWeeks[0].batchWeek : null,
+    batchWeeks,
+    tagBreakdown: [...tagCounts.entries()]
+      .map(([tag, count]) => ({ tag, count }))
+      .sort((a, b) => (b.count - a.count) || a.tag.localeCompare(b.tag)),
+    missingMetadata,
+  };
+}
+
+function buildApplyPlan(result, identities, preview, now = new Date()) {
+  const rowByKey = new Map(preview.rows.map((row) => [row.key, row]));
+  const destinationCounts = new Map();
+  const batchWeekCounts = new Map();
+  const batchWeekSourceCounts = new Map();
+
+  for (const proposal of result.proposals?.events || []) {
+    const row = rowByKey.get(eventRowKey(proposal.sourceUrl));
+    if (row?.action !== 'create' && row?.action !== 'update') continue;
+
+    const currentDoc = identities.eventDocBySourceUrl.get(proposal.sourceUrl) || null;
+    const currentStatus = trimString(currentDoc?.customFields?.pivot?.ingestStatus);
+    const status = row.action === 'create'
+      ? 'staged'
+      : (['draft', 'staged', 'published'].includes(currentStatus) ? currentStatus : 'staged');
+    const destinationKey = `${row.action}:${status}`;
+    const destination = destinationCounts.get(destinationKey) || {
+      action: row.action,
+      status,
+      count: 0,
+    };
+    destination.count += 1;
+    destinationCounts.set(destinationKey, destination);
+
+    const week = resolveEventBatchWeek({
+      batchWeek: proposal.batchWeek,
+      startTime: proposal.draft?.start_time,
+      timeSlots: proposal.draft?.timeSlots,
+      now,
+    });
+    if (!week.error) {
+      batchWeekCounts.set(week.batchWeek, (batchWeekCounts.get(week.batchWeek) || 0) + 1);
+      batchWeekSourceCounts.set(week.source, (batchWeekSourceCounts.get(week.source) || 0) + 1);
+    }
+  }
+
+  const entityRows = (entityType) => preview.rows.filter((row) =>
+    row.entityType === entityType && (row.action === 'create' || row.action === 'update'));
+  const summarizeEntityRows = (entityType) => {
+    const rows = entityRows(entityType);
+    return {
+      creates: rows.filter((row) => row.action === 'create').length,
+      updates: rows.filter((row) => row.action === 'update').length,
+    };
+  };
+
+  return {
+    eventDestinations: [...destinationCounts.values()].sort((a, b) =>
+      ['published', 'staged', 'draft'].indexOf(a.status) - ['published', 'staged', 'draft'].indexOf(b.status)
+      || a.action.localeCompare(b.action)),
+    batchWeeks: [...batchWeekCounts.entries()]
+      .map(([batchWeek, count]) => ({ batchWeek, count }))
+      .sort((a, b) => a.batchWeek.localeCompare(b.batchWeek)),
+    batchWeekSources: [...batchWeekSourceCounts.entries()]
+      .map(([source, count]) => ({ source, count }))
+      .sort((a, b) => (b.count - a.count) || a.source.localeCompare(b.source)),
+    sources: summarizeEntityRows('source'),
+    curationJobs: result.kind === 'city-source-discovery'
+      ? summarizeEntityRows('curationJob')
+      : { creates: 0, updates: 0 },
+  };
+}
+
+function buildComputeReview(result, identities, preview, now = new Date()) {
+  const rowByKey = new Map(preview.rows.map((row) => [row.key, row]));
+  const jobGroups = new Map();
+  const attention = [];
+  const impact = {
+    eventCreates: 0,
+    eventUpdates: 0,
+    publishedEventUpdates: 0,
+    stagedEventUpdates: 0,
+    unchangedEvents: 0,
+    sourceMutations: preview.rows.filter((row) => row.entityType === 'source'
+      && (row.action === 'create' || row.action === 'update')).length,
+    curationJobMutations: result.kind === 'city-source-discovery'
+      ? preview.rows.filter((row) => row.entityType === 'curationJob'
+        && (row.action === 'create' || row.action === 'update')).length
+      : 0,
+  };
+
+  for (const proposal of result.proposals?.events || []) {
+    const key = eventRowKey(proposal.sourceUrl);
+    const row = rowByKey.get(key);
+    const currentDoc = identities.eventDocBySourceUrl.get(proposal.sourceUrl) || null;
+    const currentMaterial = currentDoc ? eventDocToProposalMaterial(currentDoc) : null;
+    const proposalMaterial = eventProposalMaterial(proposal);
+    const ingestStatus = trimString(currentDoc?.customFields?.pivot?.ingestStatus) || null;
+    const job = proposal.linkedJobId ? identities.jobById.get(proposal.linkedJobId) : null;
+    const groupKey = proposal.linkedJobId || proposal.evidence?.discoveredFromHost || 'unattributed';
+    const group = jobGroups.get(groupKey) || {
+      key: groupKey,
+      jobId: proposal.linkedJobId || null,
+      label: job?.label || proposal.evidence?.discoveredFromHost || 'Unattributed events',
+      provider: job?.provider || proposal.evidence?.provider || null,
+      host: job?.linkedSourceHost || proposal.evidence?.discoveredFromHost || null,
+      creates: 0,
+      updates: 0,
+      unchanged: 0,
+      attention: 0,
+      samples: [],
+    };
+    if (row?.action === 'create') {
+      impact.eventCreates += 1;
+      group.creates += 1;
+    } else if (row?.action === 'update') {
+      impact.eventUpdates += 1;
+      group.updates += 1;
+      if (ingestStatus === 'published') impact.publishedEventUpdates += 1;
+      else impact.stagedEventUpdates += 1;
+    } else if (row?.action === 'unchanged') {
+      impact.unchangedEvents += 1;
+      group.unchanged += 1;
+    }
+    if (group.samples.length < 3 && row?.action !== 'unchanged') {
+      group.samples.push({
+        title: proposal.draft?.name || proposal.sourceUrl,
+        start: proposal.draft?.start_time || null,
+        action: row?.action || null,
+        sourceUrl: proposal.sourceUrl,
+      });
+    }
+
+    const changes = currentMaterial ? materialChanges(currentMaterial, proposalMaterial) : [];
+    const proposedStart = Date.parse(proposal.draft?.start_time);
+    let risk = null;
+    if (row?.action === 'stale' || row?.action === 'conflict') {
+      risk = {
+        code: row.action === 'stale' ? 'STALE_EVENT' : 'EVENT_CONFLICT',
+        severity: 'high',
+        message: row.message || 'Production no longer matches the worker snapshot.',
+      };
+    } else if (row?.action === 'update' && ingestStatus === 'published') {
+      risk = {
+        code: 'PUBLISHED_EVENT_UPDATE',
+        severity: 'high',
+        message: 'Applying this row changes an event that is already visible in the feed.',
+      };
+    } else if (Number.isFinite(proposedStart) && proposedStart < now.getTime()) {
+      risk = {
+        code: 'PAST_EVENT',
+        severity: 'attention',
+        message: 'The proposed event start is already in the past.',
+      };
+    } else if (row?.action === 'update' && changes.some((change) => [
+      'name', 'start_time', 'end_time', 'location', 'batchWeek',
+    ].includes(change.field))) {
+      risk = {
+        code: 'MATERIAL_EVENT_UPDATE',
+        severity: 'attention',
+        message: 'This update changes identity, time, week, or location fields.',
+      };
+    }
+    if (risk) {
+      group.attention += 1;
+      attention.push({
+        ...risk,
+        key,
+        title: proposal.draft?.name || proposal.sourceUrl,
+        sourceUrl: proposal.sourceUrl,
+        jobId: proposal.linkedJobId || null,
+        jobLabel: group.label,
+        provider: group.provider,
+        ingestStatus,
+        changes: changes.slice(0, 12),
+      });
+    }
+    jobGroups.set(groupKey, group);
+  }
+
+  for (const group of jobGroups.values()) {
+    const mutationCount = group.creates + group.updates;
+    if (mutationCount < 50) continue;
+    group.attention += 1;
+    attention.push({
+      code: 'HIGH_VOLUME_SOURCE',
+      severity: 'attention',
+      key: `group:${group.key}`,
+      title: group.label,
+      sourceUrl: group.host ? `https://${group.host}` : null,
+      jobId: group.jobId,
+      jobLabel: group.label,
+      provider: group.provider,
+      ingestStatus: null,
+      message: `${mutationCount} event mutations came from this curation job. Review its source health and sample its dates before applying.`,
+      changes: [],
+      samples: group.samples,
+    });
+  }
+
+  const outcomes = (result.proposals?.jobOutcomes || []).map((outcome) => {
+    const job = identities.jobById.get(outcome.jobId) || null;
+    const row = rowByKey.get(curationJobRowKey({ jobId: outcome.jobId }));
+    const entry = {
+      jobId: outcome.jobId,
+      label: job?.label || outcome.jobId,
+      provider: job?.provider || null,
+      host: job?.linkedSourceHost || null,
+      outcome: outcome.outcome,
+      message: outcome.failure?.message || row?.message || null,
+    };
+    if (outcome.outcome !== 'completed') {
+      attention.push({
+        code: 'CURATION_JOB_INCOMPLETE',
+        severity: 'high',
+        key: `jobId:${outcome.jobId}`,
+        title: entry.label,
+        jobId: outcome.jobId,
+        jobLabel: entry.label,
+        provider: entry.provider,
+        sourceUrl: null,
+        ingestStatus: null,
+        message: entry.message || `Curation job ${outcome.outcome}.`,
+        changes: [],
+      });
+    }
+    return entry;
+  });
+
+  const starts = (result.proposals?.events || [])
+    .map((proposal) => proposal.draft?.start_time)
+    .filter((value) => !Number.isNaN(Date.parse(value)))
+    .sort();
+
+  return {
+    executionSummary: result.summary || {},
+    timezone: trimString(identities.tenant?.pivotDropTimezone) || 'UTC',
+    impact,
+    sourceHealth: {
+      completed: outcomes.filter((row) => row.outcome === 'completed').length,
+      failed: outcomes.filter((row) => row.outcome === 'failed').length,
+      skipped: outcomes.filter((row) => row.outcome === 'skipped').length,
+      outcomes,
+    },
+    eventWindow: {
+      earliestStart: starts[0] || null,
+      latestStart: starts[starts.length - 1] || null,
+    },
+    attention: attention.slice(0, 500),
+    attentionTotal: attention.length,
+    warningGroups: aggregateReviewWarnings(attention),
+    curationQuality: buildCurationQuality(result),
+    applyPlan: buildApplyPlan(result, identities, preview, now),
+    groups: [...jobGroups.values()].sort((a, b) =>
+      (b.attention - a.attention)
+      || ((b.creates + b.updates) - (a.creates + a.updates))
+      || a.label.localeCompare(b.label)),
+  };
+}
+
+function classifyVersionedProposal({
+  entityType,
+  key,
+  proposalAction,
+  basedOnRecordVersion,
+  current,
+  proposalMaterial,
+  currentMaterial,
+  rejectedReason = null,
+}) {
+  const evidence = {};
+  if (entityType === 'source') {
+    evidence.host = key.replace(/^host:/, '');
+  }
+  if (entityType === 'event') {
+    evidence.sourceUrl = key.replace(/^sourceUrl:/, '');
+  }
+  if (entityType === 'curationJob' && current?.jobId) {
+    evidence.jobId = current.jobId;
+  }
+
+  if (rejectedReason) {
+    return {
+      entityType,
+      action: 'rejected',
+      key,
+      basedOnRecordVersion: basedOnRecordVersion ?? null,
+      currentRecordVersion: current?.recordVersion ?? null,
+      message: rejectedReason,
+      evidence,
+    };
+  }
+
+  if (!current) {
+    if (proposalAction === 'create' || proposalAction === 'upsert') {
+      return {
+        entityType,
+        action: 'create',
+        key,
+        basedOnRecordVersion: basedOnRecordVersion ?? null,
+        currentRecordVersion: null,
+        message: null,
+        evidence,
+      };
+    }
+    return {
+      entityType,
+      action: 'rejected',
+      key,
+      basedOnRecordVersion: basedOnRecordVersion ?? null,
+      currentRecordVersion: null,
+      message: 'Cannot update a record that does not exist.',
+      evidence,
+    };
+  }
+
+  if (basedOnRecordVersion && basedOnRecordVersion !== current.recordVersion) {
+    return {
+      entityType,
+      action: 'stale',
+      key,
+      basedOnRecordVersion,
+      currentRecordVersion: current.recordVersion,
+      message: 'Production record changed after the worker snapshot.',
+      evidence,
+    };
+  }
+
+  const proposalHash = recordVersion('preview', proposalMaterial);
+  const currentHash = recordVersion('preview', currentMaterial);
+  if (proposalHash === currentHash) {
+    return {
+      entityType,
+      action: 'unchanged',
+      key,
+      basedOnRecordVersion: basedOnRecordVersion ?? current.recordVersion,
+      currentRecordVersion: current.recordVersion,
+      message: null,
+      evidence,
+    };
+  }
+
+  if (proposalAction === 'update' || proposalAction === 'upsert' || proposalAction === 'create') {
+    return {
+      entityType,
+      action: 'update',
+      key,
+      basedOnRecordVersion: basedOnRecordVersion ?? current.recordVersion,
+      currentRecordVersion: current.recordVersion,
+      message: null,
+      evidence,
+    };
+  }
+
+  return {
+    entityType,
+    action: 'conflict',
+    key,
+    basedOnRecordVersion: basedOnRecordVersion ?? null,
+    currentRecordVersion: current.recordVersion,
+    message: 'Proposal action is incompatible with current production state.',
+    evidence,
+  };
+}
+
+function validateComputeExecutionResult(result) {
+  if (trimString(result?.contractVersion) !== CONTRACT_VERSION) {
+    throw serviceError(
+      `Unsupported compute contract version: ${result?.contractVersion || 'unknown'}`,
+      'UNSUPPORTED_COMPUTE_CONTRACT_VERSION',
+      400,
+    );
+  }
+  const validation = validateExecutionResult(result);
+  if (!validation.valid) {
+    throw serviceError(
+      `Invalid compute execution result: ${validation.errors.join(', ')}`,
+      'INVALID_COMPUTE_EXECUTION_RESULT',
+      400,
+    );
+  }
+  if (result.outcome !== 'completed') {
+    throw serviceError(
+      'Only completed compute results can be previewed or applied.',
+      'COMPUTE_RESULT_NOT_APPLYABLE',
+      409,
+    );
+  }
+  return result;
+}
+
+async function resolvePivotTenant(req, tenantKey) {
+  const { resolvePivotTenant: resolveTenant } = require('./pivotIngestPublishService');
+  return resolveTenant(req, tenantKey);
+}
+
+async function resolveCurrentContextVersion(req, result, { authorize = null } = {}) {
+  const options = {
+    cityKey: result.cityKey,
+    jobId: result.jobId,
+    scheduleOccurrenceId: result.scheduleOccurrenceId ?? null,
+    authorize: authorize || (async () => null),
+  };
+  if (result.kind === 'city-source-discovery') {
+    const { buildCityDiscoveryContextSnapshot } = require('./pivotOffloadedDiscoveryContextService');
+    const built = await buildCityDiscoveryContextSnapshot(req, options);
+    if (built?.error) throw serviceError(built.error, built.code || 'DISCOVERY_CONTEXT_FAILED', built.status || 500);
+    return built.data.snapshot.contextVersion;
+  }
+  const { buildCityCurationRefreshContextSnapshot } = require('./pivotOffloadedCurationRefreshContextService');
+  const built = await buildCityCurationRefreshContextSnapshot(req, options);
+  if (built?.error) throw serviceError(built.error, built.code || 'REFRESH_CONTEXT_FAILED', built.status || 500);
+  return built.data.snapshot.contextVersion;
+}
+
+async function loadProductionIdentities(req, result) {
+  const tenantResult = await resolvePivotTenant(req, result.cityKey);
+  if (tenantResult.error) {
+    throw serviceError(tenantResult.error, tenantResult.code || 'TENANT_NOT_FOUND', tenantResult.status || 404);
+  }
+
+  const {
+    serializeSourceIdentity,
+    serializeCurationJobIdentity,
+  } = require('./pivotOffloadedDiscoveryContextService');
+
+  const { PivotCitySource, PivotCurationJob } = getGlobalModels(req, 'PivotCitySource', 'PivotCurationJob');
+  const [sourceRows, jobRows] = await Promise.all([
+    PivotCitySource.find({ tenantKey: result.cityKey }).lean(),
+    PivotCurationJob.find({ tenantKey: result.cityKey }).lean(),
+  ]);
+
+  const sources = sourceRows.map(serializeSourceIdentity).filter(Boolean);
+  let curationJobs;
+  if (result.kind === 'city-curation-refresh') {
+    const { serializeRefreshJobIdentity } = require('./pivotOffloadedCurationRefreshContextService');
+    curationJobs = jobRows.map((row) => serializeRefreshJobIdentity(row)).filter(Boolean);
+  } else {
+    curationJobs = jobRows.map(serializeCurationJobIdentity).filter(Boolean);
+  }
+
+  const sourceByHost = new Map(sources.map((row) => [row.host, row]));
+  const jobById = new Map(curationJobs.map((row) => [row.jobId, row]));
+  const jobByKey = new Map(curationJobs.map((row) => [curationJobRowKey(row), row]));
+
+  let eventBySourceUrl = new Map();
+  let eventDocBySourceUrl = new Map();
+  const eventUrls = (result.proposals?.events || []).map((row) => trimString(row.sourceUrl)).filter(Boolean);
+  if (eventUrls.length) {
+    const { Event } = getModels(req, 'Event');
+    const eventRows = await Event.find({
+      'customFields.pivot.sourceUrl': { $in: eventUrls },
+    }).lean();
+    for (const eventDoc of eventRows) {
+      const identity = serializeEventIdentity(eventDoc);
+      if (!identity) continue;
+      eventBySourceUrl.set(identity.sourceUrl, identity);
+      eventDocBySourceUrl.set(identity.sourceUrl, eventDoc);
+    }
+  }
+
+  return {
+    tenant: tenantResult.tenant,
+    sourceByHost,
+    jobById,
+    jobByKey,
+    eventBySourceUrl,
+    eventDocBySourceUrl,
+  };
+}
+
+function eventDocToProposalMaterial(eventDoc) {
+  const row = eventDoc?.toObject ? eventDoc.toObject() : eventDoc;
+  return eventProposalMaterial({
+    sourceUrl: trimString(row?.customFields?.pivot?.sourceUrl),
+    batchWeek: trimString(row?.customFields?.pivot?.batchWeek) || null,
+    draft: {
+      name: row?.name,
+      description: row?.description ?? null,
+      image: row?.image ?? null,
+      location: row?.location ?? null,
+      rawLocationText: row?.customFields?.pivot?.rawLocationText ?? null,
+      start_time: row?.start_time instanceof Date ? row.start_time.toISOString() : row?.start_time,
+      end_time: row?.end_time instanceof Date ? row.end_time.toISOString() : row?.end_time ?? null,
+      hostName: row?.customFields?.pivot?.host?.name ?? null,
+      hostProfileUrl: row?.customFields?.pivot?.host?.profileUrl ?? null,
+      tags: row?.customFields?.pivot?.tags,
+    },
+  });
+}
+
+function previewDiscoveryProposals(result, identities) {
+  const rows = [];
+  for (const proposal of result.proposals?.sources || []) {
+    const current = identities.sourceByHost.get(proposal.host) || null;
+    rows.push(classifyVersionedProposal({
+      entityType: 'source',
+      key: sourceRowKey(proposal.host),
+      proposalAction: proposal.action,
+      basedOnRecordVersion: proposal.basedOnRecordVersion,
+      current,
+      proposalMaterial: sourceProposalMaterial(proposal),
+      currentMaterial: current ? sourceProposalMaterial({ ...current, action: 'update', seedTags: current.seedTags }) : null,
+      rejectedReason: proposal.status === 'rejected' ? (proposal.rejectedReason || 'rejected') : null,
+    }));
+  }
+
+  for (const proposal of result.proposals?.curationJobs || []) {
+    const current = identities.jobByKey.get(curationJobRowKey(proposal)) || null;
+    rows.push(classifyVersionedProposal({
+      entityType: 'curationJob',
+      key: curationJobRowKey(proposal),
+      proposalAction: proposal.action,
+      basedOnRecordVersion: proposal.basedOnRecordVersion,
+      current,
+      proposalMaterial: curationJobProposalMaterial(proposal),
+      currentMaterial: current ? curationJobProposalMaterial(current) : null,
+    }));
+  }
+
+  for (const proposal of result.proposals?.events || []) {
+    const current = identities.eventBySourceUrl.get(proposal.sourceUrl) || null;
+    const currentDoc = identities.eventDocBySourceUrl.get(proposal.sourceUrl) || null;
+    rows.push(classifyVersionedProposal({
+      entityType: 'event',
+      key: eventRowKey(proposal.sourceUrl),
+      proposalAction: proposal.action,
+      basedOnRecordVersion: proposal.basedOnEventVersion,
+      current,
+      proposalMaterial: eventProposalMaterial(proposal),
+      currentMaterial: currentDoc ? eventDocToProposalMaterial(currentDoc) : null,
+    }));
+  }
+
+  return rows;
+}
+
+function previewRefreshProposals(result, identities) {
+  const rows = [];
+  for (const outcome of result.proposals?.jobOutcomes || []) {
+    const current = identities.jobById.get(outcome.jobId) || null;
+    rows.push(classifyVersionedProposal({
+      entityType: 'curationJob',
+      key: curationJobRowKey({ jobId: outcome.jobId }),
+      proposalAction: 'update',
+      basedOnRecordVersion: outcome.basedOnRecordVersion,
+      current,
+      proposalMaterial: { outcome: outcome.outcome },
+      currentMaterial: current ? { outcome: 'completed' } : null,
+      rejectedReason: outcome.outcome === 'failed' || outcome.outcome === 'skipped'
+        ? (outcome.failure?.message || outcome.outcome)
+        : null,
+    }));
+  }
+
+  for (const proposal of result.proposals?.events || []) {
+    const current = identities.eventBySourceUrl.get(proposal.sourceUrl) || null;
+    const currentDoc = identities.eventDocBySourceUrl.get(proposal.sourceUrl) || null;
+    rows.push(classifyVersionedProposal({
+      entityType: 'event',
+      key: eventRowKey(proposal.sourceUrl),
+      proposalAction: proposal.action,
+      basedOnRecordVersion: proposal.basedOnEventVersion,
+      current,
+      proposalMaterial: eventProposalMaterial(proposal),
+      currentMaterial: currentDoc ? eventDocToProposalMaterial(currentDoc) : null,
+    }));
+  }
+
+  return rows;
+}
+
+function buildPreviewEnvelope(result, currentContextVersion, rows, now = new Date()) {
+  const blockingReasons = [];
+  if (isStaleContextPreview({ basedOnContextVersion: result.basedOnContextVersion }, currentContextVersion)) {
+    blockingReasons.push({
+      code: 'STALE_CONTEXT',
+      message: `Result was computed against ${result.basedOnContextVersion} but production is now ${currentContextVersion}.`,
+    });
+  }
+  if (rows.some((row) => row.action === 'stale')) {
+    blockingReasons.push({
+      code: 'STALE_ROWS',
+      message: 'One or more proposed rows are stale relative to current production records.',
+    });
+  }
+  if (rows.some((row) => row.action === 'conflict')) {
+    blockingReasons.push({
+      code: 'ROW_CONFLICT',
+      message: 'One or more proposed rows conflict with current production records.',
+    });
+  }
+
+  const applyAllowed = blockingReasons.length === 0
+    && rows.some((row) => row.action === 'create' || row.action === 'update');
+
+  const preview = {
+    contractVersion: CONTRACT_VERSION,
+    jobId: result.jobId,
+    scheduleOccurrenceId: result.scheduleOccurrenceId ?? null,
+    kind: result.kind,
+    cityKey: result.cityKey,
+    implementationRevision: result.implementationRevision,
+    contextVersion: currentContextVersion,
+    basedOnContextVersion: result.basedOnContextVersion,
+    previewedAt: isoTimestamp(now) || now.toISOString(),
+    applyAllowed,
+    blockingReasons,
+    rows: rows.slice(0, MAX_PREVIEW_ROWS),
+    summary: summarizePreviewRows(rows),
+  };
+
+  const validation = validateResultPreview(preview);
+  if (!validation.valid) {
+    throw serviceError(
+      `Generated preview failed validation: ${validation.errors.join(', ')}`,
+      'INVALID_COMPUTE_RESULT_PREVIEW',
+      500,
+    );
+  }
+  return preview;
+}
+
+function blockPreviewForMissingEventFields(result, preview) {
+  const rowByKey = new Map(preview.rows.map((row) => [row.key, row]));
+  const invalid = (result.proposals?.events || []).filter((proposal) => {
+    const action = rowByKey.get(eventRowKey(proposal.sourceUrl))?.action;
+    return (action === 'create' || action === 'update')
+      && requiredEventFieldsMissing(proposal).length > 0;
+  });
+  if (!invalid.length) return preview;
+
+  const fields = sortedStrings(invalid.flatMap((proposal) => requiredEventFieldsMissing(proposal)));
+  preview.applyAllowed = false;
+  preview.blockingReasons.push({
+    code: 'MISSING_REQUIRED_EVENT_FIELDS',
+    message: `${invalid.length} event proposal${invalid.length === 1 ? '' : 's'} must be fixed before apply. Missing: ${fields.join(', ')}.`,
+  });
+  return preview;
+}
+
+async function previewComputeResult(req, resultInput, {
+  currentContextVersion = null,
+  now = new Date(),
+  authorize = null,
+} = {}) {
+  const result = validateComputeExecutionResult(resultInput);
+  const contextVersion = currentContextVersion
+    || await resolveCurrentContextVersion(req, result, { authorize });
+  const identities = await loadProductionIdentities(req, result);
+  const rows = result.kind === 'city-curation-refresh'
+    ? previewRefreshProposals(result, identities)
+    : previewDiscoveryProposals(result, identities);
+  return blockPreviewForMissingEventFields(
+    result,
+    buildPreviewEnvelope(result, contextVersion, rows, now),
+  );
+}
+
+async function previewComputeResultWithReview(req, resultInput, {
+  currentContextVersion = null,
+  now = new Date(),
+  authorize = null,
+} = {}) {
+  const result = validateComputeExecutionResult(resultInput);
+  const contextVersion = currentContextVersion
+    || await resolveCurrentContextVersion(req, result, { authorize });
+  const identities = await loadProductionIdentities(req, result);
+  const rows = result.kind === 'city-curation-refresh'
+    ? previewRefreshProposals(result, identities)
+    : previewDiscoveryProposals(result, identities);
+  const preview = blockPreviewForMissingEventFields(
+    result,
+    buildPreviewEnvelope(result, contextVersion, rows, now),
+  );
+  return {
+    preview,
+    review: buildComputeReview(result, identities, preview, now),
+  };
+}
+
+async function applySourceRow(req, result, proposal) {
+  const { persistOutcome } = require('./pivotSourceDiscoveryService');
+  const outcome = {
+    candidate: {
+      host: proposal.host,
+      seedTags: new Set(proposal.seedTags || []),
+      discoveredVia: 'compute-apply',
+    },
+    status: proposal.status,
+    provider: proposal.provider,
+    url: proposal.url,
+    label: proposal.label,
+    eventCount: proposal.evidence?.eventCount || 0,
+    rejectedReason: proposal.rejectedReason || null,
+  };
+  await persistOutcome(req, result.cityKey, outcome, new Date());
+}
+
+async function findCurationJobProposal(result, proposal, identities) {
+  return identities.jobByKey.get(curationJobRowKey(proposal))
+    || [...identities.jobById.values()].find((row) => row.label === proposal.label && row.provider === proposal.provider)
+    || null;
+}
+
+async function applyCurationJobRow(req, result, proposal, identities) {
+  const { createCurationJob, updateCurationJob } = require('./pivotCurationJobService');
+  const existing = await findCurationJobProposal(result, proposal, identities);
+  if (!existing) {
+    await createCurationJob(req, {
+      tenantKey: result.cityKey,
+      label: proposal.label,
+      url: proposal.url,
+      provider: proposal.provider,
+      defaultTags: proposal.defaultTags || [],
+      enabled: proposal.enabled !== false,
+      defaultBatchWeekStrategy: 'next-drop',
+    });
+    return;
+  }
+  await updateCurationJob(req, {
+    tenantKey: result.cityKey,
+    jobId: existing.jobId,
+    url: proposal.url,
+    defaultTags: proposal.defaultTags,
+    enabled: proposal.enabled,
+  });
+}
+
+async function applyEventRow(req, result, proposal) {
+  const { publishIngestEvent } = require('./pivotIngestPublishService');
+  const published = await publishIngestEvent(req, {
+    tenantKey: result.cityKey,
+    draft: proposal.draft,
+    batchWeek: proposal.batchWeek,
+    url: proposal.sourceUrl,
+    tagsRequired: false,
+  });
+  if (published?.error) {
+    throw serviceError(published.error, published.code || 'EVENT_APPLY_FAILED', published.status || 500);
+  }
+}
+
+function requiredEventFieldsMissing(proposal) {
+  const draft = proposal?.draft || {};
+  const missing = [];
+  if (!trimString(draft.hostName)) missing.push('hostName');
+  if (!trimString(draft.name)) missing.push('name');
+  if (!trimString(draft.location)) missing.push('location');
+  if (!trimString(draft.start_time) && !draft.timeSlots?.length) missing.push('start_time');
+  return missing;
+}
+
+async function applyComputeResult(req, {
+  result: resultInput,
+  preview,
+  idempotencyKey,
+  actor = null,
+  now = new Date(),
+} = {}) {
+  const result = validateComputeExecutionResult(resultInput);
+  const normalizedKey = trimString(idempotencyKey);
+  if (!normalizedKey) {
+    throw serviceError('Apply idempotencyKey is required.', 'APPLY_IDEMPOTENCY_REQUIRED');
+  }
+  if (!preview || preview.jobId !== result.jobId) {
+    throw serviceError('Accepted preview is required.', 'PREVIEW_REQUIRED', 409);
+  }
+  if (!preview.applyAllowed) {
+    throw serviceError('Preview does not allow apply.', 'PREVIEW_APPLY_BLOCKED', 409);
+  }
+
+  const freshPreview = await previewComputeResult(req, result, { now });
+  if (comparablePreview(freshPreview) !== comparablePreview(preview)) {
+    throw serviceError('Preview is stale relative to current production state.', 'PREVIEW_STALE', 409);
+  }
+  if (!freshPreview.applyAllowed) {
+    throw serviceError('Fresh preview does not allow apply.', 'PREVIEW_APPLY_BLOCKED', 409);
+  }
+
+  const identities = await loadProductionIdentities(req, result);
+  const applicable = freshPreview.rows.filter((row) => row.action === 'create' || row.action === 'update');
+  const summary = {
+    creates: 0,
+    updates: 0,
+    unchanged: freshPreview.summary.unchanged,
+    conflicts: 0,
+    stale: 0,
+    rejected: freshPreview.summary.rejected,
+  };
+
+  const validationIssues = applicable
+    .filter((row) => row.entityType === 'event')
+    .map((row) => {
+      const proposal = (result.proposals.events || [])
+        .find((item) => eventRowKey(item.sourceUrl) === row.key);
+      const missingFields = requiredEventFieldsMissing(proposal);
+      return missingFields.length ? {
+        entityType: 'event',
+        key: row.key,
+        title: trimString(proposal?.draft?.name) || proposal?.sourceUrl || row.key,
+        sourceUrl: proposal?.sourceUrl || null,
+        missingFields,
+      } : null;
+    })
+    .filter(Boolean);
+  if (validationIssues.length) {
+    const fields = sortedStrings(validationIssues.flatMap((issue) => issue.missingFields));
+    const error = serviceError(
+      `${validationIssues.length} event proposal${validationIssues.length === 1 ? '' : 's'} cannot be applied. Missing required fields: ${fields.join(', ')}.`,
+      'COMPUTE_APPLY_VALIDATION_FAILED',
+      422,
+    );
+    error.validationIssues = validationIssues.slice(0, 100);
+    error.failedRow = validationIssues[0];
+    error.partialSummary = summary;
+    throw error;
+  }
+
+  let activeRow = null;
+  try {
+    for (const row of applicable) {
+      activeRow = row;
+      if (row.entityType === 'source') {
+        const proposal = (result.proposals.sources || []).find((item) => sourceRowKey(item.host) === row.key);
+        if (!proposal) continue;
+        await applySourceRow(req, result, proposal);
+        summary[row.action === 'create' ? 'creates' : 'updates'] += 1;
+        continue;
+      }
+      if (row.entityType === 'curationJob' && result.kind === 'city-source-discovery') {
+        const proposal = (result.proposals.curationJobs || []).find((item) => curationJobRowKey(item) === row.key);
+        if (!proposal) continue;
+        await applyCurationJobRow(req, result, proposal, identities);
+        summary[row.action === 'create' ? 'creates' : 'updates'] += 1;
+        continue;
+      }
+      if (row.entityType === 'event') {
+        const proposal = (result.proposals.events || []).find((item) => eventRowKey(item.sourceUrl) === row.key);
+        if (!proposal) continue;
+        await applyEventRow(req, result, proposal);
+        summary[row.action === 'create' ? 'creates' : 'updates'] += 1;
+      }
+    }
+  } catch (error) {
+    error.partialSummary = summary;
+    error.failedRow = error.failedRow || (activeRow ? {
+      entityType: activeRow.entityType,
+      key: activeRow.key,
+      action: activeRow.action,
+    } : null);
+    throw error;
+  }
+
+  return { summary, preview: freshPreview };
+}
+
+async function previewStoredComputeJob(req, externalJobId, options = {}) {
+  const job = await findJobByExternalId(req, externalJobId);
+  if (!job) throw serviceError('Compute job not found.', 'COMPUTE_JOB_NOT_FOUND', 404);
+  if (!job.result?.embedded) {
+    throw serviceError('Compute job has no stored result to preview.', 'COMPUTE_JOB_RESULT_MISSING', 409);
+  }
+  const { preview, review } = await previewComputeResultWithReview(
+    req,
+    job.result.embedded,
+    options,
+  );
+  return { job, preview, review };
+}
+
+async function applyStoredComputeJob(req, externalJobId, {
+  idempotencyKey,
+  preview,
+  tenantKey,
+  actor = null,
+  now = new Date(),
+} = {}) {
+  const job = await findJobByExternalId(req, externalJobId);
+  if (!job) throw serviceError('Compute job not found.', 'COMPUTE_JOB_NOT_FOUND', 404);
+  const requestedTenantKey = trimString(tenantKey).toLowerCase();
+  if (!requestedTenantKey) {
+    throw serviceError('A tenantKey is required to apply a compute job.', 'APPLY_TENANT_REQUIRED', 400);
+  }
+  const jobTenantKey = trimString(job.tenantKey || job.cityKey).toLowerCase();
+  const resultTenantKey = trimString(job.result?.embedded?.cityKey || job.cityKey).toLowerCase();
+  if (requestedTenantKey !== jobTenantKey || requestedTenantKey !== resultTenantKey) {
+    throw serviceError(
+      `Compute job belongs to tenant ${jobTenantKey || 'unknown'}, not ${requestedTenantKey}.`,
+      'COMPUTE_JOB_TENANT_MISMATCH',
+      409,
+    );
+  }
+  if (job.status === 'completed') {
+    if (job.applicationAudit?.idempotencyKey === trimString(idempotencyKey)) {
+      return { job, duplicate: true };
+    }
+    throw serviceError('Compute job result has already been applied.', 'COMPUTE_JOB_ALREADY_APPLIED', 409);
+  }
+  if (job.status !== 'review-required') {
+    throw serviceError(`Compute job cannot be applied from status ${job.status}.`, 'COMPUTE_JOB_NOT_REVIEWABLE', 409);
+  }
+  if (!job.result?.embedded) {
+    throw serviceError('Compute job has no stored result to apply.', 'COMPUTE_JOB_RESULT_MISSING', 409);
+  }
+
+  await beginComputeJobApply(req, {
+    externalJobId,
+    actor,
+    previewId: preview?.previewedAt || null,
+    idempotencyKey,
+    now,
+  });
+
+  try {
+    const applied = await applyComputeResult(req, {
+      result: job.result.embedded,
+      preview,
+      idempotencyKey,
+      actor,
+      now,
+    });
+    const completed = await completeComputeJobApply(req, {
+      externalJobId,
+      actor,
+      idempotencyKey,
+      summary: applied.summary,
+      outcome: 'completed',
+      now,
+    });
+    return { job: completed, duplicate: false, summary: applied.summary };
+  } catch (error) {
+    const partialSummary = error.partialSummary || {
+      creates: 0,
+      updates: 0,
+      unchanged: 0,
+      conflicts: 0,
+      stale: 0,
+      rejected: 0,
+    };
+    const appliedCount = (Number(partialSummary.creates) || 0) + (Number(partialSummary.updates) || 0);
+    const outcome = appliedCount > 0 ? 'partial' : 'rejected';
+    const reviewedJob = await completeComputeJobApply(req, {
+      externalJobId,
+      actor,
+      idempotencyKey: trimString(idempotencyKey) || `apply-failed:${externalJobId}`,
+      summary: partialSummary,
+      outcome,
+      now,
+    });
+    error.applyResult = {
+      outcome,
+      job: reviewedJob,
+      summary: partialSummary,
+      failedRow: error.failedRow || null,
+      validationIssues: error.validationIssues || [],
+    };
+    throw error;
+  }
+}
+
+async function previewManualComputeResult(req, resultInput, options = {}) {
+  return previewComputeResult(req, resultInput, options);
+}
+
+module.exports = {
+  sourceRowKey,
+  curationJobRowKey,
+  eventRowKey,
+  serializeEventIdentity,
+  classifyVersionedProposal,
+  summarizePreviewRows,
+  buildPreviewEnvelope,
+  buildComputeReview,
+  validateComputeExecutionResult,
+  previewComputeResult,
+  previewStoredComputeJob,
+  previewManualComputeResult,
+  applyComputeResult,
+  applyStoredComputeJob,
+};

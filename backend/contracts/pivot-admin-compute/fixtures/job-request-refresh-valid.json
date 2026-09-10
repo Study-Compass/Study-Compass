@@ -1,0 +1,15 @@
+{
+  "contractVersion": "1",
+  "jobId": "job:refresh-iowacity-001",
+  "scheduleOccurrenceId": "sched:weekly-refresh@2026-09-08T06:00:00.000Z",
+  "kind": "city-curation-refresh",
+  "cityKey": "iowacity",
+  "implementationRevision": "meridian-backend@2026.09.08",
+  "contextVersion": "ctx:iowacity.refresh.v7",
+  "requestedAt": "2026-09-08T06:00:05.000Z",
+  "idempotencyKey": "idem:refresh-iowacity-001",
+  "options": {
+    "batchWeek": "2026-W37",
+    "forceBatchWeek": false
+  }
+}

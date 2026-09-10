@@ -79,7 +79,20 @@ function createApp() {
   registerMobileAssociationRoutes(app);
 
   // Other middleware
-  app.use(express.json());
+  const defaultJsonParser = express.json();
+  app.use((req, res, next) => {
+    // Compute-result routers own separately bounded parsers for multi-megabyte
+    // artifacts. Letting the default 100 KiB parser run first would make those
+    // route-specific contracts unreachable in the assembled application.
+    const largeJsonBasePaths = [
+      '/worker/pivot/compute/v1',
+      '/admin/pivot/compute-jobs',
+    ];
+    if (largeJsonBasePaths.some((basePath) => (
+      req.path === basePath || req.path.startsWith(`${basePath}/`)
+    ))) return next();
+    return defaultJsonParser(req, res, next);
+  });
   app.use(express.urlencoded({ extended: true }));
   app.use(cookieParser());
   app.use(passport.initialize());
@@ -331,6 +344,8 @@ function createApp() {
   const noticeRoutes = require('./routes/noticeRoutes.js');
   const pivotRoutes = require('./routes/pivotRoutes.js');
   const pivotAdminRoutes = require('./routes/pivotAdminRoutes.js');
+  const { createPivotComputeWorkerRouter } = require('./routes/pivotComputeWorkerRoutes.js');
+  const pivotAdminComputeJobsRoutes = require('./routes/pivotAdminComputeJobsRoutes.js');
   const publicEventRoutes = require('./routes/publicEventRoutes.js');
 
   app.use(authRoutes);
@@ -372,6 +387,8 @@ function createApp() {
   app.use('/api/notice', noticeRoutes);
   app.use('/pivot', pivotRoutes);
   app.use('/admin/pivot', pivotAdminRoutes);
+  app.use('/admin/pivot/compute-jobs', pivotAdminComputeJobsRoutes);
+  app.use('/worker/pivot/compute/v1', createPivotComputeWorkerRouter());
   app.use('/verify-affiliated-email', affiliatedEmailRoutes);
   app.use('/proxy-image', require('./routes/proxyImageRoutes.js'));
 

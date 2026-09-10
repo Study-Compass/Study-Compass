@@ -1,0 +1,70 @@
+{
+  "contractVersion": "1",
+  "jobId": "job:refresh-iowacity-001",
+  "scheduleOccurrenceId": "sched:weekly-refresh@2026-09-08T06:00:00.000Z",
+  "kind": "city-curation-refresh",
+  "cityKey": "iowacity",
+  "implementationRevision": "meridian-backend@2026.09.08",
+  "contextVersion": "ctx:iowacity.refresh.v7",
+  "snapshotAt": "2026-09-08T06:00:00.000Z",
+  "tenant": {
+    "cityKey": "iowacity",
+    "name": "Iowa City",
+    "location": "Iowa City, IA",
+    "timezone": "America/Chicago"
+  },
+  "batchWeek": "2026-W37",
+  "forceBatchWeek": false,
+  "jobs": [
+    {
+      "recordVersion": "rv:job-luma-1",
+      "jobId": "507f1f77bcf86cd799439011",
+      "label": "Luma Iowa City",
+      "provider": "luma",
+      "url": "https://luma.com/iowa-city",
+      "enabled": true,
+      "defaultTags": ["community"],
+      "linkedSourceHost": "luma.com"
+    },
+    {
+      "recordVersion": "rv:job-theatre-1",
+      "jobId": "507f1f77bcf86cd799439012",
+      "label": "Example Theatre",
+      "provider": "generic-site",
+      "url": "https://example-theatre.org/events",
+      "enabled": true,
+      "defaultTags": ["live-music"],
+      "linkedSourceHost": "example-theatre.org"
+    }
+  ],
+  "sources": [
+    {
+      "recordVersion": "rv:src-luma-1",
+      "host": "luma.com",
+      "url": "https://luma.com/iowa-city",
+      "label": "Luma Iowa City",
+      "provider": "luma",
+      "status": "qualified",
+      "enabled": true,
+      "seedTags": ["community"],
+      "rejectedReason": null
+    }
+  ],
+  "organizers": [
+    {
+      "recordVersion": "rv:org-1",
+      "organizerId": "507f1f77bcf86cd799439013",
+      "normalizedName": "night owl cinema",
+      "aliases": ["Night Owl Cinema"]
+    }
+  ],
+  "permittedEventFields": {
+    "allowOrganizerLinking": true,
+    "allowLocationResolution": true,
+    "maxEventsPerJob": null
+  },
+  "providerCapabilities": {
+    "firecrawlConfigured": true,
+    "nativeProviders": ["luma", "partiful"]
+  }
+}
