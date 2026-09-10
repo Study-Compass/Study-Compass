@@ -234,6 +234,7 @@ async function executeOffloadedCityCurationRefresh(options = {}) {
       status: 500,
       code: 'REFRESH_RESULT_INVALID',
       details: resultValidation.errors,
+      repairCandidate: result,
     };
   }
 
@@ -244,6 +245,7 @@ async function executeOffloadedCityCurationRefresh(options = {}) {
       status: 500,
       code: 'REFRESH_RESULT_FORBIDDEN',
       details: forbidden,
+      repairCandidate: result,
     };
   }
 

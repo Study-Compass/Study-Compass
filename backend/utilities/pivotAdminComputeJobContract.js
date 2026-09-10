@@ -286,6 +286,19 @@ function validateExecutionResult(value) {
   return validateWithSchema(SCHEMAS.executionResult, value, { importable: true });
 }
 
+/**
+ * Central repair hook for worker-quarantined results. Keep this deliberately
+ * side-effect free: a future contract migration may normalize a cloned value
+ * here before validation without repeating provider calls.
+ */
+function prepareExecutionResultForRepair(value) {
+  const result = value == null ? value : JSON.parse(JSON.stringify(value));
+  const validation = validateExecutionResult(result);
+  return validation.valid
+    ? { valid: true, result }
+    : { valid: false, result, errors: validation.errors };
+}
+
 function validateDiagnosticExport(value) {
   return validateWithSchema(SCHEMAS.diagnosticExport, value);
 }
@@ -325,6 +338,7 @@ module.exports = {
   validateJobRequest,
   validateContextSnapshot,
   validateExecutionResult,
+  prepareExecutionResultForRepair,
   validateDiagnosticExport,
   validateWorkerCapability,
   validateResultPreview,

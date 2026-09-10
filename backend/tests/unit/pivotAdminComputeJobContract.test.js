@@ -6,6 +6,7 @@ const {
   validateJobRequest,
   validateContextSnapshot,
   validateExecutionResult,
+  prepareExecutionResultForRepair,
   validateDiagnosticExport,
   validateWorkerCapability,
   validateResultPreview,
@@ -159,6 +160,20 @@ describe('Pivot admin compute job contracts v1 (Phase 1, Step 1.2)', () => {
       expect(validation.errors).toEqual(expect.arrayContaining([
         expect.stringContaining('$.proposals.events[0].draft.description'),
         expect.stringContaining('$.proposals.events[0].draft.image'),
+      ]));
+    });
+
+    it('clones and revalidates quarantined results through the repair hook', () => {
+      const candidate = loadFixture('result-refresh-valid-completed.json');
+      const prepared = prepareExecutionResultForRepair(candidate);
+      expect(prepared).toMatchObject({ valid: true, result: candidate });
+      expect(prepared.result).not.toBe(candidate);
+
+      candidate.proposals.events[0].draft.description = 'x'.repeat(5001);
+      const invalid = prepareExecutionResultForRepair(candidate);
+      expect(invalid.valid).toBe(false);
+      expect(invalid.errors).toEqual(expect.arrayContaining([
+        expect.stringContaining('$.proposals.events[0].draft.description'),
       ]));
     });
   });

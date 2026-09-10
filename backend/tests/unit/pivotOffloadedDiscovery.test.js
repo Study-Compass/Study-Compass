@@ -245,6 +245,22 @@ describe('pivotOffloadedDiscoveryService (Phase 2, Step 2.2)', () => {
     expect(PivotCurationRun.create).not.toHaveBeenCalled();
   });
 
+  it('returns the complete candidate when a computed result fails contract validation', async () => {
+    const response = await runDiscovery({ implementationRevision: 'invalid revision' });
+
+    expect(response).toMatchObject({
+      code: 'DISCOVERY_RESULT_INVALID',
+      repairCandidate: {
+        jobId,
+        kind: 'city-source-discovery',
+        proposals: {
+          events: [expect.objectContaining({ sourceUrl: 'https://example-theatre.org/events/show-1' })],
+        },
+      },
+    });
+    expect(response.data).toBeUndefined();
+  });
+
   it('includes rejected source proposals without creating curation jobs', async () => {
     scrapeSiteEvents.mockResolvedValue({
       listLabel: 'Empty Calendar',

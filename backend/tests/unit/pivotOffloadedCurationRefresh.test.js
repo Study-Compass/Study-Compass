@@ -242,6 +242,20 @@ describe('pivotOffloadedCurationRefreshService (Phase 2, Step 2.3)', () => {
     });
   });
 
+  it('returns the complete candidate for private worker quarantine when final validation fails', async () => {
+    const response = await runRefresh({ implementationRevision: 'x'.repeat(300) });
+
+    expect(response).toMatchObject({
+      code: 'REFRESH_RESULT_INVALID',
+      details: expect.arrayContaining([expect.stringContaining('implementationRevision')]),
+      repairCandidate: expect.objectContaining({
+        kind: 'city-curation-refresh',
+        proposals: expect.objectContaining({ events: expect.any(Array) }),
+      }),
+    });
+    expect(response.data).toBeUndefined();
+  });
+
   it('does not write through production repositories when extraction succeeds', async () => {
     await runRefresh();
 

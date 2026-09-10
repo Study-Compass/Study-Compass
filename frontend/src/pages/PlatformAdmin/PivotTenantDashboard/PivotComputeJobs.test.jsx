@@ -392,6 +392,33 @@ describe('PivotComputeJobs', () => {
     expect(screen.getByRole('button', { name: 'Retry job' })).toBeInTheDocument();
   });
 
+  it('explains that a preserved repair candidate avoids repeating provider calls', async () => {
+    mockAuthenticatedRequest.mockResolvedValue({
+      data: {
+        job: {
+          ...SAMPLE_JOBS[2],
+          failure: {
+            code: 'REFRESH_RESULT_INVALID',
+            message: 'Refresh execution result failed contract validation.',
+            details: [
+              '$.proposals.events[12].draft.description: exceeds 5000 characters',
+              'Repair candidate preserved on worker job local-123. Deploy a correction, then Retry to revalidate it without recrawling.',
+            ],
+            retryable: true,
+          },
+        },
+        attempts: [],
+      },
+    });
+    renderComputeJobs({
+      path: '/platform-admin/pivot/iowacity?page=10&computeJobId=job:manual-iowacity-001',
+    });
+
+    const recovery = await screen.findByRole('alert', { name: 'Failure and recovery' });
+    expect(recovery).toHaveTextContent(/expensive result is preserved/i);
+    expect(recovery).toHaveTextContent(/without repeating provider calls/i);
+  });
+
   it('shows state-specific detail controls for review, retryable, and running jobs', async () => {
     mockAuthenticatedRequest.mockImplementation((url) => {
       if (url.includes('job%3Arefresh-iowacity-001')) {

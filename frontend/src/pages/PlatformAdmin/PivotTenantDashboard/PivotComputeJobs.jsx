@@ -104,6 +104,8 @@ function ComputeJobDetail({
   const visibleAttempts = Array.isArray(attempts) ? attempts.slice(0, MAX_ATTEMPTS_SHOWN) : [];
   const failure = safeJob.failure;
   const canRetry = safeJob.status === 'retryable';
+  const repairCandidatePreserved = Array.isArray(failure?.details)
+    && failure.details.some((detail) => String(detail).includes('Repair candidate preserved'));
 
   return (
     <div className="pivot-compute-jobs__detail" data-testid="compute-job-detail">
@@ -155,7 +157,9 @@ function ComputeJobDetail({
           </div>
           <p className="pivot-compute-jobs__failure-recourse">
             {canRetry
-              ? 'This attempt is retryable. Retry uses the same request and a fresh lease; use Run controls above to create a smaller replacement instead.'
+              ? repairCandidatePreserved
+                ? 'The expensive result is preserved on the worker. After deploying a correction, Retry revalidates and submits that candidate without repeating provider calls. Use Run controls only to discard it and create a replacement.'
+                : 'This attempt is retryable. Retry uses the same request and a fresh lease; use Run controls above to create a smaller replacement instead.'
               : 'This failure is terminal. Use Run controls above to create a corrected or smaller replacement job.'}
           </p>
         </section>

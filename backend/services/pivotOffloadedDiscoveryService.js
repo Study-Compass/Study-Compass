@@ -253,6 +253,7 @@ async function executeOffloadedCitySourceDiscovery(options = {}) {
       status: 500,
       code: 'DISCOVERY_RESULT_INVALID',
       details: resultValidation.errors,
+      repairCandidate: result,
     };
   }
 
@@ -263,6 +264,7 @@ async function executeOffloadedCitySourceDiscovery(options = {}) {
       status: 500,
       code: 'DISCOVERY_RESULT_FORBIDDEN',
       details: forbidden,
+      repairCandidate: result,
     };
   }
 
