@@ -21,6 +21,91 @@ import {
 
 const NO_FETCH_CACHE = { enabled: false };
 
+const WAKE_CHECK_LABELS = {
+  passed: 'Passed',
+  failed: 'Failed',
+  async: 'Continuing',
+  'not-run': 'Not run',
+};
+
+export function ComputeWakeDiagnostic() {
+  const [loading, setLoading] = useState(false);
+  const [report, setReport] = useState(null);
+  const [requestError, setRequestError] = useState(null);
+
+  const handleCheck = useCallback(async () => {
+    setLoading(true);
+    setRequestError(null);
+    const { data, error } = await authenticatedRequest('/admin/pivot/compute-jobs/wake-diagnostic', {
+      method: 'POST',
+      data: {},
+    });
+    setLoading(false);
+    if (error) {
+      setReport(null);
+      setRequestError(error);
+      return;
+    }
+    setReport(data?.diagnostic || null);
+  }, []);
+
+  const accepted = report?.status === 'accepted';
+  const target = report?.target
+    ? `${report.target.origin}${report.target.path}`
+    : 'Not configured';
+
+  return (
+    <section className="pivot-compute-jobs__wake-check pivot-lab__panel" aria-labelledby="compute-wake-check-heading">
+      <div className="pivot-compute-jobs__wake-check-head">
+        <div>
+          <span className="pivot-compute-jobs__eyebrow">Relay connection</span>
+          <h2 id="compute-wake-check-heading" className="pivot-compute-jobs__activity-title">Wake handshake</h2>
+          <p className="pivot-lab__section-hint">
+            Send a real signed wake without creating a job. Relay will check the durable queue if it accepts the request.
+          </p>
+        </div>
+        <button type="button" className="linear-btn" onClick={handleCheck} disabled={loading}>
+          {loading ? 'Checking…' : report ? 'Check again' : 'Test Relay wake'}
+        </button>
+      </div>
+
+      {requestError ? (
+        <p className="pivot-compute-jobs__wake-request-error" role="alert">
+          The diagnostic request failed before a handshake report was returned: {requestError}
+        </p>
+      ) : null}
+
+      {report ? (
+        <div className={`pivot-compute-jobs__wake-report is-${accepted ? 'accepted' : 'failed'}`} aria-live="polite">
+          <div className="pivot-compute-jobs__wake-report-summary">
+            <span className="pivot-compute-jobs__wake-state">{accepted ? 'Accepted' : 'Not accepted'}</span>
+            <strong>{report.message}</strong>
+            <span>{target}</span>
+          </div>
+          <dl className="pivot-compute-jobs__wake-facts">
+            <div><dt>HTTP</dt><dd>{report.response?.httpStatus || 'No response'}</dd></div>
+            <div><dt>Round trip</dt><dd>{Number.isFinite(report.durationMs) ? `${report.durationMs} ms` : '—'}</dd></div>
+            <div><dt>Checked</dt><dd>{formatTimestamp(report.checkedAt)}</dd></div>
+            <div><dt>Code</dt><dd>{report.code || '—'}</dd></div>
+          </dl>
+          <ol className="pivot-compute-jobs__wake-checks">
+            {(report.checks || []).map((check) => (
+              <li key={check.name} className={`is-${check.status}`}>
+                <span aria-hidden="true" />
+                <div>
+                  <strong>{check.name}</strong>
+                  <p>{check.detail}</p>
+                </div>
+                <small>{WAKE_CHECK_LABELS[check.status] || check.status}</small>
+              </li>
+            ))}
+          </ol>
+        </div>
+      ) : null}
+    </section>
+  );
+}
+
 export function ComputeJobCreateForm({
   tenantKey,
   onCreated,

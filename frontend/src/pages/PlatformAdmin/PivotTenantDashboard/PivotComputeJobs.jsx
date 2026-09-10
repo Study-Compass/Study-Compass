@@ -25,6 +25,7 @@ import PivotComputeJobReview from './PivotComputeJobReview';
 import {
   ComputeJobCreateForm,
   ComputeJobDetailActions,
+  ComputeWakeDiagnostic,
   FleetComputeJobCreateForm,
 } from './ComputeJobActions';
 
@@ -487,6 +488,8 @@ function PivotComputeJobs({
         <SummaryCard label="Recovery" value={jobSummary.recovery} hint="Retry or investigate" tone="danger" />
         <SummaryCard label="Completed" value={jobSummary.completed} hint="Finished in this view" tone="success" />
       </section>
+
+      <ComputeWakeDiagnostic />
 
       <section className="pivot-compute-jobs__composer pivot-lab__panel" aria-label="Start a compute run">
         {isFleet ? (
