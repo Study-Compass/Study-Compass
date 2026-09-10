@@ -16,6 +16,7 @@ const {
   rejectUnknownFields,
   handleAdminServiceError,
 } = require('../services/pivotComputeAdminService');
+const { diagnoseComputeWorkerWake } = require('../services/pivotComputeWakeService');
 
 const MAX_MANUAL_RESULT_BYTES = 9 * 1024 * 1024;
 const router = express.Router();
@@ -55,6 +56,19 @@ router.post('/', verifyToken, requirePlatformAdmin, async (req, res) => {
       now: new Date(),
     });
     return res.status(payload.created ? 201 : 200).json(payload);
+  } catch (error) {
+    return handleAdminServiceError(res, error);
+  }
+});
+
+router.post('/wake-diagnostic', verifyToken, requirePlatformAdmin, async (req, res) => {
+  try {
+    rejectUnknownFields(req.body, []);
+    const diagnostic = await diagnoseComputeWorkerWake();
+    // Delivery failure is the diagnostic result, not a failure to run the
+    // diagnostic. Keeping the envelope successful lets the UI render every
+    // sanitized check instead of collapsing it into a generic request error.
+    return res.json({ diagnostic });
   } catch (error) {
     return handleAdminServiceError(res, error);
   }

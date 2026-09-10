@@ -121,6 +121,113 @@ async function notifyComputeWorkerWake(options = {}) {
   }
 }
 
+function diagnosticCheck(name, status, detail) {
+  return { name, status, detail };
+}
+
+async function diagnoseComputeWorkerWake({
+  env = process.env,
+  fetchImpl = global.fetch,
+  clock = () => Date.now(),
+} = {}) {
+  const startedAtMs = clock();
+  let wakeUrl = null;
+  let timeoutMs = resolveWakeTimeoutMs(env.PIVOT_COMPUTE_WAKE_TIMEOUT_MS);
+
+  try {
+    wakeUrl = resolveWakeUrl(env.PIVOT_COMPUTE_WAKE_URL, {
+      requireHttps: env.NODE_ENV === 'production',
+    });
+    if (!wakeUrl) {
+      return {
+        status: 'disabled',
+        code: 'COMPUTE_WAKE_DISABLED',
+        message: 'Direct wake is not configured on this Meridian environment.',
+        checkedAt: new Date(startedAtMs).toISOString(),
+        durationMs: 0,
+        target: null,
+        request: { method: 'POST', path: WAKE_PATH, signed: true, bodyBytes: 0, timeoutMs },
+        response: null,
+        checks: [
+          diagnosticCheck('Server configuration', 'failed', 'PIVOT_COMPUTE_WAKE_URL is not set.'),
+          diagnosticCheck('Signed delivery', 'not-run', 'No request was sent.'),
+          diagnosticCheck('Relay acknowledgement', 'not-run', 'No response was received.'),
+        ],
+      };
+    }
+    decodeWakeHmacKey(env.PIVOT_COMPUTE_WAKE_HMAC_KEY);
+  } catch (error) {
+    return {
+      status: 'failed',
+      code: 'COMPUTE_WAKE_CONFIG_INVALID',
+      message: error?.message || 'Wake configuration is invalid.',
+      checkedAt: new Date(startedAtMs).toISOString(),
+      durationMs: Math.max(0, clock() - startedAtMs),
+      target: wakeUrl ? { origin: wakeUrl.origin, path: wakeUrl.pathname } : null,
+      request: { method: 'POST', path: WAKE_PATH, signed: true, bodyBytes: 0, timeoutMs },
+      response: null,
+      checks: [
+        diagnosticCheck('Server configuration', 'failed', error?.message || 'Wake configuration is invalid.'),
+        diagnosticCheck('Signed delivery', 'not-run', 'No request was sent.'),
+        diagnosticCheck('Relay acknowledgement', 'not-run', 'No response was received.'),
+      ],
+    };
+  }
+
+  try {
+    const result = await deliverComputeWorkerWake({ env, fetchImpl });
+    const durationMs = Math.max(0, clock() - startedAtMs);
+    return {
+      status: result.status,
+      code: 'COMPUTE_WAKE_ACCEPTED',
+      message: 'Relay accepted the signed wake. Queue inspection now continues asynchronously on the Mini.',
+      checkedAt: new Date(startedAtMs).toISOString(),
+      durationMs,
+      target: { origin: wakeUrl.origin, path: wakeUrl.pathname },
+      request: { method: 'POST', path: WAKE_PATH, signed: true, bodyBytes: 0, timeoutMs },
+      response: { httpStatus: result.httpStatus },
+      checks: [
+        diagnosticCheck('Server configuration', 'passed', 'Wake URL and HMAC key are valid.'),
+        diagnosticCheck('Signed delivery', 'passed', `Meridian reached the configured edge in ${durationMs} ms.`),
+        diagnosticCheck('Relay acknowledgement', 'passed', 'Relay verified the request and returned HTTP 202.'),
+        diagnosticCheck('Queue execution', 'async', 'The acknowledgement does not claim a job; job status confirms worker activity.'),
+      ],
+    };
+  } catch (error) {
+    const durationMs = Math.max(0, clock() - startedAtMs);
+    const httpStatus = error?.status;
+    const authRejected = httpStatus === 401 || httpStatus === 403;
+    return {
+      status: 'failed',
+      code: error?.code || 'COMPUTE_WAKE_FAILED',
+      message: error?.message || 'The signed wake could not be delivered.',
+      checkedAt: new Date(startedAtMs).toISOString(),
+      durationMs,
+      target: { origin: wakeUrl.origin, path: wakeUrl.pathname },
+      request: { method: 'POST', path: WAKE_PATH, signed: true, bodyBytes: 0, timeoutMs },
+      response: httpStatus ? { httpStatus } : null,
+      checks: [
+        diagnosticCheck('Server configuration', 'passed', 'Wake URL and HMAC key are valid.'),
+        diagnosticCheck(
+          'Signed delivery',
+          httpStatus ? 'passed' : 'failed',
+          httpStatus ? `The edge returned HTTP ${httpStatus} in ${durationMs} ms.` : `No HTTP response was received within ${durationMs} ms.`,
+        ),
+        diagnosticCheck(
+          'Relay acknowledgement',
+          'failed',
+          authRejected
+            ? 'Relay rejected the signature. Confirm both environments use the same wake HMAC key.'
+            : httpStatus
+              ? `Expected HTTP 202 but received HTTP ${httpStatus}.`
+              : 'Relay acknowledgement was unavailable because delivery failed.',
+        ),
+        diagnosticCheck('Queue execution', 'not-run', 'Relay did not accept the wake.'),
+      ],
+    };
+  }
+}
+
 module.exports = {
   WAKE_PATH,
   WAKE_TIMESTAMP_HEADER,
@@ -133,4 +240,5 @@ module.exports = {
   computeWakeSignature,
   deliverComputeWorkerWake,
   notifyComputeWorkerWake,
+  diagnoseComputeWorkerWake,
 };

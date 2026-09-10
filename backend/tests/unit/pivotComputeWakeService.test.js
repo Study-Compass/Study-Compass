@@ -7,6 +7,7 @@ const {
   resolveWakeUrl,
   deliverComputeWorkerWake,
   notifyComputeWorkerWake,
+  diagnoseComputeWorkerWake,
 } = require('../../services/pivotComputeWakeService');
 
 const HMAC_KEY = 'aa'.repeat(32);
@@ -90,5 +91,51 @@ describe('pivotComputeWakeService', () => {
       code: 'COMPUTE_WAKE_FAILED',
       httpStatus: undefined,
     });
+  });
+
+  it('returns a verbose sanitized handshake report for an accepted wake', async () => {
+    const ticks = [NOW_MS, NOW_MS + 37];
+    const result = await diagnoseComputeWorkerWake({
+      env: {
+        NODE_ENV: 'production',
+        PIVOT_COMPUTE_WAKE_URL: 'https://mini.example.test/v1/wake',
+        PIVOT_COMPUTE_WAKE_HMAC_KEY: HMAC_KEY,
+      },
+      fetchImpl: jest.fn().mockResolvedValue({ status: 202 }),
+      clock: () => ticks.shift(),
+    });
+
+    expect(result).toMatchObject({
+      status: 'accepted',
+      code: 'COMPUTE_WAKE_ACCEPTED',
+      durationMs: 37,
+      target: { origin: 'https://mini.example.test', path: '/v1/wake' },
+      request: { method: 'POST', signed: true, bodyBytes: 0 },
+      response: { httpStatus: 202 },
+      checks: [
+        expect.objectContaining({ name: 'Server configuration', status: 'passed' }),
+        expect.objectContaining({ name: 'Signed delivery', status: 'passed' }),
+        expect.objectContaining({ name: 'Relay acknowledgement', status: 'passed' }),
+        expect.objectContaining({ name: 'Queue execution', status: 'async' }),
+      ],
+    });
+    expect(JSON.stringify(result)).not.toContain(HMAC_KEY);
+  });
+
+  it('explains disabled wake configuration without sending a request', async () => {
+    const fetchImpl = jest.fn();
+    const result = await diagnoseComputeWorkerWake({
+      env: {},
+      fetchImpl,
+      clock: () => NOW_MS,
+    });
+
+    expect(result).toMatchObject({
+      status: 'disabled',
+      code: 'COMPUTE_WAKE_DISABLED',
+      target: null,
+      response: null,
+    });
+    expect(fetchImpl).not.toHaveBeenCalled();
   });
 });

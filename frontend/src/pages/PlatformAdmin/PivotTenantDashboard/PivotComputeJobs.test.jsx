@@ -162,6 +162,7 @@ describe('PivotComputeJobs', () => {
     expect(queue).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'Recent activity' })).toBeInTheDocument();
     expect(screen.getByText('Queued or processing')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Test Relay wake' })).toBeInTheDocument();
     expect(screen.getByText('Ready for a decision')).toBeInTheDocument();
     expect(screen.getByText('Retry or investigate')).toBeInTheDocument();
     expect(screen.getByText('Admin request · admin@example.com')).toBeInTheDocument();
@@ -178,6 +179,41 @@ describe('PivotComputeJobs', () => {
           limit: 50,
         }),
       }),
+    );
+  });
+
+  it('sends a signed wake diagnostic and renders the verbose handshake', async () => {
+    mockAuthenticatedRequest.mockResolvedValue({
+      data: {
+        diagnostic: {
+          status: 'accepted',
+          code: 'COMPUTE_WAKE_ACCEPTED',
+          message: 'Relay accepted the signed wake. Queue inspection now continues asynchronously on the Mini.',
+          checkedAt: '2026-09-10T06:00:00.000Z',
+          durationMs: 42,
+          target: { origin: 'https://relay.example.test', path: '/v1/wake' },
+          request: { method: 'POST', signed: true, bodyBytes: 0, timeoutMs: 2000 },
+          response: { httpStatus: 202 },
+          checks: [
+            { name: 'Server configuration', status: 'passed', detail: 'Wake URL and HMAC key are valid.' },
+            { name: 'Relay acknowledgement', status: 'passed', detail: 'Relay verified the request and returned HTTP 202.' },
+            { name: 'Queue execution', status: 'async', detail: 'Job status confirms worker activity.' },
+          ],
+        },
+      },
+    });
+    renderComputeJobs();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Test Relay wake' }));
+
+    expect(await screen.findByText('Relay accepted the signed wake. Queue inspection now continues asynchronously on the Mini.')).toBeInTheDocument();
+    expect(screen.getByText('https://relay.example.test/v1/wake')).toBeInTheDocument();
+    expect(screen.getByText('42 ms')).toBeInTheDocument();
+    expect(screen.getByText('COMPUTE_WAKE_ACCEPTED')).toBeInTheDocument();
+    expect(screen.getByText('Queue execution')).toBeInTheDocument();
+    expect(mockAuthenticatedRequest).toHaveBeenCalledWith(
+      '/admin/pivot/compute-jobs/wake-diagnostic',
+      { method: 'POST', data: {} },
     );
   });
 

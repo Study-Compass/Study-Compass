@@ -37,6 +37,10 @@ jest.mock('../../services/pivotComputeAdminService', () => ({
   })),
 }));
 
+jest.mock('../../services/pivotComputeWakeService', () => ({
+  diagnoseComputeWorkerWake: jest.fn(),
+}));
+
 const {
   previewStoredComputeJob,
   previewManualComputeResult,
@@ -51,6 +55,7 @@ const {
   retryAdminComputeJob,
   rejectUnknownFields,
 } = require('../../services/pivotComputeAdminService');
+const { diagnoseComputeWorkerWake } = require('../../services/pivotComputeWakeService');
 const pivotAdminComputeJobsRoutes = require('../../routes/pivotAdminComputeJobsRoutes');
 const { loadFixture } = require('../../utilities/pivotAdminComputeJobContract');
 
@@ -74,6 +79,7 @@ describe('pivotAdminComputeJobs routes outcomes', () => {
     retryAdminComputeJob.mockReset();
     rejectUnknownFields.mockReset();
     rejectUnknownFields.mockImplementation(() => {});
+    diagnoseComputeWorkerWake.mockReset();
   });
 
   it('lists compute jobs for platform admins', async () => {
@@ -114,6 +120,27 @@ describe('pivotAdminComputeJobs routes outcomes', () => {
         actor: 'admin@example.com',
       }),
     );
+  });
+
+  it('sends an authenticated wake diagnostic without exposing secrets', async () => {
+    diagnoseComputeWorkerWake.mockResolvedValue({
+      status: 'accepted',
+      code: 'COMPUTE_WAKE_ACCEPTED',
+      target: { origin: 'https://relay.example.test', path: '/v1/wake' },
+      response: { httpStatus: 202 },
+      checks: [],
+    });
+
+    const response = await request(app)
+      .post('/admin/pivot/compute-jobs/wake-diagnostic')
+      .send({});
+
+    expect(response.status).toBe(200);
+    expect(response.body.diagnostic).toMatchObject({
+      status: 'accepted',
+      response: { httpStatus: 202 },
+    });
+    expect(diagnoseComputeWorkerWake).toHaveBeenCalledTimes(1);
   });
 
   it('returns an existing admin compute job on duplicate create idempotency', async () => {

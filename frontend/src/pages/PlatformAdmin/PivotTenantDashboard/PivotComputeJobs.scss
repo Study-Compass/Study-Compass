@@ -61,6 +61,150 @@
     padding: 16px 18px;
   }
 
+  .pivot-compute-jobs__wake-check {
+    margin-bottom: 12px;
+    padding: 16px 18px;
+  }
+
+  .pivot-compute-jobs__wake-check-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+
+    .pivot-lab__section-hint {
+      margin: 4px 0 0;
+    }
+
+    .linear-btn {
+      flex: 0 0 auto;
+    }
+  }
+
+  .pivot-compute-jobs__wake-request-error {
+    margin: 14px 0 0;
+    color: var(--pivot-ops-danger);
+    font-size: 12px;
+  }
+
+  .pivot-compute-jobs__wake-report {
+    margin-top: 16px;
+    border-top: 1px solid var(--pivot-ops-border);
+
+    &.is-accepted .pivot-compute-jobs__wake-state {
+      color: var(--pivot-ops-success);
+    }
+
+    &.is-failed .pivot-compute-jobs__wake-state {
+      color: var(--pivot-ops-danger);
+    }
+  }
+
+  .pivot-compute-jobs__wake-report-summary {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    gap: 8px 16px;
+    align-items: baseline;
+    padding: 14px 0;
+
+    strong {
+      color: var(--pivot-ops-ink);
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    > span:last-child {
+      color: var(--pivot-ops-ink-soft);
+      font-family: inherit;
+      font-size: 10px;
+      overflow-wrap: anywhere;
+    }
+  }
+
+  .pivot-compute-jobs__wake-state {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .pivot-compute-jobs__wake-facts {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    margin: 0;
+    border-block: 1px solid var(--pivot-ops-border);
+
+    > div {
+      min-width: 0;
+      padding: 10px 12px;
+    }
+
+    > div + div { border-left: 1px solid var(--pivot-ops-border); }
+
+    dt {
+      color: var(--pivot-ops-ink-soft);
+      font-size: 10px;
+      font-weight: 650;
+      text-transform: uppercase;
+    }
+
+    dd {
+      margin: 3px 0 0;
+      color: var(--pivot-ops-ink);
+      font-family: inherit;
+      font-size: 11px;
+      overflow-wrap: anywhere;
+    }
+  }
+
+  .pivot-compute-jobs__wake-checks {
+    display: grid;
+    gap: 0;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    li {
+      display: grid;
+      grid-template-columns: 8px minmax(0, 1fr) auto;
+      gap: 10px;
+      align-items: start;
+      padding: 11px 2px;
+    }
+
+    li + li { border-top: 1px solid var(--pivot-ops-border); }
+
+    li > span {
+      width: 7px;
+      height: 7px;
+      margin-top: 5px;
+      border-radius: 50%;
+      background: var(--pivot-ops-ink-soft);
+    }
+
+    li.is-passed > span { background: var(--pivot-ops-success); }
+    li.is-failed > span { background: var(--pivot-ops-danger); }
+    li.is-async > span { background: var(--pivot-ops-info); }
+
+    strong {
+      display: block;
+      color: var(--pivot-ops-ink);
+      font-size: 12px;
+      font-weight: 650;
+    }
+
+    p {
+      margin: 2px 0 0;
+      color: var(--pivot-ops-ink-muted);
+      font-size: 11px;
+    }
+
+    small {
+      color: var(--pivot-ops-ink-soft);
+      font-size: 10px;
+    }
+  }
+
   .pivot-compute-jobs__fleet-create {
     display: grid;
     gap: 18px;
@@ -664,6 +808,12 @@
 @media (max-width: 720px) {
   .pivot-compute-jobs {
     .pivot-compute-jobs__summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .pivot-compute-jobs__wake-check-head,
+    .pivot-compute-jobs__wake-report-summary { align-items: flex-start; grid-template-columns: 1fr; flex-direction: column; }
+    .pivot-compute-jobs__wake-check-head .linear-btn { width: 100%; }
+    .pivot-compute-jobs__wake-facts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .pivot-compute-jobs__wake-facts > div:nth-child(3) { border-left: 0; }
+    .pivot-compute-jobs__wake-facts > div:nth-child(n + 3) { border-top: 1px solid var(--pivot-ops-border); }
     .pivot-compute-jobs__activity-head { align-items: flex-start; flex-direction: column; }
     .pivot-compute-jobs__filters { width: 100%; }
     .pivot-compute-jobs__filter--inline { flex: 1 1 150px; }
