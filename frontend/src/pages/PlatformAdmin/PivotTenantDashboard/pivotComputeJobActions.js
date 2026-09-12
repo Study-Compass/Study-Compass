@@ -30,7 +30,8 @@ export function canRetryComputeJob(job) {
 
 export function canPreviewStoredComputeJob(job) {
   return Boolean(
-    job?.status
+    job?.kind !== 'carousel-export'
+    && job?.status
     && STORED_PREVIEW_STATUSES.includes(job.status)
     && hasStoredEmbeddedResult(job),
   );
@@ -38,7 +39,8 @@ export function canPreviewStoredComputeJob(job) {
 
 export function canApplyStoredComputeJob(job, preview) {
   return Boolean(
-    job?.status === 'review-required'
+    job?.kind !== 'carousel-export'
+    && job?.status === 'review-required'
     && preview?.applyAllowed
     && preview?.jobId === job?.externalJobId,
   );

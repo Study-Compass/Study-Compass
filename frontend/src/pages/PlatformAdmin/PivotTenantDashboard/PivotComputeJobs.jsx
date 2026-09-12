@@ -1,10 +1,12 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { useFetch, authenticatedRequest } from '../../../hooks/useFetch';
 import PivotTenantPage from './PivotTenantPage';
 import {
-  COMPUTE_JOB_KINDS,
+  COMPUTE_JOB_FILTER_KINDS,
   COMPUTE_JOB_STATUSES,
+  PIVOT_FLEET_COMPUTE_JOBS_PAGE,
+  PIVOT_TENANT_COMPUTE_JOBS_PAGE,
   formatAge,
   formatComputeJobKind,
   formatComputeJobOrigin,
@@ -19,6 +21,19 @@ import {
   resolveWorkerId,
   summarizeStoredResult,
 } from './pivotComputeJobsFormat';
+import {
+  ARTIFACTS_EXPIRED_COPY,
+  CAROUSEL_EXPORT_KIND,
+  artifactsExpired,
+  carouselEditorHref,
+  deriveExportUiState,
+  exportArtifactTotals,
+  exportDurationLabel,
+  exportFailureLabel,
+  formatBytes as formatExportBytes,
+  formatExportProgress,
+  renderedRevision,
+} from './carousel/pivotCarouselExport';
 import './PivotTenantPage.scss';
 import './PivotComputeJobs.scss';
 import PivotComputeJobReview from './PivotComputeJobReview';
@@ -29,6 +44,8 @@ import {
   FleetComputeJobCreateForm,
 } from './ComputeJobActions';
 
+export { PIVOT_FLEET_COMPUTE_JOBS_PAGE, PIVOT_TENANT_COMPUTE_JOBS_PAGE };
+
 const NO_FETCH_CACHE = { enabled: false };
 const LIST_POLL_MS = 5000;
 const DETAIL_POLL_MS = 5000;
@@ -38,8 +55,6 @@ const MAX_ATTEMPTS_SHOWN = 20;
  * `/platform-admin/pivot/:tenantKey?page=10`
  * Appended after Weekly drop — do not insert earlier pages.
  */
-export const PIVOT_TENANT_COMPUTE_JOBS_PAGE = 10;
-export const PIVOT_FLEET_COMPUTE_JOBS_PAGE = 3;
 
 const STATUS_FILTER_OPTIONS = [
   { value: 'all', label: 'All statuses' },
@@ -51,7 +66,7 @@ const STATUS_FILTER_OPTIONS = [
 
 const KIND_FILTER_OPTIONS = [
   { value: 'all', label: 'All kinds' },
-  ...COMPUTE_JOB_KINDS.map((kind) => ({
+  ...COMPUTE_JOB_FILTER_KINDS.map((kind) => ({
     value: kind,
     label: formatComputeJobKind(kind),
   })),
@@ -91,9 +106,23 @@ function SummaryCard({ label, value, hint, tone = 'neutral' }) {
   );
 }
 
+function listProgress(job) {
+  if (job?.kind === CAROUSEL_EXPORT_KIND) {
+    return formatExportProgress(job, deriveExportUiState({ job })) || formatProgress(job.progress);
+  }
+  return formatProgress(job.progress);
+}
+
+function listFailure(job) {
+  if (job?.kind === CAROUSEL_EXPORT_KIND) {
+    return job.failure ? exportFailureLabel(job) : '—';
+  }
+  return formatFailure(job.failure, { maxLength: 112 });
+}
+
 function ComputeJobListItem({ job, isSelected, nowMs, onSelect, showCity = false }) {
-  const progress = formatProgress(job.progress);
-  const failure = formatFailure(job.failure, { maxLength: 112 });
+  const progress = listProgress(job);
+  const failure = listFailure(job);
   const worker = resolveWorkerId(job);
   const scheduleOccurrence = resolveScheduleOccurrenceId(job);
   const age = formatAge(job.requestedAt || job.createdAt, nowMs);
@@ -148,12 +177,65 @@ function formatBytes(value) {
   return `${(value / (1024 * 1024)).toFixed(2)} MiB`;
 }
 
+function CarouselDeckTitle({ tenantKey, deckId }) {
+  const { data } = useFetch(
+    tenantKey && deckId
+      ? `/admin/pivot/tenants/${encodeURIComponent(tenantKey)}/carousels/${encodeURIComponent(deckId)}`
+      : null,
+    { cache: NO_FETCH_CACHE },
+  );
+  const title = data?.success ? data.data?.deck?.title : null;
+  return title || '—';
+}
+
+function CarouselExportFacts({ job, tenantKey }) {
+  const resolvedTenant = tenantKey || job.tenantKey || job.cityKey || '—';
+  const totals = exportArtifactTotals(job);
+  const revision = renderedRevision(job);
+  const duration = exportDurationLabel(job);
+  const editorHref = carouselEditorHref({ ...job, tenantKey: resolvedTenant === '—' ? job.tenantKey : resolvedTenant });
+  const expired = artifactsExpired(job);
+  const slideCount = job.result?.slideCount ?? (totals.pngCount || null);
+
+  return (
+    <section className="pivot-compute-jobs__detail-section" aria-label="Carousel export">
+      <h3 className="pivot-compute-jobs__detail-heading">Export</h3>
+      <dl className="pivot-compute-jobs__detail-grid">
+        <DetailField label="Tenant" value={resolvedTenant} mono />
+        <DetailField
+          label="Deck title"
+          value={<CarouselDeckTitle tenantKey={resolvedTenant === '—' ? null : resolvedTenant} deckId={job.options?.deckId} />}
+        />
+        <DetailField label="Deck revision" value={revision || job.options?.deckRevision || '—'} mono />
+        <DetailField label="Slide count" value={slideCount == null ? '—' : String(slideCount)} />
+        <DetailField label="Artifact count" value={totals.artifactCount ? String(totals.artifactCount) : '—'} />
+        <DetailField label="Total size" value={totals.artifactCount ? formatExportBytes(totals.totalBytes) : '—'} />
+        <DetailField label="Worker" value={resolveWorkerId(job)} mono />
+        <DetailField
+          label="Attempt"
+          value={String(job.attemptCount ?? job.lease?.attemptNumber ?? 0)}
+        />
+        <DetailField label="Duration" value={duration || '—'} />
+      </dl>
+      {expired ? (
+        <p className="pivot-compute-jobs__expired" role="status">{ARTIFACTS_EXPIRED_COPY}</p>
+      ) : null}
+      {editorHref ? (
+        <p className="pivot-compute-jobs__editor-link">
+          <Link to={editorHref}>Open in carousel editor</Link>
+        </p>
+      ) : null}
+    </section>
+  );
+}
+
 function ComputeJobDetail({
   job,
   attempts,
   loading,
   error,
   nowMs,
+  tenantKey = null,
 }) {
   if (loading && !job) {
     return <p className="pivot-lab__empty">Loading job detail…</p>;
@@ -165,14 +247,19 @@ function ComputeJobDetail({
     return null;
   }
 
-  const resultSummary = summarizeStoredResult(job.result);
   const safeJob = redactSensitiveFields(job);
+  const isCarousel = safeJob.kind === CAROUSEL_EXPORT_KIND;
+  const resultSummary = isCarousel ? null : summarizeStoredResult(job.result);
   const visibleAttempts = Array.isArray(attempts) ? attempts.slice(0, MAX_ATTEMPTS_SHOWN) : [];
   const failure = safeJob.failure;
   const canRetry = safeJob.status === 'retryable';
   const jobAge = formatAge(safeJob.requestedAt || safeJob.createdAt, nowMs);
   const repairCandidatePreserved = Array.isArray(failure?.details)
     && failure.details.some((detail) => String(detail).includes('Repair candidate preserved'));
+  const progressLabel = isCarousel
+    ? (formatExportProgress(safeJob, deriveExportUiState({ job: safeJob })) || formatProgress(safeJob.progress))
+    : formatProgress(safeJob.progress);
+  const carouselTenant = tenantKey || safeJob.tenantKey || safeJob.cityKey || null;
 
   return (
     <div className="pivot-compute-jobs__detail" data-testid="compute-job-detail">
@@ -180,7 +267,7 @@ function ComputeJobDetail({
         <div>
           <p className="pivot-compute-jobs__detail-kicker">{formatComputeJobOrigin(safeJob.origin)}</p>
           <h3 className="pivot-compute-jobs__detail-title">{formatComputeJobKind(safeJob.kind)}</h3>
-          <p className="pivot-compute-jobs__detail-progress">{formatProgress(safeJob.progress)}</p>
+          <p className="pivot-compute-jobs__detail-progress">{progressLabel}</p>
         </div>
         <div className="pivot-compute-jobs__detail-state">
           <ComputeJobStatusPill status={safeJob.status} />
@@ -191,7 +278,9 @@ function ComputeJobDetail({
       {failure ? (
         <section className="pivot-compute-jobs__failure" role="alert" aria-label="Failure and recovery">
           <div>
-            <p className="pivot-compute-jobs__failure-code">{failure.code || 'JOB_FAILED'}</p>
+            <p className="pivot-compute-jobs__failure-code">
+              {isCarousel ? exportFailureLabel(safeJob) : (failure.code || 'JOB_FAILED')}
+            </p>
             <p className="pivot-compute-jobs__failure-message">{failure.message || 'The job failed without a message.'}</p>
             {Array.isArray(failure.details) && failure.details.length ? (
               <ul className="pivot-compute-jobs__failure-details">
@@ -200,14 +289,20 @@ function ComputeJobDetail({
             ) : null}
           </div>
           <p className="pivot-compute-jobs__failure-recourse">
-            {canRetry
-              ? repairCandidatePreserved
-                ? 'The expensive result is preserved on the worker. After deploying a correction, Retry revalidates and submits that candidate without repeating provider calls. Use Run controls only to discard it and create a replacement.'
-                : 'This attempt is retryable. Retry uses the same request and a fresh lease; use Run controls above to create a smaller replacement instead.'
-              : 'This failure is terminal. Use Run controls above to create a corrected or smaller replacement job.'}
+            {isCarousel
+              ? (canRetry
+                ? 'This export is retryable. Retry uses the same deck revision and a fresh lease.'
+                : 'This export failed. Start a new export from the carousel editor after fixing the cause.')
+              : (canRetry
+                ? repairCandidatePreserved
+                  ? 'The expensive result is preserved on the worker. After deploying a correction, Retry revalidates and submits that candidate without repeating provider calls. Use Run controls only to discard it and create a replacement.'
+                  : 'This attempt is retryable. Retry uses the same request and a fresh lease; use Run controls above to create a smaller replacement instead.'
+                : 'This failure is terminal. Use Run controls above to create a corrected or smaller replacement job.')}
           </p>
         </section>
       ) : null}
+
+      {isCarousel ? <CarouselExportFacts job={safeJob} tenantKey={carouselTenant} /> : null}
 
       <section className="pivot-compute-jobs__detail-section" aria-label="Execution summary">
         <h3 className="pivot-compute-jobs__detail-heading">Execution</h3>
@@ -262,7 +357,7 @@ function ComputeJobDetail({
         </section>
       ) : null}
 
-      {safeJob.applicationAudit ? (
+      {safeJob.applicationAudit && !isCarousel ? (
         <section className="pivot-compute-jobs__detail-section" aria-label="Application audit">
           <h3 className="pivot-compute-jobs__detail-heading">Application audit</h3>
           {safeJob.applicationAudit.outcome === 'partial' ? (
@@ -478,8 +573,8 @@ function PivotComputeJobs({
       tenantKey={tenantKey}
       cityDisplayName={cityDisplayName}
       subtitle={isFleet
-        ? 'Monitor offloaded discovery and curation refresh work across every city.'
-        : 'Offloaded discovery and curation refresh work for this city.'}
+        ? 'Monitor offloaded discovery, curation refresh, and carousel export work across every city.'
+        : 'Offloaded discovery, curation refresh, and carousel export work for this city.'}
       className="pivot-compute-jobs"
     >
       <section className="pivot-compute-jobs__summary" aria-label="Compute job health">
@@ -625,6 +720,7 @@ function PivotComputeJobs({
                   loading={detailLoading}
                   error={detailError}
                   nowMs={nowMs}
+                  tenantKey={isFleet ? detailJob?.tenantKey || detailJob?.cityKey : tenantKey}
                 />
                 <ComputeJobDetailActions
                   job={detailJob}

@@ -19,6 +19,16 @@ describe('pivotComputeJobActions', () => {
       result: { hasEmbeddedResult: true },
     })).toBe(true);
     expect(canPreviewStoredComputeJob({ status: 'review-required', result: null })).toBe(false);
+    expect(canPreviewStoredComputeJob({
+      kind: 'carousel-export',
+      status: 'review-required',
+      result: { hasEmbeddedResult: true },
+    })).toBe(false);
+    expect(canApplyStoredComputeJob({
+      kind: 'carousel-export',
+      externalJobId: 'job:carousel-iowacity-001',
+      status: 'review-required',
+    }, { jobId: 'job:carousel-iowacity-001', applyAllowed: true })).toBe(false);
   });
 
   it('allows apply only for matching review-required previews', () => {

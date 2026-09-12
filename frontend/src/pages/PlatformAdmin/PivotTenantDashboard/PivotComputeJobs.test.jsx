@@ -157,6 +157,7 @@ describe('PivotComputeJobs', () => {
     renderComputeJobs();
 
     expect(screen.getByRole('heading', { name: 'Compute jobs' })).toBeInTheDocument();
+    expect(screen.getByTestId('compute-jobs-subtitle')).toHaveTextContent('carousel export');
     expect(screen.getByTestId('compute-jobs-city')).toHaveTextContent('Iowa City');
     const queue = screen.getByRole('generic', { name: 'Compute jobs' });
     expect(queue).toBeInTheDocument();
@@ -213,6 +214,32 @@ describe('PivotComputeJobs', () => {
     expect(screen.getByText('Queue execution')).toBeInTheDocument();
     expect(mockAuthenticatedRequest).toHaveBeenCalledWith(
       '/admin/pivot/compute-jobs/wake-diagnostic',
+      { method: 'POST', data: {} },
+    );
+  });
+
+  it('reports carousel export storage without writing an object', async () => {
+    mockAuthenticatedRequest.mockResolvedValue({
+      data: {
+        diagnostic: {
+          status: 'accepted',
+          code: 'CAROUSEL_EXPORT_STORAGE_OK',
+          message: 'Object storage can list the export prefix and mint a short-lived upload URL.',
+          checkedAt: '2026-09-12T06:00:00.000Z',
+          durationMs: 18,
+          target: { bucket: 'pivot-exports', prefix: 'pivot-exports/' },
+          checks: [
+            { name: 'Bucket configuration', status: 'passed', detail: 'Bucket pivot-exports is set in us-west-2.' },
+            { name: 'Presigned upload', status: 'passed', detail: 'A short-lived PUT URL can be minted without writing an object.' },
+          ],
+        },
+      },
+    });
+    renderComputeJobs();
+    fireEvent.click(screen.getByRole('button', { name: 'Test export storage' }));
+    expect(await screen.findByText(/mint a short-lived upload URL/)).toBeInTheDocument();
+    expect(mockAuthenticatedRequest).toHaveBeenCalledWith(
+      '/admin/pivot/compute-jobs/artifact-diagnostic',
       { method: 'POST', data: {} },
     );
   });
@@ -821,5 +848,135 @@ describe('PivotComputeJobs', () => {
       expect.objectContaining({ status: 'review-required' }),
       expect.objectContaining({ action: 'apply', rollback: true }),
     );
+  });
+
+  it('presents carousel exports with downloads instead of review actions', async () => {
+    const carouselJob = {
+      externalJobId: 'job:carousel-iowacity-001',
+      tenantKey: 'iowacity',
+      cityKey: 'iowacity',
+      kind: 'carousel-export',
+      status: 'completed',
+      origin: { type: 'admin', requestedBy: 'admin@example.com' },
+      attemptCount: 1,
+      lease: { workerId: 'relay-mini-1' },
+      options: {
+        deckId: '507f1f77bcf86cd799439011',
+        deckRevision: '2026-09-11T19:58:00.000Z',
+      },
+      result: {
+        renderedDeckRevision: '2026-09-11T19:58:00.000Z',
+        slideCount: 1,
+        renderDurationMs: 180000,
+      },
+      exportArtifacts: {
+        expired: false,
+        artifacts: [
+          {
+            logicalName: 'slide-01.png',
+            artifactId: 'artifact:slide-01',
+            mimeType: 'image/png',
+            byteCount: 1200000,
+            slideNumber: 1,
+          },
+          {
+            logicalName: 'carousel.zip',
+            artifactId: 'artifact:zip',
+            mimeType: 'application/zip',
+            byteCount: 2100000,
+            slideNumber: null,
+          },
+        ],
+      },
+      requestedAt: '2026-09-11T20:00:00.000Z',
+      createdAt: '2026-09-11T20:00:00.000Z',
+      updatedAt: '2026-09-11T20:08:00.000Z',
+    };
+
+    mockAuthenticatedRequest.mockResolvedValue({ data: { job: carouselJob, attempts: [] } });
+    renderComputeJobs({
+      fetchValue: listFetchValue({ data: { jobs: [carouselJob], nextCursor: null } }),
+      path: '/platform-admin/pivot/iowacity?page=10&computeJobId=job:carousel-iowacity-001',
+    });
+
+    const queue = screen.getByRole('generic', { name: 'Compute jobs' });
+    expect(within(queue).getByText('Carousel export')).toBeInTheDocument();
+    expect(screen.getByLabelText('Filter by kind')).toHaveTextContent('Carousel export');
+
+    const detail = await screen.findByTestId('compute-job-detail');
+    expect(within(detail).getByRole('heading', { name: 'Carousel export' })).toBeInTheDocument();
+    const exportSection = within(detail).getByRole('region', { name: 'Carousel export' });
+    expect(within(exportSection).getByRole('heading', { name: 'Export' })).toBeInTheDocument();
+    expect(exportSection).toHaveTextContent('iowacity');
+    expect(within(detail).getByText('2026-09-11T19:58:00.000Z')).toBeInTheDocument();
+    expect(within(detail).getByRole('link', { name: 'Open in carousel editor' })).toHaveAttribute(
+      'href',
+      '/platform-admin/pivot/iowacity?page=8&deckId=507f1f77bcf86cd799439011',
+    );
+    expect(screen.queryByRole('button', { name: 'Preview stored result' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Confirm and apply' })).not.toBeInTheDocument();
+
+    const downloads = screen.getByTestId('compute-carousel-downloads');
+    expect(within(downloads).getByRole('button', { name: /Download ZIP/ })).toBeInTheDocument();
+    fireEvent.click(within(downloads).getByRole('button', { name: /Download ZIP/ }));
+    await waitFor(() => {
+      expect(mockAuthenticatedRequest).toHaveBeenCalledWith(
+        `/admin/pivot/compute-jobs/${encodeURIComponent(carouselJob.externalJobId)}/artifacts/${encodeURIComponent('artifact:zip')}`,
+        expect.objectContaining({ params: { tenantKey: 'iowacity' } }),
+      );
+    });
+  });
+
+  it('explains expired carousel files without treating the job as lost', async () => {
+    const expiredJob = {
+      externalJobId: 'job:carousel-iowacity-expired',
+      tenantKey: 'iowacity',
+      cityKey: 'iowacity',
+      kind: 'carousel-export',
+      status: 'completed',
+      origin: { type: 'admin', requestedBy: 'admin@example.com' },
+      options: { deckId: '507f1f77bcf86cd799439011', deckRevision: '2026-09-01T12:00:00.000Z' },
+      result: { slideCount: 1, renderDurationMs: 1000 },
+      exportArtifacts: { expired: true, artifacts: [] },
+      requestedAt: '2026-09-01T12:00:00.000Z',
+      createdAt: '2026-09-01T12:00:00.000Z',
+      updatedAt: '2026-09-01T12:05:00.000Z',
+    };
+    mockAuthenticatedRequest.mockResolvedValue({ data: { job: expiredJob, attempts: [] } });
+    renderComputeJobs({
+      fetchValue: listFetchValue({ data: { jobs: [expiredJob], nextCursor: null } }),
+      path: '/platform-admin/pivot/iowacity?page=10&computeJobId=job:carousel-iowacity-expired',
+    });
+
+    expect(await screen.findByTestId('compute-job-detail')).toHaveTextContent('Carousel export');
+    expect(screen.getAllByText(/Export record available/).length).toBeGreaterThan(0);
+    expect(screen.queryByTestId('compute-carousel-downloads')).not.toBeInTheDocument();
+  });
+
+  it('names queue, render, upload, and finalization failures for carousel jobs', async () => {
+    const failedJob = {
+      externalJobId: 'job:carousel-iowacity-failed',
+      tenantKey: 'iowacity',
+      cityKey: 'iowacity',
+      kind: 'carousel-export',
+      status: 'failed',
+      origin: { type: 'admin', requestedBy: 'admin@example.com' },
+      progress: { phase: 'uploading', message: 'presign rejected' },
+      failure: { code: 'UPLOAD_FAILED', message: 'presign rejected' },
+      options: { deckId: '507f1f77bcf86cd799439011', deckRevision: '2026-09-11T19:58:00.000Z' },
+      requestedAt: '2026-09-11T20:00:00.000Z',
+      createdAt: '2026-09-11T20:00:00.000Z',
+      updatedAt: '2026-09-11T20:02:00.000Z',
+    };
+    mockAuthenticatedRequest.mockResolvedValue({ data: { job: failedJob, attempts: [] } });
+    renderComputeJobs({
+      fetchValue: listFetchValue({ data: { jobs: [failedJob], nextCursor: null } }),
+      path: '/platform-admin/pivot/iowacity?page=10&computeJobId=job:carousel-iowacity-failed',
+    });
+
+    const queue = screen.getByRole('generic', { name: 'Compute jobs' });
+    expect(within(queue).getByText('Uploading failed')).toBeInTheDocument();
+    expect(await screen.findByRole('alert', { name: 'Failure and recovery' })).toHaveTextContent('Uploading failed');
+    expect(screen.queryByText(/requires review/i)).not.toBeInTheDocument();
   });
 });

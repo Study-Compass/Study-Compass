@@ -31,7 +31,9 @@ describe('popup styles survive the portal', () => {
   test('popup styles live with the popup, not on the page', () => {
     expect(popupCss).toMatch(/\.jgz-picker\b/);
     expect(popupCss).toMatch(/\.jgz-voice\b/);
+    expect(popupCss).toMatch(/\.jgz-export-panel\b/);
     expect(pageCss).not.toMatch(/\.jgz-picker\b/);
+    expect(pageCss).not.toMatch(/\.jgz-export-panel\b/);
   });
 
   test('the page keeps the styles that render inside .jgz', () => {

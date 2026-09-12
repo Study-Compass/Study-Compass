@@ -81,6 +81,13 @@
     }
   }
 
+  .pivot-compute-jobs__wake-check-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: flex-end;
+  }
+
   .pivot-compute-jobs__wake-request-error {
     margin: 14px 0 0;
     color: var(--pivot-ops-danger);
@@ -665,6 +672,34 @@
     margin: 0;
     padding: 0 18px 18px;
     border-top: 0;
+  }
+
+  .pivot-compute-jobs__downloads {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 0 0 14px;
+  }
+
+  .pivot-compute-jobs__download-size {
+    margin-left: 8px;
+    opacity: 0.72;
+    font-weight: 500;
+  }
+
+  .pivot-compute-jobs__expired {
+    margin: 0 0 12px;
+    max-width: 42rem;
+    color: var(--pivot-ops-ink-muted);
+  }
+
+  .pivot-compute-jobs__editor-link {
+    margin: 12px 0 0;
+    font-size: 0.9rem;
+
+    a {
+      color: inherit;
+    }
   }
 
   .pivot-compute-jobs__mono {

@@ -14,10 +14,12 @@
  */
 
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { authenticatedRequest } from '../../../../hooks/useFetch';
 import { useNotification } from '../../../../NotificationContext';
 import PivotTenantPage from '../PivotTenantPage';
 import PivotCarouselEditor from './PivotCarouselEditor';
+import useCarouselExport from './useCarouselExport';
 import { ZINE_DEMO_DECK } from './zineDemoDeck';
 import { frameClass, resolveDeck } from './zineDeck';
 import {
@@ -57,6 +59,8 @@ function decksPath(tenantKey) {
 
 export default function PivotCarouselPage({ tenantKey, cityDisplayName }) {
   const { addNotification } = useNotification();
+  const [searchParams] = useSearchParams();
+  const requestedDeckId = searchParams.get('deckId');
 
   const [deck, setDeck] = useState(null);
   const [draft, setDraft] = useState(null);
@@ -86,7 +90,11 @@ export default function PivotCarouselPage({ tenantKey, cityDisplayName }) {
       return;
     }
 
-    const full = await authenticatedRequest(`${decksPath(tenantKey)}/${rows[0]._id}`);
+    const match = requestedDeckId
+      ? rows.find((row) => String(row._id) === requestedDeckId)
+      : null;
+    const target = match || rows[0];
+    const full = await authenticatedRequest(`${decksPath(tenantKey)}/${target._id}`);
     if (full.data?.success) {
       setDeck(full.data.data.deck);
       setDraft(full.data.data.deck);
@@ -97,7 +105,7 @@ export default function PivotCarouselPage({ tenantKey, cityDisplayName }) {
       setShowIssueNumber(full.data.data.deck.showIssueNumber !== false);
     }
     setLoading(false);
-  }, [tenantKey]);
+  }, [tenantKey, requestedDeckId]);
 
   useEffect(() => {
     load();
@@ -211,30 +219,19 @@ export default function PivotCarouselPage({ tenantKey, cityDisplayName }) {
     [draft, tenantKey, addNotification],
   );
 
-  /**
-   * Mint a token and hand back the command to run. The rendering happens on
-   * this machine against the export route, so nothing is uploaded and no
-   * browser is installed on a server for it.
-   */
-  const startExport = useCallback(async () => {
-    if (!draft?._id) return null;
-    const result = await authenticatedRequest(
-      `${decksPath(tenantKey)}/${draft._id}/export-token`,
-      { method: 'POST' },
-    );
+  const dirty = useMemo(
+    () => Boolean(
+      draft && deck && (
+        JSON.stringify(draft) !== JSON.stringify(deck)
+        || edition !== deck.edition
+        || inkPlate !== (deck.inkPlate !== false)
+        || showIssueNumber !== (deck.showIssueNumber !== false)
+      ),
+    ),
+    [draft, deck, edition, inkPlate, showIssueNumber],
+  );
 
-    if (!result.data?.success) {
-      addNotification({
-        title: 'Could not start the export',
-        message: result.data?.message || 'The request failed.',
-        type: 'error',
-      });
-      return null;
-    }
-
-    const { token, deckId, slideCount } = result.data.data;
-    return `node scripts/export-carousel.js ${deckId} ${token} ${slideCount} ${window.location.origin}`;
-  }, [draft, tenantKey, addNotification]);
+  const exportState = useCarouselExport({ tenantKey, deck, dirty });
 
   const createDeck = useCallback(async () => {
     setSeeding(true);
@@ -258,18 +255,6 @@ export default function PivotCarouselPage({ tenantKey, cityDisplayName }) {
   const preview = useMemo(
     () => resolveDeck({ ...ZINE_DEMO_DECK, edition, inkPlate, showIssueNumber }, manifest, cityVoice),
     [edition, inkPlate, showIssueNumber, manifest, cityVoice],
-  );
-
-  const dirty = useMemo(
-    () => Boolean(
-      draft && deck && (
-        JSON.stringify(draft) !== JSON.stringify(deck)
-        || edition !== deck.edition
-        || inkPlate !== (deck.inkPlate !== false)
-        || showIssueNumber !== (deck.showIssueNumber !== false)
-      ),
-    ),
-    [draft, deck, edition, inkPlate, showIssueNumber],
   );
 
   return (
@@ -330,7 +315,7 @@ export default function PivotCarouselPage({ tenantKey, cityDisplayName }) {
             onSave={saveDeck}
             onSlotImage={setSlotImage}
             onVoiceSaved={load}
-            onExport={startExport}
+            exportState={exportState}
           />
         ) : (
           <>
