@@ -1,0 +1,45 @@
+{
+  "contractVersion": "1",
+  "jobId": "job:carousel-iowacity-001",
+  "scheduleOccurrenceId": null,
+  "kind": "carousel-export",
+  "tenantKey": "iowacity",
+  "cityKey": "iowacity",
+  "deckId": "507f1f77bcf86cd799439011",
+  "attemptId": "507f1f77bcf86cd799439012",
+  "implementationRevision": "relay-worker@2026.09.11",
+  "basedOnContextVersion": "ctx:carousel.0123456789abcdef0123456789abcdef",
+  "completedAt": "2026-09-11T20:08:00.000Z",
+  "outcome": "completed",
+  "idempotencyKey": "idem:carousel-iowacity-001-attempt-1",
+  "renderedDeckRevision": "2026-09-11T19:58:00.000Z",
+  "slideCount": 2,
+  "renderDurationMs": 180000,
+  "artifacts": [
+    {
+      "logicalName": "slide-01.png",
+      "artifactId": "artifact:carousel-001-slide-01",
+      "mimeType": "image/png",
+      "byteCount": 1200000,
+      "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "slideNumber": 1
+    },
+    {
+      "logicalName": "slide-02.png",
+      "artifactId": "artifact:carousel-001-slide-02",
+      "mimeType": "image/png",
+      "byteCount": 1100000,
+      "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "slideNumber": 2
+    },
+    {
+      "logicalName": "carousel.zip",
+      "artifactId": "artifact:carousel-001-zip",
+      "mimeType": "application/zip",
+      "byteCount": 2100000,
+      "sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "slideNumber": null
+    }
+  ],
+  "warnings": []
+}

@@ -1,0 +1,31 @@
+{
+  "contractVersion": "1",
+  "jobId": "job:carousel-iowacity-001",
+  "scheduleOccurrenceId": null,
+  "kind": "carousel-export",
+  "tenantKey": "iowacity",
+  "cityKey": "iowacity",
+  "implementationRevision": "relay-worker@2026.09.11",
+  "contextVersion": "ctx:carousel.0123456789abcdef0123456789abcdef",
+  "snapshotAt": "2026-09-11T20:05:00.000Z",
+  "attemptId": "507f1f77bcf86cd799439012",
+  "deckId": "507f1f77bcf86cd799439011",
+  "deckRevision": "2026-09-11T19:58:00.000Z",
+  "slideCount": 2,
+  "renderDimensions": { "width": 1080, "height": 1350 },
+  "renderUrlBase": "https://justgo.lol/carousel-export",
+  "renderToken": "fixture-render-grant-not-a-real-credential-0001",
+  "renderTokenExpiresAt": "2026-09-11T20:15:00.000Z",
+  "artifactUploadGrant": {
+    "grantId": "grant:carousel-fixture-001",
+    "token": "fixture-upload-grant-not-a-real-credential-0001",
+    "attemptId": "507f1f77bcf86cd799439012",
+    "expiresAt": "2026-09-11T20:15:00.000Z",
+    "allowedMimeTypes": ["image/png", "application/zip"],
+    "limits": {
+      "maxArtifactCount": 21,
+      "maxBytesPerArtifact": 67108864,
+      "maxTotalBytes": 268435456
+    }
+  }
+}

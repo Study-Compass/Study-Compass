@@ -4,7 +4,8 @@
   "title": "Pivot admin compute context snapshot v1",
   "oneOf": [
     { "$ref": "#/$defs/discoveryContext" },
-    { "$ref": "#/$defs/refreshContext" }
+    { "$ref": "#/$defs/refreshContext" },
+    { "$ref": "#/$defs/carouselContext" }
   ],
   "$defs": {
     "tenantSummary": {
@@ -260,6 +261,69 @@
         },
         "permittedEventFields": { "$ref": "#/$defs/permittedEventFields" },
         "providerCapabilities": { "$ref": "#/$defs/providerCapabilities" }
+      }
+    },
+    "carouselContext": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contractVersion", "jobId", "scheduleOccurrenceId", "kind",
+        "tenantKey", "cityKey", "implementationRevision", "contextVersion",
+        "snapshotAt", "attemptId", "deckId", "deckRevision", "slideCount",
+        "renderDimensions", "renderUrlBase", "renderToken", "renderTokenExpiresAt",
+        "artifactUploadGrant"
+      ],
+      "properties": {
+        "contractVersion": { "const": "1" },
+        "jobId": { "type": "string", "minLength": 8, "maxLength": 128, "pattern": "^[a-zA-Z0-9:_-]+$" },
+        "scheduleOccurrenceId": { "type": "null" },
+        "kind": { "const": "carousel-export" },
+        "tenantKey": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]{0,62}$" },
+        "cityKey": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]{0,62}$" },
+        "implementationRevision": { "type": "string", "pattern": "^[a-zA-Z0-9@._+-]+$", "maxLength": 128 },
+        "contextVersion": { "type": "string", "pattern": "^ctx:[a-zA-Z0-9._-]+$" },
+        "snapshotAt": { "type": "string", "format": "date-time" },
+        "attemptId": { "type": "string", "pattern": "^[0-9a-f]{24}$" },
+        "deckId": { "type": "string", "pattern": "^[0-9a-f]{24}$" },
+        "deckRevision": { "type": "string", "format": "date-time", "maxLength": 40 },
+        "slideCount": { "type": "integer", "minimum": 1, "maximum": 20 },
+        "renderDimensions": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["width", "height"],
+          "properties": {
+            "width": { "const": 1080 },
+            "height": { "const": 1350 }
+          }
+        },
+        "renderUrlBase": { "type": "string", "format": "uri", "maxLength": 2048 },
+        "renderToken": { "type": "string", "minLength": 32, "maxLength": 4096 },
+        "renderTokenExpiresAt": { "type": "string", "format": "date-time" },
+        "artifactUploadGrant": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["grantId", "token", "attemptId", "expiresAt", "allowedMimeTypes", "limits"],
+          "properties": {
+            "grantId": { "type": "string", "minLength": 8, "maxLength": 128, "pattern": "^[a-zA-Z0-9:_-]+$" },
+            "token": { "type": "string", "minLength": 32, "maxLength": 4096 },
+            "attemptId": { "type": "string", "pattern": "^[0-9a-f]{24}$" },
+            "expiresAt": { "type": "string", "format": "date-time" },
+            "allowedMimeTypes": {
+              "type": "array", "minItems": 2, "maxItems": 2,
+              "items": { "enum": ["image/png", "application/zip"] }
+            },
+            "limits": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["maxArtifactCount", "maxBytesPerArtifact", "maxTotalBytes"],
+              "properties": {
+                "maxArtifactCount": { "const": 21 },
+                "maxBytesPerArtifact": { "const": 67108864 },
+                "maxTotalBytes": { "const": 268435456 }
+              }
+            }
+          }
+        }
       }
     }
   }

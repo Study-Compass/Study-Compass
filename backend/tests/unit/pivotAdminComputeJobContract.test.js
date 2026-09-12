@@ -21,6 +21,7 @@ describe('Pivot admin compute job contracts v1 (Phase 1, Step 1.2)', () => {
     expect(COMPUTE_JOB_KINDS).toEqual([
       'city-source-discovery',
       'city-curation-refresh',
+      'carousel-export',
     ]);
   });
 
@@ -28,6 +29,7 @@ describe('Pivot admin compute job contracts v1 (Phase 1, Step 1.2)', () => {
     it('accepts valid discovery and refresh requests from fixtures', () => {
       expect(validateJobRequest(loadFixture('job-request-discovery-valid.json'))).toEqual({ valid: true });
       expect(validateJobRequest(loadFixture('job-request-refresh-valid.json'))).toEqual({ valid: true });
+      expect(validateJobRequest(loadFixture('job-request-carousel-valid.json'))).toEqual({ valid: true });
     });
 
     it('requires stable ids, kind, cityKey, contract/context versions, and timestamps', () => {
@@ -71,6 +73,7 @@ describe('Pivot admin compute job contracts v1 (Phase 1, Step 1.2)', () => {
     it('accepts bounded discovery and refresh context snapshots', () => {
       expect(validateContextSnapshot(loadFixture('context-discovery-valid.json'))).toEqual({ valid: true });
       expect(validateContextSnapshot(loadFixture('context-refresh-valid.json'))).toEqual({ valid: true });
+      expect(validateContextSnapshot(loadFixture('context-carousel-valid.json'))).toEqual({ valid: true });
     });
 
     it('includes tenant, identity, and capability material without credentials', () => {
@@ -93,6 +96,24 @@ describe('Pivot admin compute job contracts v1 (Phase 1, Step 1.2)', () => {
     it('accepts valid completed discovery and refresh results', () => {
       expect(validateExecutionResult(loadFixture('result-discovery-valid-completed.json'))).toEqual({ valid: true });
       expect(validateExecutionResult(loadFixture('result-refresh-valid-completed.json'))).toEqual({ valid: true });
+      expect(validateExecutionResult(loadFixture('result-carousel-valid-completed.json'))).toEqual({ valid: true });
+    });
+
+    it('rejects unsupported carousel artifacts and oversized or incomplete manifests', () => {
+      const unsupported = loadFixture('result-carousel-valid-completed.json');
+      unsupported.artifacts[0].mimeType = 'image/jpeg';
+      expect(validateExecutionResult(unsupported).valid).toBe(false);
+
+      const incomplete = loadFixture('result-carousel-valid-completed.json');
+      incomplete.artifacts.pop();
+      expect(validateExecutionResult(incomplete)).toEqual({
+        valid: false,
+        errors: expect.arrayContaining([expect.stringContaining('exactly one ZIP')]),
+      });
+
+      const oversized = loadFixture('result-carousel-valid-completed.json');
+      oversized.artifacts[0].byteCount = 67108865;
+      expect(validateExecutionResult(oversized).valid).toBe(false);
     });
 
     it('accepts failed outcomes with empty proposals but no diagnostics mixed in', () => {
@@ -231,12 +252,15 @@ describe('Pivot admin compute job contracts v1 (Phase 1, Step 1.2)', () => {
         expect.arrayContaining([
           'job-request-discovery-valid.json',
           'job-request-refresh-valid.json',
+          'job-request-carousel-valid.json',
           'job-request-invalid-unknown-field.json',
           'context-discovery-valid.json',
           'context-refresh-valid.json',
+          'context-carousel-valid.json',
           'result-discovery-valid-completed.json',
           'result-discovery-failed.json',
           'result-refresh-valid-completed.json',
+          'result-carousel-valid-completed.json',
           'result-duplicate-idempotency.json',
           'result-stale-context-version.json',
           'result-invalid-with-logs.json',

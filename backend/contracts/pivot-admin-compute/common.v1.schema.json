@@ -56,7 +56,7 @@
       "format": "date-time"
     },
     "computeJobKind": {
-      "enum": ["city-source-discovery", "city-curation-refresh"]
+      "enum": ["city-source-discovery", "city-curation-refresh", "carousel-export"]
     },
     "executionOutcome": {
       "enum": ["completed", "failed", "cancelled"]
