@@ -18,17 +18,36 @@ import { formatWhenLabel } from './zineDeck';
 const SEARCH_DEBOUNCE_MS = 260;
 const PAGE = 24;
 
-/** The last N days, as the date inputs want them. */
-function daysAgo(n) {
+/** Local calendar day, so a late-night picker does not slip into UTC tomorrow. */
+function ymd(date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+function tomorrowSpan() {
   const date = new Date();
-  date.setDate(date.getDate() - n);
-  return date.toISOString().slice(0, 10);
+  date.setDate(date.getDate() + 1);
+  const day = ymd(date);
+  return { from: day, to: day };
+}
+
+/** The Saturday–Sunday that has already finished, not the weekend currently in progress. */
+function lastWeekendSpan() {
+  const now = new Date();
+  const daysSinceSunday = now.getDay() === 0 ? 7 : now.getDay();
+  const sunday = new Date(now);
+  sunday.setDate(now.getDate() - daysSinceSunday);
+  const saturday = new Date(sunday);
+  saturday.setDate(sunday.getDate() - 1);
+  return { from: ymd(saturday), to: ymd(sunday) };
 }
 
 const RANGES = [
-  { key: 'week', label: 'last 7 days', from: () => daysAgo(7) },
-  { key: 'month', label: 'last 30 days', from: () => daysAgo(30) },
-  { key: 'all', label: 'any date', from: () => '' },
+  { key: 'tomorrow', label: 'tomorrow', span: tomorrowSpan },
+  { key: 'weekend', label: 'last weekend', span: lastWeekendSpan },
+  { key: 'all', label: 'any date', span: () => ({ from: '', to: '' }) },
 ];
 
 export default function PivotCarouselEventPicker({
@@ -39,8 +58,8 @@ export default function PivotCarouselEventPicker({
   onPick,
 }) {
   const [query, setQuery] = useState('');
-  const [range, setRange] = useState('month');
-  const [from, setFrom] = useState(daysAgo(30));
+  const [range, setRange] = useState('all');
+  const [from, setFrom] = useState('');
   const [to, setTo] = useState('');
   const [rows, setRows] = useState([]);
   const [total, setTotal] = useState(0);
@@ -86,8 +105,9 @@ export default function PivotCarouselEventPicker({
   const applyRange = useCallback((key) => {
     setRange(key);
     const preset = RANGES.find((r) => r.key === key);
-    setFrom(preset ? preset.from() : '');
-    setTo('');
+    const span = preset ? preset.span() : { from: '', to: '' };
+    setFrom(span.from);
+    setTo(span.to);
   }, []);
 
   const pick = useCallback(
@@ -190,15 +210,14 @@ export default function PivotCarouselEventPicker({
                   )}
                 </span>
                 <span className="jgz-picker__row">
-                  <b>{row.name}</b>
-                  <span className="jgz-picker__meta">
-                    {[formatWhenLabel(row.startTime), row.location, row.host]
-                      .filter(Boolean)
-                      .join(' · ')}
-                  </span>
-                  {row.tags?.length ? (
-                    <span className="jgz-picker__tags">{row.tags.slice(0, 4).join(' / ')}</span>
-                  ) : null}
+                  {row.host ? (
+                    <>
+                      <b className="jgz-picker__host">{row.host}</b>
+                      <span className="jgz-picker__name">{row.name}</span>
+                    </>
+                  ) : (
+                    <b className="jgz-picker__host">{row.name}</b>
+                  )}
                 </span>
               </button>
             </li>
