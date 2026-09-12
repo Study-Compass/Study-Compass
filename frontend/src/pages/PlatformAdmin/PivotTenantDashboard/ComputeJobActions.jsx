@@ -18,6 +18,15 @@ import {
   canRetryComputeJob,
   mutationFeedback,
 } from './pivotComputeJobActions';
+import {
+  ARTIFACTS_EXPIRED_COPY,
+  CAROUSEL_EXPORT_KIND,
+  artifactsExpired,
+  formatBytes,
+  slideArtifacts,
+  startBrowserDownload,
+  zipArtifact,
+} from './carousel/pivotCarouselExport';
 
 const NO_FETCH_CACHE = { enabled: false };
 
@@ -29,30 +38,40 @@ const WAKE_CHECK_LABELS = {
 };
 
 export function ComputeWakeDiagnostic() {
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(null);
   const [report, setReport] = useState(null);
+  const [reportKind, setReportKind] = useState(null);
   const [requestError, setRequestError] = useState(null);
 
-  const handleCheck = useCallback(async () => {
-    setLoading(true);
+  const handleCheck = useCallback(async (kind) => {
+    setLoading(kind);
     setRequestError(null);
-    const { data, error } = await authenticatedRequest('/admin/pivot/compute-jobs/wake-diagnostic', {
+    const path = kind === 'storage'
+      ? '/admin/pivot/compute-jobs/artifact-diagnostic'
+      : '/admin/pivot/compute-jobs/wake-diagnostic';
+    const { data, error } = await authenticatedRequest(path, {
       method: 'POST',
       data: {},
     });
-    setLoading(false);
+    setLoading(null);
     if (error) {
       setReport(null);
+      setReportKind(null);
       setRequestError(error);
       return;
     }
+    setReportKind(kind);
     setReport(data?.diagnostic || null);
   }, []);
 
   const accepted = report?.status === 'accepted';
-  const target = report?.target
-    ? `${report.target.origin}${report.target.path}`
-    : 'Not configured';
+  const target = reportKind === 'storage'
+    ? (report?.target?.bucket
+      ? `${report.target.bucket}/${report.target.prefix || ''}`
+      : 'Not configured')
+    : (report?.target
+      ? `${report.target.origin}${report.target.path}`
+      : 'Not configured');
 
   return (
     <section className="pivot-compute-jobs__wake-check pivot-lab__panel" aria-labelledby="compute-wake-check-heading">
@@ -61,12 +80,17 @@ export function ComputeWakeDiagnostic() {
           <span className="pivot-compute-jobs__eyebrow">Relay connection</span>
           <h2 id="compute-wake-check-heading" className="pivot-compute-jobs__activity-title">Wake handshake</h2>
           <p className="pivot-lab__section-hint">
-            Send a real signed wake without creating a job. Relay will check the durable queue if it accepts the request.
+            Send a real signed wake without creating a job, or confirm object storage can mint carousel upload URLs.
           </p>
         </div>
-        <button type="button" className="linear-btn" onClick={handleCheck} disabled={loading}>
-          {loading ? 'Checking…' : report ? 'Check again' : 'Test Relay wake'}
-        </button>
+        <div className="pivot-compute-jobs__wake-check-actions">
+          <button type="button" className="linear-btn" onClick={() => handleCheck('wake')} disabled={Boolean(loading)}>
+            {loading === 'wake' ? 'Checking…' : reportKind === 'wake' && report ? 'Check wake again' : 'Test Relay wake'}
+          </button>
+          <button type="button" className="linear-btn linear-btn--secondary" onClick={() => handleCheck('storage')} disabled={Boolean(loading)}>
+            {loading === 'storage' ? 'Checking…' : reportKind === 'storage' && report ? 'Check storage again' : 'Test export storage'}
+          </button>
+        </div>
       </div>
 
       {requestError ? (
@@ -551,11 +575,16 @@ export function ComputeJobDetailActions({
   const [applyResult, setApplyResult] = useState(null);
 
   const externalJobId = job?.externalJobId || '';
-  const showPreview = canPreviewStoredComputeJob(job);
+  const isCarousel = job?.kind === CAROUSEL_EXPORT_KIND;
+  const showPreview = !isCarousel && canPreviewStoredComputeJob(job);
   const showCancel = allowManagementActions && canCancelComputeJob(job);
   const showRetry = allowManagementActions && canRetryComputeJob(job);
   const applyInProgress = actionLoading === 'apply';
-  const showApply = applyInProgress || canApplyStoredComputeJob(job, preview);
+  const showApply = !isCarousel && (applyInProgress || canApplyStoredComputeJob(job, preview));
+  const showCarouselDownloads = isCarousel && job?.status === 'completed';
+  const carouselExpired = showCarouselDownloads && artifactsExpired(job);
+  const zip = showCarouselDownloads ? zipArtifact(job) : null;
+  const slides = showCarouselDownloads ? slideArtifacts(job) : [];
 
   const resetPreview = useCallback(() => {
     setPreview(null);
@@ -635,6 +664,22 @@ export function ComputeJobDetailActions({
     resetPreview();
   }, [showRetry, externalJobId, job?.contextVersion, runMutation, resetPreview]);
 
+  const handleDownload = useCallback(async (artifact) => {
+    if (!externalJobId || !artifact?.artifactId || !tenantKey) return;
+    setActionLoading(artifact.artifactId);
+    setActionFeedback(null);
+    const { data, error } = await authenticatedRequest(
+      `/admin/pivot/compute-jobs/${encodeURIComponent(externalJobId)}/artifacts/${encodeURIComponent(artifact.artifactId)}`,
+      { params: { tenantKey } },
+    );
+    setActionLoading(null);
+    if (error || !data?.downloadUrl) {
+      setActionFeedback({ tone: 'error', message: error || 'The download request failed.' });
+      return;
+    }
+    startBrowserDownload(data.downloadUrl, data.filename || artifact.logicalName);
+  }, [externalJobId, tenantKey]);
+
   const handleApply = useCallback(async () => {
     if (!showApply || !applyConfirmed || !preview || !externalJobId) return;
     onJobUpdated?.({ ...job, status: 'applying' }, { action: 'apply', optimistic: true });
@@ -689,7 +734,7 @@ export function ComputeJobDetailActions({
     return items;
   }, [showPreview, showCancel, showRetry, applyInProgress]);
 
-  if (!job || (controls.length === 0 && !preview && !applyResult)) {
+  if (!job || (controls.length === 0 && !preview && !applyResult && !showCarouselDownloads)) {
     return null;
   }
 
@@ -701,8 +746,44 @@ export function ComputeJobDetailActions({
     >
       <h3 className="pivot-compute-jobs__controls-title">Job actions</h3>
       <p className="pivot-lab__section-hint">
-        Actions follow server state for this job. A duplicate response means production already recorded the outcome.
+        {isCarousel
+          ? 'Downloads stay tenant-authorized. Cancel and retry follow the same job record.'
+          : 'Actions follow server state for this job. A duplicate response means production already recorded the outcome.'}
       </p>
+
+      {showCarouselDownloads ? (
+        carouselExpired ? (
+          <p className="pivot-compute-jobs__expired" role="status">{ARTIFACTS_EXPIRED_COPY}</p>
+        ) : (
+          <div className="pivot-compute-jobs__downloads" data-testid="compute-carousel-downloads">
+            {zip ? (
+              <button
+                type="button"
+                className="linear-btn"
+                onClick={() => handleDownload(zip)}
+                disabled={Boolean(actionLoading)}
+              >
+                {actionLoading === zip.artifactId ? 'Starting…' : 'Download ZIP'}
+                <span className="pivot-compute-jobs__download-size">{formatBytes(zip.byteCount)}</span>
+              </button>
+            ) : null}
+            {slides.map((slide) => (
+              <button
+                key={slide.artifactId}
+                type="button"
+                className="linear-btn linear-btn--secondary"
+                onClick={() => handleDownload(slide)}
+                disabled={Boolean(actionLoading)}
+              >
+                {actionLoading === slide.artifactId
+                  ? 'Starting…'
+                  : `Slide ${String(slide.slideNumber || '').padStart(2, '0')}`}
+                <span className="pivot-compute-jobs__download-size">{formatBytes(slide.byteCount)}</span>
+              </button>
+            ))}
+          </div>
+        )
+      ) : null}
 
       <div className="pivot-compute-jobs__controls-row">
         {showPreview ? (

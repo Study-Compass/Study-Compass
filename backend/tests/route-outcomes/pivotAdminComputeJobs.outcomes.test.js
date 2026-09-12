@@ -29,6 +29,7 @@ jest.mock('../../services/pivotComputeAdminService', () => ({
   submitManualComputeResult: jest.fn(),
   cancelAdminComputeJob: jest.fn(),
   retryAdminComputeJob: jest.fn(),
+  createAdminCarouselArtifactDownload: jest.fn(),
   rejectUnknownFields: jest.fn(),
   handleAdminServiceError: jest.fn((res, error) => res.status(error.status || 500).json({
     error: error.message,
@@ -39,6 +40,10 @@ jest.mock('../../services/pivotComputeAdminService', () => ({
 
 jest.mock('../../services/pivotComputeWakeService', () => ({
   diagnoseComputeWorkerWake: jest.fn(),
+}));
+
+jest.mock('../../services/pivotExportArtifactStorage', () => ({
+  diagnoseCarouselExportStorage: jest.fn(),
 }));
 
 const {
@@ -53,9 +58,11 @@ const {
   submitManualComputeResult,
   cancelAdminComputeJob,
   retryAdminComputeJob,
+  createAdminCarouselArtifactDownload,
   rejectUnknownFields,
 } = require('../../services/pivotComputeAdminService');
 const { diagnoseComputeWorkerWake } = require('../../services/pivotComputeWakeService');
+const { diagnoseCarouselExportStorage } = require('../../services/pivotExportArtifactStorage');
 const pivotAdminComputeJobsRoutes = require('../../routes/pivotAdminComputeJobsRoutes');
 const { loadFixture } = require('../../utilities/pivotAdminComputeJobContract');
 
@@ -77,9 +84,11 @@ describe('pivotAdminComputeJobs routes outcomes', () => {
     submitManualComputeResult.mockReset();
     cancelAdminComputeJob.mockReset();
     retryAdminComputeJob.mockReset();
+    createAdminCarouselArtifactDownload.mockReset();
     rejectUnknownFields.mockReset();
     rejectUnknownFields.mockImplementation(() => {});
     diagnoseComputeWorkerWake.mockReset();
+    diagnoseCarouselExportStorage.mockReset();
   });
 
   it('lists compute jobs for platform admins', async () => {
@@ -141,6 +150,26 @@ describe('pivotAdminComputeJobs routes outcomes', () => {
       response: { httpStatus: 202 },
     });
     expect(diagnoseComputeWorkerWake).toHaveBeenCalledTimes(1);
+  });
+
+  it('sends an authenticated artifact storage diagnostic without writing objects', async () => {
+    diagnoseCarouselExportStorage.mockResolvedValue({
+      status: 'accepted',
+      code: 'CAROUSEL_EXPORT_STORAGE_OK',
+      target: { bucket: 'pivot-exports', prefix: 'pivot-exports/' },
+      checks: [],
+    });
+
+    const response = await request(app)
+      .post('/admin/pivot/compute-jobs/artifact-diagnostic')
+      .send({});
+
+    expect(response.status).toBe(200);
+    expect(response.body.diagnostic).toMatchObject({
+      status: 'accepted',
+      code: 'CAROUSEL_EXPORT_STORAGE_OK',
+    });
+    expect(diagnoseCarouselExportStorage).toHaveBeenCalledTimes(1);
   });
 
   it('returns an existing admin compute job on duplicate create idempotency', async () => {
@@ -353,6 +382,31 @@ describe('pivotAdminComputeJobs routes outcomes', () => {
         validationIssues: [expect.objectContaining({ missingFields: ['hostName', 'location'] })],
       },
     });
+  });
+
+  it('returns a tenant-authorized carousel artifact download', async () => {
+    createAdminCarouselArtifactDownload.mockResolvedValue({
+      downloadUrl: 'https://s3.test/pivot-exports/iowacity/job:carousel-iowacity-001/1/carousel.zip?get=1',
+      filename: 'carousel.zip',
+      mimeType: 'application/zip',
+      byteCount: 2100000,
+      artifactId: 'artifact:carousel-001-zip',
+    });
+
+    const response = await request(app)
+      .get('/admin/pivot/compute-jobs/job:carousel-iowacity-001/artifacts/artifact:carousel-001-zip')
+      .query({ tenantKey: 'iowacity' });
+
+    expect(response.status).toBe(200);
+    expect(response.body.filename).toBe('carousel.zip');
+    expect(createAdminCarouselArtifactDownload).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({
+        externalJobId: 'job:carousel-iowacity-001',
+        artifactId: 'artifact:carousel-001-zip',
+        tenantKey: 'iowacity',
+      }),
+    );
   });
 
   it('returns actionable errors when retry is not allowed', async () => {

@@ -13,6 +13,7 @@ const PIVOT_COMPUTE_JOB_INDEX_NAMES = Object.freeze([
   'pivot_compute_job_lease_expiry',
   'pivot_compute_job_city_createdAt',
   'pivot_compute_job_city_status_updatedAt',
+  'pivot_compute_job_export_artifact_expiry',
 ]);
 
 const MAX_PROGRESS_MESSAGE_LENGTH = 500;
@@ -85,6 +86,34 @@ const resultArtifactRefSchema = new mongoose.Schema(
     key: { type: String, required: true, trim: true, maxlength: MAX_ARTIFACT_REF_KEY_LENGTH },
     byteSize: { type: Number, required: true, min: 1, max: MAX_EMBEDDED_RESULT_BYTES },
     checksum: { type: String, default: null, trim: true, maxlength: 128 },
+  },
+  { _id: false },
+);
+
+const exportArtifactEntrySchema = new mongoose.Schema(
+  {
+    logicalName: { type: String, required: true, trim: true, maxlength: 128 },
+    artifactId: { type: String, required: true, trim: true, maxlength: 128 },
+    mimeType: { type: String, required: true, trim: true, maxlength: 64 },
+    byteCount: { type: Number, required: true, min: 1 },
+    sha256: { type: String, required: true, trim: true, maxlength: 64 },
+    slideNumber: { type: Number, default: null, min: 1, max: 20 },
+    objectKey: { type: String, required: true, trim: true, maxlength: 512 },
+  },
+  { _id: false },
+);
+
+const exportArtifactsSchema = new mongoose.Schema(
+  {
+    attemptId: { type: mongoose.Schema.Types.ObjectId, required: true, ref: 'PivotComputeJobAttempt' },
+    attemptNumber: { type: Number, required: true, min: 1, max: 100 },
+    prefix: { type: String, required: true, trim: true, maxlength: 512 },
+    grantId: { type: String, required: true, trim: true, maxlength: 128 },
+    finalizedAt: { type: Date, required: true },
+    expiresAt: { type: Date, default: null },
+    expired: { type: Boolean, default: false },
+    cleanedAt: { type: Date, default: null },
+    artifacts: { type: [exportArtifactEntrySchema], default: undefined },
   },
   { _id: false },
 );
@@ -220,6 +249,7 @@ const pivotComputeJobSchema = new mongoose.Schema(
     lease: { type: leaseSchema, default: null },
     progress: { type: progressSchema, default: null },
     result: { type: storedResultSchema, default: null },
+    exportArtifacts: { type: exportArtifactsSchema, default: null },
     applicationAudit: { type: applicationAuditSchema, default: null },
     failure: { type: jobFailureSchema, default: null },
     requestedAt: { type: Date, required: true },
@@ -284,6 +314,16 @@ pivotComputeJobSchema.index(
 pivotComputeJobSchema.index(
   { cityKey: 1, status: 1, updatedAt: -1 },
   { name: PIVOT_COMPUTE_JOB_INDEX_NAMES[6] },
+);
+pivotComputeJobSchema.index(
+  { kind: 1, 'exportArtifacts.expiresAt': 1 },
+  {
+    name: PIVOT_COMPUTE_JOB_INDEX_NAMES[7],
+    partialFilterExpression: {
+      kind: 'carousel-export',
+      'exportArtifacts.expired': false,
+    },
+  },
 );
 
 module.exports = pivotComputeJobSchema;

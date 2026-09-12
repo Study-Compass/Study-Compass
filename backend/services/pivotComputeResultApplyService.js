@@ -957,6 +957,9 @@ async function previewComputeResult(req, resultInput, {
   now = new Date(),
   authorize = null,
 } = {}) {
+  if (resultInput?.kind === 'carousel-export') {
+    throw serviceError('Carousel export results do not support preview.', 'CAROUSEL_PREVIEW_UNSUPPORTED', 409);
+  }
   const result = validateComputeExecutionResult(resultInput);
   const contextVersion = currentContextVersion
     || await resolveCurrentContextVersion(req, result, { authorize });
@@ -975,6 +978,9 @@ async function previewComputeResultWithReview(req, resultInput, {
   now = new Date(),
   authorize = null,
 } = {}) {
+  if (resultInput?.kind === 'carousel-export') {
+    throw serviceError('Carousel export results do not support preview.', 'CAROUSEL_PREVIEW_UNSUPPORTED', 409);
+  }
   const result = validateComputeExecutionResult(resultInput);
   const contextVersion = currentContextVersion
     || await resolveCurrentContextVersion(req, result, { authorize });
@@ -1171,6 +1177,9 @@ async function applyComputeResult(req, {
 async function previewStoredComputeJob(req, externalJobId, options = {}) {
   const job = await findJobByExternalId(req, externalJobId);
   if (!job) throw serviceError('Compute job not found.', 'COMPUTE_JOB_NOT_FOUND', 404);
+  if (job.kind === 'carousel-export') {
+    throw serviceError('Carousel export jobs do not support preview.', 'CAROUSEL_PREVIEW_UNSUPPORTED', 409);
+  }
   if (!job.result?.embedded) {
     throw serviceError('Compute job has no stored result to preview.', 'COMPUTE_JOB_RESULT_MISSING', 409);
   }
@@ -1191,6 +1200,9 @@ async function applyStoredComputeJob(req, externalJobId, {
 } = {}) {
   const job = await findJobByExternalId(req, externalJobId);
   if (!job) throw serviceError('Compute job not found.', 'COMPUTE_JOB_NOT_FOUND', 404);
+  if (job.kind === 'carousel-export') {
+    throw serviceError('Carousel export jobs do not support apply.', 'CAROUSEL_APPLY_UNSUPPORTED', 409);
+  }
   const requestedTenantKey = trimString(tenantKey).toLowerCase();
   if (!requestedTenantKey) {
     throw serviceError('A tenantKey is required to apply a compute job.', 'APPLY_TENANT_REQUIRED', 400);

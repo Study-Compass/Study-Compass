@@ -16,7 +16,12 @@ jest.mock('../../services/pivotOffloadedCurationRefreshContextService', () => ({
   buildCityCurationRefreshContextSnapshot: jest.fn(),
 }));
 
+jest.mock('../../services/pivotCarouselComputeContextService', () => ({
+  buildCarouselExportContextSnapshot: jest.fn(),
+}));
+
 const { buildCityDiscoveryContextSnapshot } = require('../../services/pivotOffloadedDiscoveryContextService');
+const { buildCarouselExportContextSnapshot } = require('../../services/pivotCarouselComputeContextService');
 
 const WORKER_ID = 'relay-mini-1';
 const WORKER_SECRET = 'test-worker-secret';
@@ -88,6 +93,7 @@ describe('pivotComputeWorkerRoutes outcomes', () => {
     buildCityDiscoveryContextSnapshot.mockResolvedValue({
       data: { snapshot: discoveryContextSnapshot('job:placeholder') },
     });
+    buildCarouselExportContextSnapshot.mockReset();
   });
 
   afterAll(async () => {
@@ -219,6 +225,40 @@ describe('pivotComputeWorkerRoutes outcomes', () => {
       });
     expect(duplicate.status).toBe(200);
     expect(duplicate.body.job.status).toBe('review-required');
+  });
+
+  it('mints carousel render context only after a worker owns an attempt', async () => {
+    const requestFixture = loadFixture('job-request-carousel-valid.json');
+    const contextFixture = loadFixture('context-carousel-valid.json');
+    await createComputeJob(req, {
+      externalJobId: requestFixture.jobId,
+      kind: requestFixture.kind,
+      cityKey: requestFixture.cityKey,
+      contractVersion: requestFixture.contractVersion,
+      contextVersion: requestFixture.contextVersion,
+      createIdempotencyKey: requestFixture.idempotencyKey,
+      requestedAt: requestFixture.requestedAt,
+      origin: { type: 'admin' },
+      options: requestFixture.options,
+    });
+    buildCarouselExportContextSnapshot.mockImplementation(async (_req, { job }) => {
+      expect(job.status).toBe('leased');
+      expect(job.lease.attemptId).toBeTruthy();
+      return { data: { snapshot: { ...contextFixture, attemptId: job.lease.attemptId } } };
+    });
+
+    const claim = await workerAuth(request(app)
+      .post('/worker/pivot/compute/v1/jobs/claim'))
+      .send({ kind: 'carousel-export', cityKey: 'iowacity', capability: workerCapability() });
+    expect(claim.status).toBe(200);
+
+    const context = await workerAuth(request(app)
+      .get(`/worker/pivot/compute/v1/jobs/${requestFixture.jobId}/context`))
+      .set('x-pivot-compute-lease-token', claim.body.lease.leaseToken);
+    expect(context.status).toBe(200);
+    expect(context.body.context.kind).toBe('carousel-export');
+    expect(context.body.context.attemptId).toBe(claim.body.lease.attemptId);
+    expect(buildCarouselExportContextSnapshot).toHaveBeenCalledTimes(1);
   });
 
   it('reports retryable failures through the dedicated endpoint', async () => {

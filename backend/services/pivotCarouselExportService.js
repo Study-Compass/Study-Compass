@@ -21,7 +21,12 @@ const { serializeDeck } = require('./pivotCarouselDeckService');
 const PURPOSE = 'pivot-carousel-export';
 const TOKEN_TTL = '10m';
 
-async function mintExportToken(req, tenantKey, deckId) {
+function deckRevision(deck) {
+  const value = deck?.updatedAt instanceof Date ? deck.updatedAt : new Date(deck?.updatedAt);
+  return Number.isNaN(value.getTime()) ? null : value.toISOString();
+}
+
+async function mintExportToken(req, tenantKey, deckId, scope = {}) {
   const key = String(tenantKey || '').trim().toLowerCase();
   const tenant = await getTenantByKey(req, key);
   if (!tenant) return { error: 'Tenant not found.', status: 404 };
@@ -31,12 +36,20 @@ async function mintExportToken(req, tenantKey, deckId) {
 
   const { PivotCarouselDeck } = getGlobalModels(req, 'PivotCarouselDeck');
   const deck = await PivotCarouselDeck.findOne({ _id: deckId, tenantKey: key })
-    .select('slides title')
+    .select('slides title updatedAt')
     .lean();
   if (!deck) return { error: 'Deck not found.', status: 404, code: 'DECK_NOT_FOUND' };
 
+  const revision = deckRevision(deck);
   const token = jwt.sign(
-    { purpose: PURPOSE, tenantKey: key, deckId: String(deck._id) },
+    {
+      purpose: PURPOSE,
+      tenantKey: key,
+      deckId: String(deck._id),
+      ...(revision ? { deckRevision: revision } : {}),
+      ...(scope.jobId ? { jobId: String(scope.jobId) } : {}),
+      ...(scope.attemptId ? { attemptId: String(scope.attemptId) } : {}),
+    },
     process.env.JWT_SECRET,
     { expiresIn: TOKEN_TTL },
   );
@@ -46,8 +59,10 @@ async function mintExportToken(req, tenantKey, deckId) {
       token,
       tenantKey: key,
       deckId: String(deck._id),
+      deckRevision: revision,
       slideCount: (deck.slides || []).length,
       expiresInSeconds: 600,
+      expiresAt: new Date(Date.now() + 600 * 1000).toISOString(),
     },
   };
 }
@@ -84,6 +99,13 @@ async function readDeckForExport(req, token, deckId) {
     PivotCarouselVoice.findOne({ tenantKey: claims.tenantKey }).lean(),
   ]);
   if (!deck) return { error: 'Deck not found.', status: 404, code: 'DECK_NOT_FOUND' };
+  if (claims.deckRevision && deckRevision(deck) !== claims.deckRevision) {
+    return {
+      error: 'That deck changed after this export was claimed.',
+      status: 409,
+      code: 'DECK_REVISION_MISMATCH',
+    };
+  }
 
   return {
     data: {
@@ -94,4 +116,4 @@ async function readDeckForExport(req, token, deckId) {
   };
 }
 
-module.exports = { mintExportToken, readDeckForExport, PURPOSE, TOKEN_TTL };
+module.exports = { mintExportToken, readDeckForExport, deckRevision, PURPOSE, TOKEN_TTL };

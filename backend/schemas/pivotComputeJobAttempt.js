@@ -77,6 +77,28 @@ const pivotComputeJobAttemptSchema = new mongoose.Schema(
       supportedContractVersions: { type: [String], default: undefined },
       supportedKinds: { type: [String], enum: COMPUTE_JOB_KINDS, default: undefined },
     },
+    artifactUploads: {
+      grantId: { type: String, default: null, trim: true, maxlength: 128 },
+      prefix: { type: String, default: null, trim: true, maxlength: 512 },
+      slideCount: { type: Number, default: null, min: 1, max: 20 },
+      initializedAt: { type: Date, default: null },
+      finalizedAt: { type: Date, default: null },
+      cleanedAt: { type: Date, default: null },
+      artifacts: {
+        type: [{
+          artifactId: { type: String, required: true, trim: true, maxlength: 128 },
+          logicalName: { type: String, required: true, trim: true, maxlength: 128 },
+          objectKey: { type: String, required: true, trim: true, maxlength: 512 },
+          mimeType: { type: String, required: true, trim: true, maxlength: 64 },
+          byteCount: { type: Number, required: true, min: 1 },
+          sha256: { type: String, required: true, trim: true, maxlength: 64 },
+          slideNumber: { type: Number, default: null, min: 1, max: 20 },
+          status: { type: String, enum: ['pending', 'verified'], default: 'pending' },
+          verifiedAt: { type: Date, default: null },
+        }],
+        default: undefined,
+      },
+    },
     resultIdempotencyKey: {
       type: String,
       default: null,

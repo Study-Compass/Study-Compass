@@ -4,7 +4,8 @@
   "title": "Pivot admin compute job request v1",
   "oneOf": [
     { "$ref": "#/$defs/discoveryRequest" },
-    { "$ref": "#/$defs/refreshRequest" }
+    { "$ref": "#/$defs/refreshRequest" },
+    { "$ref": "#/$defs/carouselRequest" }
   ],
   "$defs": {
     "tagList": {
@@ -44,6 +45,15 @@
           "maxItems": 100,
           "items": { "type": "string", "pattern": "^[0-9a-f]{24}$" }
         }
+      }
+    },
+    "carouselOptions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["deckId", "deckRevision"],
+      "properties": {
+        "deckId": { "type": "string", "pattern": "^[0-9a-f]{24}$" },
+        "deckRevision": { "type": "string", "format": "date-time", "maxLength": 40 }
       }
     },
     "discoveryRequest": {
@@ -164,6 +174,34 @@
           "pattern": "^[a-zA-Z0-9:_-]+$"
         },
         "options": { "$ref": "#/$defs/refreshOptions" }
+      }
+    },
+    "carouselRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contractVersion",
+        "jobId",
+        "scheduleOccurrenceId",
+        "kind",
+        "cityKey",
+        "implementationRevision",
+        "contextVersion",
+        "requestedAt",
+        "idempotencyKey",
+        "options"
+      ],
+      "properties": {
+        "contractVersion": { "const": "1" },
+        "jobId": { "type": "string", "minLength": 8, "maxLength": 128, "pattern": "^[a-zA-Z0-9:_-]+$" },
+        "scheduleOccurrenceId": { "type": "null" },
+        "kind": { "const": "carousel-export" },
+        "cityKey": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]{0,62}$" },
+        "implementationRevision": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9@._+-]+$" },
+        "contextVersion": { "type": "string", "minLength": 8, "maxLength": 128, "pattern": "^ctx:[a-zA-Z0-9._-]+$" },
+        "requestedAt": { "type": "string", "format": "date-time" },
+        "idempotencyKey": { "type": "string", "minLength": 8, "maxLength": 128, "pattern": "^[a-zA-Z0-9:_-]+$" },
+        "options": { "$ref": "#/$defs/carouselOptions" }
       }
     }
   }

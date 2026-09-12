@@ -6,7 +6,42 @@ const CONTRACT_VERSION = '1';
 const COMPUTE_JOB_KINDS = Object.freeze([
   'city-source-discovery',
   'city-curation-refresh',
+  'carousel-export',
 ]);
+
+const CAROUSEL_EXPORT_LIMITS = Object.freeze({
+  maxSlideCount: 20,
+  maxArtifactCount: 21,
+  maxBytesPerArtifact: 64 * 1024 * 1024,
+  maxTotalBytes: 256 * 1024 * 1024,
+  allowedMimeTypes: Object.freeze(['image/png', 'application/zip']),
+  maxWarnings: 20,
+});
+
+function carouselSlideLogicalName(slideNumber) {
+  return `slide-${String(slideNumber).padStart(2, '0')}.png`;
+}
+
+function carouselExportArtifactPlan(slideCount) {
+  const count = Number(slideCount);
+  if (!Number.isInteger(count) || count < 1 || count > CAROUSEL_EXPORT_LIMITS.maxSlideCount) {
+    return [];
+  }
+  const artifacts = [];
+  for (let slideNumber = 1; slideNumber <= count; slideNumber += 1) {
+    artifacts.push({
+      logicalName: carouselSlideLogicalName(slideNumber),
+      mimeType: 'image/png',
+      slideNumber,
+    });
+  }
+  artifacts.push({
+    logicalName: 'carousel.zip',
+    mimeType: 'application/zip',
+    slideNumber: null,
+  });
+  return artifacts;
+}
 
 const EXECUTION_OUTCOMES = Object.freeze(['completed', 'failed', 'cancelled']);
 
@@ -283,7 +318,33 @@ function validateContextSnapshot(value) {
 }
 
 function validateExecutionResult(value) {
-  return validateWithSchema(SCHEMAS.executionResult, value, { importable: true });
+  const validation = validateWithSchema(SCHEMAS.executionResult, value, { importable: true });
+  if (!validation.valid || value?.kind !== 'carousel-export') return validation;
+
+  const errors = [];
+  const artifacts = Array.isArray(value.artifacts) ? value.artifacts : [];
+  const totalBytes = artifacts.reduce((sum, artifact) => sum + (Number(artifact?.byteCount) || 0), 0);
+  if (totalBytes > CAROUSEL_EXPORT_LIMITS.maxTotalBytes) {
+    errors.push(`$.artifacts: total byte count exceeds ${CAROUSEL_EXPORT_LIMITS.maxTotalBytes}`);
+  }
+  const pngs = artifacts.filter((artifact) => artifact?.mimeType === 'image/png');
+  const zips = artifacts.filter((artifact) => artifact?.mimeType === 'application/zip');
+  const slideNumbers = pngs.map((artifact) => artifact.slideNumber);
+  if (new Set(slideNumbers).size !== slideNumbers.length) {
+    errors.push('$.artifacts: PNG slide numbers must be unique');
+  }
+  if (slideNumbers.some((slideNumber) => slideNumber < 1 || slideNumber > value.slideCount)) {
+    errors.push('$.artifacts: PNG slide number is outside the rendered slide count');
+  }
+  if (value.outcome === 'completed') {
+    if (pngs.length !== value.slideCount) {
+      errors.push('$.artifacts: completed exports require exactly one PNG per slide');
+    }
+    if (zips.length !== 1) {
+      errors.push('$.artifacts: completed exports require exactly one ZIP');
+    }
+  }
+  return errors.length ? { valid: false, errors } : validation;
 }
 
 /**
@@ -329,6 +390,9 @@ module.exports = {
   COMPUTE_JOB_KINDS,
   EXECUTION_OUTCOMES,
   PREVIEW_ACTIONS,
+  CAROUSEL_EXPORT_LIMITS,
+  carouselSlideLogicalName,
+  carouselExportArtifactPlan,
   FORBIDDEN_IMPORTABLE_KEYS,
   SCHEMAS,
   FIXTURES_DIR,

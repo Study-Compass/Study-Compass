@@ -14,6 +14,8 @@ const {
   submitTerminalJobResult,
   reportRetryableJobFailure,
   handleWorkerServiceError,
+  initializeJobArtifactUploads,
+  finalizeJobArtifactUploads,
 } = require('../services/pivotComputeWorkerService');
 
 // Result submissions wrap an up-to-8 MiB result with lease/capability metadata.
@@ -70,6 +72,7 @@ function createPivotComputeWorkerRouter({
         workerId: req.computeWorker.workerId,
         externalJobId: req.params.externalJobId,
         leaseToken: req.get('x-pivot-compute-lease-token'),
+        now: now(),
       });
       return res.json(payload);
     } catch (error) {
@@ -111,6 +114,34 @@ function createPivotComputeWorkerRouter({
         workerId: req.computeWorker.workerId,
         externalJobId: req.params.externalJobId,
         leaseToken: req.get('x-pivot-compute-lease-token'),
+      });
+      return res.json(payload);
+    } catch (error) {
+      return handleWorkerServiceError(res, error);
+    }
+  });
+
+  router.post('/jobs/:externalJobId/artifacts/init', requireComputeWorkerAuth, async (req, res) => {
+    try {
+      const payload = await initializeJobArtifactUploads(req, {
+        workerId: req.computeWorker.workerId,
+        externalJobId: req.params.externalJobId,
+        body: req.body,
+        now: now(),
+      });
+      return res.json(payload);
+    } catch (error) {
+      return handleWorkerServiceError(res, error);
+    }
+  });
+
+  router.post('/jobs/:externalJobId/artifacts/finalize', requireComputeWorkerAuth, async (req, res) => {
+    try {
+      const payload = await finalizeJobArtifactUploads(req, {
+        workerId: req.computeWorker.workerId,
+        externalJobId: req.params.externalJobId,
+        body: req.body,
+        now: now(),
       });
       return res.json(payload);
     } catch (error) {

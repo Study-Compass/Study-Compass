@@ -11,9 +11,10 @@ import {
 } from './pivotComputeJobsFormat';
 
 describe('pivotComputeJobsFormat', () => {
-  it('labels discovery and refresh kinds', () => {
+  it('labels discovery, refresh, and carousel kinds', () => {
     expect(formatComputeJobKind('city-source-discovery')).toBe('Source discovery');
     expect(formatComputeJobKind('city-curation-refresh')).toBe('Curation refresh');
+    expect(formatComputeJobKind('carousel-export')).toBe('Carousel export');
   });
 
   it('labels admin, schedule, and manual origins', () => {

@@ -1,10 +1,11 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://justgo.lol/schemas/pivot-admin-compute/execution-result.v1.json",
-  "title": "Pivot admin compute execution result v1 (importable proposals only)",
+  "title": "Pivot admin compute execution result v1 (bounded proposals and artifact manifests)",
   "oneOf": [
     { "$ref": "#/$defs/discoveryResult" },
-    { "$ref": "#/$defs/refreshResult" }
+    { "$ref": "#/$defs/refreshResult" },
+    { "$ref": "#/$defs/carouselResult" }
   ],
   "$defs": {
     "resultEnvelope": {
@@ -342,6 +343,85 @@
         },
         "proposals": { "$ref": "#/$defs/refreshProposals" },
         "summary": { "$ref": "#/$defs/refreshSummary" }
+      }
+    },
+    "carouselArtifact": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["logicalName", "artifactId", "mimeType", "byteCount", "sha256", "slideNumber"],
+          "properties": {
+            "logicalName": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9._-]+\\.png$" },
+            "artifactId": { "type": "string", "minLength": 8, "maxLength": 128, "pattern": "^[a-zA-Z0-9:_-]+$" },
+            "mimeType": { "const": "image/png" },
+            "byteCount": { "type": "integer", "minimum": 1, "maximum": 67108864 },
+            "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+            "slideNumber": { "type": "integer", "minimum": 1, "maximum": 20 }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["logicalName", "artifactId", "mimeType", "byteCount", "sha256", "slideNumber"],
+          "properties": {
+            "logicalName": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9._-]+\\.zip$" },
+            "artifactId": { "type": "string", "minLength": 8, "maxLength": 128, "pattern": "^[a-zA-Z0-9:_-]+$" },
+            "mimeType": { "const": "application/zip" },
+            "byteCount": { "type": "integer", "minimum": 1, "maximum": 67108864 },
+            "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+            "slideNumber": { "type": "null" }
+          }
+        }
+      ]
+    },
+    "carouselResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contractVersion", "jobId", "scheduleOccurrenceId", "kind", "tenantKey",
+        "cityKey", "deckId", "attemptId", "implementationRevision",
+        "basedOnContextVersion", "completedAt", "outcome", "idempotencyKey",
+        "renderedDeckRevision", "slideCount", "renderDurationMs", "artifacts", "warnings"
+      ],
+      "properties": {
+        "contractVersion": { "const": "1" },
+        "jobId": { "type": "string", "minLength": 8, "maxLength": 128, "pattern": "^[a-zA-Z0-9:_-]+$" },
+        "scheduleOccurrenceId": { "type": "null" },
+        "kind": { "const": "carousel-export" },
+        "tenantKey": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]{0,62}$" },
+        "cityKey": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]{0,62}$" },
+        "deckId": { "type": "string", "pattern": "^[0-9a-f]{24}$" },
+        "attemptId": { "type": "string", "pattern": "^[0-9a-f]{24}$" },
+        "implementationRevision": { "type": "string", "pattern": "^[a-zA-Z0-9@._+-]+$", "maxLength": 128 },
+        "basedOnContextVersion": { "type": "string", "pattern": "^ctx:[a-zA-Z0-9._-]+$" },
+        "completedAt": { "type": "string", "format": "date-time" },
+        "outcome": { "enum": ["completed", "failed", "cancelled"] },
+        "idempotencyKey": { "type": "string", "minLength": 8, "maxLength": 128, "pattern": "^[a-zA-Z0-9:_-]+$" },
+        "renderedDeckRevision": { "type": "string", "format": "date-time", "maxLength": 40 },
+        "slideCount": { "type": "integer", "minimum": 0, "maximum": 20 },
+        "renderDurationMs": { "type": "integer", "minimum": 0, "maximum": 3600000 },
+        "artifacts": {
+          "type": "array", "maxItems": 21,
+          "items": { "$ref": "#/$defs/carouselArtifact" }
+        },
+        "warnings": {
+          "type": "array", "maxItems": 20,
+          "items": {
+            "type": "object", "additionalProperties": false, "required": ["code", "message"],
+            "properties": {
+              "code": { "type": "string", "minLength": 1, "maxLength": 64, "pattern": "^[A-Z0-9_-]+$" },
+              "message": { "type": "string", "minLength": 1, "maxLength": 500 }
+            }
+          }
+        },
+        "failure": {
+          "type": "object", "additionalProperties": false, "required": ["code", "message"],
+          "properties": {
+            "code": { "type": "string", "maxLength": 64 },
+            "message": { "type": "string", "maxLength": 1000 }
+          }
+        }
       }
     }
   }

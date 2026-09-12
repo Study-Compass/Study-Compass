@@ -17,6 +17,7 @@ import { frameClass, resolveSlide, slideGaps } from './zineDeck';
 import PivotCarouselVoicePanel from './PivotCarouselVoicePanel';
 import PivotCarouselEventPicker from './PivotCarouselEventPicker';
 import PivotCarouselAddSlide from './PivotCarouselAddSlide';
+import PivotCarouselExportPanel from './PivotCarouselExportPanel';
 
 /** Fixed types cannot be added, removed or moved — they open and close the deck. */
 function isFixed(manifest, type) {
@@ -69,7 +70,7 @@ export default function PivotCarouselEditor({
   onSave,
   onSlotImage,
   onVoiceSaved,
-  onExport,
+  exportState,
 }) {
   const [selected, setSelected] = useState(0);
   const [adding, setAdding] = useState(false);
@@ -80,7 +81,6 @@ export default function PivotCarouselEditor({
    * truth about what will print.
    */
   const [editing, setEditing] = useState(false);
-  const [exportLine, setExportLine] = useState(null);
   const [pickingSlot, setPickingSlot] = useState(null);
 
   const index = Math.min(selected, Math.max(deck.slides.length - 1, 0));
@@ -273,15 +273,17 @@ export default function PivotCarouselEditor({
           >
             {saving ? 'saving…' : 'save deck'}
           </button>
-          <button
-            type="button"
-            className="jgz__action"
-            onClick={async () => setExportLine(await onExport())}
-            disabled={dirty}
-            title={dirty ? 'Save first — the export renders what is stored' : undefined}
-          >
-            export…
-          </button>
+          {exportState?.uiEnabled !== false ? (
+            <button
+              type="button"
+              className="jgz__action"
+              onClick={exportState?.startExport}
+              disabled={dirty || exportState?.creating}
+              title={dirty ? 'Save first — the export renders what is stored' : undefined}
+            >
+              {exportState?.creating ? 'exporting…' : 'export'}
+            </button>
+          ) : null}
         </div>
       </div>
 
@@ -472,24 +474,21 @@ export default function PivotCarouselEditor({
         </div>
       </div>
 
-      {exportLine ? (
-        <div className="jgz-export-line" role="status">
-          <p>
-            Run this in the repo root. The token is good for ten minutes and for
-            this deck only.
-          </p>
-          <code>{exportLine}</code>
-          <div className="jgz-export-line__ops">
-            <button
-              type="button"
-              onClick={() => navigator.clipboard?.writeText(exportLine)}
-            >
-              copy
-            </button>
-            <button type="button" onClick={() => setExportLine(null)}>dismiss</button>
-          </div>
-        </div>
-      ) : null}
+      <PivotCarouselExportPanel
+        open={Boolean(exportState?.panelOpen)}
+        onClose={exportState?.closePanel}
+        onOpen={exportState?.openPanel}
+        job={exportState?.job}
+        uiState={exportState?.uiState}
+        progressLabel={exportState?.progressLabel}
+        failureLabel={exportState?.failureLabel}
+        revisionStale={exportState?.revisionStale}
+        artifactsExpired={exportState?.artifactsExpired}
+        onCancel={exportState?.cancelExport}
+        onRetry={exportState?.retryExport}
+        onDownload={exportState?.downloadArtifact}
+        busy={exportState?.busy}
+      />
 
       <PivotCarouselAddSlide
         open={adding}

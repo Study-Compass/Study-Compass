@@ -1,6 +1,15 @@
+export const PIVOT_TENANT_COMPUTE_JOBS_PAGE = 10;
+export const PIVOT_FLEET_COMPUTE_JOBS_PAGE = 3;
+export const PIVOT_TENANT_CAROUSEL_PAGE = 8;
+
 export const COMPUTE_JOB_KINDS = Object.freeze([
   'city-source-discovery',
   'city-curation-refresh',
+]);
+
+export const COMPUTE_JOB_FILTER_KINDS = Object.freeze([
+  ...COMPUTE_JOB_KINDS,
+  'carousel-export',
 ]);
 
 export const COMPUTE_JOB_STATUSES = Object.freeze([
@@ -26,6 +35,7 @@ export const ACTIVE_COMPUTE_JOB_STATUSES = Object.freeze([
 const KIND_LABELS = Object.freeze({
   'city-source-discovery': 'Source discovery',
   'city-curation-refresh': 'Curation refresh',
+  'carousel-export': 'Carousel export',
 });
 
 const ORIGIN_LABELS = Object.freeze({

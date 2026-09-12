@@ -5,6 +5,7 @@ const {
   buildComputeReview,
   validateComputeExecutionResult,
   previewComputeResult,
+  previewStoredComputeJob,
   applyComputeResult,
   applyStoredComputeJob,
 } = require('../../services/pivotComputeResultApplyService');
@@ -358,6 +359,28 @@ describe('pivotComputeResultApplyService', () => {
   });
 
   describe('applyComputeResult', () => {
+    it('rejects preview and apply operations for carousel export jobs', async () => {
+      const fixture = loadFixture('job-request-carousel-valid.json');
+      await createComputeJob(req, {
+        externalJobId: fixture.jobId,
+        kind: fixture.kind,
+        cityKey: fixture.cityKey,
+        contractVersion: fixture.contractVersion,
+        contextVersion: fixture.contextVersion,
+        createIdempotencyKey: fixture.idempotencyKey,
+        requestedAt: fixture.requestedAt,
+        origin: { type: 'admin' },
+        options: fixture.options,
+      });
+
+      await expect(previewStoredComputeJob(req, fixture.jobId))
+        .rejects.toMatchObject({ code: 'CAROUSEL_PREVIEW_UNSUPPORTED', status: 409 });
+      await expect(applyStoredComputeJob(req, fixture.jobId, {
+        tenantKey: fixture.cityKey,
+        idempotencyKey: 'apply:carousel-not-allowed',
+      })).rejects.toMatchObject({ code: 'CAROUSEL_APPLY_UNSUPPORTED', status: 409 });
+    });
+
     it('blocks missing required event metadata before any production writes', async () => {
       const result = loadFixture('result-discovery-valid-completed.json');
       result.proposals.events[0].draft.hostName = null;
