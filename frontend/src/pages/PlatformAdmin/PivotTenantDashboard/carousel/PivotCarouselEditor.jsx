@@ -11,7 +11,7 @@
  * type is laid out in the geometry it will print in.
  */
 
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ZineEditProvider, writePath } from './zineField';
 import { frameClass, resolveSlide, slideGaps } from './zineDeck';
 import PivotCarouselVoicePanel from './PivotCarouselVoicePanel';
@@ -26,6 +26,58 @@ function isFixed(manifest, type) {
 
 function typeLabel(manifest, type) {
   return manifest?.types?.[type]?.label || type;
+}
+
+function EventSlotRow({
+  entry,
+  slotIndex,
+  slotMin,
+  slotCount,
+  acceptsUpload,
+  slideId,
+  onSlotImage,
+  onPick,
+  onClear,
+  onDrop,
+}) {
+  return (
+    <li className="jgz-editor__slot">
+      <span className="jgz-editor__slotname">
+        {entry.snapshot?.name || <em>empty slot</em>}
+      </span>
+      <span className="jgz-editor__slotops">
+        <button type="button" onClick={() => onPick(slotIndex)}>
+          {entry.snapshot?.name ? 'replace' : 'pick'}
+        </button>
+        {acceptsUpload && entry.snapshot ? (
+          <label className="jgz-editor__upload">
+            {entry.imageOverride?.url ? 'photo ✓' : 'photo'}
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(event) => {
+                const file = event.target.files?.[0];
+                event.target.value = '';
+                if (file) onSlotImage(slideId, slotIndex, file);
+              }}
+            />
+          </label>
+        ) : null}
+        {entry.snapshot?.name ? (
+          <button type="button" onClick={() => onClear(slotIndex)}>clear</button>
+        ) : null}
+        {slotCount > slotMin ? (
+          <button
+            type="button"
+            className="jgz-editor__danger"
+            onClick={() => onDrop(slotIndex)}
+          >
+            −
+          </button>
+        ) : null}
+      </span>
+    </li>
+  );
 }
 
 function SlideThumb({ deck, slide, index, manifest, cityVoice, frames, selected, onSelect }) {
@@ -71,6 +123,9 @@ export default function PivotCarouselEditor({
   onSlotImage,
   onVoiceSaved,
   exportState,
+  tools = null,
+  focused = false,
+  onToggleFocus,
 }) {
   const [selected, setSelected] = useState(0);
   const [adding, setAdding] = useState(false);
@@ -82,9 +137,45 @@ export default function PivotCarouselEditor({
    */
   const [editing, setEditing] = useState(false);
   const [pickingSlot, setPickingSlot] = useState(null);
+  const [eventsOpen, setEventsOpen] = useState(false);
+  const lastStageTap = useRef(0);
+
+  const toggleEditingFromSlide = useCallback((event) => {
+    // A field, or the chrome that edits one, keeps its own click — double-
+    // clicking a slot selects a word rather than leaving edit.
+    if (event.target.closest('button, input, select, textarea, label, a, [contenteditable="true"], .jgz-editable, .jgz-editor__dock')) {
+      lastStageTap.current = 0;
+      return;
+    }
+    const now = Date.now();
+    if (now - lastStageTap.current < 400) {
+      lastStageTap.current = 0;
+      setEditing((on) => !on);
+      return;
+    }
+    lastStageTap.current = now;
+  }, []);
+
+  useEffect(() => {
+    if (!focused && !eventsOpen) return undefined;
+    const onKey = (event) => {
+      if (event.key !== 'Escape') return;
+      if (eventsOpen) {
+        setEventsOpen(false);
+        return;
+      }
+      if (focused && onToggleFocus) onToggleFocus();
+    };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [focused, eventsOpen, onToggleFocus]);
 
   const index = Math.min(selected, Math.max(deck.slides.length - 1, 0));
   const slide = deck.slides[index];
+
+  useEffect(() => {
+    lastStageTap.current = 0;
+  }, [index]);
 
   /**
    * A slot write lands on the deck, not on a copy of it. Paths under `issue.`
@@ -242,26 +333,56 @@ export default function PivotCarouselEditor({
   const slots = slide.events || [];
   const acceptsUpload = String(spec.photo || '').includes('upload');
 
+  const exportButton = exportState?.uiEnabled !== false ? (
+    <button
+      type="button"
+      className="jgz__action"
+      onClick={exportState?.startExport}
+      disabled={dirty || exportState?.creating}
+      title={dirty ? 'Save first — the export renders what is stored' : undefined}
+    >
+      {exportState?.creating ? 'exporting…' : 'export'}
+    </button>
+  ) : null;
+
+  const voiceButton = (
+    <button
+      type="button"
+      className="jgz__action"
+      onClick={() => setVoiceOpen(true)}
+    >
+      static copy…
+    </button>
+  );
+
   return (
-    <div className="jgz-editor">
+    <div className={`jgz-editor${focused ? ' is-focused' : ''}`}>
       <div className="jgz-editor__bar">
-        <p className="jgz-editor__title">{deck.title}</p>
+        <div className="jgz-editor__bar-main">
+          {onToggleFocus ? (
+            <button
+              type="button"
+              className={`jgz__action jgz__action--fill${focused ? ' jgz__action--icon' : ''}`}
+              aria-pressed={focused}
+              aria-label={focused ? 'exit' : undefined}
+              onClick={onToggleFocus}
+            >
+              {focused ? (
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M6 6 L18 18 M18 6 L6 18" />
+                </svg>
+              ) : (
+                'full screen'
+              )}
+            </button>
+          ) : null}
+          <p className="jgz-editor__title">{deck.title}</p>
+          {tools}
+        </div>
         <div className="jgz-editor__bar-actions">
-          <button
-            type="button"
-            className={`jgz__action${editing ? ' is-on' : ''}`}
-            aria-pressed={editing}
-            onClick={() => setEditing((on) => !on)}
-          >
-            {editing ? 'editing' : 'edit slide'}
-          </button>
-          <button
-            type="button"
-            className="jgz__action"
-            onClick={() => setVoiceOpen(true)}
-          >
-            static copy…
-          </button>
+          <span className="jgz-editor__secondary">
+            {voiceButton}
+          </span>
           <span className={`jgz-flag${dirty ? '' : ' jgz-flag--saved'}`}>
             {dirty ? 'unsaved changes' : 'saved'}
           </span>
@@ -273,17 +394,9 @@ export default function PivotCarouselEditor({
           >
             {saving ? 'saving…' : 'save deck'}
           </button>
-          {exportState?.uiEnabled !== false ? (
-            <button
-              type="button"
-              className="jgz__action"
-              onClick={exportState?.startExport}
-              disabled={dirty || exportState?.creating}
-              title={dirty ? 'Save first — the export renders what is stored' : undefined}
-            >
-              {exportState?.creating ? 'exporting…' : 'export'}
-            </button>
-          ) : null}
+          <span className="jgz-editor__secondary">
+            {exportButton}
+          </span>
         </div>
       </div>
 
@@ -312,167 +425,200 @@ export default function PivotCarouselEditor({
           </div>
         </div>
 
-        <div className="jgz-editor__canvas">
-          <div className="jgz-editor__stage">
-            <div className={frameClass(deck)}>
-              <ZineEditProvider value={editContext}>
-                {Frame
-                  ? <Frame {...resolveSlide(deck, slide, index, manifest, cityVoice).props} />
-                  : null}
-              </ZineEditProvider>
-            </div>
-          </div>
-
-          <div className="jgz-editor__meta">
-            <p className="jgz-editor__slidename">
-              {String(index + 1).padStart(2, '0')} · {typeLabel(manifest, slide.type)}
-              <span>{spec.blurb}</span>
-            </p>
-
-            {gaps.length ? (
-              <p className="jgz-editor__gaps">
-                still empty: {gaps.join(', ')}
-              </p>
-            ) : (
-              <p className="jgz-editor__gaps jgz-editor__gaps--ok">every slot filled</p>
-            )}
-
-            {(spec.options || []).length ? (
-              <div className="jgz-editor__options">
-                {spec.options.map((option) => {
-                  const current = slide.options?.[option.key] ?? option.default;
-                  const label = option.label || option.key;
-
-                  if (option.kind === 'boolean') {
-                    return (
-                      <label key={option.key} className="jgz-editor__option">
-                        <input
-                          type="checkbox"
-                          checked={current !== false}
-                          onChange={(event) => setOption(option.key, event.target.checked)}
-                        />
-                        <span>{label}</span>
-                      </label>
-                    );
-                  }
-
-                  return (
-                    <label key={option.key} className="jgz-editor__option">
-                      <span>{label}</span>
-                      <select
-                        value={String(current)}
-                        onChange={(event) => {
-                          // Options are declared with their real types, so a
-                          // select's string has to be put back to one.
-                          const picked = option.values.find(
-                            (value) => String(value) === event.target.value,
-                          );
-                          setOption(option.key, picked);
-                        }}
-                      >
-                        {option.values.map((value) => (
-                          <option key={String(value)} value={String(value)}>
-                            {String(value)}
-                          </option>
-                        ))}
-                      </select>
-                    </label>
-                  );
-                })}
+          <div className="jgz-editor__canvas">
+            <div
+              className={`jgz-editor__stage${editing ? ' is-editing' : ''}`}
+              onClick={toggleEditingFromSlide}
+              onDoubleClick={(event) => {
+                if (!event.target.closest('button, input, select, textarea, label, a, [contenteditable="true"], .jgz-editable, .jgz-editor__dock')) {
+                  event.preventDefault();
+                }
+              }}
+              title={editing ? 'Double-click to finish editing' : 'Double-click to edit'}
+            >
+              <div className="jgz-editor__board">
+                <div className="jgz-editor__viewbox">
+                  <div className={frameClass(deck)}>
+                    <ZineEditProvider value={editContext}>
+                      {Frame
+                        ? <Frame {...resolveSlide(deck, slide, index, manifest, cityVoice).props} />
+                        : null}
+                    </ZineEditProvider>
+                  </div>
+                </div>
               </div>
-            ) : null}
+            </div>
 
-            {derived ? (
-              <p className="jgz-editor__derived">
-                counts the whole issue — no events of its own
-              </p>
-            ) : (
-              <div className="jgz-editor__slots">
-                <p className="jgz-editor__slotshead">
-                  events
-                  <span>
-                    {slots.filter((e) => e.snapshot?.name).length} of {slotMax}
-                  </span>
-                </p>
-
-                <ul>
-                  {slots.map((entry, slotIndex) => (
-                    <li key={`slot-${slotIndex}`} className="jgz-editor__slot">
-                      <span className="jgz-editor__slotname">
-                        {entry.snapshot?.name || <em>empty slot</em>}
-                      </span>
-                      <span className="jgz-editor__slotops">
-                        <button type="button" onClick={() => setPickingSlot(slotIndex)}>
-                          {entry.snapshot?.name ? 'replace' : 'pick'}
+                <div className={`jgz-editor__dock${eventsOpen ? ' is-open' : ''}`}>
+                  <div className="jgz-editor__peek">
+                    <div className="jgz-editor__peek-main">
+                      <p className="jgz-editor__slidename">
+                        {String(index + 1).padStart(2, '0')} · {typeLabel(manifest, slide.type)}
+                        <span>{spec.blurb}</span>
+                      </p>
+                      {derived ? (
+                        <p className="jgz-editor__derived">
+                          counts the whole issue — no events of its own
+                        </p>
+                      ) : slots[0] ? (
+                        <ul className="jgz-editor__peek-events">
+                          <EventSlotRow
+                            entry={slots[0]}
+                            slotIndex={0}
+                            slotMin={slotMin}
+                            slotCount={slots.length}
+                            acceptsUpload={acceptsUpload}
+                            slideId={slide._id}
+                            onSlotImage={onSlotImage}
+                            onPick={setPickingSlot}
+                            onClear={clearSlot}
+                            onDrop={dropSlot}
+                          />
+                        </ul>
+                      ) : slotMax > 0 ? (
+                        <button type="button" className="jgz-editor__slotadd" onClick={addSlot}>
+                          + add event
                         </button>
-                        {acceptsUpload && entry.snapshot ? (
-                          <label className="jgz-editor__upload">
-                            {entry.imageOverride?.url ? 'photo ✓' : 'photo'}
-                            <input
-                              type="file"
-                              accept="image/*"
-                              onChange={(event) => {
-                                const file = event.target.files?.[0];
-                                event.target.value = '';
-                                if (file) onSlotImage(slide._id, slotIndex, file);
-                              }}
-                            />
-                          </label>
-                        ) : null}
-                        {entry.snapshot?.name ? (
-                          <button type="button" onClick={() => clearSlot(slotIndex)}>clear</button>
-                        ) : null}
-                        {slots.length > slotMin ? (
-                          <button
-                            type="button"
-                            className="jgz-editor__danger"
-                            onClick={() => dropSlot(slotIndex)}
-                          >
-                            −
-                          </button>
-                        ) : null}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
+                      ) : null}
+                    </div>
+                    <button
+                      type="button"
+                      className="jgz-editor__lift"
+                      aria-expanded={eventsOpen}
+                      aria-label={eventsOpen ? 'hide events' : 'all events'}
+                      onClick={() => setEventsOpen((open) => !open)}
+                    >
+                      <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M5 14.5 L12 7.5 L19 14.5" />
+                      </svg>
+                    </button>
+                  </div>
 
-                {slots.length < slotMax ? (
-                  <button type="button" className="jgz-editor__slotadd" onClick={addSlot}>
-                    + add event slot
-                  </button>
-                ) : null}
-              </div>
-            )}
+                  <div className="jgz-editor__dock-rest">
+                    <div className="jgz-editor__dock-rest-inner">
+                      <div className="jgz-editor__secondary jgz-editor__secondary--sheet">
+                        {tools}
+                        {voiceButton}
+                        {exportButton}
+                      </div>
 
-            <div className="jgz-editor__slideops">
-              <button type="button" onClick={() => move(index, index - 1)} disabled={fixed || index <= 1}>
-                move up
-              </button>
-              <button
-                type="button"
-                onClick={() => move(index, index + 1)}
-                disabled={fixed || index >= deck.slides.length - 2}
-              >
-                move down
-              </button>
-              <button
-                type="button"
-                className="jgz-editor__danger"
-                onClick={() => removeSlide(index)}
-                disabled={fixed}
-              >
-                remove
-              </button>
-            </div>
+                      {gaps.length ? (
+                        <p className="jgz-editor__gaps">
+                          still empty: {gaps.join(', ')}
+                        </p>
+                      ) : (
+                        <p className="jgz-editor__gaps jgz-editor__gaps--ok">every slot filled</p>
+                      )}
 
-            {fixed ? (
-              <p className="jgz-editor__fixed">
-                every carousel opens and closes the same way, so this one stays put
-              </p>
-            ) : null}
+                      {(spec.options || []).length ? (
+                        <div className="jgz-editor__options">
+                          {spec.options.map((option) => {
+                            const current = slide.options?.[option.key] ?? option.default;
+                            const label = option.label || option.key;
+
+                            if (option.kind === 'boolean') {
+                              return (
+                                <label key={option.key} className="jgz-editor__option">
+                                  <input
+                                    type="checkbox"
+                                    checked={current !== false}
+                                    onChange={(event) => setOption(option.key, event.target.checked)}
+                                  />
+                                  <span>{label}</span>
+                                </label>
+                              );
+                            }
+
+                            return (
+                              <label key={option.key} className="jgz-editor__option">
+                                <span>{label}</span>
+                                <select
+                                  value={String(current)}
+                                  onChange={(event) => {
+                                    const picked = option.values.find(
+                                      (value) => String(value) === event.target.value,
+                                    );
+                                    setOption(option.key, picked);
+                                  }}
+                                >
+                                  {option.values.map((value) => (
+                                    <option key={String(value)} value={String(value)}>
+                                      {String(value)}
+                                    </option>
+                                  ))}
+                                </select>
+                              </label>
+                            );
+                          })}
+                        </div>
+                      ) : null}
+
+                      {derived || (slots.length <= 1 && slots.length >= slotMax) ? null : (
+                        <div className="jgz-editor__slots">
+                          <p className="jgz-editor__slotshead">
+                            events
+                            <span>
+                              {slots.filter((e) => e.snapshot?.name).length} of {slotMax}
+                            </span>
+                          </p>
+
+                          <ul>
+                            {slots.slice(1).map((entry, offset) => (
+                              <EventSlotRow
+                                key={`slot-${offset + 1}`}
+                                entry={entry}
+                                slotIndex={offset + 1}
+                                slotMin={slotMin}
+                                slotCount={slots.length}
+                                acceptsUpload={acceptsUpload}
+                                slideId={slide._id}
+                                onSlotImage={onSlotImage}
+                                onPick={setPickingSlot}
+                                onClear={clearSlot}
+                                onDrop={dropSlot}
+                              />
+                            ))}
+                          </ul>
+
+                          {slots.length < slotMax ? (
+                            <button type="button" className="jgz-editor__slotadd" onClick={addSlot}>
+                              + add event slot
+                            </button>
+                          ) : null}
+                        </div>
+                      )}
+
+                      <div className="jgz-editor__slideops">
+                        <button type="button" onClick={() => move(index, index - 1)} disabled={fixed || index <= 1}>
+                          move up
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => move(index, index + 1)}
+                          disabled={fixed || index >= deck.slides.length - 2}
+                        >
+                          move down
+                        </button>
+                        <button
+                          type="button"
+                          className="jgz-editor__danger"
+                          onClick={() => removeSlide(index)}
+                          disabled={fixed}
+                        >
+                          remove
+                        </button>
+                      </div>
+
+                      {fixed ? (
+                        <p className="jgz-editor__fixed">
+                          every carousel opens and closes the same way, so this one stays put
+                        </p>
+                      ) : null}
+                    </div>
+                  </div>
+                </div>
           </div>
         </div>
-      </div>
 
       <PivotCarouselExportPanel
         open={Boolean(exportState?.panelOpen)}

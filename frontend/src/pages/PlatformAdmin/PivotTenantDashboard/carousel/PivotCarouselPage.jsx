@@ -57,6 +57,51 @@ function decksPath(tenantKey) {
   return `/admin/pivot/tenants/${encodeURIComponent(tenantKey)}/carousels`;
 }
 
+function EditionTools({
+  edition,
+  onEdition,
+  showIssueNumber,
+  onShowIssueNumber,
+  inkPlate,
+  onInkPlate,
+}) {
+  return (
+    <div className="jgz__controls">
+      <div className="jgz__switch" role="group" aria-label="Edition">
+        {EDITIONS.map((option) => (
+          <button
+            key={option.key}
+            type="button"
+            aria-pressed={edition === option.key}
+            onClick={() => onEdition(option.key)}
+          >
+            {option.label}
+          </button>
+        ))}
+      </div>
+      <label className="jgz__ink">
+        <input
+          type="checkbox"
+          checked={showIssueNumber}
+          onChange={(event) => onShowIssueNumber(event.target.checked)}
+        />
+        <span>issue no.</span>
+      </label>
+      {/* Only newsprint has an ink plate, so the control appears with it. */}
+      {edition === 'paper' ? (
+        <label className="jgz__ink">
+          <input
+            type="checkbox"
+            checked={inkPlate}
+            onChange={(event) => onInkPlate(event.target.checked)}
+          />
+          <span>ink plate</span>
+        </label>
+      ) : null}
+    </div>
+  );
+}
+
 export default function PivotCarouselPage({ tenantKey, cityDisplayName }) {
   const { addNotification } = useNotification();
   const [searchParams] = useSearchParams();
@@ -72,6 +117,20 @@ export default function PivotCarouselPage({ tenantKey, cityDisplayName }) {
   const [edition, setEdition] = useState('night');
   const [inkPlate, setInkPlate] = useState(true);
   const [showIssueNumber, setShowIssueNumber] = useState(true);
+  const [focused, setFocused] = useState(false);
+
+  const toggleFocus = useCallback(() => setFocused((on) => !on), []);
+
+  const editionTools = (
+    <EditionTools
+      edition={edition}
+      onEdition={setEdition}
+      showIssueNumber={showIssueNumber}
+      onShowIssueNumber={setShowIssueNumber}
+      inkPlate={inkPlate}
+      onInkPlate={setInkPlate}
+    />
+  );
 
   /** Load the deck list, then open the most recently touched one. */
   const load = useCallback(async () => {
@@ -86,6 +145,7 @@ export default function PivotCarouselPage({ tenantKey, cityDisplayName }) {
       setDraft(null);
       setManifest(null);
       setCityVoice(null);
+      setFocused(false);
       setLoading(false);
       return;
     }
@@ -259,46 +319,16 @@ export default function PivotCarouselPage({ tenantKey, cityDisplayName }) {
 
   return (
     <PivotTenantPage
-      className="pivot-carousel-page"
+      className={`pivot-carousel-page${focused ? ' is-carousel-focused' : ''}`}
       title="Carousel"
       tenantKey={tenantKey}
       cityDisplayName={cityDisplayName}
-      actions={
-        <div className="jgz__controls">
-          <div className="jgz__switch" role="group" aria-label="Edition">
-            {EDITIONS.map((option) => (
-              <button
-                key={option.key}
-                type="button"
-                aria-pressed={edition === option.key}
-                onClick={() => setEdition(option.key)}
-              >
-                {option.label}
-              </button>
-            ))}
-          </div>
-          <label className="jgz__ink">
-            <input
-              type="checkbox"
-              checked={showIssueNumber}
-              onChange={(event) => setShowIssueNumber(event.target.checked)}
-            />
-            <span>issue no.</span>
-          </label>
-          {/* Only newsprint has an ink plate, so the control appears with it. */}
-          {edition === 'paper' ? (
-            <label className="jgz__ink">
-              <input
-                type="checkbox"
-                checked={inkPlate}
-                onChange={(event) => setInkPlate(event.target.checked)}
-              />
-              <span>ink plate</span>
-            </label>
-          ) : null}
+      actions={draft && manifest ? null : (
+        <>
+          {editionTools}
           <span className="jgz__note">4:5 · 1080×1350</span>
-        </div>
-      }
+        </>
+      )}
     >
       <div className="jgz">
         {draft && manifest ? (
@@ -316,6 +346,9 @@ export default function PivotCarouselPage({ tenantKey, cityDisplayName }) {
             onSlotImage={setSlotImage}
             onVoiceSaved={load}
             exportState={exportState}
+            tools={editionTools}
+            focused={focused}
+            onToggleFocus={toggleFocus}
           />
         ) : (
           <>

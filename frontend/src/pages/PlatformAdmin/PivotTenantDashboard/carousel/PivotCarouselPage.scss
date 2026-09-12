@@ -64,6 +64,24 @@
   color: var(--jgz-type);
   font-family: var(--jgz-font-mono);
   text-transform: lowercase;
+  -webkit-tap-highlight-color: transparent;
+
+  button,
+  a,
+  [role='button'] {
+    -webkit-tap-highlight-color: transparent;
+
+    &:focus {
+      outline: none;
+    }
+  }
+}
+
+@media (pointer: coarse) {
+  .jgz :focus,
+  .jgz :focus-visible {
+    outline: none;
+  }
 }
 
 /*
@@ -151,6 +169,16 @@
   }
 
   &:focus-visible {
+    outline: none;
+  }
+
+  &.jgz__action--fill {
+    background: #fff;
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .jgz__action:focus-visible {
     outline: 3px solid var(--jgz-pop);
     outline-offset: 2px;
   }
@@ -290,6 +318,21 @@
   overflow: hidden;
   isolation: isolate;
   font-family: var(--jgz-font-display);
+
+  /*
+   * App.scss paints every h1/h2/p with `color: var(--text)` (#414141). A
+   * frame that leaves a heading to inherit then prints that dark ink on
+   * night press, while titles that set `--jgz-type` themselves stay cream.
+   * `:where()` keeps this at the frame's own specificity so a later class
+   * (muted, accent, a tone) still wins; `--text` is remapped so any leftover
+   * `var(--text)` resolves to this edition's type, including on export where
+   * the frame mounts outside `.jgz`.
+   */
+  --text: var(--jgz-type);
+
+  :where(h1, h2, h3, p) {
+    color: inherit;
+  }
 }
 
 .jgz-frame--night {
@@ -721,6 +764,7 @@
   font-family: var(--jgz-font-flos);
   font-size: 8.5cqw;
   line-height: 0.9;
+  color: var(--jgz-type);
 }
 
 .jgz-sheet__kicker {
@@ -927,6 +971,7 @@
   font-weight: 700;
   line-height: 1.02;
   letter-spacing: -0.01em;
+  color: var(--jgz-type);
 }
 
 .jgz-notice__host {
@@ -979,6 +1024,7 @@
   font-weight: 700;
   line-height: 1.02;
   letter-spacing: -0.01em;
+  color: var(--jgz-type);
 }
 
 .jgz-dispatch__venue {
@@ -1067,6 +1113,7 @@
   --jgz-type: rgba(26, 23, 20, 0.92);
   --jgz-type-muted: rgba(26, 23, 20, 0.74);
   --jgz-type-soft: rgba(26, 23, 20, 0.54);
+  --text: var(--jgz-type);
 
   background: var(--jgz-cream);
   color: var(--jgz-type);
@@ -1206,6 +1253,7 @@
   font-weight: 700;
   line-height: 1.02;
   letter-spacing: -0.012em;
+  color: var(--jgz-type);
 }
 
 .jgz-back__sub {
@@ -1317,6 +1365,14 @@
   border-bottom: 1px solid var(--jgz-line);
 }
 
+.jgz-editor__bar-main {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.75rem;
+  min-width: 0;
+}
+
 .jgz-editor__title {
   margin: 0;
   font-size: 0.9rem;
@@ -1325,8 +1381,42 @@
 
 .jgz-editor__bar-actions {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 0.6rem;
+}
+
+.jgz__action--icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.2rem;
+  height: 2.2rem;
+  padding: 0;
+
+  svg {
+    width: 0.95rem;
+    height: 0.95rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.7;
+    stroke-linecap: square;
+  }
+}
+
+.jgz-editor__secondary {
+  display: contents;
+}
+
+.jgz-editor__secondary--sheet {
+  display: none;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0 0 1.1rem;
+
+  .jgz__switch {
+    display: none;
+  }
 }
 
 /* Strip left, canvas right; stacks on narrow admin windows. */
@@ -1361,20 +1451,16 @@
   width: 100%;
   min-width: 8rem;
   padding: 0;
-  border: 2px solid transparent;
+  border: 0;
   background: transparent;
   color: inherit;
   font: inherit;
   text-align: left;
   cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
 
-  &.is-selected {
-    border-color: var(--jgz-accent);
-  }
-
-  &:focus-visible {
-    outline: 3px solid var(--jgz-pop);
-    outline-offset: 2px;
+  @media (max-width: 60rem) {
+    min-width: 10rem;
   }
 
   /* The thumbnail is the real frame at a smaller container width — cqw does
@@ -1382,6 +1468,24 @@
   .jgz-frame {
     display: block;
     pointer-events: none;
+    /* The table's drop shadow is for a slide on the canvas; here it peeks
+       past the selection ring. The ring itself lives on the frame, not the
+       button, so the caption stays outside it. */
+    box-shadow: none;
+    border-width: 2px;
+  }
+
+  &.is-selected .jgz-frame {
+    border-color: var(--jgz-accent);
+  }
+
+  &:focus,
+  &:focus-visible {
+    outline: none;
+  }
+
+  &:focus-visible .jgz-frame {
+    outline: none;
   }
 }
 
@@ -1421,16 +1525,11 @@
   }
 }
 
-/* The slide gets the room; its meta column is a rail beside it, not a peer. */
+/* The slide sits above its own event peek — the rail used to steal the viewbox. */
 .jgz-editor__canvas {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 17rem);
-  gap: clamp(1.25rem, 3vw, 2.5rem);
-  align-items: start;
-
-  @media (max-width: 48rem) {
-    grid-template-columns: minmax(0, 1fr);
-  }
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
 }
 
 /*
@@ -1442,9 +1541,25 @@
  */
 .jgz-editor__stage {
   display: flex;
+  flex-direction: column;
+  align-items: center;
   justify-content: center;
+  /* Stops iOS treating the second tap as a page zoom. */
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  outline: none;
 
-  --jgz-stage-h: clamp(20rem, calc(100vh - 17rem), 56rem);
+  --jgz-stage-h: clamp(18rem, calc(100vh - 22rem), 52rem);
+
+  &:focus,
+  &:focus-visible {
+    outline: none;
+  }
+
+  &:not(.is-editing) {
+    cursor: pointer;
+    user-select: none;
+  }
 
   .jgz-frame {
     height: var(--jgz-stage-h);
@@ -1458,6 +1573,150 @@
       height: auto;
       width: 100%;
     }
+  }
+}
+
+.jgz-editor__board {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: max-content;
+  max-width: 100%;
+
+  @media (max-width: 60rem) {
+    width: 100%;
+  }
+}
+
+.jgz-editor__viewbox {
+  display: flex;
+  justify-content: center;
+  min-width: 0;
+  min-height: 0;
+  max-width: 100%;
+}
+
+.jgz-editor__dock {
+  flex-shrink: 0;
+  width: 100%;
+  margin-top: 0.4rem;
+  padding: 0.45rem 0.75rem 0.55rem;
+  box-sizing: border-box;
+  border-top: 1px solid var(--jgz-line);
+  background: var(--background, #fff);
+}
+
+.jgz-editor__peek {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.2rem 0.5rem;
+  align-items: center;
+}
+
+.jgz-editor__peek-main {
+  min-width: 0;
+}
+
+.jgz-editor__peek-events {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.jgz-editor__peek .jgz-editor__slidename {
+  margin: 0;
+  font-size: 0.78rem;
+
+  span {
+    display: inline;
+    margin: 0 0 0 0.4rem;
+    font-size: 0.62rem;
+  }
+}
+
+.jgz-editor__peek .jgz-editor__slot {
+  padding: 0.25rem 0 0;
+  border: 0;
+
+  &:last-of-type {
+    border: 0;
+  }
+}
+
+.jgz-editor__peek .jgz-editor__derived {
+  margin: 0;
+  padding: 0.15rem 0 0;
+  border: 0;
+}
+
+.jgz-editor__peek .jgz-editor__slotadd {
+  margin-top: 0.2rem;
+}
+
+.jgz-editor__lift {
+  appearance: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
+  border: 1px solid var(--jgz-line);
+  background: transparent;
+  color: var(--jgz-type);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+
+  svg {
+    width: 1.15rem;
+    height: 1.15rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.7;
+    stroke-linecap: square;
+    stroke-linejoin: miter;
+    transition: transform 0.38s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  &:hover {
+    border-color: var(--jgz-accent);
+    color: var(--jgz-accent);
+  }
+
+  &:focus {
+    outline: none;
+  }
+}
+
+.jgz-editor__dock.is-open .jgz-editor__lift svg {
+  transform: rotate(180deg);
+}
+
+.jgz-editor__dock-rest {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.jgz-editor__dock.is-open .jgz-editor__dock-rest {
+  grid-template-rows: 1fr;
+}
+
+.jgz-editor__dock-rest-inner {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.jgz-editor__dock.is-open .jgz-editor__dock-rest-inner {
+  overflow: auto;
+  max-height: min(42vh, 22rem);
+  padding-top: 0.65rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .jgz-editor__dock-rest,
+  .jgz-editor__lift svg {
+    transition: none;
   }
 }
 
@@ -1663,12 +1922,14 @@
   --jgz-type: rgba(250, 246, 239, 0.94);
   --jgz-type-muted: rgba(250, 246, 239, 0.76);
   --jgz-type-soft: rgba(250, 246, 239, 0.56);
+  --text: var(--jgz-type);
 }
 
 .jgz-tone--dark {
   --jgz-type: rgba(26, 23, 20, 0.92);
   --jgz-type-muted: rgba(26, 23, 20, 0.74);
   --jgz-type-soft: rgba(26, 23, 20, 0.54);
+  --text: var(--jgz-type);
 }
 
 .jgz-cover__wash.jgz-tone--light {
@@ -1742,5 +2003,262 @@
     font-family: var(--jgz-font-mono);
     font-size: 0.66rem;
     cursor: pointer;
+  }
+}
+
+/* ---------------------------------------------- sheet + full screen */
+
+/*
+ * On a narrow window the meta rail is below the slide, which is how the
+ * viewbox gets pushed off-screen. Details becomes a sheet; the stage stays put.
+ * Full screen then hides the dashboard heading and the scrapbook header so the
+ * leftover height can actually hold a 4:5 frame.
+ */
+@mixin jgz-editor-sheet {
+  .jgz-editor__canvas {
+    position: relative;
+  }
+
+  .jgz-editor__bar .jgz-editor__secondary {
+    display: none;
+  }
+
+  .jgz-editor__secondary--sheet {
+    display: flex;
+  }
+}
+
+@media (max-width: 48rem) {
+  .jgz-editor {
+    @include jgz-editor-sheet;
+  }
+}
+
+.jgz-editor.is-focused {
+  @include jgz-editor-sheet;
+
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  height: 100%;
+  min-height: 0;
+
+  .jgz-editor__bar {
+    flex-shrink: 0;
+    flex-wrap: nowrap;
+    gap: 0.4rem;
+    padding: 0.35rem 0.15rem 0.4rem;
+    overflow-x: auto;
+
+    .jgz__action {
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+  }
+
+  .jgz-editor__bar-main,
+  .jgz-editor__bar-actions {
+    flex-wrap: nowrap;
+    flex-shrink: 0;
+  }
+
+  .jgz-editor__title {
+    display: none;
+  }
+
+  .jgz-editor__bar-main .jgz__ink {
+    display: none;
+  }
+
+  .jgz-editor__bar-main .jgz__controls {
+    flex-wrap: nowrap;
+    flex-shrink: 0;
+  }
+
+  .jgz-editor__bar-main .jgz__switch {
+    border-width: 1px;
+  }
+
+  .jgz-editor__bar-main .jgz__switch button {
+    padding: 0.32rem 0.5rem;
+    font-size: 0.62rem;
+    white-space: nowrap;
+
+    & + button {
+      border-left-width: 1px;
+    }
+  }
+
+  .jgz-editor__bar-actions .jgz__action {
+    padding: 0.32rem 0.55rem;
+    font-size: 0.62rem;
+  }
+
+  .jgz-editor__body {
+    flex: 1;
+    min-height: 0;
+    margin-top: 0.6rem;
+    gap: 0.6rem;
+    grid-template-rows: auto minmax(0, 1fr);
+  }
+
+  .jgz-editor__strip {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    gap: 0.45rem;
+    min-width: 0;
+  }
+
+  .jgz-strip {
+    flex: 1;
+    flex-direction: row;
+    overflow-x: auto;
+    gap: 0.45rem;
+  }
+
+  .jgz-strip__button {
+    min-width: 5.2rem;
+    width: 5.2rem;
+  }
+
+  .jgz-strip__caption {
+    display: none;
+  }
+
+  .jgz-flag {
+    display: none;
+  }
+
+  .jgz-strip__add {
+    margin: 0;
+    flex: 0 0 auto;
+    display: flex;
+  }
+
+  .jgz-strip__add > button {
+    width: auto;
+    min-width: 2.6rem;
+    padding: 0.4rem 0.45rem;
+    white-space: nowrap;
+  }
+
+  .jgz-editor__canvas {
+    min-height: 0;
+    height: 100%;
+  }
+
+  .jgz-editor__stage {
+    flex: 1;
+    min-height: 0;
+    height: auto;
+    align-items: stretch;
+  }
+
+  .jgz-editor__board {
+    flex: 1;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+  }
+
+  .jgz-editor__viewbox {
+    flex: 1;
+    min-height: 0;
+    width: 100%;
+    align-items: center;
+    container-type: size;
+  }
+
+  .jgz-editor__viewbox .jgz-frame {
+    height: min(100cqh, calc(100cqw * 5 / 4));
+    width: min(100cqw, calc(100cqh * 4 / 5));
+    max-width: 100%;
+    max-height: 100%;
+  }
+
+  .jgz-editor__dock {
+    width: 100vw;
+    max-width: 100vw;
+    margin: 0 0 0 calc(50% - 50vw);
+    padding-left: max(0.75rem, env(safe-area-inset-left, 0px));
+    padding-right: max(0.75rem, env(safe-area-inset-right, 0px));
+    padding-bottom: max(0.55rem, env(safe-area-inset-bottom, 0px));
+    background: var(--background, #fff);
+  }
+
+  .jgz-export-line {
+    flex-shrink: 0;
+    margin-top: 0.5rem;
+  }
+}
+
+@media (min-width: 48.01rem) {
+  .jgz-editor.is-focused .jgz-editor__body {
+    grid-template-columns: minmax(0, 7.5rem) minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr);
+  }
+
+  .jgz-editor.is-focused .jgz-strip {
+    flex-direction: column;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  .jgz-editor.is-focused .jgz-strip__button {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .jgz-editor.is-focused .jgz-editor__strip {
+    flex-direction: column;
+  }
+}
+
+.pivot-tenant-page.pivot-carousel-page.is-carousel-focused {
+  overflow: hidden;
+
+  > .pivot-dash-burst,
+  > .pivot-tenant-page__header {
+    display: none;
+  }
+
+  > .pivot-tenant-page__body {
+    height: 100%;
+    max-height: 100%;
+    padding: 0.5rem 0.75rem 0.75rem;
+    overflow: hidden;
+  }
+
+  .jgz {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+    padding: 0;
+  }
+}
+
+.general-dash:has(.pivot-carousel-page.is-carousel-focused) {
+  .mobile-heading {
+    display: none;
+  }
+
+  .dash-left {
+    display: none;
+  }
+
+  .dash-right,
+  .dash-right.minimized,
+  .dash-right.maximized {
+    width: 100%;
+    max-width: 100%;
+    flex-basis: 100%;
+    height: 100%;
+  }
+
+  .dash-content {
+    overflow: hidden;
+    min-height: 0;
   }
 }

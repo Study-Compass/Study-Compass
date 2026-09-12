@@ -225,3 +225,67 @@ describe('frame classes come from one place', () => {
     expect(pageCss).toMatch(/\.jgz-frame--noink \.jgz-photo::after/);
   });
 });
+
+/**
+ * App.scss paints every h2/p with `color: var(--text)` (#414141). Night press
+ * titles that left colour to inherit printed that dark ink while cover/card
+ * titles — which set `--jgz-type` themselves — stayed cream.
+ */
+describe('night press type is the frame’s own ink', () => {
+  test('headings that used to inherit App.scss set the edition token', () => {
+    for (const selector of [
+      '.jgz-sheet__title',
+      '.jgz-notice__title',
+      '.jgz-dispatch__title',
+      '.jgz-back__line',
+    ]) {
+      const start = pageCss.indexOf(`${selector} {`);
+      expect(start).toBeGreaterThan(-1);
+      const block = pageCss.slice(start, pageCss.indexOf('}', start));
+      expect(block).toMatch(/color:\s*var\(--jgz-type\)/);
+    }
+  });
+
+  test('a frame remaps --text so leftover App.scss rules take the edition colour', () => {
+    expect(pageCss).toMatch(/\.jgz-frame \{[\s\S]*?--text:\s*var\(--jgz-type\)/);
+    expect(pageCss).toMatch(/:where\(h1, h2, h3, p\)/);
+  });
+});
+
+/**
+ * Full screen has to hide chrome that lives outside this file — the dashboard
+ * mobile heading and the tenant scrapbook header — or the 4:5 frame still
+ * cannot fit.
+ */
+describe('full screen hides the surrounding chrome', () => {
+  test('the focused page drops its own header', () => {
+    expect(pageCss).toMatch(/pivot-carousel-page\.is-carousel-focused/);
+    expect(pageCss).toMatch(/pivot-tenant-page__header/);
+  });
+
+  test('the dashboard heading and sidebar leave with it', () => {
+    expect(pageCss).toMatch(/:has\(\.pivot-carousel-page\.is-carousel-focused\)/);
+    expect(pageCss).toMatch(/mobile-heading/);
+    expect(pageCss).toMatch(/dash-left/);
+  });
+
+  test('the focused stage sizes the frame from leftover space, not from column width', () => {
+    expect(pageCss).toMatch(/\.jgz-editor\.is-focused/);
+    expect(pageCss).toMatch(/100cqh/);
+  });
+
+  test('taps do not leave a focus ring, and the event dock sits under the slide', () => {
+    expect(pageCss).toMatch(/-webkit-tap-highlight-color:\s*transparent/);
+    expect(pageCss).toMatch(/jgz-editor__dock-rest/);
+    expect(pageCss).toMatch(/grid-template-rows:\s*0fr/);
+  });
+
+  test('the focused editor bar stays on one line', () => {
+    expect(pageCss).toMatch(/\.jgz-editor\.is-focused[\s\S]*?\.jgz-editor__bar \{[\s\S]*?flex-wrap:\s*nowrap/);
+    expect(pageCss).toMatch(/jgz__action--icon/);
+  });
+
+  test('the event dock bleeds to the screen edges', () => {
+    expect(pageCss).toMatch(/jgz-editor__dock[\s\S]*?100vw/);
+  });
+});

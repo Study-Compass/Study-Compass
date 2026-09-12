@@ -128,10 +128,10 @@
 
   button {
     display: flex;
-    align-items: center;
-    gap: 0.75rem;
+    align-items: flex-start;
+    gap: 1rem;
     width: 100%;
-    padding: 0.55rem 0.3rem;
+    padding: 0.85rem 0.2rem;
     border: 0;
     background: transparent;
     font: inherit;
@@ -144,8 +144,9 @@
 }
 
 .jgz-picker__thumb {
-  flex: 0 0 3.5rem;
-  height: 2.6rem;
+  flex: 0 0 5.6rem;
+  width: 5.6rem;
+  height: 7rem;
   overflow: hidden;
   background: #efe9df;
 
@@ -157,24 +158,31 @@
   align-items: center;
   justify-content: center;
   height: 100%;
-  font-size: 0.55rem;
+  font-size: 0.62rem;
   color: rgba(26, 23, 20, 0.45);
 }
 
 .jgz-picker__row {
   min-width: 0;
-
-  b { display: block; font-size: 0.8rem; }
+  padding-top: 0.15rem;
 }
 
-.jgz-picker__meta,
-.jgz-picker__tags {
+.jgz-picker__host {
   display: block;
-  font-size: 0.66rem;
-  color: rgba(26, 23, 20, 0.6);
+  font-size: 1.08rem;
+  font-weight: 700;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
 }
 
-.jgz-picker__tags { color: #ff4f1f; }
+.jgz-picker__name {
+  display: block;
+  margin-top: 0.28rem;
+  font-size: 0.78rem;
+  line-height: 1.35;
+  color: rgba(26, 23, 20, 0.62);
+  overflow-wrap: anywhere;
+}
 
 .jgz-picker__more {
   appearance: none;
