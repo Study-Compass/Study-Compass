@@ -21,6 +21,16 @@ const {
 } = require('./pivotComputeJobStore');
 const { notifyComputeWorkerWake } = require('./pivotComputeWakeService');
 const { logPivot } = require('../utilities/pivotLogger');
+const {
+  buildExportPrefix,
+  assertObjectKeyBelongsToPrefix,
+  createPresignedGetUrl,
+} = require('./pivotExportArtifactStorage');
+
+const ARTIFACTS_EXPIRED_MESSAGE = [
+  'Export record available. Files expired after the retention period.',
+  'Run another export to regenerate them.',
+].join(' ');
 
 const MAX_LIST_LIMIT = 100;
 const MAX_OPTIONS_KEYS = 20;
@@ -75,7 +85,8 @@ function serializeAdminJob(job, { includeEmbeddedResult = false } = {}) {
     };
   }
   if (!includeEmbeddedResult && serialized.result?.embedded) {
-    const embeddedByteSize = Buffer.byteLength(JSON.stringify(serialized.result.embedded), 'utf8');
+    const embedded = serialized.result.embedded;
+    const embeddedByteSize = Buffer.byteLength(JSON.stringify(embedded), 'utf8');
     serialized.result = {
       mode: serialized.result.mode,
       artifactRef: serialized.result.artifactRef ?? null,
@@ -84,7 +95,12 @@ function serializeAdminJob(job, { includeEmbeddedResult = false } = {}) {
       contractVersion: serialized.result.contractVersion,
       hasEmbeddedResult: true,
       embeddedByteSize,
-      embeddedSummary: serialized.result.embedded.summary ?? null,
+      embeddedSummary: embedded.summary ?? null,
+      ...(serialized.kind === 'carousel-export' ? {
+        renderedDeckRevision: embedded.renderedDeckRevision ?? null,
+        slideCount: embedded.slideCount ?? null,
+        renderDurationMs: embedded.renderDurationMs ?? null,
+      } : {}),
     };
   }
   return serialized;
@@ -123,6 +139,13 @@ function validateManualSubmitResult(resultInput) {
     throw serviceError(
       `Unsupported compute contract version: ${resultInput.contractVersion}`,
       'UNSUPPORTED_COMPUTE_CONTRACT_VERSION',
+    );
+  }
+  if (resultInput.kind === 'carousel-export') {
+    throw serviceError(
+      'Carousel export results must be submitted by the worker that owns the attempt',
+      'CAROUSEL_MANUAL_SUBMIT_UNSUPPORTED',
+      409,
     );
   }
   if (resultInput.outcome !== 'completed') {
@@ -305,6 +328,63 @@ async function retryAdminComputeJob(req, {
   return { job: serializeAdminJob(retried), duplicate: false };
 }
 
+async function createAdminCarouselArtifactDownload(req, {
+  externalJobId,
+  artifactId,
+  tenantKey = null,
+} = {}) {
+  const job = await findJobByExternalId(req, externalJobId);
+  if (!job) {
+    throw serviceError('Compute job not found', 'COMPUTE_JOB_NOT_FOUND', 404);
+  }
+  if (job.kind !== 'carousel-export') {
+    throw serviceError(
+      'Artifact downloads are only available for carousel exports',
+      'CAROUSEL_DOWNLOAD_UNSUPPORTED',
+      409,
+    );
+  }
+  const requestedTenant = trimString(tenantKey).toLowerCase();
+  if (requestedTenant && requestedTenant !== job.tenantKey) {
+    throw serviceError('Compute job does not belong to this tenant', 'COMPUTE_JOB_TENANT_MISMATCH', 409);
+  }
+  const exportArtifacts = job.exportArtifacts;
+  if (!exportArtifacts?.artifacts?.length) {
+    throw serviceError('Carousel export artifacts have not been finalized', 'CAROUSEL_ARTIFACTS_NOT_FINALIZED', 409);
+  }
+  if (exportArtifacts.expired) {
+    throw serviceError(ARTIFACTS_EXPIRED_MESSAGE, 'CAROUSEL_EXPORT_ARTIFACTS_EXPIRED', 410);
+  }
+
+  const requestedId = trimString(artifactId);
+  const artifact = exportArtifacts.artifacts.find((entry) => entry.artifactId === requestedId);
+  if (!artifact) {
+    throw serviceError('Carousel export artifact not found', 'CAROUSEL_ARTIFACT_NOT_FOUND', 404);
+  }
+
+  const prefix = exportArtifacts.prefix || buildExportPrefix({
+    tenantKey: job.tenantKey,
+    externalJobId: job.externalJobId,
+    attemptNumber: exportArtifacts.attemptNumber,
+  });
+  assertObjectKeyBelongsToPrefix(artifact.objectKey, prefix);
+  const presign = await createPresignedGetUrl({
+    objectKey: artifact.objectKey,
+    contentType: artifact.mimeType,
+    filename: artifact.logicalName,
+  });
+  return {
+    downloadUrl: presign.downloadUrl,
+    expiresAt: presign.expiresAt,
+    filename: artifact.logicalName,
+    mimeType: artifact.mimeType,
+    byteCount: artifact.byteCount,
+    sha256: artifact.sha256,
+    slideNumber: artifact.slideNumber ?? null,
+    artifactId: artifact.artifactId,
+  };
+}
+
 const STATUS_BY_CODE = Object.freeze({
   COMPUTE_JOB_NOT_FOUND: 404,
   COMPUTE_JOB_NOT_CANCELLABLE: 409,
@@ -330,6 +410,13 @@ const STATUS_BY_CODE = Object.freeze({
   UNSUPPORTED_COMPUTE_JOB_KIND: 400,
   COMPUTE_JOB_OPTIONS_TOO_LARGE: 413,
   COMPUTE_RESULT_TOO_LARGE: 413,
+  CAROUSEL_MANUAL_SUBMIT_UNSUPPORTED: 409,
+  CAROUSEL_PREVIEW_UNSUPPORTED: 409,
+  CAROUSEL_APPLY_UNSUPPORTED: 409,
+  CAROUSEL_DOWNLOAD_UNSUPPORTED: 409,
+  CAROUSEL_ARTIFACTS_NOT_FINALIZED: 409,
+  CAROUSEL_EXPORT_ARTIFACTS_EXPIRED: 410,
+  CAROUSEL_ARTIFACT_NOT_FOUND: 404,
   UNKNOWN_REQUEST_FIELD: 400,
   INVALID_REQUEST_BODY: 400,
 });
@@ -354,5 +441,6 @@ module.exports = {
   submitManualComputeResult,
   cancelAdminComputeJob,
   retryAdminComputeJob,
+  createAdminCarouselArtifactDownload,
   handleAdminServiceError,
 };

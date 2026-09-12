@@ -89,6 +89,7 @@ describe('pivotComputeJobStore', () => {
         'pivot_compute_job_lease_expiry',
         'pivot_compute_job_city_createdAt',
         'pivot_compute_job_city_status_updatedAt',
+        'pivot_compute_job_export_artifact_expiry',
       ]);
       expect(PIVOT_COMPUTE_JOB_ATTEMPT_INDEX_NAMES).toEqual([
         'pivot_compute_job_attempt_job_attempt_unique',
@@ -268,6 +269,107 @@ describe('pivotComputeJobStore', () => {
       });
       expect(second.status).toBe('review-required');
       expect(second.id).toBe(first.id);
+    });
+
+    it('binds carousel results to tenant, deck, revision, context, and attempt and completes directly', async () => {
+      const fixture = loadFixture('result-carousel-valid-completed.json');
+      await createComputeJob(req, buildCreateInput({
+        externalJobId: fixture.jobId,
+        kind: 'carousel-export',
+        contextVersion: fixture.basedOnContextVersion,
+        createIdempotencyKey: 'idem:create-carousel-iowacity-001',
+        options: {
+          deckId: fixture.deckId,
+          deckRevision: fixture.renderedDeckRevision,
+        },
+      }));
+      const claim = await claimNextPendingJob(req, {
+        kind: 'carousel-export',
+        workerId: 'worker-mini-1',
+        now: new Date('2026-09-11T20:05:00.000Z'),
+      });
+      await startComputeJob(req, {
+        externalJobId: claim.job.externalJobId,
+        leaseToken: claim.job.lease.token,
+        workerId: 'worker-mini-1',
+        now: new Date('2026-09-11T20:05:01.000Z'),
+      });
+
+      const result = { ...fixture, attemptId: claim.attempt.id };
+      const { PivotComputeJob } = getGlobalModels(req, 'PivotComputeJob');
+      await PivotComputeJob.updateOne(
+        { externalJobId: claim.job.externalJobId },
+        {
+          $set: {
+            exportArtifacts: {
+              attemptId: claim.attempt.id,
+              attemptNumber: claim.job.lease.attemptNumber,
+              prefix: `pivot-exports/iowacity/${fixture.jobId}/1/`,
+              grantId: 'grant:carousel-fixture-001',
+              finalizedAt: new Date('2026-09-11T20:07:00.000Z'),
+              expiresAt: new Date('2026-09-25T20:07:00.000Z'),
+              expired: false,
+              artifacts: result.artifacts.map((artifact) => ({
+                ...artifact,
+                objectKey: `pivot-exports/iowacity/${fixture.jobId}/1/${artifact.logicalName}`,
+              })),
+            },
+          },
+        },
+      );
+      await expect(submitComputeJobResult(req, {
+        externalJobId: claim.job.externalJobId,
+        leaseToken: claim.job.lease.token,
+        workerId: 'worker-mini-1',
+        result: { ...result, tenantKey: 'chicago' },
+      })).rejects.toMatchObject({ code: 'COMPUTE_RESULT_BINDING_MISMATCH' });
+
+      const submitted = await submitComputeJobResult(req, {
+        externalJobId: claim.job.externalJobId,
+        leaseToken: claim.job.lease.token,
+        workerId: 'worker-mini-1',
+        result,
+        requiresReview: true,
+        now: new Date('2026-09-11T20:08:00.000Z'),
+      });
+      expect(submitted.status).toBe('completed');
+      expect(submitted.applicationAudit).toBeNull();
+      expect(submitted.exportArtifacts.artifacts).toHaveLength(3);
+    });
+
+    it('rejects a completed carousel result before artifacts are finalized', async () => {
+      const fixture = loadFixture('result-carousel-valid-completed.json');
+      await createComputeJob(req, buildCreateInput({
+        externalJobId: 'job:carousel-missing-artifacts-001',
+        kind: 'carousel-export',
+        contextVersion: fixture.basedOnContextVersion,
+        createIdempotencyKey: 'idem:create-carousel-missing-artifacts-001',
+        options: {
+          deckId: fixture.deckId,
+          deckRevision: fixture.renderedDeckRevision,
+        },
+      }));
+      const claim = await claimNextPendingJob(req, {
+        kind: 'carousel-export',
+        workerId: 'worker-mini-1',
+        now: new Date('2026-09-11T20:05:00.000Z'),
+      });
+      await startComputeJob(req, {
+        externalJobId: claim.job.externalJobId,
+        leaseToken: claim.job.lease.token,
+        workerId: 'worker-mini-1',
+        now: new Date('2026-09-11T20:05:01.000Z'),
+      });
+      await expect(submitComputeJobResult(req, {
+        externalJobId: claim.job.externalJobId,
+        leaseToken: claim.job.lease.token,
+        workerId: 'worker-mini-1',
+        result: {
+          ...fixture,
+          jobId: claim.job.externalJobId,
+          attemptId: claim.attempt.id,
+        },
+      })).rejects.toMatchObject({ code: 'CAROUSEL_ARTIFACTS_NOT_FINALIZED' });
     });
 
     it('marks retryable failures and supports retry back to pending', async () => {

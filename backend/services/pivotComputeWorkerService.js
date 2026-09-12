@@ -94,6 +94,12 @@ async function buildAuthorizedContext(req, job, workerId) {
     if (result?.error) throw serviceError(result.error, result.code || 'REFRESH_CONTEXT_FAILED', result.status || 500);
     return result.data.snapshot;
   }
+  if (job.kind === 'carousel-export') {
+    const { buildCarouselExportContextSnapshot } = require('./pivotCarouselComputeContextService');
+    const result = await buildCarouselExportContextSnapshot(req, { job });
+    if (result?.error) throw serviceError(result.error, result.code || 'CAROUSEL_CONTEXT_FAILED', result.status || 500);
+    return result.data.snapshot;
+  }
   throw serviceError(`Unsupported compute job kind: ${job.kind}`, 'UNSUPPORTED_COMPUTE_JOB_KIND');
 }
 
@@ -213,10 +219,11 @@ async function fetchJobContext(req, {
   workerId,
   externalJobId,
   leaseToken,
+  now = new Date(),
 }) {
   const job = await findJobByExternalId(req, externalJobId);
   if (!job) throw serviceError('Compute job not found', 'COMPUTE_JOB_NOT_FOUND', 404);
-  assertLeaseBinding({ job, workerId, leaseToken, requireActive: true });
+  assertLeaseBinding({ job, workerId, leaseToken, requireActive: true, now });
   const context = await buildAuthorizedContext(req, job, workerId);
   const updatedJob = await updateComputeJobContextVersion(req, job.externalJobId, context.contextVersion);
   return { job: updatedJob, context };
@@ -307,6 +314,49 @@ async function submitTerminalJobResult(req, {
   return { job };
 }
 
+async function initializeJobArtifactUploads(req, {
+  workerId,
+  externalJobId,
+  body,
+  now = new Date(),
+}) {
+  rejectUnknownFields(body, ['leaseToken', 'capability', 'grantToken', 'slideCount', 'artifacts']);
+  const leaseToken = trimString(body.leaseToken);
+  normalizeCapabilityForLease(body.capability, workerId);
+  const job = await findJobByExternalId(req, externalJobId);
+  if (!job) throw serviceError('Compute job not found', 'COMPUTE_JOB_NOT_FOUND', 404);
+  assertLeaseBinding({ job, workerId, leaseToken, requireActive: true, now });
+  const { initializeCarouselArtifactUploads } = require('./pivotCarouselArtifactTransportService');
+  return initializeCarouselArtifactUploads(req, {
+    job,
+    grantToken: body.grantToken,
+    slideCount: body.slideCount,
+    artifacts: body.artifacts,
+    now,
+  });
+}
+
+async function finalizeJobArtifactUploads(req, {
+  workerId,
+  externalJobId,
+  body,
+  now = new Date(),
+}) {
+  rejectUnknownFields(body, ['leaseToken', 'capability', 'grantToken', 'artifacts']);
+  const leaseToken = trimString(body.leaseToken);
+  normalizeCapabilityForLease(body.capability, workerId);
+  const job = await findJobByExternalId(req, externalJobId);
+  if (!job) throw serviceError('Compute job not found', 'COMPUTE_JOB_NOT_FOUND', 404);
+  assertLeaseBinding({ job, workerId, leaseToken, requireActive: true, now });
+  const { finalizeCarouselArtifactUploads } = require('./pivotCarouselArtifactTransportService');
+  return finalizeCarouselArtifactUploads(req, {
+    job,
+    grantToken: body.grantToken,
+    artifacts: body.artifacts,
+    now,
+  });
+}
+
 async function reportRetryableJobFailure(req, {
   workerId,
   externalJobId,
@@ -341,7 +391,27 @@ async function reportRetryableJobFailure(req, {
     ? { jobsRun: 0, jobsFailed: 1, eventsProposed: 0, eventsRefreshed: 0 }
     : { searched: 0, qualified: 0, rejected: 0, eventsProposed: 0 };
 
-  const result = {
+  const result = job.kind === 'carousel-export' ? {
+    contractVersion: CONTRACT_VERSION,
+    jobId: job.externalJobId,
+    scheduleOccurrenceId: null,
+    kind: job.kind,
+    tenantKey: job.tenantKey,
+    cityKey: job.cityKey,
+    deckId: job.options?.deckId,
+    attemptId: String(job.lease?.attemptId || ''),
+    implementationRevision: capability.implementationRevision,
+    basedOnContextVersion: trimString(body.basedOnContextVersion || job.contextVersion),
+    completedAt: now.toISOString(),
+    outcome: 'failed',
+    idempotencyKey,
+    renderedDeckRevision: job.options?.deckRevision,
+    slideCount: 0,
+    renderDurationMs: 0,
+    artifacts: [],
+    warnings: [],
+    failure: { code: code.slice(0, MAX_REQUEST_FIELD_LENGTH), message: message.slice(0, 1000) },
+  } : {
     contractVersion: CONTRACT_VERSION,
     jobId: job.externalJobId,
     scheduleOccurrenceId: job.scheduleOccurrenceId ?? null,
@@ -399,7 +469,37 @@ const STATUS_BY_CODE = Object.freeze({
   INVALID_SCHEDULE_OCCURRENCE: 400,
   INVALID_RETRYABLE_FAILURE: 400,
   INVALID_COMPUTE_EXECUTION_RESULT: 400,
+  COMPUTE_RESULT_BINDING_MISMATCH: 409,
   COMPUTE_RESULT_TOO_LARGE: 413,
+  ARTIFACT_GRANT_REQUIRED: 400,
+  INVALID_ARTIFACT_UPLOADS: 400,
+  ARTIFACT_GRANT_INVALID: 401,
+  ARTIFACT_GRANT_WRONG_PURPOSE: 403,
+  ARTIFACT_GRANT_BINDING_MISMATCH: 403,
+  ARTIFACT_KIND_UNSUPPORTED: 409,
+  UNAPPROVED_EXPORT_FILENAME: 400,
+  UNAPPROVED_EXPORT_CONTENT_TYPE: 400,
+  DUPLICATE_EXPORT_FILENAME: 400,
+  ARTIFACT_SIZE_INVALID: 400,
+  ARTIFACT_CHECKSUM_INVALID: 400,
+  ARTIFACT_COUNT_INVALID: 400,
+  ARTIFACT_TOTAL_SIZE_INVALID: 400,
+  ARTIFACTS_NOT_INITIALIZED: 409,
+  ARTIFACT_NOT_INITIALIZED: 409,
+  ARTIFACTS_ALREADY_FINALIZED: 409,
+  ARTIFACT_ALREADY_VERIFIED: 409,
+  ARTIFACT_ID_MISMATCH: 409,
+  ARTIFACT_UPLOAD_MISMATCH: 409,
+  ARTIFACT_MANIFEST_MISMATCH: 409,
+  ARTIFACT_ATTEMPT_MISMATCH: 409,
+  ARTIFACT_SIZE_MISMATCH: 409,
+  ARTIFACT_CONTENT_TYPE_MISMATCH: 409,
+  ARTIFACT_CHECKSUM_MISMATCH: 409,
+  EXPORT_OBJECT_NOT_FOUND: 409,
+  EXPORT_OBJECT_PREFIX_MISMATCH: 409,
+  CAROUSEL_ARTIFACTS_NOT_FINALIZED: 409,
+  CAROUSEL_EXPORT_STORAGE_UNCONFIGURED: 503,
+  CAROUSEL_SLIDE_COUNT_INVALID: 422,
 });
 
 function handleWorkerServiceError(res, error) {
@@ -419,6 +519,8 @@ module.exports = {
   observeJobCancellation,
   submitTerminalJobResult,
   reportRetryableJobFailure,
+  initializeJobArtifactUploads,
+  finalizeJobArtifactUploads,
   listJobAttempts,
   handleWorkerServiceError,
 };

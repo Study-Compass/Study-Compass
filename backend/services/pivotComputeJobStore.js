@@ -72,6 +72,27 @@ function serializeJob(doc) {
       }
       : null,
     result: value.result ?? null,
+    exportArtifacts: value.exportArtifacts
+      ? {
+        attemptId: String(value.exportArtifacts.attemptId),
+        attemptNumber: value.exportArtifacts.attemptNumber,
+        prefix: value.exportArtifacts.prefix,
+        grantId: value.exportArtifacts.grantId,
+        finalizedAt: value.exportArtifacts.finalizedAt,
+        expiresAt: value.exportArtifacts.expiresAt ?? null,
+        expired: Boolean(value.exportArtifacts.expired),
+        cleanedAt: value.exportArtifacts.cleanedAt ?? null,
+        artifacts: (value.exportArtifacts.artifacts || []).map((artifact) => ({
+          logicalName: artifact.logicalName,
+          artifactId: artifact.artifactId,
+          mimeType: artifact.mimeType,
+          byteCount: artifact.byteCount,
+          sha256: artifact.sha256,
+          slideNumber: artifact.slideNumber ?? null,
+          objectKey: artifact.objectKey,
+        })),
+      }
+      : null,
     applicationAudit: value.applicationAudit ?? null,
     failure: value.failure ?? null,
     requestedAt: value.requestedAt,
@@ -102,6 +123,27 @@ function serializeAttempt(doc) {
     leaseExpiresAt: value.leaseExpiresAt,
     capability: value.capability ?? null,
     resultIdempotencyKey: value.resultIdempotencyKey ?? null,
+    artifactUploads: value.artifactUploads
+      ? {
+        grantId: value.artifactUploads.grantId ?? null,
+        prefix: value.artifactUploads.prefix ?? null,
+        slideCount: value.artifactUploads.slideCount ?? null,
+        initializedAt: value.artifactUploads.initializedAt ?? null,
+        finalizedAt: value.artifactUploads.finalizedAt ?? null,
+        cleanedAt: value.artifactUploads.cleanedAt ?? null,
+        artifacts: (value.artifactUploads.artifacts || []).map((artifact) => ({
+          artifactId: artifact.artifactId,
+          logicalName: artifact.logicalName,
+          objectKey: artifact.objectKey,
+          mimeType: artifact.mimeType,
+          byteCount: artifact.byteCount,
+          sha256: artifact.sha256,
+          slideNumber: artifact.slideNumber ?? null,
+          status: artifact.status,
+          verifiedAt: artifact.verifiedAt ?? null,
+        })),
+      }
+      : null,
     terminalOutcome: value.terminalOutcome ?? null,
     failure: value.failure ?? null,
     createdAt: value.createdAt,
@@ -228,6 +270,25 @@ function normalizeStoredResult(resultInput, now = new Date()) {
     submittedAt: now,
     contractVersion: CONTRACT_VERSION,
   };
+}
+
+function assertResultBinding(job, result) {
+  if (job.kind !== 'carousel-export' && result.kind !== 'carousel-export') return;
+  const mismatches = [];
+  if (result.jobId !== job.externalJobId) mismatches.push('jobId');
+  if (result.kind !== job.kind) mismatches.push('kind');
+  if (result.cityKey !== job.cityKey) mismatches.push('cityKey');
+  const expectedAttemptId = String(job.lease?.attemptId || job.result?.embedded?.attemptId || '');
+  if (result.tenantKey !== job.tenantKey) mismatches.push('tenantKey');
+  if (result.deckId !== job.options?.deckId) mismatches.push('deckId');
+  if (result.renderedDeckRevision !== job.options?.deckRevision) mismatches.push('renderedDeckRevision');
+  if (result.attemptId !== expectedAttemptId) mismatches.push('attemptId');
+  if (result.basedOnContextVersion !== job.contextVersion) mismatches.push('basedOnContextVersion');
+  if (mismatches.length) {
+    const error = new Error(`Compute result does not match its job binding: ${mismatches.join(', ')}`);
+    error.code = 'COMPUTE_RESULT_BINDING_MISMATCH';
+    throw error;
+  }
 }
 
 async function getModels(req) {
@@ -567,6 +628,11 @@ async function submitComputeJobResult(req, {
   }
 
   const storedResult = result ? normalizeStoredResult(result, now) : null;
+  assertResultBinding(job, result);
+  if (job.kind === 'carousel-export') {
+    const { assertCompletedResultMatchesVerifiedArtifacts } = require('./pivotCarouselArtifactTransportService');
+    assertCompletedResultMatchesVerifiedArtifacts(job, result);
+  }
   if (
     storedResult
     && job.result
@@ -586,7 +652,7 @@ async function submitComputeJobResult(req, {
   const nextStatus = resolveResultSubmissionStatus({
     outcome: result.outcome,
     retryable,
-    requiresReview,
+    requiresReview: job.kind === 'carousel-export' ? false : requiresReview,
   });
   assertComputeJobTransition(job.status, nextStatus);
 
@@ -605,6 +671,7 @@ async function submitComputeJobResult(req, {
       ? 'cancelled'
       : 'completed';
 
+  const attemptNumber = job.lease?.attemptNumber ?? job.exportArtifacts?.attemptNumber ?? null;
   job.status = nextStatus;
   job.result = storedResult;
   job.completedAt = now;
@@ -624,6 +691,15 @@ async function submitComputeJobResult(req, {
       },
     },
   );
+
+  if (job.kind === 'carousel-export' && result.outcome !== 'completed' && attemptNumber) {
+    await cleanupCarouselAttemptBestEffort(req, {
+      tenantKey: job.tenantKey,
+      externalJobId: job.externalJobId,
+      attemptNumber,
+      attemptId,
+    });
+  }
 
   return serializeJob(await PivotComputeJob.findById(job._id));
 }
@@ -660,6 +736,7 @@ async function cancelComputeJob(req, {
   assertComputeJobTransition(job.status, 'cancelled');
 
   const attemptId = job.lease?.attemptId ?? null;
+  const attemptNumber = job.lease?.attemptNumber ?? null;
   job.cancelRequested = true;
   job.status = 'cancelled';
   job.completedAt = now;
@@ -687,6 +764,15 @@ async function cancelComputeJob(req, {
     );
   }
 
+  if (job.kind === 'carousel-export' && attemptNumber) {
+    await cleanupCarouselAttemptBestEffort(req, {
+      tenantKey: job.tenantKey,
+      externalJobId: job.externalJobId,
+      attemptNumber,
+      attemptId,
+    });
+  }
+
   return serializeJob(job);
 }
 
@@ -709,11 +795,13 @@ async function retryComputeJob(req, {
 
   assertComputeJobTransition(job.status, 'pending');
 
+  const previousExport = job.exportArtifacts;
   job.status = 'pending';
   job.lease = null;
   job.progress = null;
   job.failure = null;
   job.result = null;
+  job.exportArtifacts = null;
   job.applicationAudit = null;
   job.cancelRequested = false;
   job.leasedAt = null;
@@ -724,6 +812,14 @@ async function retryComputeJob(req, {
   }
   job.requestedAt = now;
   await job.save();
+  if (job.kind === 'carousel-export' && previousExport?.attemptNumber && !previousExport.expired) {
+    await cleanupCarouselAttemptBestEffort(req, {
+      tenantKey: job.tenantKey,
+      externalJobId: job.externalJobId,
+      attemptNumber: previousExport.attemptNumber,
+      attemptId: previousExport.attemptId,
+    });
+  }
   return serializeJob(job);
 }
 
@@ -755,6 +851,7 @@ async function expireComputeJobLease(req, {
   assertComputeJobTransition(job.status, nextStatus);
 
   const attemptId = job.lease?.attemptId ?? null;
+  const attemptNumber = job.lease?.attemptNumber ?? null;
   const failure = nextStatus === 'pending'
     ? null
     : {
@@ -807,6 +904,15 @@ async function expireComputeJobLease(req, {
     );
   }
 
+  if (updated.kind === 'carousel-export' && attemptNumber) {
+    await cleanupCarouselAttemptBestEffort(req, {
+      tenantKey: updated.tenantKey,
+      externalJobId: updated.externalJobId,
+      attemptNumber,
+      attemptId,
+    });
+  }
+
   return serializeJob(updated);
 }
 
@@ -823,7 +929,22 @@ async function reclaimExpiredComputeJobLeases(req, {
       now,
     }));
   }
+  try {
+    const { cleanupExpiredCarouselExports } = require('./pivotCarouselArtifactTransportService');
+    await cleanupExpiredCarouselExports(req, { now, limit });
+  } catch {
+    // Retention cleanup is best-effort and must not block lease recovery.
+  }
   return reclaimed;
+}
+
+async function cleanupCarouselAttemptBestEffort(req, input) {
+  try {
+    const { cleanupCarouselAttemptPrefix } = require('./pivotCarouselArtifactTransportService');
+    await cleanupCarouselAttemptPrefix(req, input);
+  } catch {
+    // Object-storage cleanup must not roll back an already-recorded terminal job.
+  }
 }
 
 async function beginComputeJobApply(req, {
