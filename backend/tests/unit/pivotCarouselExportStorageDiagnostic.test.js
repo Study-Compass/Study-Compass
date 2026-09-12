@@ -50,6 +50,7 @@ describe('diagnoseCarouselExportStorage', () => {
       'putObject',
       expect.objectContaining({ Key: 'pivot-exports/_diagnostic/probe.bin' }),
     );
+    expect(client.getSignedUrlPromise.mock.calls[0][1]).not.toHaveProperty('ContentLength');
     expect(diagnostic.checks.map((check) => check.status)).toEqual(['passed', 'passed', 'passed', 'passed']);
   });
 });

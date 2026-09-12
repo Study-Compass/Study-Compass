@@ -118,7 +118,6 @@ async function createPresignedPutUrl({
     Bucket: bucket,
     Key: objectKey,
     ContentType: contentType,
-    ContentLength: byteCount,
     ChecksumSHA256: checksum,
     Expires: ttl,
   };
@@ -281,7 +280,7 @@ async function diagnoseCarouselExportStorage({
       Bucket: bucket,
       Key: `${EXPORT_PREFIX_ROOT}/_diagnostic/probe.bin`,
       ContentType: 'application/octet-stream',
-      ContentLength: 1,
+      ChecksumSHA256: sha256HexToS3Checksum('00'.repeat(32)),
       Expires: 60,
     });
     if (!uploadUrl) throw new Error('Presign returned an empty URL');
