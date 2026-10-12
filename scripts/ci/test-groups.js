@@ -11,7 +11,7 @@ const testFilePattern = /\.(?:spec|test)\.(?:js|jsx|ts|tsx)$/;
 const groups = {
   backend: {
     'discovery-catalog': [
-      /\/unit\/(?:clusterPivotHostNames|eventPivotIndexes|pivotBatch|pivotCatalog|pivotCuration|pivotDiscovery|pivotEnrichment|pivotEventSimilarity|pivotExtraction|pivotFieldParsing|pivotHost|pivotIngest|pivotLocation|pivotMovie|pivotOffloaded|pivotOrganizer|pivotRichData|pivotScrape|pivotSite|pivotSource|pivotStructured|pivotTag)/,
+      /\/unit\/(?:clusterPivotHostNames|eventPivotIndexes|pivotBatch|pivotCatalog|pivotCuration|pivotDiscovery|pivotEnrichment|pivotEventPrice|pivotEventSimilarity|pivotExtraction|pivotFieldParsing|pivotHost|pivotIngest|pivotLocation|pivotMovie|pivotOffloaded|pivotOrganizer|pivotRichData|pivotScrape|pivotSite|pivotSource|pivotStructured|pivotTag)/,
     ],
     'compute-admin': [
       /\/unit\/(?:pivotAdmin|pivotCompute|pivotFleet|pivotGrowth|pivotLab|pivotTenantInsights|pivotTenantJourney|pivotTenantOps|pivotWeeklyBatchQuality|pivotWeeklyReport)/,
