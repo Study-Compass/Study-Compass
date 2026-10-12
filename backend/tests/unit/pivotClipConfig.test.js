@@ -22,6 +22,11 @@ const {
 } = require('../../utilities/pivotClipConfig');
 const { normalizeTenantOverrides } = require('../../constants/defaultTenants');
 const { getPivotClipDrop } = require('../../services/pivotClipDropService');
+const {
+  getTenantClipAdmin,
+  updateTenantClipConfig,
+  searchClipCandidateEvents,
+} = require('../../services/pivotClipAdminService');
 
 const ID_A = 'aaaaaaaaaaaaaaaaaaaaaaaa';
 const ID_B = 'bbbbbbbbbbbbbbbbbbbbbbbb';
@@ -229,5 +234,97 @@ describe('getPivotClipDrop with a custom deck', () => {
 
     const result = await getPivotClipDrop({}, { tenantKey: 'nyc', now: NOW });
     expect(result.data.events).toHaveLength(1);
+  });
+});
+
+describe('pivotClipAdminService', () => {
+  it('describes each pin’s state and previews the deck, even for a closed city', async () => {
+    getTenantByKey.mockResolvedValue({
+      ...NYC_TENANT,
+      status: 'coming_soon',
+      pivotClipConfig: { deckSource: 'custom', curatedEventIds: [ID_A, ID_B, ID_C, ID_D] },
+    });
+    mockEvents({
+      byId: {
+        [ID_A]: catalogEvent(ID_A),
+        [ID_B]: catalogEvent(ID_B, {
+          start_time: new Date('2026-08-01T23:00:00.000Z'),
+          end_time: new Date('2026-08-02T03:00:00.000Z'),
+        }),
+        [ID_C]: catalogEvent(ID_C),
+      },
+      unpublished: [ID_C],
+    });
+
+    const result = await getTenantClipAdmin({}, { tenantKey: 'nyc', now: NOW });
+
+    expect(result.data.cityStatus).toBe('coming_soon');
+    expect(result.data.curated.map((row) => [row.id, row.state])).toEqual([
+      [ID_A, 'live'],
+      [ID_B, 'ended'],
+      [ID_C, 'unpublished'],
+      [ID_D, 'missing'],
+    ]);
+    expect(result.data.curated[0]).toMatchObject({
+      name: 'event a',
+      hostName: 'public records',
+      batchWeek: '2026-W36',
+    });
+    expect(result.data.preview).toMatchObject({ segment: 'custom', liveWeek: '2026-W33' });
+    expect(result.data.preview.events.map((card) => card.id)).toEqual([ID_A]);
+    expect(result.data.preview).not.toHaveProperty('copy');
+  });
+
+  it('404s cities that are not Just Go', async () => {
+    getTenantByKey.mockResolvedValue({ tenantKey: 'rpi', tenantType: 'campus' });
+    await expect(getTenantClipAdmin({}, { tenantKey: 'rpi' })).resolves.toMatchObject({
+      status: 404,
+      code: 'TENANT_NOT_FOUND',
+    });
+  });
+
+  it('validates and stores the whole config', async () => {
+    getTenantByKey.mockResolvedValue(NYC_TENANT);
+    mockEvents();
+
+    const bad = await updateTenantClipConfig({}, { tenantKey: 'nyc', config: { cardLimit: 0 } });
+    expect(bad).toMatchObject({ status: 400, code: 'INVALID_CLIP_CONFIG' });
+    expect(upsertStoredTenantRow).not.toHaveBeenCalled();
+
+    await updateTenantClipConfig(
+      { user: { globalUserId: 'admin-1' } },
+      { tenantKey: 'nyc', config: { deckSource: 'custom', curatedEventIds: [ID_A] }, now: NOW },
+    );
+    expect(upsertStoredTenantRow).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({
+        tenantKey: 'nyc',
+        pivotClipConfig: {
+          ...PIVOT_CLIP_CONFIG_DEFAULTS,
+          deckSource: 'custom',
+          curatedEventIds: [ID_A],
+        },
+      }),
+      'admin-1',
+    );
+  });
+
+  it('searches published cards across weeks with an escaped name match', async () => {
+    getTenantByKey.mockResolvedValue(NYC_TENANT);
+    const find = mockEvents({ searchRows: [catalogEvent(ID_A)] });
+
+    const result = await searchClipCandidateEvents({}, { tenantKey: 'nyc', q: 'a.b', now: NOW });
+
+    const query = find.mock.calls[0][0];
+    expect(query).not.toHaveProperty(['customFields.pivot.batchWeek']);
+    expect(query['customFields.pivot.ingestStatus']).toBeDefined();
+    expect(query.name.$regex.source).toBe('a\\.b');
+    expect(query.$or).toBeDefined();
+    expect(result.data.events).toEqual([
+      expect.objectContaining({ id: ID_A, state: 'live', batchWeek: '2026-W36' }),
+    ]);
+
+    await searchClipCandidateEvents({}, { tenantKey: 'nyc', includePast: 'true', now: NOW });
+    expect(find.mock.calls[1][0]).not.toHaveProperty('$or');
   });
 });
