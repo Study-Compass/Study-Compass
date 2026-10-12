@@ -1570,6 +1570,7 @@ async function getPivotEventFriends(req, eventId) {
 
 module.exports = {
   getPivotFeed,
+  PUBLISHED_CATALOG_BASE_QUERY,
   getPivotEventFriends,
   getPilotWindow,
   getFeedPilotWindowFilter,
