@@ -261,6 +261,25 @@ describe('pivotOffloadedDiscoveryService (Phase 2, Step 2.2)', () => {
     expect(response.data).toBeUndefined();
   });
 
+  it('upgrades an http calendar page to https in source and job proposals', async () => {
+    mapSite.mockResolvedValue({ links: [{ url: 'http://example-theatre.org/events' }] });
+
+    const result = await runDiscovery();
+    expect(result.data?.result).toBeDefined();
+
+    const executionResult = result.data.result;
+    expect(validateExecutionResult(executionResult)).toEqual({ valid: true });
+    expect(executionResult.proposals.sources).toEqual([
+      expect.objectContaining({
+        url: 'https://example-theatre.org/events',
+        evidence: expect.objectContaining({ indexUrl: 'https://example-theatre.org/events' }),
+      }),
+    ]);
+    expect(executionResult.proposals.curationJobs).toEqual([
+      expect.objectContaining({ url: 'https://example-theatre.org/events' }),
+    ]);
+  });
+
   it('includes rejected source proposals without creating curation jobs', async () => {
     scrapeSiteEvents.mockResolvedValue({
       listLabel: 'Empty Calendar',
