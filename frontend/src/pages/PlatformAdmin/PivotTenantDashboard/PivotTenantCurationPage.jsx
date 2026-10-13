@@ -46,7 +46,11 @@ import usePivotBatchWeekState from './usePivotBatchWeekState';
 import usePivotTenantWeekKeybinds from './usePivotTenantWeekKeybinds';
 import KeybindTooltip from '../../../components/Interface/KeybindTooltip/KeybindTooltip';
 import { FILTER_OPTIONS, eventMatchesFilter } from './curationCatalogFilters';
-import { eventPublishBlock, releaseOutcomeNotification } from './curationPublishFeedback';
+import {
+  eventPublishBlock,
+  locationReviewSavedMessage,
+  releaseOutcomeNotification,
+} from './curationPublishFeedback';
 import useBrokenCatalogImages from './useBrokenCatalogImages';
 import '../PivotLab/PivotLabPage.scss';
 import './PivotTenantDashboard.scss';
@@ -1413,7 +1417,7 @@ function PivotTenantCurationPage({
   );
 
   const handleLocationReview = useCallback(
-    async (eventId, action, richLocation) => {
+    async (eventId, action, richLocation, options = {}) => {
       if (action === 'invalid_json') {
         addNotification({
           title: 'Invalid location JSON',
@@ -1427,7 +1431,7 @@ function PivotTenantCurationPage({
         `/admin/platform/tenants/${tenantKey}/rich-location-migration/reviews/${eventId}`,
         {
           method: 'POST',
-          data: { action, ...(richLocation !== undefined ? { richLocation } : {}) },
+          data: { action, ...(richLocation !== undefined ? { richLocation } : {}), ...options },
         },
       );
       setBusyKey(null);
@@ -1442,7 +1446,7 @@ function PivotTenantCurationPage({
       refreshAll();
       addNotification({
         title: action === 'reject_match' ? 'Google match dismissed' : 'Location resolved',
-        message: data.data?.candidate?.name || '',
+        message: locationReviewSavedMessage(data.data),
         type: 'success',
       });
     },

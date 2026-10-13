@@ -8,6 +8,7 @@ jest.mock('../PivotLab/PivotManualImportModal', () => ({
   isTypingTarget: () => false,
 }));
 jest.mock('../PivotLab/PivotImportThumb', () => () => <span>thumb</span>);
+jest.mock('../../../hooks/useFetch', () => ({ authenticatedRequest: jest.fn() }));
 jest.mock('../PivotLab/PivotTagMultiSelect', () => () => null);
 jest.mock('../../../components/Select/Select', () => () => null);
 jest.mock('./useCurationImmersiveScroll', () => ({
@@ -238,11 +239,12 @@ describe('PivotCurationQueue catalog', () => {
     expect(onStage).not.toHaveBeenCalled();
 
     fireEvent.click(within(popup).getByRole('button', { name: /Fox Oakland/ }));
-    fireEvent.click(within(popup).getByRole('button', { name: 'Use Google' }));
+    fireEvent.click(within(popup).getByRole('button', { name: 'Save location' }));
     expect(onLocationReview).toHaveBeenCalledWith(
       '1',
       'select_match',
       expect.objectContaining({ venueName: 'Fox Oakland' }),
+      expect.objectContaining({ candidateSource: 'provider_candidate' }),
     );
 
     // Once the refreshed event no longer needs review, the resolver closes.
@@ -264,11 +266,13 @@ describe('PivotCurationQueue catalog', () => {
     expect(screen.queryByRole('heading', { name: 'This event is not ready' })).not.toBeInTheDocument();
     expect(document.querySelector('.pivot-curation-location-popup')).toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole('button', { name: 'Mark location TBD' }));
+    fireEvent.click(screen.getByRole('radio', { name: 'TBD' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Save location' }));
     expect(onLocationReview).toHaveBeenCalledWith(
       '1',
       'correct_representation',
       expect.objectContaining({ mode: 'tbd' }),
+      expect.objectContaining({ remember: true }),
     );
 
     fireEvent.keyDown(window, { key: 'Escape' });

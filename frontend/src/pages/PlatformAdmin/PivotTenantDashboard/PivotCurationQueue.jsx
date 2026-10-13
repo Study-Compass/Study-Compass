@@ -2070,6 +2070,7 @@ function PivotCurationQueue({
               candidate={locationCandidate}
               busy={busyKey === `location-${locationCandidate.eventId}`}
               onReview={onLocationReview}
+              tenantKey={tenantKey}
             />
           </PivotCurationPortalPopup>
         ) : null}

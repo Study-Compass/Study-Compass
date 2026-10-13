@@ -146,6 +146,7 @@
     td { max-width: 280px; padding: 8px 9px; color: var(--pivot-ops-ink-muted); border-bottom: 1px solid var(--pivot-ops-border); overflow-wrap: anywhere; vertical-align: top; }
     td > strong { color: var(--pivot-ops-ink); font-size: 11px; }
     code { display: block; color: var(--pivot-ops-ink-soft); font-size: 9px; font-variant-numeric: tabular-nums; }
+    td > small { display: block; margin-top: 3px; color: var(--pivot-ops-accent); font-size: 9px; font-weight: 600; }
     tbody tr.is-selected, tbody tr:hover { background: var(--pivot-ops-accent-soft); }
   }
 

@@ -95,6 +95,16 @@ export function locationReviewCandidate(event) {
   };
 }
 
+/** Notification copy after a review save, including any events it also resolved. */
+export function locationReviewSavedMessage(result = {}) {
+  const name = result?.candidate?.name || '';
+  const updated = Number(result?.matching?.updated) || 0;
+  const parts = [name];
+  if (updated) parts.push(`${updated} more ${updated === 1 ? 'event' : 'events'} with the same text`);
+  if (result?.memory) parts.push('remembered for next time');
+  return parts.filter(Boolean).join(' · ');
+}
+
 export function locationReviewHref(tenantKey, batchWeek, enabled = RICH_LOCATION_MIGRATION_UI_ENABLED) {
   if (!tenantKey || !enabled) return null;
   const params = new URLSearchParams({
