@@ -2,6 +2,7 @@ const globalUserSchema = require('../schemas/globalUser');
 const platformRoleSchema = require('../schemas/platformRole');
 const platformAdminInviteSchema = require('../schemas/platformAdminInvite');
 const tenantMembershipSchema = require('../schemas/tenantMembership');
+const pendingRegistrationSchema = require('../schemas/pendingRegistration');
 const globalSessionSchema = require('../schemas/globalSession');
 const tenantConfigSchema = require('../schemas/tenantConfig');
 const pivotReferralCodeSchema = require('../schemas/pivotReferralCode');
@@ -62,6 +63,11 @@ const getGlobalModels = (req, ...names) => {
             'platform_admin_invites'
         ),
         TenantMembership: db.model('TenantMembership', tenantMembershipSchema, 'tenant_memberships'),
+        PendingRegistration: db.model(
+            'PendingRegistration',
+            pendingRegistrationSchema,
+            'pending_registrations'
+        ),
         Session: db.model('Session', globalSessionSchema, 'sessions'),
         TenantConfig: db.model('TenantConfig', tenantConfigSchema, 'tenant_config'),
         PivotReferralCode: db.model('PivotReferralCode', pivotReferralCodeSchema, 'pivot_referral_codes'),
