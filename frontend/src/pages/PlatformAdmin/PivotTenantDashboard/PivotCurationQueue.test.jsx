@@ -213,6 +213,42 @@ describe('PivotCurationQueue catalog', () => {
     expect(screen.getByRole('complementary', { name: 'Oakland disco dossier' })).toBeInTheDocument();
   });
 
+  it('shows match confidence on the location review tag', () => {
+    mockMatchMedia(false);
+    const events = catalogEvents();
+    events[0].locationReview = {
+      status: 'needs_review',
+      reason: 'confidence_below_auto_apply',
+      confidence: 0.76,
+      candidateMatches: [{ venueName: 'Fox Oakland', formattedAddress: '1807 Telegraph Ave',
+        googlePlaceId: 'ChIJ-fox', coordinates: { type: 'Point', coordinates: [-122.27, 37.81] } }],
+    };
+    renderQueue({ events });
+    const flag = within(eventRow('Oakland disco')).getByText('Location review · 76%');
+    expect(flag).toHaveAttribute('title', expect.stringContaining("Google's top match: Fox Oakland (76% confidence)"));
+  });
+
+  it('offers a bulk Google location action for selected events with a match', () => {
+    mockMatchMedia(false);
+    const onBulkResolveLocation = jest.fn();
+    const events = catalogEvents();
+    events[0].locationReview = {
+      status: 'needs_review',
+      reason: 'ambiguous_provider_matches',
+      candidateMatches: [{ venueName: 'Fox Oakland', formattedAddress: '1807 Telegraph Ave',
+        googlePlaceId: 'ChIJ-fox', coordinates: { type: 'Point', coordinates: [-122.27, 37.81] } }],
+    };
+    renderQueue({ events, onBulkResolveLocation, selectedIds: new Set(['1', '2']) });
+    fireEvent.click(screen.getByRole('button', { name: 'Use Google location (1)' }));
+    expect(onBulkResolveLocation).toHaveBeenCalled();
+  });
+
+  it('hides the bulk Google action when no selected event has a usable match', () => {
+    mockMatchMedia(false);
+    renderQueue({ onBulkResolveLocation: jest.fn(), selectedIds: new Set(['1', '2']) });
+    expect(screen.queryByRole('button', { name: /Use Google location/ })).not.toBeInTheDocument();
+  });
+
   it('resolves a location review in place without leaving curation', () => {
     mockMatchMedia(false);
     const onLocationReview = jest.fn();
