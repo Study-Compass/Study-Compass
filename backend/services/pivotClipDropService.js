@@ -5,6 +5,8 @@
  *
  * Curated with internal `customFields.pivot.clipDrop`. Falls back to the
  * landing's featured segment, then to last week. Neither flag is returned.
+ * A city can instead pin its own list from any week (`pivotClipConfig`,
+ * `deckSource: 'custom'`), played in the admin's order.
  * No ticket links: the clip is a no-account preview, like the landing.
  * Carries the city's Voice overrides for the pack's text (`copy`).
  */
@@ -17,7 +19,12 @@ const {
   resolvePivotDropInstant,
 } = require('../utilities/pivotDropSchedule');
 const { mergePivotDeckConfig } = require('../utilities/pivotDeckConfig');
-const { buildPublishedCatalogQuery } = require('./pivotFeedService');
+const {
+  PUBLISHED_CATALOG_BASE_QUERY,
+  buildPublishedCatalogQuery,
+  isUpcomingPivotEvent,
+} = require('./pivotFeedService');
+const { mergePivotClipConfig, PIVOT_CLIP_CONFIG_DEFAULTS } = require('../utilities/pivotClipConfig');
 const { isRichLocationCapabilityEnabled } = require('../utilities/justGoRichLocationControls');
 const {
   LANDING_EVENT_FIELDS,
@@ -28,7 +35,8 @@ const {
 } = require('./pivotLandingDropService');
 const { getClipDropCopy } = require('./pivotCopyService');
 
-const CLIP_DROP_LIMIT = 12;
+/** Default deck size; a city's `pivotClipConfig.cardLimit` overrides it. */
+const CLIP_DROP_LIMIT = PIVOT_CLIP_CONFIG_DEFAULTS.cardLimit;
 const CLIP_DESCRIPTION_MAX = 600;
 const CLIP_EVENT_FIELDS = `${LANDING_EVENT_FIELDS} description end_time`;
 
@@ -79,22 +87,10 @@ function nextDropAtAfter(tenant, liveWeek, now) {
   }
 }
 
-async function getPivotClipDrop(req, options = {}) {
-  const resolved = await resolvePublicDropTenant(req, options.tenantKey);
-  if (resolved.error) return resolved;
-  const { tenant } = resolved;
-
-  const now = options.now || new Date();
-  const liveWeek = resolvePivotLiveBatchWeek(tenant, now);
+/** The live week's clip cards, then featured, then the same for last week. */
+async function loadClipWeekDeck(Event, tenant, liveWeek, now) {
   const deckConfig = mergePivotDeckConfig(tenant.pivotDeckConfig);
-
-  const db = await connectToDatabase(tenant.tenantKey);
-  const scopedReq = { db, school: tenant.tenantKey };
-  const { Event } = getModels(scopedReq, 'Event');
-
   const weeks = [liveWeek, shiftIsoWeek(liveWeek, -1)].filter(Boolean);
-  let loaded = null;
-  let segment = null;
   for (const week of weeks) {
     for (const candidate of CLIP_SEGMENTS) {
       const result = await loadDropSegmentWeek(Event, tenant, week, now, deckConfig, {
@@ -102,12 +98,60 @@ async function getPivotClipDrop(req, options = {}) {
         fields: CLIP_EVENT_FIELDS,
       });
       if (result.ranked.length > 0) {
-        loaded = result;
-        segment = candidate.segment;
-        break;
+        return { ...result, segment: candidate.segment };
       }
     }
-    if (loaded) break;
+  }
+  return null;
+}
+
+/**
+ * The city's pinned list, any batch week, in the admin's order. Unpublished
+ * or deleted events drop out; ended ones too unless the city keeps them.
+ */
+async function loadClipCuratedEvents(Event, clipConfig, now) {
+  const ids = clipConfig.curatedEventIds || [];
+  if (!ids.length) return [];
+  const events = await Event.find({
+    ...PUBLISHED_CATALOG_BASE_QUERY,
+    _id: { $in: ids },
+  })
+    .select(CLIP_EVENT_FIELDS)
+    .lean();
+  const byId = new Map(events.map((event) => [String(event._id), event]));
+  return ids
+    .map((id) => byId.get(id))
+    .filter((event) => event && (!clipConfig.hidePastEvents || isUpcomingPivotEvent(event, now)));
+}
+
+/**
+ * The clip payload for a resolved city. The public route gates on an active
+ * city first; the admin preview calls this directly.
+ */
+async function buildPivotClipDrop(req, tenant, options = {}) {
+  const now = options.now || new Date();
+  const liveWeek = resolvePivotLiveBatchWeek(tenant, now);
+  const clipConfig = mergePivotClipConfig(tenant.pivotClipConfig);
+
+  const db = await connectToDatabase(tenant.tenantKey);
+  const scopedReq = { db, school: tenant.tenantKey };
+  const { Event } = getModels(scopedReq, 'Event');
+
+  let loaded = null;
+  if (clipConfig.deckSource === 'custom') {
+    const curated = await loadClipCuratedEvents(Event, clipConfig, now);
+    if (curated.length > 0 || !clipConfig.fallbackToWeek) {
+      // Swipes key off the live week so the app imports them with this week's.
+      loaded = {
+        batchWeek: liveWeek,
+        dropAt: resolvePivotDropInstant(tenant, liveWeek, now).dropAt,
+        ranked: curated,
+        segment: curated.length > 0 ? 'custom' : null,
+      };
+    }
+  }
+  if (!loaded) {
+    loaded = await loadClipWeekDeck(Event, tenant, liveWeek, now);
   }
 
   const nextDropAt = nextDropAtAfter(tenant, liveWeek, now);
@@ -124,11 +168,11 @@ async function getPivotClipDrop(req, options = {}) {
       batchWeek: loaded ? loaded.batchWeek : liveWeek,
       liveWeek,
       fallback: Boolean(loaded && loaded.batchWeek !== liveWeek),
-      segment,
+      segment: loaded ? loaded.segment : null,
       dropAt: dropAt.toISOString(),
       ...(nextDropAt ? { nextDropAt: nextDropAt.toISOString() } : {}),
       events: loaded
-        ? loaded.ranked.slice(0, CLIP_DROP_LIMIT).map((event) =>
+        ? loaded.ranked.slice(0, clipConfig.cardLimit).map((event) =>
           serializeClipDropEvent(event, { readsEnabled }))
         : [],
       /** Voice overrides for the pack's text; the clip has no account to fetch them. */
@@ -137,8 +181,15 @@ async function getPivotClipDrop(req, options = {}) {
   };
 }
 
+async function getPivotClipDrop(req, options = {}) {
+  const resolved = await resolvePublicDropTenant(req, options.tenantKey);
+  if (resolved.error) return resolved;
+  return buildPivotClipDrop(req, resolved.tenant, options);
+}
+
 module.exports = {
   getPivotClipDrop,
+  buildPivotClipDrop,
   serializeClipDropEvent,
   buildClipDropQuery,
   CLIP_DROP_LIMIT,

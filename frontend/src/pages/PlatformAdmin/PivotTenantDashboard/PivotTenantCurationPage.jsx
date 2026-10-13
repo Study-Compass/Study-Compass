@@ -34,6 +34,7 @@ import PivotRichDataEnrichmentPopup from './PivotRichDataEnrichmentPopup';
 import PivotTenantSourcesPanel from './PivotTenantSourcesPanel';
 import PivotComputeJobRunStatus, { useTenantComputeJob } from './PivotComputeJobRunStatus';
 import { buildAdminCreateJobRequest } from './pivotComputeJobActions';
+import { describeComputeJobWake } from './pivotComputeJobsFormat';
 import Popup from '../../../components/Popup/Popup';
 import PivotTenantPage from './PivotTenantPage';
 import PivotBatchWeekPicker from './PivotBatchWeekPicker';
@@ -829,9 +830,11 @@ function PivotTenantCurationPage({
       refreshCompute.trackCreated(data);
       addNotification({
         title: data.created ? 'Refresh job created' : 'Refresh job already queued',
-        message: data?.wake?.status === 'accepted'
-          ? `“${job.label}” is queued for ${committedWeek}, and the Mini accepted the wake request.`
-          : `“${job.label}” is safely queued for ${committedWeek}. The Mini will collect it on its next poll.`,
+        message: describeComputeJobWake(data?.wake, {
+          local: `“${job.label}” is running on this machine for ${committedWeek}.`,
+          accepted: `“${job.label}” is queued for ${committedWeek}, and the Mini accepted the wake request.`,
+          queued: `“${job.label}” is safely queued for ${committedWeek}. The Mini will collect it on its next poll.`,
+        }),
         type: 'success',
       });
     },
@@ -880,9 +883,11 @@ function PivotTenantCurationPage({
     refreshCompute.trackCreated(data);
     addNotification({
       title: data.created ? 'Refresh job created' : 'Refresh job already queued',
-      message: data?.wake?.status === 'accepted'
-        ? `${runnableJobCount} source(s) are queued for ${committedWeek}, and the Mini accepted the wake request.`
-        : `${runnableJobCount} source(s) are safely queued for ${committedWeek}. The Mini will collect the job on its next poll.`,
+      message: describeComputeJobWake(data?.wake, {
+        local: `${runnableJobCount} source(s) are running on this machine for ${committedWeek}.`,
+        accepted: `${runnableJobCount} source(s) are queued for ${committedWeek}, and the Mini accepted the wake request.`,
+        queued: `${runnableJobCount} source(s) are safely queued for ${committedWeek}. The Mini will collect the job on its next poll.`,
+      }),
       type: 'success',
     });
   }, [
@@ -1405,6 +1410,43 @@ function PivotTenantCurationPage({
       });
     },
     [addNotification, patchEventOverrides, refreshAll],
+  );
+
+  const handleLocationReview = useCallback(
+    async (eventId, action, richLocation) => {
+      if (action === 'invalid_json') {
+        addNotification({
+          title: 'Invalid location JSON',
+          message: 'The rich location must be valid JSON.',
+          type: 'error',
+        });
+        return;
+      }
+      setBusyKey(`location-${eventId}`);
+      const { data, error } = await authenticatedRequest(
+        `/admin/platform/tenants/${tenantKey}/rich-location-migration/reviews/${eventId}`,
+        {
+          method: 'POST',
+          data: { action, ...(richLocation !== undefined ? { richLocation } : {}) },
+        },
+      );
+      setBusyKey(null);
+      if (error || !data?.success) {
+        addNotification({
+          title: 'Could not save location',
+          message: data?.message || error || 'Request failed',
+          type: 'error',
+        });
+        return;
+      }
+      refreshAll();
+      addNotification({
+        title: action === 'reject_match' ? 'Google match dismissed' : 'Location resolved',
+        message: data.data?.candidate?.name || '',
+        type: 'success',
+      });
+    },
+    [addNotification, refreshAll, tenantKey],
   );
 
   const handleBulkEditorial = useCallback(
@@ -2808,6 +2850,7 @@ function PivotTenantCurationPage({
             onBulkUnfeature={handleBulkUnfeature}
             onToggleFeatured={handleToggleFeatured}
             onEditorialChange={handleEditorialChange}
+            onLocationReview={handleLocationReview}
             onBulkEditorial={handleBulkEditorial}
             selectionPolicy={selectionPolicy}
             onSelectionPolicyChange={handleSelectionPolicyChange}
