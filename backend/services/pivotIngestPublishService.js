@@ -55,6 +55,7 @@ const {
 } = require('./pivotOrganizerResolveService');
 const { isRichLocationCapabilityEnabled } = require('../utilities/justGoRichLocationControls');
 const { resolveIngestRichLocation } = require('./pivotIngestRichLocationService');
+const { createLocationMemoryLookup } = require('./pivotLocationMemoryService');
 const {
   assessJustGoLocationReview,
   justGoLocationMatchText,
@@ -721,6 +722,10 @@ async function publishIngestEvent(req, options = {}) {
       location: mergedForSave.location,
       rawLocationText: mergedForSave.rawLocationText,
       googleAdapter: options.googleLocationAdapter,
+      locationMemoryLookup: options.locationMemoryLookup || createLocationMemoryLookup({
+        db,
+        tenantKey: tenantResult.tenant.tenantKey,
+      }),
       beforeProviderCall: options.beforeLocationProviderCall,
       now: options.locationNow,
     });
