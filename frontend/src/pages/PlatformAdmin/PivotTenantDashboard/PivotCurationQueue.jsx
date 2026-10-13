@@ -14,8 +14,11 @@ import { dragRangeSelection, nextSelection, reconcileCatalogAnchor, sameIdSet } 
 import useCurationImmersiveScroll from './useCurationImmersiveScroll';
 import { eventMatchesCatalogSearch } from './curationCatalogFilters';
 import {
+  bulkGoogleLocationEvents,
   locationReviewBlock,
   locationReviewCandidate,
+  locationReviewConfidencePercent,
+  locationReviewGoogleMatch,
   locationReviewHref,
   coverImageBlock,
   eventPublishBlock,
@@ -423,12 +426,7 @@ const CatalogRow = React.memo(function CatalogRow({
           </span>
         ) : null}
         {locationReviewBlock(event) ? (
-          <span
-            className="pivot-curation-sheet__review-flag"
-            title={locationReviewBlock(event).detail}
-          >
-            Location review
-          </span>
+          <LocationReviewFlag event={event} />
         ) : null}
         {imageBroken ? (
           <span
@@ -920,6 +918,25 @@ function WeightPopupCard({ event, busy, onSave, onCancel }) {
   );
 }
 
+function LocationReviewFlag({ event }) {
+  const block = locationReviewBlock(event);
+  const percent = locationReviewConfidencePercent(event);
+  const match = locationReviewGoogleMatch(event);
+  const matchLabel = match ? match.venueName || match.publicDisplayLabel || match.formattedAddress : null;
+  const title = [
+    block.detail,
+    matchLabel
+      ? `Google's top match: ${matchLabel}${percent != null ? ` (${percent}% confidence)` : ''}.`
+      : 'No Google match to accept.',
+  ].join(' ');
+  const tone = percent == null ? '' : percent >= 85 ? ' is-likely' : percent < 60 ? ' is-weak' : '';
+  return (
+    <span className={`pivot-curation-sheet__review-flag${tone}`} title={title}>
+      Location review{percent != null ? ` · ${percent}%` : ''}
+    </span>
+  );
+}
+
 function PivotCurationQueue({
   tenantKey,
   batchWeek,
@@ -961,6 +978,7 @@ function PivotCurationQueue({
   onToggleFeatured,
   onEditorialChange,
   onLocationReview,
+  onBulkResolveLocation,
   onBulkEditorial,
   selectionPolicy,
   onSelectionPolicyChange,
@@ -1146,6 +1164,7 @@ function PivotCurationQueue({
   const selectedUnfeaturedCount = selectedEvents.filter((e) => e.featured !== true).length;
   const selectedFeaturedCount = selectedEvents.filter((e) => e.featured === true).length;
   const selectedMissingRichCount = selectedEvents.filter((e) => e.needsRichData).length;
+  const selectedGoogleLocationCount = bulkGoogleLocationEvents(selectedEvents).length;
   const [bulkEditorialTier, setBulkEditorialTier] = useState('standard');
   const editorialCounts = useMemo(() => {
     const counts = { hidden: 0, demote: 0, promote: 0, strong_promote: 0, must_show: 0 };
@@ -1952,6 +1971,19 @@ function PivotCurationQueue({
                       : `Roll up showtimes (${selectedIds.size})`}
                   </button>
                 ) : null}
+                {onBulkResolveLocation && selectedGoogleLocationCount > 0 ? (
+                  <button
+                    type="button"
+                    className="linear-btn linear-btn--secondary"
+                    onClick={() => onBulkResolveLocation()}
+                    disabled={busyKey === 'bulk-location'}
+                    title="Accept Google's top match for selected events waiting on location review. Out-of-city matches are skipped."
+                  >
+                    {busyKey === 'bulk-location'
+                      ? 'Resolving…'
+                      : `Use Google location (${selectedGoogleLocationCount})`}
+                  </button>
+                ) : null}
                 {selectedDraftCount > 0 ? (
                   <button
                     type="button"
@@ -2070,6 +2102,7 @@ function PivotCurationQueue({
               candidate={locationCandidate}
               busy={busyKey === `location-${locationCandidate.eventId}`}
               onReview={onLocationReview}
+              tenantKey={tenantKey}
             />
           </PivotCurationPortalPopup>
         ) : null}

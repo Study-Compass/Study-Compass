@@ -3689,6 +3689,9 @@ router.post(
         candidateId: req.body?.candidateId,
         richLocation: req.body?.richLocation,
         notes: req.body?.notes,
+        candidateSource: req.body?.candidateSource,
+        remember: req.body?.remember === true,
+        applyToMatching: req.body?.applyToMatching === true,
       });
       if (result.error) {
         return res.status(result.status || 400).json({

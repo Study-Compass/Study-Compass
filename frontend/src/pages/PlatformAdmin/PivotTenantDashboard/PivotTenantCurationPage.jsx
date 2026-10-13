@@ -46,7 +46,13 @@ import usePivotBatchWeekState from './usePivotBatchWeekState';
 import usePivotTenantWeekKeybinds from './usePivotTenantWeekKeybinds';
 import KeybindTooltip from '../../../components/Interface/KeybindTooltip/KeybindTooltip';
 import { FILTER_OPTIONS, eventMatchesFilter } from './curationCatalogFilters';
-import { eventPublishBlock, releaseOutcomeNotification } from './curationPublishFeedback';
+import {
+  bulkGoogleLocationEvents,
+  eventPublishBlock,
+  googleMatchReviewRequest,
+  locationReviewSavedMessage,
+  releaseOutcomeNotification,
+} from './curationPublishFeedback';
 import useBrokenCatalogImages from './useBrokenCatalogImages';
 import '../PivotLab/PivotLabPage.scss';
 import './PivotTenantDashboard.scss';
@@ -1413,7 +1419,7 @@ function PivotTenantCurationPage({
   );
 
   const handleLocationReview = useCallback(
-    async (eventId, action, richLocation) => {
+    async (eventId, action, richLocation, options = {}) => {
       if (action === 'invalid_json') {
         addNotification({
           title: 'Invalid location JSON',
@@ -1427,7 +1433,7 @@ function PivotTenantCurationPage({
         `/admin/platform/tenants/${tenantKey}/rich-location-migration/reviews/${eventId}`,
         {
           method: 'POST',
-          data: { action, ...(richLocation !== undefined ? { richLocation } : {}) },
+          data: { action, ...(richLocation !== undefined ? { richLocation } : {}), ...options },
         },
       );
       setBusyKey(null);
@@ -1442,12 +1448,42 @@ function PivotTenantCurationPage({
       refreshAll();
       addNotification({
         title: action === 'reject_match' ? 'Google match dismissed' : 'Location resolved',
-        message: data.data?.candidate?.name || '',
+        message: locationReviewSavedMessage(data.data),
         type: 'success',
       });
     },
     [addNotification, refreshAll, tenantKey],
   );
+
+  const handleBulkResolveLocation = useCallback(async () => {
+    const eligible = bulkGoogleLocationEvents(selectedEvents);
+    if (!eligible.length) return;
+    setBusyKey('bulk-location');
+    let ok = 0;
+    let failed = 0;
+    // One at a time: each save also remembers the text for later scrapes.
+    for (const event of eligible) {
+      const { data, error } = await authenticatedRequest(
+        `/admin/platform/tenants/${tenantKey}/rich-location-migration/reviews/${event._id}`,
+        { method: 'POST', data: googleMatchReviewRequest(event) },
+      );
+      if (error || !data?.success) failed += 1;
+      else ok += 1;
+    }
+    setBusyKey(null);
+    refreshAll();
+    const skipped = selectedEvents.filter((event) => event.locationReview?.status === 'needs_review')
+      .length - eligible.length;
+    addNotification({
+      title: failed ? 'Some locations were not resolved' : 'Locations resolved with Google',
+      message: [
+        `${ok} resolved`,
+        failed ? `${failed} failed` : null,
+        skipped > 0 ? `${skipped} need a manual look (no match, or outside the city)` : null,
+      ].filter(Boolean).join(' · '),
+      type: failed ? 'warning' : 'success',
+    });
+  }, [addNotification, refreshAll, selectedEvents, tenantKey]);
 
   const handleBulkEditorial = useCallback(
     async (tier) => {
@@ -2851,6 +2887,7 @@ function PivotTenantCurationPage({
             onToggleFeatured={handleToggleFeatured}
             onEditorialChange={handleEditorialChange}
             onLocationReview={handleLocationReview}
+            onBulkResolveLocation={handleBulkResolveLocation}
             onBulkEditorial={handleBulkEditorial}
             selectionPolicy={selectionPolicy}
             onSelectionPolicyChange={handleSelectionPolicyChange}
