@@ -443,6 +443,48 @@ describe('JustGoLanding', () => {
     expect(screen.getByText(justGoLandingCopy.deckDownloadBody)).toBeInTheDocument();
   });
 
+  it('opens the App Store when the last card is swiped', async () => {
+    const originalLocation = window.location;
+    const originalPointerEvent = window.PointerEvent;
+    const assign = jest.fn();
+    delete window.location;
+    window.location = { ...originalLocation, assign, search: '', hash: '' };
+    if (!window.PointerEvent) {
+      window.PointerEvent = class extends MouseEvent {
+        constructor(type, init = {}) {
+          super(type, init);
+          this.pointerId = init.pointerId ?? 1;
+        }
+      };
+    }
+    try {
+      await renderLanding({ desktop: false });
+      expect(await screen.findByRole('heading', { name: 'friday night market' })).toBeInTheDocument();
+      for (let i = 0; i < 4; i += 1) {
+        fireEvent.click(screen.getByRole('button', { name: justGoLandingCopy.deckPass }));
+      }
+      await screen.findByRole('heading', { name: justGoLandingCopy.deckDownloadTitle });
+
+      const card = document.querySelector('.justgo-landing-deck__card--top');
+      fireEvent.pointerDown(card, { pointerId: 1, button: 0, clientX: 200, clientY: 300 });
+      fireEvent.pointerMove(card, { pointerId: 1, clientX: 260, clientY: 302 });
+      fireEvent.pointerMove(card, { pointerId: 1, clientX: 500, clientY: 305 });
+      fireEvent.pointerUp(card, { pointerId: 1, clientX: 500, clientY: 305 });
+
+      expect(assign).toHaveBeenCalledWith(JUSTGO_IOS_STORE_URL);
+      expect(mockApi).toHaveBeenCalledWith(
+        '/pivot/landing/event',
+        expect.objectContaining({ type: 'store_click', store: 'ios' }),
+      );
+      expect(
+        screen.getByRole('heading', { name: justGoLandingCopy.deckDownloadTitle }),
+      ).toBeInTheDocument();
+    } finally {
+      window.location = originalLocation;
+      window.PointerEvent = originalPointerEvent;
+    }
+  });
+
   it('labels the deck last week when the drop falls back', async () => {
     mockApi.mockImplementation((url) => {
       if (url === '/pivot/landing/config') {
