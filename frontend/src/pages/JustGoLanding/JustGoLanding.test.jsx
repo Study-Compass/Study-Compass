@@ -16,6 +16,7 @@ const mockApi = jest.fn();
 const mockScreen = jest.fn();
 const mockTrack = jest.fn();
 const mockIsJustGoHost = jest.fn(() => false);
+const mockBrowserTimeZone = jest.fn(() => '');
 
 jest.mock('../../utils/postRequest', () => (...args) => mockApi(...args));
 jest.mock('../../services/analytics/analytics', () => ({
@@ -34,6 +35,10 @@ jest.mock('../../config/tenantRedirect', () => {
     isJustGoHost: (...args) => mockIsJustGoHost(...args),
   };
 });
+jest.mock('./justGoPosterTzHop', () => ({
+  ...jest.requireActual('./justGoPosterTzHop'),
+  getBrowserTimeZone: () => mockBrowserTimeZone(),
+}));
 jest.mock('@iconify-icon/react/dist/iconify.mjs', () => ({
   Icon: () => null,
 }));
@@ -168,6 +173,8 @@ beforeEach(() => {
   mockTrack.mockReset();
   mockIsJustGoHost.mockReset();
   mockIsJustGoHost.mockReturnValue(false);
+  mockBrowserTimeZone.mockReset();
+  mockBrowserTimeZone.mockReturnValue('');
   window.localStorage.clear();
   window.sessionStorage.clear();
   resetLandingQrScanMemo();
@@ -598,6 +605,26 @@ describe('JustGoLanding', () => {
 
     expect(await screen.findByText(/^live in troy$/i)).toBeInTheDocument();
     expect(screen.queryByText(/live in brooklyn/i)).not.toBeInTheDocument();
+  });
+
+  it('renders the zone city on a bare Just Go landing without changing the URL', async () => {
+    mockIsJustGoHost.mockReturnValue(true);
+    mockBrowserTimeZone.mockReturnValue('America/New_York');
+    await renderLanding({ path: '/', proof: null });
+
+    expect(await screen.findByText(/^live in troy$/i)).toBeInTheDocument();
+    expect(screen.queryByText(/live in brooklyn/i)).not.toBeInTheDocument();
+    expect(mockApi).toHaveBeenCalledWith('/pivot/landing/config', null, { method: 'GET' });
+    const link = document.querySelector('link[rel="canonical"][data-justgo-canonical]');
+    expect(link?.getAttribute('href')).toBe(justGoPublicLandingUrl());
+  });
+
+  it('keeps every city when the zone city is not listed', async () => {
+    mockIsJustGoHost.mockReturnValue(true);
+    mockBrowserTimeZone.mockReturnValue('America/Los_Angeles');
+    await renderLanding({ path: '/' });
+
+    expect(screen.getByText(/live in brooklyn/i)).toBeInTheDocument();
   });
 
   it('keeps campus / as campus landing when not a Just Go host', () => {
