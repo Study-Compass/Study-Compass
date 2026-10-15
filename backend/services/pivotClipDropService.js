@@ -7,7 +7,8 @@
  * landing's featured segment, then to last week. Neither flag is returned.
  * A city can instead pin its own list from any week (`pivotClipConfig`,
  * `deckSource: 'custom'`), played in the admin's order.
- * No ticket links: the clip is a no-account preview, like the landing.
+ * No ticket links: the clip is a no-account preview, like the landing. Cards
+ * carry the feed's details, movie, and showtimes for the clip's detail sheet.
  * Carries the city's Voice overrides for the pack's text (`copy`).
  */
 
@@ -34,6 +35,12 @@ const {
   serializeLandingDropEvent,
 } = require('./pivotLandingDropService');
 const { getClipDropCopy } = require('./pivotCopyService');
+const { eventDetailsForFeed } = require('../utilities/pivotEventPrice');
+const { serializePivotMovie } = require('../utilities/pivotMovieMetadata');
+const {
+  normalizePivotTimeSlots,
+  serializePivotTimeSlots,
+} = require('../utilities/pivotTimeSlots');
 
 /** Default deck size; a city's `pivotClipConfig.cardLimit` overrides it. */
 const CLIP_DROP_LIMIT = PIVOT_CLIP_CONFIG_DEFAULTS.cardLimit;
@@ -68,12 +75,19 @@ function serializeClipDropEvent(event, options = {}) {
       .map((tag) => tag.trim())
     : [];
   const description = clipDescription(event);
+  const pivot = event.customFields?.pivot || {};
+  const details = eventDetailsForFeed(pivot);
+  const movie = serializePivotMovie(pivot.movie);
+  const slots = normalizePivotTimeSlots(pivot.timeSlots);
 
   return {
     ...card,
     ...(event.end_time ? { endTime: event.end_time } : {}),
     ...(description ? { description } : {}),
     ...(tags.length ? { tags } : {}),
+    ...(details ? { details } : {}),
+    ...(movie ? { movie } : {}),
+    ...(slots.length ? { timeSlots: serializePivotTimeSlots(slots) } : {}),
   };
 }
 
