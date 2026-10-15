@@ -147,6 +147,46 @@ describe('getPivotClipDrop', () => {
     expect(CLIP_EVENT_FIELDS).not.toContain('externalLink');
   });
 
+  it('carries details, movie, and showtimes for the detail sheet', async () => {
+    mockEventFindBySegment({
+      '2026-W33:clip': [
+        catalogEvent({
+          _id: 'film',
+          customFields: {
+            pivot: {
+              details: {
+                version: 1,
+                admission: 'paid',
+                priceRange: { min: { amountMinor: 1500, currency: 'USD' } },
+              },
+              movie: { tmdbId: 655, title: 'Paris, Texas', runtimeMinutes: 145 },
+              timeSlots: [
+                { id: 'early', start_time: '2026-08-14T23:00:00.000Z' },
+              ],
+            },
+          },
+        }),
+        catalogEvent({ _id: 'plain', start_time: new Date('2026-08-15T23:00:00.000Z') }),
+      ],
+    });
+
+    const result = await getPivotClipDrop({}, { tenantKey: 'nyc', now: HOUR_BEFORE_NEXT_DROP });
+    const film = result.data.events.find((card) => card.id === 'film');
+    const plain = result.data.events.find((card) => card.id === 'plain');
+
+    expect(film.details).toMatchObject({
+      admission: 'paid',
+      priceRange: { min: { amountMinor: 1500, currency: 'USD' } },
+    });
+    expect(film.movie).toMatchObject({ title: 'Paris, Texas', runtimeMinutes: 145 });
+    expect(film.timeSlots).toEqual([
+      expect.objectContaining({ id: 'early', start_time: '2026-08-14T23:00:00.000Z' }),
+    ]);
+    expect(plain).not.toHaveProperty('details');
+    expect(plain).not.toHaveProperty('movie');
+    expect(plain).not.toHaveProperty('timeSlots');
+  });
+
   it('carries an empty Voice overlay when copy is unavailable', async () => {
     mockEventFindBySegment({ '2026-W33:clip': [catalogEvent({ _id: 'fri' })] });
 
