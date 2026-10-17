@@ -74,7 +74,10 @@ const {
   redeemPivotEntry,
 } = require('../services/pivotEntryService');
 const { getPivotLandingDrop } = require('../services/pivotLandingDropService');
-const { getPivotClipDrop } = require('../services/pivotClipDropService');
+const {
+  getPivotClipDrop,
+  getPivotCityWeekCounts,
+} = require('../services/pivotClipDropService');
 const { recordLandingEvent, getLandingConfig } = require('../services/pivotLandingService');
 const { joinWaitlist } = require('../services/pivotLandingWaitlistService');
 const {joinCityInterest} = require('../services/justGoCityInterestService');
@@ -334,6 +337,28 @@ router.get('/landing/drop', pivotLandingDropRateLimit, async (req, res) => {
     return res.status(500).json({
       success: false,
       message: 'Unable to load this week’s drop.',
+    });
+  }
+});
+
+/** How much is on in a city this week (the journey's haystack) — public, counts only. */
+router.get('/clip/week-counts', pivotClipDropRateLimit, async (req, res) => {
+  try {
+    const result = await getPivotCityWeekCounts(req, { tenantKey: req.query.tenantKey });
+    if (result.error) {
+      return res.status(result.status || 400).json({
+        success: false,
+        message: result.error,
+        code: result.code,
+      });
+    }
+    res.set('Cache-Control', 'public, max-age=300');
+    return res.status(200).json({ success: true, data: result.data });
+  } catch (err) {
+    logPivotRouteError('GET /pivot/clip/week-counts', err, req);
+    return res.status(500).json({
+      success: false,
+      message: 'Unable to count this week’s events.',
     });
   }
 });

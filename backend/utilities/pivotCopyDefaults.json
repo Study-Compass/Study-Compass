@@ -4090,6 +4090,12 @@
       "shipped": "who’s in your circle?"
     },
     {
+      "path": "journey.city.backToList",
+      "kind": "string",
+      "params": [],
+      "shipped": "back to the list"
+    },
+    {
       "path": "journey.city.cta",
       "kind": "string",
       "params": [],
@@ -4105,7 +4111,13 @@
       "path": "journey.city.elsewhereBody",
       "kind": "string",
       "params": [],
-      "shipped": "not there yet? peek at a live city."
+      "shipped": "search any city. not live yet? we’ll tell you when."
+    },
+    {
+      "path": "journey.city.searchLabel",
+      "kind": "string",
+      "params": [],
+      "shipped": "which city?"
     },
     {
       "path": "journey.city.subtitle",
@@ -4139,6 +4151,36 @@
         "total": 170,
         "saved": 2
       }
+    },
+    {
+      "path": "journey.drop.empty",
+      "kind": "string",
+      "params": [],
+      "shipped": "this week’s drop is still cooking."
+    },
+    {
+      "path": "journey.drop.emptyBody",
+      "kind": "string",
+      "params": [],
+      "shipped": "you’ll get it the moment it lands."
+    },
+    {
+      "path": "journey.drop.emptyCta",
+      "kind": "string",
+      "params": [],
+      "shipped": "keep going"
+    },
+    {
+      "path": "journey.drop.loadError",
+      "kind": "string",
+      "params": [],
+      "shipped": "couldn’t open this week’s drop."
+    },
+    {
+      "path": "journey.drop.retry",
+      "kind": "string",
+      "params": [],
+      "shipped": "try again"
     },
     {
       "path": "journey.haystack.and",
