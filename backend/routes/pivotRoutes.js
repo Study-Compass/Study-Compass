@@ -588,6 +588,31 @@ router.put('/profile/plan-visibility', verifyToken, async (req, res) => {
   }
 });
 
+/**
+ * The interest tag vocabulary, public: the onboarding journey shows it
+ * before there's an account. Active tags only; slugs and labels.
+ */
+router.get('/catalog/tags', pivotLandingConfigRateLimit, async (req, res) => {
+  try {
+    const result = await listPivotTags(req);
+    if (result.error) {
+      return res.status(result.status || 400).json({
+        success: false,
+        message: result.error,
+        code: result.code,
+      });
+    }
+    res.set('Cache-Control', 'public, max-age=300');
+    return res.status(200).json({ success: true, data: result.data });
+  } catch (err) {
+    logPivotRouteError('GET /pivot/catalog/tags', err, req);
+    return res.status(500).json({
+      success: false,
+      message: 'Unable to load pivot tags.',
+    });
+  }
+});
+
 router.get('/tags', verifyToken, async (req, res) => {
   try {
     const result = await listPivotTags(req);

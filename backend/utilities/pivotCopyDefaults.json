@@ -4338,10 +4338,46 @@
       "shipped": "continue with email"
     },
     {
+      "path": "journey.nameIt.emailInvalid",
+      "kind": "string",
+      "params": [],
+      "shipped": "that email doesn’t look right."
+    },
+    {
+      "path": "journey.nameIt.error",
+      "kind": "string",
+      "params": [],
+      "shipped": "couldn’t sign you in. try again."
+    },
+    {
       "path": "journey.nameIt.google",
       "kind": "string",
       "params": [],
       "shipped": "continue with google"
+    },
+    {
+      "path": "journey.nameIt.mfaCodeRequired",
+      "kind": "string",
+      "params": [],
+      "shipped": "enter the code from your authenticator app."
+    },
+    {
+      "path": "journey.nameIt.passwordMismatch",
+      "kind": "string",
+      "params": [],
+      "shipped": "those passwords don’t match."
+    },
+    {
+      "path": "journey.nameIt.passwordShort",
+      "kind": "string",
+      "params": [],
+      "shipped": "passwords need at least 8 characters."
+    },
+    {
+      "path": "journey.nameIt.saving",
+      "kind": "string",
+      "params": [],
+      "shipped": "putting your name on it…"
     },
     {
       "path": "journey.nameIt.subtitle",
@@ -4535,6 +4571,12 @@
       "shipped": "9-5"
     },
     {
+      "path": "journey.thatsTheWeek.addYourOwn",
+      "kind": "string",
+      "params": [],
+      "shipped": "add your own"
+    },
+    {
       "path": "journey.thatsTheWeek.body",
       "kind": "string",
       "params": [],
@@ -4551,6 +4593,18 @@
       "kind": "string",
       "params": [],
       "shipped": "saved nothing? picky. we’ll learn from that too."
+    },
+    {
+      "path": "journey.thatsTheWeek.pickerDone",
+      "kind": "string",
+      "params": [],
+      "shipped": "done"
+    },
+    {
+      "path": "journey.thatsTheWeek.pickerTitle",
+      "kind": "string",
+      "params": [],
+      "shipped": "what are you into?"
     },
     {
       "path": "journey.thatsTheWeek.stickersHint",
