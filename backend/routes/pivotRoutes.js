@@ -28,7 +28,10 @@ const {
   submitEventFeedback,
   listUserPivotEventFeedback,
 } = require('../services/pivotFeedbackService');
-const { getPivotConfig } = require('../services/pivotConfigService');
+const {
+  getPivotConfig,
+  getPivotOnboardingVariant,
+} = require('../services/pivotConfigService');
 const {
   getPivotCopy,
   getPlatformLandingCopy,
@@ -177,6 +180,24 @@ router.post('/city-interest', pivotLandingWaitlistRateLimit, async (req, res) =>
   } catch (err) {
     logPivotRouteError('POST /pivot/city-interest', err, req);
     return res.status(500).json({success: false, message: 'Unable to join this city waitlist.'});
+  }
+});
+
+// Public: the app reads this before sign-in to pick which first run to show.
+router.get('/onboarding-variant', pivotLandingConfigRateLimit, (req, res) => {
+  try {
+    const result = getPivotOnboardingVariant();
+    res.set('Cache-Control', 'public, max-age=60');
+    return res.status(200).json({
+      success: true,
+      data: result.data,
+    });
+  } catch (err) {
+    logPivotRouteError('GET /pivot/onboarding-variant', err, req);
+    return res.status(500).json({
+      success: false,
+      message: 'Unable to load onboarding variant.',
+    });
   }
 });
 
