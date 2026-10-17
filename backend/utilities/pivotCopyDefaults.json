@@ -2035,6 +2035,17 @@
       "shipped": "friday plans"
     },
     {
+      "path": "crew.onboarding.shareCode",
+      "kind": "template",
+      "params": [
+        "code"
+      ],
+      "shipped": "or type {code} in just go",
+      "sampleArgs": {
+        "code": "Q7601Z"
+      }
+    },
+    {
       "path": "crew.onboarding.shareCta",
       "kind": "string",
       "params": [],
@@ -4021,61 +4032,196 @@
       "path": "journey.circle.added",
       "kind": "string",
       "params": [],
-      "shipped": "in"
+      "shipped": "added"
     },
     {
-      "path": "journey.circle.circleName",
+      "path": "journey.circle.checking",
       "kind": "string",
       "params": [],
-      "shipped": "your circle"
+      "shipped": "checking…"
     },
     {
-      "path": "journey.circle.ctaCount",
+      "path": "journey.circle.choose",
+      "kind": "string",
+      "params": [],
+      "shipped": "that’s me"
+    },
+    {
+      "path": "journey.circle.code",
       "kind": "template",
       "params": [
-        "size"
+        "code"
       ],
-      "shipped": "make my circle ({size})",
+      "shipped": "code {code}",
       "sampleArgs": {
-        "size": 3
+        "code": "Q7601Z"
       }
     },
     {
-      "path": "journey.circle.ctaEmpty",
+      "path": "journey.circle.codeBody",
       "kind": "string",
       "params": [],
-      "shipped": "pick a few friends"
+      "shipped": "six characters, from your friend’s circle."
     },
     {
-      "path": "journey.circle.matchBody",
+      "path": "journey.circle.codeHint",
+      "kind": "string",
+      "params": [],
+      "shipped": "hold to paste"
+    },
+    {
+      "path": "journey.circle.codeTitle",
+      "kind": "string",
+      "params": [],
+      "shipped": "what’s their code?"
+    },
+    {
+      "path": "journey.circle.create",
+      "kind": "string",
+      "params": [],
+      "shipped": "make it"
+    },
+    {
+      "path": "journey.circle.done",
+      "kind": "string",
+      "params": [],
+      "shipped": "circle’s set"
+    },
+    {
+      "path": "journey.circle.foundTitle",
+      "kind": "string",
+      "params": [],
+      "shipped": "is this your circle?"
+    },
+    {
+      "path": "journey.circle.invite",
+      "kind": "string",
+      "params": [],
+      "shipped": "invite"
+    },
+    {
+      "path": "journey.circle.inviteSection",
+      "kind": "string",
+      "params": [],
+      "shipped": "invite"
+    },
+    {
+      "path": "journey.circle.joinBody",
+      "kind": "string",
+      "params": [],
+      "shipped": "they’ll have a six-character code."
+    },
+    {
+      "path": "journey.circle.joinCta",
       "kind": "template",
       "params": [
-        "name",
-        "eventName"
+        "name"
       ],
-      "shipped": "{name} saved {eventName} too.",
+      "shipped": "join {name}",
       "sampleArgs": {
-        "name": "alex",
-        "eventName": "comedy night"
+        "name": "alex"
       }
     },
     {
-      "path": "journey.circle.matchCta",
+      "path": "journey.circle.joinTitle",
       "kind": "string",
       "params": [],
-      "shipped": "nice"
+      "shipped": "join a friend’s"
     },
     {
-      "path": "journey.circle.matchTitle",
+      "path": "journey.circle.later",
       "kind": "string",
       "params": [],
-      "shipped": "it’s a plan."
+      "shipped": "i’ll do this later"
+    },
+    {
+      "path": "journey.circle.memberCount",
+      "kind": "template",
+      "params": [
+        "count"
+      ],
+      "shipped": "{count, plural, one {# person in it} other {# people in it}}",
+      "sampleArgs": {
+        "count": 2
+      }
+    },
+    {
+      "path": "journey.circle.nameLabel",
+      "kind": "string",
+      "params": [],
+      "shipped": "circle name"
+    },
+    {
+      "path": "journey.circle.namePlaceholder",
+      "kind": "string",
+      "params": [],
+      "shipped": "friday people"
+    },
+    {
+      "path": "journey.circle.nameTitle",
+      "kind": "string",
+      "params": [],
+      "shipped": "name your circle"
+    },
+    {
+      "path": "journey.circle.notIt",
+      "kind": "string",
+      "params": [],
+      "shipped": "not this one"
+    },
+    {
+      "path": "journey.circle.onJustGo",
+      "kind": "string",
+      "params": [],
+      "shipped": "on just go"
+    },
+    {
+      "path": "journey.circle.peopleBody",
+      "kind": "string",
+      "params": [],
+      "shipped": "you’ll pick one night a week together."
+    },
+    {
+      "path": "journey.circle.peopleTitle",
+      "kind": "string",
+      "params": [],
+      "shipped": "who’s in?"
+    },
+    {
+      "path": "journey.circle.searchLabel",
+      "kind": "string",
+      "params": [],
+      "shipped": "find someone on just go"
+    },
+    {
+      "path": "journey.circle.sendLink",
+      "kind": "string",
+      "params": [],
+      "shipped": "send invite link"
     },
     {
       "path": "journey.circle.solo",
       "kind": "string",
       "params": [],
       "shipped": "just me for now"
+    },
+    {
+      "path": "journey.circle.soloBody",
+      "kind": "string",
+      "params": [],
+      "shipped": "start one any time from your week."
+    },
+    {
+      "path": "journey.circle.startBody",
+      "kind": "string",
+      "params": [],
+      "shipped": "you go first. friends join with your code."
+    },
+    {
+      "path": "journey.circle.startTitle",
+      "kind": "string",
+      "params": [],
+      "shipped": "start a circle"
     },
     {
       "path": "journey.circle.subtitle",
