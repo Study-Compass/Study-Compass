@@ -32,6 +32,9 @@ const justGoLandingEventSchema = require('../schemas/justGoLandingEvent');
 const justGoWaitlistSchema = require('../schemas/justGoWaitlist');
 const justGoCityInterestSchema = require('../schemas/justGoCityInterest');
 const justGoLandingQrSchema = require('../schemas/justGoLandingQr');
+const justGoCampaignSchema = require('../schemas/justGoCampaign');
+const justGoCampaignInviteSchema = require('../schemas/justGoCampaignInvite');
+const justGoAdmissionSchema = require('../schemas/justGoAdmission');
 const pivotComputeJobSchema = require('../schemas/pivotComputeJob');
 const pivotComputeJobAttemptSchema = require('../schemas/pivotComputeJobAttempt');
 const meridianJobRunSchema = require('../schemas/meridianJobRun');
@@ -55,6 +58,9 @@ const getGlobalModels = (req, ...names) => {
     const db = req.globalDb;
 
     const models = {
+        JustGoCampaign: db.model('JustGoCampaign', justGoCampaignSchema, 'justgo_campaigns'),
+        JustGoCampaignInvite: db.model('JustGoCampaignInvite', justGoCampaignInviteSchema, 'justgo_campaign_invites'),
+        JustGoAdmission: db.model('JustGoAdmission', justGoAdmissionSchema, 'justgo_admissions'),
         GlobalUser: db.model('GlobalUser', globalUserSchema, 'global_users'),
         PlatformRole: db.model('PlatformRole', platformRoleSchema, 'platform_roles'),
         PlatformAdminInvite: db.model(

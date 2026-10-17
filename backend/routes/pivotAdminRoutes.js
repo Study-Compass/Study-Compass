@@ -227,6 +227,8 @@ const router = express.Router();
 
 router.use(pivotRequestLogger);
 
+router.use('/campaigns', require('./justGoCampaignAdminRoutes'));
+
 function sendCopyAdminResult(res, result) {
   if (result.error) {
     return res.status(result.status || 400).json({
