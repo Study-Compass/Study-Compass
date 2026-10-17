@@ -3971,6 +3971,665 @@
       "shipped": "changed your mind?"
     },
     {
+      "path": "journey.age.cta",
+      "kind": "string",
+      "params": [],
+      "shipped": "next"
+    },
+    {
+      "path": "journey.age.hint",
+      "kind": "string",
+      "params": [],
+      "shipped": "some nights are 18+"
+    },
+    {
+      "path": "journey.age.label",
+      "kind": "string",
+      "params": [],
+      "shipped": "what year were you born?"
+    },
+    {
+      "path": "journey.age.title",
+      "kind": "template",
+      "params": [
+        "name"
+      ],
+      "shipped": "nice to meet you, {name}.",
+      "sampleArgs": {
+        "name": "alex"
+      }
+    },
+    {
+      "path": "journey.age.titleNoName",
+      "kind": "string",
+      "params": [],
+      "shipped": "nice to meet you."
+    },
+    {
+      "path": "journey.age.underage",
+      "kind": "string",
+      "params": [],
+      "shipped": "just go is 18+ for now."
+    },
+    {
+      "path": "journey.circle.add",
+      "kind": "string",
+      "params": [],
+      "shipped": "add"
+    },
+    {
+      "path": "journey.circle.added",
+      "kind": "string",
+      "params": [],
+      "shipped": "in"
+    },
+    {
+      "path": "journey.circle.circleName",
+      "kind": "string",
+      "params": [],
+      "shipped": "your circle"
+    },
+    {
+      "path": "journey.circle.ctaCount",
+      "kind": "template",
+      "params": [
+        "size"
+      ],
+      "shipped": "make my circle ({size})",
+      "sampleArgs": {
+        "size": 3
+      }
+    },
+    {
+      "path": "journey.circle.ctaEmpty",
+      "kind": "string",
+      "params": [],
+      "shipped": "pick a few friends"
+    },
+    {
+      "path": "journey.circle.matchBody",
+      "kind": "template",
+      "params": [
+        "name",
+        "eventName"
+      ],
+      "shipped": "{name} saved {eventName} too.",
+      "sampleArgs": {
+        "name": "alex",
+        "eventName": "comedy night"
+      }
+    },
+    {
+      "path": "journey.circle.matchCta",
+      "kind": "string",
+      "params": [],
+      "shipped": "nice"
+    },
+    {
+      "path": "journey.circle.matchTitle",
+      "kind": "string",
+      "params": [],
+      "shipped": "it’s a plan."
+    },
+    {
+      "path": "journey.circle.solo",
+      "kind": "string",
+      "params": [],
+      "shipped": "just me for now"
+    },
+    {
+      "path": "journey.circle.subtitle",
+      "kind": "string",
+      "params": [],
+      "shipped": "your circle swipes the same drop. when you overlap, it’s a plan."
+    },
+    {
+      "path": "journey.circle.title",
+      "kind": "string",
+      "params": [],
+      "shipped": "who’s in your circle?"
+    },
+    {
+      "path": "journey.city.cta",
+      "kind": "string",
+      "params": [],
+      "shipped": "this is my city"
+    },
+    {
+      "path": "journey.city.elsewhere",
+      "kind": "string",
+      "params": [],
+      "shipped": "somewhere else"
+    },
+    {
+      "path": "journey.city.elsewhereBody",
+      "kind": "string",
+      "params": [],
+      "shipped": "not there yet? peek at a live city."
+    },
+    {
+      "path": "journey.city.subtitle",
+      "kind": "string",
+      "params": [],
+      "shipped": "pick a city. we’ll show you what’s on."
+    },
+    {
+      "path": "journey.city.title",
+      "kind": "string",
+      "params": [],
+      "shipped": "where’s your week?"
+    },
+    {
+      "path": "journey.deck.hint",
+      "kind": "string",
+      "params": [],
+      "shipped": "right to save · left to pass"
+    },
+    {
+      "path": "journey.deck.progress",
+      "kind": "template",
+      "params": [
+        "index",
+        "total",
+        "saved"
+      ],
+      "shipped": "{index}/{total} · {saved} saved",
+      "sampleArgs": {
+        "index": 3,
+        "total": 170,
+        "saved": 2
+      }
+    },
+    {
+      "path": "journey.haystack.and",
+      "kind": "string",
+      "params": [],
+      "shipped": "and "
+    },
+    {
+      "path": "journey.haystack.ctaWant",
+      "kind": "string",
+      "params": [],
+      "shipped": "that’s what i want"
+    },
+    {
+      "path": "journey.haystack.events",
+      "kind": "string",
+      "params": [],
+      "shipped": " events."
+    },
+    {
+      "path": "journey.haystack.justGoBody",
+      "kind": "template",
+      "params": [
+        "picks",
+        "total"
+      ],
+      "shipped": "every week, about {picks} picks from all {total}. most you’d go to, a few you’d love.",
+      "sampleArgs": {
+        "picks": 15,
+        "total": 170
+      }
+    },
+    {
+      "path": "journey.haystack.justGoTitle",
+      "kind": "string",
+      "params": [],
+      "shipped": "we find them for you."
+    },
+    {
+      "path": "journey.haystack.weekIn",
+      "kind": "template",
+      "params": [
+        "city"
+      ],
+      "shipped": "in a week in {city}, there are ",
+      "sampleArgs": {
+        "city": "brooklyn"
+      }
+    },
+    {
+      "path": "journey.haystack.withJustGo",
+      "kind": "string",
+      "params": [],
+      "shipped": "with just go"
+    },
+    {
+      "path": "journey.haystack.wouldGo",
+      "kind": "string",
+      "params": [],
+      "shipped": " of these you’d actually go to."
+    },
+    {
+      "path": "journey.haystack.wouldLove",
+      "kind": "string",
+      "params": [],
+      "shipped": " you’d love."
+    },
+    {
+      "path": "journey.makeItStick.calendarBody",
+      "kind": "string",
+      "params": [],
+      "shipped": "we’ll keep it in a just go calendar on your phone."
+    },
+    {
+      "path": "journey.makeItStick.calendarTitle",
+      "kind": "template",
+      "params": [
+        "when"
+      ],
+      "shipped": "add {when} to your calendar",
+      "sampleArgs": {
+        "when": "thu 6pm"
+      }
+    },
+    {
+      "path": "journey.makeItStick.cta",
+      "kind": "string",
+      "params": [],
+      "shipped": "locked in"
+    },
+    {
+      "path": "journey.makeItStick.knockBody",
+      "kind": "string",
+      "params": [],
+      "shipped": "one ping a week. that’s the deal."
+    },
+    {
+      "path": "journey.makeItStick.knockTitle",
+      "kind": "string",
+      "params": [],
+      "shipped": "knock when monday’s pack lands"
+    },
+    {
+      "path": "journey.makeItStick.later",
+      "kind": "string",
+      "params": [],
+      "shipped": "later"
+    },
+    {
+      "path": "journey.makeItStick.on",
+      "kind": "string",
+      "params": [],
+      "shipped": "done"
+    },
+    {
+      "path": "journey.makeItStick.title",
+      "kind": "string",
+      "params": [],
+      "shipped": "make it stick"
+    },
+    {
+      "path": "journey.name.cta",
+      "kind": "string",
+      "params": [],
+      "shipped": "that’s me"
+    },
+    {
+      "path": "journey.name.label",
+      "kind": "string",
+      "params": [],
+      "shipped": "what should we call you?"
+    },
+    {
+      "path": "journey.name.title",
+      "kind": "string",
+      "params": [],
+      "shipped": "first things first."
+    },
+    {
+      "path": "journey.nameIt.admit",
+      "kind": "string",
+      "params": [],
+      "shipped": "admit"
+    },
+    {
+      "path": "journey.nameIt.apple",
+      "kind": "string",
+      "params": [],
+      "shipped": "continue with apple"
+    },
+    {
+      "path": "journey.nameIt.email",
+      "kind": "string",
+      "params": [],
+      "shipped": "continue with email"
+    },
+    {
+      "path": "journey.nameIt.google",
+      "kind": "string",
+      "params": [],
+      "shipped": "continue with google"
+    },
+    {
+      "path": "journey.nameIt.subtitle",
+      "kind": "string",
+      "params": [],
+      "shipped": "make it official. an account keeps your one, your picks, and next monday’s pack."
+    },
+    {
+      "path": "journey.nameIt.title",
+      "kind": "string",
+      "params": [],
+      "shipped": "put your name on it"
+    },
+    {
+      "path": "journey.note.cta",
+      "kind": "string",
+      "params": [],
+      "shipped": "open my week"
+    },
+    {
+      "path": "journey.note.kicker",
+      "kind": "string",
+      "params": [],
+      "shipped": "a note on the wall"
+    },
+    {
+      "path": "journey.note.nextPack",
+      "kind": "template",
+      "params": [
+        "when"
+      ],
+      "shipped": "next pack lands {when}",
+      "sampleArgs": {
+        "when": "thu 6pm"
+      }
+    },
+    {
+      "path": "journey.note.placeholder",
+      "kind": "string",
+      "params": [],
+      "shipped": "[placeholder] a few lines from the team about why just go exists, with a real photo. waiting on the real story."
+    },
+    {
+      "path": "journey.note.signoff",
+      "kind": "string",
+      "params": [],
+      "shipped": "— the just go team"
+    },
+    {
+      "path": "journey.pack.hint",
+      "kind": "string",
+      "params": [],
+      "shipped": "drag the tab to tear it open"
+    },
+    {
+      "path": "journey.pack.subtitle",
+      "kind": "template",
+      "params": [
+        "city",
+        "weekRange"
+      ],
+      "shipped": "{city} · {weekRange}",
+      "sampleArgs": {
+        "city": "brooklyn",
+        "weekRange": "jul 6–12"
+      }
+    },
+    {
+      "path": "journey.pack.title",
+      "kind": "template",
+      "params": [
+        "name"
+      ],
+      "shipped": "your week, {name}.",
+      "sampleArgs": {
+        "name": "alex"
+      }
+    },
+    {
+      "path": "journey.pack.titleNoName",
+      "kind": "string",
+      "params": [],
+      "shipped": "your week."
+    },
+    {
+      "path": "journey.problem.cta",
+      "kind": "string",
+      "params": [],
+      "shipped": "ugh, yes"
+    },
+    {
+      "path": "journey.problem.days.fri",
+      "kind": "string",
+      "params": [],
+      "shipped": "fri"
+    },
+    {
+      "path": "journey.problem.days.mon",
+      "kind": "string",
+      "params": [],
+      "shipped": "mon"
+    },
+    {
+      "path": "journey.problem.days.sat",
+      "kind": "string",
+      "params": [],
+      "shipped": "sat"
+    },
+    {
+      "path": "journey.problem.days.sun",
+      "kind": "string",
+      "params": [],
+      "shipped": "sun"
+    },
+    {
+      "path": "journey.problem.days.thu",
+      "kind": "string",
+      "params": [],
+      "shipped": "thu"
+    },
+    {
+      "path": "journey.problem.days.tue",
+      "kind": "string",
+      "params": [],
+      "shipped": "tue"
+    },
+    {
+      "path": "journey.problem.days.wed",
+      "kind": "string",
+      "params": [],
+      "shipped": "wed"
+    },
+    {
+      "path": "journey.problem.kicker",
+      "kind": "string",
+      "params": [],
+      "shipped": "a normal week"
+    },
+    {
+      "path": "journey.problem.scrollLegend",
+      "kind": "string",
+      "params": [],
+      "shipped": "scrolling for something to do"
+    },
+    {
+      "path": "journey.problem.student.body",
+      "kind": "string",
+      "params": [],
+      "shipped": "there’s a whole city past campus. finding it shouldn’t take all week."
+    },
+    {
+      "path": "journey.problem.student.fridayLegend",
+      "kind": "string",
+      "params": [],
+      "shipped": "the same party, again"
+    },
+    {
+      "path": "journey.problem.student.title",
+      "kind": "string",
+      "params": [],
+      "shipped": "class. scroll. repeat."
+    },
+    {
+      "path": "journey.problem.student.weekdayLegend",
+      "kind": "string",
+      "params": [],
+      "shipped": "class"
+    },
+    {
+      "path": "journey.problem.working.body",
+      "kind": "string",
+      "params": [],
+      "shipped": "there’s a whole city out there. finding it shouldn’t take all week."
+    },
+    {
+      "path": "journey.problem.working.fridayLegend",
+      "kind": "string",
+      "params": [],
+      "shipped": "too tired"
+    },
+    {
+      "path": "journey.problem.working.title",
+      "kind": "string",
+      "params": [],
+      "shipped": "work. scroll. repeat."
+    },
+    {
+      "path": "journey.problem.working.weekdayLegend",
+      "kind": "string",
+      "params": [],
+      "shipped": "9-5"
+    },
+    {
+      "path": "journey.thatsTheWeek.body",
+      "kind": "string",
+      "params": [],
+      "shipped": "15 things. no feed, no endless scroll. a new pack every monday."
+    },
+    {
+      "path": "journey.thatsTheWeek.cta",
+      "kind": "string",
+      "params": [],
+      "shipped": "that’s me"
+    },
+    {
+      "path": "journey.thatsTheWeek.nothingSaved",
+      "kind": "string",
+      "params": [],
+      "shipped": "saved nothing? picky. we’ll learn from that too."
+    },
+    {
+      "path": "journey.thatsTheWeek.stickersHint",
+      "kind": "string",
+      "params": [],
+      "shipped": "tap a sticker to toss it"
+    },
+    {
+      "path": "journey.thatsTheWeek.stickersTitle",
+      "kind": "string",
+      "params": [],
+      "shipped": "what we picked up"
+    },
+    {
+      "path": "journey.thatsTheWeek.title",
+      "kind": "string",
+      "params": [],
+      "shipped": "that’s the week."
+    },
+    {
+      "path": "journey.theOne.change",
+      "kind": "string",
+      "params": [],
+      "shipped": "pick a different one"
+    },
+    {
+      "path": "journey.theOne.cta",
+      "kind": "string",
+      "params": [],
+      "shipped": "that’s the one"
+    },
+    {
+      "path": "journey.theOne.fallback",
+      "kind": "string",
+      "params": [],
+      "shipped": "nothing saved, so here are the top three."
+    },
+    {
+      "path": "journey.theOne.subtitle",
+      "kind": "string",
+      "params": [],
+      "shipped": "pick the one you’d actually leave the house for."
+    },
+    {
+      "path": "journey.theOne.title",
+      "kind": "string",
+      "params": [],
+      "shipped": "if you only go to one…"
+    },
+    {
+      "path": "journey.whatIs.circle.body",
+      "kind": "string",
+      "params": [],
+      "shipped": "friends swipe the same drop. rank the overlaps, then lock in one night together."
+    },
+    {
+      "path": "journey.whatIs.circle.title",
+      "kind": "string",
+      "params": [],
+      "shipped": "your circle"
+    },
+    {
+      "path": "journey.whatIs.cta",
+      "kind": "string",
+      "params": [],
+      "shipped": "ok, show me"
+    },
+    {
+      "path": "journey.whatIs.drop.body",
+      "kind": "string",
+      "params": [],
+      "shipped": "15 things on in your city this week. not a feed."
+    },
+    {
+      "path": "journey.whatIs.drop.title",
+      "kind": "string",
+      "params": [],
+      "shipped": "the monday drop"
+    },
+    {
+      "path": "journey.whatIs.justGo.body",
+      "kind": "string",
+      "params": [],
+      "shipped": "times and tickets in one place. the rest is up to you."
+    },
+    {
+      "path": "journey.whatIs.justGo.title",
+      "kind": "string",
+      "params": [],
+      "shipped": "just go"
+    },
+    {
+      "path": "journey.whatIs.showAll",
+      "kind": "string",
+      "params": [],
+      "shipped": "show the rest"
+    },
+    {
+      "path": "journey.whatIs.so",
+      "kind": "template",
+      "params": [
+        "name"
+      ],
+      "shipped": "so, {name}…",
+      "sampleArgs": {
+        "name": "alex"
+      }
+    },
+    {
+      "path": "journey.whatIs.soNoName",
+      "kind": "string",
+      "params": [],
+      "shipped": "so…"
+    },
+    {
+      "path": "journey.whatIs.title",
+      "kind": "string",
+      "params": [],
+      "shipped": "what’s just go?"
+    },
+    {
       "path": "landing.app.cta",
       "kind": "string",
       "params": [],
