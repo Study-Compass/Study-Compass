@@ -4266,6 +4266,18 @@
       }
     },
     {
+      "path": "journey.makeItStick.contactsBody",
+      "kind": "string",
+      "params": [],
+      "shipped": "see who’s already on just go. matched on your phone; we never keep your contacts."
+    },
+    {
+      "path": "journey.makeItStick.contactsTitle",
+      "kind": "string",
+      "params": [],
+      "shipped": "find your people"
+    },
+    {
       "path": "journey.makeItStick.cta",
       "kind": "string",
       "params": [],
@@ -4288,6 +4300,12 @@
       "kind": "string",
       "params": [],
       "shipped": "later"
+    },
+    {
+      "path": "journey.makeItStick.offInSettings",
+      "kind": "string",
+      "params": [],
+      "shipped": "it’s off in settings. tap to turn it on."
     },
     {
       "path": "journey.makeItStick.on",
