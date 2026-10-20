@@ -228,6 +228,7 @@ const router = express.Router();
 router.use(pivotRequestLogger);
 
 router.use('/campaigns', require('./justGoCampaignAdminRoutes'));
+router.use('/tenants/:tenantKey/tags', require('./justGoTagAdminRoutes'));
 
 function sendCopyAdminResult(res, result) {
   if (result.error) {

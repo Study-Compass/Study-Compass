@@ -116,6 +116,7 @@ const router = express.Router();
 router.use(pivotRequestLogger);
 
 router.use('/campaign-invites', require('./justGoCampaignInviteRoutes'));
+router.use('/tags', require('./justGoTagRoutes'));
 router.use('/crews', pivotCrewRoutes);
 router.use('/creator', pivotCreatorRoutes);
 
