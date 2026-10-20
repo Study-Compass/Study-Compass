@@ -4278,6 +4278,53 @@
       "shipped": "where’s your week?"
     },
     {
+      "path": "journey.cover.cta",
+      "kind": "string",
+      "params": [],
+      "shipped": "let’s go"
+    },
+    {
+      "path": "journey.cover.invitedBy",
+      "kind": "template",
+      "params": [
+        "name"
+      ],
+      "shipped": "{name} invited you",
+      "sampleArgs": {
+        "name": "alex"
+      }
+    },
+    {
+      "path": "journey.cover.newHere",
+      "kind": "string",
+      "params": [],
+      "shipped": "new here? let’s go"
+    },
+    {
+      "path": "journey.cover.signIn",
+      "kind": "string",
+      "params": [],
+      "shipped": "already on just go? sign in"
+    },
+    {
+      "path": "journey.cover.signInCta",
+      "kind": "string",
+      "params": [],
+      "shipped": "sign in"
+    },
+    {
+      "path": "journey.cover.tagline",
+      "kind": "string",
+      "params": [],
+      "shipped": "it’s in the name."
+    },
+    {
+      "path": "journey.cover.welcomeBack",
+      "kind": "string",
+      "params": [],
+      "shipped": "welcome back."
+    },
+    {
       "path": "journey.deck.hint",
       "kind": "string",
       "params": [],
@@ -4323,10 +4370,46 @@
       "shipped": "couldn’t open this week’s drop."
     },
     {
+      "path": "journey.drop.loading",
+      "kind": "string",
+      "params": [],
+      "shipped": "opening the pack…"
+    },
+    {
+      "path": "journey.drop.offline",
+      "kind": "string",
+      "params": [],
+      "shipped": "you’re offline."
+    },
+    {
+      "path": "journey.drop.offlineBody",
+      "kind": "string",
+      "params": [],
+      "shipped": "the pack opens the moment you’re back."
+    },
+    {
       "path": "journey.drop.retry",
       "kind": "string",
       "params": [],
       "shipped": "try again"
+    },
+    {
+      "path": "journey.drop.stuck",
+      "kind": "string",
+      "params": [],
+      "shipped": "this week’s drop is being stubborn."
+    },
+    {
+      "path": "journey.drop.stuckBody",
+      "kind": "string",
+      "params": [],
+      "shipped": "it’ll be waiting in the app. let’s keep going."
+    },
+    {
+      "path": "journey.drop.stuckCta",
+      "kind": "string",
+      "params": [],
+      "shipped": "keep going"
     },
     {
       "path": "journey.haystack.and",
@@ -4536,6 +4619,18 @@
       "kind": "string",
       "params": [],
       "shipped": "passwords need at least 8 characters."
+    },
+    {
+      "path": "journey.nameIt.returnBody",
+      "kind": "string",
+      "params": [],
+      "shipped": "sign in to pick up your week."
+    },
+    {
+      "path": "journey.nameIt.returnTitle",
+      "kind": "string",
+      "params": [],
+      "shipped": "welcome back."
     },
     {
       "path": "journey.nameIt.saving",
@@ -4759,6 +4854,12 @@
       "shipped": "saved nothing? picky. we’ll learn from that too."
     },
     {
+      "path": "journey.thatsTheWeek.pickerBody",
+      "kind": "string",
+      "params": [],
+      "shipped": "pick a few, so your first pack fits."
+    },
+    {
       "path": "journey.thatsTheWeek.pickerDone",
       "kind": "string",
       "params": [],
@@ -4817,6 +4918,47 @@
       "kind": "string",
       "params": [],
       "shipped": "if you only go to one…"
+    },
+    {
+      "path": "journey.welcomeBack.cta",
+      "kind": "string",
+      "params": [],
+      "shipped": "open my week"
+    },
+    {
+      "path": "journey.welcomeBack.ctaMore",
+      "kind": "string",
+      "params": [],
+      "shipped": "keep going"
+    },
+    {
+      "path": "journey.welcomeBack.swipesSaved",
+      "kind": "string",
+      "params": [],
+      "shipped": "your swipes are in your week."
+    },
+    {
+      "path": "journey.welcomeBack.title",
+      "kind": "template",
+      "params": [
+        "name"
+      ],
+      "shipped": "welcome back, {name}.",
+      "sampleArgs": {
+        "name": "alex"
+      }
+    },
+    {
+      "path": "journey.welcomeBack.titleNoName",
+      "kind": "string",
+      "params": [],
+      "shipped": "welcome back."
+    },
+    {
+      "path": "journey.welcomeBack.waiting",
+      "kind": "string",
+      "params": [],
+      "shipped": "your week’s waiting."
     },
     {
       "path": "journey.whatIs.circle.body",
