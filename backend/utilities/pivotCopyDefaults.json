@@ -4239,7 +4239,13 @@
       "path": "journey.city.backToList",
       "kind": "string",
       "params": [],
-      "shipped": "back to the list"
+      "shipped": "pick another city"
+    },
+    {
+      "path": "journey.city.change",
+      "kind": "string",
+      "params": [],
+      "shipped": "change"
     },
     {
       "path": "journey.city.cta",
@@ -4260,6 +4266,18 @@
       "shipped": "search any city. not live yet? we’ll tell you when."
     },
     {
+      "path": "journey.city.finding",
+      "kind": "string",
+      "params": [],
+      "shipped": "finding your city…"
+    },
+    {
+      "path": "journey.city.live",
+      "kind": "string",
+      "params": [],
+      "shipped": "live on just go"
+    },
+    {
       "path": "journey.city.searchLabel",
       "kind": "string",
       "params": [],
@@ -4272,10 +4290,39 @@
       "shipped": "pick a city. we’ll show you what’s on."
     },
     {
+      "path": "journey.city.suggested",
+      "kind": "string",
+      "params": [],
+      "shipped": "in your time zone"
+    },
+    {
       "path": "journey.city.title",
       "kind": "string",
       "params": [],
       "shipped": "where’s your week?"
+    },
+    {
+      "path": "journey.city.waitlistBody",
+      "kind": "string",
+      "params": [],
+      "shipped": "leave your email and we’ll tell you when it lands."
+    },
+    {
+      "path": "journey.city.waitlistDone",
+      "kind": "string",
+      "params": [],
+      "shipped": "you’re on the list. we’ll email you when it lands."
+    },
+    {
+      "path": "journey.city.waitlistTitle",
+      "kind": "template",
+      "params": [
+        "city"
+      ],
+      "shipped": "just go isn’t in {city} yet",
+      "sampleArgs": {
+        "city": "brooklyn"
+      }
     },
     {
       "path": "journey.cover.cta",
@@ -4478,10 +4525,16 @@
       "shipped": " you’d love."
     },
     {
+      "path": "journey.makeItStick.body",
+      "kind": "string",
+      "params": [],
+      "shipped": "say yes to the ones you want. you can change them in settings any time."
+    },
+    {
       "path": "journey.makeItStick.calendarBody",
       "kind": "string",
       "params": [],
-      "shipped": "we’ll keep it in a just go calendar on your phone."
+      "shipped": "we’ll add it to a just go calendar on your phone. we only add plans you pick."
     },
     {
       "path": "journey.makeItStick.calendarTitle",
@@ -4489,7 +4542,7 @@
       "params": [
         "when"
       ],
-      "shipped": "add {when} to your calendar",
+      "shipped": "keep {when} in your calendar",
       "sampleArgs": {
         "when": "thu 6pm"
       }
@@ -4498,55 +4551,37 @@
       "path": "journey.makeItStick.contactsBody",
       "kind": "string",
       "params": [],
-      "shipped": "see who’s already on just go. matched on your phone; we never keep your contacts."
+      "shipped": "we match hashed numbers and emails to find people on just go. we don’t store your contacts or message them."
     },
     {
       "path": "journey.makeItStick.contactsTitle",
       "kind": "string",
       "params": [],
-      "shipped": "find your people"
+      "shipped": "see which friends are here"
     },
     {
-      "path": "journey.makeItStick.cta",
+      "path": "journey.makeItStick.continue",
       "kind": "string",
       "params": [],
-      "shipped": "locked in"
+      "shipped": "continue"
     },
     {
       "path": "journey.makeItStick.knockBody",
       "kind": "string",
       "params": [],
-      "shipped": "one ping a week. that’s the deal."
+      "shipped": "we’ll let you know when monday’s pack is out and when your circle makes plans."
     },
     {
       "path": "journey.makeItStick.knockTitle",
       "kind": "string",
       "params": [],
-      "shipped": "knock when monday’s pack lands"
-    },
-    {
-      "path": "journey.makeItStick.later",
-      "kind": "string",
-      "params": [],
-      "shipped": "later"
-    },
-    {
-      "path": "journey.makeItStick.offInSettings",
-      "kind": "string",
-      "params": [],
-      "shipped": "it’s off in settings. tap to turn it on."
-    },
-    {
-      "path": "journey.makeItStick.on",
-      "kind": "string",
-      "params": [],
-      "shipped": "done"
+      "shipped": "know when the drop lands"
     },
     {
       "path": "journey.makeItStick.title",
       "kind": "string",
       "params": [],
-      "shipped": "make it stick"
+      "shipped": "your phone will ask about these"
     },
     {
       "path": "journey.name.cta",
